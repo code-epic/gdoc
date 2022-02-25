@@ -1,0 +1,516 @@
+CREATE OR REPLACE FUNCTION ADM_INFI."DAYS" (p_from_date IN DATE, p_to_date IN DATE)
+   RETURN NUMBER IS
+b_days NUMBER;
+BEGIN
+
+  b_days := TRUNC(p_to_date) - TRUNC(p_from_date)  
+       - ((TRUNC(p_to_date,'D')-TRUNC(to_date(p_from_date),'D'))/7)*2
+       + 1;
+
+  IF TO_CHAR(p_to_date,'D') = '7' THEN
+    b_days := b_days - 1;
+  END IF;
+
+  IF TO_CHAR(p_from_date,'D') = '1' THEN
+    b_days := b_days - 1;
+  END IF;
+  RETURN(b_days);
+
+END;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI.fconv_bsf
+(FBFE_IMPORTE IN NUMBER) return NUMBER
+is
+BFE_IMPORTE NUMBER(30,5);
+BFE_DIFER   NUMBER(30,7);
+BFE_RETORNO NUMBER;
+
+begin
+BFE_IMPORTE := FBFE_IMPORTE;
+VJ8OCON0(BFE_IMPORTE,BFE_DIFER,BFE_RETORNO,FVJ8ODIV0('BFE_FECHA_VIGENCIA'));
+IF BFE_RETORNO = 99 then
+  return(FBFE_IMPORTE);
+else
+  return(BFE_IMPORTE);
+end if;
+
+end FCONV_BSF;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI.fechaPosicionCutodia(fCLIENT_ID IN infi_tb_702_titulos_cierre.CLIENT_ID%type,
+                                                fTITULO_ID IN infi_tb_702_titulos_cierre.TITULO_ID%type,
+                                                fTIPO_PRODUCTO_ID IN infi_tb_702_titulos_cierre.TIPO_PRODUCTO_ID %type)
+ RETURN date IS
+ 
+ fechaCustodia infi_tb_702_titulos_cierre.fecha_cierre%type := trunc(sysdate);
+/******************************************************************************
+   NAME:       fechaPosicionCutodia
+   PURPOSE:    
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        22/01/2019          1. Created this function.
+
+   NOTES:
+
+   Automatically available Auto Replace Keywords:
+      Object Name:     fechaPosicionCutodia
+      Sysdate:         22/01/2019
+      Date and Time:   22/01/2019, 11:38:35 a.m., and 22/01/2019 11:38:35 a.m.
+      Username:         Alexander Rincón 
+      Table Name:       infi_tb_702_titulos_cierre
+
+******************************************************************************/
+BEGIN
+/****  Se busca la fecha de Custiodia de acuerdo a los datos
+       Cliente , Título y tipo de producto ***/
+    SELECT trunc(c.FECHA_CIERRE) 
+    INTO   fechaCustodia
+    FROM   INFI_TB_702_TITULOS_CIERRE c, (select ci.CLIENT_ID, ci.titulo_id, ci.TIPO_PRODUCTO_ID, max(ci.FECHA_CIERRE) fecha 
+                                          from   INFI_TB_702_TITULOS_CIERRE ci
+                                          where  ci.CLIENT_ID = fCLIENT_ID
+                                          and    ci.TITULO_ID = fTITULO_ID
+                                          and    ci.TIPO_PRODUCTO_ID = fTIPO_PRODUCTO_ID    
+                                          group by ci.CLIENT_ID, ci.titulo_id, ci.TIPO_PRODUCTO_ID) cd
+    WHERE  c.CLIENT_ID = cd.CLIENT_ID
+    AND    c.TITULO_ID = cd.TITULO_ID
+    AND    c.TIPO_PRODUCTO_ID = cd.TIPO_PRODUCTO_ID
+    AND    c.FECHA_CIERRE = cd.fecha
+    AND    c.TITCUS_CANTIDAD > 0;
+   RETURN fechaCustodia;
+  
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+          RETURN fechaCustodia + 1;
+     WHEN OTHERS THEN
+       -- Consider logging the error and then re-raise
+          RETURN fechaCustodia + 1;
+END fechaPosicionCutodia;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI."FUNC_INFI_CANTIDAD_BLOQUEADA" (
+-- Generated 18/03/2011
+-- Creado por: Nelson Visbal
+-- Modified 28/12/2012
+-- Modificado por: Dayana Torres
+-- Procedimiento para obtener la cantidad bloqueada de un determinado título a una fecha indicada
+
+  pclient_id INFI_TB_201_CTES.CLIENT_ID%TYPE,
+  ptitulo_id INFI_TB_701_TITULOS.TITULO_ID%TYPE,
+  ptipo_producto_id INFI_TB_701_TITULOS.TIPO_PRODUCTO_ID%TYPE,
+  pfecha  in varchar2
+) return NUMBER AS
+vcantidadBloqueada INFI_TB_701_TITULOS.TITCUS_CANTIDAD%TYPE;
+BEGIN
+vcantidadBloqueada:=0;
+  BEGIN
+  select nvl(sum(titcus_cantidad),0) into vcantidadBloqueada from infi_tb_705_titulos_bloq_hist where titcus_cantidad<>0 and fecha in
+   (
+     select max(fecha) from infi_tb_705_titulos_bloq_hist
+    where client_id=pclient_id and titulo_id=ptitulo_id and trunc(fecha) <= to_date(pfecha, 'dd-MM-yyyy')
+    and tipo_producto_id=ptipo_producto_id  group by tipblo_id
+   ) and client_id=pclient_id and titulo_id=ptitulo_id and tipo_producto_id=ptipo_producto_id;
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+  NULL;
+   END;
+return vcantidadBloqueada;
+END FUNC_INFI_CANTIDAD_BLOQUEADA;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI."FUNC_INFI_CANT_BLOQUEADA_TIPO" (
+-- Generated 11/04/2011
+-- Creado por : Nelson Visbal
+-- Procedimiento para obtener la cantidad bloqueada de un determinado título a una fecha indicada y de un determinado tipo de bloqueo
+  pclient_id INFI_TB_201_CTES.CLIENT_ID%TYPE,
+  ptitulo_id INFI_TB_701_TITULOS.TITULO_ID%TYPE,
+  ptipo_producto_id INFI_TB_701_TITULOS.TIPO_PRODUCTO_ID%TYPE,
+  pfecha  in varchar2,
+--  pfecha in INFI_TB_705_TITULOS_BLOQ_HIST.FECHA%TYPE,
+  ptipoBloqueo  INFI_TB_700_TIPO_BLOQUEO.TIPBLO_ID%TYPE
+) return NUMBER AS
+vcantidadBloqueada INFI_TB_701_TITULOS.TITCUS_CANTIDAD%TYPE;
+BEGIN
+vcantidadBloqueada:=0;
+  BEGIN
+  select nvl(titcus_cantidad,0) into vcantidadBloqueada from infi_tb_705_titulos_bloq_hist where fecha =
+   (
+     select max(fecha) from infi_tb_705_titulos_bloq_hist
+    where client_id=pclient_id and titulo_id=ptitulo_id and trunc(fecha) <= to_date(pfecha, 'dd-MM-yyyy')
+    and tipo_producto_id=ptipo_producto_id
+   ) and client_id=pclient_id and titulo_id=ptitulo_id and tipo_producto_id=ptipo_producto_id and tipblo_id=ptipoBloqueo;
+
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+  NULL;
+   END;
+return vcantidadBloqueada;
+END FUNC_INFI_CANT_BLOQUEADA_TIPO;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI."FUNC_INFI_POSICION_A_FECHA" (
+-- Generated 11/04/2011
+-- Creado por : Nelson Visbal
+-- Procedimiento para obtener la posición de un título a una fecha dada y por un tipo de producto
+  pclient_id INFI_TB_702_TITULOS_CIERRE.CLIENT_ID%TYPE,
+  ptitulo_id INFI_TB_702_TITULOS_CIERRE.TITULO_ID%TYPE,
+  ptipo_producto_id INFI_TB_702_TITULOS_CIERRE.TIPO_PRODUCTO_ID%TYPE,
+  pfecha  in varchar2
+) return NUMBER AS
+vposicion INFI_TB_702_TITULOS_CIERRE.TITCUS_CANTIDAD%TYPE;
+BEGIN
+vposicion:=0;
+  BEGIN
+  select nvl(a.titcus_cantidad,0) into vposicion from infi_tb_702_titulos_cierre a,
+ (
+ select client_id,titulo_id,tipo_producto_id,max(fecha_cierre) fecha_cierre
+   from infi_tb_702_titulos_cierre
+   where trunc(fecha_cierre) <= to_date(pfecha, 'dd-MM-yyyy')
+   group by client_id,titulo_id,tipo_producto_id
+ ) b
+ where a.client_id = b.client_id and a.titulo_id = b.titulo_id and a.tipo_producto_id = b.tipo_producto_id and
+ a.fecha_cierre = b.fecha_cierre and a.client_id=pclient_id and a.titulo_id=ptitulo_id and a.tipo_producto_id=ptipo_producto_id;
+
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+  NULL;
+   END;
+return vposicion;
+END FUNC_INFI_POSICION_A_FECHA;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI."FUNC_INFI_PRECIO_RECOMPRA_HIST" (
+-- Generated 21/03/2011
+-- Creado por : Nelson Visbal
+-- Procedimiento para obtener el último precio aprobado para un título a una fecha determinada
+  ptitulo_id INFI_TB_119_TITULOS_PREC_HIST.TITULO_ID%TYPE,
+  ptipo_producto_id INFI_TB_119_TITULOS_PREC_HIST.TIPO_PRODUCTO_ID%TYPE,
+  pfecha  in varchar2
+) return NUMBER AS
+vprecio INFI_TB_119_TITULOS_PREC_HIST.titulos_precio_recompra%TYPE;
+BEGIN
+vprecio:=0;
+  BEGIN
+  select nvl(titulos_precio_recompra,0) INTO vprecio from infi_tb_119_titulos_prec_hist
+  where fecha_aprobacion IN (
+    select max(fecha_aprobacion) from infi_tb_119_titulos_prec_hist
+      where trunc(fecha_aprobacion) <=  to_date(pfecha, 'dd-MM-yyyy')
+   and titulo_id=ptitulo_id and tipo_producto_id=ptipo_producto_id
+  );
+
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+  NULL;
+   END;
+return vprecio;
+END FUNC_INFI_PRECIO_RECOMPRA_HIST;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI.fvj8ocon0
+(FVJE_IMPORTE IN NUMBER, FVJE_FECHA_VIGENCIA IN VARCHAR2) return NUMBER
+is
+VJE_IMPORTE NUMBER(30,5);
+VJE_DIFER   NUMBER(30,7);
+VJE_RETORNO NUMBER;
+VJE_FECHA_VIGENCIA VARCHAR2(8);
+begin
+VJE_IMPORTE := FVJE_IMPORTE;
+VJE_FECHA_VIGENCIA := FVJE_FECHA_VIGENCIA;
+VJ8OCON0(VJE_IMPORTE,VJE_DIFER,VJE_RETORNO,VJE_FECHA_VIGENCIA);
+IF VJE_RETORNO = 99 then
+  return(FVJE_IMPORTE);
+else
+  return(VJE_IMPORTE);
+end if;
+end FVJ8OCON0;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI.FVJ8ODIV0
+(FVJE_PARAMETRO IN VARCHAR2) return VARCHAR2
+is
+VJE_SWIFT VARCHAR2(3);
+VJE_ISO VARCHAR2(3);
+VJE_LABEL VARCHAR2(5);
+VJE_LIT_SINGULAR VARCHAR2(16);
+VJE_LIT_PLURAL VARCHAR2(19);
+VJE_FECHA_VIGENCIA VARCHAR2(8);
+VJE_SWIFT_OLD VARCHAR2(3);
+VJE_ISO_OLD VARCHAR2(3);
+VJE_LABEL_OLD VARCHAR2(5);
+VJE_LIT_SINGULAR_OLD VARCHAR2(14);
+VJE_LIT_PLURAL_OLD VARCHAR2(17);
+VJE_LIT_MIL VARCHAR2(3);
+VJE_LIT_MILLON VARCHAR2(3);
+
+begin
+
+VJ8ODIV0(VJE_SWIFT,VJE_ISO,VJE_LABEL,VJE_LIT_SINGULAR,VJE_LIT_PLURAL,VJE_FECHA_VIGENCIA,VJE_SWIFT_OLD,VJE_ISO_OLD,VJE_LABEL_OLD,VJE_LIT_SINGULAR_OLD,VJE_LIT_PLURAL_OLD,VJE_LIT_MIL,VJE_LIT_MILLON);
+
+IF FVJE_PARAMETRO = 'BFE_SWIFT' then
+  return(VJE_SWIFT);
+elsif FVJE_PARAMETRO = 'BFE_ISO' then
+  return(VJE_ISO);
+elsif FVJE_PARAMETRO = 'BFE_LABEL' then
+  return(VJE_LABEL);
+elsif FVJE_PARAMETRO = 'BFE_LIT_SINGULAR' then
+  return(VJE_LIT_SINGULAR);
+elsif FVJE_PARAMETRO = 'BFE_LIT_PLURAL' then
+  return(VJE_LIT_PLURAL);
+elsif FVJE_PARAMETRO = 'BFE_FECHA_VIGENCIA' then
+  return(VJE_FECHA_VIGENCIA);
+elsif FVJE_PARAMETRO = 'BFE_SWIFT_OLD' then
+  return(VJE_SWIFT_OLD);
+elsif FVJE_PARAMETRO = 'BFE_ISO_OLD' then
+  return(VJE_ISO_OLD);
+elsif FVJE_PARAMETRO = 'BFE_LABEL_OLD' then
+  return(VJE_LABEL_OLD);
+elsif FVJE_PARAMETRO = 'BFE_LIT_SINGULAR_OLD' then
+  return(VJE_LIT_SINGULAR_OLD);
+elsif FVJE_PARAMETRO = 'BFE_LIT_PLURAL_OLD' then
+  return(VJE_LIT_PLURAL_OLD);
+elsif FVJE_PARAMETRO = 'BFE_LIT_MIL' then
+  return(VJE_LIT_MIL);
+elsif FVJE_PARAMETRO = 'BFE_LIT_MILLON' then
+  return(VJE_LIT_MILLON);
+else
+  return(NULL);
+end if;
+
+end FVJ8ODIV0;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI."INFI_GETDIGVRF" (prif        IN      varchar2) return number AS
+-- Start of DDL Script for Procedure ADM_INFI.INFI_CARMEN
+-- Generated 10/08/2010 06:15:00 p.m. from ADM_INFI@INFID.BANVENEZ.COM
+-- Creado por : Alexander Rincón el 10/08/2010
+-- Modificado por : NM25287 el 10/10/2017. Inclusión del tipo de persona C ('Comuna' o ''C.Comunal)
+-- Procedimiento para Calcular el digito verificador de un RIF o Cedula
+-- con un formato de entrada de Tipo de persona y 8 digitos 'V07259635'
+  dig1      varchar2(1);
+  dig2      number(3);
+  dig3      number(3);
+  dig4      number(3);
+  dig5      number(3);
+  dig6      number(3);
+  dig7      number(3);
+  dig8      number(3);
+  dig9      number(3);
+  dig11     number(3);
+  totdig    number(3);
+  pdigvrf   number(3);
+BEGIN
+  dig1 := substr(prif,1,1);
+  dig2 := to_number(substr(prif,2,1));
+  dig2 := dig2*3;
+  dig3 := to_number(substr(prif,3,1));
+  dig3 := dig3*2;
+  dig4 := to_number(substr(prif,4,1));
+  dig4 := dig4*7;
+  dig5 := to_number(substr(prif,5,1));
+  dig5 := dig5*6;
+  dig6 := to_number(substr(prif,6,1));
+  dig6 := dig6*5;
+  dig7 := to_number(substr(prif,7,1));
+  dig7 := dig7*4;
+  dig8 := to_number(substr(prif,8,1));
+  dig8 := dig8*3;
+  dig9 := to_number(substr(prif,9,1));
+  dig9 := dig9*2;
+  IF dig1 = 'V' THEN
+     dig11 := 1;
+   ELSIF dig1 = 'E' THEN
+         dig11 := 2;
+   --ELSIF dig1 = 'J' THEN
+    ELSIF dig1 = 'J' OR dig1 = 'C' THEN --Inclusión del tipo de persona C ('Comuna' o ''C.Comunal)
+         dig11 := 3;
+   ELSIF dig1 = 'G' THEN
+         dig11 := 5;
+   ELSIF dig1 = 'W' THEN
+         dig11 := 9;
+  END IF;
+  totdig := (dig2 + dig3 + dig4 + dig5 + dig6 + dig7 + dig8 + dig9 + (dig11*4));
+  WHILE totdig >= 11 LOOP
+        totdig := totdig - 11;
+  END LOOP;
+  IF totdig = 0 or totdig = 1 THEN
+     pdigvrf := 0;
+   ELSIF totdig != 0 or totdig != 1 THEN
+         pdigvrf := totdig - 11;
+  END IF;
+  return ABS(pdigvrf);
+END;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI."INFI_GETDIGVRF_RESPALDO" (prif        IN      varchar2) return number AS
+-- Start of DDL Script for Procedure ADM_INFI.INFI_CARMEN
+-- Generated 10/08/2010 06:15:00 p.m. from ADM_INFI@INFID.BANVENEZ.COM
+-- Creado por : Alexander Rincón el 10/08/2010
+-- Procedimiento para Calcular el digito verificador de un RIF o Cedula
+-- con un formato de entrada de Tipo de persona y 9 digitos 'V007259635'
+  dig1      varchar2(1);
+  dig2      number(3);
+  dig3      number(3);
+  dig4      number(3);
+  dig5      number(3);
+  dig6      number(3);
+  dig7      number(3);
+  dig8      number(3);
+  dig9      number(3);
+  dig11     number(3);
+  totdig    number(3);
+  pdigvrf   number(3);
+BEGIN
+  dig1 := substr(prif,1,1);
+  dig2 := to_number(substr(prif,2,1));
+  dig2 := dig2*3;
+  dig3 := to_number(substr(prif,3,1));
+  dig3 := dig3*2;
+  dig4 := to_number(substr(prif,4,1));
+  dig4 := dig4*7;
+  dig5 := to_number(substr(prif,5,1));
+  dig5 := dig5*6;
+  dig6 := to_number(substr(prif,6,1));
+  dig6 := dig6*5;
+  dig7 := to_number(substr(prif,7,1));
+  dig7 := dig7*4;
+  dig8 := to_number(substr(prif,8,1));
+  dig8 := dig8*3;
+  dig9 := to_number(substr(prif,9,1));
+  dig9 := dig9*2;
+  IF dig1 = 'V' THEN
+     dig11 := 1;
+   ELSIF dig1 = 'E' THEN
+         dig11 := 2;
+   ELSIF dig1 = 'J' THEN
+         dig11 := 3;
+   ELSIF dig1 = 'G' THEN
+         dig11 := 5;
+   ELSIF dig1 = 'W' THEN
+         dig11 := 9;
+  END IF;
+  totdig := (dig2 + dig3 + dig4 + dig5 + dig6 + dig7 + dig8 + dig9 + (dig11*4));
+  WHILE totdig >= 11 LOOP
+        totdig := totdig - 11;
+  END LOOP;
+  IF totdig = 0 or totdig = 1 THEN
+     pdigvrf := 0;
+   ELSIF totdig != 0 or totdig != 1 THEN
+         pdigvrf := totdig - 11;
+  END IF;
+  return ABS(pdigvrf);
+END;
+/
+
+
+CREATE OR REPLACE FUNCTION ADM_INFI.validacion_horarios(p_bloter_id in infi_tb_102_bloter.BLOTER_ID%TYPE, p_undinv_id IN infi_tb_106_unidad_inversion.UNDINV_ID%type) RETURN NUMBER IS
+tmpVar NUMBER;
+/******************************************************************************
+   NAME:       validacion_horarios
+   PURPOSE:    Verificacion de la disponibilidad de horario segun la unidad de inversion y blotter
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        02/06/2016          1. Created this function.
+
+   NOTES:
+
+   Automatically available Auto Replace Keywords:
+      Object Name:     validacion_horarios
+      Sysdate:         02/06/2016
+      Date and Time:   02/06/2016, 09:46:24 a.m., and 02/06/2016 09:46:24 a.m.
+      Username:         (set in TOAD Options, Procedure Editor)
+      Table Name:       (set in the "New PL/SQL Object" dialog)
+
+******************************************************************************/
+ERROR_INESPERADO EXCEPTION;
+
+BEGIN
+
+    BEGIN
+
+
+
+        SELECT 0
+          INTO  tmpVar
+           FROM  infi_tb_107_ui_blotter uib
+           WHERE
+           --VALIDACION DE HORARIO DE TOMA DE ORDENES - ULTIMO DIA
+           ((uiblot_pedido_fe_fin =TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+           AND TO_DATE(SUBSTR(TO_CHAR(uib.uiblot_horario_desde_ult_dia, 'DD/MM/RRRR hh24:mi:ss'),12,19),'hh24:mi:ss')<=TO_DATE(to_char(sysdate,'hh24:mi:ss'),'hh24:mi:ss')
+           AND TO_DATE(SUBSTR(TO_CHAR(uib.uiblot_horario_hasta_ult_dia, 'DD/MM/RRRR hh24:mi:ss'),12,19),'hh24:mi:ss') >=TO_DATE(to_char(sysdate,'hh24:mi:ss'),'hh24:mi:ss'))
+           --VALIDACION DE HORARIO DE TOMA DE ORDENES - PRIMEROS DIAS
+           OR (TRUNC(UIBLOT_PEDIDO_FE_INI)<=TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR') AND (TRUNC(uiblot_pedido_fe_fin) >TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR'))
+           --OR (uiblot_pedido_fe_fin >TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+           AND TO_DATE(SUBSTR(TO_CHAR(uiblot_horario_desde, 'DD/MM/RRRR hh24:mi:ss'),12,19),'hh24:mi:ss') <=TO_DATE(to_char(sysdate,'hh24:mi:ss'),'hh24:mi:ss'))
+           AND TO_DATE(SUBSTR(TO_CHAR(uiblot_horario_hasta, 'DD/MM/RRRR hh24:mi:ss'),12,19),'hh24:mi:ss') >=TO_DATE(to_char(sysdate,'hh24:mi:ss'),'hh24:mi:ss'))
+           AND uib.bloter_id =p_bloter_id
+           AND uib.undinv_id =p_undinv_id;
+
+   EXCEPTION
+   WHEN NO_DATA_FOUND THEN
+        tmpVar:=1;
+     WHEN OTHERS THEN
+        raise ERROR_INESPERADO;
+   END;
+
+   RETURN tmpVar;
+
+END validacion_horarios;
+/
+
+
+CREATE PUBLIC SYNONYM FCONV_BSF FOR ADM_INFI.FCONV_BSF;
+
+
+CREATE PUBLIC SYNONYM FUNC_INFI_CANTIDAD_BLOQUEADA FOR ADM_INFI.FUNC_INFI_CANTIDAD_BLOQUEADA;
+
+
+CREATE PUBLIC SYNONYM FUNC_INFI_CANT_BLOQUEADA_TIPO FOR ADM_INFI.FUNC_INFI_CANT_BLOQUEADA_TIPO;
+
+
+CREATE PUBLIC SYNONYM FUNC_INFI_POSICION_A_FECHA FOR ADM_INFI.FUNC_INFI_POSICION_A_FECHA;
+
+
+CREATE PUBLIC SYNONYM FUNC_INFI_PRECIO_RECOMPRA_HIST FOR ADM_INFI.FUNC_INFI_PRECIO_RECOMPRA_HIST;
+
+
+CREATE PUBLIC SYNONYM FVJ8OCON0 FOR ADM_INFI.FVJ8OCON0;
+
+
+CREATE PUBLIC SYNONYM FVJ8ODIV0 FOR ADM_INFI.FVJ8ODIV0;
+
+
+CREATE PUBLIC SYNONYM INFI_GETDIGVRF FOR ADM_INFI.INFI_GETDIGVRF;
+
+
+GRANT EXECUTE ON  ADM_INFI.DAYS TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.FCONV_BSF TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.FUNC_INFI_CANTIDAD_BLOQUEADA TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.FUNC_INFI_CANT_BLOQUEADA_TIPO TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.INFI_GETDIGVRF TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.FUNC_INFI_PRECIO_RECOMPRA_HIST TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.FVJ8OCON0 TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.FVJ8ODIV0 TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.FUNC_INFI_POSICION_A_FECHA TO USU_INFI;
+

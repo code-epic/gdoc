@@ -1,0 +1,79 @@
+--
+-- INFI_TB_855_DEF_DINAMIC_CONTAB  (Table) 
+--
+CREATE TABLE ADM_INFI.INFI_TB_855_DEF_DINAMIC_CONTAB
+(
+  DEF_DINAMIC_ID  NUMBER(10)                    NOT NULL,
+  VALOR           VARCHAR2(1000 CHAR)           NOT NULL,
+  UPD_FECHA       DATE,
+  UPD_USUARIO     VARCHAR2(10 BYTE),
+  DESCRIPCION     VARCHAR2(50 BYTE)
+)
+TABLESPACE DATA
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       2147483645
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+COMMENT ON TABLE ADM_INFI.INFI_TB_855_DEF_DINAMIC_CONTAB IS 'Tabla para el registro de las sentencias de consulta a las tablas de infi para la generacion de la contabilidad de infi';
+
+COMMENT ON COLUMN ADM_INFI.INFI_TB_855_DEF_DINAMIC_CONTAB.DEF_DINAMIC_ID IS 'Id de sql';
+
+COMMENT ON COLUMN ADM_INFI.INFI_TB_855_DEF_DINAMIC_CONTAB.VALOR IS 'Consulta SQL';
+
+COMMENT ON COLUMN ADM_INFI.INFI_TB_855_DEF_DINAMIC_CONTAB.DESCRIPCION IS 'Descripcion';
+
+--
+-- INFI_TB_855_DEF_DINAMIC_CON_PK  (Index) 
+--
+CREATE UNIQUE INDEX ADM_INFI.INFI_TB_855_DEF_DINAMIC_CON_PK ON ADM_INFI.INFI_TB_855_DEF_DINAMIC_CONTAB
+(DEF_DINAMIC_ID)
+LOGGING
+TABLESPACE DATA
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       2147483645
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+NOPARALLEL;
+
+-- 
+-- Non Foreign Key Constraints for Table INFI_TB_855_DEF_DINAMIC_CONTAB 
+-- 
+ALTER TABLE ADM_INFI.INFI_TB_855_DEF_DINAMIC_CONTAB ADD (
+  CONSTRAINT INFI_TB_855_DEF_DINAMIC_CON_PK
+ PRIMARY KEY
+ (DEF_DINAMIC_ID)
+    USING INDEX 
+    TABLESPACE DATA
+    PCTFREE    10
+    INITRANS   2
+    MAXTRANS   255
+    STORAGE    (
+                INITIAL          64K
+                NEXT             1M
+                MINEXTENTS       1
+                MAXEXTENTS       2147483645
+                PCTINCREASE      0
+               ));
+
+

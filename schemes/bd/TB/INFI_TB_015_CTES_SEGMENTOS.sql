@@ -1,0 +1,97 @@
+--
+-- INFI_TB_015_CTES_SEGMENTOS  (Table) 
+--
+CREATE TABLE ADM_INFI.INFI_TB_015_CTES_SEGMENTOS
+(
+  CTESEG_ID                  VARCHAR2(25 BYTE)  NOT NULL,
+  CTESEG_DESCRIPCION         VARCHAR2(200 BYTE) NOT NULL,
+  CTESEG_ALTAIR_BANCO        VARCHAR2(10 BYTE)  NOT NULL,
+  CTESEG_ALTAIR_SEGMENTO     VARCHAR2(10 BYTE)  NOT NULL,
+  CTESEG_ALTAIR_SUBSEGMENTO  VARCHAR2(10 BYTE)  NOT NULL
+)
+TABLESPACE DATA
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       2147483645
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+COMMENT ON TABLE ADM_INFI.INFI_TB_015_CTES_SEGMENTOS IS 'Permite redefinir la lista de Segmentos existentes en ALTAIR. El objetivo es agrupar para efectos 
+de INFI en diferentes segmentos. Cada segmento de ALTAIR debe estar representado con esta definicion.';
+
+COMMENT ON COLUMN ADM_INFI.INFI_TB_015_CTES_SEGMENTOS.CTESEG_ID IS 'Id del segmento';
+
+COMMENT ON COLUMN ADM_INFI.INFI_TB_015_CTES_SEGMENTOS.CTESEG_DESCRIPCION IS 'Descripción del segmento';
+
+COMMENT ON COLUMN ADM_INFI.INFI_TB_015_CTES_SEGMENTOS.CTESEG_ALTAIR_BANCO IS 'Identifica el atributo de Banca en la segmentación de ALTAIR. Tomado a traves de AEA transaccion PEV7, Salida PEM1403 a traves de Servicio: XXXXXXXXXXXXXX.';
+
+COMMENT ON COLUMN ADM_INFI.INFI_TB_015_CTES_SEGMENTOS.CTESEG_ALTAIR_SEGMENTO IS 'Identifica el atributo de Segmento en la segmentación de ALTAIR. Tomado a traves de AEA transaccion PEV7, Salida PEM1403 a traves de Servicio: XXXXXXXXXXXXXX.';
+
+COMMENT ON COLUMN ADM_INFI.INFI_TB_015_CTES_SEGMENTOS.CTESEG_ALTAIR_SUBSEGMENTO IS 'Identifica el atributo de SubSegmento en la segmentación de ALTAIR. Tomado a traves de AEA transaccion PEV7, Salida PEM1403 a traves de Servicio: XXXXXXXXXXXXXX.';
+
+--
+-- PK_015  (Index) 
+--
+CREATE UNIQUE INDEX ADM_INFI.PK_015 ON ADM_INFI.INFI_TB_015_CTES_SEGMENTOS
+(CTESEG_ID)
+NOLOGGING
+TABLESPACE DATA
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       2147483645
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+PARALLEL ( DEGREE 4 INSTANCES 1 );
+
+--
+-- INFI_TB_015_CTES_SEGMENTOS  (Synonym) 
+--
+CREATE PUBLIC SYNONYM INFI_TB_015_CTES_SEGMENTOS FOR ADM_INFI.INFI_TB_015_CTES_SEGMENTOS;
+
+GRANT DELETE ON  ADM_INFI.INFI_TB_015_CTES_SEGMENTOS TO USU_INFI;
+
+GRANT INSERT ON  ADM_INFI.INFI_TB_015_CTES_SEGMENTOS TO USU_INFI;
+
+GRANT SELECT ON  ADM_INFI.INFI_TB_015_CTES_SEGMENTOS TO USU_INFI;
+
+GRANT UPDATE ON  ADM_INFI.INFI_TB_015_CTES_SEGMENTOS TO USU_INFI;
+
+-- 
+-- Non Foreign Key Constraints for Table INFI_TB_015_CTES_SEGMENTOS 
+-- 
+ALTER TABLE ADM_INFI.INFI_TB_015_CTES_SEGMENTOS ADD (
+  CONSTRAINT PK_015
+ PRIMARY KEY
+ (CTESEG_ID)
+    USING INDEX 
+    TABLESPACE DATA
+    PCTFREE    10
+    INITRANS   2
+    MAXTRANS   255
+    STORAGE    (
+                INITIAL          64K
+                NEXT             1M
+                MINEXTENTS       1
+                MAXEXTENTS       2147483645
+                PCTINCREASE      0
+               ));
+
+

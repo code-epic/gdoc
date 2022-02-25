@@ -1,0 +1,12 @@
+{
+    "/v1/api/*": {
+        "target": "https://localhost:2286",
+        "secure": false,
+        "logLevel": "debug"
+    },
+    "/devel/api/*": {
+        "target": "http://localhost:8012",
+        "secure": false,
+        "logLevel": "debug"
+    }
+}

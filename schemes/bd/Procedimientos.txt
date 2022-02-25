@@ -1,0 +1,3273 @@
+CREATE OR REPLACE PROCEDURE ADM_INFI.cargar_titulos_carmen (p_tipoMsj       IN varchar2,
+                                          p_ids           IN varchar2) IS
+
+/******************************************************************************
+   NAME:       CARGAR_TITULOS_CARMEN
+   PURPOSE:    Interfaz de registro de t¿tulos INFI-CARMEN
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        30/09/2011  Carmin Espinoza  1. Created this procedure.
+
+   NOTES:
+
+   Automatically available Auto Replace Keywords:
+      Object Name:     CARGAR_TITULOS_CARMEN
+      Sysdate:         03/10/2011
+      Date and Time:   03/10/2011, 02:45:57 p.m., and 03/10/2011 02:45:57 p.m.
+      Username:         (set in TOAD Options, Procedure Editor)
+      Table Name:       (set in the "New PL/SQL Object" dialog)
+
+******************************************************************************/
+
+    --TODO ACOMODAR ESTO
+--    v_cursor_mensajes   LIQUIDACION.ref_cur;
+    type ref_cur is ref cursor;
+    v_cursor_mensajes   ref_cur;
+    v_result            VARCHAR2(500);
+    v_cd_cliente        VARCHAR2(11);
+    v_cd_cuenta         VARCHAR2(35);
+    v_clave_valor       VARCHAR2(20);
+    v_cantidad          VARCHAR2(15);
+    v_fecha_operac      VARCHAR2(10);
+    v_fecha_liquid      VARCHAR2(10);
+    v_contraparte       VARCHAR2(11);
+    v_filtro            VARCHAR2(60);
+    v_filtroIds         VARCHAR2(2000);
+    v_tipo              VARCHAR2(3);  --'EL' (Entrega Libre) 'RL' (Recepcin Libre)
+    v_msj_id            infi_tb_218_mensaje.MENSAJE_ID%type;
+
+  BEGIN
+
+   IF (p_tipoMsj='MENSAJE_CARMEN_ENTRADA')THEN
+        v_tipo:= 'RL';
+        v_filtro:= '(''CARGA_INICIAL'',''ENTRADA_TITULO'',''TOMA_ORDEN'')';
+   ELSE
+        v_tipo:= 'EL';
+        v_filtro:= '(''VENTA_TITULOS'',''PACTO_RECOMPRA'',''SALIDA_EXTERNA'')';
+   END IF;
+
+   IF (p_ids=NULL)   THEN
+        v_filtroIds:= '';
+   ELSE
+        v_filtroIds:= ' and mensaje_id in ('||p_ids||')';
+   END IF;
+
+    OPEN v_cursor_mensajes FOR
+        'select mensaje_id
+        from
+            infi_tb_218_mensaje msg,
+            infi_tb_204_ordenes ord
+        where
+            msg.ordene_id = ord.ordene_id and
+            fecha_envio is null and
+            transa_id in '||v_filtro||' and
+            tipo_mensaje=''MENSAJE_CARMEN'''||v_filtroIds;
+
+    LOOP
+    BEGIN
+       FETCH v_cursor_mensajes INTO v_msj_id;
+            EXIT WHEN v_cursor_mensajes%NOTFOUND;
+       BEGIN
+       --Detalle del Mensaje
+       select VALOR_CAMPO into v_cd_cliente from infi_tb_219_mensaje_detalle md where md.MENSAJE_ID =v_msj_id and md.CLAVE_CAMPO='CODIGO_CLIENTE';
+       select VALOR_CAMPO into v_cd_cuenta from infi_tb_219_mensaje_detalle md where md.MENSAJE_ID =v_msj_id and md.CLAVE_CAMPO='CODIGO_CUENTA';
+       select VALOR_CAMPO into v_clave_valor from infi_tb_219_mensaje_detalle md where md.MENSAJE_ID =v_msj_id and md.CLAVE_CAMPO='CLAVE_VALOR';
+       select VALOR_CAMPO into v_cantidad from infi_tb_219_mensaje_detalle md where md.MENSAJE_ID =v_msj_id and md.CLAVE_CAMPO='CANTIDAD';
+       select TO_CHAR(TO_DATE(VALOR_CAMPO,'DD/MM/YY'),'DD/MM/YYYY') into v_fecha_operac from infi_tb_219_mensaje_detalle md where md.MENSAJE_ID =v_msj_id and md.CLAVE_CAMPO='FECHA_OPERACION';
+       select TO_CHAR(TO_DATE(VALOR_CAMPO,'DD/MM/YY'),'DD/MM/YYYY') into v_fecha_liquid from infi_tb_219_mensaje_detalle md where md.MENSAJE_ID =v_msj_id and md.CLAVE_CAMPO='FECHA_LIQUIDACION';
+       select VALOR_CAMPO into v_contraparte from infi_tb_219_mensaje_detalle md where md.MENSAJE_ID =v_msj_id and md.CLAVE_CAMPO='CONTRAPARTE';
+
+
+       SP_CARGATITULOS_INFI(v_cd_cliente,
+                       v_cd_cuenta,
+                       v_clave_valor,
+                       v_cantidad,
+                       v_fecha_operac,
+                       v_fecha_liquid,
+                       v_contraparte,
+                       v_tipo,
+                       'COMMIT');
+         update infi_tb_218_mensaje set observacion='', fecha_envio=sysdate
+                where
+                    mensaje_id=v_msj_id;
+        EXCEPTION
+            WHEN OTHERS THEN
+                --Registrar el error ocurrido en el campo de observaciones del mensaje
+                v_result:=SUBSTR(SQLERRM, 1 ,200);
+                update infi_tb_218_mensaje set observacion=v_result
+                where
+                    mensaje_id=v_msj_id;
+
+        END;
+
+    END;
+    END LOOP;
+
+
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+        --DBMS_OUTPUT.Put_Line('ERROR EN LA EJECUCION NO_DATA_FOUND');
+        NULL;
+     WHEN OTHERS THEN
+       RAISE;
+END CARGAR_TITULOS_CARMEN;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.getInfoHTTP(pHost Varchar2
+                                       ,pPort Varchar2
+                                       ,pUrl  Varchar2) is
+  req     utl_http.req;
+  res     utl_http.resp;
+  vResult CLOB;
+begin
+  utl_http.set_transfer_timeout(30);
+  dbms_output.put_line('Request>  URL:  '   ||pUrl);
+  req := utl_http.begin_request(pUrl, 'GET', 'HTTP/1.1');
+  utl_http.set_header(req, 'user-agent',     'Mozilla/4.0');
+  utl_http.set_header(req, 'content-type',   'text/html;charset=UTF-8');
+  utl_http.set_header(req, 'host',           pHost || ':' || pPort);
+  res := utl_http.get_response(req);
+  dbms_output.put_line('Response> status_code: "'   ||res.status_code  || '"');
+  dbms_output.put_line('Response> reason_phrase: "' ||res.reason_phrase || '"');
+  dbms_output.put_line('Response> http_version: "'  ||res.http_version  || '"');
+  Begin
+     Loop
+        utl_http.read_line(res, vResult);
+        dbms_output.put_line(vResult);
+     End Loop;
+     utl_http.end_response(res);
+  Exception
+     When utl_http.end_of_body Then
+        utl_http.end_response(res);
+  End;
+end;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI."INFICD300_TRANSFORMAR_REGISTRO" IS
+
+/******************************************************************************
+   NAME:       INFICD300_TRANSFORMAR_REGISTRO
+   PURPOSE:    
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        03/04/2008   Fabian Vasconez 1. Creacion
+
+   NOTES:
+
+   Proceso que transforma los registros de la estructura de TBZ12 a la TBZ15.
+   Pasa de una estructura de campos en un solo registro, a una estructura de un registro por cada campo.
+   Proceso utilizado para facilitar el proceso de emisión de informes de una validación y cuadre del
+   proceso.
+
+******************************************************************************/
+
+COLUMNAS1 					NUMBER;
+COD_REGISTRO				INFI_TB_Z12_REGISTROS.Z12_CO_CODIGO_REGISTRO%TYPE;
+COD_PROCESO					INFI_TB_Z12_REGISTROS.Z11_COD_PROCESO%TYPE;
+NUMERO_REGISTRO				INFI_TB_Z12_REGISTROS.Z12_NU_NUMERO_REGISTRO%TYPE;
+ESTATUS						INFI_TB_Z12_REGISTROS.Z12_ESTATUS%TYPE;
+V_VALOR						VARCHAR2(40);
+V_RESULTADO					VARCHAR2(40);
+V_MENSAJE					VARCHAR2(40);
+VALOR						INFI_TB_Z12_REGISTROS.Z12_CAMPO10_VALOR%TYPE;
+RESULTADO					INFI_TB_Z12_REGISTROS.Z12_CAMPO10_RESULTADO%TYPE;
+MENSAJE						INFI_TB_Z12_REGISTROS.Z12_CAMPO11_MENSAJE%TYPE;
+
+
+CURSOR PROCESO_TRANSFORMAR IS
+	  SELECT Z12_CO_CODIGO_REGISTRO, Z11_COD_PROCESO,Z12_NU_NUMERO_REGISTRO,Z12_ESTATUS
+	  FROM INFI_TB_Z12_REGISTROS 
+	  WHERE Z12_ESTATUS = 1
+	    AND Z12_CO_CODIGO_REGISTRO = 72356
+	  ORDER BY Z12_CO_CODIGO_REGISTRO ASC, Z11_COD_PROCESO ASC;
+
+/*CURSOR COLUMNAS_TRANSFORMAR IS
+	   SELECT COLUMN_NAME
+	   FROM ALL_TAB_COLUMNS A
+	   WHERE A.TABLE_NAME = 'INFI_TB_Z12_REGISTROS'
+	   AND A.COLUMN_NAME LIKE 'Z12_CAMPO%'
+	   --AND (A.COLUMN_NAME LIKE '%CAMPO1_V%' OR A.COLUMN_NAME LIKE '%CAMPO1_R%' OR A.COLUMN_NAME LIKE '%CAMPO1_M%')
+	   AND (A.COLUMN_NAME LIKE V_VALOR OR A.COLUMN_NAME LIKE V_RESULTADO OR A.COLUMN_NAME LIKE V_MENSAJE)
+	   AND OWNER = 'BDV_INFIV1DESAMSC'
+	   ORDER BY COLUMN_ID ASC;*/
+
+/*CURSOR VALORES_INSERTAR IS
+	   SELECT V_VALOR, V_RESULTADO, V_MENSAJE
+	     FROM INFI_TB_Z12_REGISTROS
+	    WHERE Z12_CO_CODIGO_REGISTRO = COD_REGISTRO
+	      AND Z11_COD_PROCESO = COD_PROCESO
+		  AND Z12_NU_NUMERO_REGISTRO = NUMERO_REGISTRO
+		  AND Z12_ESTATUS = ESTATUS
+		  AND V_VALOR IS NOT NULL
+		  AND V_RESULTADO IS NOT NULL
+		  AND V_MENSAJE IS NOT NULL;*/
+
+BEGIN
+  FOR PROCESOS IN PROCESO_TRANSFORMAR LOOP
+  	  		  COD_REGISTRO 		:= PROCESOS.Z12_CO_CODIGO_REGISTRO;
+		  	  COD_PROCESO 		:= PROCESOS.Z11_COD_PROCESO;
+	  	  	  NUMERO_REGISTRO 	:= PROCESOS.Z12_NU_NUMERO_REGISTRO;
+	  	  	  ESTATUS			:= PROCESOS.Z12_ESTATUS;	
+   	  
+   	 FOR CONTADOR_COLUMNAS IN 1..25 LOOP
+	 	 	V_VALOR 	   := 'Z12_CAMPO'||CONTADOR_COLUMNAS||'_VALOR';
+			V_RESULTADO    := 'Z12_CAMPO'||CONTADOR_COLUMNAS||'_RESULTADO';
+			V_MENSAJE      := 'Z12_CAMPO'||CONTADOR_COLUMNAS||'_MENSAJE';
+
+--  	  	  FOR VALORES IN VALORES_INSERTAR LOOP
+		  	 -- VALOR := VALORES.V_VALOR;
+			  SELECT V_VALOR
+			  		 ,V_RESULTADO
+					 ,V_MENSAJE
+				INTO VALOR
+					 ,RESULTADO
+					 ,MENSAJE
+			    FROM INFI_TB_Z12_REGISTROS
+			   WHERE Z12_CO_CODIGO_REGISTRO = COD_REGISTRO
+	      	     AND Z11_COD_PROCESO = COD_PROCESO
+		         AND Z12_NU_NUMERO_REGISTRO = NUMERO_REGISTRO
+		         AND Z12_ESTATUS = ESTATUS
+		         AND V_VALOR IS NOT NULL
+		         AND V_RESULTADO IS NOT NULL
+		         AND V_MENSAJE IS NOT NULL;
+		  	  /*INSERT 
+			    INTO INFI_TB_Z15_REGISTROS_VAL (Z15_CO_CODIGO_REGISTRO, Z11_COD_PROCESO, Z15_NU_NUMERO_REGISTRO, Z15_CAMPO_VALOR, Z15_CAMPO_MENSAJE, Z15_CAMPO_RESULTADO, Z15_CAMPO_NUMERO)
+			                            VALUES (COD_REGISTRO, COD_PROCESO,NUMERO_REGISTRO, VALORES.V_VALOR, VALORES.V_MENSAJE,VALORES.V_RESULTADO,CONTADOR_COLUMNAS);*/
+--				COLUMNAS1 := COLUMNAS1 + 1;
+		 -- END LOOP;	   
+     END LOOP;
+  END LOOP; 
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+       NULL;
+     WHEN OTHERS THEN
+       -- Consider logging the error and then re-raise
+       RAISE;
+END INFICD300_TRANSFORMAR_REGISTRO;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI."INFI_CARMEN" (rif_contraparte in  varchar2, -- Id de la Unidad de Inversion
+                       pfecpro         in  date,      -- Fecha del archivo a Procesar
+                       pstatus         out varchar2  -- Estatus de Ejecusion del Proceso
+                        ) AS                         -- '0' Ok,'1' Rechazos
+-- Start of DDL Script for Procedure ADM_INFI.INFI_CARMEN
+-- Generated 09/08/2010 10:38:54 p.m. from ADM_INFI@INFID.BANVENEZ.COM
+-- Creado por : Alexander Rincon el 09/08/2010
+-- Procedimiento para Calcular generar archivo de los clientes con custadia INFI
+-- al Sistema CARMEN en base a las caracteristicas del cliente en OPICS
+   newfile            utl_file.file_type;
+   newfileRec         utl_file.file_type;
+   pfecha             date := pfecpro;
+   cta_custodia       sacc.accountno%type;
+   contraparte        varchar2(15);
+   cliente_id         varchar2(15);
+   rif_cedula         infi_tb_201_ctes.client_nombre%type;
+   CURSOR registro IS
+          SELECT  b.tipper_id,
+                  b.client_cedrif,b.client_nombre,
+                  trim(b.tipper_id||lpad(b.client_cedrif,14,'0')) cedula,
+                  c.titulo_id, -- campo titulo
+                  to_char(nvl(a.ordene_adj_monto,0)) monto,
+                  to_char(a.ordene_ped_fe_orden,'DD/MM/YYYY') fecha_operacion,
+                  to_char(a.ordene_fecha_liquidacion,'DD/MM/YYYY') fecha_liq
+          FROM    infi_tb_204_ordenes a,infi_tb_201_ctes b, infi_tb_108_ui_titulos c
+          WHERE   c.undinv_id = a.uniinv_id
+          AND     a.client_id = b.client_id
+          AND     a.transa_id = 'TOMA_ORDEN'
+          AND     a.ordsta_id = 'ADJUDICADA'
+          AND     a.ordene_fecha_adjudicacion <= pfecha;
+
+BEGIN
+  pstatus := 'X'; -- Incializo el Estatus de Resultados --
+  newfile := utl_file.fopen('/aplicacion1/infi','entrada.txt','w');
+  newfileRec := utl_file.fopen('/aplicacion1/infi','entrada_rechazo.txt','w');
+  IF utl_file.is_open(newfile) THEN
+--- Busqueda de la contraparte de la Posicin del Cliente ---
+     SELECT a.cno
+     INTO   contraparte
+     FROM   cust a
+     WHERE  trim(a.taxid) = trim(rif_contraparte);
+--- Contruccin del Archivo de Ordenes  ----
+     FOR c1 IN registro LOOP
+         rif_cedula := c1.cedula;
+--- Busqueda de de la Cuenta Custodia en los datos del cliente en OPICS.
+         BEGIN
+         IF trim(c1.tipper_id) in ('V','E') THEN
+            SELECT trim(a.cno), trim(b.accountno)
+            INTO   cliente_id,cta_custodia
+            FROM   cust a,sacc b
+            WHERE  a.cno   = b.cno
+            AND    a.taxid = c1.cedula;
+          ELSE
+          --- Se contruye el RIF seg¿n el estandar de 'J' y nueve digitos
+             c1.cedula:= c1.tipper_id||lpad(c1.client_cedrif,8,'0')||infi_getdigvrf(c1.tipper_id||lpad(c1.client_cedrif,8,'0'));
+             SELECT trim(a.cno),trim(b.accountno)
+             INTO   cliente_id,cta_custodia
+             FROM   cust a,sacc b
+             WHERE  a.cno   = b.cno
+             AND    trim(a.taxid) = c1.cedula;
+         END IF;
+         EXCEPTION
+           WHEN others THEN -- caution handles all exceptions
+                pstatus := '1'; -- Proceso con Rechazos ---
+                IF utl_file.is_open(newfile) THEN
+                   utl_file.put_line(newfileRec,lpad(c1.cedula,15,'0')||'  '||'Nombre='||c1.client_nombre);
+                   DBMS_OUTPUT.Put_Line(lpad(c1.cedula,15,'0')||'  '||'Nombre='||c1.client_nombre);
+                END IF;
+         END;
+     --- Se escribe en el archivo los datos por cliente ADJUDICADO --
+         utl_file.put_line(newfile,
+                           cliente_id||
+                           ' '|| -- Separador de Espacio
+                           cta_custodia||
+                           ' '|| -- Separador de Espacio
+                           c1.titulo_id||
+                           ' '|| -- Separador de Espacio
+                           c1.monto||
+                           ' '|| -- Separador de Espacio
+                           c1.fecha_operacion||
+                           ' '|| -- Separador de Espacio
+                           c1.fecha_liq||
+                           ' '|| -- Separador de Espacio
+                           contraparte);
+     END LOOP; --- Ciclo de los registros a ser generados ---
+     utl_file.fclose(newfile);
+     utl_file.fclose(newfileRec);
+     IF pstatus = 'X' THEN
+        pstatus := '0'; -- Proceso Satisfactorio --
+     END IF;
+  END IF; --- Pregunta de la Apertura del Archivo  --
+EXCEPTION
+   WHEN UTL_FILE.INVALID_OPERATION THEN
+        utl_file.fclose(newfile);
+        utl_file.fclose(newfileRec);
+        raise_application_error(-20100,'Operacion Invalida Permisos UNIX');
+   WHEN UTL_FILE.INVALID_PATH THEN
+        utl_file.fclose(newfile);
+        utl_file.fclose(newfileRec);
+        raise_application_error(-20101,'Ruta Invalida');
+   WHEN UTL_FILE.INVALID_MODE THEN
+        utl_file.fclose(newfile);
+        utl_file.fclose(newfileRec);
+        raise_application_error(-20102,'Modo Invalido');
+   WHEN UTL_FILE.INVALID_FILEHANDLE THEN
+        utl_file.fclose(newfile);
+        utl_file.fclose(newfileRec);
+        raise_application_error(-20103,'Modo de Manejo Invalido');
+   WHEN UTL_FILE.WRITE_ERROR THEN
+        utl_file.fclose(newfile);
+        utl_file.fclose(newfileRec);
+        raise_application_error(-20104,'Error Escribiendo');
+   WHEN UTL_FILE.READ_ERROR THEN
+        utl_file.fclose(newfile);
+        utl_file.fclose(newfileRec);
+        raise_application_error(-20105,'Error Leyendo');
+   WHEN UTL_FILE.INTERNAL_ERROR THEN
+        utl_file.fclose(newfile);
+        utl_file.fclose(newfileRec);
+        raise_application_error(-20106,'Error Interno');
+   WHEN others THEN
+        utl_file.fclose(newfile);
+        utl_file.fclose(newfileRec);
+        raise_application_error(-20107,'Error NO Controlado'||' RIF/CEDULA= '||rif_cedula||'  '
+                                        ||'Error Oracle = '||sqlerrm);
+END INFI_CARMEN;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_CLIENTES_OPICS
+   ( puniinv_id IN number,
+     pordsta_id IN varchar2)
+   IS
+--
+-- Creado por Ing. Alexander Rinción
+-- Sistemas de Tesorería
+-- Fecha 24/03/2013
+
+------------------------------------------------------------------------------------------------------
+-- Funcionalidad
+-- Procedemiento que recibe los parametros
+-- punininv_id: Es el id de la unidad de inversión a revisar en conjunto con el estatus de las Ordenes
+-- pordsta_id:  Estatus de la Orden a revisar
+-- Con la finalidad de recorrer las ordenes cargadas en la aplicación y crear los clientes
+-- en la Instancia de OPICS de ser necesario para evitar los rechazos de los deals de Operaciones
+-- de Cambio o Operaciones de Renta Fija.
+------------------------------------------------------------------------------------------------------
+
+-- MODIFICATION HISTORY
+-- Person      Date    Comments
+-- ---------   ------  -------------------------------------------
+-- Variables del Programa ---
+
+   CURSOR ordenes IS
+          SELECT distinct translate(b.client_nombre,',''"','   ') as client_nombre,
+                  b.client_direccion,
+                  CASE when b.tipper_id in ('V','E') then
+                     trim(b.tipper_id||lpad(b.client_cedrif,14,'0'))
+                    ELSE
+                      b.tipper_id||lpad(b.client_cedrif,8,'0')||infi_getdigvrf(b.tipper_id||lpad(b.client_cedrif,8,'0'))
+                  END cedula
+          FROM    infi_tb_204_ordenes a,infi_tb_201_ctes b
+          WHERE   a.uniinv_id = puniinv_id
+          AND     a.client_id = b.client_id
+          AND     a.ordsta_id = pordsta_id
+          AND     a.transa_id = 'TOMA_ORDEN';
+   -- Declare program variables as shown above
+BEGIN
+    FOR r1 in ordenes LOOP
+        SP_CARGACLIENTES(r1.cedula,r1.client_nombre,r1.client_direccion,r1.client_direccion);
+    END LOOP;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20001,'ERROR DEL PROCESO INFI_CLIENTES_OPICS / Error Oracle = '||sqlerrm);
+END INFI_CLIENTES_OPICS; -- Procedure
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_CONS_OPE_TAQ
+  (
+  PIDCANAL        IN   VARCHAR2,
+  PCLIENT_CEDRIF  IN   VARCHAR2,
+  PTIPPER_ID      IN   VARCHAR2,
+  cursor1         OUT  pkgcursortype.cursorType
+  )
+AS
+/******************************************************************************
+   NAME:       INFI_CONS_OPE_TAQ
+   PURPOSE:    Devuelve la informacion de las operaciones de taquilla disponibles
+               para un cliente esten vigentes o no.
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   1.0        05/08/2015  LPEREZ          1. Created this procedure.
+
+******************************************************************************/
+BEGIN
+  OPEN cursor1 FOR
+  SELECT LPAD(TAQ.ORDENE_TAQ_ID,10,0),
+         LPAD(TAQ.ORDENE_ID,10,0),
+         LPAD(TAQ.ORDENE_TAQ_NRO_RETEN_CAP,10,' '),
+         LPAD(TAQ.ORDENE_TAQ_NRO_RETEN_COM,10,' '),
+         LPAD(TAQ.ORDENE_TAQ_CTA_BS,20,' '),
+         LPAD(NVL(TAQ.ORDENE_TAQ_CTA_DIVISAS,' '),20),
+         LPAD(TAQ.ORDENE_TAQ_CLIENT_CERIF,10,0),
+         TAQ.ORDENE_TAQ_TIPPER_ID,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_MONTO_CAP_BS, '099999999999999.99'),'.'),' ') MONTO,
+         REPLACE(REPLACE(TO_CHAR( TAQ.ORDENE_TAQ_MONTO_CAP_DIVISA, '099999999999999.99'),'.'),' ') MONTO_DIVISAS,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_MONTO_COM_BS, '099999999999999.99'),'.'),' ') MONTO_COM_BS,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_MONTO_COM_DIVISA, '099999999999999.99'),'.'),' ') MONTO_COM_DIVI,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_MONTO_TOTAL_DIVISA, '099999999999999.99'),'.'),' ') MONTO_TOTAL_DIVI,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_MONTO_TOTAL_BS, '099999999999999.99'),'.'),' ') MONTO_TOTAL_BS,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_TASA_CAMBIO, '099999999999999.99999'),'.'),' ') TASA_CAMBIO,
+         TO_CHAR(TAQ.ORDENE_TAQ_FE_REGISTRO,'DDMMYYYY') FE_REGISTRO,
+         TO_CHAR(TAQ.ORDENE_TAQ_FE_VALOR, 'DDMMYYYY') FE_VALOR,
+         RPAD(NVL(TAQ.ORDENE_TAQ_OBSERVACION,' '),1000) OBSERVACIONES,
+         TAQ.ORDENE_TAQ_VIGENCIA,
+         TAQ.ORDENE_TAQ_TIPO_DIVISA,
+         TAQ.ORDENE_TAQ_ESTATUS
+  FROM INFI_TB_232_ORDENES_TAQUILLA TAQ
+  WHERE TAQ.ORDENE_TAQ_CLIENT_CERIF = PCLIENT_CEDRIF
+  AND   TAQ.ORDENE_TAQ_TIPPER_ID    = PTIPPER_ID
+  AND   TAQ.ORDENE_TAQ_TIPO_OPERA   = 2
+  AND   TAQ.ORDENE_TAQ_ESTATUS = 0
+  AND   TAQ.ORDENE_TAQ_ESTATUS_BCV IN (0,1);
+
+END INFI_CONS_OPE_TAQ;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_CP_CONFIRMACION(
+      pid     in   varchar2,
+      PTASA   IN   VARCHAR2,--4
+      PMONTO  IN   VARCHAR2,--2
+      PCANAL  IN   NUMBER,
+      PTIPOSOLI IN VARCHAR2,
+      PCUENTA1 IN  VARCHAR2,
+      PCUENTA2 IN  VARCHAR2,
+      PSTATUS OUT  VARCHAR2,
+      PCOMISION OUT varchar2,--4
+      PPCTCOMISION OUT varchar2,--4
+      perror      OUT      NUMBER
+      )
+AS
+/******************************************************************************
+   NAME:       confirmacion
+   PURPOSE:    Confirmacion de los valores devultos en la toma de orden por clavenet
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        14/02/2015  AGOMEZ          1. Created this procedure.
+   2.0        14/01/2016  LPEREZ          1. Se consulta la tasa de la oferta de la tabla INFI_TB_106_UNIDAD_INVERSION.
+   3.0        23/06/2016 NM26659          1. Modificación de validacion de horarios
+
+******************************************************************************/
+
+  pcomisionfijo INFI_TB_112_UI_COMISION.COMISION_MONTO_FIJO%TYPE;
+  pcomisionpct  number;--INFI_TB_112_UI_COMISION.COMISION_PCT%TYPE;
+  pblotterid infi_tb_102_bloter.BLOTER_ID%TYPE;
+  pmontomaximo INFI_TB_111_UI_BLOTTER_RANGOS.UIBLOT_UMI_INV_MTO_MAX%type;
+  pvalidador   number;
+  ptipprodcuto  INFI_TB_101_INST_FINANCIEROS.tipo_producto_id%type;
+  vMontoDisponible infi_tb_108_UI_TITULOS.UITITU_VALOR_EQUIVALENTE%type;
+  vInventario infi_tb_108_UI_TITULOS.UITITU_IN_CONTROL_DISPONIBLE%type;
+  vControl NUMBER DEFAULT 0;
+  vTipoNegocio NUMBER DEFAULT 0;
+  vMSJDISPONIBILIDAD     VARCHAR(200);
+  vMontoMaximo NUMBER;
+  vBloterId    VARCHAR2(10);
+  vMSJHORARIO     VARCHAR2(200);
+  vMSJMONTOMAX VARCHAR2(200);
+  vMSJTASAMIN VARCHAR2(200);
+  vMSJTASAMAX VARCHAR2(200);
+  vMonto VARCHAR2(30);
+  vTasa  VARCHAR2(10);
+  vTasa1  VARCHAR2(10);
+ CURSOR DATOS
+ IS
+     SELECT u.undinv_id, u.monto_acumulado_solic, u.undinv_tasa_cambio, u.undinv_tasa_cambio_ofer
+           FROM infi_tb_106_unidad_inversion u,
+                INFI_TB_101_INST_FINANCIEROS F
+          WHERE u.undinv_status = 'PUBLICADA' AND u.undinv_active = 1
+          AND   u.insfin_id = f.insfin_id
+          AND   f.tipo_producto_id = ptipprodcuto
+          AND    u.TIPO_NEGOCIO = vTipoNegocio;
+
+BEGIN
+       vTipoNegocio  := 1;
+       ptipprodcuto := 'SICAD2PER';
+       perror := 1;
+       pstatus := 'El mercado se encuentra Cerrado';
+
+       vMonto := (PMONTO/100);
+       IF PTASA IS NOT NULL THEN
+          vTasa := (PTASA/10000);
+       END IF;
+
+
+       SELECT PT.PARVAL_VALOR
+       INTO   vMSJDISPONIBILIDAD
+       FROM   INFI_TB_002_PARAM_TIPOS PT
+       WHERE  PARGRP_ID = '001' AND
+              PARTIP_NOMBRE_PARAMETRO = 'MSJ_DISPONIBILIDAD_SIMADI';
+
+       SELECT PT.PARVAL_VALOR
+       INTO   vMSJHORARIO
+       FROM   INFI_TB_002_PARAM_TIPOS PT
+       WHERE  PARGRP_ID = '001' AND
+              PARTIP_NOMBRE_PARAMETRO = 'MSJ_HORARIO_SIMADI';
+
+       SELECT PT.PARVAL_VALOR
+        INTO   vMSJMONTOMAX
+        FROM   INFI_TB_002_PARAM_TIPOS PT
+        WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_MONTO_MAX_SIMADI';
+
+       SELECT PT.PARVAL_VALOR
+        INTO   vMSJTASAMIN
+        FROM   INFI_TB_002_PARAM_TIPOS PT
+        WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_TASA_MIN_SIMADI';
+
+       SELECT PT.PARVAL_VALOR
+        INTO   vMSJTASAMAX
+        FROM   INFI_TB_002_PARAM_TIPOS PT
+        WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_TASA_MAX_SIMADI';
+
+
+
+    FOR R2 IN DATOS LOOP
+        vControl:= 1;
+        BEGIN
+            SELECT BR.uiblot_umi_inv_mto_min_a_valor
+            INTO   vMontoMaximo
+            FROM   INFI_TB_102_BLOTER B,
+                   INFI_TB_111_UI_BLOTTER_RANGOS BR
+            WHERE  BR.UNDINV_ID = R2.undinv_id AND
+                   B.ID_CANAL = PCANAL AND
+                   B.BLOTER_ID = BR.BLOTER_ID AND
+                   BR.tipper_id = SUBSTR(pid,1,1);
+
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            perror := 8;
+            pstatus := vMSJDISPONIBILIDAD;
+        EXIT;
+        END;
+    END LOOP;
+
+     IF vControl = 1 THEN
+        IF vMONTO >= vMontoMaximo THEN
+            vTipoNegocio := 1;
+        ELSE
+            vTipoNegocio := 2;
+        END IF;
+    ELSE
+        vTipoNegocio := 2;
+    END IF;
+
+    FOR R2 IN DATOS LOOP
+
+        --Validacion del bloter en el canal 2
+            BEGIN
+                SELECT BR.BLOTER_ID,
+                       BR.uiblot_umi_inv_mto_min_a_valor
+                INTO   vBloterId,
+                       vMontoMaximo
+                FROM   INFI_TB_102_BLOTER B,
+                       INFI_TB_111_UI_BLOTTER_RANGOS BR
+                WHERE  BR.UNDINV_ID = R2.undinv_id AND
+                       B.ID_CANAL = PCANAL AND
+                       B.BLOTER_ID = BR.BLOTER_ID AND
+                       BR.tipper_id = SUBSTR(pid,1,1);
+            EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                perror := 8;
+                pstatus := vMSJDISPONIBILIDAD;
+            EXIT;
+            END;
+
+
+            --Validacion de horario
+           BEGIN
+           select validacion_horarios(vBloterId,r2.undinv_id) into pvalidador FROM DUAL;
+           EXCEPTION
+           WHEN OTHERS THEN
+               perror := 2;
+               pstatus := 'Ocurrio un error inesperado en el proceso de verificacion de horarios ';
+               EXIT;
+           END;
+
+            IF pvalidador=1 THEN
+                perror := 2;
+                pstatus := vMSJHORARIO;
+                EXIT;
+            END IF;
+        --Validacion de horario
+
+       --Validacion de horario SECCION DE CODIGO TRASLADADO A LA FUNCION  validacion_horarios EN INCIDENCIA ITS-3130 NM26659_03/06/2016
+--       BEGIN
+--          SELECT 0
+--           INTO  pvalidador
+--           FROM  infi_tb_107_ui_blotter uib
+--           WHERE
+--           --VALIDACION DE HORARIO DE TOMA DE ORDENES - ULTIMO DIA
+--           (( uiblot_pedido_fe_fin =TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+--           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_desde_ult_dia, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') <=SYSDATE
+--           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_hasta_ult_dia, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') >=SYSDATE
+--           )
+--           --VALIDACION DE HORARIO DE TOMA DE ORDENES - PRIMEROS DIAS
+--           OR ( uiblot_pedido_fe_fin >TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+--           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_desde, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') <=SYSDATE
+--           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_hasta, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') >=SYSDATE
+--           ))
+--           AND uib.bloter_id = vBloterId
+--           AND uib.undinv_id = r2.undinv_id;
+--        EXCEPTION
+--        WHEN NO_DATA_FOUND THEN
+--           perror := 2;
+--           pstatus := vMSJHORARIO;
+--        EXIT;
+--        END;
+    --Validacion de horario SECCION DE CODIGO TRASLADADO A LA FUNCION  validacion_horarios EN INCIDENCIA ITS-3130 NM26659_03/06/2016
+
+       IF PTIPOSOLI = 'D' THEN
+            SELECT UIT.UITITU_VALOR_EQUIVALENTE ,UIT.UITITU_IN_CONTROL_DISPONIBLE
+            INTO vMontoDisponible,
+                 vInventario
+            FROM infi_tb_108_UI_TITULOS UIT
+            WHERE UIT.UNDINV_ID = R2.undinv_id;
+
+            IF vInventario = 1 THEN
+                IF (NVL(R2.monto_acumulado_solic,0)+vMONTO) > vMontoDisponible THEN
+                    PERROR := 7;
+                    PSTATUS := vMSJMONTOMAX;
+                EXIT;
+                END IF;
+            END IF;
+       END IF;
+
+       -- Validacion de tasa
+       BEGIN
+       IF vTipoNegocio = 1 THEN
+
+        SELECT case
+                when vTASA < BR.UIBLOT_TASA_PROP_MIN then 1
+                when vTASA > BR.UIBLOT_TASA_PROP_MAX then 2
+                else 0
+               end
+               INTO PValidador
+        FROM   INFI_TB_102_BLOTER B,
+               INFI_TB_111_UI_BLOTTER_RANGOS BR
+        WHERE  BR.UNDINV_ID = R2.undinv_id AND
+               B.ID_CANAL = PCANAL AND
+               B.BLOTER_ID = BR.BLOTER_ID AND
+               BR.tipper_id = pid;
+
+         IF PValidador <> 0 THEN
+               IF PValidador = 1 THEN
+                PERROR := 5;
+                PSTATUS := vMSJTASAMIN;
+               EXIT;
+               ELSE
+                PERROR := 5;
+                PSTATUS := vMSJTASAMAX;
+               EXIT;
+               END IF;
+         END IF;
+
+       END IF;
+       END;
+
+       IF vTipoNegocio = 2 THEN
+            IF PTIPOSOLI = 'D' THEN
+                      vTasa1 := NVL(r2.undinv_tasa_cambio,0);
+            ELSE
+                      vTasa1 := NVL(r2.undinv_tasa_cambio_ofer,0);
+
+                      /*
+                      SELECT NVL(PT.PARVAL_VALOR,0)
+                      INTO   vTasa1
+                      FROM   INFI_TB_002_PARAM_TIPOS PT
+                      WHERE  PARGRP_ID = '001' AND
+                             PARTIP_NOMBRE_PARAMETRO = 'TASA_OFERTA';
+                      */
+
+            END IF;
+       ELSE
+        vTasa1 := vTasa;
+       END IF;
+
+       IF pvalidador = 0 THEN
+          SELECT UC.COMISION_MONTO_FIJO,
+                 UC.COMISION_PCT
+          INTO   PCOMISIONFIJO,
+                 PCOMISIONPCT
+          FROM   INFI_TB_112_UI_COMISION UC
+          WHERE  UC.UNDINV_ID = R2.undinv_id;
+--DBMS_OUTPUT.Put_Line  ('Tasa='||vTasa1||' vMonto='||vmonto||' PCOMISIONPCT='||PCOMISIONPCT||' ');
+          IF PCOMISIONFIJO = 0 THEN
+             PCOMISION := ((vMONTO*vTasa1*PCOMISIONPCT)/100);
+           ELSE
+              PCOMISION := (PCOMISIONFIJO);
+          END IF;
+          PCOMISION := round(PCOMISION,2)*10000;
+          PPCTCOMISION := (PCOMISIONPCT)*10000;
+       END IF;
+    perror := 0;
+    pstatus := 'OK';
+    END LOOP;
+
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        perror := 1;
+        pstatus := 'El mercado se encuentra Cerrado / No_DATA'||SQLCODE||' '||SQLERRM;
+    WHEN OTHERS THEN
+        perror := 1;
+        pstatus := 'El mercado se encuentra Cerrado / Others'||SQLCODE||' '||SQLERRM;
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_CP_CONFIRMACION_TEST(
+      pid     in   varchar2,
+      PTASA   IN   VARCHAR2,-- Entrada -Tasa de Cambio de la Operacion
+      PMONTO  IN   VARCHAR2,-- Entrada - Monto solicitado
+      PCANAL  IN   NUMBER,  -- 
+      PTIPOSOLI IN VARCHAR2, 
+      PCUENTA1 IN  VARCHAR2, --Entrada: Cuenta en Bolivares del cliente
+      PCUENTA2 IN  VARCHAR2, --Entrada: Cuenta en Dolares del cliente 
+      PSTATUS OUT  VARCHAR2, 
+      PCAPITAL OUT varchar2,-- Retorno: Monto capital   **Campo Nuevo 
+      PCOMISION OUT varchar2,-- Retorno: Monto comision
+      PPCTCOMISION OUT varchar2,-- Retorno: Porcentaje de comision
+      PPCTCOMISIONIGTF OUT varchar2,-- Retorno: Porcentaje de comision IGTF    **Campo Nuevo 
+      perror      OUT      NUMBER -- Retorno: Mensaje de Error
+      )
+AS
+/******************************************************************************
+   NAME:       confirmacion
+   PURPOSE:    Confirmacion de los valores devultos en la toma de orden por clavenet 
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        14/02/2015  AGOMEZ          1. Created this procedure.
+   2.0        14/01/2016  LPEREZ          1. Se consulta la tasa de la oferta
+                                          de la tabla INFI_TB_106_UNIDAD_INVERSION.
+   3.0        12/04/2016                  1. Adaptacion para calculo de comision IGTF en caso de que aplique al cliente                                           
+    
+    Para el manejo de montos por parte de clavenet es necesario realizar la siguiente conversion:
+    3.1.- Para el manejo del monto solicitado conversion:              vMonto:=(PMONTO / 100 )  
+    3.2.- Para el manejo de la tasa de cambio conversion:              vTasa := (PTASA/10000) 
+    3.3.- Para el manejo del monto Capital    conversion:              PCAPITAL := round(PCAPITAL,2)*10000    
+    3.4.- Para el manejo del monto Comision   conversion:              PCOMISION := round(PCOMISION,2)*10000  
+    3.5.- Para el manejo del porcentaje Comision conversion:           PPCTCOMISION := (PCOMISIONPCT)*10000
+    3.6.- Para el manejo del porcentaje Comision IGTF conversion:      PPCTCOMISIONIGTF:=round(vPTCCOMISIONIGTF,2);
+     
+    
+    
+******************************************************************************/
+
+  pcomisionfijo INFI_TB_112_UI_COMISION.COMISION_MONTO_FIJO%TYPE;
+  pcomisionpct  number DEFAULT 0;--INFI_TB_112_UI_COMISION.COMISION_PCT%TYPE;
+  pblotterid infi_tb_102_bloter.BLOTER_ID%TYPE;
+  pmontomaximo INFI_TB_111_UI_BLOTTER_RANGOS.UIBLOT_UMI_INV_MTO_MAX%type;
+  pvalidador   number;
+  ptipprodcuto  INFI_TB_101_INST_FINANCIEROS.tipo_producto_id%type;
+  vMontoDisponible infi_tb_108_UI_TITULOS.UITITU_VALOR_EQUIVALENTE%type;
+  vInventario infi_tb_108_UI_TITULOS.UITITU_IN_CONTROL_DISPONIBLE%type;
+  vControl NUMBER DEFAULT 0;
+  vTipoNegocio NUMBER DEFAULT 0; -- Indicador del tipo de Negocio: 0 N/A - 1 Alto Valor - 2 Bajo Valor
+  vMSJDISPONIBILIDAD     VARCHAR(200);
+  vMontoMaximo NUMBER;
+  vBloterId    VARCHAR2(10);
+  vMSJHORARIO     VARCHAR2(200);
+  vMSJMONTOMAX VARCHAR2(200);
+  vMSJTASAMIN VARCHAR2(200);
+  vMSJTASAMAX VARCHAR2(200);
+  vMonto VARCHAR2(30);
+  vTasa  VARCHAR2(10);
+  vTasa1  VARCHAR2(10);
+  
+  vIndicadorAplicaIGTF NUMBER DEFAULT 0; --Campo indicador de aplica comision IGTF 
+  vPTCCOMISIONIGTF INFI_TB_106_UNIDAD_INVERSION.COMISION_IGTF%TYPE; --Porcentaje de comision IGTF 
+   
+  
+ CURSOR DATOS
+ IS
+     SELECT u.undinv_id, u.monto_acumulado_solic, u.undinv_tasa_cambio, u.undinv_tasa_cambio_ofer,u.COMISION_IGTF
+           FROM infi_tb_106_unidad_inversion u,
+                INFI_TB_101_INST_FINANCIEROS F
+          WHERE u.undinv_status = 'PUBLICADA' AND u.undinv_active = 1
+          AND   u.insfin_id = f.insfin_id
+          AND   f.tipo_producto_id = ptipprodcuto
+          AND    u.TIPO_NEGOCIO = vTipoNegocio;
+
+BEGIN
+       vTipoNegocio  := 1;
+       ptipprodcuto := 'SICAD2PER';
+       perror := 1;
+       pstatus := 'El mercado se encuentra Cerrado';
+
+       vMonto := (PMONTO/100);
+       IF PTASA IS NOT NULL THEN
+          vTasa := (PTASA/10000);
+       END IF;
+
+
+       SELECT PT.PARVAL_VALOR
+       INTO   vMSJDISPONIBILIDAD
+       FROM   INFI_TB_002_PARAM_TIPOS PT
+       WHERE  PARGRP_ID = '001' AND
+              PARTIP_NOMBRE_PARAMETRO = 'MSJ_DISPONIBILIDAD_SIMADI';
+
+       SELECT PT.PARVAL_VALOR
+       INTO   vMSJHORARIO
+       FROM   INFI_TB_002_PARAM_TIPOS PT
+       WHERE  PARGRP_ID = '001' AND
+              PARTIP_NOMBRE_PARAMETRO = 'MSJ_HORARIO_SIMADI';
+
+       SELECT PT.PARVAL_VALOR
+        INTO   vMSJMONTOMAX
+        FROM   INFI_TB_002_PARAM_TIPOS PT
+        WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_MONTO_MAX_SIMADI';
+
+       SELECT PT.PARVAL_VALOR
+        INTO   vMSJTASAMIN
+        FROM   INFI_TB_002_PARAM_TIPOS PT
+        WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_TASA_MIN_SIMADI';
+
+       SELECT PT.PARVAL_VALOR
+        INTO   vMSJTASAMAX
+        FROM   INFI_TB_002_PARAM_TIPOS PT
+        WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_TASA_MAX_SIMADI';
+
+
+            
+            --BUSQUEDA DE INDICADOR IGTF                                    
+             vIndicadorAplicaIGTF:=1;            
+            --BUSQUEDA DE INDICADOR IGTF                        
+            
+
+    FOR R2 IN DATOS LOOP
+        vControl:= 1;
+        
+        vPTCCOMISIONIGTF:=R2.COMISION_IGTF;
+        BEGIN
+            SELECT BR.uiblot_umi_inv_mto_min_a_valor
+            INTO   vMontoMaximo
+            FROM   INFI_TB_102_BLOTER B,
+                   INFI_TB_111_UI_BLOTTER_RANGOS BR
+            WHERE  BR.UNDINV_ID = R2.undinv_id AND
+                   B.ID_CANAL = PCANAL AND
+                   B.BLOTER_ID = BR.BLOTER_ID AND
+                   BR.tipper_id = SUBSTR(pid,1,1);
+
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            perror := 8;
+            pstatus := vMSJDISPONIBILIDAD;
+        EXIT;
+        END;
+    END LOOP;
+
+     IF vControl = 1 THEN
+        IF vMONTO >= vMontoMaximo THEN
+        
+            vTipoNegocio := 1;
+            DBMS_OUTPUT.Put_Line  ('TIPO NEGOCIO ALTO VALOR');
+        ELSE
+            vTipoNegocio := 2;
+            DBMS_OUTPUT.Put_Line  ('TIPO NEGOCIO MENUDEO');
+        END IF;
+    ELSE
+        vTipoNegocio := 2;
+    END IF;
+
+    FOR R2 IN DATOS LOOP
+
+        --Validacion del bloter en el canal 2
+            BEGIN
+                SELECT BR.BLOTER_ID,
+                       BR.uiblot_umi_inv_mto_min_a_valor
+                INTO   vBloterId,
+                       vMontoMaximo
+                FROM   INFI_TB_102_BLOTER B,
+                       INFI_TB_111_UI_BLOTTER_RANGOS BR
+                WHERE  BR.UNDINV_ID = R2.undinv_id AND
+                       B.ID_CANAL = PCANAL AND
+                       B.BLOTER_ID = BR.BLOTER_ID AND
+                       BR.tipper_id = SUBSTR(pid,1,1);
+            EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                perror := 8;
+                pstatus := vMSJDISPONIBILIDAD;
+            EXIT;
+            END;
+
+       --Validacion de horario
+       BEGIN
+          SELECT 0
+           INTO  pvalidador
+           FROM  infi_tb_107_ui_blotter uib
+           WHERE
+           --VALIDACION DE HORARIO DE TOMA DE ORDENES - ULTIMO DIA
+           (( uiblot_pedido_fe_fin =TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_desde_ult_dia, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') <=SYSDATE
+           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_hasta_ult_dia, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') >=SYSDATE
+           )
+           --VALIDACION DE HORARIO DE TOMA DE ORDENES - PRIMEROS DIAS
+           OR ( uiblot_pedido_fe_fin >TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_desde, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') <=SYSDATE
+           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_hasta, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') >=SYSDATE
+           ))
+           AND uib.bloter_id = vBloterId
+           AND uib.undinv_id = r2.undinv_id;
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+           perror := 2;
+           pstatus := vMSJHORARIO;
+        EXIT;
+        END;
+
+       IF PTIPOSOLI = 'D' THEN
+            SELECT UIT.UITITU_VALOR_EQUIVALENTE ,UIT.UITITU_IN_CONTROL_DISPONIBLE
+            INTO vMontoDisponible,
+                 vInventario
+            FROM infi_tb_108_UI_TITULOS UIT
+            WHERE UIT.UNDINV_ID = R2.undinv_id;
+
+            IF vInventario = 1 THEN
+                IF (NVL(R2.monto_acumulado_solic,0)+vMONTO) > vMontoDisponible THEN
+                    PERROR := 7;
+                    PSTATUS := vMSJMONTOMAX;
+                EXIT;
+                END IF;
+            END IF;
+       END IF;
+
+       -- Validacion de tasa
+       BEGIN
+       IF vTipoNegocio = 1 THEN        
+        SELECT case
+                when vTASA < BR.UIBLOT_TASA_PROP_MIN then 1
+                when vTASA > BR.UIBLOT_TASA_PROP_MAX then 2
+                else 0
+               end
+               INTO PValidador
+        FROM   INFI_TB_102_BLOTER B,
+               INFI_TB_111_UI_BLOTTER_RANGOS BR
+        WHERE  BR.UNDINV_ID = R2.undinv_id AND
+               B.ID_CANAL = PCANAL AND
+               B.BLOTER_ID = BR.BLOTER_ID AND
+               BR.tipper_id = SUBSTR(pid,1,1);
+              -- BR.tipper_id = pid;
+
+         IF PValidador <> 0 THEN
+               IF PValidador = 1 THEN
+                PERROR := 5;
+                PSTATUS := vMSJTASAMIN;
+               EXIT;
+               ELSE
+                PERROR := 5;
+                PSTATUS := vMSJTASAMAX;
+               EXIT;
+               END IF;
+         END IF;
+
+       END IF;
+       END;
+
+       IF vTipoNegocio = 2 THEN
+            IF PTIPOSOLI = 'D' THEN
+                      vTasa1 := NVL(r2.undinv_tasa_cambio,0);
+            ELSE
+                      vTasa1 := NVL(r2.undinv_tasa_cambio_ofer,0);
+
+                      /*
+                      SELECT NVL(PT.PARVAL_VALOR,0)
+                      INTO   vTasa1
+                      FROM   INFI_TB_002_PARAM_TIPOS PT
+                      WHERE  PARGRP_ID = '001' AND
+                             PARTIP_NOMBRE_PARAMETRO = 'TASA_OFERTA';
+                      */
+
+            END IF;
+       ELSE
+        vTasa1 := vTasa;
+       END IF;
+
+       IF pvalidador = 0 THEN
+          SELECT UC.COMISION_MONTO_FIJO,
+                 NVL(UC.COMISION_PCT,0)
+          INTO   PCOMISIONFIJO,
+                 PCOMISIONPCT
+          FROM   INFI_TB_112_UI_COMISION UC
+          WHERE  UC.UNDINV_ID = R2.undinv_id;
+       --DBMS_OUTPUT.Put_Line  ('Tasa='||vTasa1||' vMonto='||vmonto||' PCOMISIONPCT='||PCOMISIONPCT||' ');
+             
+
+          PCAPITAL:=vMONTO*vTasa1;
+             
+          IF PCOMISIONFIJO = 0 THEN
+             --PCOMISION := ((vMONTO*vTasa1*PCOMISIONPCT)/100);
+             PCOMISION := ((PCAPITAL*PCOMISIONPCT)/100);
+           ELSE
+              PCOMISION := (PCOMISIONFIJO);
+          END IF;
+
+          PPCTCOMISION:= PCOMISIONPCT;
+          PPCTCOMISIONIGTF:=vPTCCOMISIONIGTF;
+          
+          IF (vIndicadorAplicaIGTF = 1) THEN
+            PCAPITAL:=PCAPITAL+((PCAPITAL*vPTCCOMISIONIGTF)/100);
+            PCOMISION:=PCOMISION+((PCOMISION*vPTCCOMISIONIGTF)/100);  
+          ELSE
+                PPCTCOMISIONIGTF:=0;
+          END IF;
+          
+          
+
+          
+           DBMS_OUTPUT.Put_Line  (' vMonto= '|| vmonto );
+           DBMS_OUTPUT.Put_Line  ('Tasa='|| vTasa1 );
+           
+           DBMS_OUTPUT.Put_Line  (' CAPITAL= ' || PCAPITAL );
+           DBMS_OUTPUT.Put_Line  (' COMISION = ' || PCOMISION );    
+           DBMS_OUTPUT.Put_Line  (' % COMISION ='|| PPCTCOMISION );                                                                                               
+           DBMS_OUTPUT.Put_Line  (' % COMISION IGTF ='|| PPCTCOMISIONIGTF);
+
+
+          PCAPITAL :=  round(PCAPITAL,2)*10000;
+          PCOMISION := round(PCOMISION,2)*10000;
+          PCOMISION:=  round(PCOMISION,2)*10000;
+          PPCTCOMISION := round(PCOMISIONPCT,4)*10000;
+          PPCTCOMISIONIGTF:=round(vPTCCOMISIONIGTF,4)*10000;
+          
+        --PCAPITAL := round(PCAPITAL,2); 
+        --PCOMISION := round(PCOMISION,2); 
+        --PPCTCOMISION := round(PCOMISIONPCT,4); 
+        --PPCTCOMISIONIGTF:=round(vPTCCOMISIONIGTF,4); 
+          
+       END IF;
+    perror := 0;
+    pstatus := 'OK';
+    DBMS_OUTPUT.Put_Line  ('pstatus='|| pstatus );
+    END LOOP;
+    
+   
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        perror := 1;
+        pstatus := 'El mercado se encuentra Cerrado / No_DATA'||SQLCODE||' '||SQLERRM;
+        DBMS_OUTPUT.Put_Line  ('ERROR NO_DATA_FOUND ' ||SQLCODE||' '||SQLERRM );
+    WHEN OTHERS THEN
+        perror := 1;
+        pstatus := 'El mercado se encuentra Cerrado / Others'||SQLCODE||' '||SQLERRM;
+        DBMS_OUTPUT.Put_Line  ('ERROR OTHERS ' ||SQLCODE||' '||SQLERRM);
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_CP_MERCADO(
+      pid     in   varchar2,
+      PMONTO  IN   varchar2,
+      PCANAL  IN   varchar2,
+      PTIPOSOLI IN VARCHAR2,
+      pdiasretencion OUT VARCHAR2,
+      PTASA     OUT VARCHAR2,
+      PSTATUS OUT  VARCHAR2,
+      perror      OUT      NUMBER
+      )
+AS
+/******************************************************************************
+   NAME:       MERCADO_VALIDACION
+   PURPOSE:    Validacion de los valores devultos en la toma de orden por clavenet
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        14/02/2015  AGOMEZ          1. Created this procedure.
+   2.0        14/01/2016  LPEREZ          1. Se consulta la tasa de la oferta
+                                          de la tabla INFI_TB_106_UNIDAD_INVERSION.
+
+******************************************************************************/
+
+
+    vTipoNegocio NUMBER DEFAULT 0;
+    vMontoMaximo NUMBER;
+    vTipoProducto VARCHAR2(20); --0 N/A, 1 = Alto Valor, 2 = Bajo Valor
+    vBloterId    VARCHAR(10);
+    vValidador   NUMBER;
+    vEmpid        varchar2(10);
+    vMSJMONTOMIN    varchar2(200);
+    vMSJMONTOMAX    varchar2(200);
+    vMSJTASA     VARCHAR2(200);
+    vMSJHORARIO     VARCHAR2(200);
+    vMSJDISPONIBILIDAD     VARCHAR2(200);
+    vMSJMULTIPLOS     VARCHAR2(200);
+    vMSJEMPLEADO     VARCHAR2(200);
+    vControl NUMBER DEFAULT 0;
+    vMonto VARCHAR2(30);
+    vMultiplesOrdenes NUMBER;
+    vValidaMultOrde NUMBER;
+    vMSJOrdenes VARCHAR2(200);
+
+
+
+CURSOR UNIDAD --R2
+ IS
+     SELECT u.undinv_id, u.undinv_nombre nombre_unidad,
+            u.undinv_in_vta_empleados,
+            u.undinv_tasa_cambio, u.undinv_tasa_cambio_ofer, u.undinv_multiplos, u.INSFIN_ID
+     FROM   infi_tb_106_unidad_inversion u,
+            INFI_TB_101_INST_FINANCIEROS F
+     WHERE  u.undinv_status = 'PUBLICADA' AND u.undinv_active = 1
+     AND    u.insfin_id = f.insfin_id
+     AND    f.tipo_producto_id = vTipoProducto
+     AND    u.TIPO_NEGOCIO = vTipoNegocio;
+
+/*CURSOR UNIDAD_ALTO_VALOR
+    IS
+        SELECT u.undinv_id
+           FROM infi_tb_106_unidad_inversion u,
+                INFI_TB_101_INST_FINANCIEROS F
+          WHERE u.undinv_status = 'PUBLICADA' AND u.undinv_active = 1
+          AND   u.insfin_id = f.insfin_id
+          AND   f.tipo_producto_id = vTipoProducto
+          AND   u.TIPO_NEGOCIO = vTipoNegocio;
+*/
+
+BEGIN
+
+    vMonto := (PMONTO/100);
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJMONTOMIN
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_MONTO_MIN_SIMADI';
+
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJMONTOMAX
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_MONTO_MAX_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJTASA
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_TASA_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJHORARIO
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_HORARIO_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJDISPONIBILIDAD
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_DISPONIBILIDAD_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJMULTIPLOS
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_MULTIPLOS_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJEMPLEADO
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_EMPLEADO_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJOrdenes
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_MUL_ORDE_SIMADI';
+
+
+
+    vTipoNegocio  := 1;
+    vTipoProducto := 'SICAD2PER';
+    perror := 1;
+    pstatus := 'El mercado se encuentra Cerrado';
+
+    FOR R2 IN UNIDAD LOOP
+        vControl:= 1;
+        BEGIN
+            SELECT BR.uiblot_umi_inv_mto_min_a_valor
+            INTO   vMontoMaximo
+            FROM   INFI_TB_102_BLOTER B,
+                   INFI_TB_111_UI_BLOTTER_RANGOS BR
+            WHERE  BR.UNDINV_ID = R2.undinv_id AND
+                   B.ID_CANAL = PCANAL AND
+                   B.BLOTER_ID = BR.BLOTER_ID AND
+                   BR.tipper_id = SUBSTR(pid,1,1);
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            perror := 8;
+            pstatus := vMSJDISPONIBILIDAD;
+        EXIT;
+        END;
+    END LOOP;
+
+  IF vControl = 1 THEN
+    IF vMONTO >= vMontoMaximo THEN
+        vTipoNegocio := 1;
+    ELSE
+        vTipoNegocio := 2;
+    END IF;
+  ELSE
+    vTipoNegocio := 2;
+  END IF;
+
+
+
+    IF vTipoNegocio <> 0 THEN
+
+        FOR R2 IN UNIDAD LOOP
+
+            BEGIN
+                SELECT BR.BLOTER_ID,
+                       BR.uiblot_umi_inv_mto_min_a_valor
+                INTO   vBloterId,
+                       vMontoMaximo
+                FROM   INFI_TB_102_BLOTER B,
+                       INFI_TB_111_UI_BLOTTER_RANGOS BR
+                WHERE  BR.UNDINV_ID = R2.undinv_id AND
+                       B.ID_CANAL = PCANAL AND
+                       B.BLOTER_ID = BR.BLOTER_ID AND
+                       BR.tipper_id = SUBSTR(pid,1,1);
+            EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                perror := 8;
+                pstatus := vMSJDISPONIBILIDAD;
+            EXIT;
+            END;
+
+            --Validacion de horario
+
+           BEGIN
+           select validacion_horarios(vBloterId,r2.undinv_id) into perror FROM DUAL;
+           EXCEPTION
+           WHEN OTHERS THEN
+           perror := 2;
+           pstatus := 'Ocurrio un error inesperado en el proceso de verificacion de horarios ';
+           vValidador := 1;
+            EXIT;
+           END;
+
+            IF perror=1 THEN
+                perror := 2;
+                pstatus := vMSJHORARIO;
+                EXIT;
+            END IF;
+
+        --Validacion de horario SECCION DE CODIGO TRASLADADO A LA FUNCION  validacion_horarios EN INCIDENCIA ITS-3130 NM26659_03/06/2016
+        --                       BEGIN
+        --                          SELECT 0
+        --                           INTO  vValidador
+        --                           FROM  infi_tb_107_ui_blotter uib
+        --                           WHERE
+        --                           --VALIDACION DE HORARIO DE TOMA DE ORDENES - ULTIMO DIA
+        --                           (( uiblot_pedido_fe_fin =TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+        --                           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_desde_ult_dia, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') <=SYSDATE
+        --                           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_hasta_ult_dia, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') >=SYSDATE
+        --                           )
+        --                           --VALIDACION DE HORARIO DE TOMA DE ORDENES - PRIMEROS DIAS
+        --                           OR ( uiblot_pedido_fe_fin >TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+        --                           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_desde, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') <=SYSDATE
+        --                           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_hasta, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') >=SYSDATE
+        --                           ))
+        --                           AND uib.bloter_id = vBloterId
+        --                           AND uib.undinv_id = r2.undinv_id;
+        --                       EXCEPTION
+        --                        WHEN NO_DATA_FOUND THEN
+        --                           perror := 2;
+        --                           pstatus := vMSJHORARIO;
+        --                       EXIT;
+        --                       END;
+           --Validacion de horario SECCION DE CODIGO TRASLADADO A LA FUNCION  validacion_horarios EN INCIDENCIA ITS-3130 NM26659_03/06/2016
+
+           BEGIN
+                --SE AGREGA AJUSTE PARA QUE NO CONSULTE HRSYS
+                --SE CONSULTA VISTA MATERIALIZADA
+                IF r2.undinv_in_vta_empleados = 0 THEN
+                   vEmpid := LTRIM(SUBSTR(PID,2,11),'0');
+                 SELECT 1
+                 INTO  vValidador
+                 --FROM  PS_RRHH_VIEW
+                 FROM  INFI_VIM_PS_RRHH_VIEW
+                 WHERE EMPLID = vEmpid;
+                END IF;
+                 IF vValidador = 1 THEN
+                   perror := 3;
+                   pstatus := vMSJEMPLEADO;
+                   EXIT;
+                 END IF;
+           EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                vValidador := 0;
+           END;
+           --DBMS_OUTPUT.put_line ('vMultiplesOrdenes' || ' ' || vMultiplesOrdenes);
+           BEGIN
+           --DBMS_OUTPUT.put_line ('R2.INSFIN_ID' || ' ' || R2.INSFIN_ID);
+            SELECT F.INSFIN_MULTIPLES_ORDENES
+            INTO   vMultiplesOrdenes
+            FROM   INFI_TB_101_INST_FINANCIEROS F
+            WHERE  F.INSFIN_ID = R2.INSFIN_ID;
+           EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                perror := 8;
+                pstatus := vMSJDISPONIBILIDAD;
+           EXIT;
+           END;
+
+           --DBMS_OUTPUT.put_line ('vMultiplesOrdenes' || ' ' || vMultiplesOrdenes);
+            IF vMultiplesOrdenes = 0 THEN
+            --DBMS_OUTPUT.put_line ('vMultiplesOrdenes' || ' ' || vMultiplesOrdenes);
+                SELECT count(1)
+                INTO vValidaMultOrde
+                FROM  SOLICITUDES_SITME SS
+                WHERE LTRIM(SUBSTR(SS.CED_RIF_CLIENTE,2,15),'0') = LTRIM(SUBSTR(PID,2,15),'0')||'0' AND
+                      SS.FECHA_REGISTRO = TO_DATE(SYSDATE);
+                IF vValidaMultOrde >= 1 THEN
+                    perror := 8;
+                    pstatus := vMSJOrdenes;
+                EXIT;
+                END IF;
+            END IF;
+
+           --Validacion de multiplo
+           IF NOT MOD(vMONTO,R2.UNDINV_MULTIPLOS) = 0 THEN
+                perror := 9;
+                pstatus := vMSJMULTIPLOS ||' '|| R2.UNDINV_MULTIPLOS;
+               EXIT;
+           END IF;
+
+           --Validacion de motno bajo valor
+           BEGIN
+               IF vTipoNegocio = 2 THEN
+                   SELECT case
+                            when vmonto < BR.UIBLOT_UMI_INV_MTO_MIN then 1
+                            when vmonto >= BR.uiblot_umi_inv_mto_min_a_valor then 2
+                            else 0
+                          end
+                          INTO vValidador
+                   FROM   INFI_TB_102_BLOTER B,
+                          INFI_TB_111_UI_BLOTTER_RANGOS BR
+                   WHERE  BR.UNDINV_ID = R2.undinv_id AND
+                          B.ID_CANAL = PCANAL AND
+                          B.BLOTER_ID = BR.BLOTER_ID AND
+                          BR.tipper_id = SUBSTR(pid,1,1);
+
+
+                   IF vValidador <> 0 THEN
+                       IF vValidador = 1 THEN
+                        PERROR := 4;
+                        PSTATUS := vMSJMONTOMIN;
+                       EXIT;
+                       ELSE
+                        PERROR := 4;
+                        PSTATUS := vMSJMONTOMAX;
+                       EXIT;
+                       END IF;
+                   END IF;
+               END IF;
+           END;
+
+           IF vTipoNegocio = 2 THEN
+               IF PTIPOSOLI = 'D' THEN
+                  PTASA := NVL(r2.undinv_tasa_cambio,0)*10000;
+               ELSE
+                  PTASA := NVL(r2.undinv_tasa_cambio_ofer,0)*10000;
+                  /*
+                  SELECT NVL(PT.PARVAL_VALOR,0)*10000
+                  INTO   PTASA
+                  FROM   INFI_TB_002_PARAM_TIPOS PT
+                  WHERE  PARGRP_ID = '001' AND
+                         PARTIP_NOMBRE_PARAMETRO = 'TASA_OFERTA';
+                  */
+               END IF;
+           ELSE
+                PTASA := 0;
+           END IF;
+
+           SELECT PT.PARVAL_VALOR
+           INTO   pdiasretencion
+           FROM   INFI_TB_002_PARAM_TIPOS PT
+           WHERE  PARGRP_ID = '001' AND
+                  PARTIP_NOMBRE_PARAMETRO = 'DIAS_RETENCION';
+
+           PERROR := 0;
+           PSTATUS := 'OK';
+        END LOOP;
+    END IF;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        perror := 1;
+        pstatus := 'El mercado se encuentra Cerrado. Mercado. / No_DATA'||SQLCODE||' '||SQLERRM;
+    WHEN OTHERS THEN
+        perror := 1;
+        pstatus := 'El mercado se encuentra Cerrado. Mercado. / Others'||SQLCODE||' '||SQLERRM;
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_CP_TOMA_DE_ORDEN(
+      PTIPOSOLI             IN   VARCHAR,
+      PIDORDEN              IN   NUMBER,
+      PTASA                 IN   VARCHAR2,--4
+      PMONTO                IN   VARCHAR2,--2
+      PCANAL                IN   NUMBER,
+      PID                   IN   VARCHAR2,
+      PFECHVENCIMIENTOID    IN   VARCHAR2,
+      PNOMBRECLI            IN   VARCHAR2,
+      PCORREO               IN   VARCHAR2,
+      PNUMBLOQUEO           IN   VARCHAR2,
+      PNUMBLOQUEOOF         IN   VARCHAR2,
+      PCUENTABFS            IN   VARCHAR2,
+      PCUENTANUM            IN   VARCHAR2,
+      PCTABANCO             IN   VARCHAR2,
+      PCTADIRECCION         IN   VARCHAR2,
+      PCTABITSWIFT          IN   VARCHAR2,
+      PTELEFONO             IN   VARCHAR2,
+      PTELEFONO1            IN   VARCHAR2,
+      PTELEFONO2            IN   VARCHAR2,
+      PCTADIRECCIONC        IN   VARCHAR2,
+      PDIDCANAL             IN   VARCHAR2,
+      PCODPAISORIGEN        IN   VARCHAR2,
+      PPAISORIGEN           IN   VARCHAR2,
+      PCODESTADO            IN   VARCHAR2,
+      PESTADO               IN   VARCHAR2,
+      PCODCIUDAD            IN   VARCHAR2,
+      PCIUDAD               IN   VARCHAR2,
+      PCTAABONO             IN   VARCHAR2,
+      PCTAABONOMONEDA       IN   VARCHAR2,
+      PNOMSUBASTA           IN   VARCHAR2,
+      PORIGENFONDO          IN   VARCHAR2,
+      PDESTINOFONDO         IN   VARCHAR2,
+      PSTATUS               OUT  VARCHAR2,
+      PERROR                OUT  NUMBER
+)AS
+
+
+/******************************************************************************
+   NAME:       TOMA_DE_ORDEN
+   PURPOSE:    Permite la insercion de la orden desde clavenet
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        14/02/2015  AGOMEZ          1. Created this procedure.
+   1.1        01/04/2015  AGOMEZ          1. Modificacion en el INSERT para el bloqueo del registro y evitar la duplicidad del mismo
+   1.2        12/06/2015  AGOMEZ          1. Se agrega la validacion de monto para bajo valor. ITS-2653
+   1.3        14/09/2015  LPEREZ          1. Se agrega validacion para evitar que se registren ordenes con el mercado cerrado
+   1.4        22/09/2015  AGOMEZ          1. Se agrega validacion para evitar que se registren ordenes con el mercado cerrado
+   1.5        24/09/2015  LPEREZ          1. Modificacion para retornar el valor de error en validacion de multiples ordenes
+   2.0        14/01/2016  LPEREZ          1. Se consulta la tasa de la oferta de la tabla INFI_TB_106_UNIDAD_INVERSION.
+   2.1        03/06/2016  DAREVA          1. SECCION DE CODIGO TRASLADADO A LA FUNCION  validacion_horarios EN INCIDENCIA ITS-3130 NM26659
+   2.2        30/09/2016  CESPIN          1. Corrección de formato de hora y minuto de registro de ordenes SIMADI PN TO_CHAR(SYSDATE, 'HH:MI:SS')
+
+******************************************************************************/
+
+  PMONTOCOMISION       SOLICITUDES_SITME.MONTO_COMISION%TYPE DEFAULT 0;
+  PIDCONCEPTO          SOLICITUDES_SITME.id_concepto%TYPE;
+  PIDPRODUCTO          SOLICITUDES_SITME.id_producto%TYPE;
+  PPCCOMISION NUMBER DEFAULT 0;
+  PVALORNOMINAL NUMBER;
+  pcomisionfijo INFI_TB_112_UI_COMISION.COMISION_MONTO_FIJO%TYPE;
+  pcomisionpct  INFI_TB_112_UI_COMISION.COMISION_PCT%TYPE;
+  pblotterid infi_tb_102_bloter.BLOTER_ID%TYPE;
+  PVENCERIF SOLICITUDES_SITME.FECHA_VENC_RIF%TYPE DEFAULT SYSDATE;
+  PNOMCLIENTE VARCHAR2(90);
+  vCUENTABFS  varchar(30) DEFAULT '0';
+  ptipprodcuto  INFI_TB_101_INST_FINANCIEROS.tipo_producto_id%type;
+  vCUENTANUM varchar2(60) DEFAULT '0';
+  vCTABANCO VARCHAR2(60) DEFAULT '0';
+  vCTADIRECCION VARCHAR2(90) DEFAULT 'SIN DIRECCION';
+  vTELEFONO   VARCHAR2(30) DEFAULT 'SINTELEFONO';
+  vTELEFONO1  VARCHAR2(30) DEFAULT 'SINTELEFONO';
+  vTELEFONO2   VARCHAR2(30) DEFAULT 'SINTELEFONO';
+  vValidador   NUMBER default 0;
+  pundind_id   infi_tb_106_unidad_inversion.undinv_id%type;
+  vControl NUMBER DEFAULT 0;
+  vTipoNegocio NUMBER DEFAULT 0;
+  vMSJDISPONIBILIDAD   INFI_TB_002_PARAM_TIPOS.parval_valor%type;
+  vMontoMaximo         NUMBER;
+  vMSJHORARIO          INFI_TB_002_PARAM_TIPOS.parval_valor%type;
+  vCTAABONO NUMBER;
+  vMonto VARCHAR2(30);
+  vTasa  VARCHAR2(10);
+  vTasa1  VARCHAR2(10);
+  vCLIENT_ID NUMBER;
+/** MANEJO DE INVENTARIO **/
+  vMontoDisponible  infi_tb_108_UI_TITULOS.uititu_valor_equivalente%type;
+  vInventario       infi_tb_108_UI_TITULOS.uititu_in_control_disponible%type;
+  vMSJMONTOMAX      INFI_TB_002_PARAM_TIPOS.parval_valor%type;
+  --MultiplesOrdenes
+  vMultiplesOrdenes NUMBER;
+  vValidaMultOrde   NUMBER;
+  vMSJOrdenes       VARCHAR2(200);
+  vMSJMONTOMIN      varchar2(200);
+
+  CURSOR INSERTARDATOS
+    IS
+     SELECT u.undinv_id, u.undinv_tasa_cambio, u.undinv_tasa_cambio_ofer,
+            u.monto_acumulado_solic, u.INSFIN_ID
+     FROM   infi_tb_106_unidad_inversion u,
+            INFI_TB_101_INST_FINANCIEROS F
+     WHERE  u.undinv_status = 'PUBLICADA' AND u.undinv_active = 1
+     AND    u.insfin_id = f.insfin_id
+     AND   f.tipo_producto_id = ptipprodcuto
+     AND    u.TIPO_NEGOCIO = vTipoNegocio;
+
+
+BEGIN
+    vTipoNegocio  := 1;
+    ptipprodcuto := 'SICAD2PER';
+    perror := 1;
+    pstatus := 'El mercado se encuentra Cerrado';
+    PIDCONCEPTO := '6';--Valor por defecto para SIMADI
+
+    vMonto := (PMONTO/100);
+    /*IF PTASA IS NOT NULL THEN
+       vTasa := (PTASA/10000);
+       PVALORNOMINAL := vMonto*vTasa;
+    END IF;*/
+
+    SELECT PT.PARVAL_VALOR
+     INTO   vMSJMONTOMAX
+     FROM   INFI_TB_002_PARAM_TIPOS PT
+     WHERE  PARGRP_ID = '001' AND
+        PARTIP_NOMBRE_PARAMETRO = 'MSJ_MONTO_MAX_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+       INTO   vMSJDISPONIBILIDAD
+       FROM   INFI_TB_002_PARAM_TIPOS PT
+       WHERE  PARGRP_ID = '001' AND
+              PARTIP_NOMBRE_PARAMETRO = 'MSJ_DISPONIBILIDAD_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+       INTO   vMSJHORARIO
+       FROM   INFI_TB_002_PARAM_TIPOS PT
+       WHERE  PARGRP_ID = '001' AND
+              PARTIP_NOMBRE_PARAMETRO = 'MSJ_HORARIO_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJOrdenes
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_MUL_ORDE_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJMONTOMIN
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_MONTO_MIN_SIMADI';
+
+
+    IF PFECHVENCIMIENTOID <> '' THEN
+        PVENCERIF := PFECHVENCIMIENTOID;
+    END IF;
+
+    IF PCUENTABFS IS NOT NULL THEN
+         vCUENTABFS := PCUENTABFS;
+    END IF;
+
+    IF PCUENTANUM IS NOT NULL THEN
+        vCUENTANUM := PCUENTANUM;
+    END IF;
+
+    IF PCTABANCO IS NOT NULL THEN
+        vCTABANCO := PCTABANCO;
+    END IF;
+
+    IF PCTADIRECCION IS NOT NULL THEN
+        vCTADIRECCION := PCTADIRECCION;
+    END IF;
+
+     IF PTELEFONO IS NOT NULL THEN
+        vTELEFONO := PTELEFONO;
+    END IF;
+
+    IF PTELEFONO1 IS NOT NULL THEN
+        vTELEFONO1 := PTELEFONO1;
+    END IF;
+
+    IF PTELEFONO2 IS NOT NULL THEN
+        vTELEFONO2 := PTELEFONO2;
+    END IF;
+
+    FOR R3 IN INSERTARDATOS LOOP
+        vControl:= 1;
+        BEGIN
+            SELECT BR.uiblot_umi_inv_mto_min_a_valor
+            INTO   vMontoMaximo
+            FROM   INFI_TB_102_BLOTER B,
+                   INFI_TB_111_UI_BLOTTER_RANGOS BR
+            WHERE  BR.UNDINV_ID = R3.undinv_id AND
+                   B.ID_CANAL = PCANAL AND
+                   B.BLOTER_ID = BR.BLOTER_ID AND
+                   BR.tipper_id = SUBSTR(pid,1,1);
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            perror := 8;
+            pstatus := vMSJDISPONIBILIDAD;
+            vValidador:= 1;
+        EXIT;
+        END;
+    END LOOP;
+
+     /*
+    NM32454 LPEREZ 14/09/2015
+     ITS-2836: SE AGREGA VALIDACION PARA QUE CUANDO NO EXISTAN REGISTROS EN ESTE QUERY NO REGISTRE LA ORDEN
+    */
+    IF vControl = 0 THEN
+        vValidador:= 1;
+    END IF;
+
+
+    IF vControl = 1 THEN
+        IF vMonto >= vMontoMaximo THEN
+            vTipoNegocio := 1;
+        ELSE
+            vTipoNegocio := 2;
+        END IF;
+    ELSE
+        vTipoNegocio := 2;
+    END IF;
+
+
+    FOR R3 IN INSERTARDATOS LOOP
+        pundind_id := r3.undinv_id;
+        --Validacion de Tasa
+         BEGIN
+            IF PTASA IS NOT NULL THEN
+               vTasa := (PTASA/10000);
+               PVALORNOMINAL := vMonto*vTasa;
+            ELSE
+               perror := 10;
+               pstatus := vMSJDISPONIBILIDAD;
+               vValidador := 1;
+            EXIT;
+            END IF;
+         EXCEPTION
+            WHEN OTHERS THEN
+                perror := 11;
+                pstatus := vMSJDISPONIBILIDAD;
+                vValidador := 1;
+            EXIT;
+         END;
+        --Validacion del bloter en el canal 2
+            BEGIN
+                SELECT BR.BLOTER_ID,
+                       BR.uiblot_umi_inv_mto_min_a_valor
+                INTO   PBLOTTERID,
+                       vMontoMaximo
+                FROM   INFI_TB_102_BLOTER B,
+                       INFI_TB_111_UI_BLOTTER_RANGOS BR
+                WHERE  BR.UNDINV_ID = R3.undinv_id AND
+                       B.ID_CANAL = PCANAL AND
+                       B.BLOTER_ID = BR.BLOTER_ID AND
+                       BR.tipper_id = SUBSTR(pid,1,1);
+            EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                perror := 8;
+                pstatus := vMSJDISPONIBILIDAD;
+                vValidador:= 1;
+            EXIT;
+            END;
+
+        --Validacion de horario
+        BEGIN
+        select validacion_horarios(PBLOTTERID,r3.undinv_id) into perror FROM DUAL;
+        EXCEPTION
+        WHEN OTHERS THEN
+        perror := 2;
+        pstatus := 'Ocurrio un error inesperado en el proceso de verificacion de horarios ';
+        vValidador := 1;
+        EXIT;
+        END;
+
+        IF perror=1 THEN
+            perror := 2;
+            pstatus := vMSJHORARIO;
+            vValidador := 1;
+            EXIT;
+        END IF;
+
+        --Validacion de horario: SECCION DE CODIGO TRASLADADO A LA FUNCION  validacion_horarios EN INCIDENCIA ITS-3130 NM26659_03/06/2016
+                --BEGIN
+                --SELECT 0
+                --INTO  perror
+                --FROM  infi_tb_107_ui_blotter uib
+                --WHERE
+                -- --VALIDACION DE HORARIO DE TOMA DE ORDENES - ULTIMO DIA
+                -- ((uiblot_pedido_fe_fin =TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+                -- AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_desde_ult_dia, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') <=SYSDATE
+                -- AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_hasta_ult_dia, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') >=SYSDATE)
+                -- --VALIDACION DE HORARIO DE TOMA DE ORDENES - PRIMEROS DIAS
+                --OR ( uiblot_pedido_fe_fin >TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+                --AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_desde, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') <=SYSDATE
+                --AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_hasta, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') >=SYSDATE))
+                --AND uib.bloter_id = PBLOTTERID
+                --AND uib.undinv_id = r3.undinv_id;
+                --EXCEPTION
+                --WHEN NO_DATA_FOUND THEN
+                --perror := 2;
+                --pstatus := vMSJHORARIO;
+                --vValidador := 1;
+                --EXIT;
+                --END;
+       --Validacion de horario: SECCION DE CODIGO TRASLADADO A LA FUNCION  validacion_horarios EN INCIDENCIA ITS-3130 NM26659_03/06/2016
+           BEGIN
+            SELECT F.INSFIN_MULTIPLES_ORDENES
+            INTO   vMultiplesOrdenes
+            FROM   INFI_TB_101_INST_FINANCIEROS F
+            WHERE  F.INSFIN_ID = R3.INSFIN_ID;
+           EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                perror := 8;
+                pstatus := vMSJDISPONIBILIDAD;
+                vValidador:= 1;
+           EXIT;
+           END;
+
+
+            /*IF vMultiplesOrdenes = 0 THEN
+                SELECT count(1)
+                INTO vValidaMultOrde
+                FROM  SOLICITUDES_SITME SS
+                WHERE LTRIM(SUBSTR(SS.CED_RIF_CLIENTE,2,15),'0') = LTRIM(SUBSTR(PID,2,15),'0')||'0' AND
+                      SS.FECHA_REGISTRO = TO_DATE(SYSDATE);
+                IF vValidaMultOrde >= 1 THEN
+                    perror := 8;
+                    pstatus := vMSJOrdenes;
+                EXIT;
+                END IF;
+            END IF;*/
+        --Validacion de multiples ordenes FIN
+
+        BEGIN
+            SELECT UC.COMISION_MONTO_FIJO,
+                   UC.COMISION_PCT
+            INTO   PCOMISIONFIJO,
+                   PCOMISIONPCT
+            FROM   INFI_TB_112_UI_COMISION UC
+            WHERE  UC.UNDINV_ID = R3.undinv_id;
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            perror := 6;
+            pstatus := 'Debe agregarle montos de comision a la unidad';
+            vValidador := 1;
+        EXIT;
+        END;
+
+       IF vTipoNegocio = 2 THEN
+          IF PTIPOSOLI = 'D' THEN
+             vTasa1 := NVL(r3.undinv_tasa_cambio,0);
+            ELSE
+             vTasa1 := NVL(r3.undinv_tasa_cambio_ofer,0);
+              /*
+              SELECT NVL(PT.PARVAL_VALOR,0)
+              INTO   vTasa1
+              FROM   INFI_TB_002_PARAM_TIPOS PT
+              WHERE  PARGRP_ID = '001' AND
+                      PARTIP_NOMBRE_PARAMETRO = 'TASA_OFERTA';
+              */
+          END IF;
+        ELSE
+           vTasa1 := vTasa;
+       END IF;
+       --Validacion de motno bajo valor
+       BEGIN
+           IF vTipoNegocio = 2 THEN
+               SELECT case
+                        when vmonto < BR.UIBLOT_UMI_INV_MTO_MIN then 1
+                        when vmonto >= BR.uiblot_umi_inv_mto_min_a_valor then 2
+                        else 0
+                      end
+                      INTO vValidador
+               FROM   INFI_TB_102_BLOTER B,
+                      INFI_TB_111_UI_BLOTTER_RANGOS BR
+               WHERE  BR.UNDINV_ID = R3.undinv_id AND
+                      B.ID_CANAL = PCANAL AND
+                      B.BLOTER_ID = BR.BLOTER_ID AND
+                      BR.tipper_id = SUBSTR(pid,1,1);
+
+
+               IF vValidador <> 0 THEN
+                   IF vValidador = 1 THEN
+                    PERROR := 4;
+                    PSTATUS := vMSJMONTOMIN;
+                   EXIT;
+                   ELSE
+                    PERROR := 4;
+                    PSTATUS := vMSJMONTOMAX;
+                   EXIT;
+                   END IF;
+               END IF;
+           END IF;
+       END;
+/* Calculos de las comisiones*/
+       IF perror <> 6 THEN
+          IF PTIPOSOLI = 'D' THEN
+             PSTATUS := '0';
+             PIDPRODUCTO := '6'; ---Demanda temporal
+             vCTAABONO := 2;
+           ELSE
+              PIDPRODUCTO := '7'; ---Oferta temporal
+              vCTAABONO := 3;
+          END IF;
+--DBMS_OUTPUT.Put_Line  ('Tasa='||vTasa1||' vMonto='||vmonto||' PCOMISIONPCT='||PCOMISIONPCT||' ');
+          IF PCOMISIONFIJO = 0 THEN
+             PMONTOCOMISION := (vMonto*vTasa1*PCOMISIONPCT)/100;
+           ELSE
+              PMONTOCOMISION := PCOMISIONFIJO;
+          END IF;
+          PPCCOMISION := PCOMISIONPCT;
+          PMONTOCOMISION := round(PMONTOCOMISION,2);
+       END IF;
+/***Manejo de Inventario para las Demanada y si lo indica la unidad**/
+       IF PTIPOSOLI = 'D' THEN
+          SELECT UIT.UITITU_VALOR_EQUIVALENTE ,UIT.UITITU_IN_CONTROL_DISPONIBLE
+          INTO vMontoDisponible,
+               vInventario
+          FROM infi_tb_108_UI_TITULOS UIT
+          WHERE UIT.UNDINV_ID = pundind_id;
+          IF vInventario = 1 THEN
+             IF (NVL(r3.monto_acumulado_solic,0)+vMONTO) > vMontoDisponible THEN
+                PERROR := 7;
+                PSTATUS := vMSJMONTOMAX;
+                vValidador := 1;
+             END IF;
+          END IF;
+       END IF;
+       --IF vValidador <> 1 then
+       IF vValidador = 0 then
+          PSTATUS := 'OK';
+          perror := 0;
+       END IF;
+    END LOOP;
+
+    IF perror = 1 THEN
+        vValidador:= 1;
+    END IF;
+
+/*--Registros de los datos ---*/
+ --IF vValidador <> 1 THEN
+ IF vValidador = 0 THEN
+    SAVEPOINT start_tran;
+     IF vMultiplesOrdenes = 0 THEN
+        BEGIN
+            SELECT 1
+            INTO vValidaMultOrde
+            FROM  SOLICITUDES_SITME SS
+            WHERE LTRIM(SUBSTR(SS.CED_RIF_CLIENTE,2,15),'0') = LTRIM(SUBSTR(PID,2,15),'0')||'0' AND
+                  SS.FECHA_REGISTRO = TO_DATE(SYSDATE)
+            FOR UPDATE;
+            ROLLBACK;
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            perror := 0;
+            pstatus := 'Ok';
+        END;
+     END IF;
+
+     IF vValidaMultOrde IS NULL THEN
+        INSERT INTO SOLICITUDES_SITME
+          (ID_ORDEN,
+          NUMERO_ORDEN_INFI,
+          NOMBRE_CLIENTE,
+          CED_RIF_CLIENTE,
+          FECHA_VENC_RIF,
+          NUM_RUSITME,
+          EMAIL_CLIENTE,
+          CED_RIF_CONTRAPARTE,
+          MONTO_SOLICITADO,
+          MONTO_COMISION,
+          PORC_COMISION,
+          NUM_BLOQUEO,
+          MONTO_ADJUDICADO,
+          ID_CONCEPTO,
+          SECTOR_PRODUCTIVO,
+          SECTOR_ACT_ECONOM,
+          GRUPO_ECONOMICO,
+          ESTATUS,
+          FECHA_REGISTRO,
+          HORA_REGISTRO,
+          FECHA_TRAMITE,
+          FECHA_ADJUDICACION,
+          FECHA_COBRO,
+          FECHA_ENV_SWIFT,
+          FECHA_RES_SWIFT,
+          TITULO_ADJUDICADO,
+          PRECIO_ADJUDICACION,
+          VALOR_EFECTIVO_USD,
+          VALOR_NOMINAL_USD,
+          VALOR_EFECTIVO,
+          VALOR_NOMINAL,
+          CUENTA_BSF_O,
+          NOMBRE_BENEFICIARIO,
+          CTA_NUMERO,
+          CTA_BANCO,
+          CTA_DIRECCION,
+          CTA_BIC_SWIFT,
+          CTA_TELEFONO,
+          CTA_TELEFONO_2,
+          CTA_TELEFONO_3,
+          CTA_ABA,
+          CTA_DIRECCION_C,
+          CTA_IBAN,
+          CTA_INT_NUMERO,
+          CTA_INT_BANCO,
+          CTA_INT_DIRECCION,
+          CTA_INT_BIC_SWIFT,
+          CTA_INT_TELEFONO,
+          CTA_INT_ABA,
+          CONTADOR_ENV_SWIFT,
+          ID_CANAL,
+          FECHA_MODIFICACION,
+          FECHA_SALIDA_VIAJE,
+          FECHA_RETORNO_VIAJE,
+          COD_PAIS_ORIGEN,
+          DESC_PAIS_ORIGEN,
+          COD_ESTADO_ORIGEN,
+          DESC_ESTADO_ORIGEN,
+          COD_CIUDAD_ORIGEN,
+          DESC_CIUDAD_ORIGEN,
+          COD_PAIS_DESTINO,
+          DESC_PAIS_DESTINO,
+          NUM_PASAPORTE,
+          NUM_BOLETO,
+          CTA_ABONO,
+          CTA_ABONO_MONEDA,
+          NUM_BOLETO_VUELTA,
+          ID_PRODUCTO,
+          TASA_CAMBIO,
+          UNDINV_ID,
+          FECHA_RECEPCION_REC,
+          HORA_RECEPCION_REC,
+          NOMBRE_SUBASTA,
+          ORIGEN_FONDOS,
+          DESTINO_FONDOS,
+          num_bloqueo_oferta)
+          VALUES
+          (PIDORDEN,
+          '',
+          PNOMBRECLI,
+          PID||'0',
+          PVENCERIF,
+          '',
+          PCORREO,
+          '',
+          vMonto,
+          PMONTOCOMISION,
+          PPCCOMISION,
+          PNUMBLOQUEO,
+          '',
+          PIDCONCEPTO,
+          '',
+          '',
+          '',
+          'RECIBIDA',
+          TO_DATE(SYSDATE),
+          TO_CHAR(SYSDATE, 'HH:MI:SS'), -- ITS-3130 Corrección de formato de hora y minuto de registro de ordenes SIMADI PN TO_CHAR(SYSDATE, 'HH:MI:SS')
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          PVALORNOMINAL,
+          vCUENTABFS,
+          PNOMBRECLI,
+          vCUENTANUM,
+          vCTABANCO,
+          vCTADIRECCION,
+          PCTABITSWIFT,
+          vTELEFONO,
+          vTELEFONO1,
+          vTELEFONO2,
+          '',
+          PCTADIRECCIONC,
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          PDIDCANAL,
+          TO_DATE(SYSDATE),
+          TO_DATE(SYSDATE),
+          TO_DATE(SYSDATE),
+          PCODPAISORIGEN,
+          PPAISORIGEN,
+          PCODESTADO,
+          PESTADO,
+          PCODCIUDAD,
+          PCIUDAD,
+          '',
+          '',
+          '',
+          '',
+          vCTAABONO,
+          PCTAABONOMONEDA,
+          '',
+          PIDPRODUCTO,
+          vTasa1,
+          pundind_id,
+          '',
+          '',
+          PNOMSUBASTA,
+          PORIGENFONDO,
+          PDESTINOFONDO,
+          PNUMBLOQUEOOF);
+
+
+          IF vInventario = 1  AND PTIPOSOLI = 'D' THEN
+             UPDATE  infi_tb_106_unidad_inversion a
+             SET     a.monto_acumulado_solic = vMONTO + nvl(a.monto_acumulado_solic,0)-- Acumulado inventario
+             WHERE   a.undinv_id = pundind_id;
+          END IF;
+        COMMIT;
+     --NM32454 SE AGREGA ELSE PARA QUE EL MOMOENTO QUE FALLE POR MULTIPLES ORDENES INFI DEVULEVA EL ERROR CORRECTO
+     ELSE
+         perror  := 8;
+         pstatus := vMSJOrdenes;
+     END IF;
+  END IF;
+       EXCEPTION
+        WHEN OTHERS THEN
+             PERROR := SQLCODE;
+             PSTATUS := SUBSTR(SQLERRM, 1, 64);
+             ROLLBACK TO start_tran;
+             RAISE;
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_CP_TOMA_DE_ORDEN_TEST(
+      PTIPOSOLI             IN   VARCHAR,
+      PIDORDEN              IN   NUMBER,
+      PTASA                 IN   VARCHAR2,--4
+      PMONTO                IN   VARCHAR2,--2      
+      PCANAL                IN   NUMBER,
+      PID                   IN   VARCHAR2,
+      PFECHVENCIMIENTOID    IN   VARCHAR2,
+      PNOMBRECLI            IN   VARCHAR2,
+      PCORREO               IN   VARCHAR2,
+      PNUMBLOQUEO           IN   VARCHAR2,
+      PNUMBLOQUEOOF         IN   VARCHAR2,
+      PCUENTABFS            IN   VARCHAR2,
+      PCUENTANUM            IN   VARCHAR2,
+      PCTABANCO             IN   VARCHAR2,
+      PCTADIRECCION         IN   VARCHAR2,
+      PCTABITSWIFT          IN   VARCHAR2,
+      PTELEFONO             IN   VARCHAR2,
+      PTELEFONO1            IN   VARCHAR2,
+      PTELEFONO2            IN   VARCHAR2,
+      PCTADIRECCIONC        IN   VARCHAR2,
+      PDIDCANAL             IN   VARCHAR2,
+      PCODPAISORIGEN        IN   VARCHAR2,
+      PPAISORIGEN           IN   VARCHAR2,
+      PCODESTADO            IN   VARCHAR2,
+      PESTADO               IN   VARCHAR2,
+      PCODCIUDAD            IN   VARCHAR2,
+      PCIUDAD               IN   VARCHAR2,
+      PCTAABONO             IN   VARCHAR2,
+      PCTAABONOMONEDA       IN   VARCHAR2,
+      PNOMSUBASTA           IN   VARCHAR2,
+      PORIGENFONDO          IN   VARCHAR2,
+      PDESTINOFONDO         IN   VARCHAR2,
+      PCAPITAL              IN   VARCHAR2,-- Entrada: Monto capital                  **Campo Nuevo 
+      PCOMISION             IN   VARCHAR2,-- Entrada: Monto comision                 **Campo Nuevo 
+      PPCTCOMISION          IN   VARCHAR2,-- Entrada: Porcentaje de comision         **Campo Nuevo 
+      PPCTCOMISIONIGTF      IN   VARCHAR2,-- Entrada: Porcentaje de comision IGTF    **Campo Nuevo 
+      PSTATUS               OUT  VARCHAR2,
+      PERROR                OUT  NUMBER
+)AS
+
+
+/******************************************************************************
+   NAME:       TOMA_DE_ORDEN
+   PURPOSE:    Permite la insercion de la orden desde clavenet
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        14/02/2015  AGOMEZ          1. Created this procedure.
+   1.1        01/04/2015  AGOMEZ          1. Modificacion en el INSERT para el bloqueo del registro y evitar la duplicidad del mismo
+   1.2        12/06/2015  AGOMEZ          1. Se agrega la validacion de monto para bajo valor. ITS-2653 
+   1.3        14/09/2015  LPEREZ          1. Se agrega validacion para evitar que se registren ordenes con el mercado cerrado
+   1.4        22/09/2015  AGOMEZ          1. Se agrega validacion para evitar que se registren ordenes con el mercado cerrado
+   1.5        24/09/2015  LPEREZ          1. Modificacion para retornar el valor de error en validacion de multiples ordenes
+   2.0        14/01/2016  LPEREZ          1. Se consulta la tasa de la oferta de la tabla INFI_TB_106_UNIDAD_INVERSION.
+
+******************************************************************************/
+  PCOMISION_IGTF       SOLICITUDES_SITME.COMISION_IGTF%TYPE DEFAULT 0; 
+  PMONTOCOMISION       SOLICITUDES_SITME.MONTO_COMISION%TYPE DEFAULT 0;
+  PIDCONCEPTO          SOLICITUDES_SITME.id_concepto%TYPE;
+  PIDPRODUCTO          SOLICITUDES_SITME.id_producto%TYPE;
+  PPCCOMISION NUMBER DEFAULT 0;
+  PVALORNOMINAL NUMBER;
+  pcomisionfijo INFI_TB_112_UI_COMISION.COMISION_MONTO_FIJO%TYPE;
+  pcomisionpct  INFI_TB_112_UI_COMISION.COMISION_PCT%TYPE;
+  pblotterid infi_tb_102_bloter.BLOTER_ID%TYPE;
+  PVENCERIF SOLICITUDES_SITME.FECHA_VENC_RIF%TYPE DEFAULT SYSDATE;
+  PNOMCLIENTE VARCHAR2(90);
+  vCUENTABFS  varchar(30) DEFAULT '0';
+  ptipprodcuto  INFI_TB_101_INST_FINANCIEROS.tipo_producto_id%type;
+  vCUENTANUM varchar2(60) DEFAULT '0';
+  vCTABANCO VARCHAR2(60) DEFAULT '0';
+  vCTADIRECCION VARCHAR2(90) DEFAULT 'SIN DIRECCION';
+  vTELEFONO   VARCHAR2(30) DEFAULT 'SINTELEFONO';
+  vTELEFONO1  VARCHAR2(30) DEFAULT 'SINTELEFONO';
+  vTELEFONO2   VARCHAR2(30) DEFAULT 'SINTELEFONO';
+  vValidador   NUMBER default 0;
+  pundind_id   infi_tb_106_unidad_inversion.undinv_id%type;
+  vControl NUMBER DEFAULT 0;
+  vTipoNegocio NUMBER DEFAULT 0;
+  vMSJDISPONIBILIDAD   INFI_TB_002_PARAM_TIPOS.parval_valor%type;
+  vMontoMaximo         NUMBER;
+  vMSJHORARIO          INFI_TB_002_PARAM_TIPOS.parval_valor%type;
+  vCTAABONO NUMBER;
+  vMonto VARCHAR2(30);
+  vTasa  VARCHAR2(10);
+  vTasa1  VARCHAR2(10);
+  vCLIENT_ID NUMBER;
+/** MANEJO DE INVENTARIO **/
+  vMontoDisponible  infi_tb_108_UI_TITULOS.uititu_valor_equivalente%type;
+  vInventario       infi_tb_108_UI_TITULOS.uititu_in_control_disponible%type;
+  vMSJMONTOMAX      INFI_TB_002_PARAM_TIPOS.parval_valor%type;
+  --MultiplesOrdenes
+  vMultiplesOrdenes NUMBER;
+  vValidaMultOrde   NUMBER;
+  vMSJOrdenes       VARCHAR2(200);
+  vMSJMONTOMIN      varchar2(200);
+
+  CURSOR INSERTARDATOS
+    IS
+     SELECT u.undinv_id, u.undinv_tasa_cambio, u.undinv_tasa_cambio_ofer,
+            u.monto_acumulado_solic, u.INSFIN_ID
+     FROM   infi_tb_106_unidad_inversion u,
+            INFI_TB_101_INST_FINANCIEROS F
+     WHERE  u.undinv_status = 'PUBLICADA' AND u.undinv_active = 1
+     AND    u.insfin_id = f.insfin_id
+     AND   f.tipo_producto_id = ptipprodcuto
+     AND    u.TIPO_NEGOCIO = vTipoNegocio;
+
+
+BEGIN
+    
+    --DBMS_OUTPUT.Put_Line('PCAPITAL: ' || PCAPITAL);
+    vTipoNegocio  := 1;
+    ptipprodcuto := 'SICAD2PER';
+    perror := 1;
+    pstatus := 'El mercado se encuentra Cerrado';
+    PIDCONCEPTO := '6';--Valor por defecto para SIMADI 
+
+    vMonto := (PMONTO/100);
+    /*IF PTASA IS NOT NULL THEN
+       vTasa := (PTASA/10000);
+       PVALORNOMINAL := vMonto*vTasa;
+    END IF;*/
+
+    SELECT PT.PARVAL_VALOR
+     INTO   vMSJMONTOMAX
+     FROM   INFI_TB_002_PARAM_TIPOS PT
+     WHERE  PARGRP_ID = '001' AND
+        PARTIP_NOMBRE_PARAMETRO = 'MSJ_MONTO_MAX_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+       INTO   vMSJDISPONIBILIDAD
+       FROM   INFI_TB_002_PARAM_TIPOS PT
+       WHERE  PARGRP_ID = '001' AND
+              PARTIP_NOMBRE_PARAMETRO = 'MSJ_DISPONIBILIDAD_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+       INTO   vMSJHORARIO
+       FROM   INFI_TB_002_PARAM_TIPOS PT
+       WHERE  PARGRP_ID = '001' AND
+              PARTIP_NOMBRE_PARAMETRO = 'MSJ_HORARIO_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJOrdenes
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_MUL_ORDE_SIMADI';
+
+    SELECT PT.PARVAL_VALOR
+    INTO   vMSJMONTOMIN
+    FROM   INFI_TB_002_PARAM_TIPOS PT
+    WHERE  PARGRP_ID = '001' AND
+           PARTIP_NOMBRE_PARAMETRO = 'MSJ_MONTO_MIN_SIMADI';
+
+
+    IF PFECHVENCIMIENTOID <> '' THEN
+        PVENCERIF := PFECHVENCIMIENTOID;
+    END IF;
+
+    IF PCUENTABFS IS NOT NULL THEN
+         vCUENTABFS := PCUENTABFS;
+    END IF;
+
+    IF PCUENTANUM IS NOT NULL THEN
+        vCUENTANUM := PCUENTANUM;
+    END IF;
+
+    IF PCTABANCO IS NOT NULL THEN
+        vCTABANCO := PCTABANCO;
+    END IF;
+
+    IF PCTADIRECCION IS NOT NULL THEN
+        vCTADIRECCION := PCTADIRECCION;
+    END IF;
+
+     IF PTELEFONO IS NOT NULL THEN
+        vTELEFONO := PTELEFONO;
+    END IF;
+
+    IF PTELEFONO1 IS NOT NULL THEN
+        vTELEFONO1 := PTELEFONO1;
+    END IF;
+
+    IF PTELEFONO2 IS NOT NULL THEN
+        vTELEFONO2 := PTELEFONO2;
+    END IF;
+
+    FOR R3 IN INSERTARDATOS LOOP
+        vControl:= 1;
+        BEGIN
+            SELECT BR.uiblot_umi_inv_mto_min_a_valor
+            INTO   vMontoMaximo
+            FROM   INFI_TB_102_BLOTER B,
+                   INFI_TB_111_UI_BLOTTER_RANGOS BR
+            WHERE  BR.UNDINV_ID = R3.undinv_id AND
+                   B.ID_CANAL = PCANAL AND
+                   B.BLOTER_ID = BR.BLOTER_ID AND
+                   BR.tipper_id = SUBSTR(pid,1,1);
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            perror := 8;
+            pstatus := vMSJDISPONIBILIDAD;
+            vValidador:= 1;
+        EXIT;
+        END;
+    END LOOP;
+
+     /*
+    NM32454 LPEREZ 14/09/2015
+     ITS-2836: SE AGREGA VALIDACION PARA QUE CUANDO NO EXISTAN REGISTROS EN ESTE QUERY NO REGISTRE LA ORDEN
+    */
+    IF vControl = 0 THEN
+        vValidador:= 1;
+    END IF;
+
+
+    IF vControl = 1 THEN
+        IF vMonto >= vMontoMaximo THEN
+            vTipoNegocio := 1;
+        ELSE
+            vTipoNegocio := 2;
+        END IF;
+    ELSE
+        vTipoNegocio := 2;
+    END IF;
+
+
+    FOR R3 IN INSERTARDATOS LOOP
+        pundind_id := r3.undinv_id;
+        --Validacion de Tasa
+         BEGIN
+            IF PTASA IS NOT NULL THEN
+               vTasa := (PTASA/10000);
+               --PVALORNOMINAL := vMonto*vTasa; --NM26659 12/04/2016 Montos de Capital y comision se pasan como parametros desde el procedure INFI_CP_CONFIRMACION
+                PVALORNOMINAL := (PCAPITAL)/10000;
+               
+            ELSE
+               perror := 10;
+               pstatus := vMSJDISPONIBILIDAD;
+               vValidador := 1;
+            EXIT;
+            END IF;
+         EXCEPTION
+            WHEN OTHERS THEN
+                perror := 11;
+                pstatus := vMSJDISPONIBILIDAD;
+                vValidador := 1;
+            EXIT;
+         END;
+        --Validacion del bloter en el canal 2
+            BEGIN
+                SELECT BR.BLOTER_ID,
+                       BR.uiblot_umi_inv_mto_min_a_valor
+                INTO   PBLOTTERID,
+                       vMontoMaximo
+                FROM   INFI_TB_102_BLOTER B,
+                       INFI_TB_111_UI_BLOTTER_RANGOS BR
+                WHERE  BR.UNDINV_ID = R3.undinv_id AND
+                       B.ID_CANAL = PCANAL AND
+                       B.BLOTER_ID = BR.BLOTER_ID AND
+                       BR.tipper_id = SUBSTR(pid,1,1);
+            EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                perror := 8;
+                pstatus := vMSJDISPONIBILIDAD;
+                vValidador:= 1;
+            EXIT;
+            END;
+     --Validacion de horario
+       BEGIN
+       
+       DBMS_OUTPUT.Put_Line('PBLOTTERID: ' || PBLOTTERID);
+       DBMS_OUTPUT.Put_Line('r3.undinv_id: ' || r3.undinv_id);
+           SELECT 0
+           INTO  perror
+           FROM  infi_tb_107_ui_blotter uib
+           WHERE
+           --VALIDACION DE HORARIO DE TOMA DE ORDENES - ULTIMO DIA
+           (( uiblot_pedido_fe_fin =TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_desde_ult_dia, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') <=SYSDATE
+           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_hasta_ult_dia, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') >=SYSDATE
+           )
+           --VALIDACION DE HORARIO DE TOMA DE ORDENES - PRIMEROS DIAS
+           OR ( uiblot_pedido_fe_fin >TO_DATE (TO_CHAR(SYSDATE,'DD/MM/RRRR'), 'DD/MM/RRRR')
+           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_desde, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') <=SYSDATE
+           AND TO_DATE(TO_CHAR (SYSDATE, 'DD/MM/RRRR')||''||SUBSTR(TO_CHAR(uiblot_horario_hasta, 'DD/MM/RRRR hh:mi:ss am'),11,19) , 'DD/MM/RRRR hh:mi:ss am') >=SYSDATE
+           ))
+           AND uib.bloter_id = PBLOTTERID
+           AND uib.undinv_id = r3.undinv_id;
+
+           --DBMS_OUTPUT.Put_Line('UNIDAD INVERSION: ' || r3.undinv_id);
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+           perror := 2;
+           pstatus := vMSJHORARIO;
+           vValidador := 1;
+          --DBMS_OUTPUT.put_line ('El mercado se encuentra fuera de horario');
+        EXIT;
+        END;
+       --Validacion de multiples ordenes INICIO
+           BEGIN
+            SELECT F.INSFIN_MULTIPLES_ORDENES
+            INTO   vMultiplesOrdenes
+            FROM   INFI_TB_101_INST_FINANCIEROS F
+            WHERE  F.INSFIN_ID = R3.INSFIN_ID;
+           EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                perror := 8;
+                pstatus := vMSJDISPONIBILIDAD;
+                vValidador:= 1;
+           EXIT;
+           END;
+
+
+            /*IF vMultiplesOrdenes = 0 THEN
+                SELECT count(1)
+                INTO vValidaMultOrde
+                FROM  SOLICITUDES_SITME SS
+                WHERE LTRIM(SUBSTR(SS.CED_RIF_CLIENTE,2,15),'0') = LTRIM(SUBSTR(PID,2,15),'0')||'0' AND
+                      SS.FECHA_REGISTRO = TO_DATE(SYSDATE);
+                IF vValidaMultOrde >= 1 THEN
+                    perror := 8;
+                    pstatus := vMSJOrdenes;
+                EXIT;
+                END IF;
+            END IF;*/
+        --Validacion de multiples ordenes FIN
+
+        BEGIN
+            SELECT UC.COMISION_MONTO_FIJO,
+                   UC.COMISION_PCT
+            INTO   PCOMISIONFIJO,
+                   PCOMISIONPCT
+            FROM   INFI_TB_112_UI_COMISION UC
+            WHERE  UC.UNDINV_ID = R3.undinv_id;
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            perror := 6;
+            pstatus := 'Debe agregarle montos de comision a la unidad';
+            vValidador := 1;
+        EXIT;
+        END;
+
+       IF vTipoNegocio = 2 THEN
+          IF PTIPOSOLI = 'D' THEN
+             vTasa1 := NVL(r3.undinv_tasa_cambio,0);
+            ELSE
+             vTasa1 := NVL(r3.undinv_tasa_cambio_ofer,0);
+              /*
+              SELECT NVL(PT.PARVAL_VALOR,0)
+              INTO   vTasa1
+              FROM   INFI_TB_002_PARAM_TIPOS PT
+              WHERE  PARGRP_ID = '001' AND
+                      PARTIP_NOMBRE_PARAMETRO = 'TASA_OFERTA';
+              */
+          END IF;
+        ELSE
+           vTasa1 := vTasa;
+       END IF;
+       --Validacion de motno bajo valor
+       BEGIN
+           IF vTipoNegocio = 2 THEN
+               SELECT case
+                        when vmonto < BR.UIBLOT_UMI_INV_MTO_MIN then 1
+                        when vmonto >= BR.uiblot_umi_inv_mto_min_a_valor then 2
+                        else 0
+                      end
+                      INTO vValidador
+               FROM   INFI_TB_102_BLOTER B,
+                      INFI_TB_111_UI_BLOTTER_RANGOS BR
+               WHERE  BR.UNDINV_ID = R3.undinv_id AND
+                      B.ID_CANAL = PCANAL AND
+                      B.BLOTER_ID = BR.BLOTER_ID AND
+                      BR.tipper_id = SUBSTR(pid,1,1);
+
+
+               IF vValidador <> 0 THEN
+                   IF vValidador = 1 THEN
+                    PERROR := 4;
+                    PSTATUS := vMSJMONTOMIN;
+                   EXIT;
+                   ELSE
+                    PERROR := 4;
+                    PSTATUS := vMSJMONTOMAX;
+                   EXIT;
+                   END IF;
+               END IF;
+           END IF;
+       END;
+/* Calculos de las comisiones*/
+       IF perror <> 6 THEN
+          IF PTIPOSOLI = 'D' THEN
+             PSTATUS := '0';
+             PIDPRODUCTO := '6'; ---Demanda temporal
+             vCTAABONO := 2;
+           ELSE
+              PIDPRODUCTO := '7'; ---Oferta temporal
+              vCTAABONO := 3;
+          END IF;
+          --DBMS_OUTPUT.Put_Line  ('Tasa='||vTasa1||' vMonto='||vmonto||' PCOMISIONPCT='||PCOMISIONPCT||' ');
+
+        --NM26659 12/04/2016 Montos de Capital y comision se pasan como parametros  desde el procedure INFI_CP_CONFIRMACION 
+        --IF PCOMISIONFIJO = 0 THEN
+        --PMONTOCOMISION := (vMonto*vTasa1*PCOMISIONPCT)/100;
+        --ELSE
+        --PMONTOCOMISION := PCOMISIONFIJO;
+        --END IF;
+        --PPCCOMISION := PCOMISIONPCT;
+        --PMONTOCOMISION := round(PMONTOCOMISION,2);
+        PMONTOCOMISION:=(PCOMISION)/10000;
+        PPCCOMISION:=(PPCTCOMISION)/10000;
+        
+       END IF;
+       
+       IF  PPCTCOMISIONIGTF <>0 THEN
+            PCOMISION_IGTF:=(PPCTCOMISIONIGTF)/10000;
+       END IF;
+      /***Manejo de Inventario para las Demanada y si lo indica la unidad**/
+       IF PTIPOSOLI = 'D' THEN
+          SELECT UIT.UITITU_VALOR_EQUIVALENTE ,UIT.UITITU_IN_CONTROL_DISPONIBLE
+          INTO vMontoDisponible,
+               vInventario
+          FROM infi_tb_108_UI_TITULOS UIT
+          WHERE UIT.UNDINV_ID = pundind_id;
+          IF vInventario = 1 THEN
+             IF (NVL(r3.monto_acumulado_solic,0)+vMONTO) > vMontoDisponible THEN
+                PERROR := 7;
+                PSTATUS := vMSJMONTOMAX;
+                vValidador := 1;
+             END IF;
+          END IF;
+       END IF;
+       --IF vValidador <> 1 then
+       IF vValidador = 0 then
+          PSTATUS := 'OK';
+          perror := 0;
+       END IF;
+    END LOOP;
+
+    IF perror = 1 THEN
+        vValidador:= 1;
+    END IF;
+
+/*--Registros de los datos ---*/
+ --IF vValidador <> 1 THEN
+ IF vValidador = 0 THEN
+    SAVEPOINT start_tran;
+     IF vMultiplesOrdenes = 0 THEN
+        BEGIN
+            SELECT 1
+            INTO vValidaMultOrde
+            FROM  SOLICITUDES_SITME SS
+            WHERE LTRIM(SUBSTR(SS.CED_RIF_CLIENTE,2,15),'0') = LTRIM(SUBSTR(PID,2,15),'0')||'0' AND
+                  SS.FECHA_REGISTRO = TO_DATE(SYSDATE)
+            FOR UPDATE;
+            ROLLBACK;
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            perror := 0;
+            pstatus := 'Ok';
+        END;
+     END IF;
+
+     IF vValidaMultOrde IS NULL THEN
+                INSERT INTO SOLICITUDES_SITME
+                  (ID_ORDEN,
+                  NUMERO_ORDEN_INFI,
+                  NOMBRE_CLIENTE,
+                  CED_RIF_CLIENTE,
+                  FECHA_VENC_RIF,
+                  NUM_RUSITME,
+                  EMAIL_CLIENTE,
+                  CED_RIF_CONTRAPARTE,
+                  MONTO_SOLICITADO,
+                  MONTO_COMISION,
+                  PORC_COMISION,
+                  NUM_BLOQUEO,
+                  MONTO_ADJUDICADO,
+                  ID_CONCEPTO,
+                  SECTOR_PRODUCTIVO,
+                  SECTOR_ACT_ECONOM,
+                  GRUPO_ECONOMICO,
+                  ESTATUS,
+                  FECHA_REGISTRO,
+                  HORA_REGISTRO,
+                  FECHA_TRAMITE,
+                  FECHA_ADJUDICACION,
+                  FECHA_COBRO,
+                  FECHA_ENV_SWIFT,
+                  FECHA_RES_SWIFT,
+                  TITULO_ADJUDICADO,
+                  PRECIO_ADJUDICACION,
+                  VALOR_EFECTIVO_USD,
+                  VALOR_NOMINAL_USD,
+                  VALOR_EFECTIVO,
+                  VALOR_NOMINAL,
+                  CUENTA_BSF_O,
+                  NOMBRE_BENEFICIARIO,
+                  CTA_NUMERO,
+                  CTA_BANCO,
+                  CTA_DIRECCION,
+                  CTA_BIC_SWIFT,
+                  CTA_TELEFONO,
+                  CTA_TELEFONO_2,
+                  CTA_TELEFONO_3,
+                  CTA_ABA,
+                  CTA_DIRECCION_C,
+                  CTA_IBAN,
+                  CTA_INT_NUMERO,
+                  CTA_INT_BANCO,
+                  CTA_INT_DIRECCION,
+                  CTA_INT_BIC_SWIFT,
+                  CTA_INT_TELEFONO,
+                  CTA_INT_ABA,
+                  CONTADOR_ENV_SWIFT,
+                  ID_CANAL,
+                  FECHA_MODIFICACION,
+                  FECHA_SALIDA_VIAJE,
+                  FECHA_RETORNO_VIAJE,
+                  COD_PAIS_ORIGEN,
+                  DESC_PAIS_ORIGEN,
+                  COD_ESTADO_ORIGEN,
+                  DESC_ESTADO_ORIGEN,
+                  COD_CIUDAD_ORIGEN,
+                  DESC_CIUDAD_ORIGEN,
+                  COD_PAIS_DESTINO,
+                  DESC_PAIS_DESTINO,
+                  NUM_PASAPORTE,
+                  NUM_BOLETO,
+                  CTA_ABONO,
+                  CTA_ABONO_MONEDA,
+                  NUM_BOLETO_VUELTA,
+                  ID_PRODUCTO,
+                  TASA_CAMBIO,
+                  UNDINV_ID,
+                  FECHA_RECEPCION_REC,
+                  HORA_RECEPCION_REC,
+                  NOMBRE_SUBASTA,
+                  ORIGEN_FONDOS,
+                  DESTINO_FONDOS,
+                  num_bloqueo_oferta,
+                  COMISION_IGTF)
+                  VALUES
+                  (PIDORDEN,
+                  '',
+                  PNOMBRECLI,
+                  PID||'0',
+                  PVENCERIF,
+                  '',
+                  PCORREO,
+                  '',
+                  vMonto,
+                  PMONTOCOMISION,
+                  PPCCOMISION,
+                  PNUMBLOQUEO,
+                  '',
+                  PIDCONCEPTO,
+                  '',
+                  '',
+                  '',
+                  'RECIBIDA',
+                  TO_DATE(SYSDATE),
+                  TO_CHAR(SYSDATE, 'HH:MM:SS'),
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  PVALORNOMINAL,
+                  vCUENTABFS,
+                  PNOMBRECLI,
+                  vCUENTANUM,
+                  vCTABANCO,
+                  vCTADIRECCION,
+                  PCTABITSWIFT,
+                  vTELEFONO,
+                  vTELEFONO1,
+                  vTELEFONO2,
+                  '',
+                  PCTADIRECCIONC,
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  PDIDCANAL,
+                  TO_DATE(SYSDATE),
+                  TO_DATE(SYSDATE),
+                  TO_DATE(SYSDATE),
+                  PCODPAISORIGEN,
+                  PPAISORIGEN,
+                  PCODESTADO,
+                  PESTADO,
+                  PCODCIUDAD,
+                  PCIUDAD,
+                  '',
+                  '',
+                  '',
+                  '',
+                  vCTAABONO,
+                  PCTAABONOMONEDA,
+                  '',
+                  PIDPRODUCTO,
+                  vTasa1,
+                  pundind_id,
+                  '',
+                  '',
+                  PNOMSUBASTA,
+                  PORIGENFONDO,
+                  PDESTINOFONDO,
+                  PNUMBLOQUEOOF,
+                  PCOMISION_IGTF);
+
+
+          IF vInventario = 1  AND PTIPOSOLI = 'D' THEN
+             UPDATE  infi_tb_106_unidad_inversion a
+             SET     a.monto_acumulado_solic = vMONTO + nvl(a.monto_acumulado_solic,0)-- Acumulado inventario
+             WHERE   a.undinv_id = pundind_id;
+          END IF;
+        COMMIT;
+     --NM32454 SE AGREGA ELSE PARA QUE EL MOMOENTO QUE FALLE POR MULTIPLES ORDENES INFI DEVULEVA EL ERROR CORRECTO
+     ELSE
+         perror  := 8;
+         pstatus := vMSJOrdenes;
+     END IF;
+  END IF;
+       EXCEPTION
+        WHEN OTHERS THEN
+             PERROR := SQLCODE;
+             PSTATUS := SUBSTR(SQLERRM, 1, 64);
+             ROLLBACK TO start_tran;
+             RAISE;
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_DYNAMICS_CURSOR
+  (
+  sqlText                 IN         varchar2,
+  dataCursor            OUT     pkgcursortype.cursorType
+  )
+AS
+/******************************************************************************
+    NAME:       INFI_DYNAMICS_CURSOR
+    
+   PURPOSE:  Devuelve el CURSOR de datos según la Consulta enviada en el Campo sqlText.
+   Campo: 
+   sqlText       ==> recibe el texto del QUERY a ser ejecutado.
+   dataCursor ==> Devuel el CURSOR con los datos generados.
+   REVISIONS:
+   Ver        Date           Author           Description
+   1.0        23/04/2018  ARincon         1. Created this procedure.
+
+******************************************************************************/
+BEGIN
+  /* Llamado de un query Dinámico */ 
+    OPEN dataCursor FOR sqlText;
+  
+END INFI_DYNAMICS_CURSOR;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_ESTABLECER_GRUPO (
+  p_unidad_inversion IN INFI_TB_204_ORDENES.UNIINV_ID%type,
+  p_grupos IN INFI_TB_204_ORDENES.NUMERO_GRUPO%type
+) AS
+v_ordenes_por_grupo NUMBER;
+v_grupo_activo INFI_TB_204_ORDENES.NUMERO_GRUPO%type;
+v_registro_procesado NUMBER;
+
+CURSOR REGISTRO_ORDENES IS
+  SELECT ordene_id FROM INFI_TB_204_ORDENES
+  WHERE uniinv_id = p_unidad_inversion
+  AND ordsta_id<>'CANCELADA' AND ORDSTA_ID='ADJUDICADA' order by client_id;
+
+BEGIN
+   v_grupo_activo:=1;
+   v_registro_procesado:=0;
+
+   SELECT ROUND(count(*) /p_grupos)+1 INTO v_ordenes_por_grupo FROM infi_tb_204_ordenes WHERE uniinv_id=p_unidad_inversion AND ordsta_id<>'CANCELADA';
+
+      FOR REGISTRO IN REGISTRO_ORDENES LOOP
+      UPDATE INFI_TB_204_ORDENES SET NUMERO_GRUPO=v_grupo_activo WHERE ordene_id=REGISTRO.ordene_id;
+     v_registro_procesado:=v_registro_procesado+1;
+     IF v_registro_procesado = v_ordenes_por_grupo THEN
+      v_registro_procesado:=0;
+     v_grupo_activo:=v_grupo_activo+1;
+		 IF (v_grupo_activo > p_grupos) THEN
+		   v_grupo_activo := 1;
+		 END IF;
+     END IF;
+      END LOOP;
+    COMMIT;
+EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+       NULL;
+     WHEN OTHERS THEN
+       RAISE;
+END INFI_ESTABLECER_GRUPO;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.infi_getbascal (
+   pbascal       IN     varchar2,
+   psal          IN     number,
+   ptasint       IN     number,
+   pfecini       IN     date,
+   pfecfin       IN     date,
+   psecid        IN     varchar,
+   pbase         OUT    number,
+   pdias         OUT    number,
+   pintcaido     OUT    number) AS
+-- Start of DDL Script for Procedure INFI_O7GETBASCAL
+-- Generated 05/08/2010 02:06:56 p.m. from ADM_INFI@INFID
+-- Creado por : Alexander Rincón el 05/08/2010
+-- Procedimiento para Calcular los días y la base financiera para los Intereses
+-- caidos de las Operaciones de INFI en base a las caracteristicas de OPICS
+-- PARÁMETROS ENTRADA:
+-- pbascal      = Codigo base de Cálculo en OPICS
+-- PSAL         = Monto de la operación
+-- PTASINT      = Tasa de Interés de las operación
+-- PFECINI      = Fecha inicio del Cupón a calcular
+-- PFECFIN      = Fecha Valor de la operación a Calcular
+-- PSECID       = ID del titulo en OPICS
+-- PARÁMETROS SALIDA:
+-- PBASE        = Factor para el cálculo de Interes segun la Base
+-- PDIAS        = Días Transcurridos hasta la fecha Valor del cupon Vigente
+-- PINTCAIDO    = Intereses cálculados o caidos.
+   meses         number := months_between(trunc(pfecfin,'MM'), trunc(pfecini,'MM'));
+   pfeccup       date;
+   pfrecup       number(10) := 0;
+   pmeses        number(10) := 0;
+   pdiaini       number(10) := 0;
+   pdiafin       number(10) := 0;
+   piniano       date;
+   pfinano       date;
+   pcaldiaini    number := 0;
+   pcaldiafin    number := 0;
+   pfrepgocup    secm.intpaycycle%type; --varchar2(4);
+
+BEGIN
+   IF TRIM(pbascal) IN ('BOND','EBOND','30F360') THEN        /*  30/360 */--
+      IF last_day(pfecfin) = pfecfin and to_number(to_char(pfecfin,'DD')) < 30 THEN
+         SELECT (meses*30) +
+                (to_number(to_char(pfecfin,'DD'))-
+                 to_number(to_char(pfecini,'DD')))
+         INTO   pdias
+         FROM   dual;
+       ELSE
+          SELECT (meses*30) +
+                 (decode(pfecfin,last_day(pfecfin),30,to_number(to_char(pfecfin,'DD')))-
+                  decode(pfecini,last_day(pfecini),30,to_number(to_char(pfecini,'DD'))))
+          INTO   pdias
+          FROM   dual;
+      END IF;
+      pbase := pdias / 360;
+   ELSIF TRIM(pbascal) = 'A360' THEN     /* act/360 */
+         pdias := pfecfin - pfecini;
+         pbase := pdias / 360;
+   ELSIF TRIM(pbascal) = 'A365' THEN     /* act/365 */
+         pdias := pfecfin - pfecini;
+         pbase := pdias/ 365;
+   ELSIF TRIM(pbascal) = 'ACT365' THEN  /* act/365 Bisiesto */
+         SELECT to_char(to_date('31-dec-'||to_char(pfecini, 'YYYY')),'ddd')
+         INTO   pdiaini
+         FROM   dual;
+         SELECT to_char(to_date('31-dec-'||to_char(pfecfin, 'YYYY')),'ddd')
+         INTO   pdiafin
+         FROM   dual;
+         IF pdiaini = 366 and pdiafin = 366 THEN
+            pdias := pfecfin - pfecini;
+            pbase := pdias / pdiaini;
+          ELSIF pdiaini = 365 or pdiafin = 365 THEN
+                SELECT to_date(TRUNC(pfecfin, 'YEAR')) -- Primer dia del año para la fecha fin cupon
+                INTO   piniano
+                FROM   dual;
+                SELECT to_date('31-dec-'||to_char(pfecini, 'YYYY') ) -- Último dia del año para la fecha incio cupon
+                INTO   pfinano
+                FROM   dual;
+                pcaldiaini := (pfinano - pfecini) / pdiaini; -- Fin año menos Fecha inicio Cupon
+                pcaldiafin := (pfecfin - piniano) / pdiafin; -- Fecha fin cupon meno Inicio año
+                pdias := (pfinano - pfecini) + (pfecfin - piniano);
+                pbase := pcaldiaini + pcaldiafin;
+         END IF;
+   ELSIF TRIM(pbascal) = 'ACTUAL' THEN     /* act/act */
+         pdias := pfecfin - pfecini; --- Días transcurridos desde el último Cálculo
+     --- Se busca la frecuencia del Cupón a calcular---
+         SELECT intpaycycle --- Tipo Frecuencia
+	     INTO   pfrepgocup
+	     FROM   secm
+	     WHERE  secid = psecid; --
+
+     --- Buscar los meses y la frecuencia de Cupón según el tipo de frecuencias:
+     --- (A) Anual,(S) Semestral,(T)Triemestral
+         IF pfrepgocup = 'A' then
+            pfrecup := 1;      --- Cantidad de Frecuencias en el Año
+            pmeses := 12;      --- Cantidad de Meses por Frecuencia de Pago
+         ELSIF pfrepgocup = 'S' then
+               pfrecup := 2;
+               pmeses := 6;
+         ELSIF pfrepgocup = 'T' then
+               pfrecup := 4;
+               pmeses := 3;
+         ELSIF pfrepgocup = 'Q' then
+               pfrecup := 3;
+               pmeses := 4;
+         END IF;
+
+     --- Se busca la fecha de Vencimiento del Cupón a calcular según pfecfin
+         SELECT min(intenddte)
+         INTO   pfeccup
+         FROM   secs
+         WHERE  secid = psecid
+         AND    intenddte >= pfecfin;
+
+     --- Se cálcula los días base se frecuencia de Interés
+         if pfrecup > 0 and pmeses > 0 then
+       		pbase := (1/(pfeccup - add_months(pfeccup,-pmeses))) * (1/pfrecup);
+         end if;
+   END IF;
+   pintcaido := psal*ptasint*pbase;  -- Cálculo de Intereses
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_OPER_TAQ
+  (
+  PIDCANAL        IN   VARCHAR2,
+  PCLIENT_CEDRIF  IN   VARCHAR2,
+  PTIPPER_ID      IN   VARCHAR2,
+  cursor1         OUT  pkgcursortype.cursorType,
+  PTIPOOPER       IN   VARCHAR2 DEFAULT 1, --por defecto va a hacer consulta
+  PTAQESTATUS     IN   VARCHAR2 DEFAULT -1, 
+  PORDIDTAQ       IN   VARCHAR2 DEFAULT -1
+  )
+AS
+i NUMBER(4);
+/******************************************************************************
+   NAME:       INFI_ACT_OPE_TAQ
+   PURPOSE:    Devuelve la informacion de las operaciones de taquilla disponibles
+               para un cliente esten vigentes o no.
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   1.0        05/08/2015  LPEREZ          1. Created this procedure.
+
+******************************************************************************/
+BEGIN
+ 
+  IF PTIPOOPER = 1 THEN
+    OPEN cursor1 FOR
+    SELECT LPAD(TAQ.ORDENE_TAQ_ID,10,0),
+         LPAD(TAQ.ORDENE_ID,10,0),
+         LPAD(TAQ.ORDENE_TAQ_NRO_RETEN_CAP,10,' '),
+         LPAD(TAQ.ORDENE_TAQ_NRO_RETEN_COM,10,' '),
+         LPAD(TAQ.ORDENE_TAQ_CTA_BS,20,' '),
+         LPAD(NVL(TAQ.ORDENE_TAQ_CTA_DIVISAS,' '),20),
+         LPAD(TAQ.ORDENE_TAQ_CLIENT_CERIF,10,0),
+         TAQ.ORDENE_TAQ_TIPPER_ID,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_MONTO_CAP_BS, '099999999999999.99'),'.'),' ') MONTO,
+         REPLACE(REPLACE(TO_CHAR( TAQ.ORDENE_TAQ_MONTO_CAP_DIVISA, '099999999999999.99'),'.'),' ') MONTO_DIVISAS,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_MONTO_COM_BS, '099999999999999.99'),'.'),' ') MONTO_COM_BS,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_MONTO_COM_DIVISA, '099999999999999.99'),'.'),' ') MONTO_COM_DIVI,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_MONTO_TOTAL_DIVISA, '099999999999999.99'),'.'),' ') MONTO_TOTAL_DIVI,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_MONTO_TOTAL_BS, '099999999999999.99'),'.'),' ') MONTO_TOTAL_BS,
+         REPLACE(REPLACE(TO_CHAR(TAQ.ORDENE_TAQ_TASA_CAMBIO, '099999999999999.99999'),'.'),' ') TASA_CAMBIO,
+         TO_CHAR(TAQ.ORDENE_TAQ_FE_REGISTRO,'DDMMYYYY') FE_REGISTRO,
+         TO_CHAR(TAQ.ORDENE_TAQ_FE_VALOR, 'DDMMYYYY') FE_VALOR,
+         RPAD(NVL(TAQ.ORDENE_TAQ_OBSERVACION,' '),1000) OBSERVACIONES,
+         TAQ.ORDENE_TAQ_VIGENCIA,
+         TAQ.ORDENE_TAQ_TIPO_DIVISA,
+         TAQ.ORDENE_TAQ_ESTATUS
+    FROM INFI_TB_232_ORDENES_TAQUILLA TAQ
+    WHERE TAQ.ORDENE_TAQ_CLIENT_CERIF = PCLIENT_CEDRIF
+    AND   TAQ.ORDENE_TAQ_TIPPER_ID    = PTIPPER_ID
+    AND   TAQ.ORDENE_TAQ_TIPO_OPERA   = 2
+    AND   TAQ.ORDENE_TAQ_ESTATUS = 0
+    AND   TAQ.ORDENE_TAQ_ESTATUS_BCV IN (0,1);
+  ELSIF PTIPOOPER = 2 THEN
+      UPDATE INFI_TB_232_ORDENES_TAQUILLA TAQ SET TAQ.ORDENE_TAQ_ESTATUS = PTAQESTATUS WHERE TAQ.ORDENE_TAQ_ID = PORDIDTAQ;
+      i := sql%rowcount;
+      IF i <> 0 THEN
+        COMMIT;
+        OPEN cursor1 FOR
+           SELECT 0 PCODERROR, 'SIN ERROR' PDESCRIPCION FROM DUAL; 
+      ELSE
+        OPEN cursor1 FOR
+            SELECT 1 PCODERROR, 'NO SE ENCONTRARON REGISTROS PARA ACTUALIZAR' PDESCRIPCION FROM DUAL;
+      END IF;
+  END IF;
+    
+  EXCEPTION
+    WHEN OTHERS THEN
+        OPEN cursor1 FOR
+           SELECT 1 PCODERROR, 'NO SE ENCONTRARON REGISTROS' PDESCRIPCION FROM DUAL;
+        ROLLBACK;
+        
+END INFI_OPER_TAQ;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.INFI_RETENCIONES(
+      PFECHAINI  IN   VARCHAR2, --DD/MM/RRRR
+      PFECHAFIN  IN   VARCHAR2, --DD/MM/RRRR,
+      PTRNFIN    IN   NUMBER,
+      PVEHICU    IN   VARCHAR2,
+      PERROR     OUT  VARCHAR2,
+      PCURSOR    OUT  pkgcursortype.cursorType)
+AS
+/******************************************************************************
+   NAME:       INFI_RETENCIONES
+   PURPOSE:    Consulta de las solicitudes SIMADI en el rango de fecha ingresado,
+               Ofertas desde Clave, y demandas desde la red comercial, de acuerdo
+               al TRNFIN y al VEHICU.
+   Parametros de entrada
+       PFECHAINI  Fecha de inicio para realizar la busqueda.
+       PFECHAFIN  Fecha fin para realizar la busqueda.
+       PTRNFIN    ID de la transaccion.
+       PVEHICU    ID del vehiculo.       
+   Parametros de salida
+      PERROR   Captura y devuelve los posibles errores ocurridos durante la ejecucion del procedimiento.
+      PCURSOR  Devuelve los resultados de la consulta.      
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        13/03/2015  AGOMEZ          1. Created this procedure.
+
+******************************************************************************/
+
+    vFECHAINI DATE;
+    vFECHAFIN DATE;
+    
+    CURSOR INSTRUMENTO
+    IS
+    SELECT   UI.INSFIN_ID ID_INSTRUMENTO
+    FROM     SOLICITUDES_SITME SS,
+             INFI_TB_106_UNIDAD_INVERSION UI
+    WHERE    SS.FECHA_REGISTRO BETWEEN vFECHAINI AND vFECHAFIN AND
+             SS.UNDINV_ID = UI.UNDINV_ID
+    GROUP BY UI.INSFIN_ID, SS.UNDINV_ID
+    UNION
+    SELECT   UI.INSFIN_ID ID_INSTRUMENTO  
+    FROM     INFI_TB_204_ORDENES O,
+             INFI_TB_106_UNIDAD_INVERSION UI
+    WHERE    O.ORDENE_PED_FE_ORDEN BETWEEN vFECHAINI AND vFECHAFIN AND
+             O.UNIINV_ID = UI.UNDINV_ID AND
+             O.TRANSA_ID = 'TOMA_ORDEN'
+    GROUP BY UI.INSFIN_ID, O.UNIINV_ID; 
+
+BEGIN
+ 
+   vFECHAINI := TO_DATE(PFECHAINI, 'DD/MM/RRRR');
+   vFECHAFIN := TO_DATE(PFECHAFIN, 'DD/MM/RRRR'); 
+    
+    FOR C1 IN INSTRUMENTO LOOP
+        OPEN PCURSOR FOR
+            SELECT TFV.COD_OPERACION_CTE_BLO CODIGO_OPERACION,              --OFERTA
+                   SS.CTA_NUMERO NRO_CUENTA,    
+                   'USD' MONEDA,
+                   SS.NUM_BLOQUEO_OFERTA CODIGO_RETENCION,
+                   SS.MONTO_SOLICITADO MONTO_OPERACION 
+            FROM   SOLICITUDES_SITME SS,
+                   INFI_TB_032_TRNF_FIJAS_VEHICU TFV   
+            WHERE  SS.FECHA_REGISTRO BETWEEN vFECHAINI AND vFECHAFIN AND
+                   SS.CTA_ABONO = '3' AND 
+                   TFV.TRNFIN_ID = PTRNFIN AND
+                   TFV.VEHICU_ID = PVEHICU  AND
+                   TFV.INSFIN_ID = C1.ID_INSTRUMENTO
+            UNION ALL
+            SELECT TFV.COD_OPERACION_CTE_BLO CODIGO_OPERACION, 
+                   SS.CUENTA_BSF_O NRO_CUENTA,   
+                   'VEF'MONEDA,  
+                   SS.NUM_BLOQUEO CODIGO_RETENCION,   
+                   SS.MONTO_COMISION MONTO_OPERACION
+            FROM   SOLICITUDES_SITME SS,
+                   INFI_TB_032_TRNF_FIJAS_VEHICU TFV   
+            WHERE  SS.FECHA_REGISTRO BETWEEN vFECHAINI AND vFECHAFIN AND
+                   SS.CTA_ABONO = '3' AND
+                   TFV.TRNFIN_ID = PTRNFIN AND
+                   TFV.VEHICU_ID = PVEHICU  AND
+                   TFV.INSFIN_ID = C1.ID_INSTRUMENTO                            --OFERTA
+           UNION ALL
+           SELECT TFV.COD_OPERACION_CTE_BLO CODIGO_OPERACION,              --DEMANDA
+                  O.CTECTA_NUMERO NRO_CUENTA,
+                  'VEF' MONEDA,
+                  OO.NUMERO_RETENCION CODIGO_RETENCION,
+                  OO.MONTO_OPERACION MONTO_OPERACION                  
+           FROM   INFI_TB_204_ORDENES O,
+                  INFI_TB_207_ORDENES_OPERACION OO,
+                  INFI_TB_032_TRNF_FIJAS_VEHICU TFV   
+           WHERE  O.ORDENE_PED_FE_ORDEN BETWEEN vFECHAINI AND vFECHAFIN AND
+                  O.TRANSA_ID = 'TOMA_ORDEN' AND
+                  OO.TRNF_TIPO = 'BLO' AND
+                  OO.ORDENE_ID  = O.ORDENE_ID AND
+                  TFV.TRNFIN_ID = PTRNFIN AND
+                  TFV.VEHICU_ID = PVEHICU  AND
+                  TFV.INSFIN_ID = C1.ID_INSTRUMENTO;
+    END LOOP;      
+    EXCEPTION
+       WHEN OTHERS THEN
+        PERROR := SQLCODE || ' ' || SQLERRM;
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.vj8ocon0
+(
+BFE_IMPORTE IN OUT NUMBER,
+BFE_DIFER   OUT NUMBER,
+BFE_RETORNO OUT NUMBER,
+BFE_FECHA_VIGENCIA IN VARCHAR2
+)
+AS
+IMPORTE NUMBER(19,4);
+
+BEGIN
+
+IF TO_CHAR(SYSDATE,'YYYYMMDD') >= BFE_FECHA_VIGENCIA THEN
+IMPORTE := TRUNC(BFE_IMPORTE/100000,4);
+IF IMPORTE >= 0 THEN
+   IMPORTE := TRUNC(IMPORTE + 0.005,2);
+   BFE_DIFER := (BFE_IMPORTE/100000) - IMPORTE;
+   BFE_IMPORTE := TRUNC(IMPORTE,2);
+   BFE_RETORNO := 00;
+ELSE
+   IMPORTE := TRUNC(IMPORTE - 0.005,2);
+   BFE_DIFER := (BFE_IMPORTE/100000) - IMPORTE;
+   BFE_IMPORTE := TRUNC(IMPORTE,2);
+   BFE_RETORNO := 00;
+end if;
+ELSE
+   BFE_IMPORTE := BFE_IMPORTE;
+   BFE_DIFER := BFE_DIFER;
+   BFE_RETORNO := 00;
+end if;
+
+EXCEPTION
+    WHEN OTHERS THEN
+         BFE_RETORNO := 99;
+end VJ8OCON0;
+/
+
+
+CREATE OR REPLACE PROCEDURE ADM_INFI.VJ8ODIV0(VJE_SWIFT            OUT varchar2,
+                                     VJE_ISO              OUT varchar2,
+                                     VJE_LABEL            OUT varchar2,
+                                     VJE_LIT_SINGULAR     OUT varchar2,
+                                     VJE_LIT_PLURAL       OUT varchar2,
+                                     VJE_FECHA_VIGENCIA   OUT number,
+                                     VJE_SWIFT_OLD        OUT varchar2,
+                                     VJE_ISO_OLD          OUT varchar2,
+                                     VJE_LABEL_OLD        OUT varchar2,
+                                     VJE_LIT_SINGULAR_OLD OUT varchar2,
+                                     VJE_LIT_PLURAL_OLD   OUT varchar2,
+                                     VJE_LIT_MIL          OUT varchar2,
+                                     VJE_LIT_MILLON       OUT varchar2
+
+                                     ) AS
+
+BEGIN
+
+  VJE_SWIFT            := 'VES';
+  VJE_ISO              := '928';
+  VJE_LABEL            := 'Bs.S.';
+  VJE_LIT_SINGULAR     := 'BOLIVAR SOBERANO';
+  VJE_LIT_PLURAL       := 'BOLIVARES SOBERANOS';
+  VJE_FECHA_VIGENCIA   := '20180325';
+  VJE_SWIFT_OLD        := 'VEF';
+  VJE_ISO_OLD          := '937';
+  VJE_LABEL_OLD        := 'Bs.';
+  VJE_LIT_SINGULAR_OLD := 'BOLIVAR       ';
+  VJE_LIT_PLURAL_OLD   := 'BOLIVARES        ';
+  VJE_LIT_MIL          := 'M.';
+  VJE_LIT_MILLON       := 'MM';
+
+end VJ8ODIV0;
+/
+
+
+CREATE PUBLIC SYNONYM CARGAR_TITULOS_CARMEN FOR ADM_INFI.CARGAR_TITULOS_CARMEN;
+
+
+CREATE PUBLIC SYNONYM INFICD300_TRANSFORMAR_REGISTRO FOR ADM_INFI.INFICD300_TRANSFORMAR_REGISTRO;
+
+
+CREATE PUBLIC SYNONYM INFI_CARMEN FOR ADM_INFI.INFI_CARMEN;
+
+
+CREATE PUBLIC SYNONYM INFI_CLIENTES_OPICS FOR ADM_INFI.INFI_CLIENTES_OPICS;
+
+
+CREATE PUBLIC SYNONYM INFI_CONS_OPE_TAQ FOR ADM_INFI.INFI_CONS_OPE_TAQ;
+
+
+CREATE PUBLIC SYNONYM INFI_CP_CONFIRMACION FOR ADM_INFI.INFI_CP_CONFIRMACION;
+
+
+CREATE PUBLIC SYNONYM INFI_CP_MERCADO FOR ADM_INFI.INFI_CP_MERCADO;
+
+
+CREATE PUBLIC SYNONYM INFI_CP_TOMA_DE_ORDEN FOR ADM_INFI.INFI_CP_TOMA_DE_ORDEN;
+
+
+CREATE PUBLIC SYNONYM INFI_ESTABLECER_GRUPO FOR ADM_INFI.INFI_ESTABLECER_GRUPO;
+
+
+CREATE PUBLIC SYNONYM INFI_GETBASCAL FOR ADM_INFI.INFI_GETBASCAL;
+
+
+CREATE PUBLIC SYNONYM INFI_OPER_TAQ FOR ADM_INFI.INFI_OPER_TAQ;
+
+
+CREATE PUBLIC SYNONYM INFI_RETENCIONES FOR ADM_INFI.INFI_RETENCIONES;
+
+
+CREATE PUBLIC SYNONYM VJ8OCON0 FOR ADM_INFI.VJ8OCON0;
+
+
+CREATE PUBLIC SYNONYM VJ8ODIV0 FOR ADM_INFI.VJ8ODIV0;
+
+
+GRANT EXECUTE ON  ADM_INFI.INFI_OPER_TAQ TO TF_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.INFI_CONS_OPE_TAQ TO TF_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.INFI_CARMEN TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.INFI_CLIENTES_OPICS TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.INFI_CONS_OPE_TAQ TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.VJ8ODIV0 TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.INFI_GETBASCAL TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.INFI_OPER_TAQ TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.INFI_RETENCIONES TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.VJ8OCON0 TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.INFICD300_TRANSFORMAR_REGISTRO TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.CARGAR_TITULOS_CARMEN TO USU_INFI;
+
+GRANT EXECUTE ON  ADM_INFI.INFI_ESTABLECER_GRUPO TO USU_INFI;
+

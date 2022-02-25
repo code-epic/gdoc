@@ -1,0 +1,361 @@
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--7">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Documentos</h6>
+                            <h2 class="mb-0">Seleccione criterios</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row mb-4">
+                            <div class="col-md-12 text-left">
+                                <button type="button" class="btn bg-gradient-red text-white" (click)="add(agregar)">+
+                                    Agregar + <i aria-hidden="true"></i> </button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="">Unidad de inversion</label>
+                                <select name="" id="unidadInv" class="form-control">
+                                    <option value="">Unidad de inversion</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="">Transaccion</label>
+                                <select name="" id="transaccion" class="form-control">
+                                    <option value="">Transaccion</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="">Estatus</label>
+                                <select name="" id="estatus" class="form-control">
+                                    <option value="">Estatus</option>
+                                    <option value="P">APROBADO</option>
+                                    <option value="E">REGISTRADO</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+
+                            <div class="form-group col-md-6">
+                                <label for="">Creado</label>
+                                <select name="" id="creado" class="form-control">
+                                    <option value="">Creado</option>
+                                    <option value="P">Angel</option>
+                                    <option value="E">Jesus</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="">Aprobado</label>
+                                <select name="" id="aprobado" class="form-control">
+                                    <option value="">Aprobado</option>
+                                    <option value="P">Antonio</option>
+                                    <option value="E">Gustavo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+
+                                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                    <label for="">Fecha creacion</label>
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input class="form-control" placeholder="Desde" name="dp" [(ngModel)]="fechaDesde" ngbDatepicker #fd="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl">
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                         
+                                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                    <div class="margenBoton"></div>
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input class="form-control" placeholder="Hasta" name="dp" [(ngModel)]="fechaDesde" ngbDatepicker #fd="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl">
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">  
+                                    <label for="">Fecha aprobado</label>                              
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input class="form-control" placeholder="Desde" name="dp" [(ngModel)]="fechaDesde" ngbDatepicker #fd="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl">
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                         
+                                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                    <div class="margenBoton"></div>
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input class="form-control" placeholder="Hasta" name="dp" [(ngModel)]="fechaDesde" ngbDatepicker #fd="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl">
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                
+                                </div>
+                        </div>
+                        
+                        <div class="form-row justify-content-md-center mb-2 top2">
+
+                           
+                       
+                    </div>
+
+                        <div class="row top5">
+                            <div class="col-md-12 text-center">
+                                <div class="table-responsive">
+                                    <div class="table-responsive-sm table-bordered">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Archivo</th>
+                                                    <th scope="col">Transsacion</th>
+                                                    <th scope="col">Tipo de persona</th>
+                                                    <th scope="col">Unidad de inversion</th>
+                                                    <th scope="col">Estatus</th>
+                                                    <th scope="col">Creado</th>
+                                                    <th scope="col">Creacion</th>
+                                                    <th scope="col">Aprobado</th>
+                                                    <th scope="col">Aprobacion</th>
+                                                    <th scope="col">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+
+                                                    <td>ANGEL</td>
+                                                    <td>ANGEL</td>
+                                                    <td>ANGEL</td>
+                                                    <td>NO</td>
+                                                    <td>SI</td>
+                                                    <td>NO</td>
+                                                    <td>02:00:00 AM</td>
+                                                    <td>09:00:00 PM</td>
+                                                    <td>INFI</td>
+                                                    <td>
+                                                        <i class="fas fa-search iconElimi"
+                                                            (click)="modficar(observacion)"></i>
+                                                        <i class="fas fa-edit iconEdit" (click)="modficar(content)"></i>
+                                                        <i class="fas fa-download iconEdit"
+                                                            (click)="observation(observacion)"></i>
+                                                        <i class="far fa-trash-alt iconElimi"
+                                                            (click)="open(eliminar)"></i>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #agregar let-c="close" let-d="dismiss">
+    <div class="modal-header header bg-gradient-red">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Agregar</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <label for="">Transaccion</label>
+                <select class="form-control" name="" id="">
+                    <option value="">Seleccione</option>
+                </select>
+            </div>
+
+
+            <div class="col-md-4">
+                <br>
+                <p class="row"></p>
+                <div class="form-inline">
+                    <label
+                        class="custom-file-upload col-md-12 col-sm-12 col-xs-12 col-lg-5  col-xl-5 bg-gradient-red text-white radio">
+                        <input type="file" id="anexoInformeRRHH" name="datosSol.anexoInformeRRHH"
+                            (change)="document($event.target.value)" />
+                        Examinar <i class="fas fa-file-export"></i>
+                    </label> <input type="text"
+                        class="form-control col-md-12 col-sm-12 col-xs-12 col-lg-5  col-xl-6 radio" id="mostrar"
+                        placeholder="Seleccione Archivo" disabled>
+                    <div class="invalid-feedback" id="fileinvali">
+                        No Puede Estar Vacío
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-4">
+                <label for="">Tipo de persona</label>
+                <select class="form-control" name="" id="">
+                    <option value="">Seleccione</option>
+                    <option value="S">Comunas</option>
+                    <option value="S">Extranjero</option>
+                    <option value="S">Gubernamental</option>
+                    <option value="S">Internacional</option>
+                    <option value="S">Juridico</option>
+                    <option value="N">Venezolano</option>
+                </select>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white" (click)="c('Save click')">Agregar </button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>
+
+<ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header bg-gradient-red">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Agregar</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <label for="">Transaccion</label>
+                <select class="form-control" name="" id="">
+                    <option value="">Seleccione</option>
+                </select>
+            </div>
+
+
+            <div class="col-md-4">
+                <label for="">Archivo</label>
+                <input type="file" class="form-control">
+            </div>
+
+
+            <div class="col-md-4">
+                <label for="">Tipo de persona</label>
+                <select class="form-control" name="" id="">
+                    <option value="">Seleccione</option>
+                    <option value="S">Comunas</option>
+                    <option value="S">Extranjero</option>
+                    <option value="S">Gubernamental</option>
+                    <option value="S">Internacional</option>
+                    <option value="S">Juridico</option>
+                    <option value="N">Venezolano</option>
+                </select>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white" (click)="c('Save click')">Modificar </button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>
+
+
+<ng-template #eliminar let-c="close" let-d="dismiss">
+    <div class="modal-header bg-gradient-red">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Eliminar Registro</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>Por favor confirme si desea eliminar este registro <strong> Archivo : ANGEL</strong> </p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white" (click)="c('Save click')">Eliminar </button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>
+
+<ng-template #observacion let-c="close" let-d="dismiss">
+    <div class="modal-header bg-gradient-red">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Validacion Documento</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="text-center">
+                <label> Recomendaciones para la Sustitución</label>
+            </div>
+            <textarea class="form-control" name="" id="" cols="30" rows="10">
+      1.-Si va a colocar formato (negritas, cursivas, etc.) a cualquiera de los campos agregado, deberá seleccionarlo completo
+      desde el '@' de inicio hasta el '@' de fin, para que el sistema pueda efectuar las sustituciones sin problemas.
+      2.-Copie y pegue los campos disponibles que se le muestran no los tipee para evitar errores.
+      3.-No olvide guardar el documento en formato .htm ó .html, es el formato válido que acepta el sistema.
+      4.-Procure que ninguna de las palabras contenidas dentro de los @ poseea el subrayado color rojo que indica 
+      error ortográfico, debido a que el documento al ser salvado presenta inconvenientes en la sustituciones
+       con los datos reales.
+    </textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 top5">
+            <div class="text-center">
+                <label> Recomendaciones para la Sustitución</label>
+            </div>
+            <textarea class="form-control" name="" id="" cols="30" rows="10">
+      @page {mso-footnote-separator:url("Adjudicacion%20de%20Titulos%20Soberano%20Int%202026_archivos/header.htm") fs; 
+      mso-footnote-continuation-separator:url("Adjudicacion%20de%20Titulos%20Soberano%20Int%202026_archivos/header.htm") fcs; 
+      mso-endnote-separator:url("Adjudicacion%20de%20Titulos%20Soberano%20Int%202026_archivos/header.htm") es; 
+      mso-endnote-continuation-separator:url("Adjudicacion%20de%20Titulos%20Soberano%20Int%202026_archivos/header.htm") ecs;}
+     @page Section1 {size:595.3pt 841.9pt; margin:2.0cm 3.0cm 2.0cm 3.0cm; mso-header-margin:2.0cm; mso-footer-margin:36.0pt; mso-page-numbers:1; 
+      mso-paper-source:0;} div.Section1 {page:Section1;} --> @logo@ J-00002948-2 Caracas, @dia_adjudicacion@ del mes de @nombre_mes_adjudicacion@ del año @anio_adjudicacion@
+      Señor(es)@cliente@CI / RIF @cedula@Presente.-Nos dirigimos a usted(es) en atención al mandato otorgado a  @vehiculo_nombre@, identificado con 
+      el número @operacion@, con ocasión de la subasta de la Oferta Combinada de Bonos @unidad_inversion@, cuya adjudicación se realizó el día 
+      @dia_adjudicacion@ del mes de @nombre_mes_adjudicacion@ del año @anio_adjudicacion@, para informarle que  el resultado definitivo de la subasta 
+      fue el siguiente: 
+    </textarea>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>
