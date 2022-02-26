@@ -1,0 +1,96 @@
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>    
+  </div>
+    
+  <div class="container-fluid mt--7">
+    <div class="row">
+      <div class="col-xl-12 col-md-12 col-lg-12">
+        <div class="card shadow">
+          <div class="card-body">
+            <ng-wizard [config]="config" (stepChanged)="stepChanged($event)">
+                <ng-wizard-step [title]="'Paso 1'" [description]="'Unidad de Inversión'"
+                  [canEnter]="isValidTypeBoolean" [canExit]="">
+                  <span>
+                    <div class="card shadow">
+                      <div class="card-header bg-transparent">
+                        <div class="row align-items-center">
+                          <div class="col">
+                            <h2 class="mb-0">Unidad de Inversión</h2>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <form>
+                          <div class="form-row">
+                            <div class="form-group col-md-4">
+                              <label for="inputEmail4">Nombre</label>                    
+                              <input type="text" class="form-control" id="numCuenta">
+                            </div>
+                            <div class="form-group col-md-4">
+                              <label for="nombre">Emisión</label>
+                              <input type="text" class="form-control" id="numCuenta">
+                            </div>
+                            <div class="form-group col-md-4">
+                              <label for="nombre">Serie</label>
+                              <input type="text" class="form-control" id="numCuenta">
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              <label for="fechaDesde">Descripción</label>                    
+                              <input type="text" class="form-control" id="numCuenta">
+                            </div>
+                            <div class="form-group col-md-6">
+                              <label for="fechaHasta">Tipo de Instrumento</label>                    
+                              <select name="" id="status" class="form-control">
+                                <option value="">Seleccione</option>
+                              </select>
+                            </div>
+                          </div> 
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              <label for="fechaDesde">Moneda de Negociación</label>                    
+                              <select name="" id="status" class="form-control">
+                                <option value="">Seleccione</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                              <label for="fechaHasta">Tasa de Cambio</label>                    
+                              <input type="text" class="form-control" id="numCuenta">
+                            </div>
+                          </div>                            
+                        </form>
+                      </div>
+                  </div>
+                  </span>
+                </ng-wizard-step>
+                
+                <ng-wizard-step [title]="'Paso 2'" [description]="'Títulos'">
+                  <span>Step 2 content</span>
+                </ng-wizard-step>
+                
+                <ng-wizard-step [title]="'Paso 3'" [description]="'Blotters'"
+                  [canEnter]="" [canExit]="">
+                  <span>Step 3 content</span>
+                </ng-wizard-step>
+              
+              <ng-wizard-step [title]="'Paso 4'" [description]="'Indicadores'">
+                  <span>Step 4 content</span>
+                </ng-wizard-step>
+              
+                <ng-wizard-step [title]="'Paso 5'" [description]="'Empresas'">
+                  <span>Step 5 content</span>
+                </ng-wizard-step>
+                
+                <ng-wizard-step [title]="'Paso 6'" [description]="'Campos Dinámicos'">
+                  <span>Step 6 content</span>
+                </ng-wizard-step>
+            </ng-wizard>
+  
+          </div>
+        </div>
+      </div>
+    </div>    
+  </div>

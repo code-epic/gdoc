@@ -1,0 +1,93 @@
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>    
+  </div>
+  
+  <div class="container-fluid mt--7">
+    <div class="row">
+      <div class="col-xl-12 col-md-12 col-lg-12">
+        <div class="card shadow">
+          <div class="card-header bg-transparent">
+            <div class="row align-items-center">
+              <div class="col">
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Custodia - Informes</h6>
+                <h2 class="mb-0">Transacciones Liquidadas</h2>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+
+            <div class="row justify-content-md-center mb-4">
+                
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-6 col-xl-3">
+                 <label for="">Cliente</label>
+                 <div class="input-group">                      
+                    <input type="search" class="form-control float-rigth" placeholder="Cliente" aria-label="Cliente">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">
+                        <span class="fa fa-search" ngbTooltip="Buscar Cliente"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-6 col-xl-3">
+                  <label for="">Transacción</label>
+                   <select name="" id="" class="form-control">
+                       <option value="">Seleccione</option>
+                   </select>
+                 </div>
+               
+
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-6 col-xl-3">
+                    <label for="">Formato</label>
+                    <select name="" id="" class="form-control">
+                        <option value="">Selecione</option>
+                    </select>
+                </div>                
+              </div>
+
+              <div class="row justify-content-md-center mb-4">
+
+                
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-6 col-xl-3">
+                    <label for="">Fecha Desde</label>                    
+                        <div class="form-group">
+                          <div class="input-group">
+                            <input class="form-control" placeholder="yyyy-mm-dd"
+                                   name="fed" [(ngModel)]="desde" ngbDatepicker #ed="ngbDatepicker"
+                                   [placement]="placement" [positionTarget]="fed">
+                            <div class="input-group-append">
+                              <button #fed class="btn calendario" (click)="ed.toggle()" type="button"></button>
+                            </div>
+                          </div>
+                        </div>                                           
+                </div>  
+
+                <div class="col-xs-12 col-sm-6 col-md-12 col-lg-6 col-xl-3">
+                    <label for="">Fecha Hasta</label>                    
+                        <div class="form-group">
+                          <div class="input-group">
+                            <input class="form-control" placeholder="yyyy-mm-dd"
+                                   name="fed" [(ngModel)]="hasta" ngbDatepicker #h="ngbDatepicker"
+                                   [placement]="placement" [positionTarget]="fed">
+                            <div class="input-group-append">
+                              <button #fed class="btn calendario" (click)="h.toggle()" type="button"></button>
+                            </div>
+                          </div>
+                        </div>                                           
+                </div>
+
+                <div class="form-group col-md-3">
+                    <div class="margenBoton"></div>
+                    <button type="button" class="btn bg-gradient-red text-white">Buscar <i class="fa fa-search" aria-hidden="true"></i> </button>
+                  </div>
+              </div>
+        </div>
+      </div>
+    </div>    
+  </div>
+  
+
+

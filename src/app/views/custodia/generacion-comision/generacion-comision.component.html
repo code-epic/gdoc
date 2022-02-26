@@ -1,0 +1,61 @@
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--7">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Custodia</h6>
+                            <h2 class="mb-0">Generacion de comisiones</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Chart -->
+                    <form>
+                        <div class="form-row justify-content-md-center mb-2 top2">
+                            <div class="form-group col-md-3">
+                                <input type="text" class="form-control" id="nombre" placeholder="Mes a procesar">
+                            </div>
+                            <div class="form-group col-md-2">
+                                <button type="submit" class="btn bg-gradient-red text-white" (click)="procesar(procesarr)">++ Procesar ++<i aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-row justify-content-md-center mb-2 top2">
+                            <p>Los montos generados seran cobrados el dia 15 del mes de agosto de 2009</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #procesarr let-c="close" let-d="dismiss">
+    <div class="modal-header bg-gradient-red text-white">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Procesar</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div class="row top2">
+            <div class="col-md-12">
+                <div class="text-center">
+                    <p> <span class="textRojo"><strong>NOTA:</strong></span> Por favor confirmar si desea procesar este registro <strong>Mes:</strong> Julio 2009</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white">Procesar</button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>

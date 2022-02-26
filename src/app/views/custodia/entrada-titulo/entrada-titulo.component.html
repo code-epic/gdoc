@@ -1,0 +1,263 @@
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--7">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Custodia</h6>
+                            <h2 class="mb-0">Entrada titulo</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Chart -->
+                    <form>
+                        <div class="form-row justify-content-md-center mb-2 top2">
+                            <div class="form-group col-md-3">
+                                <input type="text" class="form-control" id="nombre" placeholder="Cliente">
+                            </div>
+                            <div class="form-group col-md-1 top1">
+                                <i class="fas fa-search iconElimi"></i>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <input type="text" class="form-control" id="nombre" placeholder="Titulo">
+                            </div>
+                            <div class="form-group col-md-1 top1">
+                                <i class="fas fa-search iconElimi"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-row justify-content-md-center mb-2">
+
+                        </div>
+
+                        <div class="form-row justify-content-md-center mb-2">
+
+
+                            <button type="submit" class="btn bg-gradient-red text-white" (click)="add(agregar)">++ Agregar ++<i aria-hidden="true"></i></button>
+
+
+                        </div>
+
+
+
+                    </form>
+                    <div class="row top2">
+                        <div class="col-md-12 text-center">
+                            <div class="table-responsive">
+                                <div class="table-responsive-sm table-bordered">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col"></th>
+                                                <th scope="col">Titulos</th>
+                                                <th scope="col">Cantidad</th>
+                                                <th scope="col">Valor nominal</th>
+                                                <th scope="col">Valor total</th>
+                                                <th scope="col">Bloqueada</th>
+                                                <th scope="col">Disponible</th>
+                                                <th scope="col">Moneda</th>
+                                                <th scope="col">Bloqueo</th>
+                                                <th scope="col">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td></td>
+                                                <td>Farmatodos</td>
+                                                <td>1000</td>
+                                                <td>1</td>
+                                                <td>210</td>
+                                                <td>210</td>
+                                                <td>1000</td>
+                                                <td>USD</td>
+                                                <td>SI</td>
+                                                <td>
+                                                    <i class="fas fa-edit iconEditt" (click)="modficar(content)"></i>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header bg-gradient-red">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Editar Registro</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div class="row top">
+            <div class="col-md-12 text-center">
+                <table class="table-responsive">
+                    <div class="table-responsive-sm table-bordered">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Titulo</th>
+                                    <th scope="col">Moneda negociacion</th>
+                                    <th scope="col">Cantidad a transferir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>BODEN15</td>
+                                    <td>USD</td>
+                                    <td><input type="number" class="form-control" placeholder="10000"></td>
+                                </tr>
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="col-md-12">
+                                            <label for="">Depositario</label>
+                                            <select name="" id="tipoAuditoria" class="form-control">
+                                            <option value="">Empresa depositaria</option>
+                                            <option value="">Garantia de la nacion</option>
+                                        </select>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </table>
+            </div>
+        </div>
+        <div class="row top2">
+            <div class="col-md-12">
+                <div class="text-center">
+                    <p> <span class="textRojo"><strong>NOTA:</strong></span> El Campo Deben Ser Llenados Para Poder Procesar El Formulario.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white" (click)="detalles(detalle)">Modificar </button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>
+
+<ng-template #detalle let-c="close" let-d="dismiss">
+    <div class="modal-header bg-gradient-red">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Detalle</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div class="row top">
+            <div class="col-md-12 text-center">
+                <div class="table-responsive">
+                    <div class="table-responsive-sm table-bordered">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Fecha custodia</th>
+                                    <th scope="col">Ultimo cobro comision</th>
+                                    <th scope="col">Fecha ultimo pago cupon</th>
+                                    <th scope="col">Disponible</th>
+                                    <th scope="col">Cantidad a tranferir</th>
+                                    <th scope="col">Moneda denominacion</th>
+                                    <th scope="col">Moneda negociacion</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>16-04-2022</td>
+                                    <td>16-04-2022</td>
+                                    <td>16-04-2022</td>
+                                    <td>1000</td>
+                                    <td>500</td>
+                                    <td>USD</td>
+                                    <td>USD</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row top2">
+            <div class="col-md-12">
+                <div class="text-center">
+                    <p> <span class="textRojo"><strong>NOTA:</strong></span> El Campo Deben Ser Llenados Para Poder Procesar El Formulario.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white" (click)="c('Save click')">Aceptar </button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>
+
+<ng-template #agregar let-c="close" let-d="dismiss">
+    <div class="modal-header headerModalE">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Datos de la transaccion</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-row justify-content-md-center mb-2">
+            <div class="form-group col-md-3">
+                <label for="inputEmail4">Cliente</label>
+                <input type="text" class="form-control" value="Angel Herrera" disabled>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="nombre">Titulo</label>
+                <input type="text" class="form-control" value="PDVSA" disabled>
+            </div>
+            <div class="form-group col-md-1">
+                <label for="inputEmail4">Moneda</label>
+                <input type="text" class="form-control" value="USD" disabled>
+            </div>
+            <div class="form-group col-md-2">
+                <label for="nombre">Valor nominal</label>
+                <input type="text" class="form-control" value="1" disabled>
+            </div>
+        </div>
+        <div class="form-row justify-content-md-center mb-2">
+            <div class="form-group col-md-2">
+                <label for="inputEmail4">Cantidad</label>
+                <input type="number" class="form-control" value="">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="nombre">Depositario</label>
+                <select class="form-control" name="" id="">
+                <option value="">Caja venezolana de valores</option>
+              </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="inputEmail4">Contraparte</label>
+                <input type="text" class="form-control" value="Mercantil">
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white" (click)="c('Save click')">Guardar </button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>

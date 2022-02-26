@@ -1,4 +1,4 @@
-<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
     <div class="container-fluid">
         <p></p>
     </div>    
@@ -22,7 +22,7 @@
                 <div class="form-row">
                   <div class="form-group col-md-6">
                     <label for="inputEmail4">Tipo Cliente</label>                    
-                    <select name="" id="" class="form-control">
+                    <select name="" id="tipoCliente" (change)="tipoCliente($event.target.value)" class="form-control">
                             <option value="">Seleccione</option>
                             <option value="P">Persona</option>
                             <option value="E">Empresa</option>
@@ -42,14 +42,15 @@
                                 <OPtion> seleccione</OPtion>
                             </select>
                         </div>
-                        <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
+                        <input type="text" class="form-control inputModifica" placeholder="" aria-label="" aria-describedby="basic-addon1">
                       </div>
                    </div>
 
                    <div class="form-group col-md-6">
                     <label for="numCuenta">Nro Cuenta</label>
                     <input type="text" class="form-control" id="numCuenta">
-                  </div>
+              
+            </div>
                 
                </div>
 
@@ -98,19 +99,20 @@
                 <div class="form-row">
                     <div class="form-group col-md-12">
                         <label for="observacion">Observación</label>
-                        <input type="email" id="observacion" class="form-control">
+                        <textarea class="form-control" name="" id="observacion" cols="30" rows="10"></textarea>
+                        
                     </div>
                 </div>
 
                 <div class="row">                   
                     <div class="col-md-12">
                         <div class="text-right">
-                            <button type="submit" class="btn btn-success">Guardar <i class="fas fa-check-double"></i></button>
-                            <button type="submit" class="btn btn-primary">Limpiar <i class="far fa-trash-alt"></i></button>
+                            <button type="submit" class="btn bg-gradient-red text-white">Guardar <i class="fas fa-check-double"></i></button>
+                            <button type="submit" class="btn bg-gradient-red text-white">Limpiar <i class="far fa-trash-alt"></i></button>
                         </div>                           
                     </div>                   
                 </div>                               
-              </form>
+            </form>
           </div>
         </div>
       </div>

@@ -1,0 +1,116 @@
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+      <p></p>
+  </div>    
+</div>
+  
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Configuración</h6>
+              <h2 class="mb-0">Unidad de Inversión</h2>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="inputEmail4">Unidad de Inversión</label>                    
+                <input type="text" class="form-control" id="numCuenta">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="nombre">Emisor</label>
+                <select name="" id="tipoCliente" class="form-control">
+                  <option value="">Seleccione</option>
+                  <option value="P">Persona</option>
+                  <option value="E">Empresa</option>
+                </select>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="nombre">Tipo de Instrumento</label>
+                <select name="" id="tipoCliente" class="form-control">
+                  <option value="">Seleccione</option>
+                  <option value="P">Persona</option>
+                  <option value="E">Empresa</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="fechaDesde">Fecha Desde</label>                    
+                <input type="date" class="form-control" id="numCuenta">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="fechaHasta">Fecha Hasta</label>                    
+                <input type="date" class="form-control" id="numCuenta">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="nombre">Status</label>
+                <select name="" id="status" class="form-control">
+                  <option value="">Seleccione</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">                   
+                <div class="col-md-12 mb-4">
+                    <div class="text-right">
+                        <button type="submit" class="btn bg-gradient-red text-white">Buscar <i class="fa fa-search"></i></button>
+                    </div>                           
+                </div>                   
+            </div>                               
+          </form>
+
+        <div class="card shadow">
+          <div class="row top">
+              <div class="col-md-12 text-center">
+                  <table class="table-responsive">
+                      <div class="table-responsive-sm table-bordered">
+                          <table class="table">
+                              <thead>
+                                  <tr>
+                                      <th scope="col">Unidad de<br>Inversión</th>
+                                      <th scope="col">Tipo de<br>Instrumento</th>
+                                      <th scope="col">Emisor</th>
+                                      <th scope="col">Fecha de<br>Emisión</th>
+                                      <th scope="col">Fecha de<br>Liquidación</th>
+                                      <th scope="col">Fecha de<br>Cierre</th>
+                                      <th scope="col">Estatus</th>
+                                      <th scope="col">Acción</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr>
+                                      <td>Papeles Comerciales Nelson</td>
+                                      <td>Bonos Subasta_C</td>
+                                      <td>Banco Central de Venezuela</td>
+                                      <td>10-07-2008</td>
+                                      <td>10-07-2008</td>
+                                      <td>10-07-2008</td>
+                                      <td>Registrada</td>
+                                      <td>
+                                        <a routerLinkActive="active" [routerLink]="['/inversionw']"><i class="fas fa-edit iconEdit"></i></a>                          
+                                      </td>    
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </table>
+              </div>
+          </div>
+        </div>
+        </div>
+    </div>
+  </div>    
+</div>
+
+
+
+
+
+  

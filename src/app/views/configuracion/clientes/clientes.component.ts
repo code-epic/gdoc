@@ -13,4 +13,9 @@ export class ClientesComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  tipoCliente(xvalor){
+     console.log(xvalor);
+     
+  }
+
 }

@@ -1,0 +1,92 @@
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--7">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Calendario</h6>
+                            <h2 class="mb-0">Informacion</h2>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 top">
+                            <div>
+                                <button type="submit" class="btn bg-gradient-red text-white" (click)="add(agregar)">+ Agregar +<i aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row top">
+                        <div class="col-md-12 text-center">
+                            <table class="table-responsive">
+                                <div class="table-responsive-sm table-bordered">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Fecha no laboral</th>
+                                            <th scope="col">Motivo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>04-02-2022</td>
+                                            <td>Carnaval</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </table>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #agregar let-c="close" let-d="dismiss">
+    <div class="modal-header bg-gradient-red">
+        <h4 class="modal-title tituloModal text-white" id="modal-basic-title">Agregar accion</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-md-6">
+                <label for="">Fecha</label>
+                <input type="text" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label for="">Motivo</label>
+                <input type="text" class="form-control">
+            </div>
+        </div>
+        <div class="row top">
+            <div class="col-md-12">
+                <div class="text-center">
+                    <p> <span class="textRojo"><strong>NOTA:</strong></span> El Campo Deben Ser Llenados Para Poder Procesar El Formulario.</p>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white" (click)="c('Save click')">Agregar </button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>

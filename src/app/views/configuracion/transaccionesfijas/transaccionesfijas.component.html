@@ -1,0 +1,121 @@
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>    
+  </div>
+  
+  <div class="container-fluid mt--7">
+    <div class="row">
+      <div class="col-xl-12 col-md-12 col-lg-12">
+        <div class="card shadow">
+          <div class="card-header bg-transparent">
+            <div class="row align-items-center">
+              <div class="col">
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Generales</h6>
+                <h2 class="mb-0">Transacciones Fijas</h2>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row justify-content-md-center mb-4">
+              <div class="col-md-4">
+                <select class="form-control" name="">
+                    <option value="0">Seleccionar Vehículo</option>
+                 </select> 
+              </div>
+              <div class="col-md-6">
+                <input type="text" class="form-control" placeholder="Nombre de Transacción"> 
+              </div>
+              <div class="col-md-2">
+                <button type="button" class="btn bg-gradient-red text-white">Buscar <i class="fa fa-search" aria-hidden="true"></i> </button>
+              </div>
+            </div>
+            <div class="card shadow">
+                <div class="row top">
+                    <div class="col-md-12 text-center">
+                        <table class="table-responsive">
+                            <div class="table-responsive-sm table-bordered">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Valor<br>Transacción</th>
+                                            <th scope="col">Nombre<br>Transacción</th>
+                                            <th scope="col">Descripción</th>
+                                            <th scope="col">Tipo de<br>Operación</th>
+                                            <th scope="col">Valor<br>Operación</th>
+                                            <th scope="col">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>CUSTODIA_COMISIONES</td>
+                                            <td>COMISIÓN CUSTODIA</td>
+                                            <td>COBRO DE COMISIÓN POR CUSTODIA</td>
+                                            <td>DEB</td>
+                                            <td>0</td>
+                                            <td>
+                                                <i class="fas fa-edit iconEdit" (click)="modficar(content)"></i>                             
+                                            </td>    
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </table>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>    
+  </div>
+  
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header headerModal">
+      <h4 class="modal-title tituloModal" id="modal-basic-title">Editar Transacciones Fijas</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+  
+        <div class="row">
+            <div class="col-md-4 mb-4 text-left">
+                <label for="">Código</label>
+                <input type="text" class="form-control" placeholder="001" disabled>
+            </div>
+            <div class="col-md-8 mb-4 text-left">
+                <label for="">Transacción Negocio</label>
+                <input type="text" class="form-control" placeholder="VENTA_TITULOS" disabled>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-4 text-left">
+                <label for="">Nombre</label>
+                <input type="text" class="form-control" placeholder="Venta de Títulos" disabled>
+            </div>
+            <div class="col-md-6 mb-4 text-left">
+                <label for="">Descripción</label>
+                <input type="text" class="form-control" placeholder="Operación de venta de títulos del banco de venezuela" disabled>
+            </div>  
+        </div>
+        <div class="row">
+            <div class="col-md-6 text-left">
+                <label for="">Tipo</label>
+                <input type="text" class="form-control" placeholder="CRE" disabled>
+            </div>
+            <div class="col-md-6 text-left">
+                <label for="">Valor Operación</label>
+                <input type="text" class="form-control" placeholder="000">
+            </div>
+        </div>
+        
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn bg-gradient-red text-white" (click)="c('Save click')">Modificar </button>
+      <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+  </ng-template>
+
+
+

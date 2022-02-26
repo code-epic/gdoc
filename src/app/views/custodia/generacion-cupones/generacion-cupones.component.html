@@ -1,0 +1,133 @@
+<p>generacion-cupones</p>
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+
+<div class="container-fluid mt--7">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <!-- Chart -->
+                    <div class="row">
+                        <div class="col-xs-12 col-md-12 col-lg-12">
+                            <ul ngbNav #nav="ngbNav" class="nav-tabs">
+                                <li ngbNavItem>
+                                    <a ngbNavLink>Consulta</a>
+                                    <ng-template ngbNavContent>
+                                        <section id="consulta">
+                                            <form action="">
+                                                <div class="row">
+                                                    <div class="col-md-12 text-center">
+                                                        <div class="table-responsive">
+                                                            <div class="table-responsive-sm table-bordered">
+                                                                <table class="table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="col">Titulos</th>
+                                                                            <th scope="col">Fecha inicio pago cupon</th>
+                                                                            <th scope="col">Fecha fin pago cupon</th>
+                                                                            <th scope="col">Interes cupon</th>
+                                                                            <th scope="col">Interes amortizacion</th>
+                                                                            <th scope="col">Amortizacion</th>
+                                                                            <th scope="col">Cantidad de clientes</th>
+                                                                            <th scope="col">Acciones</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>Farmatodos ti</td>
+                                                                            <td>16-04-2022</td>
+                                                                            <td>16-04-2022</td>
+                                                                            <td>5,17</td>
+                                                                            <td>1,00</td>
+                                                                            <td>0,00</td>
+                                                                            <td>2</td>
+                                                                            <td>
+                                                                                <i class="fas fa-edit iconEditt" (click)="modficar(content)"></i>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </section>
+
+                                    </ng-template>
+                                </li>
+                                <li ngbNavItem>
+                                    <a ngbNavLink>Titulos por vencerse</a>
+                                    <ng-template ngbNavContent>
+                                        <section id="">
+                                            <form action="">
+                                                <div class="row">
+                                                    <div class="col-md-12 text-center">
+                                                        <div class="table-responsive">
+                                                            <div class="table-responsive-sm table-bordered">
+                                                                <table class="table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="col">Titulos</th>
+                                                                            <th scope="col">Fecha inicio pago cupon</th>
+                                                                            <th scope="col">Fecha fin pago cupon</th>
+                                                                            <th scope="col">Cantidad de clientes</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>Bono PDVSA</td>
+                                                                            <td>16-04-2022</td>
+                                                                            <td>16-04-2022</td>
+                                                                            <td>573</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </section>
+                                    </ng-template>
+                                </li>
+                            </ul>
+
+                            <div [ngbNavOutlet]="nav" class="mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header bg-gradient-red text-white">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Editar Registro</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <h4 class="card-title text-center tituloP">Titulo : Farmatodo Global 2022</h4>
+        <div class="row top2">
+            <div class="col-md-12">
+                <div class="text-center">
+                    <p> <span class="textRojo"><strong>NOTA:</strong></span> Por favor confirme si desea procesar la generacion de pago de cupones de el siguientes titulo</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white">Procesar </button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>

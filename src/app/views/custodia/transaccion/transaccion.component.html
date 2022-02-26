@@ -1,0 +1,209 @@
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--7">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Custodia</h6>
+                            <h2 class="mb-0">Bloqueo / Desbloqueo de titulos</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Chart -->
+                    <form>
+                        <div class="form-row justify-content-md-center mb-2 top5">
+                            <div class="form-group col-md-3">
+                                <input type="text" class="form-control" id="nombre" placeholder="Cliente">
+                            </div>
+                            <div class="form-group col-md-1">
+                                <select name="" id="tipoAuditoria" class="form-control">
+                                    <option value="">Bloqueo</option>
+                                    <option value="P">Desbloqueo</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-2">
+
+                                <button type="submit" class="btn bg-gradient-red text-white">Buscar<i aria-hidden="true"></i></button>
+
+                            </div>
+                        </div>
+
+
+
+                    </form>
+                    <div class="row top5">
+                        <div class="col-md-12 text-center">
+                            <div class="table-responsive">
+                                <div class="table-responsive-sm table-bordered">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Titulos</th>
+                                                <th scope="col">Cantidad disponible</th>
+                                                <th scope="col">Valor nominal</th>
+                                                <th scope="col">Cant.custodia</th>
+                                                <th scope="col">Moneda</th>
+                                                <th scope="col">Bloqueo</th>
+                                                <th scope="col">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Farmatodos</td>
+                                                <td>1000</td>
+                                                <td>1</td>
+                                                <td>1000</td>
+                                                <td>USD</td>
+                                                <td>SI</td>
+                                                <td>
+                                                    <i class="fas fa-search iconElimi" (click)="detalle(observacion)"></i>
+                                                    <i class="fas fa-edit iconEditt" (click)="modficar(content)"></i>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header bg-gradient-red">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Editar Registro</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <h4 class="card-title text-center tituloP">Datos generales</h4>
+        <div class="row justify-content-md-center  mb-1">
+            <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                <label for=""><strong>Titulo : Farmatodos</strong></label>
+                <span></span>
+
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                <label for=""> <strong>Cliente : Angel</strong></label>
+                <br>
+                <span></span>
+            </div>
+
+        </div>
+        <h4 class="card-title text-center tituloP">Datos bloqueo</h4>
+        <div class="row justify-content-md-center  mb-1">
+            <div class="col-md-2">
+                <label for="">Fecha bloqueo</label>
+                <input type="text" class="form-control" value="08-02-2022">
+            </div>
+            <div class="col-md-3">
+                <label for="">Codigo blqueo</label>
+                <select name="" id="tipoAuditoria" class="form-control">
+                    <option value="">Bloqueo a favor BDV</option>
+                    <option value="">Garantia de la nacion</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="">Beneficiario</label>
+                <select name="" id="tipoAuditoria" class="form-control">
+                    <option value="">Banco de venezuela</option>
+                    <option value="">Banco central de venezuela</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="">Numero de garantia</label>
+                <input type="text" class="form-control" value="427589">
+            </div>
+        </div>
+
+        <div class="row justify-content-md-center  mb-1 top5">
+            <div class="col-md-2">
+                <label for="">Cantidad total</label>
+                <input type="number" class="form-control" value="20">
+            </div>
+            <div class="col-md-2">
+                <label for="">Cantidad bloquear</label>
+                <input type="number" class="form-control" value="5">
+            </div>
+
+        </div>
+        <div class="row top5">
+            <div class="col-md-12">
+                <div class="text-center">
+                    <p> <span class="textRojo"><strong>NOTA:</strong></span> El Campo Deben Ser Llenados Para Poder Procesar El Formulario.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white" (click)="c('Save click')">Modificar </button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>
+
+<ng-template #observacion let-c="close" let-d="dismiss">
+    <div class="modal-header bg-gradient-red">
+        <h4 class="modal-title tituloModal" id="modal-basic-title">Detalle titulo</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <h4 class="card-title text-center tituloP">Bloqueo sobre el titulo : <strong>Farmatodos</strong> / cliente : <strong>Angel</strong> </h4>
+        <div class="row top5">
+            <div class="col-md-12 text-center">
+                <div class="table-responsive">
+                    <div class="table-responsive-sm table-bordered">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Titulos</th>
+                                    <th scope="col">Cantidad bloqueada</th>
+                                    <th scope="col">Valor nominal</th>
+                                    <th scope="col">Cant.custodia</th>
+                                    <th scope="col">Moneda</th>
+                                    <th scope="col">Bloqueo</th>
+                                    <th scope="col">Beneficiario</th>
+                                    <th scope="col">Nro garantia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Farmatodos</td>
+                                    <td>1000</td>
+                                    <td>1</td>
+                                    <td>1000</td>
+                                    <td>USD</td>
+                                    <td>Bloqueo a favor de BDV</td>
+                                    <td>Banco de venezuela</td>
+                                    <td>150</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-red text-white" (click)="c('Save click')">Modificar </button>
+        <button type="button" class="btn bg-gradient-red text-white" (click)="d('Cross click')">Cancelar </button>
+    </div>
+</ng-template>

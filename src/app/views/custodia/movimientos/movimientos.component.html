@@ -1,0 +1,521 @@
+<div class="header bg-gradient-red pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>    
+  </div>
+  
+  <div class="container-fluid mt--7">
+    <div class="row">
+      <div class="col-xl-12 col-md-12 col-lg-12">
+        <div class="card shadow">
+          <div class="card-header bg-transparent">
+            <div class="row align-items-center">
+              <div class="col">
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Custodia</h6>
+                <h2 class="mb-0">Movimientos</h2>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div *ngIf="busqueda">
+                <div class="row justify-content-md-center mb-4">
+                    <div class="col-md-4">
+                        <label class="d-lg-none d-md-none">Cliente</label>
+                      <div class="input-group">                      
+                        <input type="search" class="form-control float-rigth" placeholder="Cliente" aria-label="Cliente">
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">
+                            <span class="fa fa-search"></span>
+                          </div>
+                        </div>
+                      </div> 
+                    </div>
+    
+                    <div class="col-md-4">
+                        <label class="d-lg-none d-md-none">Titulo</label>
+                        <div class="input-group">                      
+                          <input type="search" class="form-control float-rigth" placeholder="Titulo" aria-label="Titulo">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">
+                              <span class="fa fa-search"></span>
+                            </div>
+                          </div>
+                        </div> 
+                      </div>
+    
+                      <div class="col-md-2">
+                        <label class="d-lg-none d-md-none">Transacción</label>
+                        <select name="" id="" class="form-control">
+                            <option value=""> Seleccione Transacción </option>
+                        </select>
+                      </div>
+    
+                  </div>
+    
+    
+                  <div class="row justify-content-md-center mb-4">
+                    <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                        <label for="">Fecha Transación Desde</label>
+                        <form class="form-inline">
+                            <div class="form-group">
+                              <div class="input-group">
+                                <input class="form-control" placeholder="yyyy-mm-dd"
+                                       name="dp" [(ngModel)]="fechaDesde" ngbDatepicker #fd="ngbDatepicker"
+                                       [placement]="placement" [positionTarget]="buttonEl">
+                                <div class="input-group-append">
+                                  <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+                                </div>
+                              </div>
+                            </div>                        
+                          </form>                      
+                    </div>
+    
+    
+                    <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                        <label for="">Fecha Transación Hasta</label>
+                        <form class="form-inline">
+                            <div class="form-group">
+                              <div class="input-group">
+                                <input class="form-control" placeholder="yyyy-mm-dd"
+                                       name="dp" [(ngModel)]="fechaHasta" ngbDatepicker #fh="ngbDatepicker"
+                                       [placement]="placement" [positionTarget]="buttonEl">
+                                <div class="input-group-append">
+                                  <button #buttonEl class="btn calendario" (click)="fh.toggle()" type="button"></button>
+                                </div>
+                              </div>
+                            </div>                        
+                          </form>                      
+                    </div>
+    
+                    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+                        <div class="margenBoton"></div>
+                        <button type="button" class="btn bg-gradient-red text-white" >Buscar <i class="fa fa-search" aria-hidden="true"></i> </button>
+                      </div>
+    
+                  </div>
+    
+                 
+                <div class="card shadow">
+                    <div class="row top">
+                        <div class="col-md-12 text-center">
+                            <table class="table-responsive">
+                                <div class="table-responsive-sm table-bordered">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Cliente</th>
+                                                <th scope="col">Transacción</th>
+                                                <th scope="col">Fecha</th>
+                                                <th scope="col">Número Orden</th>
+                                                <th scope="col">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>MIGUEL ANGEL PIÑA DORTA</td>
+                                                <td>SALIDA EXTERNA</td>
+                                                <td>11/08/2019</td>
+                                                <td>2351</td>
+                                                <td>
+                                                    <i class="fas fa-history iconEdit"  (click)="prueba()" ngbTooltip="detalle Orden"  ></i>
+                                                   
+                                                </td>    
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          
+
+
+            <div *ngIf="resp">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                    <ul ngbNav #nav="ngbNav" class="nav nav-tabs justify-content-center">
+                      <li ngbNavItem>
+                        <a ngbNavLink>Datos</a>
+                        <ng-template ngbNavContent>
+                          <section id="datos">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <div class="row justify-content-md-center mb-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Unidad Inversión</strong></label>
+                                            <span></span>
+                                            
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""> <strong>Id Orden</strong></label>
+                                            <br>
+                                            <span>2351</span>
+                                        </div>
+                                    </div>
+            
+                                    <h4 class="card-title tituloP">Información del Usuario que Tomo la Orden</h4>
+
+                                    <div class="row justify-content-md-center mb-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                                            <label for=""><strong>Usuario</strong></label>
+                                            <br>
+                                            <span>NM11383</span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                                            <label for=""><strong>Centro Contable</strong></label>  <br>
+                                            <span>2351</span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                                            <label for=""><strong>Sucursal</strong> </label>  <br>
+                                            <span>222</span>
+                                        </div>
+
+                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                                            <label for=""><strong>Terminal</strong> </label>  <br>
+                                            <span>127.0.0.1</span>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="card-title tituloP">Información del Cliente: <strong>MIGUEL ANGEL PINA DORTA</strong> </h4>
+
+                                    <div class="row justify-content-md-center mb-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Tipo de Cuenta</strong></label> <br>
+                                            <span>127.0.0.1</span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Número de Cuenta</strong></label><br>
+                                            <span>127.0.0.1</span>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="card-title tituloP">Información del Cliente: <strong>MIGUEL ANGEL PINA DORTA</strong> </h4>
+
+                                    <div class="row justify-content-md-center mb-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Status</strong></label> <br>
+                                            <span>REGISTRADA</span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Sistmas</strong></label><br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Depositorio</strong></label><br>
+                                            <span>Empresa Depositorio</span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Contraparte</strong></label><br>
+                                            <span>Mercantil</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row justify-content-md-center mb-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Transacción</strong></label> <br>
+                                            <span>SALIDA EXTERNA</span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Enviado a BCV</strong></label><br>
+                                            <span>NO</span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Fecha Valor</strong></label><br>
+                                            <span>01/02/2021</span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Fecha Orden</strong></label><br>
+                                            <span>01/02/2021</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row justify-content-md-center mb-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Ultima Actualización</strong></label> <br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Monto total orden</strong></label><br>
+                                            <span>0,00</span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Porcentaje Comision Emisor</strong></label><br>
+                                            <span>01/02/2021</span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Monto Financiado</strong></label><br>
+                                            <span>0,00</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row justify-content-md-center mb-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Monto Comisión Emisor</strong></label> <br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Tasa Pool</strong></label><br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Porcentaje Ganancia Red</strong></label><br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Comision Oficina</strong></label><br>
+                                            <span></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row justify-content-md-center mb-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Monto Total Comisión</strong></label> <br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Precio Recompra</strong></label><br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Rendimiento</strong></label><br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Interese Caidos</strong></label><br>
+                                            <span>0,00</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row justify-content-md-center mb-4">
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Blotter</strong></label> <br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Vehiculo Tomador</strong></label><br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Vehiculo Colocador</strong></label><br>
+                                            <span></span>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                                            <label for=""><strong>Vehiculo Recompra</strong></label><br>
+                                            <span></span>
+                                        </div>
+                                    </div>
+
+
+                                    
+                                </div>
+                            </div>
+
+
+                          </section>
+      
+                        </ng-template>
+                      </li>
+
+                      <li ngbNavItem>
+                        <a ngbNavLink>Transacciones</a>
+                        <ng-template ngbNavContent>
+                          <section id="transacciones">
+                            <div class="card shadow">
+                                <div class="row top">
+                                    <div class="col-md-12 text-center">
+                                        <table class="table-responsive">
+                                            <div class="table-responsive-sm table-bordered">
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Transacción</th>
+                                                            <th scope="col">Credito</th>
+                                                            <th scope="col">Moneda</th>
+                                                            <th scope="col">Monto</th>
+                                                            <th scope="col">Status</th>
+                                                            <th scope="col">tasa</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>MIGUEL ANGEL PIÑA DORTA</td>
+                                                            <td>SALIDA EXTERNA</td>
+                                                            <td>11/08/2019</td>
+                                                            <td>2351</td>
+                                                            <td>2351</td>
+                                                            <td>2351</td>    
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+      
+                          </section>
+                        </ng-template>
+                      </li>
+
+                      <li ngbNavItem>
+                        <a ngbNavLink>Títulos</a>
+                        <ng-template ngbNavContent>
+                          <section id="titulo">
+                            <div class="card shadow">
+                                <div class="row top">
+                                    <div class="col-md-12 text-center">
+                                        <table class="table-responsive">
+                                            <div class="table-responsive-sm table-bordered">
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Titulo</th>
+                                                            <th scope="col">Emisión</th>
+                                                            <th scope="col">Unidades</th>
+                                                            <th scope="col">Porcentaje</th>
+                                                            <th scope="col">Moneda De</th>
+                                                            <th scope="col">Moneda Neg</th>
+                                                            <th scope="col">Porcentaje Recompra</th>
+                                                            <th scope="col">Precio Mercado</th>
+                                                            <th scope="col">Interese Caidos</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>MIGUEL ANGEL PIÑA DORTA</td>
+                                                            <td>SALIDA EXTERNA</td>
+                                                            <td>11/08/2019</td>
+                                                            <td>2351</td>
+                                                            <td>2351</td>
+                                                            <td>2351</td> 
+                                                            <td>2351</td>
+                                                            <td>2351</td>
+                                                            <td>2351</td>    
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+      
+                          </section>
+                        </ng-template>
+                      </li>
+
+                      <li ngbNavItem>
+                        <a ngbNavLink>Documentos</a>
+                        <ng-template ngbNavContent>
+                          <section id="documentos">
+                            
+      
+                          </section>
+                        </ng-template>
+                      </li>
+
+                      <li ngbNavItem>
+                        <a ngbNavLink>Campos Dinamicos</a>
+                        <ng-template ngbNavContent>
+                          <section id="camposDinamicos">
+                            <div class="card shadow">
+                                <div class="row top">
+                                    <div class="col-md-12 text-center">
+                                        <table class="table-responsive">
+                                            <div class="table-responsive-sm table-bordered">
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Campo</th>
+                                                            <th scope="col">Valor</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>MIGUEL ANGEL PIÑA DORTA</td>
+                                                            <td>SALIDA EXTERNA</td>  
+                                                        </tr>
+                                                        <tr>
+                                                            <td>MIGUEL ANGEL PIÑA DORTA</td>
+                                                            <td>SALIDA EXTERNA</td>  
+                                                        </tr>
+                                                        <tr>
+                                                            <td>MIGUEL ANGEL PIÑA DORTA</td>
+                                                            <td>SALIDA EXTERNA</td>  
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+      
+                          </section>
+                        </ng-template>
+                      </li>
+
+                      <li ngbNavItem>
+                        <a ngbNavLink>Data Extendida</a>
+                        <ng-template ngbNavContent>
+                          <section id="camposDinamicos">
+                            <div class="card shadow">
+                                <div class="row top">
+                                    <div class="col-md-12 text-center">
+                                        <table class="table-responsive">
+                                            <div class="table-responsive-sm table-bordered">
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Campo</th>
+                                                            <th scope="col">Valor</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>MIGUEL ANGEL PIÑA DORTA</td>
+                                                            <td>SALIDA EXTERNA</td>  
+                                                        </tr>
+                                                        <tr>
+                                                            <td>MIGUEL ANGEL PIÑA DORTA</td>
+                                                            <td>SALIDA EXTERNA</td>  
+                                                        </tr>
+                                                        <tr>
+                                                            <td>MIGUEL ANGEL PIÑA DORTA</td>
+                                                            <td>SALIDA EXTERNA</td>  
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+      
+                          </section>
+                        </ng-template>
+                      </li>
+                    </ul>
+                    
+                    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+                  </div>
+
+                  <div class="d-flex bd-highlight top5" >
+                    <div class="p-2 flex-grow-1 bd-highlight"></div>
+                    <div class="p-2 bd-highlight"></div>
+                    <div class="p-2 bd-highlight">
+                        <button type="button" class="btn bg-gradient-red text-white"  (click)="prueba()">Borrar <i class="fa fa-trash" aria-hidden="true"></i> </button>
+                    </div>
+                </div>
+                </div>
+
+          </div>
+        </div>
+      </div>
+    </div>    
+  </div>
+  
+ 
+
+ 
