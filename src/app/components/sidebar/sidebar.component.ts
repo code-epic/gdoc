@@ -9,12 +9,13 @@ declare interface RouteInfo {
 }
 export const ROUTES: RouteInfo[] = [
     { path: '/dashboard', title: 'Dashboard',  icon: 'ni-tv-2 text-primary', class: '' },
-    { path: '/configuracion', title: 'Configuracion',  icon:'ni-planet text-blue', class: '' },
-    { path: '/custodia', title: 'Custodia',  icon:'ni-pin-3 text-orange', class: '' },
-    { path: '/inversion', title: 'Inversion',  icon:'ni-single-02 text-yellow', class: '' },
-    { path: '/ordenes', title: 'Ordenes',  icon:'ni-bullet-list-67 text-red', class: '' },
-    { path: '/login', title: 'Login',  icon:'ni-key-25 text-info', class: '' },
-    { path: '/register', title: 'Register',  icon:'ni-circle-08 text-pink', class: '' }
+    { path: '/control', title: 'Control y Gestión',  icon:'ni-planet text-blue', class: '' },
+    { path: '/secretaria', title: 'Secretaría',  icon:'ni-pin-3 text-orange', class: '' },
+    { path: '/resoluciones', title: 'Resoluciones',  icon:'ni-single-02 text-yellow', class: '' },
+    { path: '/ayudantia', title: 'Ayudantía',  icon:'ni-bullet-list-67 text-red', class: '' },
+    { path: '/timonel', title: 'Timonel',  icon:'ni-key-25 text-info', class: '' },
+    { path: '/acami', title: 'Acami',  icon:'ni-circle-08 text-pink', class: '' },
+    { path: '/personal', title: 'Personal',  icon:'ni-circle-08 text-pink', class: '' }
 ];
 
 @Component({
