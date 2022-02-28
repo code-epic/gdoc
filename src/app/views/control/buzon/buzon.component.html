@@ -12,21 +12,7 @@
             <div class="row align-items-center">
                 <div class="col-md-10">
                     <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
-                    <h2 class="mb-0">Documentos Registrados</h2>
-                </div>
-                <div class="col-md-1 text-center">
-                    <a routerLinkActive="active" [routerLink]="['/documento']">
-                        <button  mat-fab color="primary" title="Registrar Nuevo Documento">
-                        <mat-icon class="waves waves-effect waves-light">note_add</mat-icon>
-                        </button>
-                    </a>
-                </div>
-                <div class="col-md-1 text-center">
-                    <a routerLinkActive="active" [routerLink]="['/']">
-                        <button  mat-fab color="accent" title="Registrar Nuevo Documento">
-                        <mat-icon class="waves waves-effect waves-light">settings</mat-icon>
-                        </button>
-                    </a>
+                    <h2 class="mb-0">Buzón de Documentos</h2>
                 </div>
             </div>
           </div>
@@ -34,7 +20,7 @@
         <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"> 
             <mat-tab>
                 <ng-template mat-tab-label>
-                    DOCUMENTOS REGISTRADOS
+                    RECIBIDOS
                 </ng-template>
                 <mat-nav-list>
                     <mat-list-item>
@@ -63,35 +49,68 @@
                 </mat-nav-list>
             </mat-tab>
             <mat-tab>
+            <ng-template mat-tab-label>
+                PROCESADOS
+            </ng-template>
+            <mat-selection-list>
+                <mat-list-option>
+                    Documento 1
+                </mat-list-option>
+                <mat-list-option>
+                    Documento 1
+                </mat-list-option>
+                <mat-list-option>
+                    Documento 1
+                </mat-list-option>
+            </mat-selection-list>
+
+            <!-- <mat-paginator [length]="lengthOfi"
+                (page)="pageChangeEvent($event)"
+                [pageSize]="pageSizeOfi"
+                [pageSizeOptions]="pageSizeOptions"
+                (page)="pageEvent = $event"
+                aria-label="Select page">
+            </mat-paginator> -->
+            </mat-tab>
+            <mat-tab>
                 <ng-template mat-tab-label>
-                    NOTAS DE ENTREGA
+                    PENDIENTES
                 </ng-template>
-                <mat-nav-list>
-                    <mat-list-item>
-                        <div class="row col-lg-12">
-                            <div class="col-lg-1 text-center">
-                                <input type="checkbox" aria-label="Checkbox for following text input">
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            CG-00001
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            Oficio
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            02/01/2022
-                            </div>
-                            <div class="col-lg-3 text-center">
-                            Ministerio de Vivienda
-                            </div>
-                            <div class="col-md-2 text-right">               
-                                <i class="fas fa-edit iconEdit"></i>
-                                <i class="far fa-trash-alt iconElimi"></i>
-                            </div>
-                        </div>
-                    </mat-list-item>
-                </mat-nav-list>
-            
+                <mat-selection-list>
+                    <mat-list-option>
+                        Documento 1
+                    </mat-list-option>
+                    <mat-list-option>
+                        Documento 1
+                    </mat-list-option>
+                    <mat-list-option>
+                        Documento 1
+                    </mat-list-option>
+                </mat-selection-list>
+    
+                <!-- <mat-paginator [length]="lengthOfi"
+                    (page)="pageChangeEvent($event)"
+                    [pageSize]="pageSizeOfi"
+                    [pageSizeOptions]="pageSizeOptions"
+                    (page)="pageEvent = $event"
+                    aria-label="Select page">
+                </mat-paginator> -->
+                </mat-tab>
+                <mat-tab>
+            <ng-template mat-tab-label>
+                CERRADOS
+            </ng-template>
+            <mat-selection-list>
+                <mat-list-option>
+                    Documento 1
+                </mat-list-option>
+                <mat-list-option>
+                    Documento 1
+                </mat-list-option>
+                <mat-list-option>
+                    Documento 1
+                </mat-list-option>
+            </mat-selection-list>
 
             <!-- <mat-paginator [length]="lengthOfi"
                 (page)="pageChangeEvent($event)"
@@ -106,5 +125,3 @@
       </div>
     </div>    
 </div>
-
-  

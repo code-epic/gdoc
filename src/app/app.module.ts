@@ -26,6 +26,9 @@ import { TimonelComponent } from './views/timonel/timonel.component';
 import { AcamiComponent } from './views/acami/acami.component';
 import { PersonalComponent } from './views/personal/personal.component';
 import { RegistrarComponent } from './views/control/registrar/registrar.component';
+import { DocumentoComponent } from './views/control/documento/documento.component';
+import { BuzonComponent } from './views/control/buzon/buzon.component';
+import { SalidasComponent } from './views/control/salidas/salidas.component';
 
 
 
@@ -64,7 +67,10 @@ const ngWizardConfig: NgWizardConfig = {
     TimonelComponent,
     AcamiComponent,
     PersonalComponent,
-    RegistrarComponent
+    RegistrarComponent,
+    DocumentoComponent,
+    BuzonComponent,
+    SalidasComponent
   ],
   providers: [],
   bootstrap: [AppComponent]
