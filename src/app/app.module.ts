@@ -29,8 +29,13 @@ import { RegistrarComponent } from './views/control/registrar/registrar.componen
 import { DocumentoComponent } from './views/control/documento/documento.component';
 import { BuzonComponent } from './views/control/buzon/buzon.component';
 import { SalidasComponent } from './views/control/salidas/salidas.component';
+import { NgxEditorModule } from 'ngx-editor';
 
-
+NgxEditorModule.forRoot({
+  locals: {
+    // ...
+  },
+});
 
 const ngWizardConfig: NgWizardConfig = {
   theme: THEME.arrows
@@ -53,7 +58,8 @@ const ngWizardConfig: NgWizardConfig = {
     MatExpansionModule,
     MatListModule,
     MatPaginatorModule,
-    NgWizardModule.forRoot(ngWizardConfig)
+    NgWizardModule.forRoot(ngWizardConfig),
+    NgxEditorModule,
 
   ],
   declarations: [

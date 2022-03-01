@@ -31,12 +31,30 @@
                             <input type="text" class="form-control" id="">
                         </div>
                         <div class="form-group col-md-3">
-                            <label for="nombre">Fecha Registro</label>
-                            <input type="date" class="form-control" id="nombre">
+                            <label for="">Fecha Creacion</label>
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input class="form-control" placeholder="dd/mm/aaaa" name="creacion" [(ngModel)]="fechaCreacion" ngbDatepicker #fc="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl">
+                                        <div class="input-group-append">
+                                            <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                         <div class="form-group col-md-3">
                             <label for="nombre">Fecha Origen</label>
-                            <input type="date" class="form-control" id="nombre">
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input class="form-control" placeholder="dd/mm/aaaa" name="origen" [(ngModel)]="fechaOrigen" ngbDatepicker #fo="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl">
+                                        <div class="input-group-append">
+                                            <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                         <div class="form-group col-md-2">
                             <label for="nombre">Nro. Origen</label>
@@ -52,35 +70,47 @@
                             <label for="">Tipo de Documento</label>
                             <select class="form-control" name="" id="">
                                 <option value="0">Seleccione</option>
-                                <option value="1"></option>
+                                <option value="1">Oficio</option>
+                                <option value="2">Solicitud</option>
                             </select>
                         </div>
                         <div class="form-group col-md-4">
                             <label for="">Remitente</label>
                             <select class="form-control" name="" id="">
                                 <option value="0">Seleccione</option>
-                                <option value="1"></option>
+                                <option value="1">Ministerio de Vivienda</option>
+                                <option value="2">Comandancia del Ejército</option>
                             </select>
                         </div>
                         <div class="form-group col-md-4">
                             <label for="">Unidad o Dependencia</label>
                             <select class="form-control" name="" id="">
                                 <option value="0">Seleccione</option>
-                                <option value="1"></option>
+                                <option value="1">Unidad Independencia</option>
+                                <option value="1">Unidad Ministerial</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12">
                             <label for="observacion">Contenido</label>
-                            <textarea class="form-control" name="" id="observacion" cols="30" rows="10"></textarea>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="observacion">Instrucciones Generales</label>
-                            <textarea class="form-control" name="" id="observacion" cols="30" rows="10"></textarea>
+                            <div class="NgxEditor__Wrapper">
+                                <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                                <ngx-editor
+                                  [editor]="editor"
+                                  [ngModel]="html"
+                                  [disabled]="false"
+                                  [placeholder]="'Escibe aqui...'">
+                                </ngx-editor>
+                            </div>
                         </div>
                     </div>
-                    
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="observacion">Instrucciones Generales</label>
+                            <textarea class="form-control" name="" id="observacion" cols="30" rows="3"></textarea>
+                        </div> 
+                    </div>
                     <div class="form-row">
                         <div class="form-group col-md-3">
                             <label for="nombre">Código Archivo</label>

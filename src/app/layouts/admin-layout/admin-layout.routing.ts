@@ -5,6 +5,7 @@ import { RegistrarComponent } from '../../views/control/registrar/registrar.comp
 import { DocumentoComponent } from '../../views/control/documento/documento.component';
 import { BuzonComponent } from '../../views/control/buzon/buzon.component';
 import { SalidasComponent } from '../../views/control/salidas/salidas.component';
+import { AyudantiaComponent } from '../../views/ayudantia/ayudantia.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -13,5 +14,6 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'registrar', component: RegistrarComponent },
     { path: 'documento', component: DocumentoComponent },
     { path: 'buzon', component: BuzonComponent },
-    { path: 'salidas', component: SalidasComponent }
+    { path: 'salidas', component: SalidasComponent },
+    { path: 'ayudantia', component: AyudantiaComponent }
 ];
