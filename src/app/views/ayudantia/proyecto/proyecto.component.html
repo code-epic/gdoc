@@ -1,0 +1,111 @@
+<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>    
+</div>
+
+<div class="container-fluid mt--9">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+            <div class="card-header bg-transparent">
+                <div class="row align-items-center">
+                    <div class="col-md-11">
+                        <h6 class="text-uppercase text-muted ls-1 mb-1">Ayudantía</h6>
+                        <h2 class="mb-0">Registrar Proyecto</h2>
+                    </div>
+                    <div class="col-md-1">
+                        <a routerLinkActive="active" [routerLink]="['/']">
+                            <button  mat-fab color="primary" title="Anexar Registro Fotográficos">
+                            <mat-icon class="waves waves-effect waves-light">camera</mat-icon>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="txtNombre"> Nombre del Proyecto </label>                    
+                            <input type="txtNombre" class="form-control" id="">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="cmbTipo">Tipo de Proyecto</label>
+                            <select class="form-control" name="" id="">
+                                <option value="0">Seleccione</option>
+                                <option value="1">Infraestructura</option>
+                                <option value="2">Remodelación</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="txtEnte"> Ente Contratante </label>                    
+                            <input type="txtEnte" class="form-control" id="">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="txtEmpresa">Empresa Ejecutante</label>
+                            <input type="txtEmpresa" class="form-control" id="nombre">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="cmbFuente">Fuente de Financiamiento</label>
+                            <select class="form-control" name="" id="">
+                                <option value="0">Seleccione</option>
+                                <option value="1">Ministerio de Vivienda</option>
+                                <option value="2">Comandancia del Ejército</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="cmbUsuario">Usuario Final</label>
+                            <select class="form-control" name="" id="">
+                                <option value="0">Seleccione</option>
+                                <option value="1">Presidencia</option>
+                                <option value="1">Ministerio</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtObjeto">Objeto del Proyecto</label>
+                            <textarea class="form-control" name="" id="observacion" cols="30" rows="3"></textarea>
+                        </div> 
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtObservacion">Observaciones</label>
+                            <textarea class="form-control" name="" id="observacion" cols="30" rows="3"></textarea>
+                        </div> 
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label for="txtLapso">Lapso de Ejecución</label>
+                            <input type="txtLapso" class="form-control" id="nombre">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="txtMonto">Monto Total del Proyecto</label>
+                            <input type="txtMonto" class="form-control" id="nombre">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="nombre">Monto Pagado</label>
+                            <input type="text" class="form-control" id="nombre">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="txtDeuda">Deuda Pendiente</label>
+                            <input type="txtDeuda" class="form-control" id="nombre">
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">                   
+                        <div class="col-md-12">
+                            <div class="text-right">
+                                <button type="btnGuardar" class="btn bg-primary text-white">Guardar</button>
+                                <button type="btnCancelar" class="btn bg-red text-white">Cancelar</button>
+                            </div>                           
+                        </div>                   
+                    </div>                               
+                </form>
+            </div>
+        </div>
+    </div>   
+</div>

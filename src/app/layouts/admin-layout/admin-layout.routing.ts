@@ -6,6 +6,7 @@ import { DocumentoComponent } from '../../views/control/documento/documento.comp
 import { BuzonComponent } from '../../views/control/buzon/buzon.component';
 import { SalidasComponent } from '../../views/control/salidas/salidas.component';
 import { AyudantiaComponent } from '../../views/ayudantia/ayudantia.component';
+import { ProyectoComponent } from '../../views/ayudantia/proyecto/proyecto.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -15,5 +16,6 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'documento', component: DocumentoComponent },
     { path: 'buzon', component: BuzonComponent },
     { path: 'salidas', component: SalidasComponent },
-    { path: 'ayudantia', component: AyudantiaComponent }
+    { path: 'ayudantia', component: AyudantiaComponent },
+    { path: 'proyecto', component: ProyectoComponent },
 ];

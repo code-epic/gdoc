@@ -30,6 +30,7 @@ import { DocumentoComponent } from './views/control/documento/documento.componen
 import { BuzonComponent } from './views/control/buzon/buzon.component';
 import { SalidasComponent } from './views/control/salidas/salidas.component';
 import { NgxEditorModule } from 'ngx-editor';
+import { ProyectoComponent } from './views/ayudantia/proyecto/proyecto.component';
 
 NgxEditorModule.forRoot({
   locals: {
@@ -76,7 +77,8 @@ const ngWizardConfig: NgWizardConfig = {
     RegistrarComponent,
     DocumentoComponent,
     BuzonComponent,
-    SalidasComponent
+    SalidasComponent,
+    ProyectoComponent
   ],
   providers: [],
   bootstrap: [AppComponent]
