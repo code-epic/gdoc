@@ -1,7 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { MatAccordion } from '@angular/material/expansion';
 import { PageEvent } from '@angular/material/paginator';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+export interface DialogData {
+  name: string;
+}
+
 
 @Component({
   selector: 'app-control',
@@ -11,6 +17,10 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 export class ControlComponent implements OnInit {
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
+
+  public rdocumento : string = "none"
+  public rtarjetas  : string = ""
+  public rlistado : string = "none"
 
   public paginador = 10
   public focus;
@@ -52,7 +62,7 @@ export class ControlComponent implements OnInit {
   pageEvent: PageEvent;
 
 
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService, public dialog: MatDialog) { }
 
   ngOnInit(): void {
     
@@ -112,5 +122,33 @@ export class ControlComponent implements OnInit {
 
   }
 
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(DialogConfigurar, {
+      width: '550px',
+      data: {name: ''},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Cerrar Ventana');
+      //this.animal = result;
+    });
+  }
+
+}
+
+@Component({
+  selector: 'dialog-configurar',
+  templateUrl: 'dialog-configurar.html',
+})
+export class DialogConfigurar {
+  constructor(
+    public dialogRef: MatDialogRef<DialogConfigurar>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {}
+
+  ConfigurarGuardar(): void {
+    this.dialogRef.close();
+  }
 
 }

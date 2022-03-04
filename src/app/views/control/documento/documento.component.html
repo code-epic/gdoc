@@ -28,7 +28,7 @@
                     <div class="form-row">
                         <div class="form-group col-md-2">
                             <label for="txtControl"> Nro. Control </label>                    
-                            <input type="txtControl" class="form-control" id="">
+                            <input type="text" class="form-control" id="txtControl" [(ngModel)]="xDoc.id">
                         </div>
                         <div class="form-group col-md-3">
                             <label for="tmsCreacion">Fecha Creacion</label>
@@ -125,8 +125,8 @@
                     <div class="row">                   
                         <div class="col-md-12">
                             <div class="text-right">
-                                <button type="btnRegistrar" class="btn bg-primary text-white">Registrar</button>
-                                <button type="btnCancelar" class="btn bg-red text-white">Cancelar</button>
+                                <button type="btnRegistrar" class="btn bg-primary text-white" (click) = "registrar()">Registrar</button>
+                                <button type="btnCancelar" class="btn bg-red text-white"  [routerLink]="['/control']">Cancelar</button>
                             </div>                           
                         </div>                   
                     </div>                               

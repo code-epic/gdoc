@@ -2,6 +2,8 @@ import { AfterViewInit, Component, ElementRef, ViewChild, OnInit } from '@angula
 import { NgbModalConfig, NgbModal,NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Editor } from 'ngx-editor';
 
+import { ApiService, IAPICore, ceDocumento } from 'src/app/services/apicore/api.service';
+
 
 @Component({
   selector: 'app-documento',
@@ -11,14 +13,14 @@ import { Editor } from 'ngx-editor';
 
 export class DocumentoComponent implements AfterViewInit {
 
-    title = 'Documentos';
-    fechaCreacion : NgbDateStruct;
-    fechaOrigen : NgbDateStruct;
-    placement = 'bottom';
+  title = 'Documentos';
+  fechaCreacion : NgbDateStruct;
+  fechaOrigen : NgbDateStruct;
+  placement = 'bottom';
 
-    lineCountCache :number = 0; 
-    editor: Editor = new Editor;
-    html: string = '';
+  lineCountCache :number = 0; 
+  editor: Editor = new Editor;
+  html: string = '';
 
   @ViewChild('codeEditor', { static: false })
   public codeEditor!: ElementRef;
@@ -26,6 +28,37 @@ export class DocumentoComponent implements AfterViewInit {
   @ViewChild('lineCounter', { static: false })
   public lineCounter!: ElementRef;
 
+  public xDoc : ceDocumento = {
+    id: ''
+  };
+
+  public xAPI : IAPICore = {
+    funcion: ''
+
+  };
+
+  constructor(private apiService: ApiService) {
+    
+    this.xAPI.funcion = 'IDocumento'
+    
+
+  }
+
+  registrar(){
+
+    this.xAPI.valores = JSON.stringify(this.xDoc)
+
+    console.info(this.xAPI)
+
+    // this.apiService.Ejecutar(this.xAPI).then({
+    //   (data) => {
+
+    //   }, 
+    //   (err)=> {
+
+    //   }
+    // })
+  }
 
   ngAfterViewInit() {
     var lineCount = this.codeEditor.nativeElement.value.split('\n').length; 

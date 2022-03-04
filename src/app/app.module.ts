@@ -31,6 +31,7 @@ import { BuzonComponent } from './views/control/buzon/buzon.component';
 import { SalidasComponent } from './views/control/salidas/salidas.component';
 import { NgxEditorModule } from 'ngx-editor';
 import { ProyectoComponent } from './views/ayudantia/proyecto/proyecto.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 NgxEditorModule.forRoot({
   locals: {
@@ -61,6 +62,7 @@ const ngWizardConfig: NgWizardConfig = {
     MatPaginatorModule,
     NgWizardModule.forRoot(ngWizardConfig),
     NgxEditorModule,
+    MatDialogModule,
 
   ],
   declarations: [
