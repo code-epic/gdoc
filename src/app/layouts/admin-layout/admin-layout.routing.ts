@@ -7,6 +7,7 @@ import { BuzonComponent } from '../../views/control/buzon/buzon.component';
 import { SalidasComponent } from '../../views/control/salidas/salidas.component';
 import { AyudantiaComponent } from '../../views/ayudantia/ayudantia.component';
 import { ProyectoComponent } from '../../views/ayudantia/proyecto/proyecto.component';
+import { ResolucionesComponent } from 'src/app/views/resoluciones/resoluciones.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -14,6 +15,7 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'control', component: ControlComponent },
     { path: 'registrar', component: RegistrarComponent },
     { path: 'documento', component: DocumentoComponent },
+    { path: 'resoluciones', component: ResolucionesComponent },
     { path: 'buzon', component: BuzonComponent },
     { path: 'salidas', component: SalidasComponent },
     { path: 'ayudantia', component: AyudantiaComponent },

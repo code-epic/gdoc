@@ -1,1 +1,166 @@
-<p>resoluciones works!</p>
+
+
+
+<div class="header bg-gradient-red pb-8 pt-4 pt-md-8">
+    <div class="container-fluid">
+      <p></p>
+      </div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  <div class="container-fluid mt--9">
+    <div class="row">
+      <div class="col-xl-12 col-md-12 col-lg-12">
+        <div class="card shadow">
+          <div class="card-header bg-transparent">
+            <div class="row align-items-center">
+              <div class="col-md-10">
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
+                <h2 class="mb-0">General</h2>
+              </div>
+              <div class="col-md-2 text-right">
+  
+                
+               
+                  <button  mat-mini-fab color="primary" aria-label="Agregar">
+                    <mat-icon class="waves waves-effect waves-light">more_vert</mat-icon>
+                  </button>
+                
+              </div>
+              
+  
+            </div>
+          </div>
+          <div class="card-body">
+           <!-- Contenido WEB Configuracion Menu -->
+            
+           <div class="container">
+             <div class="row">
+             
+                <div class="col-md-3">
+                        
+                </div>
+                <div class="col-md-6">
+                  
+                  <form class="navbar-search">
+                    <div class="form-group" [ngClass]="{ 'focused': focus === true }">
+                      <div class="input-group input-group-alternative">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input class="form-control" placeholder="Buscar" type="text" 
+                        (focus)="focus = true"   [(ngModel)]="buscar" (ngValue)="{buscar}">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fas fa-sliders-h" (click)="CMppd()"></i></span>
+                          &nbsp; 
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                  
+                </div>
+                <div class="col-md-3">
+                                      
+                  
+                </div>
+              </div> 
+            </div>
+  
+  
+            <br>
+  
+            <div class="row">
+                <div class="col-md-12">
+
+                    <!-- (selectedIndexChange)="CargarListadoAPI($event)" -->
+                    <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" >
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                            <mat-icon class="example-tab-icon">source</mat-icon>
+                            &nbsp;ENTRADA DE DOCUMENTOS
+                            </ng-template>
+                            <mat-accordion class="example-headers-align">
+                                <mat-expansion-panel hideToggle *ngFor="let api of lst">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        <b> {{ api.ubic }} </b>
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+                                        <div class="col-md-4"> oooo </div>
+                                      
+                                        <div class="col-md-2"><span class="float-right badge me-1 bg-primary">0000/00/00</span></div>
+                                    </mat-panel-description>
+                                </mat-expansion-panel-header>
+                                <mat-divider></mat-divider>
+                                <br>
+                               
+
+                                
+                                <p class="card-text text-justify">
+                                    
+                                        {{ api.cont }}
+                                </p>
+                                <mat-action-row>
+                                    <div class="col-md-6">
+                                        <button class="btn btn-sm btn-primary " type="button">Promover</button>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <button class="btn btn-sm btn-warning" type="button">Modificar</button>
+                                        <button class="btn btn-sm btn-info" type="button" >Probar</button>
+                                    </div>
+                                    
+                                </mat-action-row>
+                                </mat-expansion-panel>
+                            </mat-accordion>
+                            <!-- <mat-paginator [length]="lengthOfi"
+                                (page)="pageChangeEvent($event)"
+                                [pageSize]="pageSizeOfi"
+                                [pageSizeOptions]="pageSizeOptions"
+                                (page)="pageEvent = $event"
+                                aria-label="Seleccionar">
+                            </mat-paginator> -->
+              
+              
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                            <mat-icon class="example-tab-icon">source</mat-icon>
+                            &nbsp;RESOLUCIONES
+                            </ng-template>
+                            
+              
+                        </mat-tab>
+                    
+                    </mat-tab-group>
+
+                
+                </div>
+            </div>
+        
+  
+  
+  
+       
+            <br>
+  
+  
+  
+  
+  
+         
+            <!-- Card stats -->
+           
+  
+  
+          </div>
+        </div>
+      </div>
+    </div>    
+  </div>
+  
+  

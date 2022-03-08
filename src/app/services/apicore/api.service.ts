@@ -69,7 +69,8 @@ export class ApiService {
   
   //Ejecutar Api generales
   Ejecutar(xAPI : IAPICore) : Observable<any>{
-    return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
+    // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
+    return this.http.post<any>(this.URL + "crud" + this.hash, xAPI);
   }
 
 
