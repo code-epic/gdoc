@@ -1,8 +1,10 @@
-import { AfterViewInit, Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { NgbModalConfig, NgbModal,NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Editor } from 'ngx-editor';
 
 import { ApiService, IAPICore, ceDocumento } from 'src/app/services/apicore/api.service';
+import { IDocumento } from 'src/app/services/control/documentos.service';
+
 
 
 @Component({
@@ -11,7 +13,7 @@ import { ApiService, IAPICore, ceDocumento } from 'src/app/services/apicore/api.
   styleUrls: ['./documento.component.scss']
 })
 
-export class DocumentoComponent implements AfterViewInit {
+export class DocumentoComponent implements OnInit, OnDestroy {
 
   title = 'Documentos';
   fechaCreacion : NgbDateStruct;
@@ -22,15 +24,27 @@ export class DocumentoComponent implements AfterViewInit {
   editor: Editor = new Editor;
   html: string = '';
 
-  @ViewChild('codeEditor', { static: false })
-  public codeEditor!: ElementRef;
-
-  @ViewChild('lineCounter', { static: false })
-  public lineCounter!: ElementRef;
+  public Doc : IDocumento = {
+    id : '',
+    ncontrol : '',
+    fcreacion : '',
+    salida : '',
+    forigen : '',
+    norigen : '',
+    tipo : '',
+    remitente : '',
+    unidad : '',
+    contenido : '',
+    instrucciones : '',
+    codigo : '',
+    nexpediente : ''    
+  } 
 
   public xDoc : ceDocumento = {
     id: ''
   };
+
+
 
   public xAPI : IAPICore = {
     funcion: ''
@@ -46,53 +60,35 @@ export class DocumentoComponent implements AfterViewInit {
 
   registrar(){
 
-    this.xAPI.valores = JSON.stringify(this.xDoc)
+    this.xAPI.funcion = 'IDocumento'
+    this.xAPI.coleccion = 'documento'
+    this.xAPI.valores = this.Doc
 
-    console.info(this.xAPI)
-
-    // this.apiService.Ejecutar(this.xAPI).then({
-    //   (data) => {
-
-    //   }, 
-    //   (err)=> {
-
-    //   }
-    // })
-  }
-
-  ngAfterViewInit() {
-    var lineCount = this.codeEditor.nativeElement.value.split('\n').length; 
-    var outarr = new Array(); 
-      if (this.lineCountCache != lineCount) { 
-         for (var x = 0; x < lineCount; x++) { 
-            outarr[x] = (x + 1) + '.'; 
-         } 
-         this.lineCounter.nativeElement.value = outarr.join('\n'); 
-      } 
-      this.lineCountCache = lineCount;
-      console.log(" Prueba => ", this.lineCountCache)
-  }  
-
-  counLine():void{
-    this.colortexto();
-    var lineCount = this.codeEditor.nativeElement.value.split('\n').length; 
-    var outarr = new Array(); 
-      if (this.lineCountCache != lineCount) { 
-         for (var x = 0; x < lineCount; x++) { 
-            outarr[x] = (x + 1) + '.'; 
-         } 
-         this.lineCounter.nativeElement.value = outarr.join('\n'); 
-      } 
-      this.lineCountCache = lineCount;
-  }
-
-  colortexto():void{
-   var  texto : string = this.codeEditor.nativeElement.value;
-   var arr :any = texto.split("@import");
-   var respuesta : any =arr[0]; 
    
-    console.log("esperando Color", respuesta);
+     
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+       (data)=>{
+        console.log(data)
+        
+         //this.toastrService.success(
+        //    'Tu (API) ha sido registrada codigo: ' + data.InsertedID,
+        //    `Code-Epic ESB`
+        //  );
+        // this.ngxService.stopLoader("loader-registrar")
+        // this.ngWizardService.reset();
+ 
+       },
+       (errot)=>{
+       //  this.ngxService.stopLoader("loader-registrar")
+        //  this.toastrService.error(
+        //    'Fallo la conexión, con el API',
+        //    `Code-Epic ESB`
+        //  );
+         
+       }
+     )
   }
+
 
  
   ngOnInit(): void {
