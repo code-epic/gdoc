@@ -12,22 +12,36 @@
             <div class="row align-items-center">
                 <div class="col-md-11">
                     <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
-                    <h2 class="mb-0">Salidas Registradas</h2>
+                    <h2 class="mb-0">Salidas</h2>
                 </div>
-                <div class="col-md-1 text-center">
-                    <a routerLinkActive="active" [routerLink]="['/']">
-                        <button  mat-fab color="primary" title="Registrar Salida">
-                        <mat-icon class="waves waves-effect waves-light">note_add</mat-icon>
-                        </button>
-                    </a>
-                </div>
+                <div class="col-md-1">
+                    <ul class="navbar-nav align-items-right d-none d-md-flex">
+                      <li class="nav-item" ngbDropdown placement="bottom-right">
+                        <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                          <div class="media align-items-center">
+                            <div class="example-button-row">
+                              <button mat-icon-button aria-label="Example icon-button with a heart icon">
+                                <mat-icon>more_vert</mat-icon>
+                              </button>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                          <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item">
+                            <i class="fa fa-plus"></i>
+                            <span>Nueva Salida</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
             </div>
           </div>
 
         <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"> 
             <mat-tab>
                 <ng-template mat-tab-label>
-                    SALIDAS REGISTRADAS
+                 REGISTRADAS
                 </ng-template>
                 <mat-nav-list>
                     <mat-list-item>
@@ -57,7 +71,46 @@
             </mat-tab>
             <mat-tab>
                 <ng-template mat-tab-label>
-                    NOTAS DE ENTREGA
+                    PROCESADAS
+                </ng-template>
+                <mat-nav-list>
+                    <mat-list-item>
+                        <div class="row col-lg-12">
+                            <div class="col-lg-1 text-center">
+                                <input type="checkbox" aria-label="Checkbox for following text input">
+                            </div>
+                            <div class="col-lg-2 text-center">
+                            CG-00001
+                            </div>
+                            <div class="col-lg-2 text-center">
+                            Oficio
+                            </div>
+                            <div class="col-lg-2 text-center">
+                            02/01/2022
+                            </div>
+                            <div class="col-lg-3 text-center">
+                            Ministerio de Vivienda
+                            </div>
+                            <div class="col-md-2 text-right">               
+                                <i class="fas fa-edit iconEdit"></i>
+                                <i class="far fa-trash-alt iconElimi"></i>
+                            </div>
+                        </div>
+                    </mat-list-item>
+                </mat-nav-list>
+            
+
+            <!-- <mat-paginator [length]="lengthOfi"
+                (page)="pageChangeEvent($event)"
+                [pageSize]="pageSizeOfi"
+                [pageSizeOptions]="pageSizeOptions"
+                (page)="pageEvent = $event"
+                aria-label="Select page">
+            </mat-paginator> -->
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    PENDIENTES
                 </ng-template>
                 <mat-nav-list>
                     <mat-list-item>

@@ -12,7 +12,7 @@
             <div class="row align-items-center">
               <div class="col-md-11">
                   <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
-                  <h2 class="mb-0">Buzón de Documentos</h2>
+                  <h2 class="mb-0">Documentos</h2>
               </div>
               <div class="col-md-1">
                 <ul class="navbar-nav align-items-center d-none d-md-flex">
@@ -41,8 +41,7 @@
           <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" >
             <mat-tab>
                 <ng-template mat-tab-label>
-                <mat-icon class="example-tab-icon">source</mat-icon>
-                &nbsp;ENTRADA DE DOCUMENTOS
+                &nbsp;RECIBIDOS
                 </ng-template>
                 <div class="col-md-12">
                   <button type="button" class="btn" *ngFor="let item of checklist" > 
@@ -101,9 +100,18 @@
             </mat-tab>
             <mat-tab>
                 <ng-template mat-tab-label>
-                <mat-icon class="example-tab-icon">source</mat-icon>
-                &nbsp;RESOLUCIONES
+                &nbsp;PROCESADOS
                 </ng-template>
+            </mat-tab>
+            <mat-tab>
+              <ng-template mat-tab-label>
+              &nbsp;PENDIENTES
+              </ng-template>
+            </mat-tab>
+            <mat-tab>
+            <ng-template mat-tab-label>
+            &nbsp;CERRADOS
+            </ng-template>
             </mat-tab>
           </mat-tab-group>  
         </div>

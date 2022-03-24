@@ -89,7 +89,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
      )
   }
 
-
+  fecha(date:any): string {
+    return date.day + '-' + date.month + '-' + date.year;
+  }
  
   ngOnInit(): void {
     this.editor = new Editor();

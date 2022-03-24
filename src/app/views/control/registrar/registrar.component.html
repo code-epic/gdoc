@@ -12,7 +12,7 @@
                 <div class="row align-items-center">
                   <div class="col-md-11">
                       <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
-                      <h2 class="mb-0">Registrados</h2>
+                      <h2 class="mb-0">Documentos</h2>
                   </div>
                   <div class="col-md-1">
                     <ul class="navbar-nav align-items-right d-none d-md-flex">
@@ -45,48 +45,55 @@
           <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" >
             <mat-tab>
                 <ng-template mat-tab-label>
-                &nbsp;DOCUMENTOS REGISTRADOS
+                &nbsp;REGISTRADOS
                 </ng-template>
-                <div class="col-md-11">
-                  <button type="button" class="btn" *ngFor="let item of checklist" > 
-                    <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
-                  </button>
+                <div class="row col-md-12 px-2 py-2">
+                  <div class="col-md-1">
+                    <mat-panel-title>
+                      <button type="button" class="btn" *ngFor="let item of checklist" > 
+                        <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
+                      </button>
+                    </mat-panel-title>
+                  </div>
+                  <div class="col-md-1">
+                    <button mat-icon-button>
+                      <i class="fa fa-share"></i>
+                    </button>
+                  </div>
                 </div>
                 <mat-accordion>
                   <mat-expansion-panel hideToggle>
                     <mat-expansion-panel-header>
                       <mat-panel-title *ngFor="let item of checklist">
-                        <div class="col-md-1">
-                          <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
-                        (change)="checkUncheckAll()" />
+                        <div class="row col-md-12 px-2 py-2">
+                          <div class="col-md-1">
+                            <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
+                          (change)="checkUncheckAll()" />
+                          </div>
+                          <div class="col-md-2">
+                            00001
+                          </div>
+                          <div class="col-md-2">
+                            Oficio
+                          </div>
+                          <div class="col-md-2">
+                            02/01/2022
+                          </div>
+                          <div class="col-md-5">
+                            Ministerio del Poder Popular para la Salud
+                          </div>
                         </div>
                       </mat-panel-title>
-                      <mat-panel-description>
-                        <div class="col-md-2">
-                          00001
-                        </div>
-                        <div class="col-md-2">
-                          Oficio
-                        </div>
-                        <div class="col-md-2">
-                          02/01/2022
-                        </div>
-                        <div class="col-md-5">
-                          Ministerio del Poder Popular para la Salud
-                        </div>
-                        
-                      </mat-panel-description>
                     </mat-expansion-panel-header>
                     <p><strong>Contenido: Ascenso de 400 profesionales del Ejército Bolivariano</strong></p>
-                    <mat-divider></mat-divider>
-                      <br>
+                    
                       <mat-action-row>
                           <div class="col-md-6">
-                              <button class="btn btn-sm btn-primary " type="button">Distrbuir</button>
+                              <button class="btn btn-sm btn-primary " type="button">Distribuir</button>
                           </div>
                           <div class="col-md-6 text-right">
                               <button class="btn btn-sm btn-warning" type="button">Editar</button>
-                              <button class="btn btn-sm btn-info" type="button" >Eliminar</button>
+                              <button class="btn btn-sm btn-info" type="button" >Escanear</button>
                           </div>
                       </mat-action-row>
                   </mat-expansion-panel>
@@ -103,10 +110,64 @@
   
             </mat-tab>
             <mat-tab>
-                <ng-template mat-tab-label>
-                &nbsp;NOTAS DE ENTREGA
-                </ng-template>
-            </mat-tab>
+              <ng-template mat-tab-label>
+              &nbsp;NOTAS DE ENTREGA
+              </ng-template>
+              <div class="col-md-11">
+                <button type="button" class="btn" *ngFor="let item of checklist" > 
+                  <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
+                </button>
+              </div>
+              <mat-accordion>
+                <mat-expansion-panel hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title *ngFor="let item of checklist">
+                      <div class="col-md-1">
+                        <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
+                      (change)="checkUncheckAll()" />
+                      </div>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                      <div class="col-md-2">
+                        00001
+                      </div>
+                      <div class="col-md-2">
+                        Oficio
+                      </div>
+                      <div class="col-md-2">
+                        02/01/2022
+                      </div>
+                      <div class="col-md-5">
+                        Ministerio del Poder Popular para la Salud
+                      </div>
+                      
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <p><strong>Contenido: Ascenso de 400 profesionales del Ejército Bolivariano</strong></p>
+                  <mat-divider></mat-divider>
+                    <br>
+                    <mat-action-row>
+                        <div class="col-md-6">
+                            <button class="btn btn-sm btn-primary " type="button">Distrbuir</button>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button class="btn btn-sm btn-warning" type="button">Editar</button>
+                            <button class="btn btn-sm btn-info" type="button" >Eliminar</button>
+                        </div>
+                    </mat-action-row>
+                </mat-expansion-panel>
+              </mat-accordion>
+      
+              <!-- <mat-paginator [length]="lengthOfi"
+                  (page)="pageChangeEvent($event)"
+                  [pageSize]="pageSizeOfi"
+                  [pageSizeOptions]="pageSizeOptions"
+                  (page)="pageEvent = $event"
+                  aria-label="Seleccionar">
+              </mat-paginator> -->
+
+
+          </mat-tab>
           </mat-tab-group>
         </div>
       </div>

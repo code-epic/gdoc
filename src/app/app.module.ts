@@ -33,6 +33,7 @@ import { NgxEditorModule } from 'ngx-editor';
 import { ProyectoComponent } from './views/ayudantia/proyecto/proyecto.component';
 import { MatDialogModule } from '@angular/material/dialog';
 
+
 NgxEditorModule.forRoot({
   locals: {
     // ...
