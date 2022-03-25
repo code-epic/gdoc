@@ -33,11 +33,12 @@
                         <div class="form-group col-md-3">
                             <label for="tmsCreacion">Fecha Creacion</label>
                             <form class="form-inline">
-                                <div class="form-group">
-                                    <div class="input-group">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
                                         <input class="form-control" placeholder="dd/mm/aaaa" 
                                         [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.fcreacion" ngbDatepicker #fc="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl">
+                                        [(ngModel)]="Doc.fcreacion" ngbDatepicker #fc="ngbDatepicker" 
+                                        [placement]="placement" [positionTarget]="buttonEl">
                                         <div class="input-group-append">
                                             <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button"></button>
                                         </div>
@@ -48,8 +49,8 @@
                         <div class="form-group col-md-3">
                             <label for="tmsOrigen">Fecha Origen</label>
                             <form class="form-inline">
-                                <div class="form-group">
-                                    <div class="input-group">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
                                         <input class="form-control" placeholder="dd/mm/aaaa" 
                                         [ngModelOptions]="{standalone: true}"
                                         [(ngModel)]="Doc.forigen" ngbDatepicker #fo="ngbDatepicker" 
@@ -112,7 +113,7 @@
                                 <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
                                 <ngx-editor
                                   [editor]="editor"
-                                  [ngModel]="html"
+                                  [ngModel]="Doc.contenido"
                                   [disabled]="false"
                                   [placeholder]="'Escibe aqui...'">
                                 </ngx-editor>
@@ -120,14 +121,20 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-8">
+                        <div class="form-group col-md-12">
                             <label for="txtInstrucciones">Instrucciones Generales</label>
-                            <textarea class="form-control" name="" id="observacion" cols="30" rows="3"></textarea>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="txtInstrucciones">Lista de Asociación</label>
-                            <textarea class="form-control" name="" id="observacion" cols="30" rows="3"></textarea>
-                        </div>  
+
+                            <div class="NgxEditor__Wrapper">
+                                <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
+                                <ngx-editor
+                                  [editor]="xeditor"
+                                  [ngModel]="Doc.instrucciones"
+                                  [disabled]="false"
+                                  [placeholder]="'Escibe aqui...'">
+                                </ngx-editor>
+                            </div>
+
+                        </div> 
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-3">
