@@ -1,5 +1,5 @@
-import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
-import { NgbModalConfig, NgbModal,NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgbModal,NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Editor } from 'ngx-editor';
 
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
@@ -15,6 +15,14 @@ import { UtilService } from 'src/app/services/util/util.service';
 })
 
 export class DocumentoComponent implements OnInit, OnDestroy {
+
+
+  masterSelected:boolean;
+  checklist:any;
+  checkedList:any;
+
+  closeResult = '';
+  
 
   title = 'Documentos';
   fechaCreacion : NgbDateStruct;
@@ -51,11 +59,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   };
 
-  constructor(private apiService: ApiService, private utilService : UtilService) {
-    
-    this.xAPI.funcion = 'IDocumento'
-    
+  constructor(private apiService : ApiService,  
+              private modalService: NgbModal, 
+              private utilService: UtilService ) {
 
+    
+  }
+
+  open(content) {
+    this.modalService.open(content);
+    
   }
 
   registrar(){
@@ -73,8 +86,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         //    'Tu (API) ha sido registrada codigo: ' + data.InsertedID,
         //    `Code-Epic ESB`
         //  );
-        // this.ngxService.stopLoader("loader-registrar")
-        // this.ngWizardService.reset();
+        
  
        },
        (errot)=>{
@@ -98,7 +110,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.editor.destroy();
     this.xeditor.destroy();
   }
-  
+
+
 
 }
 
