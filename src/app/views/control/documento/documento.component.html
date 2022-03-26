@@ -51,7 +51,7 @@
                                     <div class="input-group" style="width:100%">
                                         <input class="form-control" placeholder="dd/mm/aaaa" 
                                         [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.fcreacion" ngbDatepicker #fc="ngbDatepicker" 
+                                        [(ngModel)]="fcreacion" ngbDatepicker #fc="ngbDatepicker" 
                                         [placement]="placement" [positionTarget]="buttonEl">
                                         <div class="input-group-append">
                                             <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button"></button>
@@ -67,7 +67,7 @@
                                     <div class="input-group" style="width:100%">
                                         <input class="form-control" placeholder="dd/mm/aaaa" 
                                         [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.forigen" ngbDatepicker #fo="ngbDatepicker" 
+                                        [(ngModel)]="forigen" ngbDatepicker #fo="ngbDatepicker" 
                                         [placement]="placement" [positionTarget]="buttonEl">
                                         <div class="input-group-append">
                                             <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button"></button>
@@ -93,7 +93,8 @@
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label for="cmbTipoDocumento">Tipo de Documento</label>
-                            <select class="form-control">
+                            <select class="form-control" [(ngModel)]="Doc.tipo"
+                            [ngModelOptions]="{standalone: true}">
                                 <option value="0">Seleccione</option>
                                 <option value="1">Oficio</option>
                                 <option value="2">Solicitud</option>
@@ -101,7 +102,8 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label for="cmbRemitente">Remitente</label>
-                            <select class="form-control">
+                            <select class="form-control" [(ngModel)]="Doc.remitente"
+                            [ngModelOptions]="{standalone: true}">
                                 <option value="0">Seleccione</option>
                                 <option value="1">Ministerio de Vivienda</option>
                                 <option value="2">Comandancia del Ejército</option>
@@ -109,7 +111,8 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label for="cmbUnidad">Unidad o Dependencia</label>
-                            <select class="form-control">
+                            <select class="form-control" [(ngModel)]="Doc.unidad"
+                            [ngModelOptions]="{standalone: true}">
                                 <option value="0">Seleccione</option>
                                 <option value="1">Unidad Independencia</option>
                                 <option value="1">Unidad Ministerial</option>
@@ -123,7 +126,8 @@
                                 <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
                                 <ngx-editor
                                   [editor]="editor"
-                                  [ngModel]="Doc.contenido"
+                                  [(ngModel)]="Doc.contenido"
+                                  [ngModelOptions]="{standalone: true}"
                                   [disabled]="false"
                                   [placeholder]="'Escibe aqui...'">
                                 </ngx-editor>
@@ -139,7 +143,8 @@
                                         <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
                                         <ngx-editor
                                           [editor]="xeditor"
-                                          [ngModel]="Doc.instrucciones"
+                                          [(ngModel)]="Doc.instrucciones"
+                                          [ngModelOptions]="{standalone: true}"
                                           [disabled]="false"
                                           [placeholder]="'Escibe aqui...'">
                                         </ngx-editor>
@@ -148,18 +153,24 @@
                             </div>
                             <div class="row">
                                 <div class="form-group col-md-6">
-                                    <label for="">Tipo de Documento</label>
-                                    <input type="text" class="form-control" id="txtControl">
+                                    <label for="">Numero de Expediente</label>
+                                    <input type="text" class="form-control" 
+                                    [(ngModel)]="Doc.nexpediente"
+                                    [ngModelOptions]="{standalone: true}">
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="">Remitente</label>
-                                    <input type="text" class="form-control" id="txtControl">
+                                    <label for="">Codigo de Archivo</label>
+                                    <input type="text" class="form-control" 
+                                    [(ngModel)]="Doc.codigo"
+                                    [ngModelOptions]="{standalone: true}">
                                 </div>
                             </div> 
                         </div>
                         <div class="col-md-4 ">
                             <label for="txtInstrucciones">Lista de Asociación</label>
-                            <textarea class="form-control" name="" id="observacion" cols="30" rows="8"></textarea>
+                            <textarea readonly class="form-control" name="" id="observacion" cols="30" rows="8">
+
+                            </textarea>
                         </div>  
                     </div>
                     <hr>

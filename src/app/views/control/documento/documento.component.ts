@@ -2,8 +2,9 @@ import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/co
 import { NgbModalConfig, NgbModal,NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Editor } from 'ngx-editor';
 
-import { ApiService, IAPICore, ceDocumento } from 'src/app/services/apicore/api.service';
+import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { IDocumento } from 'src/app/services/control/documentos.service';
+import { UtilService } from 'src/app/services/util/util.service';
 
 
 
@@ -24,25 +25,24 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   editor: Editor = new Editor;
   xeditor: Editor = new Editor;
 
+  public fcreacion : ''
+  public forigen : ''
+
   public Doc : IDocumento = {
-    id : '',
     ncontrol : '',
     fcreacion : '',
-    salida : '',
     forigen : '',
     norigen : '',
-    tipo : '',
-    remitente : '',
-    unidad : '',
+    salida : '',
+    tipo : '0',
+    remitente : '0',
+    unidad : '0',
     contenido : '',
     instrucciones : '',
     codigo : '',
-    nexpediente : ''    
+    nexpediente : '',
+    creador : '',
   } 
-
-  public xDoc : ceDocumento = {
-    id: ''
-  };
 
 
 
@@ -51,7 +51,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   };
 
-  constructor(private apiService: ApiService) {
+  constructor(private apiService: ApiService, private utilService : UtilService) {
     
     this.xAPI.funcion = 'IDocumento'
     
@@ -61,11 +61,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   registrar(){
 
     this.xAPI.funcion = 'IDocumento'
-    this.xAPI.coleccion = 'documento'
-    this.xAPI.valores = this.Doc
+    this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
+    this.Doc.forigen = this.utilService.ConvertirFecha(this.forigen)
+    this.xAPI.valores = JSON.stringify(this.Doc)
 
-   
-     
     this.apiService.Ejecutar(this.xAPI).subscribe(
        (data)=>{
         console.log(data)

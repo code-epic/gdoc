@@ -11,7 +11,7 @@ export class UtilService {
 
   //retorna fecha en formato Dia/Mes/Anio
   ConvertirFecha(fecha : any) : string {
-      return fecha.day + '-' + fecha.month + '-' + fecha.year
+      return fecha.year + '-' + + fecha.month + '-'  + fecha.day
   }
 
 }
