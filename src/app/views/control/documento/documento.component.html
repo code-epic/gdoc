@@ -8,174 +8,175 @@
     <div class="row">
         <div class="col-xl-12 col-md-12 col-lg-12">
             <div class="card shadow">
-            <div class="card-header bg-transparent">
-                <div class="row align-items-center">
-                    <div class="col-md-11">
-                        <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
-                        <h2 class="mb-0">Registrar Documento</h2>
-                    </div>
-                    <div class="col-md-1">
-                        <ul class="navbar-nav align-items-right d-none d-md-flex">
-                          <li class="nav-item" ngbDropdown placement="bottom-right">
-                            <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                              <div class="media align-items-center">
-                                <div class="example-button-row">
-                                  <button mat-icon-button aria-label="Example icon-button with a heart icon">
-                                    <mat-icon>more_vert</mat-icon>
-                                  </button>
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col-md-11">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
+                            <h2 class="mb-0">Registrar Documento</h2>
+                        </div>
+                        <div class="col-md-1">
+                            <ul class="navbar-nav align-items-right d-none d-md-flex">
+                            <li class="nav-item" ngbDropdown placement="bottom-right">
+                                <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                <div class="media align-items-center">
+                                    <div class="example-button-row">
+                                    <button mat-icon-button aria-label="Example icon-button with a heart icon">
+                                        <mat-icon>more_vert</mat-icon>
+                                    </button>
+                                    </div>
                                 </div>
-                              </div>
-                            </a>
-                            <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                              <a routerLinkActive="active" [routerLink]="['/']" class="dropdown-item">
-                                <i class="fa fa-print"></i>
-                                <span>Escanear Documento</span>
-                              </a>
-                            </div>
-                          </li>
-                        </ul>
+                                </a>
+                                <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                <a routerLinkActive="active" [routerLink]="['/']" class="dropdown-item">
+                                    <i class="fa fa-print"></i>
+                                    <span>Escanear Documento</span>
+                                </a>
+                                </div>
+                            </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <form role="form">
-                    <div class="form-row">
-                        <div class="form-group col-md-2">
-                            <label for="txtControl"> Nro. Control </label>                    
-                            <input type="text" class="form-control" id="txtControl" [(ngModel)]="Doc.ncontrol">
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="tmsCreacion">Fecha Creacion</label>
-                            <form class="form-inline">
-                                <div class="form-group" style="width:100%">
-                                    <div class="input-group" style="width:100%">
-                                        <input class="form-control" placeholder="dd/mm/aaaa" 
-                                        [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.fcreacion" ngbDatepicker #fc="ngbDatepicker" 
-                                        [placement]="placement" [positionTarget]="buttonEl">
-                                        <div class="input-group-append">
-                                            <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button"></button>
+                <div class="card-body">
+                    <form role="form">
+                        <div class="form-row">
+                            <div class="form-group col-md-2">
+                                <label for="txtControl"> Nro. Control </label>                    
+                                <input type="text" class="form-control" id="txtControl" [(ngModel)]="Doc.ncontrol">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="tmsCreacion">Fecha Creacion</label>
+                                <form class="form-inline">
+                                    <div class="form-group" style="width:100%">
+                                        <div class="input-group" style="width:100%">
+                                            <input class="form-control" placeholder="dd/mm/aaaa" 
+                                            [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="Doc.fcreacion" ngbDatepicker #fc="ngbDatepicker" 
+                                            [placement]="placement" [positionTarget]="buttonEl">
+                                            <div class="input-group-append">
+                                                <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button"></button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="tmsOrigen">Fecha Origen</label>
-                            <form class="form-inline">
-                                <div class="form-group" style="width:100%">
-                                    <div class="input-group" style="width:100%">
-                                        <input class="form-control" placeholder="dd/mm/aaaa" 
-                                        [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.forigen" ngbDatepicker #fo="ngbDatepicker" 
-                                        [placement]="placement" [positionTarget]="buttonEl">
-                                        <div class="input-group-append">
-                                            <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button"></button>
+                                </form>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="tmsOrigen">Fecha Origen</label>
+                                <form class="form-inline">
+                                    <div class="form-group" style="width:100%">
+                                        <div class="input-group" style="width:100%">
+                                            <input class="form-control" placeholder="dd/mm/aaaa" 
+                                            [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="Doc.forigen" ngbDatepicker #fo="ngbDatepicker" 
+                                            [placement]="placement" [positionTarget]="buttonEl">
+                                            <div class="input-group-append">
+                                                <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button"></button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="txtOrigen">Nro. Origen</label>
-                            <input type="txtOrigen" class="form-control" 
-                            [ngModelOptions]="{standalone: true}"
-                            [(ngModel)]="Doc.norigen">
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="txtSalida">Salida Asociada</label>
-                            <input type="txtSalida" class="form-control" 
-                            [ngModelOptions]="{standalone: true}"
-                            [(ngModel)]="Doc.salida"
-                            >
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="cmbTipoDocumento">Tipo de Documento</label>
-                            <select class="form-control">
-                                <option value="0">Seleccione</option>
-                                <option value="1">Oficio</option>
-                                <option value="2">Solicitud</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="cmbRemitente">Remitente</label>
-                            <select class="form-control">
-                                <option value="0">Seleccione</option>
-                                <option value="1">Ministerio de Vivienda</option>
-                                <option value="2">Comandancia del Ejército</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="cmbUnidad">Unidad o Dependencia</label>
-                            <select class="form-control">
-                                <option value="0">Seleccione</option>
-                                <option value="1">Unidad Independencia</option>
-                                <option value="1">Unidad Ministerial</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label for="txtContenido">Contenido</label>
-                            <div class="NgxEditor__Wrapper">
-                                <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
-                                <ngx-editor
-                                  [editor]="editor"
-                                  [ngModel]="Doc.contenido"
-                                  [disabled]="false"
-                                  [placeholder]="'Escibe aqui...'">
-                                </ngx-editor>
+                                </form>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="txtOrigen">Nro. Origen</label>
+                                <input type="txtOrigen" class="form-control" 
+                                [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Doc.norigen">
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="txtSalida">Salida Asociada</label>
+                                <input type="txtSalida" class="form-control" 
+                                [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Doc.salida"
+                                >
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="row">
-                                <div class="form-group col-md-12">
-                                    <label for="txtInstrucciones">Instrucciones Generales</label>
-                                    <div class="NgxEditor__Wrapper">
-                                        <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
-                                        <ngx-editor
-                                          [editor]="xeditor"
-                                          [ngModel]="Doc.instrucciones"
-                                          [disabled]="false"
-                                          [placeholder]="'Escibe aqui...'">
-                                        </ngx-editor>
-                                    </div>        
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="cmbTipoDocumento">Tipo de Documento</label>
+                                <select class="form-control">
+                                    <option value="0">Seleccione</option>
+                                    <option value="1">Oficio</option>
+                                    <option value="2">Solicitud</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="cmbRemitente">Remitente</label>
+                                <select class="form-control">
+                                    <option value="0">Seleccione</option>
+                                    <option value="1">Ministerio de Vivienda</option>
+                                    <option value="2">Comandancia del Ejército</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="cmbUnidad">Unidad o Dependencia</label>
+                                <select class="form-control">
+                                    <option value="0">Seleccione</option>
+                                    <option value="1">Unidad Independencia</option>
+                                    <option value="1">Unidad Ministerial</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="txtContenido">Contenido</label>
+                                <div class="NgxEditor__Wrapper">
+                                    <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                                    <ngx-editor
+                                    [editor]="editor"
+                                    [ngModel]="Doc.contenido"
+                                    [disabled]="false"
+                                    [placeholder]="'Escibe aqui...'">
+                                    </ngx-editor>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="form-group col-md-6">
-                                    <label for="">Tipo de Documento</label>
-                                    <input type="text" class="form-control" id="txtControl">
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="">Remitente</label>
-                                    <input type="text" class="form-control" id="txtControl">
-                                </div>
-                            </div> 
                         </div>
-                        <div class="col-md-4 ">
-                            <label for="txtInstrucciones">Lista de Asociación</label>
-                            <textarea class="form-control" name="" id="observacion" cols="30" rows="8"></textarea>
-                        </div>  
-                    </div>
-                    <hr>
-                    <div class="row">                   
-                        <div class="col-md-12">
-                            <div class="text-right">
-                                <button type="btnRegistrar" class="btn bg-primary text-white" (click) = "registrar()">Registrar</button>
-                                <button type="btnCancelar" class="btn bg-red text-white"  [routerLink]="['/control']">Cancelar</button>
-                            </div>                           
-                        </div>                   
-                    </div>                               
-                </form>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="form-group col-md-12">
+                                        <label for="txtInstrucciones">Instrucciones Generales</label>
+                                        <div class="NgxEditor__Wrapper">
+                                            <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
+                                            <ngx-editor
+                                            [editor]="xeditor"
+                                            [ngModel]="Doc.instrucciones"
+                                            [disabled]="false"
+                                            [placeholder]="'Escibe aqui...'">
+                                            </ngx-editor>
+                                        </div>        
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label for="">Tipo de Documento</label>
+                                        <input type="text" class="form-control" id="txtControl">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="">Remitente</label>
+                                        <input type="text" class="form-control" id="txtControl">
+                                    </div>
+                                </div> 
+                            </div>
+                            <div class="col-md-4">
+                                <label for="txtInstrucciones">Lista de Asociación</label>
+                                <textarea class="form-control" name="" id="observacion" cols="30" rows="8"></textarea>
+                            </div>  
+                        </div>
+                        <hr>
+                        <div class="row">                   
+                            <div class="col-md-12">
+                                <div class="text-right">
+                                    <button type="btnRegistrar" class="btn bg-primary text-white" (click) = "registrar()">Registrar</button>
+                                    <button type="btnCancelar" class="btn bg-red text-white"  [routerLink]="['/control']">Cancelar</button>
+                                </div>                           
+                            </div>                   
+                        </div>                               
+                    </form>
+                </div>
             </div>
-        </div>
-    </div>   
-</div>
+        </div>   
+    </div>
+
 
 
 

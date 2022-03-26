@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild} from '@angular/core';
 import { MatAccordion } from '@angular/material/expansion';
 import { PageEvent } from '@angular/material/paginator';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-registrar',
@@ -56,8 +57,20 @@ export class RegistrarComponent implements OnInit {
   checkedList:any;
 
 
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService, config: NgbModalConfig, private modalService: NgbModal) { 
 
+     // customize default values of modals used by this component tree
+     config.backdrop = 'static';
+     config.keyboard = false;
+  }
+
+
+  open(content) {
+    this.modalService.open(content);
+    
+  }
+
+  
   ngOnInit(): void {
     this.masterSelected = false;
     this.checklist = [

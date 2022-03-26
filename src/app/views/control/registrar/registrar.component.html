@@ -10,9 +10,18 @@
         <div class="card shadow">
             <div class="card-header bg-transparent">
                 <div class="row align-items-center">
-                  <div class="col-md-11">
+                  <div class="col-md-10">
                       <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
                       <h2 class="mb-0">Documentos</h2>
+                  </div>
+                  <div class="col-md-1">
+                    <div class="media align-items-center">
+                      <div class="example-button-row">
+                        <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                          <mat-icon>reply</mat-icon>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   <div class="col-md-1">
                     <ul class="navbar-nav align-items-right d-none d-md-flex">
@@ -31,7 +40,7 @@
                             <i class="fa fa-plus"></i>
                             <span>Nuevo Documento</span>
                           </a>
-                          <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
+                          <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
                             <i class="ni ni-settings-gear-65"></i>
                             <span>Configuración</span>
                           </a>
@@ -56,7 +65,7 @@
                     </mat-panel-title>
                   </div>
                   <div class="col-md-1">
-                    <button mat-icon-button>
+                    <button class="btn" (click)="open(content)">
                       <i class="fa fa-share"></i>
                     </button>
                   </div>
@@ -89,11 +98,11 @@
                     
                       <mat-action-row>
                           <div class="col-md-6">
-                              <button class="btn btn-sm btn-primary " type="button">Distribuir</button>
+                              <button class="btn btn-sm btn-primary fa fa-share" type="button">Distribuir</button>
                           </div>
                           <div class="col-md-6 text-right">
-                              <button class="btn btn-sm btn-warning" type="button">Editar</button>
-                              <button class="btn btn-sm btn-info" type="button" >Escanear</button>
+                              <button class="btn btn-sm btn-warning fa fa-edit" type="button">Editar</button>
+                              <button class="btn btn-sm btn-info fa fa-ban" type="button" >Cancelar</button>
                           </div>
                       </mat-action-row>
                   </mat-expansion-panel>
@@ -148,7 +157,7 @@
                     <br>
                     <mat-action-row>
                         <div class="col-md-6">
-                            <button class="btn btn-sm btn-primary " type="button">Distrbuir</button>
+                            <button class="btn btn-sm btn-primary" type="button">Distrbuir</button>
                         </div>
                         <div class="col-md-6 text-right">
                             <button class="btn btn-sm btn-warning" type="button">Editar</button>
@@ -167,11 +176,39 @@
               </mat-paginator> -->
 
 
-          </mat-tab>
+            </mat-tab>
           </mat-tab-group>
         </div>
       </div>
     </div>    
 </div>
+
+<ng-template #content let-modal>
+  <div class="modal-header header bg-gradient-success">
+    <h4 class="modal-title text-white" id="modal-basic-title">DISTRIBUCIÓN</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"><i class="fa fa-times"></i></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <label for="dateOfBirth">Seleccionar Área</label>
+          <select class="form-control">
+              <option value="0">Seleccione</option>
+              <option value="1">Control de Gestión</option>
+              <option value="2">Secretaría</option>
+              <option value="3">Resoluciones</option>
+              <option value="4">Ayudantía</option>
+              <option value="5">Timonel</option>
+              <option value="6">Acami</option>
+              <option value="6">Personal</option>
+          </select>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-sm bg-gradient-success text-white fa fa-share" type="button" (click)="modal.close('Save click')">Enviar</button>
+  </div>
+</ng-template>
+
 
   

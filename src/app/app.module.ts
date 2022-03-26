@@ -32,6 +32,7 @@ import { SalidasComponent } from './views/control/salidas/salidas.component';
 import { NgxEditorModule } from 'ngx-editor';
 import { ProyectoComponent } from './views/ayudantia/proyecto/proyecto.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { ConfiguracionComponent } from './views/control/configuracion/configuracion.component';
 
 
 NgxEditorModule.forRoot({
@@ -81,7 +82,8 @@ const ngWizardConfig: NgWizardConfig = {
     DocumentoComponent,
     BuzonComponent,
     SalidasComponent,
-    ProyectoComponent
+    ProyectoComponent,
+    ConfiguracionComponent
   ],
   providers: [],
   bootstrap: [AppComponent]
