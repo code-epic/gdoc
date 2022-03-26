@@ -1,167 +1,108 @@
 <div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
-    <div class="container-fluid">
-        <p></p>
-    </div>    
+  <div class="container-fluid">
+      <p></p>
+  </div>    
 </div>
 
 <div class="container-fluid mt--9">
-    <div class="row">
-      <div class="col-xl-12 col-md-12 col-lg-12">
-        <div class="card shadow">
-            <div class="card-header bg-transparent">
-                <div class="row align-items-center">
-                  <div class="col-md-10">
-                      <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
-                      <h2 class="mb-0">Documentos</h2>
-                  </div>
-                  <div class="col-md-1">
-                    <div class="media align-items-center">
-                      <div class="example-button-row">
-                        <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                          <mat-icon>reply</mat-icon>
-                        </button>
-                      </div>
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
+          <div class="card-header bg-transparent">
+              <div class="row align-items-center">
+                <div class="col-md-10">
+                    <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
+                    <h2 class="mb-0">Documentos</h2>
+                </div>
+                <div class="col-md-1">
+                  <div class="media align-items-center">
+                    <div class="example-button-row">
+                      <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                        <mat-icon>reply</mat-icon>
+                      </button>
                     </div>
                   </div>
-                  <div class="col-md-1">
-                    <ul class="navbar-nav align-items-right d-none d-md-flex">
-                      <li class="nav-item" ngbDropdown placement="bottom-right">
-                        <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                          <div class="media align-items-center">
-                            <div class="example-button-row">
-                              <button mat-icon-button aria-label="Example icon-button with a heart icon">
-                                <mat-icon>more_vert</mat-icon>
-                              </button>
-                            </div>
+                </div>
+                <div class="col-md-1">
+                  <ul class="navbar-nav align-items-right d-none d-md-flex">
+                    <li class="nav-item" ngbDropdown placement="bottom-right">
+                      <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                        <div class="media align-items-center">
+                          <div class="example-button-row">
+                            <button mat-icon-button aria-label="Example icon-button with a heart icon">
+                              <mat-icon>more_vert</mat-icon>
+                            </button>
                           </div>
+                        </div>
+                      </a>
+                      <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                        <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item">
+                          <i class="fa fa-plus"></i>
+                          <span>Nuevo Documento</span>
                         </a>
-                        <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                          <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item">
-                            <i class="fa fa-plus"></i>
-                            <span>Nuevo Documento</span>
-                          </a>
-                          <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
-                            <i class="ni ni-settings-gear-65"></i>
-                            <span>Configuración</span>
-                          </a>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
+                        <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
+                          <i class="ni ni-settings-gear-65"></i>
+                          <span>Configuración</span>
+                        </a>
+                      </div>
+                    </li>
+                  </ul>
                 </div>
-            </div>
+              </div>
+          </div>
 
-          <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" >
-            <mat-tab>
-                <ng-template mat-tab-label>
-                &nbsp;REGISTRADOS
-                </ng-template>
-                <div class="row col-md-12 px-2 py-2">
-                  <div class="col-md-1">
-                    <mat-panel-title>
-                      <button type="button" class="btn" *ngFor="let item of checklist" > 
-                        <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
-                      </button>
-                    </mat-panel-title>
-                  </div>
-                  <div class="col-md-1">
-                    <button class="btn" (click)="open(content)">
-                      <i class="fa fa-share"></i>
-                    </button>
-                  </div>
-                </div>
-                <mat-accordion>
-                  <mat-expansion-panel hideToggle>
-                    <mat-expansion-panel-header>
-                      <mat-panel-title *ngFor="let item of checklist">
-                        <div class="row col-md-12 px-2 py-2">
-                          <div class="col-md-1">
-                            <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
-                          (change)="checkUncheckAll()" />
-                          </div>
-                          <div class="col-md-2">
-                            00001
-                          </div>
-                          <div class="col-md-2">
-                            Oficio
-                          </div>
-                          <div class="col-md-2">
-                            02/01/2022
-                          </div>
-                          <div class="col-md-5">
-                            Ministerio del Poder Popular para la Salud
-                          </div>
-                        </div>
-                      </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <p><strong>Contenido: Ascenso de 400 profesionales del Ejército Bolivariano</strong></p>
-                    
-                      <mat-action-row>
-                          <div class="col-md-6">
-                              <button class="btn btn-sm btn-primary fa fa-share" type="button">Distribuir</button>
-                          </div>
-                          <div class="col-md-6 text-right">
-                              <button class="btn btn-sm btn-warning fa fa-edit" type="button">Editar</button>
-                              <button class="btn btn-sm btn-info fa fa-ban" type="button" >Cancelar</button>
-                          </div>
-                      </mat-action-row>
-                  </mat-expansion-panel>
-                </mat-accordion>
-        
-                <!-- <mat-paginator [length]="lengthOfi"
-                    (page)="pageChangeEvent($event)"
-                    [pageSize]="pageSizeOfi"
-                    [pageSizeOptions]="pageSizeOptions"
-                    (page)="pageEvent = $event"
-                    aria-label="Seleccionar">
-                </mat-paginator> -->
-  
-  
-            </mat-tab>
-            <mat-tab>
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" >
+          <mat-tab>
               <ng-template mat-tab-label>
-              &nbsp;NOTAS DE ENTREGA
+              &nbsp;REGISTRADOS
               </ng-template>
-              <div class="col-md-11">
-                <button type="button" class="btn" *ngFor="let item of checklist" > 
-                  <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
-                </button>
+              <div class="row col-md-12 px-2 py-2">
+                <div class="col-md-1">
+                  <mat-panel-title>
+                    <button type="button" class="btn" *ngFor="let item of checklist" > 
+                      <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
+                    </button>
+                  </mat-panel-title>
+                </div>
+                <div class="col-md-1">
+                  <button class="btn" (click)="open(content)">
+                    <i class="fa fa-share"></i>
+                  </button>
+                </div>
               </div>
               <mat-accordion>
                 <mat-expansion-panel hideToggle>
                   <mat-expansion-panel-header>
                     <mat-panel-title *ngFor="let item of checklist">
-                      <div class="col-md-1">
-                        <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
-                      (change)="checkUncheckAll()" />
+                      <div class="row col-md-12 px-2 py-2">
+                        <div class="col-md-1">
+                          <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
+                        (change)="checkUncheckAll()" />
+                        </div>
+                        <div class="col-md-2">
+                          00001
+                        </div>
+                        <div class="col-md-2">
+                          Oficio
+                        </div>
+                        <div class="col-md-2">
+                          02/01/2022
+                        </div>
+                        <div class="col-md-5">
+                          Ministerio del Poder Popular para la Salud
+                        </div>
                       </div>
                     </mat-panel-title>
-                    <mat-panel-description>
-                      <div class="col-md-2">
-                        00001
-                      </div>
-                      <div class="col-md-2">
-                        Oficio
-                      </div>
-                      <div class="col-md-2">
-                        02/01/2022
-                      </div>
-                      <div class="col-md-5">
-                        Ministerio del Poder Popular para la Salud
-                      </div>
-                      
-                    </mat-panel-description>
                   </mat-expansion-panel-header>
                   <p><strong>Contenido: Ascenso de 400 profesionales del Ejército Bolivariano</strong></p>
-                  <mat-divider></mat-divider>
-                    <br>
+                  
                     <mat-action-row>
                         <div class="col-md-6">
-                            <button class="btn btn-sm btn-primary" type="button">Distrbuir</button>
+                            <button class="btn btn-sm btn-primary fa fa-share" type="button">Distribuir</button>
                         </div>
                         <div class="col-md-6 text-right">
-                            <button class="btn btn-sm btn-warning" type="button">Editar</button>
-                            <button class="btn btn-sm btn-info" type="button" >Eliminar</button>
+                            <button class="btn btn-sm btn-warning fa fa-edit" type="button">Editar</button>
+                            <button class="btn btn-sm btn-info fa fa-ban" type="button" >Cancelar</button>
                         </div>
                     </mat-action-row>
                 </mat-expansion-panel>
@@ -176,11 +117,60 @@
               </mat-paginator> -->
 
 
-            </mat-tab>
-          </mat-tab-group>
-        </div>
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+            &nbsp;NOTAS DE ENTREGA
+            </ng-template>
+            <div class="row col-md-12 px-2 py-2">
+              <div class="col-md-1">
+                <mat-panel-title>
+                  <button type="button" class="btn" *ngFor="let item of checklist" title="Seleccionar Todos" > 
+                    <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
+                  </button>
+                </mat-panel-title>
+              </div>
+              <div class="col-md-1">
+                <button class="btn" title="Generar Nota de Entrega">
+                  <i class="fa fa-file"></i>
+                </button>
+              </div>
+            </div>
+
+            <mat-panel-title>
+              <div class="row col-md-12 px-2 py-2 text-center">
+                  <div class="col-md-1" *ngFor="let item of checklist">
+                    <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
+                    (change)="checkUncheckAll()" />
+                  </div>
+                  <div class="col-md-4">
+                      José Ramon Iglesias
+                  </div>
+                  <div class="col-md-5">
+                      Ministerio del Poder Popular para la Salud
+                  </div>
+                  <div class="col-md-2 text-right">
+                      <i class="fas fa-edit iconEdit"></i>
+                      <i class="far fa-trash-alt iconElimi"></i> 
+                  </div>
+              </div>
+            </mat-panel-title>
+            
+    
+            <!-- <mat-paginator [length]="lengthOfi"
+                (page)="pageChangeEvent($event)"
+                [pageSize]="pageSizeOfi"
+                [pageSizeOptions]="pageSizeOptions"
+                (page)="pageEvent = $event"
+                aria-label="Seleccionar">
+            </mat-paginator> -->
+
+
+          </mat-tab>
+        </mat-tab-group>
       </div>
-    </div>    
+    </div>
+  </div>    
 </div>
 
 <ng-template #content let-modal>
