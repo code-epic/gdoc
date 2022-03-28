@@ -73,12 +73,4 @@ export class ApiService {
     return this.http.post<any>(this.URL + "crud" + this.hash, xAPI);
   }
 
-  Guardar(xAPI : IAPICore, sApi : string) : Observable<any>{
-    console.log(xAPI);
-    var url = this.URL + sApi + this.hash;
-    return this.http.post<any>(url, xAPI, this.httpOptions);
-  }
-
-
-
 }

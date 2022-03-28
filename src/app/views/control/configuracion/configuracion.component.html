@@ -21,7 +21,7 @@
                     <div class="col-md-8">
                         <div class="form-group">
                             <label for="cmbConfiguracion">Seleccionar Configuación</label>
-                            <select class="form-control">
+                            <select class="form-control" [(ngModel)]="tipo" (change)="selTipo()">
                                 <option value="0">Seleccione</option>
                                 <option value="1">Tipo de Documento</option>
                                 <option value="2">Remitente</option>
@@ -41,15 +41,28 @@
                         <div class="row col-md-12">
                             <div class="form-group col-md-6">
                                 <label for="">Nombre</label>
-                                <input type="text" class="form-control" id="txtControl">
+                                <input type="text" class="form-control" id="txtControl"
+                                [(ngModel)]="nombre"  value ="{{ nombre }}">
                             </div>
+
                             <div class="form-group col-md-6">
-                                <label for="">Descripción</label>
-                                <input type="text" class="form-control" id="txtControl">
+                                <label>Descripcion</label>
+                                <div class="input-group mb-3">
+                                    
+                                    <input style="font-size:14px;" type="text" 
+                                        class="form-control" [ngModelOptions]="{standalone: true}" 
+                                        [(ngModel)]="observacion"  value ="{{observacion}}" >
+                                    <div class="input-group-prepend">
+                                        
+                                        <button type="button" class="btn btn-primary" (click)="guardar()">
+                                            <i class="fa fa-plus" aria-hidden="true" ></i> &nbsp; Registar
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-12 text-right">
-                                <button class="btn btn-sm btn-primary" type="button" >Registrar</button>
-                            </div>
+
+
+                            
                         </div>
                     </div> 
                 </mat-tab>
@@ -59,15 +72,15 @@
                     </ng-template>
 
                     <mat-panel-title>
-                        <div class="row col-md-12 px-2 py-2 text-center">
+                        <div class="row col-md-12 px-2 py-2 text-center" *ngFor="let config of lista">
                             <div class="col-md-1">
                                 <input type="checkbox" name="list_name" value="m1"/>
                             </div>
                             <div class="col-md-4">
-                                José Ramon Iglesias
+                                {{ config.nomb | uppercase}}
                             </div>
                             <div class="col-md-5">
-                                Ministerio del Poder Popular para la Salud
+                                {{ config.obse | uppercase}}
                             </div>
                             <div class="col-md-2 text-right">
                                 <i class="fas fa-edit iconEdit"></i>

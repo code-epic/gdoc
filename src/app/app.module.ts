@@ -33,6 +33,7 @@ import { NgxEditorModule } from 'ngx-editor';
 import { ProyectoComponent } from './views/ayudantia/proyecto/proyecto.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ConfiguracionComponent } from './views/control/configuracion/configuracion.component';
+import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 
 
 NgxEditorModule.forRoot({
@@ -65,6 +66,13 @@ const ngWizardConfig: NgWizardConfig = {
     NgWizardModule.forRoot(ngWizardConfig),
     NgxEditorModule,
     MatDialogModule,
+    ToastContainerModule,
+    ToastrModule.forRoot({
+      closeButton: false,
+      newestOnTop: false,
+      progressBar: true,
+      positionClass: "toast-top-right",
+      preventDuplicates: false    }),
 
   ],
   declarations: [

@@ -12,7 +12,7 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "12.1.2",
+    "@angular/animations": "^12.1.2",
     "@angular/cdk": "^12.2.13",
     "@angular/common": "^12.1.2",
     "@angular/compiler": "12.1.2",
@@ -34,9 +34,10 @@
     "ngx-bootstrap": "^8.0.0",
     "ngx-clipboard": "14.0.1",
     "ngx-editor": "^12.2.2",
-    "ngx-toastr": "14.0.0",
+    "ngx-toastr": "^14.0.0",
     "nouislider": "14.6.2",
     "rxjs": "7.2.0",
+    "sweetalert2": "^11.4.7",
     "zone.js": "0.11.4"
   },
   "devDependencies": {
