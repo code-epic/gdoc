@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {MatSelectModule} from '@angular/material/select';
+import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -14,20 +14,17 @@ export class BuzonComponent implements OnInit {
   checklist:any;
   checkedList:any;
 
-  constructor(){
-    this.masterSelected = false;
-    this.checklist = [
-      {id:1,value:'CG-00001  ',isSelected:false},
-      // {id:2,value:'Caden Kunze',isSelected:false},
-      // {id:3,value:'Ms. Hortense Zulauf',isSelected:true},
-      // {id:4,value:'Grady Reichert',isSelected:true},
-      // {id:5,value:'Dejon Olson',isSelected:true},
-      // {id:6,value:'Jamir Pfannerstill',isSelected:false},
-      // {id:7,value:'Aracely Renner DVM',isSelected:false},
-      // {id:8,value:'Genoveva Luettgen',isSelected:false}
-    ];
-    this.getCheckedItemList();
-}
+  constructor(config: NgbModalConfig, private modalService: NgbModal){
+     // customize default values of modals used by this component tree
+     config.backdrop = 'static';
+     config.keyboard = false;
+
+  }
+
+  open(content) {
+    this.modalService.open(content);
+    
+  }
 
  // The master checkbox will check/ uncheck all items
  checkUncheckAll() {
@@ -55,8 +52,21 @@ getCheckedItemList(){
   this.checkedList = JSON.stringify(this.checkedList);
 }
 
-  ngOnInit(): void {
-  }
+ngOnInit(): void {
+  this.masterSelected = false;
+  this.checklist = [
+    {id:1,value:'CG-00001  ',isSelected:false},
+    // {id:2,value:'Caden Kunze',isSelected:false},
+    // {id:3,value:'Ms. Hortense Zulauf',isSelected:true},
+    // {id:4,value:'Grady Reichert',isSelected:true},
+    // {id:5,value:'Dejon Olson',isSelected:true},
+    // {id:6,value:'Jamir Pfannerstill',isSelected:false},
+    // {id:7,value:'Aracely Renner DVM',isSelected:false},
+    // {id:8,value:'Genoveva Luettgen',isSelected:false}
+  ];
+  this.getCheckedItemList();
+  
+}
 
 
 }

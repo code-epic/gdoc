@@ -36,7 +36,7 @@
                       </div>
                     </a>
                     <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                      <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
+                      <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
                         <i class="ni ni-settings-gear-65"></i>
                         <span>Configuración</span>
                       </a>
@@ -52,46 +52,53 @@
                 <ng-template mat-tab-label>
                 &nbsp;RECIBIDOS
                 </ng-template>
-                <div class="col-md-12">
-                  <button type="button" class="btn" *ngFor="let item of checklist" > 
-                    <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
-                  </button>
+                <div class="row col-md-12 px-2 py-2">
+                  <div class="col-md-1">
+                    <mat-panel-title>
+                      <button type="button" class="btn" *ngFor="let item of checklist" > 
+                        <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
+                      </button>
+                    </mat-panel-title>
+                  </div>
+                  <div class="col-md-1" title="Redistribuir">
+                    <button class="btn" (click)="open(content)">
+                      <i class="fa fa-share"></i>
+                    </button>
+                  </div>
                 </div>
                 <mat-accordion>
                   <mat-expansion-panel hideToggle>
                     <mat-expansion-panel-header>
                       <mat-panel-title *ngFor="let item of checklist">
-                        <div class="col-md-1">
-                          <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
-                        (change)="checkUncheckAll()" />
+                        <div class="row col-md-12 px-2 py-2">
+                          <div class="col-md-1">
+                            <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
+                          (change)="checkUncheckAll()" />
+                          </div>
+                          <div class="col-md-2">
+                            00001
+                          </div>
+                          <div class="col-md-2">
+                            Oficio
+                          </div>
+                          <div class="col-md-2">
+                            02/01/2022
+                          </div>
+                          <div class="col-md-5">
+                            Ministerio del Poder Popular para la Salud
+                          </div>
                         </div>
                       </mat-panel-title>
-                      <mat-panel-description>
-                        <div class="col-md-2">
-                          00001
-                        </div>
-                        <div class="col-md-2">
-                          Oficio
-                        </div>
-                        <div class="col-md-2">
-                          02/01/2022
-                        </div>
-                        <div class="col-md-5">
-                          Ministerio del Poder Popular para la Salud
-                        </div>
-                        
-                      </mat-panel-description>
                     </mat-expansion-panel-header>
                     <p><strong>Contenido: Ascenso de 400 profesionales del Ejército Bolivariano</strong></p>
-                    <mat-divider></mat-divider>
-                      <br>
+                    
                       <mat-action-row>
                           <div class="col-md-6">
-                              <button class="btn btn-sm btn-primary " type="button">Distrbuir</button>
+                              <button class="btn btn-sm btn-primary fa fa-share" type="button">Distribuir</button>
                           </div>
                           <div class="col-md-6 text-right">
-                              <button class="btn btn-sm btn-warning" type="button">Editar</button>
-                              <button class="btn btn-sm btn-info" type="button" >Eliminar</button>
+                              <button class="btn btn-sm btn-warning fa fa-edit" type="button">Editar</button>
+                              <button class="btn btn-sm btn-info fa fa-ban" type="button" >Cancelar</button>
                           </div>
                       </mat-action-row>
                   </mat-expansion-panel>
@@ -127,3 +134,30 @@
       </div>
     </div>    
 </div>
+
+<ng-template #content let-modal>
+  <div class="modal-header header bg-gradient-success">
+    <h4 class="modal-title text-white" id="modal-basic-title">DISTRIBUCIÓN</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"><i class="fa fa-times"></i></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <label for="dateOfBirth">Seleccionar Área</label>
+          <select class="form-control">
+              <option value="0">Seleccione</option>
+              <option value="1">Control de Gestión</option>
+              <option value="2">Secretaría</option>
+              <option value="3">Resoluciones</option>
+              <option value="4">Ayudantía</option>
+              <option value="5">Timonel</option>
+              <option value="6">Acami</option>
+              <option value="6">Personal</option>
+          </select>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-sm bg-gradient-success text-white fa fa-share" type="button" (click)="modal.close('Save click')">Enviar</button>
+  </div>
+</ng-template>

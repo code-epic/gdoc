@@ -64,7 +64,7 @@ export class RegistrarComponent implements OnInit {
      config.keyboard = false;
   }
 
-
+ 
   open(content) {
     this.modalService.open(content);
     
