@@ -10,3 +10,26 @@
     cursor: pointer;
     padding-right: 6%;
 }
+
+input{
+    text-transform: uppercase;
+}
+select{
+    text-transform: uppercase;
+}
+textarea {
+    text-transform: uppercase;
+}
+
+.example-section {
+    margin: 12px 0;
+}
+  
+.example-margin {
+    margin: 0 12px;
+}
+
+ul {
+    list-style-type: none;
+    margin-top: 4px;
+}

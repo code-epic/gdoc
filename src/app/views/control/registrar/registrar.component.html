@@ -56,57 +56,72 @@
               <ng-template mat-tab-label>
               &nbsp;REGISTRADOS
               </ng-template>
-              <div class="row col-md-12 px-2 py-2">
-                <div class="col-md-1">
-                  <mat-panel-title>
-                    <button type="button" class="btn" *ngFor="let item of checklist" > 
-                      <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
-                    </button>
-                  </mat-panel-title>
-                </div>
-                <div class="col-md-1">
-                  <button class="btn" (click)="open(content)">
-                    <i class="fa fa-share"></i>
-                  </button>
-                </div>
-              </div>
-              <mat-accordion>
-                <mat-expansion-panel hideToggle>
-                  <mat-expansion-panel-header>
-                    <mat-panel-title *ngFor="let item of checklist">
+              
+              
+          
+                <div class="row col-md-12 px-2 py-2" style="height: 50px">
+                  <div class="col-md-6" style="margin-left: 15px">
+                    <mat-panel-title>
                       <div class="row col-md-12 px-2 py-2">
-                        <div class="col-md-1">
-                          <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
-                        (change)="checkUncheckAll()" />
-                        </div>
                         <div class="col-md-2">
-                          00001
+                            <mat-checkbox class="example-margin"></mat-checkbox>                                                  
                         </div>
-                        <div class="col-md-2">
-                          Oficio
-                        </div>
-                        <div class="col-md-2">
-                          02/01/2022
-                        </div>
-                        <div class="col-md-5">
-                          Ministerio del Poder Popular para la Salud
+                        <div class="col-md-1" style="margin-top: -11px" [ngStyle]="{'display':clasificar}">
+                          <button mat-icon-button (click)="open(content)">
+                            <mat-icon style="margin-top: -10px;" ><span style="font-size: 20px;" class="fa fa-share"></span></mat-icon>
+                          </button>
                         </div>
                       </div>
+
                     </mat-panel-title>
-                  </mat-expansion-panel-header>
-                  <p><strong>Contenido: Ascenso de 400 profesionales del Ejército Bolivariano</strong></p>
-                  
-                    <mat-action-row>
-                        <div class="col-md-6">
-                            <button class="btn btn-sm btn-primary fa fa-share" type="button">Distribuir</button>
+                  </div>
+                </div>
+
+                <mat-accordion>
+                  <mat-expansion-panel hideToggle *ngFor="let e of bzRegistrados">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title >
+                        <div class="row col-md-12 px-2 py-2">
+                          <div class="col-md-1">
+                            
+                              <mat-checkbox class="example-margin"></mat-checkbox>
+                          
+                          </div>
+                          <div class="col-md-2">
+                            {{ e.numc }}
+                          </div>
+                          <div class="col-md-2">
+                            {{ e.tdoc | uppercase }}
+                          </div>
+                          <div class="col-md-2">
+                            {{ e.fcre | date:"yyyy/MM/dd" }}
+                          </div>
+                          <div class="col-md-5">
+                            {{ e.remi | uppercase }}
+                          </div>
                         </div>
-                        <div class="col-md-6 text-right">
-                            <button class="btn btn-sm btn-warning fa fa-edit" type="button">Editar</button>
-                            <button class="btn btn-sm btn-info fa fa-ban" type="button" >Cancelar</button>
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                      <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="txtInstrucciones">Contenido General</label>
+                            <div [innerHTML]="e.cont">
+                            </div>        
                         </div>
-                    </mat-action-row>
-                </mat-expansion-panel>
-              </mat-accordion>
+                      </div>
+                    
+                    
+                      <mat-action-row>
+                          <div class="col-md-6">
+                              <button class="btn btn-primary" type="button"><span class="fa fa-share"></span>&nbsp;&nbsp;Distribuir</button>
+                          </div>
+                          <div class="col-md-6 text-right">
+                              <button class="btn btn-info" type="button"><span class="fa fa-edit"></span>&nbsp;&nbsp;Editar</button>
+                              <button class="btn btn-warning" type="button" ><span class="fa fa-ban"></span>&nbsp;&nbsp;Eliminar</button>
+                          </div>
+                      </mat-action-row>
+                  </mat-expansion-panel>
+                </mat-accordion>
       
               <!-- <mat-paginator [length]="lengthOfi"
                   (page)="pageChangeEvent($event)"
@@ -115,8 +130,8 @@
                   (page)="pageEvent = $event"
                   aria-label="Seleccionar">
               </mat-paginator> -->
-
-
+              
+             
           </mat-tab>
           <mat-tab>
             <ng-template mat-tab-label>
@@ -139,12 +154,11 @@
 
             <mat-panel-title>
               <div class="row col-md-12 px-2 py-2 text-center">
-                  <div class="col-md-1" *ngFor="let item of checklist">
-                    <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
-                    (change)="checkUncheckAll()" />
+                  <div class="col-md-1" *ngFor="let e of bzNotaEntregas">
+                    <input type="checkbox" />
                   </div>
                   <div class="col-md-4">
-                      José Ramon Iglesias
+                      
                   </div>
                   <div class="col-md-5">
                       Ministerio del Poder Popular para la Salud
@@ -175,28 +189,24 @@
 
 <ng-template #content let-modal>
   <div class="modal-header header bg-gradient-success">
-    <h4 class="modal-title text-white" id="modal-basic-title">DISTRIBUCIÓN</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"><i class="fa fa-times"></i></button>
+    <h4 class="modal-title text-white" id="modal-basic-title">CLASIFICAR DOCUMENTOS</h4>
   </div>
   <div class="modal-body">
     <form>
       <div class="mb-3">
-        <label for="dateOfBirth">Seleccionar Área</label>
+        <label for="dateOfBirth">Clasificación</label>
           <select class="form-control">
-              <option value="0">Seleccione</option>
-              <option value="1">Control de Gestión</option>
-              <option value="2">Secretaría</option>
-              <option value="3">Resoluciones</option>
-              <option value="4">Ayudantía</option>
-              <option value="5">Timonel</option>
-              <option value="6">Acami</option>
-              <option value="6">Personal</option>
+              <option value="0">SELECCIONE</option>
+              <option *ngFor="let x of lstEstados" value="{{ x.id }}" >{{ x.nomb }}</option> 
           </select>
       </div>
     </form>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-sm bg-gradient-success text-white fa fa-share" type="button" (click)="modal.close('Save click')">Enviar</button>
+    <button class="btn bg-gradient-success text-white "  (click)="modal.close('Save')"> 
+      <span class="fa fa-share"></span>&nbsp;&nbsp;Clasificar </button>
+    <button  class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-edit"></span>&nbsp;&nbsp;Cancelar</button>
   </div>
 </ng-template>
 

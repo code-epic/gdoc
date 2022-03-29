@@ -45,9 +45,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     forigen : '',
     norigen : '',
     salida : '',
-    tipo : 0,
-    remitente : 0,
-    unidad : 0,
+    tipo : '',
+    remitente : '',
+    unidad : '',
     contenido : '',
     instrucciones : '',
     codigo : '',
@@ -83,8 +83,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   registrar(){
     var WkDoc = {
       "nombre" : "Control de Gestion",
-      "estado" : 0,
-      "estatus" : 0,
+      "estado" : 1,
+      "estatus" : 1,
       "observacion" : "Iniciando Documento",
       "usuario" : "Sistema"
     }
@@ -99,7 +99,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           return false
         }
 
-        this.xAPI.funcion = 'MD_IDocumento'
+        this.xAPI.funcion = 'WKF_IDocumentoDetalle'
         this.Doc.ncontrol = this.utilService.Semillero(data.msj)
         this.Doc.wfdocumento = parseInt(data.msj)
         this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
@@ -135,6 +135,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.listarConfiguracion()
   }
 
+
+  
+
   limpiarDoc(){
     this.fcreacion = ''
     this.forigen = ''
@@ -145,9 +148,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.Doc.nexpediente = ''
     this.Doc.codigo = ''
     this.Doc.salida = ''
-    this.Doc.tipo = 0
-    this.Doc.remitente = 0
-    this.Doc.unidad = 0
+    this.Doc.tipo = ''
+    this.Doc.remitente = ''
+    this.Doc.unidad = ''
     
 
   }
@@ -186,18 +189,19 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   protected aceptar(msj : string){
     Swal.fire({
-      title: 'Numero de documento registrado es : ' + msj,
+      title: 'Documento registrado #: ' + msj,
       text: "¿Desea registar otro documento?",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Si, continuar!'
+      confirmButtonText: 'Si',
+      cancelButtonText: 'No'
     }).then((result) => {
       if (result.isConfirmed) {
         
       }else{
-        this.ruta.navigate( ['/control'] );
+        this.ruta.navigate( ['/registrar'] );
       }
     })    
   }

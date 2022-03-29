@@ -11,9 +11,9 @@ export interface IDocumento{
   salida ?: string
   forigen ?: string
   norigen ?: string
-  tipo ?: number
-  remitente ?: number
-  unidad ?: number
+  tipo ?: string
+  remitente ?: string
+  unidad ?: string
   contenido ?: string
   instrucciones ?: string
   observaciones ?: []

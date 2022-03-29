@@ -3,6 +3,8 @@ import { MatAccordion } from '@angular/material/expansion';
 import { PageEvent } from '@angular/material/paginator';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Editor } from 'ngx-editor';
+
 
 @Component({
   selector: 'app-registrar',
@@ -44,6 +46,7 @@ export class RegistrarComponent implements OnInit {
   selNav = 0
   oficinas = []
   lst = []
+  public lstEstados = [] //Listar Estados
 
   lengthOfi = 0;
   pageSizeOfi = 10;
@@ -55,7 +58,12 @@ export class RegistrarComponent implements OnInit {
   masterSelected:boolean;
   checklist:any;
   checkedList:any;
+  editor: Editor = new Editor;
 
+  public clasificar = false
+
+  public bzRegistrados = []
+  public bzNotaEntregas = []
 
   constructor(private apiService: ApiService, config: NgbModalConfig, private modalService: NgbModal) { 
 
@@ -72,6 +80,7 @@ export class RegistrarComponent implements OnInit {
 
   
   ngOnInit(): void {
+    this.editor = new Editor();
     this.masterSelected = false;
     this.checklist = [
       {id:1,value:'CG-00001  ',isSelected:false},
@@ -84,9 +93,44 @@ export class RegistrarComponent implements OnInit {
       // {id:8,value:'Genoveva Luettgen',isSelected:false}
     ];
     this.getCheckedItemList();
+    this.listarEstados()
+    this.listarBuzon()
     
   }
 
+  listarEstados(){
+    this.xAPI.funcion = 'WKF_CEstados'
+    this.xAPI.parametros = '' 
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        data.Cuerpo.forEach(e => {
+          if (e.esta == 1)this.lstEstados.push(e)
+        });
+      },
+      (error) => {
+
+      }
+    )
+  }
+
+  listarBuzon(){
+    this.xAPI.funcion = 'WKF_CDocumentos'
+    this.xAPI.parametros = '1' 
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.bzRegistrados = data.Cuerpo
+      },
+      (error) => {
+
+      }
+    )
+}
+
+  
   pageChangeEvent(e){
     console.log(e)
     this.recorrerElementos(e.pageIndex+1, this.lst)

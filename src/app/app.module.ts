@@ -32,6 +32,9 @@ import { SalidasComponent } from './views/control/salidas/salidas.component';
 import { NgxEditorModule } from 'ngx-editor';
 import { ProyectoComponent } from './views/ayudantia/proyecto/proyecto.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+
 import { ConfiguracionComponent } from './views/control/configuracion/configuracion.component';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 
@@ -61,12 +64,14 @@ const ngWizardConfig: NgWizardConfig = {
     MatIconModule,
     MatCheckboxModule,
     MatExpansionModule,
+    MatButtonToggleModule,
     MatListModule,
     MatPaginatorModule,
     NgWizardModule.forRoot(ngWizardConfig),
     NgxEditorModule,
     MatDialogModule,
     ToastContainerModule,
+    MatToolbarModule,
     ToastrModule.forRoot({
       closeButton: false,
       newestOnTop: false,

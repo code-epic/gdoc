@@ -93,24 +93,24 @@
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label for="cmbTipoDocumento">Tipo de Documento</label>
-                                <select class="form-control">
+                                <select class="form-control" [(ngModel)]="Doc.tipo">
                                     <option value="0">Seleccione</option>
-                                    <option *ngFor="let x of lstT" value="{{x.id}}" >{{ x.nomb }}  </option> 
+                                    <option *ngFor="let x of lstT" value="{{x.nomb}}" >{{ x.nomb }}  </option> 
                                    
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="cmbRemitente">Remitente</label>
-                                <select class="form-control">
+                                <select class="form-control" [(ngModel)]="Doc.remitente">
                                     <option value="0">Seleccione</option>
-                                    <option *ngFor="let x of lstR" value="{{x.id}}" >{{ x.nomb }}  </option> 
+                                    <option *ngFor="let x of lstR" value="{{x.nomb}}" >{{ x.nomb }}</option> 
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="cmbUnidad">Unidad o Dependencia</label>
-                                <select class="form-control">
+                                <select class="form-control" [(ngModel)]="Doc.unidad">
                                     <option value="0">Seleccione</option>
-                                    <option *ngFor="let x of lstU" value="{{x.id}}" >{{ x.nomb }}  </option> 
+                                    <option *ngFor="let x of lstU" value="{{x.nomb}}" >{{ x.nomb }}  </option> 
                                 </select>
                             </div>
                         </div>
