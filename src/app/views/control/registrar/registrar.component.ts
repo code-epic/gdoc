@@ -5,6 +5,9 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Editor } from 'ngx-editor';
 
+import {ThemePalette} from '@angular/material/core';
+
+
 
 @Component({
   selector: 'app-registrar',
@@ -54,17 +57,17 @@ export class RegistrarComponent implements OnInit {
 
   // MatPaginator Output
   pageEvent: PageEvent;
-
-  masterSelected:boolean;
-  checklist:any;
-  checkedList:any;
   editor: Editor = new Editor;
 
-  public clasificar = false
+  public estilocheck  = 'none'
+  public estiloclasificar = 'none'
 
   public bzRegistrados = []
   public bzNotaEntregas = []
 
+  allComplete: boolean = false;
+
+  
   constructor(private apiService: ApiService, config: NgbModalConfig, private modalService: NgbModal) { 
 
      // customize default values of modals used by this component tree
@@ -72,31 +75,50 @@ export class RegistrarComponent implements OnInit {
      config.keyboard = false;
   }
 
- 
+
+  ngOnInit(): void {
+    this.editor = new Editor();
+   
+    
+    this.listarEstados()
+    this.listarBuzon(0)
+    
+  }
+
+  updateAllComplete() {
+    this.allComplete = this.bzRegistrados != null && this.bzRegistrados.every(t => t.completed);
+  }
+
+  someComplete(): boolean {
+    if (this.bzRegistrados == null) {
+      return false;
+    }
+    return this.bzRegistrados.filter(t => t.completed).length > 0 && !this.allComplete;
+    
+  }
+
+  setAll(completed: boolean) {
+    this.allComplete = completed;
+    if (this.bzRegistrados == null) {
+      return;
+    }
+    
+    this.bzRegistrados.forEach(t => (t.completed = completed));
+    if ( completed == false) {
+      this.estiloclasificar = 'none'
+    }else{
+      this.estiloclasificar = ''
+    }
+  }
+
+
   open(content) {
     this.modalService.open(content);
     
   }
 
   
-  ngOnInit(): void {
-    this.editor = new Editor();
-    this.masterSelected = false;
-    this.checklist = [
-      {id:1,value:'CG-00001  ',isSelected:false},
-      // {id:2,value:'Caden Kunze',isSelected:false},
-      // {id:3,value:'Ms. Hortense Zulauf',isSelected:true},
-      // {id:4,value:'Grady Reichert',isSelected:true},
-      // {id:5,value:'Dejon Olson',isSelected:true},
-      // {id:6,value:'Jamir Pfannerstill',isSelected:false},
-      // {id:7,value:'Aracely Renner DVM',isSelected:false},
-      // {id:8,value:'Genoveva Luettgen',isSelected:false}
-    ];
-    this.getCheckedItemList();
-    this.listarEstados()
-    this.listarBuzon()
-    
-  }
+  
 
   listarEstados(){
     this.xAPI.funcion = 'WKF_CEstados'
@@ -115,14 +137,38 @@ export class RegistrarComponent implements OnInit {
     )
   }
 
-  listarBuzon(){
-    this.xAPI.funcion = 'WKF_CDocumentos'
-    this.xAPI.parametros = '1' 
-    this.xAPI.valores = ''
+  listarBuzon(e){
+    this.selNav = e
+    this.seleccionNavegacion()
+   
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
-        this.bzRegistrados = data.Cuerpo
+        
+        data.Cuerpo.forEach(e => {
+          var existe  = e.anom != ''?true:false
+          this.bzRegistrados.push(
+            { 
+              id : e.id,
+              numc : e.numc, 
+              completed : false, 
+              color: 'warn',
+              tdoc : e.tdoc,
+              fcre : e.fcre,
+              remi : e.remi,
+              anom : e.anom,
+              existe : existe
+            }
+          ) 
+          
+        })//Registros recorridos como elementos
+        console.info(this.bzRegistrados)
+        
+        this.lengthOfi = data.Cuerpo.length
+        if (this.lengthOfi > 0) {
+          this.estilocheck = ''
+          this.recorrerElementos(1, this.bzRegistrados)
+        }
+
       },
       (error) => {
 
@@ -132,85 +178,53 @@ export class RegistrarComponent implements OnInit {
 
   
   pageChangeEvent(e){
-    console.log(e)
-    this.recorrerElementos(e.pageIndex+1, this.lst)
-  }
-
-
-  ConsultarOficinas(e){
-
-    this.selNav = e
-    this.seleccionNavegacion()
     
-    if (this.xAPI.funcion == '') return false;
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.lst = data //Registros recorridos como elementos
-        this.lengthOfi = data.length
-        this.recorrerElementos(1, data)
-      },
-      (error) => { console.log(error) }
-    )
+    this.recorrerElementos(e.pageIndex+1, this.lst)
   }
 
 
   seleccionNavegacion(){
     switch (this.selNav) {
       case 0:
-        this.xAPI.funcion = ''
+        this.xAPI.funcion = 'WKF_CDocumentos'
+        this.xAPI.parametros = '1' 
+        this.xAPI.valores = ''
         break;
       case 1:
-        this.xAPI.funcion = 'ConsultarOficinas'
+        
         break;
-      case 2:
-        this.xAPI.funcion = ''
-        break;
-      case 3:
-        this.xAPI.funcion = ''
-        break;
-    
       default:
         break;
     }
   }
 
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion : number, lst : any){
+  recorrerElementos(posicion : number, lista : any){
     if (posicion > 1) posicion = posicion * 10
-    this.oficinas = lst.slice(posicion, posicion + this.pageSizeOfi)
+    this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
     
-    
-    console.info(this.oficinas)
+  }
 
+  //editar
+  editar(id: string){
+
+  }
+  
+  //adjuntar
+  adjuntar(id: string){
 
   }
 
- // The master checkbox will check/ uncheck all items
- checkUncheckAll() {
-  for (var i = 0; i < this.checklist.length; i++) {
-    this.checklist[i].isSelected = this.masterSelected;
+  //eliminar
+  eliminar(id: string){
+
   }
-  this.getCheckedItemList();
-}
 
-// Check All Checkbox Checked
-isAllSelected() {
-  this.masterSelected = this.checklist.every(function(item:any) {
-      return item.isSelected == true;
-    })
-  this.getCheckedItemList();
-}
-
-// Get List of Checked Items
-getCheckedItemList(){
-  this.checkedList = [];
-  for (var i = 0; i < this.checklist.length; i++) {
-    if(this.checklist[i].isSelected)
-    this.checkedList.push(this.checklist[i]);
+  obtenerClasificacion(){
+    this.bzRegistrados.forEach(e => {
+      console.log( `Contenido, ${e.id}, estatus: ${e.completed}`)
+    });
   }
-  this.checkedList = JSON.stringify(this.checkedList);
-}
-
 
 }
 

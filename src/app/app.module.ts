@@ -35,6 +35,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
+import { MatCommonModule } from '@angular/material/core';
+
 import { ConfiguracionComponent } from './views/control/configuracion/configuracion.component';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 
@@ -70,6 +72,7 @@ const ngWizardConfig: NgWizardConfig = {
     NgWizardModule.forRoot(ngWizardConfig),
     NgxEditorModule,
     MatDialogModule,
+    MatCommonModule,
     ToastContainerModule,
     MatToolbarModule,
     ToastrModule.forRoot({

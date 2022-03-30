@@ -49,7 +49,7 @@
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
-                                            <input class="form-control" placeholder="dd/mm/aaaa" 
+                                            <input class="form-control" placeholder="AAAA-MM-DD" 
                                             [ngModelOptions]="{standalone: true}"
                                             [(ngModel)]="fcreacion" ngbDatepicker #fc="ngbDatepicker" 
                                             [placement]="placement" [positionTarget]="buttonEl">
@@ -65,7 +65,7 @@
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
-                                            <input class="form-control" placeholder="dd/mm/aaaa" 
+                                            <input class="form-control" placeholder="AAAA-MM-DD" 
                                             [ngModelOptions]="{standalone: true}"
                                             [(ngModel)]="forigen" ngbDatepicker #fo="ngbDatepicker" 
                                             [placement]="placement" [positionTarget]="buttonEl">
@@ -93,7 +93,9 @@
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label for="cmbTipoDocumento">Tipo de Documento</label>
-                                <select class="form-control" [(ngModel)]="Doc.tipo">
+                                <select class="form-control" 
+                                    [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.tipo"  value ="{{Doc.tipo}}">
                                     <option value="0">Seleccione</option>
                                     <option *ngFor="let x of lstT" value="{{x.nomb}}" >{{ x.nomb }}  </option> 
                                    
@@ -101,14 +103,18 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="cmbRemitente">Remitente</label>
-                                <select class="form-control" [(ngModel)]="Doc.remitente">
+                                <select class="form-control" 
+                                    [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.remitente"  value ="{{Doc.remitente}}">
                                     <option value="0">Seleccione</option>
                                     <option *ngFor="let x of lstR" value="{{x.nomb}}" >{{ x.nomb }}</option> 
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="cmbUnidad">Unidad o Dependencia</label>
-                                <select class="form-control" [(ngModel)]="Doc.unidad">
+                                <select class="form-control" 
+                                    [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.unidad"  value ="{{Doc.unidad}}">
                                     <option value="0">Seleccione</option>
                                     <option *ngFor="let x of lstU" value="{{x.nomb}}" >{{ x.nomb }}  </option> 
                                 </select>
@@ -130,6 +136,33 @@
                         </div>
                         <div class="row">
                             <div class="col-md-8">
+                               
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label for="">Numero de Expediente</label>
+                                        <input type="text" class="form-control" [(ngModel)]="Doc.nexpediente">
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="">Codigo de Archivo</label>
+                                        <input type="text" class="form-control" [(ngModel)]="Doc.codigo">
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="tmsCreacion">Plazo / Alerta</label>
+                                        <form class="form-inline">
+                                            <div class="form-group" style="width:100%">
+                                                <div class="input-group" style="width:100%">
+                                                    <input class="form-control" placeholder="AAAA-MM-DD" 
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    [(ngModel)]="fplazo" ngbDatepicker #fd="ngbDatepicker" 
+                                                    [placement]="placement" [positionTarget]="buttonEl">
+                                                    <div class="input-group-append">
+                                                        <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div> 
                                 <div class="row">
                                     <div class="form-group col-md-12">
                                         <label for="txtInstrucciones">Instrucciones Generales</label>
@@ -144,28 +177,19 @@
                                         </div>        
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="form-group col-md-6">
-                                        <label for="">Numero de Expediente</label>
-                                        <input type="text" class="form-control" [(ngModel)]="Doc.nexpediente">
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label for="">Codigo de Archivo</label>
-                                        <input type="text" class="form-control" [(ngModel)]="Doc.codigo">
-                                    </div>
-                                </div> 
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4" >
                                 <label for="txtobservacion">Lista de Asociación</label>
-                                <textarea class="form-control" name="" id="observacion" cols="30" rows="8" readonly></textarea>
+                                <textarea class="form-control" name="" id="observacion" 
+                                cols="30" rows="8"   readonly></textarea>
                             </div>  
                         </div>
                         <hr>
                         <div class="row">                   
                             <div class="col-md-12">
                                 <div class="text-right">
-                                    <button type="btnRegistrar" class="btn bg-primary text-white" (click) = "registrar()">Registrar</button>
-                                    <button type="btnCancelar" class="btn bg-red text-white"  [routerLink]="['/control']">Cancelar</button>
+                                    <button class="btn bg-primary text-white" (click) = "registrar()">Aceptar</button>
+                                    <button class="btn bg-red text-white"  [routerLink]="['/control']">Cancelar</button>
                                 </div>                           
                             </div>                   
                         </div>                               

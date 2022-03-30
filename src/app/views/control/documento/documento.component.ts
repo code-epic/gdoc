@@ -5,7 +5,7 @@ import { Editor } from 'ngx-editor';
 import { ToastrService } from 'ngx-toastr';
 
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { IDocumento } from 'src/app/services/control/documentos.service';
+import { IWKFAlerta, IDocumento, IWKFDocumento } from 'src/app/services/control/documentos.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import Swal from 'sweetalert2'
 
@@ -27,8 +27,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   
 
   title = 'Documentos';
-  fechaCreacion : NgbDateStruct;
-  fechaOrigen : NgbDateStruct;
   placement = 'bottom';
 
   lineCountCache :number = 0; 
@@ -37,6 +35,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   public fcreacion : ''
   public forigen : ''
+  public fplazo : any
+
+  public WkDoc : IWKFDocumento = {
+    nombre :  '',
+    estado : 0,
+    estatus : 0,
+    observacion :  '',
+    usuario :  ''
+  }
+
 
   public Doc : IDocumento = {
     ncontrol : '',
@@ -45,15 +53,26 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     forigen : '',
     norigen : '',
     salida : '',
-    tipo : '',
-    remitente : '',
-    unidad : '',
+    tipo : '0',
+    remitente : '0',
+    unidad : '0',
     contenido : '',
     instrucciones : '',
     codigo : '',
     nexpediente : '',
     creador : '',
+    archivo : '',
   } 
+
+  public WAlerta : IWKFAlerta = {
+    documento : 0,
+    estado : 0,
+    estatus : 0,
+    activo : 0,
+    fecha : '',
+    usuario: '',
+    observacion : ''   
+  }
 
   public lstT = [] //Objeto Tipo documento
   public lstR = [] //Objeto Remitente
@@ -76,12 +95,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   open(content) {
     this.modalService.open(content);
-    
   }
 
-  
-  registrar(){
-    var WkDoc = {
+  //obtenerWorkFlow Permite generar los primeros valores de la red del documento
+  obtenerWorkFlow(){
+    this.WkDoc = {
       "nombre" : "Control de Gestion",
       "estado" : 1,
       "estatus" : 1,
@@ -89,37 +107,39 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       "usuario" : "Sistema"
     }
     this.xAPI.funcion = 'WKF_IDocumento'
-    this.xAPI.valores = JSON.stringify(WkDoc)
+    this.xAPI.valores = JSON.stringify(this.WkDoc)
+  }
 
+  //registrar Un documento pasando por el WorkFlow
+  registrar(){
+    this.obtenerWorkFlow() //Obtener valores de una API
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data)=>{
-        console.log(data)
-        if (data.tipo == 0) {
-          this.toastrService.error(data.msj,`Code-Epic Wkf`);
-          return false
-        }
-
-        this.xAPI.funcion = 'WKF_IDocumentoDetalle'
-        this.Doc.ncontrol = this.utilService.Semillero(data.msj)
-        this.Doc.wfdocumento = parseInt(data.msj)
-        this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
-        this.Doc.forigen = this.utilService.ConvertirFecha(this.forigen)
-
-        this.xAPI.valores = JSON.stringify(this.Doc)
-    
+      (data) => {
+        this.obtenerDatos(data)      
         this.apiService.Ejecutar(this.xAPI).subscribe(
-           (data)=>{                     
+           (xdata)=>{ 
+              if (this.fplazo.year != undefined){
+                this.obtenerAlertaWorkFlow(xdata)
+                this.apiService.Ejecutar(this.xAPI).subscribe(
+                  (ydata)=>{
+                    console.info(ydata)
+                  },
+                  (errot)=>{
+                   this.toastrService.error(data.msj,`GDoc Wkf.Alerta`);
+                 }
+               )
+              }
               this.aceptar(this.Doc.ncontrol)
               this.limpiarDoc()
            },
            (errot)=>{
-            this.toastrService.error(data.msj,`Code-Epic GDoc`);
+            this.toastrService.error(data.msj,`GDoc Wkf.Documento.Detalle`);
           }
         )
 
       }, //En caso de fallar Wkf
       (errot)=>{
-        this.toastrService.error(errot,`Code-Epic Wkf`);
+        this.toastrService.error(errot,`GDoc Wkf.Documento`);
           
         
       }
@@ -129,10 +149,39 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    
   }
 
+  obtenerDatos(data : any){
+    if (data.tipo == 0) {
+      this.toastrService.error(data.msj,`GDoc Wkf.Documento`);
+      return false
+    }
+    this.xAPI.funcion = 'WKF_IDocumentoDetalle'
+    this.Doc.ncontrol = this.utilService.Semillero(data.msj)
+    this.Doc.wfdocumento = parseInt(data.msj)
+    this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
+    this.Doc.forigen = this.utilService.ConvertirFecha(this.forigen)
+    this.xAPI.valores = JSON.stringify(this.Doc)
+  }
+
+  obtenerAlertaWorkFlow(data : any){
+    if (data.tipo == 0) {
+      this.toastrService.error(data.msj ,`GDoc Wkf.Alerta`);
+      return false
+    }
+    this.WAlerta.activo = 1
+    this.WAlerta.documento = this.Doc.wfdocumento
+    this.WAlerta.estado = this.WkDoc.estado
+    this.WAlerta.estatus = this.WkDoc.estatus
+    this.WAlerta.usuario = this.WkDoc.usuario
+    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
+    this.xAPI.funcion = 'WKF_IAlerta'
+    this.xAPI.valores = JSON.stringify(this.WAlerta)
+  }
+
   ngOnInit(): void {
     this.editor = new Editor();
     this.xeditor = new Editor();
     this.listarConfiguracion()
+    this.limpiarDoc()
   }
 
 
@@ -141,6 +190,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   limpiarDoc(){
     this.fcreacion = ''
     this.forigen = ''
+    this.fplazo = ''
     this.Doc.ncontrol = ''
     this.Doc.norigen = ''
     this.Doc.contenido = ''
@@ -148,9 +198,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.Doc.nexpediente = ''
     this.Doc.codigo = ''
     this.Doc.salida = ''
-    this.Doc.tipo = ''
-    this.Doc.remitente = ''
-    this.Doc.unidad = ''
+    this.Doc.tipo = '0'
+    this.Doc.remitente = '0'
+    this.Doc.unidad = '0'
     
 
   }
@@ -189,7 +239,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   protected aceptar(msj : string){
     Swal.fire({
-      title: 'Documento registrado #: ' + msj,
+      title: 'El Documento Registrado es # ' + msj,
       text: "¿Desea registar otro documento?",
       icon: 'warning',
       showCancelButton: true,
