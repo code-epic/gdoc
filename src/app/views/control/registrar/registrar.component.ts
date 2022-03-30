@@ -174,24 +174,26 @@ export class RegistrarComponent implements OnInit {
 
       }
     )
-}
+  }
 
   
   pageChangeEvent(e){
-    
     this.recorrerElementos(e.pageIndex+1, this.lst)
   }
 
 
   seleccionNavegacion(){
+    console.log(this.selNav)
     switch (this.selNav) {
       case 0:
         this.xAPI.funcion = 'WKF_CDocumentos'
-        this.xAPI.parametros = '1' 
+        this.xAPI.parametros = '1,1' 
         this.xAPI.valores = ''
         break;
       case 1:
-        
+        this.xAPI.funcion = 'WKF_CDocumentos'
+        this.xAPI.parametros = '1,2' 
+        this.xAPI.valores = ''
         break;
       default:
         break;
@@ -222,8 +224,15 @@ export class RegistrarComponent implements OnInit {
 
   obtenerClasificacion(){
     this.bzRegistrados.forEach(e => {
-      console.log( `Contenido, ${e.id}, estatus: ${e.completed}`)
+      // console.log( `Contenido, ${e.id}, estatus: ${e.completed}`)
+      if (e.completed == true){
+        
+      }
     });
+  }
+
+  imprimir(id : string){
+
   }
 
 }
