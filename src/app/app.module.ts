@@ -39,6 +39,8 @@ import { MatCommonModule } from '@angular/material/core';
 
 import { ConfiguracionComponent } from './views/control/configuracion/configuracion.component';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
+import { AuthGuardGuard } from './services/seguridad/auth-guard.guard';
+import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
 
 
 NgxEditorModule.forRoot({
@@ -101,7 +103,12 @@ const ngWizardConfig: NgWizardConfig = {
     ProyectoComponent,
     ConfiguracionComponent
   ],
-  providers: [],
+  providers:  [
+    {
+      provide: [ LocationStrategy, AuthGuardGuard,  JsonPipe],
+      useClass: HashLocationStrategy
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -53,7 +53,7 @@ export interface ceDocumento {
 })
 export class ApiService {
    //Dirección Get para servicios en la página WEB
-   URL =  '/devel/api/'
+   URL =  environment.API
 
    hash = environment.Hash
 
@@ -72,5 +72,7 @@ export class ApiService {
     // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
     return this.http.post<any>(this.URL + "crud" + this.hash, xAPI);
   }
+
+
 
 }

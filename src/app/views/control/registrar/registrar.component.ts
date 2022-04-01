@@ -4,8 +4,9 @@ import { PageEvent } from '@angular/material/paginator';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Editor } from 'ngx-editor';
+import { Router } from '@angular/router';
 
-import {ThemePalette} from '@angular/material/core';
+import { ToastrService } from 'ngx-toastr';
 
 
 
@@ -61,6 +62,7 @@ export class RegistrarComponent implements OnInit {
 
   public estilocheck  = 'none'
   public estiloclasificar = 'none'
+  public cmbDestino = 0
 
   public bzRegistrados = []
   public bzNotaEntregas = []
@@ -68,7 +70,11 @@ export class RegistrarComponent implements OnInit {
   allComplete: boolean = false;
 
   
-  constructor(private apiService: ApiService, config: NgbModalConfig, private modalService: NgbModal) { 
+  constructor(private apiService: ApiService, 
+    config: NgbModalConfig,
+    private ruta: Router,
+    private toastrService: ToastrService, 
+    private modalService: NgbModal) { 
 
      // customize default values of modals used by this component tree
      config.backdrop = 'static';
@@ -93,6 +99,7 @@ export class RegistrarComponent implements OnInit {
     if (this.bzRegistrados == null) {
       return false;
     }
+    
     return this.bzRegistrados.filter(t => t.completed).length > 0 && !this.allComplete;
     
   }
@@ -222,18 +229,52 @@ export class RegistrarComponent implements OnInit {
 
   }
 
-  obtenerClasificacion(){
-    this.bzRegistrados.forEach(e => {
-      // console.log( `Contenido, ${e.id}, estatus: ${e.completed}`)
-      if (e.completed == true){
-        
+   
+  clasificarBuzon(){
+      var lstBz = this.bzRegistrados
+      var usuario = `'Sistema'`
+      var llave = `''`
+      var i = 0
+      var estatus = 2 //NOTA DE ENTREGA
+      this.xAPI.funcion = 'WKF_AUbicacion'
+      this.xAPI.valores = ''
+      
+      if(this.cmbDestino == 0) {
+        this.toastrService.error('Debe seleccionar un concepto',`GDoc Wkf.Ubicacion`);
+        return
       }
-    });
+      lstBz.forEach(e => {
+        i++
+        if (e.completed == true){
+          this.xAPI.parametros = `${this.cmbDestino},${estatus},${llave},${usuario},${e.id}` 
+          this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data)=>{
+              console.info('Codigo actualizado: ', e.numc, data)
+              this.eliminarBzRegistrados(e.numc)
+            },
+            (errot)=>{
+              this.toastrService.error(errot,`GDoc Wkf.Estatus`);
+            }) //
+          
+        }
+      });
+  }
+  eliminarBzRegistrados(codigo){
+    var posicion = 0
+    var i = 0
+    this.bzRegistrados.forEach(e => {
+      if (e.numc == codigo){
+        posicion = i
+        return
+      }
+      i++
+    })
+    this.bzRegistrados.splice(posicion, 1)
+
   }
 
   imprimir(id : string){
 
   }
-
 }
-
+//6483186

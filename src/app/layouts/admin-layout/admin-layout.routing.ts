@@ -9,17 +9,58 @@ import { AyudantiaComponent } from '../../views/ayudantia/ayudantia.component';
 import { ResolucionesComponent } from 'src/app/views/resoluciones/resoluciones.component';
 import { ProyectoComponent } from '../../views/ayudantia/proyecto/proyecto.component';
 import { ConfiguracionComponent } from 'src/app/views/control/configuracion/configuracion.component';
+import { AuthGuardGuard } from 'src/app/services/seguridad/auth-guard.guard';
 
 
 export const AdminLayoutRoutes: Routes = [
-    { path: 'dashboard', component: DashboardComponent},
-    { path: 'control', component: ControlComponent },
-    { path: 'registrar', component: RegistrarComponent },
-    { path: 'documento', component: DocumentoComponent },
-    { path: 'resoluciones', component: ResolucionesComponent },
-    { path: 'buzon', component: BuzonComponent },
-    { path: 'salidas', component: SalidasComponent },
-    { path: 'ayudantia', component: AyudantiaComponent },
-    { path: 'proyecto', component: ProyectoComponent },
-    { path: 'configuracion', component: ConfiguracionComponent },
+    { 
+        path: 'dashboard', 
+        component: DashboardComponent,
+        canActivate:[AuthGuardGuard]
+    },
+    { 
+        path: 'control', 
+        component: ControlComponent,
+        canActivate:[AuthGuardGuard]
+    },
+    { 
+        path: 'registrar', 
+        component: RegistrarComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'documento', 
+        component: DocumentoComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'resoluciones', 
+        component: ResolucionesComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'buzon', 
+        component: BuzonComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'salidas', 
+        component: SalidasComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'ayudantia', 
+        component: AyudantiaComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'proyecto', 
+        component: ProyectoComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'configuracion', 
+        component: ConfiguracionComponent,
+        canActivate:[AuthGuardGuard] 
+    },
 ];
