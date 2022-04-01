@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { NgbModal,NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Editor } from 'ngx-editor';
 import { ToastrService } from 'ngx-toastr';
+import { MatFileUploadModule } from 'angular-material-fileupload';
 
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta, IDocumento, IWKFDocumento } from 'src/app/services/control/documentos.service';
