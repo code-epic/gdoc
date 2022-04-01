@@ -139,7 +139,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
       }, //En caso de fallar Wkf
       (errot)=>{
-        this.toastrService.error(errot,`GDoc Wkf.Documento`);
+        var mensaje = errot + ' - ' + this.xAPI.funcion
+        this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
           
         
       }
@@ -151,7 +152,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   obtenerDatos(data : any){
     if (data.tipo == 0) {
-      this.toastrService.error(data.msj,`GDoc Wkf.Documento`);
+      var mensaje = data.msj + ' - ' + this.xAPI.funcion
+      this.toastrService.error(mensaje,`GDoc Wkf.Documento`);
       return false
     }
     this.xAPI.funcion = 'WKF_IDocumentoDetalle'
