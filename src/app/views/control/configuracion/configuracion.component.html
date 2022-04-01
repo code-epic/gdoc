@@ -10,10 +10,19 @@
         <div class="card shadow">
             <div class="card-header bg-transparent">
                 <div class="row align-items-center">
-                    <div class="col-md-12">
+                    <div class="col-md-10">
                         <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
                         <h2 class="mb-0">Configuración</h2>
                     </div>
+                    <div class="col-md-2">
+                        <div class="media align-items-center">
+                          <div class="example-button-row">
+                            <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                              <mat-icon>reply</mat-icon>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                 </div>
             </div>
             <div class="card-body bg-transparent">
@@ -59,10 +68,7 @@
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-
-
-                            
+                            </div>      
                         </div>
                     </div> 
                 </mat-tab>
@@ -70,24 +76,42 @@
                     <ng-template mat-tab-label>
                     &nbsp;CONSULTAS
                     </ng-template>
-
-                    <mat-panel-title *ngFor="let config of lista">
-                        <div class="row col-md-12 px-2 py-2 text-center" >
-                            <div class="col-md-1">
-                                <mat-checkbox class="example-margin" ></mat-checkbox>        
-                            </div>
-                            <div class="col-md-4">
+                    <mat-selection-list>
+                        <mat-list *ngFor="let config of lista " 
+                          style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                          <div class="row col-md-12">
+    
+                            <div class="col-md-5 texto-lista">
                                 {{ config.nomb | uppercase}}
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-5 texto-lista">
                                 {{ config.obse | uppercase}}
                             </div>
-                            <div class="col-md-2 text-right">
-                                <i class="fas fa-edit iconEdit"></i>
-                                <i class="far fa-trash-alt iconElimi"></i> 
+                            <div class="col-md-2 text-right" >
+                              <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.id)">
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            </div>
+                          </div>
+                        </mat-list>
+                    </mat-selection-list>
+
+                    <!-- <mat-panel-title *ngFor="let config of lista"
+                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                            <div class="col-md-5 texto-lista">
+                                {{ config.nomb | uppercase}}
+                            </div>
+                            <div class="col-md-5 texto-lista">
+                                {{ config.obse | uppercase}}
+                            </div>
+                            <div class="col-md-2 text-right" >
+                              <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.id)">
+                                <mat-icon>delete</mat-icon>
+                              </button>
                             </div>
                         </div>
-                    </mat-panel-title>
+                    </mat-panel-title>  -->
                 </mat-tab>
             </mat-tab-group>
         </div>
