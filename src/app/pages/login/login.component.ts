@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
 
   constructor(private router: Router, private loginService: LoginService, private toastrService: ToastrService){
     if (sessionStorage.getItem("token") != undefined ){
-      this.router.navigate(['dashbord']);
+      this.router.navigate(['/dashboard']);
     }
   }
 
@@ -45,15 +45,12 @@ export class LoginComponent implements OnInit {
 
 
   async login(){
-    console.log('login')
-    this.loading = true;
     await this.loginService.getLogin(this.usuario, this.clave).subscribe(
       (data) => { // Success
         this.itk = data;
         sessionStorage.setItem("token", this.itk.token );
-        this.loading = false;
-        this.isHidden = false;
-        this.router.navigate(['dashbord']);
+        console.log(this.itk)
+        this.router.navigate(['/dashboard']);
 
       },
       (error) => {
