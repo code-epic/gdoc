@@ -10,9 +10,10 @@
     <div class="collapse navbar-collapse"  [ngbCollapse]="isCollapsed" id="sidenav-collapse-main">
       <!-- Navigation -->
       <ul class="navbar-nav">
-          <li *ngFor="let menuItem of menuItems" class="{{menuItem.class}} nav-item">
+        <!-- <li *ngFor="let menuItem of menuItems" class="{{menuItem.class}} nav-item"></li> -->
+          <li *ngFor="let menuItem of menuItems" class=" nav-item">
               <a routerLinkActive="active" [routerLink]="[menuItem.path]" class="nav-link">
-                  <i class="ni {{menuItem.icon}}"></i>
+                  <i class="ni {{ menuItem.icon + ' ' +  menuItem.class}}"></i>
                   {{menuItem.title}}
               </a>
           </li>

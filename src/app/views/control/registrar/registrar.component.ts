@@ -7,6 +7,7 @@ import { Editor } from 'ngx-editor';
 import { Router } from '@angular/router';
 
 import { ToastrService } from 'ngx-toastr';
+import { UpperCasePipe } from '@angular/common';
 
 
 
@@ -61,8 +62,12 @@ export class RegistrarComponent implements OnInit {
   editor: Editor = new Editor;
 
   public estilocheck  = 'none'
+  
   public estiloclasificar = 'none'
+  
   public cmbDestino = 0
+
+  public htmlContenido = ''
 
   public bzRegistrados = []
   public bzNotaEntregas = []
@@ -273,6 +278,43 @@ export class RegistrarComponent implements OnInit {
 
   }
 
+  ConsultarCtrl(id: string){
+    console.log( id )
+    this.xAPI.funcion = 'WKF_CClasificados'
+    this.xAPI.valores = ''
+    this.xAPI.parametros = id
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data)=>{
+        console.log(data)
+        var i = 0
+        var htmlContenido = `<table class="table" style="width:100%">
+          <thead class="thead-light">
+            <th>#</th>
+            <th>N-Control</th>
+            <th>N-Origen</th>
+            <th>Fecha</th>
+            <th>Remitente</th>
+          </thead><tbody>`     
+        data.Cuerpo.forEach(e => {
+          var remitente = e.remi + e.udep 
+          htmlContenido += `<tr>
+          <td>${++i}</td>
+          <td>${e.numc }</td>
+          <td>${e.nori }</td>
+          <td>${e.fcre.substring(0,10) }</td>
+          <td>${ remitente.toUpperCase() }</td>
+          </tr>`
+        })
+        htmlContenido += `</tbody></table>`
+        this.htmlContenido = htmlContenido
+
+      },
+      (errot)=>{
+        this.toastrService.error(errot,`GDoc Wkf.Estatus`);
+      }) //
+
+  }
   imprimir(id : string){
 
   }

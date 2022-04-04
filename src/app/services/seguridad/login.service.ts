@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
+
 export interface IUsuario{
   nombre : string,
   cedula : string,
@@ -33,14 +34,26 @@ export interface UClave{
 
 export class LoginService {
  
-  URL =  environment.API
+  public URL : string =  environment.API
+  
+  public Id : string = ''
+  
+  public Token : any
 
+  public Aplicacion : any
+  
+  
   constructor(private router: Router, private http : HttpClient) {
-   
+    this.Id = environment.ID
     
     
   }
 
+  async Iniciar() {
+    await this.getUserDecrypt()
+    this.obenterAplicacion()
+    
+  }
   getLogin(user: string, clave : string) : Observable<IToken>{
     var usuario = {
       "nombre" : user,
@@ -62,9 +75,41 @@ export class LoginService {
     sessionStorage.removeItem("id");
   }
 
-  getUserDecrypt(){
+  protected getUserDecrypt() : any {    
     var e = sessionStorage.getItem("token");
     var s = e.split(".");
-    return JSON.parse(atob(s[1]));
+    
+    //var str = Buffer.from(s[1], 'base64').toString();
+    var str = atob( s[1] );
+    this.Token = JSON.parse(str);
+    return JSON.parse(str);
   }
+  
+  //ObenterAplicacion 
+  protected obenterAplicacion(){
+    var Aplicacion = this.Token.Usuario.Aplicacion
+    Aplicacion.forEach(e => {
+      if(e.id == this.Id ){
+        this.Aplicacion = e;
+      }
+    });
+  }
+  
+  obtenerMenu(){
+
+  }
+
+  obtenerSubMenu(idUrl : string) : any{
+   
+    var App = this.Aplicacion
+    var SubMenu = [] 
+    App.Rol.Menu.forEach(e => {
+      console.log(e.url, idUrl)
+      if (e.url == idUrl) {
+        SubMenu = e.SubMenu
+      }
+    });
+    return SubMenu
+  }
+
 }

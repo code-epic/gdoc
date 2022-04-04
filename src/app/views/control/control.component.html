@@ -49,17 +49,17 @@
             
                 <div class="card-body">
                     <div class="row" [ngStyle]="{'display':rtarjetas}">
-                        <div class="col-md-4">
-                            <a routerLinkActive="active" [routerLink]="['/registrar']">
-                                <div class="card bg-c-green order-card">
+                        <div class="col-md-4" *ngFor="let item of SubMenu">
+                            <a routerLinkActive="active" [routerLink]="[item.url]">
+                                <div class="card {{item.color}} order-card">
                                     <div class="card-block">
-                                        <h2 class="text-right text-white"><i class="fa fa-plus-circle f-left"></i><span>REGISTRADOS</span></h2>
-                                        <p class="m-b-0">Documentos Registrados<span class="f-right">351</span></p>
+                                        <h2 class="text-right text-white"><i class="{{item.icono + ' ' + item.clase}}"></i><span>{{item.nombre}}</span></h2>
+                                        <p class="m-b-0">{{item.descripcion}}<span class="f-right">351</span></p>
                                     </div>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <a routerLinkActive="active" [routerLink]="['/buzon']">
                                 <div class="card bg-c-blue order-card">
                                     <div class="card-block">
@@ -78,7 +78,7 @@
                                     </div>
                                 </div>
                             </a>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="row" [ngStyle]="{'display':rlistado}">

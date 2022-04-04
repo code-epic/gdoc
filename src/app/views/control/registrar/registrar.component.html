@@ -141,8 +141,8 @@
             &nbsp;CLASIFICACIÓN
             </ng-template>
             <mat-accordion class="example-headers-align">
-              <mat-expansion-panel hideToggle *ngFor="let x of lstEstados">
-                  <mat-expansion-panel-header>
+              <mat-expansion-panel hideToggle *ngFor="let x of lstEstados" (click)="ConsultarCtrl( x.id )">
+                  <mat-expansion-panel-header >
                     <mat-panel-title style="font-weight:bold">
                       {{x.nomb}}
                     </mat-panel-title>
@@ -151,8 +151,9 @@
                       <mat-icon>format_list_numbered_rtl</mat-icon>
                     </mat-panel-description>
                   </mat-expansion-panel-header>
-              
-                 Contenido
+                  <div [innerHTML] = "htmlContenido" > 
+
+                  </div>
               
                   <mat-action-row>
                     <button class="btn bg-gradient-primary text-white "  
