@@ -73,6 +73,16 @@ export class ApiService {
     return this.http.post<any>(this.URL + "crud" + this.hash, xAPI);
   }
 
+   //EnviarArchivos generales
+   EnviarArchivos(frm : FormData ) : Observable<any>{
+    var httpOptions = {
+      headers: new HttpHeaders({
+        'Authorization': 'Bearer ' + sessionStorage.getItem('token') 
+      })
+    };
+    return this.http.post<any>(this.URL + "subirarchivos", frm, httpOptions);
+  }
+
 
 
 }

@@ -38,14 +38,18 @@ export class LoginService {
   
   public Id : string = ''
   
+  public SToken : any
+
   public Token : any
+
+  public Usuario : any
 
   public Aplicacion : any
   
   
   constructor(private router: Router, private http : HttpClient) {
     this.Id = environment.ID
-    
+    if (sessionStorage.getItem("token") != undefined ) this.SToken = sessionStorage.getItem("token");
     
   }
 
@@ -60,7 +64,6 @@ export class LoginService {
       "clave" : clave,
     }
     var url = this.URL + 'wusuario/login'
-    console.log(url)
     return this.http.post<IToken>(url, usuario )
   }
   
@@ -82,6 +85,7 @@ export class LoginService {
     //var str = Buffer.from(s[1], 'base64').toString();
     var str = atob( s[1] );
     this.Token = JSON.parse(str);
+    this.Usuario = this.Token.Usuario
     return JSON.parse(str);
   }
   
@@ -99,16 +103,10 @@ export class LoginService {
 
   }
 
-  obtenerSubMenu(idUrl : string) : any{
-   
+  obtenerSubMenu(idUrl : string) : any{   
     var App = this.Aplicacion
     var SubMenu = [] 
-    App.Rol.Menu.forEach(e => {
-      console.log(e.url, idUrl)
-      if (e.url == idUrl) {
-        SubMenu = e.SubMenu
-      }
-    });
+    App.Rol.Menu.forEach(e => {if (e.url == idUrl) SubMenu = e.SubMenu});
     return SubMenu
   }
 

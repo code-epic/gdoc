@@ -25,7 +25,7 @@
           "descripcion": "Usuario Sistema",
           "Menu": [
             {
-              "url": "",
+              "url": "/principal",
               "js": "",
               "icono": "ni-tv-2",
               "descripcion": "Principal",
@@ -90,7 +90,7 @@
               ]
             },
             {
-              "url": "",
+              "url": "/control",
               "js": "",
               "icono": "ni-planet",
               "descripcion": "Control y Gestión",
@@ -189,7 +189,7 @@
               ]
             },
             {
-              "url": "",
+              "url": "/secretaria",
               "js": "",
               "icono": "ni-pin-3",
               "descripcion": "Secretaria",
@@ -227,7 +227,7 @@
               ]
             },
             {
-              "url": "",
+              "url": "/resoluciones",
               "js": "",
               "icono": "ni-single-02 ",
               "descripcion": "Resoluciones",

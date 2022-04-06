@@ -43,6 +43,9 @@ import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { AuthGuardGuard } from './services/seguridad/auth-guard.guard';
 import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
 
+import { AngularFileUploaderModule } from "angular-file-uploader";
+
+
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -117,6 +120,7 @@ const ngWizardConfig: NgWizardConfig = {
       progressBar: true,
       positionClass: "toast-top-right",
       preventDuplicates: false    }),
+    AngularFileUploaderModule
 
   ],
   declarations: [

@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef } from '@angular/core';
 import { ROUTES } from '../sidebar/sidebar.component';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2'
 
 @Component({
   selector: 'app-navbar',
@@ -31,6 +32,24 @@ export class NavbarComponent implements OnInit {
         }
     }
     return 'Dashboard';
+  }
+
+  cerrar(){
+    
+    Swal.fire({
+      title: 'Esta seguro?',
+      text: "de salir del sistema!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si, desconectarme!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        sessionStorage.removeItem('token')
+        window.location.href = '/';
+      }
+    })    
   }
 
 }

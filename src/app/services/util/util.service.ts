@@ -20,7 +20,7 @@ export class UtilService {
     var anio = f.getFullYear().toString().substring(2,4)
     var mes = this.zfill((f.getMonth() + 1).toString(),2)
     var dia = this.zfill(f.getDate().toString(), 2)
-    return anio+ mes + dia + '/' + this.zfill(id, 5)
+    return anio+ mes + dia + '-' + this.zfill(id, 5)
   }
 
   protected zfill(number, width) {

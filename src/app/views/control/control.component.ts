@@ -76,7 +76,6 @@ export class ControlComponent implements OnInit {
   }
 
   pageChangeEvent(e){
-    console.log(e)
     this.recorrerElementos(e.pageIndex+1, this.lst)
   }
 
@@ -121,12 +120,7 @@ export class ControlComponent implements OnInit {
   //recorrerElementos para paginar listados
   recorrerElementos(posicion : number, lst : any){
     if (posicion > 1) posicion = posicion * 10
-    this.oficinas = lst.slice(posicion, posicion + this.pageSizeOfi)
-    
-    
-    console.info(this.oficinas)
-
-
+    this.oficinas = lst.slice(posicion, posicion + this.pageSizeOfi)    
   }
 
 

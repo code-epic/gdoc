@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "scripts": {
     "ng": "ng",
-    "start": "NODE_OPTIONS=\"--max-http-header-size=100000\" ng serve --host 0.0.0.0 --proxy-config ./src/proxy.conf.json",
+    "start": "NODE_OPTIONS=\"--max-http-header-size=100000\" ng serve --host 0.0.0.0  --port 4201 --proxy-config ./src/proxy.conf.json",
     "build": "ng build --prod --aot --build-optimizer --common-chunk --vendor-chunk --optimization --progress",
     "test": "ng test",
     "lint": "ng lint",
@@ -26,6 +26,7 @@
     "@angular/router": "12.1.2",
     "@ng-bootstrap/ng-bootstrap": "10.0.0",
     "@sebgroup/ng-wizard": "^3.2.0",
+    "angular-file-uploader": "^7.1.1",
     "bootstrap": "4.5.2",
     "buffer": "^6.0.3",
     "chart.js": "2.9.3",
@@ -39,7 +40,7 @@
     "ngx-ui-loader": "^11.0.0",
     "nouislider": "14.6.2",
     "rxjs": "7.2.0",
-    "sweetalert2": "^11.4.7",
+    "sweetalert2": "^11.4.8",
     "zone.js": "0.11.4"
   },
   "devDependencies": {
