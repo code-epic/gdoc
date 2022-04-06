@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal,NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Editor } from 'ngx-editor';
 import { ToastrService } from 'ngx-toastr';
@@ -83,16 +83,51 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     funcion: ''
 
   };
+  routerDoc : { numc : string }
 
   constructor(private apiService : ApiService,  
               private modalService: NgbModal, 
               private utilService: UtilService,
               private toastrService: ToastrService,
+              private rutaActiva: ActivatedRoute,
               private ruta: Router) {
 
     
   }
+  
+  ngOnInit(): void {
+     
+    if (this.rutaActiva.snapshot.params.id != undefined ) {
+      this.consultarDocumento (this.rutaActiva.snapshot.params.id)
+    }
+    // this.coche = {
 
+    // }
+    this.editor = new Editor();
+    this.xeditor = new Editor();
+    this.listarConfiguracion()
+    this.limpiarDoc()
+  }
+
+  consultarDocumento(numControl : string){
+    this.xAPI.funcion = 'WKF_CDocumentoDetalle'
+    this.xAPI.parametros = numControl 
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        data.Cuerpo.forEach(e => {
+          console.log(e)
+          this.Doc = e
+        });
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  }
+
+  
   open(content) {
     this.modalService.open(content);
   }
@@ -179,12 +214,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = JSON.stringify(this.WAlerta)
   }
 
-  ngOnInit(): void {
-    this.editor = new Editor();
-    this.xeditor = new Editor();
-    this.listarConfiguracion()
-    this.limpiarDoc()
-  }
 
 
   

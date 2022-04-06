@@ -172,7 +172,7 @@ export class RegistrarComponent implements OnInit {
       (data) => {
         
         data.Cuerpo.forEach(e => {
-          console.log (e)
+          
           var existe  = e.anom == ''?true:false
           this.bzRegistrados.push(
             { 
@@ -236,7 +236,7 @@ export class RegistrarComponent implements OnInit {
 
   //editar
   editar(id: string){
-
+    this.ruta.navigate(['/documento',id])
   }
   
   //adjuntar

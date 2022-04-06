@@ -111,7 +111,7 @@
                           {{ e.remi | uppercase }}
                         </div>
                         <div class="col-md-2 text-right" >
-                          <button mat-icon-button aria-label="Editar" (click)="editar(e.id)">
+                          <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
                             <mat-icon>edit_note</mat-icon>
                           </button>
                           <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
