@@ -17,7 +17,7 @@ export class AuthGuardGuard implements CanActivate {
       if (sessionStorage.getItem("token") != undefined ){
         return true;
       }else{
-        console.log('Entrando');
+       
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("id");
         this.router.navigate(['login']);

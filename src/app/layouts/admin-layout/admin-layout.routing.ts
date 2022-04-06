@@ -34,6 +34,11 @@ export const AdminLayoutRoutes: Routes = [
         canActivate:[AuthGuardGuard] 
     },
     { 
+        path: 'documento/:id', 
+        component: DocumentoComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
         path: 'resoluciones', 
         component: ResolucionesComponent,
         canActivate:[AuthGuardGuard] 

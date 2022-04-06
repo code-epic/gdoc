@@ -7,6 +7,9 @@ import { Editor } from 'ngx-editor';
 import { Router } from '@angular/router';
 
 import { ToastrService } from 'ngx-toastr';
+import { LoginService } from 'src/app/services/seguridad/login.service';
+import { AngularFileUploaderComponent } from 'angular-file-uploader';
+import { environment } from 'src/environments/environment';
 
 
 
@@ -16,6 +19,10 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./registrar.component.scss']
 })
 export class RegistrarComponent implements OnInit {
+
+  @ViewChild('fileUpload1')
+  
+  private fileUpload1:  AngularFileUploaderComponent;
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
 
@@ -61,31 +68,44 @@ export class RegistrarComponent implements OnInit {
   editor: Editor = new Editor;
 
   public estilocheck  = 'none'
+  
   public estiloclasificar = 'none'
+  
   public cmbDestino = 0
 
+  public htmlContenido = ''
+
   public bzRegistrados = []
+  
   public bzNotaEntregas = []
+
+  public archivos = []
+
+  public numControl : string = ''
 
   allComplete: boolean = false;
 
+  afuConfig = {
+    
+  };
+  public strRuta : string = ''
   
   constructor(private apiService: ApiService, 
     config: NgbModalConfig,
     private ruta: Router,
     private toastrService: ToastrService, 
+    private loginService : LoginService,
     private modalService: NgbModal) { 
-
+    
      // customize default values of modals used by this component tree
      config.backdrop = 'static';
      config.keyboard = false;
+     this.strRuta = environment.Url + environment.API
   }
 
 
   ngOnInit(): void {
     this.editor = new Editor();
-   
-    
     this.listarEstados()
     this.listarBuzon(0)
     
@@ -119,9 +139,10 @@ export class RegistrarComponent implements OnInit {
   }
 
 
-  open(content) {
+  open(content, id) {
+    this.numControl = id
     this.modalService.open(content);
-    
+
   }
 
   
@@ -133,7 +154,6 @@ export class RegistrarComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         data.Cuerpo.forEach(e => {
           if (e.esta == 1)this.lstEstados.push(e)
         });
@@ -152,7 +172,8 @@ export class RegistrarComponent implements OnInit {
       (data) => {
         
         data.Cuerpo.forEach(e => {
-          var existe  = e.anom != ''?true:false
+          
+          var existe  = e.anom == ''?true:false
           this.bzRegistrados.push(
             { 
               id : e.id,
@@ -168,7 +189,6 @@ export class RegistrarComponent implements OnInit {
           ) 
           
         })//Registros recorridos como elementos
-        console.info(this.bzRegistrados)
         
         this.lengthOfi = data.Cuerpo.length
         if (this.lengthOfi > 0) {
@@ -190,7 +210,7 @@ export class RegistrarComponent implements OnInit {
 
 
   seleccionNavegacion(){
-    console.log(this.selNav)
+    
     switch (this.selNav) {
       case 0:
         this.xAPI.funcion = 'WKF_CDocumentos'
@@ -216,7 +236,7 @@ export class RegistrarComponent implements OnInit {
 
   //editar
   editar(id: string){
-
+    this.ruta.navigate(['/documento',id])
   }
   
   //adjuntar
@@ -249,8 +269,8 @@ export class RegistrarComponent implements OnInit {
           this.xAPI.parametros = `${this.cmbDestino},${estatus},${llave},${usuario},${e.id}` 
           this.apiService.Ejecutar(this.xAPI).subscribe(
             (data)=>{
-              console.info('Codigo actualizado: ', e.numc, data)
-              this.eliminarBzRegistrados(e.numc)
+             
+              this.actualizarBzRegistrados(e.numc, 0)
             },
             (errot)=>{
               this.toastrService.error(errot,`GDoc Wkf.Estatus`);
@@ -259,7 +279,8 @@ export class RegistrarComponent implements OnInit {
         }
       });
   }
-  eliminarBzRegistrados(codigo){
+
+  actualizarBzRegistrados(codigo, tipo){
     var posicion = 0
     var i = 0
     this.bzRegistrados.forEach(e => {
@@ -269,12 +290,94 @@ export class RegistrarComponent implements OnInit {
       }
       i++
     })
-    this.bzRegistrados.splice(posicion, 1)
-
+    if (tipo == 0){
+      this.bzRegistrados.splice(posicion, 1)
+    }else{
+      this.bzRegistrados[posicion].existe = false
+    }
   }
 
+
+  
+
+  ConsultarCtrl(id: string){
+    
+    this.xAPI.funcion = 'WKF_CClasificados'
+    this.xAPI.valores = ''
+    this.xAPI.parametros = id
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data)=>{        
+        var i = 0
+        var htmlContenido = `<table class="table" style="width:100%">
+          <thead class="thead-light">
+            <th>#</th>
+            <th>N-Control</th>
+            <th>N-Origen</th>
+            <th>Fecha</th>
+            <th>Remitente</th>
+          </thead><tbody>`     
+        data.Cuerpo.forEach(e => {
+          var remitente = e.remi + e.udep 
+          htmlContenido += `<tr>
+          <td>${++i}</td>
+          <td>${e.numc }</td>
+          <td>${e.nori }</td>
+          <td>${e.fcre.substring(0,10) }</td>
+          <td>${ remitente.toUpperCase() }</td>
+          </tr>`
+        })
+        htmlContenido += `</tbody></table>`
+        this.htmlContenido = htmlContenido
+
+      },
+      (errot)=>{
+        this.toastrService.error(errot,`GDoc Wkf.Estatus`);
+      }) //
+
+  }
+  
   imprimir(id : string){
 
   }
+
+
+  fileSelected(e){
+    this.archivos.push(e.target.files[0])
+  }
+
+  async SubirArchivo(e){
+    
+    var frm = new FormData( document.forms.namedItem("forma") )
+    try {
+      await this.apiService.EnviarArchivos(frm).subscribe(
+        (data) => {
+          this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
+          this.xAPI.parametros = this.archivos[0].name + ',' + this.loginService.Usuario.id+ ','  + this.numControl  
+          this.xAPI.valores = ''
+          this.apiService.Ejecutar(this.xAPI).subscribe(
+            (xdata) => {
+              console.log(xdata)
+              if (xdata.tipo == 1){
+                this.toastrService.success(
+                  'Tu archivo ha sido cargado con exito ',
+                  `GDoc Registro`
+                );
+                this.actualizarBzRegistrados(this.numControl, 1)
+              }else{
+                this.toastrService.error(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+              }
+            },
+            (error) => {
+              this.toastrService.error(error,`GDoc Wkf.Documento.Adjunto`);
+            }
+          )
+        }
+      )
+    } catch (error) {
+      console.error(error)
+    }
+
+  }
+
 }
-//6483186

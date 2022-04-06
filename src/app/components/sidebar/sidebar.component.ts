@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { LoginService } from 'src/app/services/seguridad/login.service';
 
 declare interface RouteInfo {
     path: string;
@@ -7,16 +8,7 @@ declare interface RouteInfo {
     icon: string;
     class: string;
 }
-export const ROUTES: RouteInfo[] = [
-    { path: '/dashboard', title: 'Principal',  icon: 'ni-tv-2 text-primary', class: '' },
-    { path: '/control', title: 'Control y Gestión',  icon:'ni-planet text-blue', class: '' },
-    { path: '/secretaria', title: 'Secretaría',  icon:'ni-pin-3 text-orange', class: '' },
-    { path: '/resoluciones', title: 'Resoluciones',  icon:'ni-single-02 text-yellow', class: '' },
-    { path: '/ayudantia', title: 'Ayudantía',  icon:'ni-bullet-list-67 text-red', class: '' },
-    { path: '/timonel', title: 'Timonel',  icon:'ni-key-25 text-info', class: '' },
-    { path: '/acami', title: 'Acami',  icon:'ni-circle-08 text-pink', class: '' },
-    { path: '/personal', title: 'Personal',  icon:'ni-circle-08 text-pink', class: '' }
-];
+export const ROUTES: RouteInfo[] = [];
 
 @Component({
   selector: 'app-sidebar',
@@ -28,12 +20,27 @@ export class SidebarComponent implements OnInit {
   public menuItems: any[];
   public isCollapsed = true;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private loginService: LoginService) { 
 
-  ngOnInit() {
-    this.menuItems = ROUTES.filter(menuItem => menuItem);
+  }
+
+  async ngOnInit() {
+    
+    if (ROUTES.length == 0){
+      await this.loginService.Iniciar()
+      var App = this.loginService.Aplicacion
+      App.Rol.Menu.forEach(e => {
+        ROUTES.push({
+          path : e.url,
+          title: e.nombre,
+          icon : e.icono,
+          class : e.clase
+        })
+      });
+    }
+    this.menuItems = ROUTES.filter(menuItem => menuItem);    
     this.router.events.subscribe((event) => {
       this.isCollapsed = true;
-   });
+    });
   }
 }

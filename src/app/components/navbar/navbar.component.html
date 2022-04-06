@@ -23,7 +23,7 @@
             <i class="ni ni-single-02"></i>
             <span>Perfil</span>
           </a>
-          <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
+          <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
             <i class="ni ni-settings-gear-65"></i>
             <span>Configuración</span>
           </a>
@@ -33,7 +33,7 @@
           </a>
         
           <div class="dropdown-divider"></div>
-          <a href="#!" class="dropdown-item">
+          <a href="#" class="dropdown-item" (click)="cerrar()">
             <i class="ni ni-user-run"></i>
             <span>Cerrar Sesión</span>
           </a>

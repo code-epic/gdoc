@@ -34,6 +34,7 @@ import { ProyectoComponent } from './views/ayudantia/proyecto/proyecto.component
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { NgxUiLoaderModule,  NgxUiLoaderConfig } from "ngx-ui-loader";
 
 import { MatCommonModule } from '@angular/material/core';
 
@@ -41,6 +42,41 @@ import { ConfiguracionComponent } from './views/control/configuracion/configurac
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { AuthGuardGuard } from './services/seguridad/auth-guard.guard';
 import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
+
+import { AngularFileUploaderModule } from "angular-file-uploader";
+
+
+
+const ngxUiLoaderConfig: NgxUiLoaderConfig = {
+  "bgsColor": "#79c680",
+  "bgsOpacity": 0.2,
+  "bgsPosition": "center-center",
+  "bgsSize": 60,
+  "bgsType": "ball-spin-clockwise",
+  "blur": 8,
+  "delay": 0,
+  "fastFadeOut": true,
+  "fgsColor": "#1ea24a",
+  "fgsPosition": "center-center",
+  "fgsSize": 50,
+  "fgsType": "ball-spin-clockwise",
+  "gap": 24,
+  "logoPosition": "center-center",
+  "logoSize": 120,
+  "logoUrl": "",
+  "masterLoaderId": "master",
+  "overlayBorderRadius": "0",
+  "overlayColor": "rgba(40, 40, 40, 0.63)",
+  "pbColor": "#79c680",
+  "pbDirection": "ltr",
+  "pbThickness": 3,
+  "hasProgressBar": true,
+  "text": "",
+  "textColor": "#FFFFFF",
+  "textPosition": "center-center",
+  "maxTime": -1,
+  "minTime": 300
+}
 
 
 NgxEditorModule.forRoot({
@@ -76,6 +112,7 @@ const ngWizardConfig: NgWizardConfig = {
     MatDialogModule,
     MatCommonModule,
     ToastContainerModule,
+    NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
     MatToolbarModule,
     ToastrModule.forRoot({
       closeButton: false,
@@ -83,6 +120,7 @@ const ngWizardConfig: NgWizardConfig = {
       progressBar: true,
       positionClass: "toast-top-right",
       preventDuplicates: false    }),
+    AngularFileUploaderModule
 
   ],
   declarations: [

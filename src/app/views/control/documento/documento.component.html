@@ -51,7 +51,10 @@
                         <div class="form-row">
                             <div class="form-group col-md-2">
                                 <label for="txtControl"> Nro. Control </label>                    
-                                <input type="text" class="form-control" id="txtControl" [(ngModel)]="Doc.ncontrol" readonly>
+                                <input type="text" class="form-control" id="txtControl" 
+                                [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Doc.ncontrol" readonly
+                                >
                             </div>
                             <div class="form-group col-md-3">
                                 <label for="tmsCreacion">Fecha Creacion</label>
@@ -135,6 +138,7 @@
                                 <div class="NgxEditor__Wrapper">
                                     <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
                                     <ngx-editor
+                                    [ngModelOptions]="{standalone: true}"
                                     [editor]="editor"
                                     [(ngModel)]="Doc.contenido"
                                     [disabled]="false"
@@ -149,11 +153,15 @@
                                 <div class="row">
                                     <div class="form-group col-md-4">
                                         <label for="">Numero de Expediente</label>
-                                        <input type="text" class="form-control" [(ngModel)]="Doc.nexpediente">
+                                        <input type="text" class="form-control" 
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="">Codigo de Archivo</label>
-                                        <input type="text" class="form-control" [(ngModel)]="Doc.codigo">
+                                        <input type="text" class="form-control" 
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Doc.codigo" value="{{ Doc.codigo }}">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="tmsCreacion">Plazo / Alerta</label>
@@ -179,6 +187,7 @@
                                             <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
                                             <ngx-editor
                                             [editor]="xeditor"
+                                            [ngModelOptions]="{standalone: true}"
                                             [(ngModel)]="Doc.instrucciones"
                                             [disabled]="false"
                                             [placeholder]="'Escibe aqui...'">

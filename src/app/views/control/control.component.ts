@@ -3,6 +3,8 @@ import { MatAccordion } from '@angular/material/expansion';
 import { PageEvent } from '@angular/material/paginator';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { LoginService } from 'src/app/services/seguridad/login.service';
 
 export interface DialogData {
   name: string;
@@ -61,15 +63,19 @@ export class ControlComponent implements OnInit {
   // MatPaginator Output
   pageEvent: PageEvent;
 
+  public SubMenu = []
 
-  constructor(private apiService: ApiService, public dialog: MatDialog) { }
+  constructor(private apiService: ApiService, 
+    public dialog: MatDialog,
+    public loginService : LoginService,
+    public ruta : Router) { }
 
-  ngOnInit(): void {
-    
+  async ngOnInit() {
+    await this.loginService.Iniciar()
+    this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
   }
 
   pageChangeEvent(e){
-    console.log(e)
     this.recorrerElementos(e.pageIndex+1, this.lst)
   }
 
@@ -114,12 +120,7 @@ export class ControlComponent implements OnInit {
   //recorrerElementos para paginar listados
   recorrerElementos(posicion : number, lst : any){
     if (posicion > 1) posicion = posicion * 10
-    this.oficinas = lst.slice(posicion, posicion + this.pageSizeOfi)
-    
-    
-    console.info(this.oficinas)
-
-
+    this.oficinas = lst.slice(posicion, posicion + this.pageSizeOfi)    
   }
 
 
