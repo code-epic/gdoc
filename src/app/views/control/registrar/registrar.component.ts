@@ -184,16 +184,21 @@ export class RegistrarComponent implements OnInit {
         data.Cuerpo.forEach(e => {
           
           var existe  = e.anom == ''?true:false
+          var privado  = e.priv == 1?true:false
+          console.log(privado)
           this.bzRegistrados.push(
             { 
               id : e.id,
               numc : e.numc, 
               completed : false, 
               color: 'warn',
+              nori : e.nori,
               tdoc : e.tdoc,
               fcre : e.fcre,
               remi : e.remi,
+              udep : e.udep,
               anom : e.anom,
+              priv : privado,
               existe : existe
             }
           ) 
@@ -347,7 +352,7 @@ export class RegistrarComponent implements OnInit {
   
 
   ConsultarCtrl(id: string){
-    console.log('clicked...')
+    
     this.xAPI.funcion = 'WKF_CClasificados'
     this.xAPI.valores = ''
     this.xAPI.parametros = id

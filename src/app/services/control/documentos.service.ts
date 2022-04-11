@@ -20,6 +20,7 @@ export interface IDocumento{
   codigo ?: string
   nexpediente ?: string
   asociacion ?: []
+  privacidad ?: number
   creador ?: string 
   archivo ?: string 
   historico ?: []

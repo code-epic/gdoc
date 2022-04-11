@@ -102,23 +102,26 @@
                           {{ e.numc }}
                         </div>
                         <div class="col-md-2 texto-lista">
-                          {{ e.tdoc | uppercase }}
+                          {{ e.nori | uppercase }}
                         </div>
                         <div class="col-md-2 texto-lista">
-                          {{ e.fcre | date:"yyyy/MM/dd" }}
+                          {{ e.fcre | date:"dd-MM-yyyy" }}
                         </div>
                         <div class="col-md-3 texto-lista">
-                          {{ e.remi | uppercase }}
+                          {{ e.udep | uppercase }}
                         </div>
                         <div class="col-md-2 text-right" >
+                          <button mat-icon-button aria-label="Privado" >
+                            <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
+                          </button>
                           <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
-                            <mat-icon>edit_note</mat-icon>
+                            <mat-icon  class="text-pink">edit_note</mat-icon>
                           </button>
                           <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
-                            <mat-icon>attach_file</mat-icon>
+                            <mat-icon class="text-info">attach_file</mat-icon>
                           </button>
                           <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
-                            <mat-icon>delete</mat-icon>
+                            <mat-icon  class="text-purple">delete</mat-icon>
                           </button>
 
                         </div>

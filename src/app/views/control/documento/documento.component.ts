@@ -68,6 +68,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     nexpediente : '',
     creador : '',
     archivo : '',
+    privacidad : 0
   } 
 
   public WAlerta : IWKFAlerta = {
