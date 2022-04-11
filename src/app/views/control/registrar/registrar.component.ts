@@ -11,6 +11,10 @@ import { LoginService } from 'src/app/services/seguridad/login.service';
 import { AngularFileUploaderComponent } from 'angular-file-uploader';
 import { environment } from 'src/environments/environment';
 
+import Swal from 'sweetalert2'
+
+import {Md5} from "md5-typescript";
+
 
 
 @Component({
@@ -81,9 +85,15 @@ export class RegistrarComponent implements OnInit {
 
   public archivos = []
 
+  public lstNotaEntrega = []
+
   public numControl : string = ''
 
-  allComplete: boolean = false;
+  public allComplete: boolean = false
+
+  public btnNota: boolean = false
+  
+  public llave : string = ''
 
   afuConfig = {
     
@@ -174,16 +184,21 @@ export class RegistrarComponent implements OnInit {
         data.Cuerpo.forEach(e => {
           
           var existe  = e.anom == ''?true:false
+          var privado  = e.priv == 1?true:false
+          console.log(privado)
           this.bzRegistrados.push(
             { 
               id : e.id,
               numc : e.numc, 
               completed : false, 
               color: 'warn',
+              nori : e.nori,
               tdoc : e.tdoc,
               fcre : e.fcre,
               remi : e.remi,
+              udep : e.udep,
               anom : e.anom,
+              priv : privado,
               existe : existe
             }
           ) 
@@ -210,17 +225,15 @@ export class RegistrarComponent implements OnInit {
 
 
   seleccionNavegacion(){
+    this.xAPI.funcion = 'WKF_CDocumentos'
+    this.xAPI.valores = ''
     
     switch (this.selNav) {
       case 0:
-        this.xAPI.funcion = 'WKF_CDocumentos'
         this.xAPI.parametros = '1,1' 
-        this.xAPI.valores = ''
         break;
       case 1:
-        this.xAPI.funcion = 'WKF_CDocumentos'
         this.xAPI.parametros = '1,2' 
-        this.xAPI.valores = ''
         break;
       default:
         break;
@@ -245,15 +258,53 @@ export class RegistrarComponent implements OnInit {
   }
 
   //eliminar
-  eliminar(id: string){
+  eliminar(codigo: string, id : number){
 
+
+      Swal.fire({
+        title: '¿Estás seguro que deseas eliminar el documento?',
+        text: '#' + codigo,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si',
+        cancelButtonText: 'No'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          var usuario = this.loginService.Usuario.id
+          var llave = ``
+          this.xAPI.funcion = 'WKF_AUbicacion'
+          this.xAPI.valores = ''
+          this.xAPI.parametros = `10,1,${llave},${usuario},${id}` 
+          console.info(this.xAPI)
+          this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data)=>{
+              if (data.tipo == 1 ){
+                this.toastrService.success(
+                  'Tu archivo ha sido enviado a la papelera con exito ',
+                  `GDoc Wkf.Papelera`
+                );
+                this.actualizarBzRegistrados(codigo, 0)
+                console.info(data)
+              }else{
+                this.toastrService.error(data.msj,`GDoc Wkf.Papelera`);
+              }
+              
+            },
+            (errot)=>{
+              this.toastrService.error(errot,`GDoc Wkf.Papelera`);
+            }) //
+          
+        }
+      })  
   }
 
    
   clasificarBuzon(){
       var lstBz = this.bzRegistrados
-      var usuario = `'Sistema'`
-      var llave = `''`
+      var usuario = this.loginService.Usuario.id
+      var llave = ``
       var i = 0
       var estatus = 2 //NOTA DE ENTREGA
       this.xAPI.funcion = 'WKF_AUbicacion'
@@ -305,39 +356,18 @@ export class RegistrarComponent implements OnInit {
     this.xAPI.funcion = 'WKF_CClasificados'
     this.xAPI.valores = ''
     this.xAPI.parametros = id
-
+    this.lstNotaEntrega = []
+    this.btnNota = false
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data)=>{        
-        var i = 0
-        var htmlContenido = `<table class="table" style="width:100%">
-          <thead class="thead-light">
-            <th>#</th>
-            <th>N-Control</th>
-            <th>N-Origen</th>
-            <th>Fecha</th>
-            <th>Remitente</th>
-          </thead><tbody>`     
-        data.Cuerpo.forEach(e => {
-          var remitente = e.remi + e.udep 
-          htmlContenido += `<tr>
-          <td>${++i}</td>
-          <td>${e.numc }</td>
-          <td>${e.nori }</td>
-          <td>${e.fcre.substring(0,10) }</td>
-          <td>${ remitente.toUpperCase() }</td>
-          </tr>`
-        })
-        htmlContenido += `</tbody></table>`
-        this.htmlContenido = htmlContenido
-
+        this.lstNotaEntrega = data.Cuerpo
+        if (this.lstNotaEntrega.length > 0) this.btnNota = true
+        var fecha = new Date().toISOString()
+        this.llave = Md5.init(id + fecha)
       },
       (errot)=>{
         this.toastrService.error(errot,`GDoc Wkf.Estatus`);
       }) //
-
-  }
-  
-  imprimir(id : string){
 
   }
 
@@ -380,4 +410,86 @@ export class RegistrarComponent implements OnInit {
 
   }
 
+
+  async notaEntrega(id : string){
+    
+    var cantidad = this.lstNotaEntrega.length
+    
+    if ( cantidad > 0){
+      var i = 0
+      this.lstNotaEntrega.forEach(e => {
+        var origen = e.dest
+        var estatus = 1
+        var usuario = this.loginService.Usuario.id
+        var id = e.idd
+        this.xAPI.funcion = 'WKF_APromoverDocumento'
+        this.xAPI.valores = ''
+        this.xAPI.parametros = origen + ',' + estatus + ',' +  this.llave  + ',' + usuario  + ',' + id
+        
+        
+        
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          (data)=>{
+            i++
+            console.log('documento actualizado ', data)   
+            if (cantidad == i)this.imprimir()
+          },
+          (errot)=>{
+            this.toastrService.error(errot,`GDoc Wkf.PromoverDocumento`);
+        })
+
+      })
+    }
+  }
+
+  imprimir(){
+    
+    this.btnNota = false
+    var ventana = window.open("", "_blank");
+    var localtime = new Date().toLocaleString();
+    var contenido = document.getElementById('prtNota').innerHTML
+    ventana.document.write(contenido)
+
+    ventana.document.head.innerHTML = ` <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Gestion de Documentos</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    
+    <style type="text/css">
+        @media print {
+            body {
+                  margin: 0px;
+                  font-family: Calibri;
+              }
+              .encabezado{
+                text-align:center;
+              }
+              .footer, .push {
+                  height: 5em;
+                  font-size: 12px;
+              }
+              h3 {
+                text-align:center;
+              }
+              .footer, .push {
+                  height: 5em;
+                  font-size: 12px;
+              }
+              .tabla-contenido {
+                border-collapse: collapse;
+                font-family: Arial, Calibre;
+                font-size: 12px;
+            }
+            .wrapper {
+                min-height: 100%;
+                height: auto !important;
+                height: 100%;
+                margin: 0 auto -5em;
+            }
+        }
+    </style>
+     `;
+     ventana.print()
+     ventana.close()
+  }
 }

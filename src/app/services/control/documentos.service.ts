@@ -20,6 +20,7 @@ export interface IDocumento{
   codigo ?: string
   nexpediente ?: string
   asociacion ?: []
+  privacidad ?: number
   creador ?: string 
   archivo ?: string 
   historico ?: []
@@ -32,6 +33,7 @@ export interface IDocumento{
 export interface IWKFDocumento {
   nombre : string
   estado : number
+  workflow : number
   estatus : number
   observacion : string
   usuario : string
