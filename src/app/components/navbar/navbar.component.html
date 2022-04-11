@@ -11,14 +11,11 @@
               <img alt="Escudo" src="assets/img/theme/sketch.jpg">
             </span>
             <div class="media-body ml-2 d-none d-lg-block">
-              <span class="mb-0 text-sm  font-weight-bold">Analista de Datos</span>
+              <span class="mb-0 text-sm  font-weight-bold">{{ nombre }}</span>
             </div>
           </div>
         </a>
         <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-          <div class=" dropdown-header noti-title">
-            <h6 class="text-overflow m-0">Bienvenidos!</h6>
-          </div>
           <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
             <i class="ni ni-single-02"></i>
             <span>Perfil</span>

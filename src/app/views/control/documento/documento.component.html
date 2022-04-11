@@ -63,6 +63,7 @@
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD" 
                                             [ngModelOptions]="{standalone: true}"
+                                            [value]="formatter.format(fcreacionDate)"
                                             [(ngModel)]="fcreacion" ngbDatepicker #fc="ngbDatepicker" 
                                             [placement]="placement" [positionTarget]="buttonEl">
                                             <div class="input-group-append">
@@ -80,9 +81,13 @@
                                             <input class="form-control" placeholder="AAAA-MM-DD" 
                                             [ngModelOptions]="{standalone: true}"
                                             [(ngModel)]="forigen" ngbDatepicker #fo="ngbDatepicker" 
+                                            [value]="formatter.format(forigenDate)"
                                             [placement]="placement" [positionTarget]="buttonEl">
                                             <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button"></button>
+                                                <button #buttonEl 
+                                                    class="btn calendario" (click)="fo.toggle()" 
+                                                    type="button">
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -97,6 +102,7 @@
                             <div class="form-group col-md-2">
                                 <label for="txtSalida">Salida Asociada</label>
                                 <input type="txtSalida" class="form-control" 
+                                value ="{{Doc.salida}}"
                                 [ngModelOptions]="{standalone: true}"
                                 [(ngModel)]="Doc.salida"
                                 >
@@ -207,7 +213,7 @@
                             <div class="col-md-12">
                                 <div class="text-right">
                                     <button class="btn bg-primary text-white" (click) = "registrar()">Aceptar</button>
-                                    <button class="btn bg-red text-white"  [routerLink]="['/control']">Cancelar</button>
+                                    <button class="btn bg-red text-white"  [routerLink]="['/registrar']">Cancelar</button>
                                 </div>                           
                             </div>                   
                         </div>                               

@@ -29,6 +29,7 @@ export class SidebarComponent implements OnInit {
     if (ROUTES.length == 0){
       await this.loginService.Iniciar()
       var App = this.loginService.Aplicacion
+      
       App.Rol.Menu.forEach(e => {
         ROUTES.push({
           path : e.url,

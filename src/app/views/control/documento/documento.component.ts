@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal,NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal,NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { Editor } from 'ngx-editor';
 import { ToastrService } from 'ngx-toastr';
 
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta, IDocumento, IWKFDocumento } from 'src/app/services/control/documentos.service';
+import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import Swal from 'sweetalert2'
 
@@ -33,14 +34,19 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   editor: Editor = new Editor;
   xeditor: Editor = new Editor;
 
-  public fcreacion : ''
-  public forigen : ''
+  public fcreacion : any 
+  public forigen : any
+
+  public fcreacionDate : NgbDate | null 
+  public forigenDate : NgbDate | null
+
   public fplazo : any
 
   public WkDoc : IWKFDocumento = {
     nombre :  '',
     estado : 0,
     estatus : 0,
+    workflow : 0,
     observacion :  '',
     usuario :  ''
   }
@@ -90,6 +96,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
               private utilService: UtilService,
               private toastrService: ToastrService,
               private rutaActiva: ActivatedRoute,
+              private loginService: LoginService,
+              public formatter: NgbDateParserFormatter,
               private ruta: Router) {
 
     
@@ -115,10 +123,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         data.Cuerpo.forEach(e => {
-          console.log(e)
           this.Doc = e
+          this.fcreacionDate = NgbDate.from( this.formatter.parse( this.Doc.fcreacion.substring(0,10) ))
+          this.forigenDate = NgbDate.from( this.formatter.parse( this.Doc.forigen.substring(0,10) ))
+       
         });
       },
       (error) => {
@@ -127,7 +136,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     )
   }
 
-  
+
+ 
   open(content) {
     this.modalService.open(content);
   }
@@ -136,10 +146,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   obtenerWorkFlow(){
     this.WkDoc = {
       "nombre" : "Control de Gestion",
+      "workflow" : 2,
       "estado" : 1,
       "estatus" : 1,
       "observacion" : "Iniciando Documento",
-      "usuario" : "Sistema"
+      "usuario" : this.loginService.Usuario.id
     }
     this.xAPI.funcion = 'WKF_IDocumento'
     this.xAPI.valores = JSON.stringify(this.WkDoc)
@@ -147,6 +158,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //registrar Un documento pasando por el WorkFlow
   registrar(){
+    if (this.rutaActiva.snapshot.params.id != undefined ) {
+      this.actualizarDocumentos()
+      return
+    }
     this.obtenerWorkFlow() //Obtener valores de una API
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -185,6 +200,13 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    
   }
 
+
+  actualizarDocumentos(){
+    this.toastrService.error('Pendiente por Desarrollar',`GDoc Wkf.Documento`);
+    console.log('Actualizar Documento')
+  }
+
+
   obtenerDatos(data : any){
     if (data.tipo == 0) {
       var mensaje = data.msj + ' - ' + this.xAPI.funcion
@@ -196,6 +218,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.Doc.wfdocumento = parseInt(data.msj)
     this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
     this.Doc.forigen = this.utilService.ConvertirFecha(this.forigen)
+    this.Doc.creador = this.loginService.Usuario.id
+
     this.xAPI.valores = JSON.stringify(this.Doc)
   }
 
@@ -232,6 +256,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.Doc.tipo = '0'
     this.Doc.remitente = '0'
     this.Doc.unidad = '0'
+    this.Doc.creador = ''
     
 
   }
