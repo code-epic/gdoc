@@ -49,71 +49,86 @@
 
           <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" >
             <mat-tab>
-                <ng-template mat-tab-label>
-                &nbsp;RECIBIDOS
-                </ng-template>
-                <div class="row col-md-12 px-2 py-2">
-                  <div class="col-md-1">
-                    <mat-panel-title>
-                      <button type="button" class="btn" *ngFor="let item of checklist" > 
-                        <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name"/>
-                      </button>
-                    </mat-panel-title>
-                  </div>
-                  <div class="col-md-1" title="Redistribuir">
-                    <button class="btn" (click)="open(content)">
-                      <i class="fa fa-share"></i>
-                    </button>
-                  </div>
-                </div>
-                <mat-accordion>
-                  <mat-expansion-panel hideToggle>
-                    <mat-expansion-panel-header>
-                      <mat-panel-title *ngFor="let item of checklist">
-                        <div class="row col-md-12 px-2 py-2">
-                          <div class="col-md-1">
-                            <input type="checkbox" [(ngModel)]="item.isSelected" name="list_name" value="m1"
-                          (change)="checkUncheckAll()" />
-                          </div>
-                          <div class="col-md-2">
-                            00001
-                          </div>
-                          <div class="col-md-2">
-                            Oficio
-                          </div>
-                          <div class="col-md-2">
-                            02/01/2022
-                          </div>
-                          <div class="col-md-5">
-                            Ministerio del Poder Popular para la Salud
-                          </div>
+              <ng-template mat-tab-label>
+              &nbsp;RECIBIDOS
+              </ng-template>
+              
+                <div class="container">
+                  <mat-selection-list #documento>
+                    <mat-list  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                      <div class="row">
+                        <div class="col-md-1" [ngStyle]="{'display':estilocheck}">
+                          <mat-checkbox 
+                            [checked]="allComplete"
+                            color="primary"
+                            [indeterminate]="someComplete()"
+                            (change)="setAll($event.checked)"
+                            class="example-margin texto-lista">
+                          </mat-checkbox>  
                         </div>
-                      </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <p><strong>Contenido: Ascenso de 400 profesionales del Ejército Bolivariano</strong></p>
-                    
-                      <mat-action-row>
-                          <div class="col-md-6">
-                              <button class="btn btn-sm btn-primary fa fa-share" type="button">Distribuir</button>
-                          </div>
-                          <div class="col-md-6 text-right">
-                              <button class="btn btn-sm btn-warning fa fa-edit" type="button">Editar</button>
-                              <button class="btn btn-sm btn-info fa fa-ban" type="button" >Cancelar</button>
-                          </div>
-                      </mat-action-row>
-                  </mat-expansion-panel>
-                </mat-accordion>
-        
-                <!-- <mat-paginator [length]="lengthOfi"
-                    (page)="pageChangeEvent($event)"
-                    [pageSize]="pageSizeOfi"
-                    [pageSizeOptions]="pageSizeOptions"
-                    (page)="pageEvent = $event"
-                    aria-label="Seleccionar">
-                </mat-paginator> -->
-  
-  
-            </mat-tab>
+                        <div class="col-md-2" >
+                          <button mat-icon-button aria-label="Example " (click)="open(content)">
+                            <mat-icon>create_new_folder</mat-icon>
+                          </button>
+                        </div>
+                       
+                      </div>
+
+                    </mat-list>
+                  </mat-selection-list>
+
+                  <mat-selection-list #lstDocumentos>
+                    <mat-list *ngFor="let e of bzRecibido; let i=index " 
+                      style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                      <div class="row">
+                        <div class="col-md-1">
+                            <mat-checkbox class="example-margin texto-lista"  
+                              [(ngModel)]="e.completed"
+                              color="warn"
+                              (ngModelChange)="updateAllComplete()">
+                            </mat-checkbox>
+                        </div>
+                        <div class="col-md-2 texto-lista">
+                          {{ e.numc }}
+                        </div>
+                        <div class="col-md-1 texto-lista">
+                          {{ e.nori | uppercase }}
+                        </div>
+                        <div class="col-md-2 texto-lista">
+                          {{ e.fcre | date:"dd-MM-yyyy" }}
+                        </div>
+                        <div class="col-md-3 texto-lista">
+                          {{ e.udep | uppercase }}
+                        </div>
+                        <div class="col-md-3 text-right" >
+                          <button mat-icon-button aria-label="Privado" >
+                            <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
+                          </button>
+                          <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
+                            <mat-icon  class="text-pink">edit_note</mat-icon>
+                          </button>
+                          <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                            <mat-icon class="text-info">attach_file</mat-icon>
+                          </button>
+                          <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
+                            <mat-icon  class="text-purple">delete</mat-icon>
+                          </button>
+
+                        </div>
+                      </div>
+                    </mat-list>
+                  </mat-selection-list>
+                </div>
+
+              <mat-paginator [length]="lengthOfi"
+                  (page)="pageChangeEvent($event)"
+                  [pageSize]="pageSizeOfi"
+                  [pageSizeOptions]="pageSizeOptions"
+                  (page)="pageEvent = $event"
+                  aria-label="Seleccionar">
+              </mat-paginator>
+              
+          </mat-tab>
             <mat-tab>
                 <ng-template mat-tab-label>
                 &nbsp;PROCESADOS

@@ -1,14 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal,NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
-import { Editor } from 'ngx-editor';
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { NgbModal,NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
+import { Editor } from 'ngx-editor'
 import { ToastrService } from 'ngx-toastr';
-
-import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { IWKFAlerta, IDocumento, IWKFDocumento } from 'src/app/services/control/documentos.service';
-import { LoginService } from 'src/app/services/seguridad/login.service';
-import { UtilService } from 'src/app/services/util/util.service';
+import { NgxUiLoaderService } from 'ngx-ui-loader'
 import Swal from 'sweetalert2'
+
+import { ApiService, IAPICore } from 'src/app/services/apicore/api.service'
+import { IWKFAlerta, IDocumento, IWKFDocumento } from 'src/app/services/control/documentos.service'
+import { LoginService } from 'src/app/services/seguridad/login.service'
+import { UtilService } from 'src/app/services/util/util.service'
 
 
 @Component({
@@ -98,24 +99,78 @@ export class DocumentoComponent implements OnInit, OnDestroy {
               private toastrService: ToastrService,
               private rutaActiva: ActivatedRoute,
               private loginService: LoginService,
+              private ngxService: NgxUiLoaderService,
               public formatter: NgbDateParserFormatter,
-              private ruta: Router) {
+              private ruta: Router ) {
 
     
   }
   
   ngOnInit(): void {
-     
+    
+    this.editor = new Editor()
+    this.xeditor = new Editor()
+    this.listarConfiguracion()
+
     if (this.rutaActiva.snapshot.params.id != undefined ) {
       this.consultarDocumento (this.rutaActiva.snapshot.params.id)
-    }
-    // this.coche = {
 
-    // }
-    this.editor = new Editor();
-    this.xeditor = new Editor();
-    this.listarConfiguracion()
-    this.limpiarDoc()
+    }else{
+      this.limpiarDoc()
+      
+    }
+
+   
+    
+  }
+
+
+  listarConfiguracion(){
+    this.xAPI.funcion = 'MD_CConfiguracion'
+    this.xAPI.parametros = '%'
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        
+        data.Cuerpo.forEach(e => {
+          switch (e.tipo) {
+            case "1":
+              this.lstT.push(e) 
+              break
+            case "2":
+              this.lstR.push(e) 
+              break
+            case "3":
+              this.lstU.push(e) 
+              break
+          }
+        });
+      },
+      error => {
+        console.error('Fallo consultando los datos de Configuraciones')
+      }
+    )
+  }
+
+
+
+  limpiarDoc(){
+    var dia = this.utilService.FechaActual()
+    
+    this.forigen = ''
+    this.fplazo = ''
+    this.Doc.ncontrol = ''
+    this.Doc.norigen = ''
+    this.Doc.contenido = ''
+    this.Doc.instrucciones = ''
+    this.Doc.nexpediente = ''
+    this.Doc.codigo = ''
+    this.Doc.salida = ''
+    this.Doc.tipo = '0'
+    this.Doc.remitente = '0'
+    this.Doc.unidad = '0'
+    this.Doc.creador = ''
+    this.fcreacionDate = NgbDate.from( this.formatter.parse( dia  ))
+    this.fcreacion = dia
   }
 
   consultarDocumento(numControl : string){
@@ -128,7 +183,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.Doc = e
           this.fcreacionDate = NgbDate.from( this.formatter.parse( this.Doc.fcreacion.substring(0,10) ))
           this.forigenDate = NgbDate.from( this.formatter.parse( this.Doc.forigen.substring(0,10) ))
-       
         });
       },
       (error) => {
@@ -159,10 +213,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //registrar Un documento pasando por el WorkFlow
   registrar(){
+
     if (this.rutaActiva.snapshot.params.id != undefined ) {
       this.actualizarDocumentos()
       return
     }
+    this.ngxService.startLoader("loader-aceptar")
     this.obtenerWorkFlow() //Obtener valores de una API
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -174,9 +230,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
                 this.apiService.Ejecutar(this.xAPI).subscribe(
                   (ydata)=>{
                     console.info(ydata)
+                    this.ngxService.stopLoader("loader-aceptar")
                   },
                   (errot)=>{
-                   this.toastrService.error(data.msj,`GDoc Wkf.Alerta`);
+                   this.toastrService.error(data.msj,`GDoc Wkf.Alerta`)
+                   this.ngxService.stopLoader("loader-aceptar")
                  }
                )
               }
@@ -184,14 +242,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
               this.limpiarDoc()
            },
            (errot)=>{
-            this.toastrService.error(data.msj,`GDoc Wkf.Documento.Detalle`);
+            this.toastrService.error(data.msj,`GDoc Wkf.Documento.Detalle`)
+            this.ngxService.stopLoader("loader-aceptar")
           }
         )
 
       }, //En caso de fallar Wkf
       (errot)=>{
         var mensaje = errot + ' - ' + this.xAPI.funcion
-        this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
+        this.toastrService.error(mensaje, `GDoc Wkf.Documento`)
+        this.ngxService.stopLoader("loader-aceptar")
           
         
       }
@@ -239,61 +299,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = JSON.stringify(this.WAlerta)
   }
 
-
-
-  
-
-  limpiarDoc(){
-    this.fcreacion = ''
-    this.forigen = ''
-    this.fplazo = ''
-    this.Doc.ncontrol = ''
-    this.Doc.norigen = ''
-    this.Doc.contenido = ''
-    this.Doc.instrucciones = ''
-    this.Doc.nexpediente = ''
-    this.Doc.codigo = ''
-    this.Doc.salida = ''
-    this.Doc.tipo = '0'
-    this.Doc.remitente = '0'
-    this.Doc.unidad = '0'
-    this.Doc.creador = ''
-    
-
-  }
-
-  listarConfiguracion(){
-    this.xAPI.funcion = 'MD_CConfiguracion'
-    this.xAPI.parametros = '%'
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-        console.info(data)
-        data.Cuerpo.forEach(e => {
-          switch (e.tipo) {
-            case "1":
-              this.lstT.push(e) 
-              break
-            case "2":
-              this.lstR.push(e) 
-              break
-            case "3":
-              this.lstU.push(e) 
-              break
-          }
-        });
-      },
-      error => {
-        console.error('Fallo consultando los datos de Configuraciones')
-      }
-    )
-  }
-  // make sure to destory the editor
-  ngOnDestroy(): void {
-    this.editor.destroy();
-    this.xeditor.destroy();
-  }
-
-
   protected aceptar(msj : string){
     Swal.fire({
       title: 'El Documento Registrado es # ' + msj,
@@ -311,6 +316,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.ruta.navigate( ['/registrar'] );
       }
     })    
+  }  
+  
+  
+  ngOnDestroy(): void {
+    this.editor.destroy()
+    this.xeditor.destroy()
   }
 
 

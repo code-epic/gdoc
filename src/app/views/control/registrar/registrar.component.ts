@@ -307,6 +307,7 @@ export class RegistrarComponent implements OnInit {
       var llave = ``
       var i = 0
       var estatus = 2 //NOTA DE ENTREGA
+      //Buscar en Wk de acuerdo al usuario y la app activa
       this.xAPI.funcion = 'WKF_AUbicacion'
       this.xAPI.valores = ''
       

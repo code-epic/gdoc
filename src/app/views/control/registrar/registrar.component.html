@@ -57,10 +57,6 @@
               &nbsp;REGISTRADOS
               </ng-template>
               
-              
-          
-         
-
                 <div class="container">
                   <mat-selection-list #documento>
                     <mat-list  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
@@ -90,18 +86,16 @@
                       style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                       <div class="row">
                         <div class="col-md-1">
-                          
                             <mat-checkbox class="example-margin texto-lista"  
                               [(ngModel)]="e.completed"
                               color="warn"
                               (ngModelChange)="updateAllComplete()">
                             </mat-checkbox>
-                        
                         </div>
                         <div class="col-md-2 texto-lista">
                           {{ e.numc }}
                         </div>
-                        <div class="col-md-2 texto-lista">
+                        <div class="col-md-1 texto-lista">
                           {{ e.nori | uppercase }}
                         </div>
                         <div class="col-md-2 texto-lista">
@@ -110,7 +104,7 @@
                         <div class="col-md-3 texto-lista">
                           {{ e.udep | uppercase }}
                         </div>
-                        <div class="col-md-2 text-right" >
+                        <div class="col-md-3 text-right" >
                           <button mat-icon-button aria-label="Privado" >
                             <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
                           </button>

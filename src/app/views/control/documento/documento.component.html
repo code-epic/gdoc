@@ -47,6 +47,7 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
                     <form role="form">
                         <div class="form-row">
                             <div class="form-group col-md-2">
@@ -154,23 +155,25 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="txtInstrucciones">Instrucciones Generales</label>
+                                <div class="NgxEditor__Wrapper">
+                                    <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
+                                    <ngx-editor
+                                    [editor]="xeditor"
+                                    [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.instrucciones"
+                                    [disabled]="false"
+                                    [placeholder]="'Escibe aqui...'">
+                                    </ngx-editor>
+                                </div>        
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-8">
                                
                                 <div class="row">
-                                    <div class="form-group col-md-6">
-                                        <label for="">Código de Archivo</label>
-                                        <input type="text" class="form-control" 
-                                        [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.codigo" value="{{ Doc.codigo }}">
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label for="">Expediente</label>
-                                        <input type="text" class="form-control" 
-                                        [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
-                                    </div>
-                                    
                                     <div class="form-group col-md-6">
                                         <label for="tmsCreacion">Plazo / Alerta</label>
                                         <form class="form-inline">
@@ -194,30 +197,30 @@
                                             [ngModelOptions]="{standalone: true}"
                                             [(ngModel)]="Doc.privacidad"  value ="{{Doc.privacidad}}">
                                             <option value="0">PUBLICO</option>
-                                            <option value="1">PRIVADO</option>
+                                            <option value="1">CONFIDENCIAL</option>
                                         </select>
                                     </div>
-                                </div> 
-                                <div class="row">
-                                    <div class="form-group col-md-12">
-                                        <label for="txtInstrucciones">Instrucciones Generales</label>
-                                        <div class="NgxEditor__Wrapper">
-                                            <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
-                                            <ngx-editor
-                                            [editor]="xeditor"
-                                            [ngModelOptions]="{standalone: true}"
-                                            [(ngModel)]="Doc.instrucciones"
-                                            [disabled]="false"
-                                            [placeholder]="'Escibe aqui...'">
-                                            </ngx-editor>
-                                        </div>        
+                                    <div class="form-group col-md-6">
+                                        <label for="">Código de Archivo</label>
+                                        <input type="text" class="form-control" 
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Doc.codigo" value="{{ Doc.codigo }}">
                                     </div>
-                                </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="">Expediente</label>
+                                        <input type="text" class="form-control" 
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
+                                    </div>
+                                    
+                                    
+                                </div> 
+                                
                             </div>
                             <div class="col-md-4" >
                                 <label for="txtobservacion">Lista de Asociación</label>
                                 <textarea class="form-control" name="" id="observacion" 
-                                cols="30" rows="12"   readonly></textarea>
+                                cols="30" rows="6"   readonly></textarea>
                             </div>  
                         </div>
                         <hr>
