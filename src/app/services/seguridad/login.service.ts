@@ -85,7 +85,7 @@ export class LoginService {
     //var str = Buffer.from(s[1], 'base64').toString();
     var str = atob( s[1] );
     this.Token = JSON.parse(str)
-    console.info(this.Token)
+    // console.info(this.Token)
     this.Usuario = this.Token.Usuario
     return JSON.parse(str);
   }

@@ -55,12 +55,20 @@ export class BuzonComponent implements OnInit {
   selNav = 0
 
   public bzRecibido = []
-
+  public bzProcesados = []
+  public bzPendientes = []
+  public bzCerrados = []
+  
   public estilocheck  = 'none'
   
   public estiloclasificar = 'none'
 
   public allComplete: boolean = false
+
+  public numControl = ''
+
+  public Observacion = ''
+
 
   constructor(
     private apiService: ApiService, 
@@ -77,37 +85,48 @@ export class BuzonComponent implements OnInit {
 
   ngOnInit(): void {
     this.listarEstados()
-    this.listarBuzon(0)
+    this.seleccionNavegacion(0)
   
   }
 
 
-  open(content) {
+  open(content, id) {
+    this.numControl = id
     this.modalService.open(content);
     
   }
 
 
-  seleccionNavegacion(){
+  seleccionNavegacion(e){
+    this.bzRecibido = []
+    this.bzProcesados = []
+    this.bzPendientes = []
+    this.bzCerrados = []
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
+    this.selNav = e
     
-    switch (this.selNav) {
+    switch (e) {
       case 0:
         this.xAPI.parametros = '2,1' 
+        this.listarBuzon(this.bzRecibido)
         break
       case 1:
         this.xAPI.parametros = '2,2' 
+        this.listarBuzon(this.bzProcesados)
         break
       case 2:
         this.xAPI.parametros = '2,3' 
+        this.listarBuzon(this.bzPendientes)
         break
       case 4:
-        this.xAPI.parametros = '2,2' 
+        this.xAPI.parametros = '2,2'
+        this.listarBuzon(this.bzCerrados)
         break
       default:
         break
     }
+    
   }
 
   listarEstados(){
@@ -126,11 +145,8 @@ export class BuzonComponent implements OnInit {
     )
   }
 
-  listarBuzon(e){
-    this.selNav = e
-    this.seleccionNavegacion()
-   
-    this.apiService.Ejecutar(this.xAPI).subscribe(
+  async listarBuzon(bz : any){
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         
         data.Cuerpo.forEach(e => {
@@ -138,9 +154,10 @@ export class BuzonComponent implements OnInit {
           var existe  = e.anom == ''?true:false
           var privado  = e.priv == 1?true:false
           console.log(privado)
-          this.bzRecibido.push(
+          bz.push(
             { 
               id : e.id,
+              idd : e.idd,
               numc : e.numc, 
               completed : false, 
               color: 'warn',
@@ -175,6 +192,10 @@ export class BuzonComponent implements OnInit {
     this.recorrerElementos(e.pageIndex+1, this.lst)
   }
 
+  updateAllComplete() {
+    this.allComplete = this.bzRecibido != null && this.bzRecibido.every(t => t.completed);
+  }
+
   setAll(completed: boolean) {
     this.allComplete = completed;
     if (this.bzRecibido == null) {
@@ -202,6 +223,56 @@ export class BuzonComponent implements OnInit {
     
   }
   
+
+  //editar
+  editar(id: string){
+    this.ruta.navigate(['/documento',id])
+  }
+
+  insertarObservacion(){
+    var usuario = this.loginService.Usuario.id
+    this.xAPI.funcion = 'WKF_IDocumentoObservacion'
+    this.xAPI.valores = JSON.stringify({"documento": this.numControl, "observacion": this.Observacion, "usuario": usuario})
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data)=>{        
+        this.toastrService.success(
+          'Se ha promovido el documento',
+          `GDoc Wkf.DocumentoObservacion`
+        )
+        this.promoverBuzon()
+
+
+      },
+      (errot)=>{
+        this.toastrService.error(errot,`GDoc Wkf.DocumentoObservacion`);
+      }) //
+  }
+
+  async promoverBuzon(){
+   
+    var usuario = this.loginService.Usuario.id
+    var llave = ``
+    var i = 0
+    var estatus = 1 //NOTA DE ENTREGA
+    //Buscar en Wk de acuerdo al usuario y la app activa
+    this.xAPI.funcion = 'WKF_APromoverEstatus'
+    this.xAPI.valores = ''
+    
+    this.xAPI.parametros = `${estatus},${llave},${usuario},${this.numControl}` 
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data)=>{
+        console.log('', data)
+        this.seleccionNavegacion(this.selNav)
+        this.Observacion = ''
+        this.numControl = '0'
+      },
+      (errot)=>{
+        this.toastrService.error(errot,`GDoc Wkf.PromoverDocumento`);
+      }) //
+    
+}
+
 
 }
 

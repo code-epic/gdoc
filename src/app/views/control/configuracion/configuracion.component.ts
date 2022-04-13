@@ -39,11 +39,8 @@ export class ConfiguracionComponent implements OnInit {
     this.xApi.funcion = 'MD_CConfiguracion'
     this.xApi.parametros = '%'
     this.xApi.valores = ''
-    
     this.apiService.Ejecutar(this.xApi).subscribe(
       data => {
-        console.info('cargando datos ')
-        console.info(data)
         this.lst = data.Cuerpo
       },
       error => {
@@ -55,7 +52,6 @@ export class ConfiguracionComponent implements OnInit {
 
   selTipo(){
     this.lista = []
-    console.log(this.lst)
     this.lst.forEach(e => {
       if ( e.tipo == this.tipo ) this.lista.push(e)
     });
