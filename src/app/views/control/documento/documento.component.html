@@ -200,7 +200,8 @@
                                                 <button type="button" class="btn btn-primary btn-sm" (click)="selEditarCuenta( i )"><i class="fa fa-edit" aria-hidden="true"  ></i></button>
                                                 <button type="button" class="btn btn-danger btn-sm" (click)="eliminarCuenta( i )"><i class="fa fa-trash" aria-hidden="true"  ></i></button>
                                             </div>
-                                            <button *ngIf="el.activo != 0" type="button" class="btn btn-danger btn-sm"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> &nbsp;&nbsp;En Proceso  </button>
+                                            <button *ngIf="el.activo != 0" type="button" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> &nbsp;&nbsp;En Proceso  </button>
                                         </td>
                                         <td>{{ el.cuenta }}</td>
                                         <td>{{ el.resumen.substring(0,20) }}... </td>

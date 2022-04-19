@@ -10,6 +10,8 @@ import { ResolucionesComponent } from 'src/app/views/resoluciones/resoluciones.c
 import { ProyectoComponent } from '../../views/ayudantia/proyecto/proyecto.component';
 import { ConfiguracionComponent } from 'src/app/views/control/configuracion/configuracion.component';
 import { AuthGuardGuard } from 'src/app/services/seguridad/auth-guard.guard';
+import { SecretariaComponent } from 'src/app/views/secretaria/secretaria.component';
+import { AcamiComponent } from 'src/app/views/acami/acami.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -51,6 +53,16 @@ export const AdminLayoutRoutes: Routes = [
     { 
         path: 'salidas', 
         component: SalidasComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'secretaria', 
+        component: SecretariaComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'acami', 
+        component: AcamiComponent,
         canActivate:[AuthGuardGuard] 
     },
     { 
