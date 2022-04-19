@@ -253,7 +253,10 @@ export class RegistrarComponent implements OnInit {
 
   //editar
   editar(id: string){
-    this.ruta.navigate(['/documento',id])
+    const estado = 1
+    const estatus = 1
+    const base = btoa( estado + ',' + estatus + ',' + id)
+    this.ruta.navigate(['/documento', base])
   }
   
   //adjuntar
@@ -494,7 +497,14 @@ export class RegistrarComponent implements OnInit {
   insertarObservacion(){
     var usuario = this.loginService.Usuario.id
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
-    this.xAPI.valores = JSON.stringify({"documento": this.numControl, "observacion": this.Observacion, "usuario": usuario})
+    this.xAPI.valores = JSON.stringify({
+      "documento": this.numControl,
+      "estado": 1, //Estado que ocupa
+      "estatus": 2,
+      "observacion": this.Observacion,
+      "accion" : '',
+      "usuario": usuario
+    })
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data)=>{        

@@ -133,7 +133,7 @@
                       <div class="row">
                         <div class="col-md-1">
                           <button mat-icon-button aria-label="Visibilidad" >
-                            <mat-icon  class="text-primary">visibility</mat-icon>
+                            <mat-icon  class="text-primary"  (click)="open(observacion, e.idd)">add_circle</mat-icon>
                           </button>
                         </div>
                        
@@ -182,12 +182,59 @@
               <ng-template mat-tab-label>
               &nbsp;PENDIENTES
               </ng-template>
+
+              <div class="container">
+                <mat-selection-list #lstPendientes>
+                  <mat-list *ngFor="let e of bzPendientes; let i=index " 
+                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                    <div class="row">
+                      <div class="col-md-1">
+                        <button mat-icon-button aria-label="Visibilidad" >
+                          <mat-icon  class="text-primary"  (click)="open(observacion, e.idd)">add_circle</mat-icon>
+                        </button>
+                      </div>
+                     
+                      <div class="col-md-2 texto-lista">
+                        {{ e.numc }}
+                      </div>
+                      <div class="col-md-1 texto-lista">
+                        {{ e.nori | uppercase }}
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        {{ e.fcre | date:"dd-MM-yyyy" }}
+                      </div>
+                      <div class="col-md-4 texto-lista">
+                        {{ e.udep | uppercase }}
+                      </div>
+                      <div class="col-md-2 text-right" >
+                        <button mat-icon-button aria-label="Privado" >
+                          <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
+                          <mat-icon  class="text-pink">edit_note</mat-icon>
+                        </button>
+                        <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                          <mat-icon class="text-info">attach_file</mat-icon>
+                        </button>
+                        <!-- <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
+                          <mat-icon  class="text-purple">delete</mat-icon>
+                        </button> -->
+
+                      </div>
+                    </div>
+                  </mat-list>
+                </mat-selection-list>
+              </div>
+
+            <mat-paginator [length]="lengthOfi"
+                (page)="pageChangeEvent($event)"
+                [pageSize]="pageSizeOfi"
+                [pageSizeOptions]="pageSizeOptions"
+                (page)="pageEvent = $event"
+                aria-label="Seleccionar">
+            </mat-paginator>
             </mat-tab>
-            <mat-tab>
-            <ng-template mat-tab-label>
-            &nbsp;CERRADOS
-            </ng-template>
-            </mat-tab>
+          
           </mat-tab-group>  
         </div>
       </div>
@@ -199,10 +246,21 @@
     <h4 class="modal-title text-white" id="modal-basic-title">Promover Documento</h4>
   </div>
   <div class="modal-body">
-    <div class="col-md-12">
+    <div class="form-group col-md-12">
       <label for="txtobservacion">Observaciones</label>
       <textarea class="form-control" cols="30" rows="3"  [ngModelOptions]="{standalone: true}"
       [(ngModel)]="Observacion"></textarea>
+    </div>
+    <div class="form-group  col-md-12">
+      <label>Acción</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="AccionTexto">
+        <option value="0">NO APLICA</option>
+        <option value="1">POR FIRMA</option>
+        <option value="2">OPINION JURIDICA</option>
+        <option value="3">POR OPINION</option>
+              
+      </select>
     </div>
   </div>
   <div class="modal-footer">
@@ -246,3 +304,5 @@
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
   </div>
 </ng-template>
+
+

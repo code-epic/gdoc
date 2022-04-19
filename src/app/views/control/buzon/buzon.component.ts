@@ -15,6 +15,9 @@ import { LoginService } from 'src/app/services/seguridad/login.service';
 })
 export class BuzonComponent implements OnInit {
 
+
+  
+
   public paginador = 10
   public focus;
   public xAPI : IAPICore = {
@@ -69,6 +72,7 @@ export class BuzonComponent implements OnInit {
 
   public Observacion = ''
 
+  public AccionTexto : string = '0'
 
   constructor(
     private apiService: ApiService, 
@@ -232,7 +236,14 @@ export class BuzonComponent implements OnInit {
   insertarObservacion(){
     var usuario = this.loginService.Usuario.id
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
-    this.xAPI.valores = JSON.stringify({"documento": this.numControl, "observacion": this.Observacion, "usuario": usuario})
+    this.xAPI.valores = JSON.stringify(
+      {"documento": this.numControl,
+      "estado": 2, //Estado que ocupa
+      "estatus": this.selNav+1,
+      "observacion": this.Observacion.toUpperCase(), 
+      "accion": this.AccionTexto, 
+      "usuario": usuario}
+    )
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data)=>{        
@@ -240,7 +251,7 @@ export class BuzonComponent implements OnInit {
           'Se ha promovido el documento',
           `GDoc Wkf.DocumentoObservacion`
         )
-        this.promoverBuzon()
+        //this.promoverBuzon()
 
 
       },
@@ -252,14 +263,14 @@ export class BuzonComponent implements OnInit {
   async promoverBuzon(){
    
     var usuario = this.loginService.Usuario.id
-    var llave = ``
+    
     var i = 0
     var estatus = 1 //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
     this.xAPI.funcion = 'WKF_APromoverEstatus'
     this.xAPI.valores = ''
     
-    this.xAPI.parametros = `${estatus},${llave},${usuario},${this.numControl}` 
+    this.xAPI.parametros = `${estatus},${usuario},${this.numControl}` 
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data)=>{
         console.log('', data)

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { LoginService } from 'src/app/services/seguridad/login.service';
 
 @Component({
   selector: 'app-configuracion',
@@ -26,6 +27,7 @@ export class ConfiguracionComponent implements OnInit {
   public tipo = 0
   constructor(private apiService: ApiService, 
     private toastrService: ToastrService,
+    private loginService: LoginService,
     private ngxService: NgxUiLoaderService) { 
 
 
@@ -71,7 +73,7 @@ export class ConfiguracionComponent implements OnInit {
       "nombre" : this.nombre,
       "tipo" : this.tipo,
       "observacion" : this.observacion,
-      "usuario" : this.usuario
+      "usuario" : this.loginService.Usuario.id
     }
 
     this.xApi.funcion = 'MD_IConfiguracion'
@@ -116,5 +118,27 @@ export class ConfiguracionComponent implements OnInit {
     this.registrar = !this.registrar
     this.ngxService.stopLoader("loader-registrar")
   }
+
+  // testing(){
+  //   var configuracion = {
+  //     "nombre" : 'Middleware',
+  //     "version" : '2.0.0 RC.2',
+  //     "identificador" : 1
+  //   }
+
+  //   this.xApi.funcion = 'UTech'
+  //   this.xApi.valores = JSON.stringify(configuracion)
+
+  //   this.apiService.Ejecutar(this.xApi).subscribe(
+  //     data => {
+  //       console.info(data)
+
+  //     },
+  //     error => {
+  //       console.error(error)
+      
+  //     }
+  //   )
+  // }
 
 }

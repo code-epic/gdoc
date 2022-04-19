@@ -71,7 +71,7 @@ export class ApiService {
   Ejecutar(xAPI : IAPICore) : Observable<any>{
     // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
     var url = this.URL + "crud" + this.hash
-    //console.info(url)
+    //console.info( JSON.stringify(xAPI ))
     return this.http.post<any>(url, xAPI, this.httpOptions);
   }
 
