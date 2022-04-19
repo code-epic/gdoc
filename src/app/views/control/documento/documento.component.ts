@@ -357,7 +357,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
 
-  actualizarDocumentos() {
+  async actualizarDocumentos() {
 
     this.Doc.fcreacion = typeof this.fcreacion === 'object' ? this.utilService.ConvertirFecha(this.fcreacion) : this.Doc.fcreacion.substring(0, 10)
     this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10)
@@ -375,11 +375,31 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     }
 
-    this.ngxService.stopLoader("loader-aceptar")
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.info(this.xAPI);
+      },
+      (errot) => {
+        
+        this.limpiarDoc()
+        this.toastrService.error(errot, `GDoc Wkf.Actualizar Documentos`)
+        this.ngxService.stopLoader("loader-aceptar")
+      }
+    )
+
+    
 
   }
 
   agregarCuenta(): IWKFCuenta {
+    
+    if (this.cuenta == '' || 
+    this.resumen == '' ||
+    this.detalle == '') {
+      this.toastrService.info('Todos los campos son requeridos', `GDoc Wkf.Agregar Cuentas`)
+      return
+    }
+    
     const wkcuenta: IWKFCuenta = {
       documento: 0,
       cuenta: this.cuenta.toUpperCase(),
@@ -494,7 +514,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   selTipoDocumento() {
     this.puntocuenta = false
     this.lstCuenta = []
-    if (this.Doc.tipo == 'PUNTO DE CUENTA') this.puntocuenta = true
+    if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') this.puntocuenta = true
   }
 
   ngOnDestroy(): void {

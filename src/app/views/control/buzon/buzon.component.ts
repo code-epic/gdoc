@@ -16,32 +16,34 @@ import { LoginService } from 'src/app/services/seguridad/login.service';
 export class BuzonComponent implements OnInit {
 
 
-  
+
+  public estadoActual = 2
+  public estadoOrigen = 1
 
   public paginador = 10
   public focus;
-  public xAPI : IAPICore = {
+  public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
     relacional: false,
-    concurrencia : false,
+    concurrencia: false,
     protocolo: '',
-    ruta : '',
+    ruta: '',
     version: '',
-    retorna : false,
-    migrar : false,
-    http : 0,
-    https : 0,
-    consumidores : '',
-    puertohttp : 0,
-    puertohttps : 0,
-    driver : '',
-    query : '',
-    metodo : '',
-    tipo : '',
-    prioridad : '',
+    retorna: false,
+    migrar: false,
+    http: 0,
+    https: 0,
+    consumidores: '',
+    puertohttp: 0,
+    puertohttps: 0,
+    driver: '',
+    query: '',
+    metodo: '',
+    tipo: '',
+    prioridad: '',
     entorno: '',
-    logs : false,
+    logs: false,
     cache: 0,
     estatus: false
   }
@@ -61,9 +63,9 @@ export class BuzonComponent implements OnInit {
   public bzProcesados = []
   public bzPendientes = []
   public bzCerrados = []
-  
-  public estilocheck  = 'none'
-  
+
+  public estilocheck = 'none'
+
   public estiloclasificar = 'none'
 
   public allComplete: boolean = false
@@ -72,36 +74,36 @@ export class BuzonComponent implements OnInit {
 
   public Observacion = ''
 
-  public AccionTexto : string = '0'
+  public AccionTexto: string = '0'
 
   constructor(
-    private apiService: ApiService, 
+    private apiService: ApiService,
     config: NgbModalConfig,
     private ruta: Router,
-    private toastrService: ToastrService, 
-    private loginService : LoginService,
-    private modalService: NgbModal){
-     // customize default values of modals used by this component tree
-     config.backdrop = 'static';
-     config.keyboard = false;
+    private toastrService: ToastrService,
+    private loginService: LoginService,
+    private modalService: NgbModal) {
+    // customize default values of modals used by this component tree
+    config.backdrop = 'static';
+    config.keyboard = false;
 
   }
 
   ngOnInit(): void {
     this.listarEstados()
     this.seleccionNavegacion(0)
-  
+
   }
 
 
   open(content, id) {
     this.numControl = id
     this.modalService.open(content);
-    
+
   }
 
 
-  seleccionNavegacion(e){
+  seleccionNavegacion(e) {
     this.bzRecibido = []
     this.bzProcesados = []
     this.bzPendientes = []
@@ -109,38 +111,38 @@ export class BuzonComponent implements OnInit {
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
     this.selNav = e
-    
+
     switch (e) {
       case 0:
-        this.xAPI.parametros = '2,1' 
+        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
         this.listarBuzon(this.bzRecibido)
         break
       case 1:
-        this.xAPI.parametros = '2,2' 
+        this.xAPI.parametros =  this.estadoActual + ',' + 2
         this.listarBuzon(this.bzProcesados)
         break
       case 2:
-        this.xAPI.parametros = '2,3' 
+        this.xAPI.parametros =  this.estadoActual + ',' + 3
         this.listarBuzon(this.bzPendientes)
         break
       case 4:
-        this.xAPI.parametros = '2,2'
+        this.xAPI.parametros =  this.estadoActual + ',' + 4
         this.listarBuzon(this.bzCerrados)
         break
       default:
         break
     }
-    
+
   }
 
-  listarEstados(){
+  listarEstados() {
     this.xAPI.funcion = 'WKF_CEstados'
-    this.xAPI.parametros = '' 
+    this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         data.Cuerpo.forEach(e => {
-          if (e.esta == 1)this.lstEstados.push(e)
+          if (e.esta == 1) this.lstEstados.push(e)
         });
       },
       (error) => {
@@ -149,35 +151,35 @@ export class BuzonComponent implements OnInit {
     )
   }
 
-  async listarBuzon(bz : any){
+  async listarBuzon(bz: any) {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
+
         data.Cuerpo.forEach(e => {
-          
-          var existe  = e.anom == ''?true:false
-          var privado  = e.priv == 1?true:false
+
+          var existe = e.anom == '' ? true : false
+          var privado = e.priv == 1 ? true : false
           console.log(privado)
           bz.push(
-            { 
-              id : e.id,
-              idd : e.idd,
-              numc : e.numc, 
-              completed : false, 
+            {
+              id: e.id,
+              idd: e.idd,
+              numc: e.numc,
+              completed: false,
               color: 'warn',
-              nori : e.nori,
-              tdoc : e.tdoc,
-              fcre : e.fcre,
-              remi : e.remi,
-              udep : e.udep,
-              anom : e.anom,
-              priv : privado,
-              existe : existe
+              nori: e.nori,
+              tdoc: e.tdoc,
+              fcre: e.fcre,
+              remi: e.remi,
+              udep: e.udep,
+              anom: e.anom,
+              priv: privado,
+              existe: existe
             }
-          ) 
-          
+          )
+
         })//Registros recorridos como elementos
-        
+
         this.lengthOfi = data.Cuerpo.length
         if (this.lengthOfi > 0) {
           this.estilocheck = ''
@@ -191,9 +193,9 @@ export class BuzonComponent implements OnInit {
     )
   }
 
-  
-  pageChangeEvent(e){
-    this.recorrerElementos(e.pageIndex+1, this.lst)
+
+  pageChangeEvent(e) {
+    this.recorrerElementos(e.pageIndex + 1, this.lst)
   }
 
   updateAllComplete() {
@@ -205,11 +207,11 @@ export class BuzonComponent implements OnInit {
     if (this.bzRecibido == null) {
       return;
     }
-    
+
     this.bzRecibido.forEach(t => (t.completed = completed));
-    if ( completed == false) {
+    if (completed == false) {
       this.estiloclasificar = 'none'
-    }else{
+    } else {
       this.estiloclasificar = ''
     }
   }
@@ -219,70 +221,72 @@ export class BuzonComponent implements OnInit {
     return this.bzRecibido.filter(t => t.completed).length > 0 && !this.allComplete;
   }
 
- 
+
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion : number, lista : any){
+  recorrerElementos(posicion: number, lista: any) {
     if (posicion > 1) posicion = posicion * 10
     this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
-    
+
   }
-  
+
 
   //editar
-  editar(id: string){
-    this.ruta.navigate(['/documento',id])
+  editar(id: string) {
+    this.ruta.navigate(['/documento', id])
   }
 
-  insertarObservacion(){
+  insertarObservacion() {
     var usuario = this.loginService.Usuario.id
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify(
-      {"documento": this.numControl,
-      "estado": 2, //Estado que ocupa
-      "estatus": this.selNav+1,
-      "observacion": this.Observacion.toUpperCase(), 
-      "accion": this.AccionTexto, 
-      "usuario": usuario}
+      {
+        "documento": this.numControl,
+        "estado": this.estadoActual, //Estado que ocupa
+        "estatus": this.selNav + 1,
+        "observacion": this.Observacion.toUpperCase(),
+        "accion": this.AccionTexto,
+        "usuario": usuario
+      }
     )
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data)=>{        
+      (data) => {
         this.toastrService.success(
           'Se ha promovido el documento',
           `GDoc Wkf.DocumentoObservacion`
         )
-        //this.promoverBuzon()
+        this.promoverBuzon()
 
 
       },
-      (errot)=>{
-        this.toastrService.error(errot,`GDoc Wkf.DocumentoObservacion`);
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
       }) //
   }
 
-  async promoverBuzon(){
-   
+  async promoverBuzon() {
+
     var usuario = this.loginService.Usuario.id
-    
+
     var i = 0
     var estatus = 1 //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
     this.xAPI.funcion = 'WKF_APromoverEstatus'
     this.xAPI.valores = ''
-    
-    this.xAPI.parametros = `${estatus},${usuario},${this.numControl}` 
+
+    this.xAPI.parametros = `${estatus},${usuario},${this.numControl}`
     await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data)=>{
+      (data) => {
         console.log('', data)
         this.seleccionNavegacion(this.selNav)
         this.Observacion = ''
         this.numControl = '0'
       },
-      (errot)=>{
-        this.toastrService.error(errot,`GDoc Wkf.PromoverDocumento`);
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.PromoverDocumento`);
       }) //
-    
-}
+
+  }
 
 
 }
