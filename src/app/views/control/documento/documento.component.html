@@ -47,6 +47,7 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
                     <form role="form">
                         <div class="form-row">
                             <div class="form-group col-md-2">
@@ -114,7 +115,7 @@
                                 <label for="cmbTipoDocumento">Tipo de Documento</label>
                                 <select class="form-control" 
                                     [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Doc.tipo"  value ="{{Doc.tipo}}">
+                                    [(ngModel)]="Doc.tipo"  value ="{{Doc.tipo}}" (change)="selTipoDocumento()">
                                     <option value="0">Seleccione</option>
                                     <option *ngFor="let x of lstT" value="{{x.nomb}}" >{{ x.nomb }}  </option> 
                                    
@@ -154,23 +155,84 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="form-row" *ngIf="puntocuenta">
+                            <div class="form-group col-md-2">
+                                <label >Cuenta</label>
+                                <input type="text" 
+                                class="form-control"  [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="cuenta" value="{{cuenta}}" >
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label >Resumen de Contenido</label>
+                                <input type="text" 
+                                class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="resumen"  value="{{resumen}}">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="cmbUnidad">Detalle Cuenta</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="detalle"  value="{{detalle}}">
+                                        <div class="input-group-prepend">
+                                            <button *ngIf="!editar" type="button" class="btn btn-success"  (click)="agregarCuenta()">
+                                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </button>
+                                            <button *ngIf="editar" type="button" class="btn btn-primary"  (click)="editarCuenta()">
+                                                <i class="fa fa-edit" aria-hidden="true"></i>
+                                            </button>
+                                           
+                                        </div>
+                                </div> 
+
+                            </div>
+                            <div class="form-group col-md-12">
+                                <table class="table align-items-center table-flush" style="width:100%">
+                                    <thead class="thead-light">
+                                      <th style="text-align:center;width:20px">Acción</th>
+                                      <th>Cuenta</th>
+                                      <th>Resumen</th>
+                                      <th>Detalle</th>
+                                  </thead><tbody>
+                                    <tr *ngFor="let el of lstCuenta;let i=index">
+                                        <td style="text-align:center;width:20px">
+                                            
+                                            <div class="btn-group" role="group" aria-label="Basic"  *ngIf="el.activo == 0">
+                                                <button type="button" class="btn btn-primary btn-sm" (click)="selEditarCuenta( i )"><i class="fa fa-edit" aria-hidden="true"  ></i></button>
+                                                <button type="button" class="btn btn-danger btn-sm" (click)="eliminarCuenta( i )"><i class="fa fa-trash" aria-hidden="true"  ></i></button>
+                                            </div>
+                                            <button *ngIf="el.activo != 0" type="button" class="btn btn-danger btn-sm"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> &nbsp;&nbsp;En Proceso  </button>
+                                        </td>
+                                        <td>{{ el.cuenta }}</td>
+                                        <td>{{ el.resumen.substring(0,20) }}... </td>
+                                        <td>{{ el.detalle.substring(0,20) }}...</td>
+                                        
+                                    </tr>
+
+                                  </tbody></table>
+                            
+                            </div>
+                        </div>
+
+
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="txtInstrucciones">Instrucciones Generales</label>
+                                <div class="NgxEditor__Wrapper">
+                                    <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
+                                    <ngx-editor
+                                    [editor]="xeditor"
+                                    [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.instrucciones"
+                                    [disabled]="false"
+                                    [placeholder]="'Escibe aqui...'">
+                                    </ngx-editor>
+                                </div>        
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-8">
                                
                                 <div class="row">
-                                    <div class="form-group col-md-6">
-                                        <label for="">Código de Archivo</label>
-                                        <input type="text" class="form-control" 
-                                        [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.codigo" value="{{ Doc.codigo }}">
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label for="">Expediente</label>
-                                        <input type="text" class="form-control" 
-                                        [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
-                                    </div>
-                                    
                                     <div class="form-group col-md-6">
                                         <label for="tmsCreacion">Plazo / Alerta</label>
                                         <form class="form-inline">
@@ -194,30 +256,30 @@
                                             [ngModelOptions]="{standalone: true}"
                                             [(ngModel)]="Doc.privacidad"  value ="{{Doc.privacidad}}">
                                             <option value="0">PUBLICO</option>
-                                            <option value="1">PRIVADO</option>
+                                            <option value="1">CONFIDENCIAL</option>
                                         </select>
                                     </div>
-                                </div> 
-                                <div class="row">
-                                    <div class="form-group col-md-12">
-                                        <label for="txtInstrucciones">Instrucciones Generales</label>
-                                        <div class="NgxEditor__Wrapper">
-                                            <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
-                                            <ngx-editor
-                                            [editor]="xeditor"
-                                            [ngModelOptions]="{standalone: true}"
-                                            [(ngModel)]="Doc.instrucciones"
-                                            [disabled]="false"
-                                            [placeholder]="'Escibe aqui...'">
-                                            </ngx-editor>
-                                        </div>        
+                                    <div class="form-group col-md-6">
+                                        <label for="">Código de Archivo</label>
+                                        <input type="text" class="form-control" 
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Doc.codigo" value="{{ Doc.codigo }}">
                                     </div>
-                                </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="">Expediente</label>
+                                        <input type="text" class="form-control" 
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
+                                    </div>
+                                    
+                                    
+                                </div> 
+                                
                             </div>
                             <div class="col-md-4" >
                                 <label for="txtobservacion">Lista de Asociación</label>
                                 <textarea class="form-control" name="" id="observacion" 
-                                cols="30" rows="12"   readonly></textarea>
+                                cols="30" rows="6"   readonly></textarea>
                             </div>  
                         </div>
                         <hr>

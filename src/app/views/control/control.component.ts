@@ -73,13 +73,25 @@ export class ControlComponent implements OnInit {
   async ngOnInit() {
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
+    await this.ConsultarCantidades()
   }
 
   pageChangeEvent(e){
     this.recorrerElementos(e.pageIndex+1, this.lst)
   }
 
+  ConsultarCantidades(){
 
+    
+    this.xAPI.funcion = 'WKF_CCantidadEstado'
+ 
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+       
+      },
+      (error) => { console.log(error) }
+    )
+  }
   ConsultarOficinas(e){
 
     this.selNav = e

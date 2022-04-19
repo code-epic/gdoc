@@ -25,7 +25,7 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.loginService.Usuario)
+    
     this.nombre = this.loginService.Usuario.nombre
 
     this.listTitles = ROUTES.filter(listTitle => listTitle);

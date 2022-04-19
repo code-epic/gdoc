@@ -1,6 +1,6 @@
 {
     "/v1/api/*": {
-        "target": "https://code-epic.com:2286",
+        "target": "https://code-epic.com",
         "secure": false,
         "logLevel": "debug"
     },

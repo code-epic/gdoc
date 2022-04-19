@@ -9,6 +9,14 @@ export class UtilService {
   //
   constructor() { }
 
+
+  //Retorna la fecha actual del sistema en formato YYYY-MM-DD
+  FechaActual() : string {
+    let date = new Date()
+
+    let output = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+    return output
+  }
   //retorna fecha en formato Dia/Mes/Anio
   ConvertirFecha(fecha : any) : string {
       return fecha.year + '-' + + fecha.month + '-'  + fecha.day

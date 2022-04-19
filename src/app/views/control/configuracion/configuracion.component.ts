@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { ToastrService } from 'ngx-toastr';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { LoginService } from 'src/app/services/seguridad/login.service';
 
 @Component({
   selector: 'app-configuracion',
@@ -18,11 +20,15 @@ export class ConfiguracionComponent implements OnInit {
   public observacion : string = ''
   public usuario : string = ''
 
+  public registrar : boolean = true
+
   public lst = [] //Consulta Global de Configuraciones
   public lista = [] //Objeto filtrado
   public tipo = 0
   constructor(private apiService: ApiService, 
-    private toastrService: ToastrService,) { 
+    private toastrService: ToastrService,
+    private loginService: LoginService,
+    private ngxService: NgxUiLoaderService) { 
 
 
   }
@@ -35,11 +41,8 @@ export class ConfiguracionComponent implements OnInit {
     this.xApi.funcion = 'MD_CConfiguracion'
     this.xApi.parametros = '%'
     this.xApi.valores = ''
-    
     this.apiService.Ejecutar(this.xApi).subscribe(
       data => {
-        console.info('cargando datos ')
-        console.info(data)
         this.lst = data.Cuerpo
       },
       error => {
@@ -51,13 +54,14 @@ export class ConfiguracionComponent implements OnInit {
 
   selTipo(){
     this.lista = []
-    console.log(this.lst)
     this.lst.forEach(e => {
       if ( e.tipo == this.tipo ) this.lista.push(e)
     });
   }
 
   guardar(){
+    this.ngxService.startLoader("loader-registrar")
+    this.registrar = !this.registrar
     if ( this.tipo == 0 || this.nombre == '') {
       this.toastrService.error(
         'Debe seleccionar un tipo de configuracion o completar todos los campos',
@@ -69,7 +73,7 @@ export class ConfiguracionComponent implements OnInit {
       "nombre" : this.nombre,
       "tipo" : this.tipo,
       "observacion" : this.observacion,
-      "usuario" : this.usuario
+      "usuario" : this.loginService.Usuario.id
     }
 
     this.xApi.funcion = 'MD_IConfiguracion'
@@ -84,12 +88,11 @@ export class ConfiguracionComponent implements OnInit {
           );
           this.tipo = 0
           this.listarConfiguracion()
-         
-          this.nombre = ""
-          this.observacion = ""
-          
+          this.limpiar()
+          this.ngxService.stopLoader("loader-registrar")
          
         }else{
+          this.limpiar()
           this.toastrService.error(
             data.msj,
             `Code-Epic GDoc`
@@ -98,15 +101,44 @@ export class ConfiguracionComponent implements OnInit {
 
       },
       error => {
-        
+        this.limpiar()
         this.toastrService.error(
           'error al insertar los datos de Configuraciones' + error,
           `Code-Epic ESB`
-        );
+        )
+       
       }
     )
 
   }
 
+   limpiar(){
+    this.nombre = ""
+    this.observacion = ""
+    this.registrar = !this.registrar
+    this.ngxService.stopLoader("loader-registrar")
+  }
+
+  // testing(){
+  //   var configuracion = {
+  //     "nombre" : 'Middleware',
+  //     "version" : '2.0.0 RC.2',
+  //     "identificador" : 1
+  //   }
+
+  //   this.xApi.funcion = 'UTech'
+  //   this.xApi.valores = JSON.stringify(configuracion)
+
+  //   this.apiService.Ejecutar(this.xApi).subscribe(
+  //     data => {
+  //       console.info(data)
+
+  //     },
+  //     error => {
+  //       console.error(error)
+      
+  //     }
+  //   )
+  // }
 
 }

@@ -58,10 +58,6 @@
               &nbsp;REGISTRADOS
               </ng-template>
               
-              
-          
-         
-
                 <div class="container">
                   <mat-selection-list #documento>
                     <mat-list  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
@@ -91,18 +87,16 @@
                       style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                       <div class="row">
                         <div class="col-md-1">
-                          
                             <mat-checkbox class="example-margin texto-lista"  
                               [(ngModel)]="e.completed"
                               color="warn"
                               (ngModelChange)="updateAllComplete()">
                             </mat-checkbox>
-                        
                         </div>
                         <div class="col-md-2 texto-lista">
                           {{ e.numc }}
                         </div>
-                        <div class="col-md-2 texto-lista">
+                        <div class="col-md-1 texto-lista">
                           {{ e.nori | uppercase }}
                         </div>
                         <div class="col-md-2 texto-lista">
@@ -111,11 +105,11 @@
                         <div class="col-md-3 texto-lista">
                           {{ e.udep | uppercase }}
                         </div>
-                        <div class="col-md-2 text-right" >
+                        <div class="col-md-3 text-right" >
                           <button mat-icon-button aria-label="Privado" >
                             <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
                           </button>
-                          <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
+                          <button mat-icon-button aria-label="Editar" (click)="editar( e.numc )">
                             <mat-icon  class="text-pink">edit_note</mat-icon>
                           </button>
                           <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
@@ -157,29 +151,44 @@
                   </mat-expansion-panel-header>
 
                   <div *ngIf="btnNota" > 
-                    <table class="table" style="width:100%">
-                      <thead class="thead-light">
-                        <th>#</th>
-                        <th>N-Control</th>
-                        <th>N-Origen</th>
-                        <th>Fecha</th>
-                        <th>Remitente</th>
+                    <div class="table-responsive">
+                      <table class="table align-items-center table-flush" style="width:100%">
+                        <thead class="thead-light">
+                          <th style="text-align:center">#</th>
+                          <th>N-Control</th>
+                          <th>N-Origen</th>
+                          <th>Fecha</th>
+                          <th>Remitente</th>
+                          <th style="text-align:center">Acción</th>
                       </thead><tbody>
                         <tr *ngFor="let e of lstNotaEntrega; let i=index;">
-                          <td>{{i + 1}}</td>
-                          <td>{{e.numc }}</td>
-                          <td>{{e.nori }}</td>
-                          <td>{{e.fcre.substring(0,10) }}</td>
+                          <td style="text-align:center">
+                            <a class="btn btn-sm btn-icon-only text-info" (click)="open(observacion, e.idd)" >
+                              <i class="fa fa-edit"></i>
+                            </a>
+                          </td>
+                          <td>{{ e.numc | uppercase }}
+                          </td>
+                          <td>{{ e.nori | uppercase }}</td>
+                          <td>{{ e.fcre.substring(0,10) }}</td>
                           <td>{{ remitente | uppercase }}</td>
+                          
+                          <th scope="row" style="text-align:center">
+                              <a class="btn btn-sm btn-icon-only text-warning"  (click)="mensajeReversarDoc(e.idd)">
+                                <i class="fa fa-history"></i>
+                              </a>
+                            
+                          </th>
                           </tr>
                         </tbody></table>
+                    </div>
                   </div>
               
                   <mat-action-row>
                     <button *ngIf="btnNota" class="btn bg-gradient-primary text-white "  
                       (click)="notaEntrega(x.id)"> 
                       <span class="fa fa-print"></span>&nbsp;&nbsp; Nota de entrega 
-                  </button>
+                    </button>
                     
                   </mat-action-row>
                 </mat-expansion-panel>
@@ -197,19 +206,17 @@
 
 <ng-template #content let-modal>
   <div class="modal-header header bg-gradient-success">
-    <h4 class="modal-title text-white" id="modal-basic-title">CLASIFICAR DOCUMENTOS</h4>
+    <h4 class="modal-title text-white" id="modal-basic-title">Clasificar Documentos</h4>
   </div>
   <div class="modal-body">
-    <form>
-      <div class="mb-3">
-        <label for="dateOfBirth">Clasificación</label>
+      <div class="col-md-12">
+        <label >Clasificación</label>
           <select class="form-control" [ngModelOptions]="{standalone: true}"
           [(ngModel)]="cmbDestino">
               <option value="0">SELECCIONE</option>
               <option *ngFor="let x of lstEstados" value="{{ x.id }}" >{{ x.nomb }}</option> 
           </select>
       </div>
-    </form>
   </div>
   <div class="modal-footer">
     <button class="btn bg-gradient-success text-white "  (click)="clasificarBuzon();modal.close('Save')"> 
@@ -217,7 +224,7 @@
     <button  class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
   </div>
-</ng-template>
+</ng-template>/
 
 
 <ng-template #adjuntar let-c="close" let-d="dismiss">
@@ -253,6 +260,27 @@
 </ng-template>
 
   
+
+
+<ng-template #observacion let-modal>
+  <div class="modal-header header bg-gradient-primary">
+    <h4 class="modal-title text-white" id="modal-basic-title">Agregar Observación</h4>
+  </div>
+  <div class="modal-body">
+      <div class="col-md-12">
+        <label for="txtobservacion">Observaciones</label>
+        <textarea class="form-control" cols="30" rows="3"  [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="Observacion"></textarea>
+      </div>
+      
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-primary text-white "  (click)="insertarObservacion();modal.close('Save')"> 
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Guardar </button>
+    <button  class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
 
 
 <div style="display: none">

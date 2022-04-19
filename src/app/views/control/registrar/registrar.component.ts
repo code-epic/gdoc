@@ -95,6 +95,10 @@ export class RegistrarComponent implements OnInit {
   
   public llave : string = ''
 
+  public Observacion : string = ''
+
+  public UbicacionSeleccionLista : string = '0'
+
   afuConfig = {
     
   };
@@ -185,7 +189,7 @@ export class RegistrarComponent implements OnInit {
           
           var existe  = e.anom == ''?true:false
           var privado  = e.priv == 1?true:false
-          console.log(privado)
+          // console.log(privado)
           this.bzRegistrados.push(
             { 
               id : e.id,
@@ -249,7 +253,10 @@ export class RegistrarComponent implements OnInit {
 
   //editar
   editar(id: string){
-    this.ruta.navigate(['/documento',id])
+    const estado = 1
+    const estatus = 1
+    const base = btoa( estado + ',' + estatus + ',' + id)
+    this.ruta.navigate(['/documento', base])
   }
   
   //adjuntar
@@ -277,7 +284,7 @@ export class RegistrarComponent implements OnInit {
           this.xAPI.funcion = 'WKF_AUbicacion'
           this.xAPI.valores = ''
           this.xAPI.parametros = `10,1,${llave},${usuario},${id}` 
-          console.info(this.xAPI)
+          // console.info(this.xAPI)
           this.apiService.Ejecutar(this.xAPI).subscribe(
             (data)=>{
               if (data.tipo == 1 ){
@@ -286,7 +293,7 @@ export class RegistrarComponent implements OnInit {
                   `GDoc Wkf.Papelera`
                 );
                 this.actualizarBzRegistrados(codigo, 0)
-                console.info(data)
+                
               }else{
                 this.toastrService.error(data.msj,`GDoc Wkf.Papelera`);
               }
@@ -307,6 +314,7 @@ export class RegistrarComponent implements OnInit {
       var llave = ``
       var i = 0
       var estatus = 2 //NOTA DE ENTREGA
+      //Buscar en Wk de acuerdo al usuario y la app activa
       this.xAPI.funcion = 'WKF_AUbicacion'
       this.xAPI.valores = ''
       
@@ -352,7 +360,7 @@ export class RegistrarComponent implements OnInit {
   
 
   ConsultarCtrl(id: string){
-    
+    this.UbicacionSeleccionLista = id
     this.xAPI.funcion = 'WKF_CClasificados'
     this.xAPI.valores = ''
     this.xAPI.parametros = id
@@ -387,7 +395,7 @@ export class RegistrarComponent implements OnInit {
           this.xAPI.valores = ''
           this.apiService.Ejecutar(this.xAPI).subscribe(
             (xdata) => {
-              console.log(xdata)
+              // console.log(xdata)
               if (xdata.tipo == 1){
                 this.toastrService.success(
                   'Tu archivo ha sido cargado con exito ',
@@ -431,7 +439,7 @@ export class RegistrarComponent implements OnInit {
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data)=>{
             i++
-            console.log('documento actualizado ', data)   
+            // console.log('documento actualizado ', data)   
             if (cantidad == i)this.imprimir()
           },
           (errot)=>{
@@ -441,6 +449,77 @@ export class RegistrarComponent implements OnInit {
       })
     }
   }
+
+  mensajeReversarDoc(id : string){
+    Swal.fire({
+      title: 'Alerta',
+      text: '¿Está seguro que desea reversar este documento?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, estoy seguro'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.reversarDoc(id)
+      }
+    })  
+  }
+
+  reversarDoc(id : string){
+    //WKF_AReversarDocumento
+    var usuario = this.loginService.Usuario.id
+    this.xAPI.funcion = 'WKF_AReversarDocumento'
+    this.xAPI.valores = ''
+    this.xAPI.parametros = '0,1,' +  usuario  + ',' + id
+    
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data)=>{
+        this.lstNotaEntrega = []
+        this.btnNota = false
+        this.ConsultarCtrl(id)
+        this.toastrService.success(
+          'Tu documento ha sido reversado ',
+          `GDoc Wkf.ReversarDocumento`
+        );
+        this.bzRegistrados = []
+        this.listarBuzon(0)
+        
+
+
+      },
+      (errot)=>{
+        this.toastrService.error(errot,`GDoc Wkf.ReversarDocumento`);
+    })
+   
+  }
+
+
+  insertarObservacion(){
+    var usuario = this.loginService.Usuario.id
+    this.xAPI.funcion = 'WKF_IDocumentoObservacion'
+    this.xAPI.valores = JSON.stringify({
+      "documento": this.numControl,
+      "estado": 1, //Estado que ocupa
+      "estatus": 2,
+      "observacion": this.Observacion,
+      "accion" : '',
+      "usuario": usuario
+    })
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data)=>{        
+        this.toastrService.success(
+          'Se ha agregado observacion al documento',
+          `GDoc Wkf.DocumentoObservacion`
+        )
+        this.Observacion = ''
+        this.numControl = '0'
+      },
+      (errot)=>{
+        this.toastrService.error(errot,`GDoc Wkf.DocumentoObservacion`);
+      }) //
+  }
+
 
   imprimir(){
     
@@ -492,4 +571,6 @@ export class RegistrarComponent implements OnInit {
      ventana.print()
      ventana.close()
   }
+
+
 }
