@@ -12,6 +12,10 @@ import { ConfiguracionComponent } from 'src/app/views/control/configuracion/conf
 import { AuthGuardGuard } from 'src/app/services/seguridad/auth-guard.guard';
 import { SecretariaComponent } from 'src/app/views/secretaria/secretaria.component';
 import { AcamiComponent } from 'src/app/views/acami/acami.component';
+import { TimonelComponent } from 'src/app/views/timonel/timonel.component';
+import { PersonalComponent } from 'src/app/views/personal/personal.component';
+import { AybuzonComponent } from 'src/app/views/ayudantia/aybuzon/aybuzon.component';
+import { AyreportesComponent } from 'src/app/views/ayudantia/ayreportes/ayreportes.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -68,6 +72,26 @@ export const AdminLayoutRoutes: Routes = [
     { 
         path: 'ayudantia', 
         component: AyudantiaComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'aybuzon', 
+        component: AybuzonComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'ayreportes', 
+        component: AyreportesComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'timonel', 
+        component: TimonelComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'personal', 
+        component: PersonalComponent,
         canActivate:[AuthGuardGuard] 
     },
     { 

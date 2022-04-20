@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -8,15 +9,15 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 
 
-@Component({
-  selector: 'app-acami',
-  templateUrl: './acami.component.html',
-  styleUrls: ['./acami.component.scss']
-})
-export class AcamiComponent implements OnInit {
 
-  
-  public estadoActual = 7
+@Component({
+  selector: 'app-aybuzon',
+  templateUrl: './aybuzon.component.html',
+  styleUrls: ['./aybuzon.component.scss']
+})
+export class AybuzonComponent implements OnInit {
+
+  public estadoActual = 5
   public estadoOrigen = 1
 
   public paginador = 10
@@ -117,15 +118,16 @@ export class AcamiComponent implements OnInit {
         this.listarBuzon(this.bzRecibido)
         break
       case 1:
-        this.xAPI.parametros =  this.estadoActual + ',' + 2
+        this.xAPI.funcion = 'WKF_CSubDocumento'
+        this.xAPI.parametros = this.estadoActual + ',' + 2
         this.listarBuzon(this.bzProcesados)
         break
       case 2:
-        this.xAPI.parametros =  this.estadoActual + ',' + 3
+        this.xAPI.parametros = this.estadoActual + ',' + 3
         this.listarBuzon(this.bzPendientes)
         break
       case 4:
-        this.xAPI.parametros =  this.estadoActual + ',' + 4
+        this.xAPI.parametros = this.estadoActual + ',' + 4
         this.listarBuzon(this.bzCerrados)
         break
       default:
@@ -153,14 +155,15 @@ export class AcamiComponent implements OnInit {
   async listarBuzon(bz: any) {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-
         data.Cuerpo.forEach(e => {
 
           var existe = e.anom == '' ? true : false
           var privado = e.priv == 1 ? true : false
-          console.log(privado)
-          bz.push(
-            {
+          const cuenta = e.cuenta != undefined ? e.cuenta : ''
+          const resumen = e.resumen != undefined ? e.resumen : ''
+          const detalle = e.detalle != undefined ? e.detalle : ''
+
+          bz.push({
               id: e.id,
               idd: e.idd,
               numc: e.numc,
@@ -173,9 +176,11 @@ export class AcamiComponent implements OnInit {
               udep: e.udep,
               anom: e.anom,
               priv: privado,
+              cuenta: cuenta,
+              resumen: resumen,
+              detalle: detalle,
               existe: existe
-            }
-          )
+          })
 
         })//Registros recorridos como elementos
 
@@ -220,14 +225,12 @@ export class AcamiComponent implements OnInit {
     return this.bzRecibido.filter(t => t.completed).length > 0 && !this.allComplete;
   }
 
-
   //recorrerElementos para paginar listados
   recorrerElementos(posicion: number, lista: any) {
     if (posicion > 1) posicion = posicion * 10
     this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
 
   }
-
 
   //editar
   editar(id: string) {
@@ -255,8 +258,6 @@ export class AcamiComponent implements OnInit {
           `GDoc Wkf.DocumentoObservacion`
         )
         this.promoverBuzon()
-
-
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
@@ -264,19 +265,15 @@ export class AcamiComponent implements OnInit {
   }
 
   async promoverBuzon() {
-
     var usuario = this.loginService.Usuario.id
-
     var i = 0
     var estatus = 1 //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
     this.xAPI.funcion = 'WKF_APromoverEstatus'
     this.xAPI.valores = ''
-
     this.xAPI.parametros = `${estatus},${usuario},${this.numControl}`
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log('', data)
         this.seleccionNavegacion(this.selNav)
         this.Observacion = ''
         this.numControl = '0'
@@ -286,6 +283,5 @@ export class AcamiComponent implements OnInit {
       }) //
 
   }
-
 
 }
