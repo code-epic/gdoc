@@ -209,6 +209,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+
         data.Cuerpo.forEach(e => {
           this.Doc = e
 
@@ -221,6 +222,24 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.WAlerta.estado = 1
             this.WAlerta.estatus = 1
             this.WAlerta.usuario = this.loginService.Usuario.id
+          }
+          if (e.subdocumento != undefined){
+            const subdoc = JSON.parse(e.subdocumento)
+            this.puntocuenta = true
+            subdoc.forEach(e => {
+              const wkcuenta: IWKFCuenta = {
+                documento: parseInt(this.Doc.id),
+                cuenta: e.cuenta.toUpperCase(),
+                estado: e.estado,
+                estatus: e.estatus,
+                detalle: e.detalle.toUpperCase(),
+                resumen: e.resumen.toUpperCase(),
+                fecha: '',
+                usuario: e.usuario,
+                activo: e.activo
+              }
+              this.lstCuenta.push(wkcuenta)
+            });
           }
 
         });
@@ -367,7 +386,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Doc)
 
-    this.toastrService.error('Pendiente por Desarrollar', `GDoc Wkf.Documento`);
+    
 
 
     if (this.WAlerta.documento != 0) {
@@ -378,12 +397,17 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.info(this.xAPI);
+        this.toastrService.success('Proceso exitoso', `GDoc Wkf.Actualizar Documento`);
+        this.ngxService.stopLoader("loader-aceptar")
+        this.limpiarDoc()
+        this.ruta.navigate(['/registrar']);
       },
       (errot) => {
         
         this.limpiarDoc()
         this.toastrService.error(errot, `GDoc Wkf.Actualizar Documentos`)
         this.ngxService.stopLoader("loader-aceptar")
+        this.ruta.navigate(['/registrar']);
       }
     )
 
