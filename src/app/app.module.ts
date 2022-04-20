@@ -45,6 +45,8 @@ import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/commo
 
 import { AngularFileUploaderModule } from "angular-file-uploader";
 import { AuthInterceptorService } from './services/seguridad/auth-interceptor.service';
+import { AybuzonComponent } from './views/ayudantia/aybuzon/aybuzon.component';
+import { AyreportesComponent } from './views/ayudantia/ayreportes/ayreportes.component';
 
 
 
@@ -140,7 +142,9 @@ const ngWizardConfig: NgWizardConfig = {
     BuzonComponent,
     SalidasComponent,
     ProyectoComponent,
-    ConfiguracionComponent
+    ConfiguracionComponent,
+    AybuzonComponent,
+    AyreportesComponent
   ],
   providers:  [
     {
