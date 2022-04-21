@@ -47,6 +47,7 @@ import { AngularFileUploaderModule } from "angular-file-uploader";
 import { AuthInterceptorService } from './services/seguridad/auth-interceptor.service';
 import { AybuzonComponent } from './views/ayudantia/aybuzon/aybuzon.component';
 import { AyreportesComponent } from './views/ayudantia/ayreportes/ayreportes.component';
+import { GeneralesComponent } from './views/generales/generales.component';
 
 
 
@@ -144,7 +145,8 @@ const ngWizardConfig: NgWizardConfig = {
     ProyectoComponent,
     ConfiguracionComponent,
     AybuzonComponent,
-    AyreportesComponent
+    AyreportesComponent,
+    GeneralesComponent
   ],
   providers:  [
     {

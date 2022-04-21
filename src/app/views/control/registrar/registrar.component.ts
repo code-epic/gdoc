@@ -189,10 +189,11 @@ export class RegistrarComponent implements OnInit {
           
           var existe  = e.anom == ''?true:false
           var privado  = e.priv == 1?true:false
-          // console.log(privado)
+           console.log(e)
           this.bzRegistrados.push(
             { 
-              id : e.id,
+              id : e.id, //Detalle ID Documento
+              idd : e.idd, //ID Documento
               numc : e.numc, 
               completed : false, 
               color: 'warn',
@@ -325,11 +326,13 @@ export class RegistrarComponent implements OnInit {
       lstBz.forEach(e => {
         i++
         if (e.completed == true){
-          this.xAPI.parametros = `${this.cmbDestino},${estatus},${llave},${usuario},${e.id}` 
+          this.xAPI.parametros = `${this.cmbDestino},${estatus},${llave},${usuario},${e.idd}` 
+          console.log(this.xAPI)
           this.apiService.Ejecutar(this.xAPI).subscribe(
             (data)=>{
-             
+              console.error(data)
               this.actualizarBzRegistrados(e.numc, 0)
+
             },
             (errot)=>{
               this.toastrService.error(errot,`GDoc Wkf.Estatus`);

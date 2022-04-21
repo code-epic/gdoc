@@ -36,6 +36,14 @@
                       </div>
                     </a>
                     <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                      <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item">
+                        <i class="fa fa-plus"></i>
+                        <span>Nuevo Documento</span>
+                      </a>
+                      <a routerLinkActive="active" [routerLink]="['/notasentregas']" class="dropdown-item">
+                        <i class="fa fa-search"></i>
+                        <span>Notas de Entrega</span>
+                      </a>
                       <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
                         <i class="ni ni-settings-gear-65"></i>
                         <span>Configuración</span>
@@ -140,14 +148,14 @@
                         <div class="col-md-2 texto-lista">
                           {{ e.numc }}
                         </div>
-                        <div class="col-md-1 texto-lista">
-                          {{ e.nori | uppercase }}
-                        </div>
                         <div class="col-md-2 texto-lista">
                           {{ e.fcre | date:"dd-MM-yyyy" }}
                         </div>
                         <div class="col-md-4 texto-lista">
-                          {{ e.udep | uppercase }}
+                          {{ e.remi | uppercase }}
+                        </div>
+                        <div class="col-md-1 texto-lista">
+                          {{ e.observacion_accion | uppercase }}
                         </div>
                         <div class="col-md-2 text-right" >
                           <button mat-icon-button aria-label="Privado" >
@@ -197,15 +205,17 @@
                       <div class="col-md-2 texto-lista">
                         {{ e.numc }}
                       </div>
-                      <div class="col-md-1 texto-lista">
-                        {{ e.nori | uppercase }}
-                      </div>
                       <div class="col-md-2 texto-lista">
                         {{ e.fcre | date:"dd-MM-yyyy" }}
                       </div>
                       <div class="col-md-4 texto-lista">
-                        {{ e.udep | uppercase }}
+                        {{ e.remi | uppercase }}
                       </div>
+                      <div class="col-md-1 texto-lista">
+                        {{ e.observacion_accion | uppercase }}
+                      </div>
+                     
+                     
                       <div class="col-md-2 text-right" >
                         <button mat-icon-button aria-label="Privado" >
                           <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
@@ -243,7 +253,7 @@
 
 <ng-template #observacion let-modal>
   <div class="modal-header header bg-gradient-info">
-    <h4 class="modal-title text-white" id="modal-basic-title">Promover Documento</h4>
+    <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
   </div>
   <div class="modal-body">
     <div class="form-group col-md-12">
@@ -254,18 +264,31 @@
     <div class="form-group  col-md-12">
       <label>Acción</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}"
-          [(ngModel)]="AccionTexto">
-        <option value="0">NO APLICA</option>
-        <option value="1">POR FIRMA</option>
-        <option value="2">OPINION JURIDICA</option>
-        <option value="3">POR OPINION</option>
-              
+          [(ngModel)]="AccionTexto" (change)="selAccion()">
+        <option value="0" *ngIf="vrecibido">ACEPTAR</option>
+        <option value="1" *ngIf="vrecibido">RECHAZAR</option>
+
+        <option value="2" *ngIf="vprocesados" >ELABORAR OFICIO</option>
+        <option value="3"*ngIf="vprocesados" >EN MANOS DEL DIRECTOR DEL DESPACHO</option>
+        <option value="4"*ngIf="vprocesados" >EN MANOS DEL SUB DIRECTOR DEL DESPACHO</option>  
+        <option value="5" *ngIf="vprocesados" >ARCHIVAR</option>
+        <option value="6" *ngIf="vprocesados" >REDISTRIBUCION</option>
+        <option value="7" *ngIf="vpendientes" >SALIDA</option>
       </select>
+      
+    </div>
+    <div class="col-md-12" *ngIf="clasificacion">
+      <label >Area</label>
+        <select class="form-control" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="cmbDestino">
+            <option value="0">SELECCIONE</option>
+            <option *ngFor="let x of lstEstados" value="{{ x.id }}" >{{ x.nomb }}</option> 
+        </select>
     </div>
   </div>
   <div class="modal-footer">
     <button class="btn bg-gradient-info text-white "  (click)="insertarObservacion();modal.close('Save')"> 
-      <span class="fa fa-check"></span>&nbsp;&nbsp;Promover </button>
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
     <button  class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
   </div>

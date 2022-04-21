@@ -15,9 +15,9 @@
                         <h2 class="mb-0">Registrar Proyecto</h2>
                     </div>
                     <div class="col-md-1">
-                        <a routerLinkActive="active" [routerLink]="['/']">
-                            <button  mat-fab color="primary" title="Anexar Registro Fotográficos">
-                            <mat-icon class="waves waves-effect waves-light">camera</mat-icon>
+                        <a routerLinkActive="active" [routerLink]="['/ayreportes']">
+                            <button  mat-fab color="primary" title="Reporte General">
+                                <mat-icon class="waves waves-effect waves-light">print</mat-icon>
                             </button>
                         </a>
                     </div>
@@ -28,79 +28,107 @@
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label for="txtNombre"> Nombre del Proyecto </label>                    
-                            <input type="txtNombre" class="form-control" id="">
+                            <input type="txtNombre" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.nombre" value="{{Proyecto.nombre}}" class="form-control">
                         </div>
                         <div class="form-group col-md-4">
                             <label for="cmbTipo">Tipo de Proyecto</label>
-                            <select class="form-control" name="" id="">
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.tipo" value="{{Proyecto.tipo}}">
                                 <option value="0">Seleccione</option>
-                                <option value="1">Infraestructura</option>
-                                <option value="2">Remodelación</option>
+                                <option value="Infraestructura">Infraestructura</option>
+                                <option value="Remodelación">Remodelación</option>
                             </select>
                         </div>
                         <div class="form-group col-md-4">
                             <label for="txtEnte"> Ente Contratante </label>                    
-                            <input type="txtEnte" class="form-control" id="">
+                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.contratante" value="{{Proyecto.contratante}}">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label for="txtEmpresa">Empresa Ejecutante</label>
-                            <input type="txtEmpresa" class="form-control" id="nombre">
+                            <input type="txtEmpresa" class="form-control" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.empresa" value="{{Proyecto.empresa}}">
                         </div>
                         <div class="form-group col-md-4">
                             <label for="cmbFuente">Fuente de Financiamiento</label>
-                            <select class="form-control" name="" id="">
+                            <select class="form-control"  [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.fuente" value="{{Proyecto.fuente}}">
                                 <option value="0">Seleccione</option>
-                                <option value="1">Ministerio de Vivienda</option>
-                                <option value="2">Comandancia del Ejército</option>
+                                <option value="Ministerio de Vivienda">Ministerio de Vivienda</option>
+                                <option value="Comandancia del Ejército">Comandancia del Ejército</option>
                             </select>
                         </div>
                         <div class="form-group col-md-4">
                             <label for="cmbUsuario">Usuario Final</label>
-                            <select class="form-control" name="" id="">
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.usuario_final" value="{{Proyecto.usuario_final}}">
                                 <option value="0">Seleccione</option>
-                                <option value="1">Presidencia</option>
-                                <option value="1">Ministerio</option>
+                                <option value="Presidencia">Presidencia</option>
+                                <option value="Ministerio">Ministerio</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <label for="txtObjeto">Objeto del Proyecto</label>
-                            <textarea class="form-control" name="" id="observacion" cols="30" rows="3"></textarea>
+                            <div class="NgxEditor__Wrapper">
+                                <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                                <ngx-editor
+                                [ngModelOptions]="{standalone: true}"
+                                [editor]="editor"
+                                [(ngModel)]="Proyecto.objeto"
+                                [disabled]="false"
+                                [placeholder]="'Escibe aqui...'">
+                                </ngx-editor>
+                            </div>
                         </div> 
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <label for="txtObservacion">Observaciones</label>
-                            <textarea class="form-control" name="" id="observacion" cols="30" rows="3"></textarea>
+                            <div class="NgxEditor__Wrapper">
+                                <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
+                                <ngx-editor
+                                [ngModelOptions]="{standalone: true}"
+                                [editor]="xeditor"
+                                [(ngModel)]="Proyecto.observacion"
+                                [disabled]="false"
+                                [placeholder]="'Escibe aqui...'">
+                                </ngx-editor>
+                            </div>
                         </div> 
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-3">
                             <label for="txtLapso">Lapso de Ejecución</label>
-                            <input type="txtLapso" class="form-control" id="nombre">
+                            <input type="txtLapso" class="form-control"  [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.lapso" value="{{Proyecto.lapso}}">
                         </div>
                         <div class="form-group col-md-3">
                             <label for="txtMonto">Monto Total del Proyecto</label>
-                            <input type="txtMonto" class="form-control" id="nombre">
+                            <input type="number" class="form-control"  [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.monto_total" value="{{Proyecto.monto_total}}">
                         </div>
                         <div class="form-group col-md-3">
                             <label for="nombre">Monto Pagado</label>
-                            <input type="text" class="form-control" id="nombre">
+                            <input type="number" class="form-control" (blur)="restar()" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.monto_pagado" value="{{Proyecto.monto_pagado}}">
                         </div>
                         <div class="form-group col-md-3">
                             <label for="txtDeuda">Deuda Pendiente</label>
-                            <input type="txtDeuda" class="form-control" id="nombre">
+                            <input type="number" readonly class="form-control"  [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.adeuda" value="{{Proyecto.adeuda}}">
                         </div>
                     </div>
                     <hr>
                     <div class="row">                   
                         <div class="col-md-12">
                             <div class="text-right">
-                                <button type="btnGuardar" class="btn bg-primary text-white">Guardar</button>
-                                <button type="btnCancelar" class="btn bg-red text-white">Cancelar</button>
+                                <button  class="btn bg-primary text-white" (click)="guardar()">Guardar</button>
+                                <button  class="btn bg-red text-white">Cancelar</button>
                             </div>                           
                         </div>                   
                     </div>                               

@@ -212,7 +212,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         data.Cuerpo.forEach(e => {
           this.Doc = e
-
+          console.log(e)
           this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
           this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
           if (e.alerta != null) {
