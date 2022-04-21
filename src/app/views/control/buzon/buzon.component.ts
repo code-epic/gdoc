@@ -1,3 +1,4 @@
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -274,11 +275,24 @@ export class BuzonComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.toastrService.success(
-          'Se ha promovido el documento',
-          `GDoc Wkf.DocumentoObservacion`
-        )
-        this.promoverBuzon()
+        console.info(this.AccionTexto)
+        switch (this.AccionTexto) {
+          case "1":
+
+          this.rechazarBuzon()
+          
+            
+            break;
+        
+          default:
+            this.toastrService.success(
+              'Se ha promovido el documento',
+              `GDoc Wkf.DocumentoObservacion`
+            )
+            this.promoverBuzon()
+            break;
+        }
+        
 
 
       },
@@ -286,6 +300,28 @@ export class BuzonComponent implements OnInit {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
       }) //
   }
+
+  async rechazarBuzon(){
+    this.xAPI.funcion="WKF_AUbicacionRechazo"
+    this.xAPI.valores=''
+    this.xAPI.parametros='1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.toastrService.success(
+          'El documento ha sido enviado al origen',
+          `GDoc Wkf.DocumentoObservacion`
+        )
+        console.log(data)
+        this.seleccionNavegacion(this.selNav)
+      },
+      (error) => {
+        console.error(error)
+      }
+      
+    )
+    }
+
+
 
   async promoverBuzon() {
 
