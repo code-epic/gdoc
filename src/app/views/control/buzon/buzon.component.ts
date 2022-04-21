@@ -20,6 +20,15 @@ export class BuzonComponent implements OnInit {
   public estadoActual = 2
   public estadoOrigen = 1
 
+  public clasificacion = false
+
+  public vrecibido = true
+
+  public vprocesados = false
+
+  public vpendientes = false
+  
+
   public paginador = 10
   public focus;
   public xAPI: IAPICore = {
@@ -104,6 +113,7 @@ export class BuzonComponent implements OnInit {
 
 
   seleccionNavegacion(e) {
+    console.log(e);
     this.bzRecibido = []
     this.bzProcesados = []
     this.bzPendientes = []
@@ -114,19 +124,32 @@ export class BuzonComponent implements OnInit {
 
     switch (e) {
       case 0:
+        this.vrecibido = true
+        this.vprocesados = false
+        this.vpendientes = false
+        this.clasificacion = false
+        
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
         this.listarBuzon(this.bzRecibido)
         break
       case 1:
-        this.xAPI.parametros =  this.estadoActual + ',' + 2
+        this.vrecibido = false
+        this.vprocesados = true
+        this.vpendientes = false
+        this.clasificacion = false
+        this.xAPI.parametros = this.estadoActual + ',' + 2
         this.listarBuzon(this.bzProcesados)
         break
       case 2:
-        this.xAPI.parametros =  this.estadoActual + ',' + 3
+        this.vrecibido = false
+        this.vprocesados = true
+        this.vpendientes = true
+        this.clasificacion = false
+        this.xAPI.parametros = this.estadoActual + ',' + 3
         this.listarBuzon(this.bzPendientes)
         break
       case 4:
-        this.xAPI.parametros =  this.estadoActual + ',' + 4
+        this.xAPI.parametros = this.estadoActual + ',' + 4
         this.listarBuzon(this.bzCerrados)
         break
       default:
@@ -159,7 +182,7 @@ export class BuzonComponent implements OnInit {
 
           var existe = e.anom == '' ? true : false
           var privado = e.priv == 1 ? true : false
-          console.log(privado)
+          console.log(e)
           bz.push(
             {
               id: e.id,
@@ -288,6 +311,19 @@ export class BuzonComponent implements OnInit {
 
   }
 
+
+
+  selAccion(){
+    this.clasificacion = false
+    switch (this.AccionTexto) {
+      case '6':
+        this.clasificacion = true
+        break;
+    
+      default:
+        break;
+    } 
+  }
 
 }
 

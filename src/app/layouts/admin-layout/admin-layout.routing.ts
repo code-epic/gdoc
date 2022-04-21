@@ -16,6 +16,7 @@ import { TimonelComponent } from 'src/app/views/timonel/timonel.component';
 import { PersonalComponent } from 'src/app/views/personal/personal.component';
 import { AybuzonComponent } from 'src/app/views/ayudantia/aybuzon/aybuzon.component';
 import { AyreportesComponent } from 'src/app/views/ayudantia/ayreportes/ayreportes.component';
+import { GeneralesComponent } from 'src/app/views/generales/generales.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -97,6 +98,11 @@ export const AdminLayoutRoutes: Routes = [
     { 
         path: 'proyecto', 
         component: ProyectoComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'generales', 
+        component: GeneralesComponent,
         canActivate:[AuthGuardGuard] 
     },
     { 

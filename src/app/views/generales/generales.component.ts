@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 
+
 @Component({
-  selector: 'app-ayreportes',
-  templateUrl: './ayreportes.component.html',
-  styleUrls: ['./ayreportes.component.scss']
+  selector: 'app-generales',
+  templateUrl: './generales.component.html',
+  styleUrls: ['./generales.component.scss']
 })
-export class AyreportesComponent implements OnInit {
+export class GeneralesComponent implements OnInit {
 
-
+ 
   public focus : boolean = true
   public buscar : string = ''
   lst = []
@@ -27,11 +28,11 @@ export class AyreportesComponent implements OnInit {
   }
 
 
-  CProyectos(){
-    this.xApi.funcion = "MPPD_CProyectos"
+  CMppd(){
+    this.xApi.funcion = "C_Mppd"
     this.xApi.parametros = this.buscar
     
-   
+    console.log(10)
     this.apiService.Ejecutar(this.xApi).subscribe(
       (data) => {
         console.log(data)
