@@ -1,4 +1,4 @@
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { ClassGetter, THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -28,7 +28,20 @@ export class BuzonComponent implements OnInit {
   public vprocesados = false
 
   public vpendientes = false
-  
+
+  public cmbDestino = ''
+
+  public lstAcciones = []
+
+  public cmbAcciones = [
+    { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
+    { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
+    { 'valor': '2', 'texto': 'ELABORAR OFICIO DE OPINION', 'visible': '1' },
+    { 'valor': '3', 'texto': 'EN MANOS DEL DIRECTOR DEL DESPACHO', 'visible': '1' },
+    { 'valor': '4', 'texto': 'EN MANOS DEL SUB DIRECTOR DEL DESPACHO', 'visible': '1' },
+    { 'valor': '5', 'texto': 'ARCHIVAR', 'visible': '1' },
+    { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '1' },
+    { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' }]
 
   public paginador = 10
   public focus;
@@ -125,26 +138,20 @@ export class BuzonComponent implements OnInit {
 
     switch (e) {
       case 0:
-        this.vrecibido = true
-        this.vprocesados = false
-        this.vpendientes = false
+        this.cargarAcciones(0)
         this.clasificacion = false
-        
+
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
         this.listarBuzon(this.bzRecibido)
         break
       case 1:
-        this.vrecibido = false
-        this.vprocesados = true
-        this.vpendientes = false
+        this.cargarAcciones(1)
         this.clasificacion = false
         this.xAPI.parametros = this.estadoActual + ',' + 2
         this.listarBuzon(this.bzProcesados)
         break
       case 2:
-        this.vrecibido = false
-        this.vprocesados = true
-        this.vpendientes = true
+        this.cargarAcciones(2)
         this.clasificacion = false
         this.xAPI.parametros = this.estadoActual + ',' + 3
         this.listarBuzon(this.bzPendientes)
@@ -179,6 +186,8 @@ export class BuzonComponent implements OnInit {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
+        console.log(data)
+
         data.Cuerpo.forEach(e => {
 
           var existe = e.anom == '' ? true : false
@@ -198,7 +207,8 @@ export class BuzonComponent implements OnInit {
               udep: e.udep,
               anom: e.anom,
               priv: privado,
-              existe: existe
+              existe: existe,
+              xaccion: e.accion
             }
           )
 
@@ -277,22 +287,25 @@ export class BuzonComponent implements OnInit {
       (data) => {
         console.info(this.AccionTexto)
         switch (this.AccionTexto) {
-          case "1":
-
-          this.rechazarBuzon()
-          
-            
+          case "1"://Rechazar en el estado inicial
+            this.rechazarBuzon()
             break;
-        
+
+          case "2"://Oficio por opinión
+            this.promoverBuzon()
+            break;
+
+          case "6":// Enviar a otras areas
+            this.redistribuir()
+            break;
+
+
           default:
-            this.toastrService.success(
-              'Se ha promovido el documento',
-              `GDoc Wkf.DocumentoObservacion`
-            )
+
             this.promoverBuzon()
             break;
         }
-        
+
 
 
       },
@@ -301,10 +314,10 @@ export class BuzonComponent implements OnInit {
       }) //
   }
 
-  async rechazarBuzon(){
-    this.xAPI.funcion="WKF_AUbicacionRechazo"
-    this.xAPI.valores=''
-    this.xAPI.parametros='1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl
+  async rechazarBuzon() {
+    this.xAPI.funcion = "WKF_AUbicacionRechazo"
+    this.xAPI.valores = ''
+    this.xAPI.parametros = '1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.toastrService.success(
@@ -317,9 +330,9 @@ export class BuzonComponent implements OnInit {
       (error) => {
         console.error(error)
       }
-      
+
     )
-    }
+  }
 
 
 
@@ -340,6 +353,10 @@ export class BuzonComponent implements OnInit {
         this.seleccionNavegacion(this.selNav)
         this.Observacion = ''
         this.numControl = '0'
+        this.toastrService.success(
+          'Se ha promovido el documento',
+          `GDoc Wkf.DocumentoObservacion`
+        )
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.PromoverDocumento`);
@@ -347,18 +364,48 @@ export class BuzonComponent implements OnInit {
 
   }
 
+  async redistribuir() {
+    this.xAPI.funcion = "WKF_ARedistribuir"
+    this.xAPI.valores = ''
+    this.xAPI.parametros = this.cmbDestino + ',' + this.cmbDestino + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.toastrService.success(
+          'El documento ha sido redistribuido segun su selección',
+          `GDoc Wkf.DocumentoObservacion`
+        )
+        console.log(data)
+        this.seleccionNavegacion(this.selNav)
+      },
+      (error) => {
+        console.error(error)
+      }
+
+    )
 
 
-  selAccion(){
+  }
+
+  async cargarAcciones(posicion){
+    this.lstAcciones = []
+    this.cmbAcciones.forEach(e => {
+      if(e.visible==posicion){
+        this.lstAcciones.push(e)
+      }
+      
+    });
+  }
+
+  selAccion() {
     this.clasificacion = false
     switch (this.AccionTexto) {
       case '6':
         this.clasificacion = true
         break;
-    
+
       default:
         break;
-    } 
+    }
   }
 
 }

@@ -265,15 +265,16 @@
       <label>Acción</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}"
           [(ngModel)]="AccionTexto" (change)="selAccion()">
-        <option value="0" *ngIf="vrecibido">ACEPTAR</option>
+          <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+        <!-- <option value="0" *ngIf="vrecibido">ACEPTAR</option>
         <option value="1" *ngIf="vrecibido">RECHAZAR</option>
 
-        <option value="2" *ngIf="vprocesados" >ELABORAR OFICIO</option>
+        <option value="2" *ngIf="vprocesados" >ELABORAR OFICIO DE OPINION</option>
         <option value="3"*ngIf="vprocesados" >EN MANOS DEL DIRECTOR DEL DESPACHO</option>
         <option value="4"*ngIf="vprocesados" >EN MANOS DEL SUB DIRECTOR DEL DESPACHO</option>  
         <option value="5" *ngIf="vprocesados" >ARCHIVAR</option>
         <option value="6" *ngIf="vprocesados" >REDISTRIBUCION</option>
-        <option value="7" *ngIf="vpendientes" >SALIDA</option>
+        <option value="7" *ngIf="vpendientes" >SALIDA</option> -->
       </select>
       
     </div>

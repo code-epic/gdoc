@@ -1,168 +1,323 @@
 <div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
-    <div class="container-fluid">
-        <p></p>
-    </div>    
+  <div class="container-fluid">
+      <p></p>
+  </div>    
 </div>
 
 <div class="container-fluid mt--9">
-    <div class="row">
-      <div class="col-xl-12 col-md-12 col-lg-12">
-        <div class="card shadow">
-          <div class="card-header bg-transparent">
-            <div class="row align-items-center">
-                <div class="col-md-10">
-                    <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
-                    <h2 class="mb-0">Salidas</h2>
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-10">
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
+                <h2 class="mb-0">Salidas</h2>
+            </div>
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>reply</mat-icon>
+                  </button>
                 </div>
-                <div class="col-md-1">
+              </div>
+            </div>
+            <div class="col-md-1">
+              <ul class="navbar-nav align-items-center d-none d-md-flex">
+                <li class="nav-item" ngbDropdown placement="bottom-right">
+                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
                     <div class="media align-items-center">
                       <div class="example-button-row">
-                        <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                          <mat-icon>reply</mat-icon>
+                        <button mat-icon-button aria-label="Example icon-button with a heart icon">
+                          <mat-icon>more_vert</mat-icon>
                         </button>
                       </div>
                     </div>
+                  </a>
+                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                    <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item">
+                      <i class="fa fa-plus"></i>
+                      <span>Nueva Salida</span>
+                    </a>
+                    <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
+                      <i class="ni ni-settings-gear-65"></i>
+                      <span>Configuración</span>
+                    </a>
                   </div>
-                <div class="col-md-1">
-                    <ul class="navbar-nav align-items-right d-none d-md-flex">
-                      <li class="nav-item" ngbDropdown placement="bottom-right">
-                        <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                          <div class="media align-items-center">
-                            <div class="example-button-row">
-                              <button mat-icon-button aria-label="Example icon-button with a heart icon">
-                                <mat-icon>more_vert</mat-icon>
-                              </button>
-                            </div>
-                          </div>
-                        </a>
-                        <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                          <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item">
-                            <i class="fa fa-plus"></i>
-                            <span>Nueva Salida</span>
-                          </a>
-                          <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
-                            <i class="ni ni-settings-gear-65"></i>
-                            <span>Configuración</span>
-                          </a>
-                        </div>
-                        
-                      </li>
-                    </ul>
-                </div>
+                </li>
+              </ul>
             </div>
           </div>
-
-        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"> 
-            <mat-tab>
-                <ng-template mat-tab-label>
-                 REGISTRADAS
-                </ng-template>
-                <mat-nav-list>
-                    <mat-list-item>
-                        <div class="row col-lg-12">
-                            <div class="col-lg-1 text-center">
-                                <input type="checkbox" aria-label="Checkbox for following text input">
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            CG-00001
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            Oficio
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            02/01/2022
-                            </div>
-                            <div class="col-lg-3 text-center">
-                            Ministerio de Vivienda
-                            </div>
-                            <div class="col-md-2 text-right">               
-                                <i class="fas fa-edit iconEdit"></i>
-                                <i class="far fa-trash-alt iconElimi"></i>
-                            </div>
-                        </div>
-                    </mat-list-item>
-                </mat-nav-list>
-            </mat-tab>
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    PROCESADAS
-                </ng-template>
-                <mat-nav-list>
-                    <mat-list-item>
-                        <div class="row col-lg-12">
-                            <div class="col-lg-1 text-center">
-                                <input type="checkbox" aria-label="Checkbox for following text input">
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            CG-00001
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            Oficio
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            02/01/2022
-                            </div>
-                            <div class="col-lg-3 text-center">
-                            Ministerio de Vivienda
-                            </div>
-                            <div class="col-md-2 text-right">               
-                                <i class="fas fa-edit iconEdit"></i>
-                                <i class="far fa-trash-alt iconElimi"></i>
-                            </div>
-                        </div>
-                    </mat-list-item>
-                </mat-nav-list>
-            
-
-            <!-- <mat-paginator [length]="lengthOfi"
-                (page)="pageChangeEvent($event)"
-                [pageSize]="pageSizeOfi"
-                [pageSizeOptions]="pageSizeOptions"
-                (page)="pageEvent = $event"
-                aria-label="Select page">
-            </mat-paginator> -->
-            </mat-tab>
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    PENDIENTES
-                </ng-template>
-                <mat-nav-list>
-                    <mat-list-item>
-                        <div class="row col-lg-12">
-                            <div class="col-lg-1 text-center">
-                                <input type="checkbox" aria-label="Checkbox for following text input">
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            CG-00001
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            Oficio
-                            </div>
-                            <div class="col-lg-2 text-center">
-                            02/01/2022
-                            </div>
-                            <div class="col-lg-3 text-center">
-                            Ministerio de Vivienda
-                            </div>
-                            <div class="col-md-2 text-right">               
-                                <i class="fas fa-edit iconEdit"></i>
-                                <i class="far fa-trash-alt iconElimi"></i>
-                            </div>
-                        </div>
-                    </mat-list-item>
-                </mat-nav-list>
-            
-
-            <!-- <mat-paginator [length]="lengthOfi"
-                (page)="pageChangeEvent($event)"
-                [pageSize]="pageSizeOfi"
-                [pageSizeOptions]="pageSizeOptions"
-                (page)="pageEvent = $event"
-                aria-label="Select page">
-            </mat-paginator> -->
-            </mat-tab>
-        </mat-tab-group>
         </div>
+
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
+        (selectedIndexChange)="seleccionNavegacion($event)">
+          <mat-tab>
+            <ng-template mat-tab-label>
+            &nbsp;RECIBIDOS
+            </ng-template>
+            
+              <div class="container">
+                <!-- <mat-selection-list #documento>
+                  <mat-list  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                    <div class="row">
+                      <div class="col-md-1" [ngStyle]="{'display':estilocheck}">
+                        <mat-checkbox 
+                          [checked]="allComplete"
+                          color="primary"
+                          [indeterminate]="someComplete()"
+                          (change)="setAll($event.checked)"
+                          class="example-margin texto-lista">
+                        </mat-checkbox>  
+                      </div>
+                      <div class="col-md-2" >
+                       
+                      </div>
+                     
+                    </div>
+
+                  </mat-list>
+                </mat-selection-list> -->
+
+                <mat-selection-list #lstDocumentos>
+                  <mat-list *ngFor="let e of bzRecibido; let i=index " 
+                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                    <div class="row">
+                      <div class="col-md-1">
+                          <!-- <mat-checkbox class="example-margin texto-lista"  
+                            [(ngModel)]="e.completed"
+                            color="warn"
+                            (ngModelChange)="updateAllComplete()">
+                          </mat-checkbox> -->
+                          <button mat-icon-button aria-label="Example "  class="text-primary" (click)="open(observacion, e.idd)">
+                            <mat-icon>task_alt</mat-icon>
+                          </button>
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        {{ e.numc }}
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        {{ e.nori | uppercase }}
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        {{ e.fcre | date:"dd-MM-yyyy" }}
+                      </div>
+                      <div class="col-md-4 texto-lista">
+                        {{ e.udep | uppercase }}
+                      </div>
+                      <div class="col-md-1 text-right" >
+                        <button mat-icon-button aria-label="Privado" >
+                          <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
+                        </button>
+                       
+                      </div>
+                    </div>
+                  </mat-list>
+                </mat-selection-list>
+              </div>
+
+            <mat-paginator [length]="lengthOfi"
+                (page)="pageChangeEvent($event)"
+                [pageSize]="pageSizeOfi"
+                [pageSizeOptions]="pageSizeOptions"
+                (page)="pageEvent = $event"
+                aria-label="Seleccionar">
+            </mat-paginator>
+            
+          </mat-tab>
+          <mat-tab>
+              <ng-template mat-tab-label>
+              &nbsp;PROCESADOS
+              </ng-template>
+              <div class="container">
+                <mat-selection-list #lstProcesados>
+                  <mat-list *ngFor="let e of bzProcesados; let i=index " 
+                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                    <div class="row">
+                      <div class="col-md-1">
+                        <button mat-icon-button aria-label="Visibilidad" >
+                          <mat-icon  class="text-primary"  (click)="open(observacion, e.idd)">add_circle</mat-icon>
+                        </button>
+                      </div>
+                     
+                      <div class="col-md-2 texto-lista">
+                        {{ e.numc }}
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        {{ e.fcre | date:"dd-MM-yyyy" }}
+                      </div>
+                      <div class="col-md-4 texto-lista">
+                        {{ e.remi | uppercase }}
+                      </div>
+                      <div class="col-md-1 texto-lista">
+                        {{ e.observacion_accion | uppercase }}
+                      </div>
+                      <div class="col-md-2 text-right" >
+                        <button mat-icon-button aria-label="Privado" >
+                          <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
+                          <mat-icon  class="text-pink">edit_note</mat-icon>
+                        </button>
+                        <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                          <mat-icon class="text-info">attach_file</mat-icon>
+                        </button>
+                        <!-- <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
+                          <mat-icon  class="text-purple">delete</mat-icon>
+                        </button> -->
+
+                      </div>
+                    </div>
+                  </mat-list>
+                </mat-selection-list>
+              </div>
+
+            <mat-paginator [length]="lengthOfi"
+                (page)="pageChangeEvent($event)"
+                [pageSize]="pageSizeOfi"
+                [pageSizeOptions]="pageSizeOptions"
+                (page)="pageEvent = $event"
+                aria-label="Seleccionar">
+            </mat-paginator>
+
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+            &nbsp;PENDIENTES
+            </ng-template>
+
+            <div class="container">
+              <mat-selection-list #lstPendientes>
+                <mat-list *ngFor="let e of bzPendientes; let i=index " 
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1">
+                      <button mat-icon-button aria-label="Visibilidad" >
+                        <mat-icon  class="text-primary"  (click)="open(observacion, e.idd)">add_circle</mat-icon>
+                      </button>
+                    </div>
+                   
+                    <div class="col-md-2 texto-lista">
+                      {{ e.numc }}
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      {{ e.fcre | date:"dd-MM-yyyy" }}
+                    </div>
+                    <div class="col-md-4 texto-lista">
+                      {{ e.remi | uppercase }}
+                    </div>
+                    <div class="col-md-1 texto-lista">
+                      {{ e.observacion_accion | uppercase }}
+                    </div>
+                   
+                   
+                    <div class="col-md-2 text-right" >
+                      <button mat-icon-button aria-label="Privado" >
+                        <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
+                      </button>
+                      <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
+                        <mat-icon  class="text-pink">edit_note</mat-icon>
+                      </button>
+                      <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                        <mat-icon class="text-info">attach_file</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+          <mat-paginator [length]="lengthOfi"
+              (page)="pageChangeEvent($event)"
+              [pageSize]="pageSizeOfi"
+              [pageSizeOptions]="pageSizeOptions"
+              (page)="pageEvent = $event"
+              aria-label="Seleccionar">
+          </mat-paginator>
+          </mat-tab>
+        
+        </mat-tab-group>  
       </div>
-    </div>    
+    </div>
+  </div>    
 </div>
+
+<ng-template #observacion let-modal>
+<div class="modal-header header bg-gradient-info">
+  <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
+</div>
+<div class="modal-body">
+  <div class="form-group col-md-12">
+    <label for="txtobservacion">Observaciones</label>
+    <textarea class="form-control" cols="30" rows="3"  [ngModelOptions]="{standalone: true}"
+    [(ngModel)]="Observacion"></textarea>
+  </div>
+  <div class="form-group  col-md-12">
+    <label>Acción</label>
+    <select class="form-control" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="AccionTexto" (change)="selAccion()">
+        <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+      <!-- <option value="0" *ngIf="vrecibido">ACEPTAR</option>
+      <option value="1" *ngIf="vrecibido">RECHAZAR</option>
+
+      <option value="2" *ngIf="vprocesados" >ELABORAR OFICIO DE OPINION</option>
+      <option value="3"*ngIf="vprocesados" >EN MANOS DEL DIRECTOR DEL DESPACHO</option>
+      <option value="4"*ngIf="vprocesados" >EN MANOS DEL SUB DIRECTOR DEL DESPACHO</option>  
+      <option value="5" *ngIf="vprocesados" >ARCHIVAR</option>
+      <option value="6" *ngIf="vprocesados" >REDISTRIBUCION</option>
+      <option value="7" *ngIf="vpendientes" >SALIDA</option> -->
+    </select>
+    
+  </div>
+  <div class="col-md-12" *ngIf="clasificacion">
+    <label >Area</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}"
+      [(ngModel)]="cmbDestino">
+          <option value="0">SELECCIONE</option>
+          <option *ngFor="let x of lstEstados" value="{{ x.id }}" >{{ x.nomb }}</option> 
+      </select>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn bg-gradient-info text-white "  (click)="insertarObservacion();modal.close('Save')"> 
+    <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+  <button  class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+    <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+</div>
+</ng-template>
+
+
+
+<ng-template #adjuntar let-c="close" let-d="dismiss">
+<div class="modal-header header bg-gradient-success">
+  <h4 class="modal-title" id="modal-basic-title">Cargar Archivo en {{ numControl }}</h4>
+  
+</div>
+<div class="modal-body">
+  
+ 
+  <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+    <input type="hidden" name="txtFileID" id="txtFileID" 
+    [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="numControl"
+     value="{{numControl}}" readonly="readonly">
+    <label for="input-folder-2">Seleccionar Archivo</label>
+    <div class="file-loading">
+      <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" 
+      name="input-folder-2" type="file" multiple accept=".pdf">
+    </div>
+    <div id="errorBlock" class="help-block"></div>
+</form>
+
+
+
+</div>
+<div class="modal-footer">
+  <button class="btn bg-gradient-success text-white "  (click)="SubirArchivo();c('Save')"> 
+    <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
+  <button  class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+    <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+</div>
+</ng-template>
