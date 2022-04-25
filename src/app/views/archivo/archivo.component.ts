@@ -1,4 +1,3 @@
-import { ClassGetter, THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -10,38 +9,29 @@ import { LoginService } from 'src/app/services/seguridad/login.service';
 
 
 @Component({
-  selector: 'app-buzon',
-  templateUrl: './buzon.component.html',
-  styleUrls: ['./buzon.component.scss']
+  selector: 'app-archivo',
+  templateUrl: './archivo.component.html',
+  styleUrls: ['./archivo.component.scss']
 })
-export class BuzonComponent implements OnInit {
+export class ArchivoComponent implements OnInit {
 
 
 
-  public estadoActual = 2
+  public estadoActual = 11
   public estadoOrigen = 1
 
   public clasificacion = false
 
-  public vrecibido = true
-
-  public vprocesados = false
-
-  public vpendientes = false
+  public nexpediente = ''
+  
+  public codigo =  ''
 
   public cmbDestino = ''
 
   public lstAcciones = []
 
   public cmbAcciones = [
-    { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
-    { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
-    { 'valor': '2', 'texto': 'ELABORAR OFICIO DE OPINION', 'visible': '1' },
-    { 'valor': '3', 'texto': 'EN MANOS DEL DIRECTOR DEL DESPACHO', 'visible': '1' },
-    { 'valor': '4', 'texto': 'EN MANOS DEL SUB DIRECTOR DEL DESPACHO', 'visible': '1' },
-    { 'valor': '5', 'texto': 'ARCHIVAR', 'visible': '1' },
-    { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '1' },
-    { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' }]
+    { 'valor': '0', 'texto': 'ARCHIVAR', 'visible': '0' }]
 
   public paginador = 10
   public focus;
@@ -291,21 +281,6 @@ export class BuzonComponent implements OnInit {
             this.rechazarBuzon()
             break;
 
-          case "2"://Oficio por opinión
-            this.promoverBuzon()
-            break;
-
-          case "5":// Enviar a Archivo
-            this.redistribuir(11)
-            break;
-
-          case "6":// Enviar a otras areas
-            this.redistribuir(0)
-            break;
-
-          case "7"://Enviar a salida con bifurcacion
-            this.promoverBuzon()
-            break;
 
           default:
 
@@ -371,13 +346,10 @@ export class BuzonComponent implements OnInit {
 
   }
 
-  async redistribuir(destino: number = 0) {
-    var dst = destino != 0 ? destino : this.cmbDestino
-
+  async redistribuir() {
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
-    this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
-    console.log(this.xAPI.parametros)
+    this.xAPI.parametros = this.cmbDestino + ',' + this.cmbDestino + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.toastrService.success(
@@ -396,20 +368,20 @@ export class BuzonComponent implements OnInit {
 
   }
 
-  async cargarAcciones(posicion) {
+  async cargarAcciones(posicion){
     this.lstAcciones = []
     this.cmbAcciones.forEach(e => {
-      if (e.visible == posicion) {
+      if(e.visible==posicion){
         this.lstAcciones.push(e)
       }
-
+      
     });
   }
 
   selAccion() {
     this.clasificacion = false
     switch (this.AccionTexto) {
-      case '6':
+      case '0':
         this.clasificacion = true
         break;
 
@@ -419,5 +391,3 @@ export class BuzonComponent implements OnInit {
   }
 
 }
-
-

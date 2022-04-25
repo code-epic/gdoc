@@ -20,6 +20,11 @@ import { UtilService } from 'src/app/services/util/util.service'
 
 export class DocumentoComponent implements OnInit, OnDestroy {
 
+  public estadoActual = 1
+  public estadoOrigen = 1
+
+  public ncontrolv = true // visibilidad del input numero de control
+  public ncontrolt = 'Nro. Control'
 
   masterSelected: boolean;
   checklist: any;
@@ -109,6 +114,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstR = [] //Objeto Remitente
   public lstU = [] //Objeto Unidad
   public lstCuenta = [] //Objeto Unidad
+  public titulo = 'Documento'
 
 
   public xAPI: IAPICore = {
@@ -137,7 +143,19 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.listarConfiguracion()
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
-      this.consultarDocumento(this.rutaActiva.snapshot.params.id)
+      var id = this.rutaActiva.snapshot.params.id
+      if (id == 'salida') {
+        this.titulo = 'Salida'
+        this.estadoActual = 9
+        this.ncontrolv = false
+        this.ncontrolt = 'Nro de Salida'
+
+      } else {
+        this.consultarDocumento(id)
+      }
+
+
+
     } else {
       this.limpiarDoc()
 
@@ -240,9 +258,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.WkDoc = {
       "nombre": "Control de Gestion",
       "workflow": 2,
-      "estado": 1,
-      "estatus": 1,
-      "observacion": "Iniciando Documento",
+      "estado": this.estadoActual,
+      "estatus": this.estadoOrigen,
+      "observacion": "Creando " + this.titulo,
       "usuario": this.loginService.Usuario.id
     }
     this.xAPI.funcion = 'WKF_IDocumento'
@@ -255,8 +273,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.obtenerWorkFlow() //Obtener valores de una API
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
-      this.actualizarDocumentos()
-      return
+      var id = this.rutaActiva.snapshot.params.id
+      if (id != 'salida') {
+        this.actualizarDocumentos()
+        return
+      }
+
     }
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -268,11 +290,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
               this.obtenerAlertaWorkFlow(xdata)
               this.apiService.Ejecutar(this.xAPI).subscribe(
                 (ydata) => {
-                  
+
                   this.ngxService.stopLoader("loader-aceptar")
                 },
                 (errot) => {
-                  
+
                   this.toastrService.error(data.msj, `GDoc Wkf.Alerta`)
                   this.ngxService.stopLoader("loader-aceptar")
                 }
@@ -317,7 +339,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       return false
     }
     this.xAPI.funcion = 'WKF_IDocumentoDetalle'
-    this.Doc.ncontrol = this.utilService.Semillero(data.msj)
+    if (this.estadoActual !=9) this.Doc.ncontrol = this.utilService.Semillero(data.msj)
     this.Doc.wfdocumento = parseInt(data.msj)
     this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
     this.Doc.forigen = this.utilService.ConvertirFecha(this.forigen)
@@ -382,26 +404,26 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         console.info(this.xAPI);
       },
       (errot) => {
-        
+
         this.limpiarDoc()
         this.toastrService.error(errot, `GDoc Wkf.Actualizar Documentos`)
         this.ngxService.stopLoader("loader-aceptar")
       }
     )
 
-    
+
 
   }
 
   agregarCuenta(): IWKFCuenta {
-    
-    if (this.cuenta == '' || 
-    this.resumen == '' ||
-    this.detalle == '') {
+
+    if (this.cuenta == '' ||
+      this.resumen == '' ||
+      this.detalle == '') {
       this.toastrService.info('Todos los campos son requeridos', `GDoc Wkf.Agregar Cuentas`)
       return
     }
-    
+
     const wkcuenta: IWKFCuenta = {
       documento: 0,
       cuenta: this.cuenta.toUpperCase(),

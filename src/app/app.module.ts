@@ -48,6 +48,7 @@ import { AuthInterceptorService } from './services/seguridad/auth-interceptor.se
 import { AybuzonComponent } from './views/ayudantia/aybuzon/aybuzon.component';
 import { AyreportesComponent } from './views/ayudantia/ayreportes/ayreportes.component';
 import { GeneralesComponent } from './views/generales/generales.component';
+import { ArchivoComponent } from './views/archivo/archivo.component';
 
 
 
@@ -146,7 +147,8 @@ const ngWizardConfig: NgWizardConfig = {
     ConfiguracionComponent,
     AybuzonComponent,
     AyreportesComponent,
-    GeneralesComponent
+    GeneralesComponent,
+    ArchivoComponent
   ],
   providers:  [
     {

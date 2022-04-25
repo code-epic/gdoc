@@ -4,6 +4,7 @@ import { Location, LocationStrategy, PathLocationStrategy } from '@angular/commo
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2'
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-navbar',
@@ -20,6 +21,7 @@ export class NavbarComponent implements OnInit {
   constructor(location: Location,  
     private element: ElementRef, 
     private router: Router,
+    private modalService: NgbModal,
     private loginService : LoginService ) {
     this.location = location;
   }
@@ -30,12 +32,17 @@ export class NavbarComponent implements OnInit {
 
     this.listTitles = ROUTES.filter(listTitle => listTitle);
   }
+
+  open(content) {
+    this.modalService.open(content);
+  } 
+
   getTitle(){
     var titlee = this.location.prepareExternalUrl(this.location.path());
     if(titlee.charAt(0) === '#'){
         titlee = titlee.slice( 1 );
     }
-
+   
     for(var item = 0; item < this.listTitles.length; item++){
         if(this.listTitles[item].path === titlee){
             return this.listTitles[item].title;

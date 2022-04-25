@@ -12,7 +12,7 @@
                     <div class="row align-items-center">
                         <div class="col-md-10">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
-                            <h2 class="mb-0">Registrar Documento</h2>
+                            <h2 class="mb-0">Registrar {{titulo}}</h2>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
@@ -51,10 +51,10 @@
                     <form role="form">
                         <div class="form-row">
                             <div class="form-group col-md-2">
-                                <label for="txtControl"> Nro. Control </label>                    
+                                <label for="txtControl"> {{ncontrolt}} </label>                    
                                 <input type="text" class="form-control" id="txtControl" 
                                 [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Doc.ncontrol" readonly
+                                [(ngModel)]="Doc.ncontrol" [readonly]="ncontrolv"
                                 >
                             </div>
                             

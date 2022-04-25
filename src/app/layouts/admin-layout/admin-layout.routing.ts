@@ -17,6 +17,8 @@ import { PersonalComponent } from 'src/app/views/personal/personal.component';
 import { AybuzonComponent } from 'src/app/views/ayudantia/aybuzon/aybuzon.component';
 import { AyreportesComponent } from 'src/app/views/ayudantia/ayreportes/ayreportes.component';
 import { GeneralesComponent } from 'src/app/views/generales/generales.component';
+import { ArchivoComponent } from 'src/app/views/archivo/archivo.component';
+
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -108,6 +110,11 @@ export const AdminLayoutRoutes: Routes = [
     { 
         path: 'configuracion', 
         component: ConfiguracionComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'archivo', 
+        component: ArchivoComponent,
         canActivate:[AuthGuardGuard] 
     },
 ];

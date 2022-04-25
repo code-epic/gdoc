@@ -16,7 +16,7 @@
           </div>
         </a>
         <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-          <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
+          <a class="dropdown-item" (click)="open(content)">
             <i class="ni ni-single-02"></i>
             <span>Perfil</span>
           </a>
@@ -24,10 +24,14 @@
             <i class="ni ni-calendar-grid-58"></i>
             <span>Alertas</span>
           </a>
+          <a class="dropdown-item" (click)="open(contra)">
+            <i class="ni ni-key-25"></i>
+            <span>Cambiar Contraseña</span>
+          </a>
         
           <div class="dropdown-divider"></div>
           <a href="#" class="dropdown-item" (click)="cerrar()">
-            <i class="ni ni-user-run"></i>
+            <i class="ni ni-button-power"></i>
             <span>Cerrar Sesión</span>
           </a>
         </div>
@@ -35,3 +39,79 @@
     </ul>
   </div>
 </nav>
+
+<ng-template #content let-modal>
+  <div class="modal-header header bg-gradient-success font-weight-bold">
+    <h4 class="modal-title text-white" id="modal-basic-title">PERFIL</h4>
+  </div>
+  <div class="modal-body">
+    <div class="col-md-12">
+      <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="txtControl"> Cédula </label>                    
+            <input type="text" class="form-control" id="txtCedula">
+        </div>
+        <div class="form-group col-md-8">
+          <label for="txtControl"> Área </label>                    
+          <input type="text" class="form-control" id="txtArea">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="txtControl"> Nombres </label>                    
+            <input type="text" class="form-control" id="txtNombre">
+        </div>
+        <div class="form-group col-md-6">
+          <label for="txtControl"> Apellidos </label>                    
+          <input type="text" class="form-control" id="txtApellido">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-success text-white "  (click)="clasificarBuzon();modal.close('Save')"> 
+      <span class="fa fa-save"></span>&nbsp;&nbsp;Guardar </button>
+    <button  class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
+
+<ng-template #contra let-modal>
+  <div class="modal-header header bg-gradient-success font-weight-bold">
+    <h4 class="modal-title text-white" id="modal-basic-title">CAMBIAR CONTRASEÑA</h4>
+  </div>
+  <div class="modal-body">
+    <div class="col-md-12">
+      <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="txtControl"> Clave Actual </label>                    
+            <input type="text" class="form-control" id="txtClaveActual">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="txtControl"> Clave Nueva </label>                    
+            <input type="text" class="form-control" id="txtClaveNueva">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="txtControl"> Repetir </label>                    
+            <input type="text" class="form-control" id="txtClaveRepetida">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-success text-white "  (click)="clasificarBuzon();modal.close('Save')"> 
+      <span class="fa fa-save"></span>&nbsp;&nbsp;Guardar </button>
+    <button  class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>

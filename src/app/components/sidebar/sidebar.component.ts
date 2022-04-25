@@ -25,6 +25,8 @@ export class SidebarComponent implements OnInit {
   }
 
   async ngOnInit() {
+
+    // console.log('ENtrando en el menu')
     
     if (ROUTES.length == 0){
       await this.loginService.Iniciar()

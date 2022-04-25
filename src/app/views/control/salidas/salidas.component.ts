@@ -19,7 +19,7 @@ export class SalidasComponent implements OnInit {
 
 
 
-  public estadoActual = 2
+  public estadoActual = 9
   public estadoOrigen = 1
 
   public clasificacion = false
