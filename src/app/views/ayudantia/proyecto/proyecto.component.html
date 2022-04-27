@@ -26,12 +26,12 @@
             <div class="card-body">
                 <form>
                     <div class="form-row">
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label for="txtNombre"> Nombre del Proyecto </label>                    
                             <input type="txtNombre" [ngModelOptions]="{standalone: true}"
                             [(ngModel)]="Proyecto.nombre" value="{{Proyecto.nombre}}" class="form-control">
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             <label for="cmbTipo">Tipo de Proyecto</label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                             [(ngModel)]="Proyecto.tipo" value="{{Proyecto.tipo}}">
@@ -40,18 +40,38 @@
                                 <option value="Remodelación">Remodelación</option>
                             </select>
                         </div>
+                        <div class="form-group col-md-3">
+                            <label for="cmbTipo">Estatus</label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.estatus" value="{{Proyecto.estatus}}">
+                                <option value="0">Seleccione</option>
+                                <option value="ACTIVO">ACTIVO</option>
+                                <option value="CERRADO">CERRADO</option>
+                            </select>
+                        </div>
+
+
+                       
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="txtEnte"> Jefe del Proyecto </label>                    
+                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.jefeproyecto" value="{{Proyecto.jefeproyecto}}">
+                        </div>
                         <div class="form-group col-md-4">
                             <label for="txtEnte"> Ente Contratante </label>                    
                             <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
                             [(ngModel)]="Proyecto.contratante" value="{{Proyecto.contratante}}">
                         </div>
-                    </div>
-                    <div class="form-row">
                         <div class="form-group col-md-4">
                             <label for="txtEmpresa">Empresa Ejecutante</label>
                             <input type="txtEmpresa" class="form-control" [ngModelOptions]="{standalone: true}"
                             [(ngModel)]="Proyecto.empresa" value="{{Proyecto.empresa}}">
                         </div>
+                        
+                    </div>
+                    <div class="form-row">
                         <div class="form-group col-md-4">
                             <label for="cmbFuente">Fuente de Financiamiento</label>
                             <select class="form-control"  [ngModelOptions]="{standalone: true}"
@@ -70,7 +90,70 @@
                                 <option value="Ministerio">Ministerio</option>
                             </select>
                         </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="txtSistema">Sistema</label>
+                            <input type="txtSistema" class="form-control" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.sistema" value="{{Proyecto.sistema}}">
+                        </div>
+
                     </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="tmsOrigen">Fecha Desde</label>
+                            <form class="form-inline">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
+                                        <input class="form-control" placeholder="AAAA-MM-DD" 
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Proyecto.lapso" ngbDatepicker #fo="ngbDatepicker" 
+                                        [value]="formatter.format(flapso)"
+                                        [placement]="placement" [positionTarget]="buttonEl">
+                                        <div class="input-group-append">
+                                            <button #buttonEl 
+                                                class="btn calendario" (click)="fo.toggle()" 
+                                                type="button">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                       
+                        <div class="form-group col-md-4">
+                            <label for="tmsOrigen">Fecha Hasta</label>
+                            <form class="form-inline">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
+                                        <input class="form-control" placeholder="AAAA-MM-DD" 
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Proyecto.lapso" ngbDatepicker #fo="ngbDatepicker" 
+                                        [value]="formatter.format(flapso)"
+                                        [placement]="placement" [positionTarget]="buttonEl">
+                                        <div class="input-group-append">
+                                            <button #buttonEl 
+                                                class="btn calendario" (click)="fo.toggle()" 
+                                                type="button">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <div class="form-group col-md-4">
+                            <label for="txtDeuda">Numero de Contrato</label>
+                            <input type="text" class="form-control"  [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Proyecto.ncontrato" value="{{Proyecto.ncontrato}}">
+                        </div>
+                    </div>
+
+
+
+
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <label for="txtObjeto">Objeto del Proyecto</label>
@@ -101,11 +184,28 @@
                             </div>
                         </div> 
                     </div>
+                    
+                    
                     <div class="form-row">
                         <div class="form-group col-md-3">
-                            <label for="txtLapso">Lapso de Ejecución</label>
-                            <input type="txtLapso" class="form-control"  [ngModelOptions]="{standalone: true}"
-                            [(ngModel)]="Proyecto.lapso" value="{{Proyecto.lapso}}">
+                            <label for="tmsOrigen">Fecha Origen</label>
+                            <form class="form-inline">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
+                                        <input class="form-control" placeholder="AAAA-MM-DD" 
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Proyecto.lapso" ngbDatepicker #fo="ngbDatepicker" 
+                                        [value]="formatter.format(flapso)"
+                                        [placement]="placement" [positionTarget]="buttonEl">
+                                        <div class="input-group-append">
+                                            <button #buttonEl 
+                                                class="btn calendario" (click)="fo.toggle()" 
+                                                type="button">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                         <div class="form-group col-md-3">
                             <label for="txtMonto">Monto Total del Proyecto</label>
@@ -123,7 +223,64 @@
                             [(ngModel)]="Proyecto.adeuda" value="{{Proyecto.adeuda}}">
                         </div>
                     </div>
-                    <hr>
+                    
+                    
+                    <br>
+                    <h4 class="titulo">Avances fisicos</h4>
+                    <hr style="margin-top:1rem">
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label for="tmsOrigen">Fecha Avance</label>
+                            <form class="form-inline">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
+                                        <input class="form-control" placeholder="AAAA-MM-DD" 
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Avance.lapso" ngbDatepicker #fo="ngbDatepicker" 
+                                        [value]="formatter.format(flapso)"
+                                        [placement]="placement" [positionTarget]="buttonEl">
+                                        <div class="input-group-append">
+                                            <button #buttonEl 
+                                                class="btn calendario" (click)="fo.toggle()" 
+                                                type="button">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="txtMonto">Monto</label>
+                            <input type="number" class="form-control"  [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Avance.monto" value="{{Avance.monto}}">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="nombre">Ejecucion Fisica</label>
+                            <input type="number" class="form-control"  [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Avance.ejecucion" value="{{Avance.ejecucion}}">
+                        </div>
+                       
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtObservacion">Observaciones</label>
+                            <div class="NgxEditor__Wrapper">
+                                <ngx-editor-menu [editor]="xobser"> </ngx-editor-menu>
+                                <ngx-editor
+                                [ngModelOptions]="{standalone: true}"
+                                [editor]="xobser"
+                                [(ngModel)]="Avance.observacion"
+                                [disabled]="false"
+                                [placeholder]="'Escibe aqui...'">
+                                </ngx-editor>
+                            </div>
+                        </div> 
+                    </div>
+                    
+                    
+                    
                     <div class="row">                   
                         <div class="col-md-12">
                             <div class="text-right">

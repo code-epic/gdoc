@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Editor } from 'ngx-editor'
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { IProyecto } from 'src/app/services/ayudantia/proyecto.service';
+import { Proyecto, Avance } from 'src/app/services/ayudantia/proyecto.service';
 import { UtilService } from 'src/app/services/util/util.service';
 
 import { ActivatedRoute, Router } from '@angular/router'
@@ -25,8 +25,14 @@ export class ProyectoComponent implements OnInit {
 
 
   editor: Editor = new Editor;
+  
   xeditor: Editor = new Editor;
+  
+  xobser: Editor = new Editor;
+  
 
+  flapso : NgbDate | null
+  placement = 'top';
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -34,7 +40,8 @@ export class ProyectoComponent implements OnInit {
     valores: ''
   }
 
-  public Proyecto: IProyecto = {
+  public Proyecto: Proyecto = {
+    ncontrato : '',
     nombre: '',
     tipo: '0',
     contratante: '',
@@ -49,8 +56,17 @@ export class ProyectoComponent implements OnInit {
     monto_pagado: 0.00,
     adeuda: 0.00,
     usuario: '',
+    estatus: '',
+    jefeproyecto: '',
+    desdehasta : '',
+    sistema: '',
   }
 
+  public Avance : Avance = {
+    lapso: '',
+    ejecucion: '',
+    monto: ''
+  }
 
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
@@ -64,7 +80,10 @@ export class ProyectoComponent implements OnInit {
 
   ngOnInit(): void {
     this.editor = new Editor()
+
     this.xeditor = new Editor()
+
+    this.xobser = new Editor()
   }
 
   async guardar() {

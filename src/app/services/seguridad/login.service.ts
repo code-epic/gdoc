@@ -45,12 +45,10 @@ export class LoginService {
   public Usuario : any
 
   public Aplicacion : any
-  
-  
+
   constructor(private router: Router, private http : HttpClient) {
     this.Id = environment.ID
     if (sessionStorage.getItem("token") != undefined ) this.SToken = sessionStorage.getItem("token");
-    
   }
 
   async Iniciar() {
