@@ -1,0 +1,158 @@
+<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--9">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col-md-11">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Ayudantía</h6>
+                            <h2 class="mb-0">Registrar Cotizaciones</h2>
+                        </div>
+                        <div class="col-md-1">
+                            <a routerLinkActive="active" [routerLink]="['/ayreportes']">
+                                <button  mat-fab color="primary" title="Adjuntar Fotos">
+                                    <mat-icon class="waves waves-effect waves-light">wallpaper</mat-icon>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="txtNombre"> Nombre de la Empresa </label>
+                                <input type="txtNombre" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Proyecto.nombre" value="{{Proyecto.nombre}}" class="form-control">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="tmsOrigen">Fecha</label>
+                                <form class="form-inline">
+                                    <div class="form-group" style="width:100%">
+                                        <div class="input-group" style="width:100%">
+                                            <input class="form-control" placeholder="AAAA-MM-DD"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Proyecto.lapso"
+                                                ngbDatepicker #fo="ngbDatepicker" [value]="formatter.format(flapso)"
+                                                [placement]="placement" [positionTarget]="buttonEl">
+                                            <div class="input-group-append">
+                                                <button #buttonEl class="btn calendario" (click)="fo.toggle()"
+                                                    type="button">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="tmsOrigen">Vigencia</label>
+                                <form class="form-inline">
+                                    <div class="form-group" style="width:100%">
+                                        <div class="input-group" style="width:100%">
+                                            <input class="form-control" placeholder="AAAA-MM-DD"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Proyecto.lapso"
+                                                ngbDatepicker #fo="ngbDatepicker" [value]="formatter.format(flapso)"
+                                                [placement]="placement" [positionTarget]="buttonEl">
+                                            <div class="input-group-append">
+                                                <button #buttonEl class="btn calendario" (click)="fo.toggle()"
+                                                    type="button">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="txtObjeto">Objeto de la Cotización</label>
+                                <div class="NgxEditor__Wrapper">
+                                    <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                                    <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor"
+                                        [(ngModel)]="Proyecto.objeto" [disabled]="false"
+                                        [placeholder]="'Escibe aqui...'">
+                                    </ngx-editor>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-row">
+                            <div class="form-group col-md-3">
+                                <label for="txtEnte"> Monto Total </label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Proyecto.jefeproyecto" value="{{Proyecto.jefeproyecto}}">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="txtEnte"> Tiempo de Ejecución </label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Proyecto.contratante" value="{{Proyecto.contratante}}">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="txtEmpresa">Monto Pagado</label>
+                                <input type="txtEmpresa" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Proyecto.empresa" value="{{Proyecto.empresa}}">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="txtEmpresa">Deuda</label>
+                                <input type="txtEmpresa" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Proyecto.empresa" value="{{Proyecto.empresa}}">
+                            </div>
+
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="txtMonto">Garantía</label>
+                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Avance.monto" value="{{Avance.monto}}">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="txtMonto">Modalidad de Entrega</label>
+                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Avance.monto" value="{{Avance.monto}}">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="nombre">Forma de Pago</label>
+                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Avance.ejecucion" value="{{Avance.ejecucion}}">
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="txtMonto">Responsable</label>
+                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Avance.monto" value="{{Avance.monto}}">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="txtMonto">Cargo Responsable</label>
+                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Avance.monto" value="{{Avance.monto}}">
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="text-right">
+                                    <button class="btn bg-primary text-white" (click)="guardar()">Guardar</button>
+                                    <button class="btn bg-red text-white">Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

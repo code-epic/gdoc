@@ -18,6 +18,7 @@ import { AybuzonComponent } from 'src/app/views/ayudantia/aybuzon/aybuzon.compon
 import { AyreportesComponent } from 'src/app/views/ayudantia/ayreportes/ayreportes.component';
 import { GeneralesComponent } from 'src/app/views/generales/generales.component';
 import { ArchivoComponent } from 'src/app/views/archivo/archivo.component';
+import { AycotizacionesComponent } from 'src/app/views/ayudantia/aycotizaciones/aycotizaciones.component';
 
 
 
@@ -115,6 +116,11 @@ export const AdminLayoutRoutes: Routes = [
     { 
         path: 'archivo', 
         component: ArchivoComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'aycotizaciones', 
+        component: AycotizacionesComponent,
         canActivate:[AuthGuardGuard] 
     },
 ];

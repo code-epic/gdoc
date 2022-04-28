@@ -36,8 +36,9 @@
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                             [(ngModel)]="Proyecto.tipo" value="{{Proyecto.tipo}}">
                                 <option value="0">Seleccione</option>
-                                <option value="Infraestructura">Infraestructura</option>
-                                <option value="Remodelación">Remodelación</option>
+                                <option value="Infraestructura">INFRAESTRUCTURA</option>
+                                <option value="Intendencia">INTENDENCIA</option>
+                                <option value="Sistema">SISTEMA DE ARMAS</option>
                             </select>
                         </div>
                         <div class="form-group col-md-3">
@@ -45,8 +46,9 @@
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                             [(ngModel)]="Proyecto.estatus" value="{{Proyecto.estatus}}">
                                 <option value="0">Seleccione</option>
-                                <option value="ACTIVO">ACTIVO</option>
-                                <option value="CERRADO">CERRADO</option>
+                                <option value="ACTIVO">POR INICIAR</option>
+                                <option value="CERRADO">EJECUCIÓN</option>
+                                <option value="FINALIZADO">FINALIZADO</option>
                             </select>
                         </div>
 
@@ -77,8 +79,9 @@
                             <select class="form-control"  [ngModelOptions]="{standalone: true}"
                             [(ngModel)]="Proyecto.fuente" value="{{Proyecto.fuente}}">
                                 <option value="0">Seleccione</option>
-                                <option value="Ministerio de Vivienda">Ministerio de Vivienda</option>
-                                <option value="Comandancia del Ejército">Comandancia del Ejército</option>
+                                <option value="Fonden">FONDEN</option>
+                                <option value="Mppd">MPPD</option>
+                                <option value="Otros">Otros</option>
                             </select>
                         </div>
                         <div class="form-group col-md-4">
@@ -86,8 +89,14 @@
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                             [(ngModel)]="Proyecto.usuario_final" value="{{Proyecto.usuario_final}}">
                                 <option value="0">Seleccione</option>
-                                <option value="Presidencia">Presidencia</option>
-                                <option value="Ministerio">Ministerio</option>
+                                <option value="Presidencia">EJÉRCITO BOLIVARIANO</option>
+                                <option value="Ministerio">ARMADA BOLIVARIANA</option>
+                                <option value="Presidencia">AVAIACIÓN MILITAR BOLIVARIANA</option>
+                                <option value="Ministerio">GUARDIA NACIONAL BOLIVARIANA</option>
+                                <option value="Presidencia">CODAI</option>
+                                <option value="Ministerio">COMANDO ÁEREO DEL EJERCITO BOLIVARIANO</option>
+                                <option value="Ministerio">COMANDO ÁEREO DE LA GUARDIA NACIONAL BOLIVARIANA</option>
+                                <option value="Ministerio">AVIACIÓN NAVAL BOLIVARIANA</option>
                             </select>
                         </div>
 
@@ -222,61 +231,6 @@
                             <input type="number" readonly class="form-control"  [ngModelOptions]="{standalone: true}"
                             [(ngModel)]="Proyecto.adeuda" value="{{Proyecto.adeuda}}">
                         </div>
-                    </div>
-                    
-                    
-                    <br>
-                    <h4 class="titulo">Avances fisicos</h4>
-                    <hr style="margin-top:1rem">
-                    
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <label for="tmsOrigen">Fecha Avance</label>
-                            <form class="form-inline">
-                                <div class="form-group" style="width:100%">
-                                    <div class="input-group" style="width:100%">
-                                        <input class="form-control" placeholder="AAAA-MM-DD" 
-                                        [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Avance.lapso" ngbDatepicker #fo="ngbDatepicker" 
-                                        [value]="formatter.format(flapso)"
-                                        [placement]="placement" [positionTarget]="buttonEl">
-                                        <div class="input-group-append">
-                                            <button #buttonEl 
-                                                class="btn calendario" (click)="fo.toggle()" 
-                                                type="button">
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="txtMonto">Monto</label>
-                            <input type="number" class="form-control"  [ngModelOptions]="{standalone: true}"
-                            [(ngModel)]="Avance.monto" value="{{Avance.monto}}">
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="nombre">Ejecucion Fisica</label>
-                            <input type="number" class="form-control"  [ngModelOptions]="{standalone: true}"
-                            [(ngModel)]="Avance.ejecucion" value="{{Avance.ejecucion}}">
-                        </div>
-                       
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label for="txtObservacion">Observaciones</label>
-                            <div class="NgxEditor__Wrapper">
-                                <ngx-editor-menu [editor]="xobser"> </ngx-editor-menu>
-                                <ngx-editor
-                                [ngModelOptions]="{standalone: true}"
-                                [editor]="xobser"
-                                [(ngModel)]="Avance.observacion"
-                                [disabled]="false"
-                                [placeholder]="'Escibe aqui...'">
-                                </ngx-editor>
-                            </div>
-                        </div> 
                     </div>
                     
                     

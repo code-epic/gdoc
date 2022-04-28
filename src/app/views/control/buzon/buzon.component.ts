@@ -304,7 +304,7 @@ export class BuzonComponent implements OnInit {
             break;
 
           case "7"://Enviar a salida con bifurcacion
-            this.promoverBuzon()
+            this.redistribuir(9)
             break;
 
           default:
