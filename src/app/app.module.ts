@@ -50,6 +50,7 @@ import { AyreportesComponent } from './views/ayudantia/ayreportes/ayreportes.com
 import { GeneralesComponent } from './views/generales/generales.component';
 import { ArchivoComponent } from './views/archivo/archivo.component';
 import { AycotizacionesComponent } from './views/ayudantia/aycotizaciones/aycotizaciones.component';
+import { PendientesComponent } from './views/control/pendientes/pendientes.component';
 
 
 
@@ -150,7 +151,8 @@ const ngWizardConfig: NgWizardConfig = {
     AyreportesComponent,
     GeneralesComponent,
     ArchivoComponent,
-    AycotizacionesComponent
+    AycotizacionesComponent,
+    PendientesComponent
   ],
   providers:  [
     {

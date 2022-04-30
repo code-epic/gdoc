@@ -19,6 +19,7 @@ import { AyreportesComponent } from 'src/app/views/ayudantia/ayreportes/ayreport
 import { GeneralesComponent } from 'src/app/views/generales/generales.component';
 import { ArchivoComponent } from 'src/app/views/archivo/archivo.component';
 import { AycotizacionesComponent } from 'src/app/views/ayudantia/aycotizaciones/aycotizaciones.component';
+import { PendientesComponent } from 'src/app/views/control/pendientes/pendientes.component';
 
 
 
@@ -122,5 +123,9 @@ export const AdminLayoutRoutes: Routes = [
         path: 'aycotizaciones', 
         component: AycotizacionesComponent,
         canActivate:[AuthGuardGuard] 
-    },
+    },{ 
+        path: 'pendientes', 
+        component: PendientesComponent,
+        canActivate:[AuthGuardGuard] 
+    }
 ];

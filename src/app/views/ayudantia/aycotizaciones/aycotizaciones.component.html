@@ -27,9 +27,9 @@
                     <form>
                         <div class="form-row">
                             <div class="form-group col-md-4">
-                                <label for="txtNombre"> Nombre de la Empresa </label>
-                                <input type="txtNombre" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.nombre" value="{{Proyecto.nombre}}" class="form-control">
+                                <label > Nombre de la Empresa </label>
+                                <input type="text" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}" class="form-control">
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="tmsOrigen">Fecha</label>
@@ -37,11 +37,11 @@
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Proyecto.lapso"
-                                                ngbDatepicker #fo="ngbDatepicker" [value]="formatter.format(flapso)"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Cotizaciones.fecha"
+                                                ngbDatepicker #fe="ngbDatepicker" [value]="formatter.format(fecha)"
                                                 [placement]="placement" [positionTarget]="buttonEl">
                                             <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="fo.toggle()"
+                                                <button #buttonEl class="btn calendario" (click)="fe.toggle()"
                                                     type="button">
                                                 </button>
                                             </div>
@@ -55,11 +55,11 @@
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Proyecto.lapso"
-                                                ngbDatepicker #fo="ngbDatepicker" [value]="formatter.format(flapso)"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Cotizaciones.vigencia"
+                                                ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(vigencia)"
                                                 [placement]="placement" [positionTarget]="buttonEl">
                                             <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="fo.toggle()"
+                                                <button #buttonEl class="btn calendario" (click)="vi.toggle()"
                                                     type="button">
                                                 </button>
                                             </div>
@@ -74,7 +74,7 @@
                                 <div class="NgxEditor__Wrapper">
                                     <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
                                     <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor"
-                                        [(ngModel)]="Proyecto.objeto" [disabled]="false"
+                                        [(ngModel)]="Cotizaciones.objeto" [disabled]="false"
                                         [placeholder]="'Escibe aqui...'">
                                     </ngx-editor>
                                 </div>
@@ -83,44 +83,49 @@
 
 
                         <div class="form-row">
+                           
                             <div class="form-group col-md-3">
-                                <label for="txtEnte"> Monto Total </label>
+                                <label> Tiempo de Ejecución </label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.jefeproyecto" value="{{Proyecto.jefeproyecto}}">
+                                    [(ngModel)]="Cotizaciones.lapso" value="{{Cotizaciones.lapso}}">
                             </div>
                             <div class="form-group col-md-3">
-                                <label for="txtEnte"> Tiempo de Ejecución </label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.contratante" value="{{Proyecto.contratante}}">
+                                <label> Monto Total </label>
+                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Cotizaciones.total" value="{{Cotizaciones.total}}"
+                                    (blur)="restar()"
+                                    >
                             </div>
                             <div class="form-group col-md-3">
-                                <label for="txtEmpresa">Monto Pagado</label>
-                                <input type="txtEmpresa" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.empresa" value="{{Proyecto.empresa}}">
+                                <label>Monto Pagado</label>
+                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Cotizaciones.pagado" value="{{Cotizaciones.pagado}}" 
+                                    (blur)="restar()"
+                                >
                             </div>
                             <div class="form-group col-md-3">
-                                <label for="txtEmpresa">Deuda</label>
-                                <input type="txtEmpresa" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.empresa" value="{{Proyecto.empresa}}">
+                                <label>Deuda</label>
+                                <input type="number" readonly class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Cotizaciones.deuda" value="{{Cotizaciones.deuda}}">
                             </div>
 
                         </div>
 
                         <div class="form-row">
                             <div class="form-group col-md-4">
-                                <label for="txtMonto">Garantía</label>
+                                <label>Garantía</label>
                                 <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Avance.monto" value="{{Avance.monto}}">
+                                    [(ngModel)]="Cotizaciones.garantia" value="{{Cotizaciones.garantia}}">
                             </div>
                             <div class="form-group col-md-4">
-                                <label for="txtMonto">Modalidad de Entrega</label>
-                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Avance.monto" value="{{Avance.monto}}">
+                                <label>Modalidad de Entrega</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Cotizaciones.modalidad" value="{{Cotizaciones.modalidad}}">
                             </div>
                             <div class="form-group col-md-4">
-                                <label for="nombre">Forma de Pago</label>
-                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Avance.ejecucion" value="{{Avance.ejecucion}}">
+                                <label>Forma de Pago</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Cotizaciones.forma_pago" value="{{Cotizaciones.forma_pago}}">
                             </div>
 
                         </div>
@@ -128,14 +133,14 @@
 
                         <div class="form-row">
                             <div class="form-group col-md-6">
-                                <label for="txtMonto">Responsable</label>
-                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Avance.monto" value="{{Avance.monto}}">
+                                <label>Responsable</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Cotizaciones.responsable" value="{{Cotizaciones.responsable}}">
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="txtMonto">Cargo Responsable</label>
-                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Avance.monto" value="{{Avance.monto}}">
+                                <label>Cargo Responsable</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Cotizaciones.cargo_responsable" value="{{Cotizaciones.cargo_responsable}}">
                             </div>
 
                         </div>

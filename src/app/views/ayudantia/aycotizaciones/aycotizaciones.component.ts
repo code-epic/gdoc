@@ -12,25 +12,54 @@ import { NgxUiLoaderService } from 'ngx-ui-loader'
 import Swal from 'sweetalert2'
 
 import { LoginService } from 'src/app/services/seguridad/login.service'
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+
+
+interface Cotizaciones {
+  nombre: string
+  fecha: string
+  vigencia: string
+  objeto: string
+  total: number
+  pagado: number
+  deuda: number
+  garantia: number
+  moneda: string
+  lapso: string
+  modalidad: string
+  forma_pago: string //forma de pago
+  responsable: string
+  cargo_responsable: string
+  usuario: string
+  obseravacion: string
+}
+
+
+
+
 
 @Component({
   selector: 'app-aycotizaciones',
   templateUrl: './aycotizaciones.component.html',
   styleUrls: ['./aycotizaciones.component.scss']
 })
+
 export class AycotizacionesComponent implements OnInit {
 
 
 
   editor: Editor = new Editor;
-  
-  xeditor: Editor = new Editor;
-  
-  xobser: Editor = new Editor;
-  
 
-  flapso : NgbDate | null
-  placement = 'top';
+  xeditor: Editor = new Editor;
+
+  xobser: Editor = new Editor;
+
+
+  fecha: NgbDate | null
+
+  vigencia: NgbDate | null
+
+  placement = 'bottom';
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -38,34 +67,24 @@ export class AycotizacionesComponent implements OnInit {
     valores: ''
   }
 
-  public Proyecto: Proyecto = {
-    ncontrato : '',
+  public Cotizaciones: Cotizaciones = {
     nombre: '',
-    tipo: '0',
-    contratante: '',
-    empresa: '',
-    fuente: '0',
-    usuario_final: '0',
+    fecha: '',
+    vigencia: '',
     objeto: '',
-    observacion: '',
+    total: 0,
+    pagado: 0,
+    deuda: 0,
+    garantia: 0,
     moneda: '',
     lapso: '',
-    monto_total: 0.00,
-    monto_pagado: 0.00,
-    adeuda: 0.00,
+    modalidad: '',
+    forma_pago: '',
+    responsable: '',
+    cargo_responsable: '',
     usuario: '',
-    estatus: '',
-    jefeproyecto: '',
-    desdehasta : '',
-    sistema: '',
+    obseravacion: ''
   }
-
-  public Avance : Avance = {
-    lapso: '',
-    ejecucion: '',
-    monto: ''
-  }
-
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
     private utilService: UtilService,
@@ -85,22 +104,28 @@ export class AycotizacionesComponent implements OnInit {
   }
 
   async guardar() {
-    console.log(this.Proyecto);
-    this.xAPI.funcion = 'MPPD_IProyecto'
+    console.log(this.Cotizaciones);
+    this.xAPI.funcion = 'MPPD_ICotizaciones'
     this.xAPI.parametros = ''
-    this.Proyecto.usuario = this.loginService.Usuario.id
+    this.Cotizaciones.usuario = this.loginService.Usuario.id
 
-    this.xAPI.valores = JSON.stringify(this.Proyecto)
+    this.Cotizaciones.fecha = this.utilService.ConvertirFecha(this.Cotizaciones.fecha)
+
+    this.Cotizaciones.vigencia = this.utilService.ConvertirFecha(this.Cotizaciones.vigencia)
+
+    this.xAPI.valores = JSON.stringify(this.Cotizaciones)
+    console.log(this.xAPI)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.limpiarFrm()
-        this.aceptar('')
+
+        this.aceptar(data.msj)
         this.ngxService.stopLoader("loader-aceptar")
-       
+
       },
       (errot) => {
 
-        this.toastrService.error(errot, `GDoc MPPD Insertar Proyecto`)
+        this.toastrService.error(errot, `GDoc MPPD Insertar Cotizaciones`)
         this.ngxService.stopLoader("loader-aceptar")
         this.ruta.navigate(['/ayudantia']);
       }
@@ -109,8 +134,8 @@ export class AycotizacionesComponent implements OnInit {
 
   protected aceptar(msj: string) {
     Swal.fire({
-      title: 'El Proyecto ha sido  Registrado' + msj,
-      text: "¿Desea registar otro documento?",
+      title: 'La cotización ha sido  Registrada #' + this.utilService.zfill(msj, 4),
+      text: "¿Desea registar otra cotización?",
       icon: 'info',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -125,25 +150,26 @@ export class AycotizacionesComponent implements OnInit {
   }
 
   limpiarFrm() {
-    this.Proyecto.nombre = ''
-    this.Proyecto.tipo = ''
-    this.Proyecto.contratante = ''
-    this.Proyecto.empresa = ''
-    this.Proyecto.fuente = ''
-    this.Proyecto.usuario_final = ''
-    this.Proyecto.objeto = ''
-    this.Proyecto.observacion = ''
-    this.Proyecto.moneda = ''
-    this.Proyecto.lapso = ''
-    this.Proyecto.monto_total = 0.00
-    this.Proyecto.monto_pagado = 0.00
-    this.Proyecto.adeuda = 0.00
-    this.Proyecto.usuario = ''
-
+    this.Cotizaciones.nombre = ''
+    this.Cotizaciones.fecha = ''
+    this.Cotizaciones.vigencia = ''
+    this.Cotizaciones.objeto = ''
+    this.Cotizaciones.total = 0
+    this.Cotizaciones.pagado = 0
+    this.Cotizaciones.deuda = 0
+    this.Cotizaciones.garantia = 0
+    this.Cotizaciones.moneda = ''
+    this.Cotizaciones.lapso = ''
+    this.Cotizaciones.modalidad = ''
+    this.Cotizaciones.forma_pago = ''
+    this.Cotizaciones.responsable = ''
+    this.Cotizaciones.cargo_responsable = ''
+    this.Cotizaciones.usuario = ''
+    this.Cotizaciones.obseravacion = ''
   }
 
-  restar(){
-    this.Proyecto.adeuda = this.Proyecto.monto_total - this.Proyecto.monto_pagado
+  restar() {
+    this.Cotizaciones.deuda = this.Cotizaciones.total - this.Cotizaciones.pagado
   }
 
 }

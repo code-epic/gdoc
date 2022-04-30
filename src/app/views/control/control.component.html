@@ -57,7 +57,7 @@
             
                 <div class="card-body">
                     <div class="row" [ngStyle]="{'display':rtarjetas}">
-                        <div class="col-md-4" *ngFor="let item of SubMenu">
+                        <div class="col-md-3" *ngFor="let item of SubMenu">
                             <a routerLinkActive="active" [routerLink]="[item.url]">
                                 <div class="card {{item.color}} order-card">
                                     <div class="card-block">
