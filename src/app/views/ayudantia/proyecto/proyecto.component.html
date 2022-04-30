@@ -116,12 +116,12 @@
                                     <div class="input-group" style="width:100%">
                                         <input class="form-control" placeholder="AAAA-MM-DD" 
                                         [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Proyecto.lapso" ngbDatepicker #fo="ngbDatepicker" 
-                                        [value]="formatter.format(flapso)"
+                                        [(ngModel)]="Proyecto.fdesde" ngbDatepicker #fd="ngbDatepicker" 
+                                        [value]="formatter.format(fdesde)"
                                         [placement]="placement" [positionTarget]="buttonEl">
                                         <div class="input-group-append">
                                             <button #buttonEl 
-                                                class="btn calendario" (click)="fo.toggle()" 
+                                                class="btn calendario" (click)="fd.toggle()" 
                                                 type="button">
                                             </button>
                                         </div>
@@ -131,18 +131,18 @@
                         </div>
                        
                         <div class="form-group col-md-4">
-                            <label for="tmsOrigen">Fecha Hasta</label>
+                            <label>Fecha Hasta</label>
                             <form class="form-inline">
                                 <div class="form-group" style="width:100%">
                                     <div class="input-group" style="width:100%">
                                         <input class="form-control" placeholder="AAAA-MM-DD" 
                                         [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Proyecto.lapso" ngbDatepicker #fo="ngbDatepicker" 
-                                        [value]="formatter.format(flapso)"
+                                        [(ngModel)]="Proyecto.fhasta" ngbDatepicker #fh="ngbDatepicker" 
+                                        [value]="formatter.format(fhasta)"
                                         [placement]="placement" [positionTarget]="buttonEl">
                                         <div class="input-group-append">
                                             <button #buttonEl 
-                                                class="btn calendario" (click)="fo.toggle()" 
+                                                class="btn calendario" (click)="fh.toggle()" 
                                                 type="button">
                                             </button>
                                         </div>
