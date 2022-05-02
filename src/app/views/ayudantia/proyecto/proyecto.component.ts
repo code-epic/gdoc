@@ -40,6 +40,23 @@ export class ProyectoComponent implements OnInit {
     valores: ''
   }
 
+  public aplicasistema = 'none'
+  public campos = 6
+  public otros = 'none'
+  public camposotros = 4
+
+  public sistemaarmas = ''
+  public SistemaArmas = [
+    { 'id' : 'AVIONES', 'nombre' : 'AVIONES'},
+    { 'id' : 'HELICOPTERO', 'nombre' : 'HELICOPTERO'},
+    { 'id' : 'VEHICULOS TACTICOS', 'nombre' : 'VEHICULOS TACTICOS'},
+    { 'id' : 'TANQUES', 'nombre' : 'TANQUES'},
+    { 'id' : 'EMBARCACIONES', 'nombre' : 'EMBARCACIONES'},
+    { 'id' : 'RADARES', 'nombre' : 'RADARES'},
+    { 'id' : 'COMPLEJO MISILISTICO', 'nombre' : 'COMPLEJO MISILISTICO'},
+    { 'id' : 'ARMAMENTO INDIVIDUAL', 'nombre' : 'ARMAMENTO INDIVIDUAL'},
+  ]
+
   public Proyecto: Proyecto = {
     ncontrato : '',
     nombre: '',
@@ -148,4 +165,16 @@ export class ProyectoComponent implements OnInit {
     this.Proyecto.adeuda = this.Proyecto.monto_total - this.Proyecto.monto_pagado
   }
 
+  selSistemaArmas(){
+
+    this.aplicasistema = this.Proyecto.tipo=='Sistema'?'':'none'
+    this.campos = this.Proyecto.tipo=='Sistema'?3:6
+    
+  }
+  selFondo(){
+
+    this.otros = this.Proyecto.fuente=='Otros'?'':'none'
+    this.camposotros = this.Proyecto.fuente=='Otros'?3:4
+    
+  }
 }
