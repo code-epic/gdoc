@@ -31,6 +31,8 @@ export class ProyectoComponent implements OnInit {
   xobser: Editor = new Editor;
   
 
+  fdesde : NgbDate | null
+  fhasta : NgbDate | null
   flapso : NgbDate | null
   placement = 'top';
 
@@ -68,6 +70,8 @@ export class ProyectoComponent implements OnInit {
     objeto: '',
     observacion: '',
     moneda: '',
+   // fdesde: '',
+   // fhasta: '',
     lapso: '',
     monto_total: 0.00,
     monto_pagado: 0.00,
@@ -75,7 +79,6 @@ export class ProyectoComponent implements OnInit {
     usuario: '',
     estatus: '',
     jefeproyecto: '',
-    desdehasta : '',
     sistema: '',
   }
 
@@ -113,7 +116,7 @@ export class ProyectoComponent implements OnInit {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.limpiarFrm()
-        this.aceptar('')
+        this.aceptar(data.msj)
         this.ngxService.stopLoader("loader-aceptar")
        
       },
@@ -128,7 +131,7 @@ export class ProyectoComponent implements OnInit {
 
   protected aceptar(msj: string) {
     Swal.fire({
-      title: 'El Proyecto ha sido  Registrado' + msj,
+      title: 'El Proyecto ha sido  Registrado #' + this.utilService.zfill(msj, 4),
       text: "¿Desea registar otro documento?",
       icon: 'info',
       showCancelButton: true,

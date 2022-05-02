@@ -20,7 +20,8 @@ export interface Proyecto {
   usuario?: string
   estatus?: string
   jefeproyecto?: string
-  desdehasta ?: string
+  fdesde ?: string
+  fhasta ?: string
   sistema?: string
 
 }
