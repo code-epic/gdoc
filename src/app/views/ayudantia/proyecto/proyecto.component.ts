@@ -31,9 +31,13 @@ export class ProyectoComponent implements OnInit {
   xobser: Editor = new Editor;
   
 
-  fdesde : NgbDate | null
-  fhasta : NgbDate | null
-  flapso : NgbDate | null
+  public fdesde: any
+  public fhasta: any
+  public flapso: any
+
+  public fdesdeDate : NgbDate | null
+  public fhastaDate : NgbDate | null
+  public flapsoDate : NgbDate | null
   placement = 'top';
 
   public xAPI: IAPICore = {
@@ -60,26 +64,30 @@ export class ProyectoComponent implements OnInit {
   ]
 
   public Proyecto: Proyecto = {
-    ncontrato : '',
     nombre: '',
     tipo: '0',
+    sistema_armas: '',
+    estatus: '',
+    jefeproyecto: '',
+    tlf_jefe: '',
     contratante: '',
     empresa: '',
+    pais: '',
     fuente: '0',
+    otros: '',
     usuario_final: '0',
+    sistema: '',
+    desde: '',
+    hasta: '',
+    ncontrato : '',
     objeto: '',
     observacion: '',
-    moneda: '',
-   // fdesde: '',
-   // fhasta: '',
     lapso: '',
+    moneda: '',
     monto_total: 0.00,
     monto_pagado: 0.00,
     adeuda: 0.00,
     usuario: '',
-    estatus: '',
-    jefeproyecto: '',
-    sistema: '',
   }
 
   public Avance : Avance = {
@@ -111,6 +119,9 @@ export class ProyectoComponent implements OnInit {
     this.xAPI.funcion = 'MPPD_IProyecto'
     this.xAPI.parametros = ''
     this.Proyecto.usuario = this.loginService.Usuario.id
+    this.Proyecto.desde = this.utilService.ConvertirFecha(this.fdesde)
+    this.Proyecto.hasta = this.utilService.ConvertirFecha(this.fhasta)
+    this.Proyecto.lapso = this.utilService.ConvertirFecha(this.flapso)
 
     this.xAPI.valores = JSON.stringify(this.Proyecto)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -161,6 +172,8 @@ export class ProyectoComponent implements OnInit {
     this.Proyecto.monto_pagado = 0.00
     this.Proyecto.adeuda = 0.00
     this.Proyecto.usuario = ''
+    this.Proyecto.desde = ''
+    this.Proyecto.hasta = ''
 
   }
 
