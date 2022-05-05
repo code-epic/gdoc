@@ -52,6 +52,9 @@ import { ArchivoComponent } from './views/archivo/archivo.component';
 import { AycotizacionesComponent } from './views/ayudantia/procesos/aycotizaciones/aycotizaciones.component';
 import { PendientesComponent } from './views/control/pendientes/pendientes.component';
 import { ProcesosComponent } from './views/ayudantia/procesos/procesos.component';
+import { RsprocesosComponent } from './views/resoluciones/rsprocesos/rsprocesos.component';
+import { RsbuzonComponent } from './views/resoluciones/rsbuzon/rsbuzon.component';
+import { RsentradasComponent } from './views/resoluciones/rsentradas/rsentradas.component';
 
 
 
@@ -154,7 +157,10 @@ const ngWizardConfig: NgWizardConfig = {
     ArchivoComponent,
     AycotizacionesComponent,
     PendientesComponent,
-    ProcesosComponent
+    ProcesosComponent,
+    RsprocesosComponent,
+    RsbuzonComponent,
+    RsentradasComponent
   ],
   providers:  [
     {
