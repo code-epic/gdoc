@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Editor } from 'ngx-editor'
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { Proyecto, Avance } from 'src/app/services/ayudantia/proyecto.service';
+import { Proyecto } from 'src/app/services/ayudantia/proyecto.service';
 import { UtilService } from 'src/app/services/util/util.service';
 
 import { ActivatedRoute, Router } from '@angular/router'
@@ -65,42 +65,36 @@ export class ProyectoComponent implements OnInit {
 
   public Proyecto: Proyecto = {
     nombre: '',
-    tipo: '0',
+    tipo: '',
     sistema_armas: '',
     estatus: '',
-    jefeproyecto: '',
-    tlf_jefe: '',
-    contratante: '',
+    jefe_proyecto: '',
+    telefono_jefe: '',
+    ente: '',
     empresa: '',
     pais: '',
-    fuente: '0',
+    fuente: '',
     otros: '',
-    usuario_final: '0',
+    usuario_final: '',
     sistema: '',
-    desde: '',
-    hasta: '',
-    ncontrato : '',
+    fecha_desde: '',
+    fecha_hasta: '',
+    numero_contrato: '',
     objeto: '',
     observacion: '',
-    lapso: '',
+    fecha_origen: '',
     moneda: '',
-    monto_total: 0.00,
-    monto_pagado: 0.00,
-    adeuda: 0.00,
-    usuario: '',
+    monto_total: 0,
+    monto_pagado: 0,
+    monto_deuda: 0,
+    usuario: ''
   }
 
-  public Avance : Avance = {
-    lapso: '',
-    ejecucion: '',
-    monto: ''
-  }
+
 
   constructor(private apiService: ApiService,
-    private modalService: NgbModal,
     private utilService: UtilService,
     private toastrService: ToastrService,
-    private rutaActiva: ActivatedRoute,
     private loginService: LoginService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
@@ -108,28 +102,28 @@ export class ProyectoComponent implements OnInit {
 
   ngOnInit(): void {
     this.editor = new Editor()
-
     this.xeditor = new Editor()
-
-    this.xobser = new Editor()
   }
 
   async guardar() {
-    console.log(this.Proyecto);
+    
     this.xAPI.funcion = 'MPPD_IProyecto'
     this.xAPI.parametros = ''
     this.Proyecto.usuario = this.loginService.Usuario.id
-    this.Proyecto.desde = this.utilService.ConvertirFecha(this.fdesde)
-    this.Proyecto.hasta = this.utilService.ConvertirFecha(this.fhasta)
-    this.Proyecto.lapso = this.utilService.ConvertirFecha(this.flapso)
+    this.Proyecto.fecha_desde = this.utilService.ConvertirFecha(this.fdesde)
+    this.Proyecto.fecha_hasta = this.utilService.ConvertirFecha(this.fhasta)
+    this.Proyecto.fecha_origen = this.utilService.ConvertirFecha(this.flapso)
 
+    console.log(this.Proyecto);
     this.xAPI.valores = JSON.stringify(this.Proyecto)
+    console.log(this.xAPI)
+
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.limpiarFrm()
         this.aceptar(data.msj)
         this.ngxService.stopLoader("loader-aceptar")
-       
+        this.limpiarFrm()
+        
       },
       (errot) => {
 
@@ -160,25 +154,23 @@ export class ProyectoComponent implements OnInit {
   limpiarFrm() {
     this.Proyecto.nombre = ''
     this.Proyecto.tipo = ''
-    this.Proyecto.contratante = ''
     this.Proyecto.empresa = ''
     this.Proyecto.fuente = ''
     this.Proyecto.usuario_final = ''
     this.Proyecto.objeto = ''
     this.Proyecto.observacion = ''
     this.Proyecto.moneda = ''
-    this.Proyecto.lapso = ''
     this.Proyecto.monto_total = 0.00
     this.Proyecto.monto_pagado = 0.00
-    this.Proyecto.adeuda = 0.00
+    this.Proyecto.monto_deuda = 0.00
     this.Proyecto.usuario = ''
-    this.Proyecto.desde = ''
-    this.Proyecto.hasta = ''
+    this.Proyecto.fecha_desde = ''
+    this.Proyecto.fecha_hasta = ''
 
   }
 
   restar(){
-    this.Proyecto.adeuda = this.Proyecto.monto_total - this.Proyecto.monto_pagado
+    this.Proyecto.monto_deuda = this.Proyecto.monto_total - this.Proyecto.monto_pagado
   }
 
   selSistemaArmas(){

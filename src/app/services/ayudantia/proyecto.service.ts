@@ -3,38 +3,37 @@ import { Injectable } from '@angular/core';
 
 
 export interface Proyecto {
-  nombre?: string
-  tipo?: string
-  sistema_armas?: string
-  estatus?: string
-  jefeproyecto?: string
-  tlf_jefe?: string
-  contratante?: string
-  empresa?: string
-  pais?: string
-  fuente?: string
-  otros?: string
-  usuario_final?: string
-  sistema?: string
-  desde?: string
-  hasta?: string
-  ncontrato ?: string
-  objeto?: string
-  observacion?: string
-  lapso?: string
-  moneda?: string
-  monto_total?: number
-  monto_pagado?: number
-  adeuda?: number
-  usuario?: string
-
+  nombre: string
+  tipo: string
+  sistema_armas: string
+  estatus: string
+  jefe_proyecto: string
+  telefono_jefe: string
+  ente: string
+  empresa: string
+  pais: string
+  fuente: string
+  otros: string
+  usuario_final: string
+  sistema: string
+  fecha_desde: string
+  fecha_hasta: string
+  numero_contrato: string
+  objeto: string
+  observacion: string
+  fecha_origen: string
+  moneda: string
+  monto_total: number
+  monto_pagado: number
+  monto_deuda: number
+  usuario: string
 
 }
 
 export interface Avance {
-  lapso : string
-  ejecucion : string
-  monto : string
+  lapso: string
+  ejecucion: string
+  monto: string
   observacion?: string
 }
 

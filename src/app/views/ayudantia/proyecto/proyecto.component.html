@@ -24,6 +24,7 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
                     <form>
                         <div class="form-row">
                             <div class="form-group col-md-6">
@@ -44,7 +45,7 @@
                             <div class="form-group col-md-3" [ngStyle]="{'display':aplicasistema}">
                                 <label for="cmbTipo">Sistema de Armas </label>
                                 <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="sistemaarmas" value="{{sistemaarmas}}">
+                                    [(ngModel)]="Proyecto.sistema_armas" value="{{Proyecto.sistema_armas}}">
                                     <option *ngFor="let s of SistemaArmas" value="{{s.id}}">{{s.nombre}}</option>
                                     <option value="0" selected>Seleccione</option>
                                 </select>
@@ -67,12 +68,12 @@
                             <div class="form-group col-md-4">
                                 <label for="txtEnte"> Jefe del Proyecto </label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.jefeproyecto" value="{{Proyecto.jefeproyecto}}">
+                                    [(ngModel)]="Proyecto.jefe_proyecto" value="{{Proyecto.jefe_proyecto}}">
                             </div>
                             <div class="form-group col-md-4">
                                 <label> Telefono Jefe de Proyecto </label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.tlf_jefe" value="{{Proyecto.tlf_jefe}}">
+                                    [(ngModel)]="Proyecto.telefono_jefe" value="{{Proyecto.telefono_jefe}}">
                             </div>
 
                         </div>
@@ -80,7 +81,7 @@
                             <div class="form-group col-md-4">
                                 <label> Ente Contratante </label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.contratante" value="{{Proyecto.contratante}}">
+                                    [(ngModel)]="Proyecto.ente" value="{{Proyecto.ente}}">
                             </div>
                             <div class="form-group col-md-4">
                                 <label> Empresa Ejecutante </label>
@@ -183,7 +184,7 @@
                             <div class="form-group col-md-4">
                                 <label for="txtDeuda">Numero de Contrato</label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.ncontrato" value="{{Proyecto.ncontrato}}">
+                                    [(ngModel)]="Proyecto.numero_contrato" value="{{Proyecto.numero_contrato}}">
                             </div>
                         </div>
 
@@ -260,7 +261,7 @@
                             <div class="form-group col-md-2">
                                 <label for="txtDeuda">Deuda Pendiente</label>
                                 <input type="number" readonly class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.adeuda" value="{{Proyecto.adeuda}}">
+                                    [(ngModel)]="Proyecto.monto_deuda" value="{{Proyecto.monto_deuda}}">
                             </div>
                         </div>
 
