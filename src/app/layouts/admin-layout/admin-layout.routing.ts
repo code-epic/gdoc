@@ -7,7 +7,7 @@ import { BuzonComponent } from '../../views/control/buzon/buzon.component';
 import { SalidasComponent } from '../../views/control/salidas/salidas.component';
 import { AyudantiaComponent } from '../../views/ayudantia/ayudantia.component';
 import { ResolucionesComponent } from 'src/app/views/resoluciones/resoluciones.component';
-import { ProyectoComponent } from '../../views/ayudantia/proyecto/proyecto.component';
+import { ProyectoComponent } from '../../views/ayudantia/procesos/proyecto/proyecto.component';
 import { ConfiguracionComponent } from 'src/app/views/control/configuracion/configuracion.component';
 import { AuthGuardGuard } from 'src/app/services/seguridad/auth-guard.guard';
 import { SecretariaComponent } from 'src/app/views/secretaria/secretaria.component';
@@ -18,8 +18,9 @@ import { AybuzonComponent } from 'src/app/views/ayudantia/aybuzon/aybuzon.compon
 import { AyreportesComponent } from 'src/app/views/ayudantia/ayreportes/ayreportes.component';
 import { GeneralesComponent } from 'src/app/views/generales/generales.component';
 import { ArchivoComponent } from 'src/app/views/archivo/archivo.component';
-import { AycotizacionesComponent } from 'src/app/views/ayudantia/aycotizaciones/aycotizaciones.component';
+import { AycotizacionesComponent } from 'src/app/views/ayudantia/procesos/aycotizaciones/aycotizaciones.component';
 import { PendientesComponent } from 'src/app/views/control/pendientes/pendientes.component';
+import { ProcesosComponent } from 'src/app/views/ayudantia/procesos/procesos.component';
 
 
 
@@ -105,6 +106,11 @@ export const AdminLayoutRoutes: Routes = [
         canActivate:[AuthGuardGuard] 
     },
     { 
+        path: 'proyecto/:id', 
+        component: ProyectoComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
         path: 'generales', 
         component: GeneralesComponent,
         canActivate:[AuthGuardGuard] 
@@ -120,10 +126,21 @@ export const AdminLayoutRoutes: Routes = [
         canActivate:[AuthGuardGuard] 
     },
     { 
+        path: 'procesos', 
+        component: ProcesosComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
         path: 'aycotizaciones', 
         component: AycotizacionesComponent,
         canActivate:[AuthGuardGuard] 
-    },{ 
+    },
+    { 
+        path: 'aycotizaciones/:id', 
+        component: AycotizacionesComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
         path: 'pendientes', 
         component: PendientesComponent,
         canActivate:[AuthGuardGuard] 

@@ -30,7 +30,7 @@ import { DocumentoComponent } from './views/control/documento/documento.componen
 import { BuzonComponent } from './views/control/buzon/buzon.component';
 import { SalidasComponent } from './views/control/salidas/salidas.component';
 import { NgxEditorModule } from 'ngx-editor';
-import { ProyectoComponent } from './views/ayudantia/proyecto/proyecto.component';
+import { ProyectoComponent } from './views/ayudantia/procesos/proyecto/proyecto.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -49,8 +49,9 @@ import { AybuzonComponent } from './views/ayudantia/aybuzon/aybuzon.component';
 import { AyreportesComponent } from './views/ayudantia/ayreportes/ayreportes.component';
 import { GeneralesComponent } from './views/generales/generales.component';
 import { ArchivoComponent } from './views/archivo/archivo.component';
-import { AycotizacionesComponent } from './views/ayudantia/aycotizaciones/aycotizaciones.component';
+import { AycotizacionesComponent } from './views/ayudantia/procesos/aycotizaciones/aycotizaciones.component';
 import { PendientesComponent } from './views/control/pendientes/pendientes.component';
+import { ProcesosComponent } from './views/ayudantia/procesos/procesos.component';
 
 
 
@@ -152,7 +153,8 @@ const ngWizardConfig: NgWizardConfig = {
     GeneralesComponent,
     ArchivoComponent,
     AycotizacionesComponent,
-    PendientesComponent
+    PendientesComponent,
+    ProcesosComponent
   ],
   providers:  [
     {

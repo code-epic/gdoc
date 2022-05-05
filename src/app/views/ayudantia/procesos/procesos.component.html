@@ -1,0 +1,275 @@
+<div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
+  <div class="container-fluid">
+    <p></p>
+  </div>
+</div>
+<div class="container-fluid mt--9">
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-10">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Panel de Control</h6>
+              <h2 class="mb-0">Ayudantia</h2>
+            </div>
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>reply</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-1">
+              <ul class="navbar-nav align-items-right d-none d-md-flex">
+                <li class="nav-item" ngbDropdown placement="bottom-right">
+                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                    <div class="media align-items-center">
+                      <div class="example-button-row">
+                        <button mat-icon-button aria-label="">
+                          <mat-icon>more_vert</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </a>
+                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                    <a routerLinkActive="active" [routerLink]="['/proyecto']" class="dropdown-item">
+                      <i class="fa fa-plus"></i>
+                      <span>Nuevo Proyecto</span>
+                    </a>
+                    <a routerLinkActive="active" [routerLink]="['/aycotizaciones']" class="dropdown-item">
+                      <i class="fa fa-plus"></i>
+                      <span>Nueva Cotizacion</span>
+                    </a>
+
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+
+          <div class="container">
+            <div class="row">
+              <div class="col-md-3 text-right">
+
+              </div>
+              <div class="col-md-6 text-center">
+
+                <form class="navbar-search">
+                  <div class="form-group" [ngClass]="{ 'focused': focus === true }">
+                    <div class="input-group input-group-alternative">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+                      </div>
+                      <input class="form-control" placeholder="Buscar" type="text" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="buscar" value="{{buscar}}" (keypress)="seleccionLista($event)"
+                        (focus)="focus = true" (blur)="focus = false">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-sliders"></i></span>
+                      </div>
+
+                    </div>
+                  </div>
+                </form>
+
+              </div>
+              <div class="col-md-3">
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" (selectedIndexChange)="selNavegacion($event)">
+            <mat-tab>
+              <ng-template mat-tab-label>
+                &nbsp;PROYECTOS
+              </ng-template>
+
+              <div class="container">
+
+
+                <mat-selection-list #lstDocumentos>
+                  <mat-list *ngFor="let e of lstProyectos; let i=index "
+                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                    <div class="row">
+                      <div class="col-md-3 texto-lista">
+                        {{ e.nombre | uppercase }}
+                      </div>
+                      <div class="col-md-3 texto-lista">
+                        {{ e.ente | uppercase }}
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        {{ e.tipo | uppercase }}
+                      </div>
+                      <div class="col-md-2 texto-lista  {{ e.color }}">
+                        {{ e.fecha_origen | date:"dd-MM-yyyy" }}
+                      </div>
+
+                      <div class="col-md-2 text-right">
+
+                        <button mat-icon-button aria-label="Editar" (click)="editar('proyecto', e.id )">
+                          <mat-icon class="text-pink">edit_note</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Avance" (click)="open(avance, e.id)">
+                          <mat-icon class="text-info">add_circle</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
+                          <mat-icon class="text-purple">delete</mat-icon>
+                        </button>
+
+
+                      </div>
+                    </div>
+                  </mat-list>
+                </mat-selection-list>
+              </div>
+
+              <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+              </mat-paginator>
+
+            </mat-tab>
+            <mat-tab>
+              <ng-template mat-tab-label>
+                &nbsp;COTIZACIONES
+              </ng-template>
+
+
+              <div class="container">
+                <mat-selection-list>
+                  <mat-list *ngFor="let e of lstCotizaciones; let i=index "
+                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                    <div class="row">
+                      <div class="col-md-2 texto-lista">
+                        {{ e.nombre | uppercase }}
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        {{ e.vigencia | date:"dd-MM-yyyy" }}
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        {{ e.modalidad | uppercase }}
+                      </div>
+                      <div class="col-md-4 texto-lista">
+                        {{ e.responsable | uppercase }}
+                      </div>
+
+                      <div class="col-md-2 text-right">
+
+                        <button mat-icon-button aria-label="Editar" (click)="editar('aycotizaciones', e.id )">
+                          <mat-icon class="text-pink">edit_note</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
+                          <mat-icon class="text-purple">delete</mat-icon>
+                        </button>
+
+                      </div>
+                    </div>
+                  </mat-list>
+                </mat-selection-list>
+              </div>
+              <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+
+
+
+            </mat-tab>
+
+          </mat-tab-group>
+
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- Fin de Tarjeta Padre -->
+</div>
+
+
+
+
+
+<ng-template #avance let-modal>
+  <div class="modal-header header bg-gradient-primary ">
+    <h4 class="modal-title text-white" id="modal-basic-title">Agregar Avances Fisicos</h4>
+  </div>
+  <div class="modal-body">
+
+
+
+    <br>
+    <h4 class="titulo">Avances fisicos</h4>
+    <hr style="margin-top:1rem">
+
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <label for="tmsOrigen">Fecha Avance</label>
+        <form class="form-inline">
+          <div class="form-group" style="width:100%">
+            <div class="input-group" style="width:100%">
+              <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="Avance.lapso" ngbDatepicker #fo="ngbDatepicker" [value]="formatter.format(favance)"
+                [placement]="placement" [positionTarget]="buttonEl">
+              <div class="input-group-append">
+                <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button">
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="txtMonto">Monto</label>
+        <input type="number" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Avance.monto"
+          value="{{Avance.monto}}">
+      </div>
+      <div class="form-group col-md-4">
+        <label for="nombre">Ejecucion Fisica</label>
+        <input type="number" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Avance.ejecucion"
+          value="{{Avance.ejecucion}}">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-12">
+        <label for="txtObservacion">Observaciones</label>
+        <div class="NgxEditor__Wrapper">
+          <ngx-editor-menu [editor]="xobser"> </ngx-editor-menu>
+          <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xobser" [(ngModel)]="Avance.observacion"
+            [disabled]="false" [placeholder]="'Escibe aqui...'">
+          </ngx-editor>
+        </div>
+      </div>
+    </div>
+
+
+    <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+      <input type="hidden" name="txtFileID" id="txtFileID" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="id" value="{{id}}" readonly="readonly">
+      <label for="input-folder-2">Seleccionar Archivo</label>
+      <div class="file-loading">
+        <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file"
+          multiple accept=".jpg .jpeg .png">
+      </div>
+      <div id="errorBlock" class="help-block"></div>
+    </form>
+
+
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-primary text-white " (click)="insertarObservacion();modal.close('Save')">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Agregar </button>
+    <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>

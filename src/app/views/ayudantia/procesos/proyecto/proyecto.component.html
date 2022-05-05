@@ -10,16 +10,41 @@
             <div class="card shadow">
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
-                        <div class="col-md-11">
+                        <div class="col-md-10">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Ayudantía</h6>
                             <h2 class="mb-0">Registrar Proyecto</h2>
                         </div>
                         <div class="col-md-1">
-                            <a routerLinkActive="active" [routerLink]="['/ayreportes']">
-                                <button mat-fab color="primary" title="Reporte General">
-                                    <mat-icon class="waves waves-effect waves-light">print</mat-icon>
-                                </button>
-                            </a>
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>reply</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <ul class="navbar-nav align-items-right d-none d-md-flex">
+                                <li class="nav-item" ngbDropdown placement="bottom-right">
+                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                        <div class="media align-items-center">
+                                            <div class="example-button-row">
+                                                <button mat-icon-button aria-label="">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                        <a routerLinkActive="active" class="dropdown-item">
+                                            <i class="fa fa-plus"></i>
+                                            <span>Agregar Imagen</span>
+                                        </a>
+
+
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -93,6 +118,7 @@
                                 <select class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Proyecto.pais" value="{{Proyecto.pais}}">
                                     <option value="0">Seleccione</option>
+                                    <option *ngFor="let e of Paises" value="{{e.iso3166a2}}">{{e.nombre}}</option>
                                 </select>
                             </div>
 
@@ -101,8 +127,7 @@
                             <div class="form-group col-md-{{camposotros}}">
                                 <label for="cmbFuente">Fuente de Financiamiento</label>
                                 <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Proyecto.fuente" value="{{Proyecto.fuente}}"
-                                    (change)="selFondo()">
+                                    [(ngModel)]="Proyecto.fuente" value="{{Proyecto.fuente}}" (change)="selFondo()">
                                     <option value="0">Seleccione</option>
                                     <option value="Fonden">FONDEN</option>
                                     <option value="Mppd">MPPD</option>
@@ -147,8 +172,8 @@
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="fdesde"
-                                                ngbDatepicker #fd="ngbDatepicker" [value]="formatter.format(fdesdeDate)"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="fdesde" ngbDatepicker
+                                                #fd="ngbDatepicker" [value]="formatter.format(fdesdeDate)"
                                                 [placement]="placement" [positionTarget]="buttonEl">
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="fd.toggle()"
@@ -166,8 +191,8 @@
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="fhasta"
-                                                ngbDatepicker #fh="ngbDatepicker" [value]="formatter.format(fhastaDate)"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="fhasta" ngbDatepicker
+                                                #fh="ngbDatepicker" [value]="formatter.format(fhastaDate)"
                                                 [placement]="placement" [positionTarget]="buttonEl">
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="fh.toggle()"
@@ -224,8 +249,8 @@
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="flapso"
-                                                ngbDatepicker #fo="ngbDatepicker" [value]="formatter.format(flapsoDate)"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="flapso" ngbDatepicker
+                                                #fo="ngbDatepicker" [value]="formatter.format(flapsoDate)"
                                                 [placement]="placement" [positionTarget]="buttonEl">
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="fo.toggle()"
@@ -270,8 +295,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="text-right">
-                                    <button class="btn bg-primary text-white" (click)="guardar()">Guardar</button>
-                                    <button class="btn bg-red text-white">Cancelar</button>
+                                    <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
                                 </div>
                             </div>
                         </div>

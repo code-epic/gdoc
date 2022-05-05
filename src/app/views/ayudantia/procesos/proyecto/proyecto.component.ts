@@ -23,21 +23,22 @@ import { LoginService } from 'src/app/services/seguridad/login.service'
 export class ProyectoComponent implements OnInit {
 
 
+  public id : string = ''
 
   editor: Editor = new Editor;
-  
+
   xeditor: Editor = new Editor;
-  
-  xobser: Editor = new Editor;
-  
+
+
+
 
   public fdesde: any
   public fhasta: any
   public flapso: any
 
-  public fdesdeDate : NgbDate | null
-  public fhastaDate : NgbDate | null
-  public flapsoDate : NgbDate | null
+  public fdesdeDate: NgbDate | null
+  public fhastaDate: NgbDate | null
+  public flapsoDate: NgbDate | null
   placement = 'top';
 
   public xAPI: IAPICore = {
@@ -53,14 +54,14 @@ export class ProyectoComponent implements OnInit {
 
   public sistemaarmas = ''
   public SistemaArmas = [
-    { 'id' : 'AVIONES', 'nombre' : 'AVIONES'},
-    { 'id' : 'HELICOPTERO', 'nombre' : 'HELICOPTERO'},
-    { 'id' : 'VEHICULOS TACTICOS', 'nombre' : 'VEHICULOS TACTICOS'},
-    { 'id' : 'TANQUES', 'nombre' : 'TANQUES'},
-    { 'id' : 'EMBARCACIONES', 'nombre' : 'EMBARCACIONES'},
-    { 'id' : 'RADARES', 'nombre' : 'RADARES'},
-    { 'id' : 'COMPLEJO MISILISTICO', 'nombre' : 'COMPLEJO MISILISTICO'},
-    { 'id' : 'ARMAMENTO INDIVIDUAL', 'nombre' : 'ARMAMENTO INDIVIDUAL'},
+    { 'id': 'AVIONES', 'nombre': 'AVIONES' },
+    { 'id': 'HELICOPTERO', 'nombre': 'HELICOPTERO' },
+    { 'id': 'VEHICULOS TACTICOS', 'nombre': 'VEHICULOS TACTICOS' },
+    { 'id': 'TANQUES', 'nombre': 'TANQUES' },
+    { 'id': 'EMBARCACIONES', 'nombre': 'EMBARCACIONES' },
+    { 'id': 'RADARES', 'nombre': 'RADARES' },
+    { 'id': 'COMPLEJO MISILISTICO', 'nombre': 'COMPLEJO MISILISTICO' },
+    { 'id': 'ARMAMENTO INDIVIDUAL', 'nombre': 'ARMAMENTO INDIVIDUAL' },
   ]
 
   public Proyecto: Proyecto = {
@@ -90,9 +91,11 @@ export class ProyectoComponent implements OnInit {
     usuario: ''
   }
 
+  public Paises = []
 
-
-  constructor(private apiService: ApiService,
+  constructor(
+    private apiService: ApiService,
+    private rutaActiva: ActivatedRoute,
     private utilService: UtilService,
     private toastrService: ToastrService,
     private loginService: LoginService,
@@ -103,10 +106,54 @@ export class ProyectoComponent implements OnInit {
   ngOnInit(): void {
     this.editor = new Editor()
     this.xeditor = new Editor()
+
+    this.ConsultarPaises()
+    if (this.rutaActiva.snapshot.params.id != undefined) {
+      this.id = this.rutaActiva.snapshot.params.id
+      this.ObtenerProyecto(this.id)
+
+    }
+    
+
+  }
+
+
+  async ConsultarPaises() {
+    this.xAPI.funcion = 'ListarPaises'
+    this.xAPI.parametros = ''
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.Paises = data.Cuerpo
+      },
+      (error) => {
+
+      }
+    )
+  }
+
+  async ObtenerProyecto(numBase64: string) {
+    const base = atob(numBase64)
+    this.xAPI.funcion = 'MPPD_CProyecto'
+    this.xAPI.parametros = base
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.Proyecto = data.Cuerpo[0]
+        this.fdesdeDate = NgbDate.from(this.formatter.parse(this.Proyecto.fecha_desde.substring(0, 10)))
+        this.fhastaDate = NgbDate.from(this.formatter.parse(this.Proyecto.fecha_hasta.substring(0, 10)))
+        this.flapsoDate = NgbDate.from(this.formatter.parse(this.Proyecto.fecha_origen.substring(0, 10)))
+      },
+      (error) => {
+
+      }
+    )
   }
 
   async guardar() {
-    
+
+    if ( this.id != '') {
+      this.toastrService.warning('Actualizacion pendiente', `GDoc MPPD Modificar Proyecto`)
+      return
+    }
     this.xAPI.funcion = 'MPPD_IProyecto'
     this.xAPI.parametros = ''
     this.Proyecto.usuario = this.loginService.Usuario.id
@@ -123,7 +170,7 @@ export class ProyectoComponent implements OnInit {
         this.aceptar(data.msj)
         this.ngxService.stopLoader("loader-aceptar")
         this.limpiarFrm()
-        
+
       },
       (errot) => {
 
@@ -169,20 +216,20 @@ export class ProyectoComponent implements OnInit {
 
   }
 
-  restar(){
+  restar() {
     this.Proyecto.monto_deuda = this.Proyecto.monto_total - this.Proyecto.monto_pagado
   }
 
-  selSistemaArmas(){
+  selSistemaArmas() {
 
-    this.aplicasistema = this.Proyecto.tipo=='Sistema'?'':'none'
-    this.campos = this.Proyecto.tipo=='Sistema'?3:6
-    
+    this.aplicasistema = this.Proyecto.tipo == 'Sistema' ? '' : 'none'
+    this.campos = this.Proyecto.tipo == 'Sistema' ? 3 : 6
+
   }
-  selFondo(){
+  selFondo() {
 
-    this.otros = this.Proyecto.fuente=='Otros'?'':'none'
-    this.camposotros = this.Proyecto.fuente=='Otros'?3:4
-    
+    this.otros = this.Proyecto.fuente == 'Otros' ? '' : 'none'
+    this.camposotros = this.Proyecto.fuente == 'Otros' ? 3 : 4
+
   }
 }

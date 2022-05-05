@@ -46,7 +46,7 @@ interface Cotizaciones {
 
 export class AycotizacionesComponent implements OnInit {
 
-
+  public id : string = ''
 
   editor: Editor = new Editor;
 
@@ -55,9 +55,14 @@ export class AycotizacionesComponent implements OnInit {
   xobser: Editor = new Editor;
 
 
-  fecha: NgbDate | null
+  ffecha: NgbDate | null
 
-  vigencia: NgbDate | null
+  fvigencia: NgbDate | null
+
+
+
+  public fecha: any
+  public vigencia: any
 
   placement = 'bottom';
 
@@ -101,17 +106,45 @@ export class AycotizacionesComponent implements OnInit {
     this.xeditor = new Editor()
 
     this.xobser = new Editor()
+
+    if (this.rutaActiva.snapshot.params.id != undefined) {
+      this.id = this.rutaActiva.snapshot.params.id
+      this.ObtenerCotizacion(this.id)
+
+    }
   }
 
+
+  async ObtenerCotizacion(numBase64: string) {
+    const base = atob(numBase64)
+    this.xAPI.funcion = 'MPPD_CCotizacion'
+    this.xAPI.parametros = base
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.Cotizaciones = data.Cuerpo[0]
+        this.ffecha = NgbDate.from(this.formatter.parse(this.Cotizaciones.fecha.substring(0, 10)))
+        this.fvigencia = NgbDate.from(this.formatter.parse(this.Cotizaciones.vigencia.substring(0, 10)))
+        console.log(this.fecha)
+      },
+      (error) => {
+
+      }
+    )
+  }
   async guardar() {
+
+    if ( this.id != '') {
+      this.toastrService.warning('Actualizacion pendiente', `GDoc MPPD Modificar Cotizaciones`)
+      return
+    }
     console.log(this.Cotizaciones);
     this.xAPI.funcion = 'MPPD_ICotizaciones'
     this.xAPI.parametros = ''
     this.Cotizaciones.usuario = this.loginService.Usuario.id
 
-    this.Cotizaciones.fecha = this.utilService.ConvertirFecha(this.Cotizaciones.fecha)
-
-    this.Cotizaciones.vigencia = this.utilService.ConvertirFecha(this.Cotizaciones.vigencia)
+    this.Cotizaciones.fecha = this.utilService.ConvertirFecha(this.fecha)
+    this.Cotizaciones.vigencia = this.utilService.ConvertirFecha(this.vigencia)
 
     this.xAPI.valores = JSON.stringify(this.Cotizaciones)
     console.log(this.xAPI)

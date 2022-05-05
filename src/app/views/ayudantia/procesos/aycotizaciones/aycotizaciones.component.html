@@ -10,17 +10,43 @@
             <div class="card shadow">
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
-                        <div class="col-md-11">
+                        <div class="col-md-10">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Ayudantía</h6>
                             <h2 class="mb-0">Registrar Cotizaciones</h2>
                         </div>
                         <div class="col-md-1">
-                            <a routerLinkActive="active" [routerLink]="['/ayreportes']">
-                                <button  mat-fab color="primary" title="Adjuntar Fotos">
-                                    <mat-icon class="waves waves-effect waves-light">wallpaper</mat-icon>
-                                </button>
-                            </a>
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>reply</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                        <div class="col-md-1">
+                            <ul class="navbar-nav align-items-right d-none d-md-flex">
+                                <li class="nav-item" ngbDropdown placement="bottom-right">
+                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                        <div class="media align-items-center">
+                                            <div class="example-button-row">
+                                                <button mat-icon-button aria-label="">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                        <a routerLinkActive="active" class="dropdown-item">
+                                            <i class="fa fa-plus"></i>
+                                            <span>Agregar Imagen</span>
+                                        </a>
+
+
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                       
                     </div>
                 </div>
                 <div class="card-body">
@@ -37,8 +63,8 @@
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Cotizaciones.fecha"
-                                                ngbDatepicker #fe="ngbDatepicker" [value]="formatter.format(fecha)"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
+                                                ngbDatepicker #fe="ngbDatepicker" [value]="formatter.format(ffecha)"
                                                 [placement]="placement" [positionTarget]="buttonEl">
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="fe.toggle()"
@@ -55,8 +81,8 @@
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Cotizaciones.vigencia"
-                                                ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(vigencia)"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia"
+                                                ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
                                                 [placement]="placement" [positionTarget]="buttonEl">
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="vi.toggle()"
@@ -87,6 +113,7 @@
                             <div class="form-group col-md-3">
                                 <label> Tiempo de Ejecución </label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                   
                                     [(ngModel)]="Cotizaciones.lapso" value="{{Cotizaciones.lapso}}">
                             </div>
                             <div class="form-group col-md-3">
@@ -150,8 +177,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="text-right">
-                                    <button class="btn bg-primary text-white" (click)="guardar()">Guardar</button>
-                                    <button class="btn bg-red text-white">Cancelar</button>
+                                    <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
                                 </div>
                             </div>
                         </div>
