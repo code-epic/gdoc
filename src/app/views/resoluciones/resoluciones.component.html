@@ -1,166 +1,57 @@
-
-
-
-<div class="header bg-gradient-red pb-8 pt-4 pt-md-8">
-    <div class="container-fluid">
-      <p></p>
-      </div>
+<div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
+  <div class="container-fluid">
+    <p></p>
   </div>
-  
-  
-  
-  
-  
-  
-  
-  <div class="container-fluid mt--9">
-    <div class="row">
-      <div class="col-xl-12 col-md-12 col-lg-12">
-        <div class="card shadow">
-          <div class="card-header bg-transparent">
-            <div class="row align-items-center">
-              <div class="col-md-10">
-                <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
-                <h2 class="mb-0">General</h2>
-              </div>
-              <div class="col-md-2 text-right">
-  
-                
-               
-                  <button  mat-mini-fab color="primary" aria-label="Agregar">
-                    <mat-icon class="waves waves-effect waves-light">more_vert</mat-icon>
-                  </button>
-                
-              </div>
-              
-  
+</div>
+<div class="container-fluid mt--9">
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+
+
+      <div class="card shadow">
+
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-12">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">PRINCIPAL</h6>
+              <h2 class="mb-0">Resoluciones</h2>
             </div>
+
           </div>
-          <div class="card-body">
-           <!-- Contenido WEB Configuracion Menu -->
-            
-           <div class="container">
-             <div class="row">
-             
-                <div class="col-md-3">
-                        
+        </div>
+
+        <div class="card-body">
+          <div class="row">
+
+            <div class="col-md-4">
+              <a routerLinkActive="active" [routerLink]="['/rsbuzon']">
+                <div class="card bg-c-blue order-card">
+                  <div class="card-block">
+                    <h2 class="text-right text-white"><i class="fa fa-inbox f-left"></i>
+                      <span>Buzón</span>
+                    </h2>
+                    <p class="m-b-0" style="font-size: 13px;">Documentos Recibidos</p>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  
-                  <form class="navbar-search">
-                    <div class="form-group" [ngClass]="{ 'focused': focus === true }">
-                      <div class="input-group input-group-alternative">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        </div>
-                        <input class="form-control" placeholder="Buscar" type="text" 
-                        (focus)="focus = true"   [(ngModel)]="buscar" (ngValue)="{buscar}">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text"><i class="fas fa-sliders-h" (click)="CMppd()"></i></span>
-                          &nbsp; 
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                  
-                </div>
-                <div class="col-md-3">
-                                      
-                  
-                </div>
-              </div> 
+              </a>
             </div>
-  
-  
-            <br>
-  
-            <div class="row">
-                <div class="col-md-12">
 
-                    <!-- (selectedIndexChange)="CargarListadoAPI($event)" -->
-                    <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" >
-                        <mat-tab>
-                            <ng-template mat-tab-label>
-                            <mat-icon class="example-tab-icon">source</mat-icon>
-                            &nbsp;ENTRADA DE DOCUMENTOS
-                            </ng-template>
-                            <mat-accordion class="example-headers-align">
-                                <mat-expansion-panel hideToggle>
-                                <mat-expansion-panel-header>
-                                    <mat-panel-title>
-                                        <b> hola </b>
-                                    </mat-panel-title>
-                                    <mat-panel-description>
-                                        <div class="col-md-4"> oooo </div>
-                                      
-                                        <div class="col-md-2"><span class="float-right badge me-1 bg-primary">0000/00/00</span></div>
-                                    </mat-panel-description>
-                                </mat-expansion-panel-header>
-                                <mat-divider></mat-divider>
-                                <br>
-                               
-
-                                
-                                <p class="card-text text-justify">
-                                    
-                                        
-                                </p>
-                                <mat-action-row>
-                                    <div class="col-md-6">
-                                        <button class="btn btn-sm btn-primary " type="button">Promover</button>
-                                    </div>
-                                    <div class="col-md-6 text-right">
-                                        <button class="btn btn-sm btn-warning" type="button">Modificar</button>
-                                        <button class="btn btn-sm btn-info" type="button" >Probar</button>
-                                    </div>
-                                    
-                                </mat-action-row>
-                                </mat-expansion-panel>
-                            </mat-accordion>
-                            <!-- <mat-paginator [length]="lengthOfi"
-                                (page)="pageChangeEvent($event)"
-                                [pageSize]="pageSizeOfi"
-                                [pageSizeOptions]="pageSizeOptions"
-                                (page)="pageEvent = $event"
-                                aria-label="Seleccionar">
-                            </mat-paginator> -->
-              
-              
-                        </mat-tab>
-                        <mat-tab>
-                            <ng-template mat-tab-label>
-                            <mat-icon class="example-tab-icon">source</mat-icon>
-                            &nbsp;RESOLUCIONES
-                            </ng-template>
-                            
-              
-                        </mat-tab>
-                    
-                    </mat-tab-group>
-
-                
+            <div class="col-md-4">
+              <a routerLinkActive="active" [routerLink]="['/rsprocesos']">
+                <div class="card bg-purple order-card">
+                  <div class="card-block">
+                    <h2 class="text-right text-white"><i class="fa fa-print f-left"></i>
+                      <span>Procesos</span>
+                    </h2>
+                    <p class="m-b-0" style="font-size: 13px;">Procesos Generales<span class="f-right"></span></p>
+                  </div>
                 </div>
+              </a>
             </div>
-        
-  
-  
-  
-       
-            <br>
-  
-  
-  
-  
-  
-         
-            <!-- Card stats -->
-           
-  
-  
           </div>
         </div>
       </div>
-    </div>    
+    </div>
   </div>
-  
-  
+  <!-- Fin de Tarjeta Padre -->
+</div>

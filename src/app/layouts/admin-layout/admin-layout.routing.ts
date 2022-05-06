@@ -21,6 +21,9 @@ import { ArchivoComponent } from 'src/app/views/archivo/archivo.component';
 import { AycotizacionesComponent } from 'src/app/views/ayudantia/procesos/aycotizaciones/aycotizaciones.component';
 import { PendientesComponent } from 'src/app/views/control/pendientes/pendientes.component';
 import { ProcesosComponent } from 'src/app/views/ayudantia/procesos/procesos.component';
+import { RsprocesosComponent } from 'src/app/views/resoluciones/rsprocesos/rsprocesos.component';
+import { RsbuzonComponent } from 'src/app/views/resoluciones/rsbuzon/rsbuzon.component';
+import { RsentradasComponent } from 'src/app/views/resoluciones/rsentradas/rsentradas.component';
 
 
 
@@ -143,6 +146,21 @@ export const AdminLayoutRoutes: Routes = [
     { 
         path: 'pendientes', 
         component: PendientesComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'rsprocesos', 
+        component: RsprocesosComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'rsbuzon', 
+        component: RsbuzonComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'rsentradas', 
+        component: RsentradasComponent,
         canActivate:[AuthGuardGuard] 
     }
 ];
