@@ -57,6 +57,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public detalle: string = ''
   public cuenta: string = ''
   public resumen: string = ''
+  public salida: string = 'Salida Asociada'
 
 
   public WkDoc: IWKFDocumento = {
@@ -147,6 +148,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       if (id == 'salida') {
         this.titulo = 'Salida'
         this.estadoActual = 9
+        this.estadoOrigen = 2
         this.ncontrolv = false
         this.ncontrolt = 'Nro de Salida'
 
@@ -224,7 +226,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
     this.xAPI.parametros = base
     this.xAPI.valores = ''
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         data.Cuerpo.forEach(e => {
@@ -236,8 +237,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
             this.WAlerta.activo = 1
             this.WAlerta.documento = this.Doc.wfdocumento
-            this.WAlerta.estado = 1
-            this.WAlerta.estatus = 1
+            this.WAlerta.estado = this.estadoActual
+            this.WAlerta.estatus = this.estadoOrigen
             this.WAlerta.usuario = this.loginService.Usuario.id
           }
 
@@ -332,6 +333,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
+  //Obtener los dados de Documento
   obtenerDatos(data: any) {
     if (data.tipo == 0) {
       var mensaje = data.msj + ' - ' + this.xAPI.funcion
@@ -339,15 +341,26 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       return false
     }
     this.xAPI.funcion = 'WKF_IDocumentoDetalle'
-    if (this.estadoActual !=9) this.Doc.ncontrol = this.utilService.Semillero(data.msj)
+    if (this.estadoActual !=9 ) {
+      this.Doc.ncontrol = this.utilService.Semillero(data.msj).toUpperCase()
+
+    }else{
+      this.Doc.salida = this.Doc.ncontrol.toUpperCase()
+      this.Doc.ncontrol = ''
+ 
+    }
     this.Doc.wfdocumento = parseInt(data.msj)
     this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
     this.Doc.forigen = this.utilService.ConvertirFecha(this.forigen)
+    this.Doc.contenido = this.Doc.contenido.toUpperCase()
+    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
+
     this.Doc.creador = this.loginService.Usuario.id
 
     this.xAPI.valores = JSON.stringify(this.Doc)
   }
 
+  //Obtener alerta del Documento
   obtenerAlertaWorkFlow(data: any) {
     if (data.tipo == 0) {
       this.toastrService.error(data.msj, `GDoc Wkf.Alerta`);
@@ -375,7 +388,13 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       cancelButtonText: 'No'
     }).then((result) => {
       if (!result.isConfirmed)
-        this.ruta.navigate(['/registrar']);
+
+      if(this.estadoActual == 9){
+        this.ruta.navigate(['/salidas']);
+        return
+      }
+      
+      this.ruta.navigate(['/registrar']);
 
     })
   }
@@ -391,21 +410,19 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.Doc)
 
-    this.toastrService.error('Pendiente por Desarrollar', `GDoc Wkf.Documento`);
 
+    if (this.WAlerta.documento != 0) this.WAlerta.fecha = typeof this.fplazo === 'object' ? this.utilService.ConvertirFecha(this.fplazo) : this.fplazo.substring(0, 10)
 
-    if (this.WAlerta.documento != 0) {
-      this.WAlerta.fecha = typeof this.fplazo === 'object' ? this.utilService.ConvertirFecha(this.fplazo) : this.fplazo.substring(0, 10)
-
-    }
 
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.info(this.xAPI);
+        
+        this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
+        this.ngxService.stopLoader("loader-aceptar")
+        this.ruta.navigate(['/registrar']);
+
       },
       (errot) => {
-
-        this.limpiarDoc()
         this.toastrService.error(errot, `GDoc Wkf.Actualizar Documentos`)
         this.ngxService.stopLoader("loader-aceptar")
       }

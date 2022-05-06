@@ -1,4 +1,4 @@
-import { ClassGetter, THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { ClassGetter, THIS_EXPR, ThrowStmt } from '@angular/compiler/src/output/output_ast';
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -6,7 +6,9 @@ import { Router } from '@angular/router';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { UtilService } from 'src/app/services/util/util.service';
 
 
 @Component({
@@ -19,7 +21,7 @@ export class BuzonComponent implements OnInit {
 
 
   public estadoActual = 2
-  public estadoOrigen = 1
+  public estatusAcutal = 1
 
   public clasificacion = false
 
@@ -73,12 +75,7 @@ export class BuzonComponent implements OnInit {
   lst = []
   public lstEstados = [] //Listar Estados
 
-  lengthOfi = 0;
-  pageSizeOfi = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 100];
 
-  // MatPaginator Output
-  pageEvent: PageEvent;
 
   selNav = 0
 
@@ -87,23 +84,51 @@ export class BuzonComponent implements OnInit {
   public bzPendientes = []
   public bzCerrados = []
 
+
+  public bzBusqueda = []
+  public bzAlertasO = []
+  public bzAlertas = []
+  public buscar = ''
+
   public estilocheck = 'none'
-
   public estiloclasificar = 'none'
-
   public allComplete: boolean = false
-
   public numControl = ''
-
   public Observacion = ''
-
   public AccionTexto: string = '0'
+  public extender_plazo: any
+
+
+
+
+  longitud = 0;
+  pageSize = 10;
+  pageSizeOptions: number[] = [5, 10, 25, 100];
+
+
+  // MatPaginator Output
+  pageEvent: PageEvent;
+
+
+  public posicionPagina = 0
+  public placement = 'bottom'
+
+  public WAlerta: IWKFAlerta = {
+    documento: 0,
+    estado: 0,
+    estatus: 0,
+    activo: 0,
+    fecha: '',
+    usuario: '',
+    observacion: ''
+  }
 
   constructor(
     private apiService: ApiService,
     config: NgbModalConfig,
     private ruta: Router,
     private toastrService: ToastrService,
+    private utilService: UtilService,
     private loginService: LoginService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
@@ -116,6 +141,54 @@ export class BuzonComponent implements OnInit {
     this.listarEstados()
     this.seleccionNavegacion(0)
 
+    this.ConsultarAlertas()
+
+  }
+
+
+  seleccionLista(event) {
+    this.longitud = 0;
+    this.pageSize = 10;
+    const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
+    if (event.charCode == 13) {
+      this.longitud = this.bzBusqueda.length
+      if (this.posicionPagina == 3) {
+        this.bzBusqueda = this.bzAlertasO.filter((e) => {
+          return patron.test(this.utilService.ConvertirCadena(e.busqueda))
+        })
+        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+      }
+      this.buscar = ''
+    }
+  }
+
+
+
+
+
+  async ConsultarAlertas() {
+    this.xAPI.funcion = 'WKF_CAlertas'
+    this.xAPI.parametros = '2,2'
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.bzAlertasO = data.Cuerpo.map((e) => {
+          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
+          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
+          e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto
+          e.busqueda = this.utilService.ConvertirCadena(
+            e.ncontrol + e.remitente + e.plazo + e.texto
+          )
+          return e
+        }
+        )
+        this.bzBusqueda = this.bzAlertasO
+        this.longitud = this.bzBusqueda.length
+        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+      },
+      (error) => {
+
+      }
+    )
   }
 
 
@@ -141,7 +214,7 @@ export class BuzonComponent implements OnInit {
         this.cargarAcciones(0)
         this.clasificacion = false
 
-        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
+        this.xAPI.parametros = this.estadoActual + ',' + this.estatusAcutal
         this.listarBuzon(this.bzRecibido)
         break
       case 1:
@@ -189,33 +262,15 @@ export class BuzonComponent implements OnInit {
         console.log(data)
 
         data.Cuerpo.forEach(e => {
-
-          var existe = e.anom == '' ? true : false
-          var privado = e.priv == 1 ? true : false
-          console.log(e)
-          bz.push(
-            {
-              id: e.id,
-              idd: e.idd,
-              numc: e.numc,
-              completed: false,
-              color: 'warn',
-              nori: e.nori,
-              tdoc: e.tdoc,
-              fcre: e.fcre,
-              remi: e.remi,
-              udep: e.udep,
-              anom: e.anom,
-              priv: privado,
-              existe: existe,
-              xaccion: e.accion
-            }
-          )
-
+          e.existe = e.anom == '' ? true : false
+          e.privado = e.priv == 1 ? true : false
+          e.completed =  false
+          e.color = 'warn'
+          bz.push(e)
         })//Registros recorridos como elementos
-
-        this.lengthOfi = data.Cuerpo.length
-        if (this.lengthOfi > 0) {
+        
+        this.longitud = data.Cuerpo.length
+        if (this.longitud > 0) {
           this.estilocheck = ''
           this.recorrerElementos(1, this.bzRecibido)
         }
@@ -259,7 +314,7 @@ export class BuzonComponent implements OnInit {
   //recorrerElementos para paginar listados
   recorrerElementos(posicion: number, lista: any) {
     if (posicion > 1) posicion = posicion * 10
-    this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
+    this.lst = lista.slice(posicion, posicion + this.pageSize)
 
   }
 
@@ -285,7 +340,7 @@ export class BuzonComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.info(this.AccionTexto)
+        
         switch (this.AccionTexto) {
           case "1"://Rechazar en el estado inicial
             this.rechazarBuzon()
@@ -380,11 +435,29 @@ export class BuzonComponent implements OnInit {
     console.log(this.xAPI.parametros)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.toastrService.success(
-          'El documento ha sido redistribuido segun su selección',
-          `GDoc Wkf.DocumentoObservacion`
-        )
-        console.log(data)
+        this.WAlerta.documento = parseInt(this.numControl)
+        this.WAlerta.observacion = 'PENDIENTE POR REVISION'
+        this.WAlerta.activo = 1
+        this.WAlerta.estado = this.estadoActual
+        this.WAlerta.estatus = this.estatusAcutal + 1
+        this.WAlerta.fecha = this.utilService.ConvertirFecha(this.extender_plazo)
+        this.WAlerta.usuario = this.loginService.Usuario.id
+       
+        this.xAPI.funcion = "WKF_IAlerta"
+        this.xAPI.parametros = ''
+        this.xAPI.valores =  JSON.stringify(this.WAlerta)
+
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          (data) => {
+            this.toastrService.success(
+              'El documento ha sido redistribuido segun su selección',
+              `GDoc Wkf.DocumentoObservacion`
+            )
+          },
+          (error) => {
+            console.error('Fallo la alerta', error)
+          })
+
         this.seleccionNavegacion(this.selNav)
       },
       (error) => {
@@ -398,12 +471,7 @@ export class BuzonComponent implements OnInit {
 
   async cargarAcciones(posicion) {
     this.lstAcciones = []
-    this.cmbAcciones.forEach(e => {
-      if (e.visible == posicion) {
-        this.lstAcciones.push(e)
-      }
-
-    });
+    this.lstAcciones = this.cmbAcciones.filter(e => {return e.visible == posicion });
   }
 
   selAccion() {

@@ -13,20 +13,16 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class PendientesComponent implements OnInit {
 
 
-  public bzBusqueda = [] 
+  public bzBusqueda = []
 
-  public bzAlertasO = []
-  public bzAlertas = []
 
   public bzSeguimientoO = []
   public bzSeguimiento = []
 
   public fplazo: any
-
   public id_alerta = ''
 
   public buscar = ''
-
   public posicionPagina = 0
 
   public focus = true
@@ -50,7 +46,7 @@ export class PendientesComponent implements OnInit {
     private utilService: UtilService) { }
 
   ngOnInit(): void {
-    this.ConsultarAlertas()
+    this.ConsultarSeguimiento()
 
 
   }
@@ -59,70 +55,30 @@ export class PendientesComponent implements OnInit {
   seleccionLista(event) {
     this.longitud = 0;
     this.pageSize = 10;
-    const patron = new RegExp(this.convertirCadena(this.buscar))
+    
     if (event.charCode == 13) {
-      
+      const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
       this.longitud = this.bzBusqueda.length
-      if(this.posicionPagina == 0 ){
-        this.bzBusqueda = this.bzSeguimientoO.filter((e) => {
-          return patron.test(this.convertirCadena(e.busqueda))
-        })
-        this.bzSeguimiento =  this.bzBusqueda.slice(0, this.pageSize)
-      }else{
-        this.bzBusqueda = this.bzAlertasO.filter((e) => {
-          return patron.test(this.convertirCadena(e.busqueda))
-        })
-        this.bzAlertas =  this.bzBusqueda.slice(0, this.pageSize)
-
-      }
-
-      this.buscar = ''
+      this.bzBusqueda = this.bzSeguimientoO.filter((e) => { return patron.test(e.busqueda)})
+      this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize)
     }
 
   }
 
-
-  //convertir cadena a minuscula y sin carateres especiales
-  convertirCadena(cadena: string): string {
-    return cadena.toLowerCase().replace(/á/g, "a").replace(/ê/g, "i").replace(/í/g, "i").replace(/ó/g, "o").replace(/ú/g, "u")
-  }
-
-
-  async ConsultarAlertas() {
-    this.xAPI.funcion = 'WKF_CAlertas'
-    this.xAPI.parametros = '1,1'
-    await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.bzAlertasO = data.Cuerpo.map((e) => {
-          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
-          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
-          e.texto = e.contador == 0?'Se vence hoy': e.texto
-          e.busqueda = this.convertirCadena(
-            e.ncontrol + e.remitente + e.plazo + e.texto
-          )
-          return e
-        }
-        )
-        this.bzBusqueda = this.bzAlertasO
-        this.longitud = this.bzBusqueda.length
-        this.bzAlertas =  this.bzBusqueda.slice(0, this.pageSize)
-      },
-      (error) => {
-
-      }
-    )
-  }
 
   async ConsultarSeguimiento() {
     this.xAPI.funcion = 'WKF_CSeguimiento'
     this.xAPI.parametros = ''
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
-        this.bzSeguimientoO = data.Cuerpo
+        this.bzSeguimientoO = data.Cuerpo.map((e) => {
+          e.busqueda = this.utilService.ConvertirCadena( e.ncontrol + ' ' + e.estatus_nombre + ' ' + e.remitente + ' ' + e.nombre)
+          return e
+        } )
+
         this.bzBusqueda = this.bzSeguimientoO
         this.longitud = this.bzBusqueda.length
-        this.bzSeguimiento =  this.bzBusqueda.slice(0, this.pageSize)
+        this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize)
 
       },
       (error) => {
@@ -140,28 +96,14 @@ export class PendientesComponent implements OnInit {
   }
 
 
-  selNavegacion(e) {
-    this.longitud = 0;
-    this.pageSize = 10;
-    this.posicionPagina = e
-    if (e == 1) this.ConsultarSeguimiento()
-  }
 
   pageChangeEvent(e) {
     this.recorrerElementos(e.pageIndex)
   }
 
-  recorrerElementos(pagina : number){
-    let pag = this.pageSize
-    pag = pag * pagina
-
-    if(this.posicionPagina == 0 ){
-      this.bzAlertas =  this.bzBusqueda.slice(pag, pag + this.pageSize)
-    }else{
-      this.bzSeguimiento =  this.bzBusqueda.slice(pag, pag + this.pageSize)
-    }
-   
-   
+  recorrerElementos(pagina: number) {
+    let pag = this.pageSize * pagina
+    this.bzSeguimiento = this.bzBusqueda.slice(pag, pag + this.pageSize)
   }
   insertarObservacion() {
 

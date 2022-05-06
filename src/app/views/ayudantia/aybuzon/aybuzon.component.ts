@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 
 
@@ -65,16 +66,38 @@ export class AybuzonComponent implements OnInit {
   public bzCerrados = []
 
   public estilocheck = 'none'
-
   public estiloclasificar = 'none'
-
   public allComplete: boolean = false
-
   public numControl = ''
-
   public Observacion = ''
-
   public AccionTexto: string = '0'
+
+  public placement = 'bottom'
+
+  public WAlerta: IWKFAlerta = {
+    documento: 0,
+    estado: 0,
+    estatus: 0,
+    activo: 0,
+    fecha: '',
+    usuario: '',
+    observacion: ''
+  }
+  public clasificacion = false
+
+  public cmbDestino = ''
+
+  public lstAcciones = []
+
+  public cmbAcciones = [
+    { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
+    { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
+    { 'valor': '2', 'texto': 'ELABORAR OFICIO DE OPINION', 'visible': '1' },
+    { 'valor': '3', 'texto': 'EN MANOS DEL DIRECTOR DEL DESPACHO', 'visible': '1' },
+    { 'valor': '4', 'texto': 'EN MANOS DEL SUB DIRECTOR DEL DESPACHO', 'visible': '1' },
+    { 'valor': '5', 'texto': 'ARCHIVAR', 'visible': '1' },
+    { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '1' },
+    { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' }]
 
   constructor(
     private apiService: ApiService,
@@ -114,10 +137,12 @@ export class AybuzonComponent implements OnInit {
 
     switch (e) {
       case 0:
+        this.cargarAcciones(0)
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
         this.listarBuzon(this.bzRecibido)
         break
       case 1:
+        this.cargarAcciones(1)
         this.xAPI.funcion = 'WKF_CSubDocumento'
         this.xAPI.parametros = this.estadoActual + ',' + 2
         this.listarBuzon(this.bzProcesados)
@@ -142,9 +167,7 @@ export class AybuzonComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        data.Cuerpo.forEach(e => {
-          if (e.esta == 1) this.lstEstados.push(e)
-        });
+        this.lstEstados = data.Cuerpo.filter(e => {return e.esta == 1 });
       },
       (error) => {
 
@@ -155,32 +178,16 @@ export class AybuzonComponent implements OnInit {
   async listarBuzon(bz: any) {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        data.Cuerpo.forEach(e => {
+         data.Cuerpo.forEach(e => {
 
-          var existe = e.anom == '' ? true : false
-          var privado = e.priv == 1 ? true : false
-          const cuenta = e.cuenta != undefined ? e.cuenta : ''
-          const resumen = e.resumen != undefined ? e.resumen : ''
-          const detalle = e.detalle != undefined ? e.detalle : ''
-
-          bz.push({
-              id: e.id,
-              idd: e.idd,
-              numc: e.numc,
-              completed: false,
-              color: 'warn',
-              nori: e.nori,
-              tdoc: e.tdoc,
-              fcre: e.fcre,
-              remi: e.remi,
-              udep: e.udep,
-              anom: e.anom,
-              priv: privado,
-              cuenta: cuenta,
-              resumen: resumen,
-              detalle: detalle,
-              existe: existe
-          })
+          e.existe = e.anom == '' ? true : false
+          e.privado = e.priv == 1 ? true : false
+          e.cuenta = e.cuenta != undefined ? e.cuenta : ''
+          e.resumen = e.resumen != undefined ? e.resumen : ''
+          e.detalle = e.detalle != undefined ? e.detalle : ''
+          e.completed = false
+          e.color = 'warn'
+          bz.push(e)
 
         })//Registros recorridos como elementos
 
@@ -282,6 +289,24 @@ export class AybuzonComponent implements OnInit {
         this.toastrService.error(errot, `GDoc Wkf.PromoverDocumento`);
       }) //
 
+  }
+
+
+  async cargarAcciones(posicion) {
+    this.lstAcciones = []
+    this.lstAcciones = this.cmbAcciones.filter(e => {return e.visible == posicion});
+  }
+
+  selAccion() {
+    this.clasificacion = false
+    switch (this.AccionTexto) {
+      case '6':
+        this.clasificacion = true
+        break;
+
+      default:
+        break;
+    }
   }
 
 }
