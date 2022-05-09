@@ -265,6 +265,7 @@ export class BuzonComponent implements OnInit {
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.completed =  false
+          e.nombre_accion = this.cmbAcciones[e.accion].texto
           e.color = 'warn'
           bz.push(e)
         })//Registros recorridos como elementos
