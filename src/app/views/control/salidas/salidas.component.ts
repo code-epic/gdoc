@@ -7,6 +7,7 @@ import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { UtilService } from 'src/app/services/util/util.service';
 
 
 
@@ -89,22 +90,28 @@ export class SalidasComponent implements OnInit {
   public bzCerrados = []
 
   public estilocheck = 'none'
-
   public estiloclasificar = 'none'
-
   public allComplete: boolean = false
-
   public numControl = ''
-
   public Observacion = ''
-
   public AccionTexto: string = '0'
+
+  public bzBusqueda = []
+  public bzAlertasO = []
+  public bzAlertas = []
+  public buscar = ''
+  public longitud = 0;
+  public pageSize = 10;
+  public xtender_plazo = ''
+
+  public posicionPagina = 0
 
   constructor(
     private apiService: ApiService,
     config: NgbModalConfig,
     private ruta: Router,
     private toastrService: ToastrService,
+    private utilService: UtilService,
     private loginService: LoginService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
@@ -116,7 +123,51 @@ export class SalidasComponent implements OnInit {
   ngOnInit(): void {
     this.listarEstados()
     this.seleccionNavegacion(0)
+    this.ConsultarAlertas()
 
+  }
+
+
+  seleccionLista(event) {
+    if (event.charCode == 13) {
+      this.longitud = 0;
+      this.pageSize = 10;
+      const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
+      this.longitud = this.bzBusqueda.length
+      if (this.posicionPagina == 3) {
+        this.bzBusqueda = this.bzAlertasO.filter((e) => { return patron.test(e.busqueda) })
+        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+      }
+      this.buscar = ''
+    }
+  }
+
+
+
+
+
+  async ConsultarAlertas() {
+    this.xAPI.funcion = 'WKF_CAlertas'
+    this.xAPI.parametros = '9,2'
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.bzAlertasO = data.Cuerpo.map((e) => {
+          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
+          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
+          e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto
+          e.busqueda = this.utilService.ConvertirCadena(
+            e.ncontrol + e.remitente + e.plazo + e.texto
+          )
+          return e
+        })
+        this.bzBusqueda = this.bzAlertasO
+        this.longitud = this.bzBusqueda.length
+        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+      },
+      (error) => {
+
+      }
+    )
   }
 
 

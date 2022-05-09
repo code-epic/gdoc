@@ -8,8 +8,8 @@ export class UtilService {
 
 
   //
-  constructor() { 
-   
+  constructor() {
+
   }
 
 
@@ -54,6 +54,11 @@ export class UtilService {
     }
 
 
+  }
+
+  //convertir cadena a minuscula y sin carateres especiales
+  ConvertirCadena(cadena: string): string {
+    return cadena.toLowerCase().replace(/á/g, "a").replace(/ê/g, "i").replace(/í/g, "i").replace(/ó/g, "o").replace(/ú/g, "u")
   }
 
 
