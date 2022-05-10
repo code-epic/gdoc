@@ -179,6 +179,47 @@
             </mat-paginator>
             </mat-tab>
           
+
+            <mat-tab>
+              <ng-template mat-tab-label>
+                &nbsp;ALERTAS
+              </ng-template>
+  
+              <div class="container">
+                <mat-selection-list #lstAlertas>
+                  <mat-list *ngFor="let e of bzAlertas; let i=index "
+                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                    <div class="row">
+                      <div class="col-md-2 texto-lista">
+                        {{ e.ncontrol }}
+                      </div>
+                      <div class="col-md-4 texto-lista">
+                        {{ e.remitente | uppercase }}
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        {{ e.plazo | date:"dd-MM-yyyy" }}
+                      </div>
+                      <div class="col-md-3 texto-lista  {{ e.color }}">
+                        {{ e.texto | uppercase }}
+                      </div>
+                      <div class="col-md-1 text-right ">
+                        <button mat-icon-button aria-label="Privado">
+                          <!--  -->
+                          <mat-icon class="text-warning" (click)="open(observacion, e.id_alerta)">today</mat-icon>
+                        </button>
+  
+                      </div>
+                    </div>
+                  </mat-list>
+                </mat-selection-list>
+              </div>
+  
+              <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+              </mat-paginator>
+            </mat-tab>
+
+
           </mat-tab-group>  
         </div>
       </div>

@@ -6,6 +6,7 @@ import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { UtilService } from 'src/app/services/util/util.service';
 
 
 @Component({
@@ -76,11 +77,51 @@ export class SecretariaComponent implements OnInit {
 
   public AccionTexto: string = '0'
 
+
+  public clasificacion = false
+
+  public cmbDestino = ''
+
+  public lstAcciones = []
+
+  public cmbAcciones = [
+    { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
+    { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
+    { 'valor': '2', 'texto': 'ANALISTA', 'visible': '1' },
+    { 'valor': '3', 'texto': 'CUENTA PRESIDENCIAL', 'visible': '1' },
+    { 'valor': '4', 'texto': 'SUB-DIRECCION', 'visible': '1' },
+    { 'valor': '5', 'texto': 'DIRECCION DEL DESPACHO', 'visible': '1' },
+    { 'valor': '6', 'texto': 'TITULAR DEL DESPACHO', 'visible': '1' },
+    { 'valor': '7', 'texto': 'CONSULTORIA JURIDICA', 'visible': '1' },
+    { 'valor': '8', 'texto': 'DIV. DE RESOLUCIONES', 'visible': '1' },
+    { 'valor': '9', 'texto': 'ESPERA DE OPINION', 'visible': '1' },
+    { 'valor': '10', 'texto': 'SALIDA', 'visible': '2' }]
+
+  public lstEstatus = [
+    { 'valor': '6', 'texto': 'TITULAR DEL DESPACHO', 'visible': '0' },
+    { 'valor': '7', 'texto': 'CONSULTORIA JURIDICA', 'visible': '0' },
+    { 'valor': '8', 'texto': 'DIV. DE RESOLUCIONES', 'visible': '0' },
+    { 'valor': '9', 'texto': 'ESPERA DE OPINION', 'visible': '0' }]
+
+
+  public bzBusqueda = []
+  public bzAlertasO = []
+  public bzAlertas = []
+  public buscar = ''
+  longitud = 0;
+  pageSize = 10;
+
+
+  public posicionPagina = 0
+  public placement = 'bottom'
+
+
   constructor(
     private apiService: ApiService,
     config: NgbModalConfig,
     private ruta: Router,
     private toastrService: ToastrService,
+    private utilService: UtilService,
     private loginService: LoginService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
@@ -89,16 +130,69 @@ export class SecretariaComponent implements OnInit {
 
   }
 
+
   ngOnInit(): void {
     this.listarEstados()
     this.seleccionNavegacion(0)
+    this.ConsultarAlertas()
 
+  }
+
+
+  seleccionLista(event) {
+    this.longitud = 0;
+    this.pageSize = 10;
+    const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
+    if (event.charCode == 13) {
+      this.longitud = this.bzBusqueda.length
+      if (this.posicionPagina == 3) {
+        this.bzBusqueda = this.bzAlertasO.filter((e) => {
+          return patron.test(this.utilService.ConvertirCadena(e.busqueda))
+        })
+        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+      }
+      this.buscar = ''
+    }
+  }
+
+
+
+
+
+  async ConsultarAlertas() {
+    this.xAPI.funcion = 'WKF_CAlertas'
+    this.xAPI.parametros = '2,2'
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.bzAlertasO = data.Cuerpo.map((e) => {
+          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
+          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
+          e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto
+          e.busqueda = this.utilService.ConvertirCadena(
+            e.ncontrol + e.remitente + e.plazo + e.texto
+          )
+          return e
+        }
+        )
+        this.bzBusqueda = this.bzAlertasO
+        this.longitud = this.bzBusqueda.length
+        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+      },
+      (error) => {
+
+      }
+    )
   }
 
 
   open(content, id) {
     this.numControl = id
-    this.modalService.open(content);
+    if (this.selNav == 1) {
+      this.modalService.open(content, { size: 'lg' })
+    } else {
+      this.modalService.open(content)
+    }
+
 
   }
 
@@ -114,15 +208,24 @@ export class SecretariaComponent implements OnInit {
 
     switch (e) {
       case 0:
+        this.cargarAcciones(0)
+        this.clasificacion = false
+
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
         this.listarBuzon(this.bzRecibido)
         break
       case 1:
+        this.cargarAcciones(1)
+        this.clasificacion = false
+
         this.xAPI.funcion = 'WKF_CSubDocumento'
         this.xAPI.parametros = this.estadoActual + ',' + 2
         this.listarBuzon(this.bzProcesados)
         break
       case 2:
+        this.cargarAcciones(2)
+        this.clasificacion = false
+
         this.xAPI.parametros = this.estadoActual + ',' + 3
         this.listarBuzon(this.bzPendientes)
         break
@@ -136,15 +239,14 @@ export class SecretariaComponent implements OnInit {
 
   }
 
+
   listarEstados() {
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        data.Cuerpo.forEach(e => {
-          if (e.esta == 1) this.lstEstados.push(e)
-        });
+        this.lstEstados = data.Cuerpo.filter(e => { return e.esta == 1 });
       },
       (error) => {
 
@@ -155,33 +257,14 @@ export class SecretariaComponent implements OnInit {
   async listarBuzon(bz: any) {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data);
         data.Cuerpo.forEach(e => {
-
-          var existe = e.anom == '' ? true : false
-          var privado = e.priv == 1 ? true : false
-          const cuenta = e.cuenta != undefined ? e.cuenta : ''
-          const resumen = e.resumen != undefined ? e.resumen : ''
-          const detalle = e.detalle != undefined ? e.detalle : ''
-
-          bz.push({
-              id: e.id,
-              idd: e.idd,
-              numc: e.numc,
-              completed: false,
-              color: 'warn',
-              nori: e.nori,
-              tdoc: e.tdoc,
-              fcre: e.fcre,
-              remi: e.remi,
-              udep: e.udep,
-              anom: e.anom,
-              priv: privado,
-              cuenta: cuenta,
-              resumen: resumen,
-              detalle: detalle,
-              existe: existe
-          })
-
+          e.existe = e.anom == '' ? true : false
+          e.privado = e.priv == 1 ? true : false
+          e.completed = false
+          e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
+          e.color = 'warn'
+          bz.push(e)
         })//Registros recorridos como elementos
 
         this.lengthOfi = data.Cuerpo.length
@@ -283,6 +366,24 @@ export class SecretariaComponent implements OnInit {
       }) //
 
   }
+
+  async cargarAcciones(posicion) {
+    this.lstAcciones = []
+    this.lstAcciones = this.cmbAcciones.filter(e => { return e.visible == posicion });
+  }
+
+  selAccion() {
+    this.clasificacion = false
+    switch (this.AccionTexto) {
+      case '6':
+        this.clasificacion = true
+        break;
+
+      default:
+        break;
+    }
+  }
+
 
 
 }

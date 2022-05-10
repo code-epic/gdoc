@@ -52,6 +52,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   public editar: boolean = false
   public puntocuenta: boolean = false
+  public salidavisible : boolean = true
 
 
   public detalle: string = ''
@@ -150,6 +151,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.estadoActual = 9
         this.estadoOrigen = 2
         this.ncontrolv = false
+        this.salidavisible = false
         this.ncontrolt = 'Nro de Salida'
 
       } else {

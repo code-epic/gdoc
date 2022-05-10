@@ -224,8 +224,8 @@ export class SalidasComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        data.Cuerpo.forEach(e => {
-          if (e.esta == 1) this.lstEstados.push(e)
+        this.lstEstados = data.Cuerpo.filter(e => {
+          return e.esta == 1 && e.id != 9
         });
       },
       (error) => {

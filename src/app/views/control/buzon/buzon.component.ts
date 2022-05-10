@@ -245,9 +245,9 @@ export class BuzonComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        data.Cuerpo.forEach(e => {
-          if (e.esta == 1) this.lstEstados.push(e)
-        });
+        this.lstEstados = data.Cuerpo.filter(e => { 
+          return e.esta == 1 && e.id != 9
+         });
       },
       (error) => {
 
@@ -265,7 +265,7 @@ export class BuzonComponent implements OnInit {
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.completed =  false
-          e.nombre_accion = this.cmbAcciones[e.accion].texto
+          e.nombre_accion = e.accion != null? this.cmbAcciones[e.accion].texto: ''
           e.color = 'warn'
           bz.push(e)
         })//Registros recorridos como elementos
