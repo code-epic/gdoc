@@ -18,7 +18,7 @@ export class RsbuzonComponent implements OnInit {
 
 
 
-  public estadoActual = 2
+  public estadoActual = 3
   public estadoOrigen = 1
 
   public clasificacion = false

@@ -389,14 +389,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Si',
       cancelButtonText: 'No'
     }).then((result) => {
-      if (!result.isConfirmed)
-
-      if(this.estadoActual == 9){
-        this.ruta.navigate(['/salidas']);
-        return
+      if (!result.isConfirmed){
+        if(this.estadoActual == 9){
+          this.ruta.navigate(['/salidas']);
+          return
+        }
+        
+        this.ruta.navigate(['/registrar']);
       }
+
       
-      this.ruta.navigate(['/registrar']);
 
     })
   }

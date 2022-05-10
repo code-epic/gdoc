@@ -245,9 +245,9 @@ export class BuzonComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstEstados = data.Cuerpo.filter(e => { 
+        this.lstEstados = data.Cuerpo.filter(e => {
           return e.esta == 1 && e.id != 9
-         });
+        });
       },
       (error) => {
 
@@ -264,12 +264,12 @@ export class BuzonComponent implements OnInit {
         data.Cuerpo.forEach(e => {
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
-          e.completed =  false
-          e.nombre_accion = e.accion != null? this.cmbAcciones[e.accion].texto: ''
+          e.completed = false
+          e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
           e.color = 'warn'
           bz.push(e)
         })//Registros recorridos como elementos
-        
+
         this.longitud = data.Cuerpo.length
         if (this.longitud > 0) {
           this.estilocheck = ''
@@ -341,7 +341,7 @@ export class BuzonComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
+
         switch (this.AccionTexto) {
           case "1"://Rechazar en el estado inicial
             this.rechazarBuzon()
@@ -443,10 +443,10 @@ export class BuzonComponent implements OnInit {
         this.WAlerta.estatus = this.estatusAcutal + 1
         this.WAlerta.fecha = this.utilService.ConvertirFecha(this.extender_plazo)
         this.WAlerta.usuario = this.loginService.Usuario.id
-       
+
         this.xAPI.funcion = "WKF_IAlerta"
         this.xAPI.parametros = ''
-        this.xAPI.valores =  JSON.stringify(this.WAlerta)
+        this.xAPI.valores = JSON.stringify(this.WAlerta)
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
@@ -472,13 +472,16 @@ export class BuzonComponent implements OnInit {
 
   async cargarAcciones(posicion) {
     this.lstAcciones = []
-    this.lstAcciones = this.cmbAcciones.filter(e => {return e.visible == posicion });
+    this.lstAcciones = this.cmbAcciones.filter(e => { return e.visible == posicion });
   }
 
   selAccion() {
     this.clasificacion = false
     switch (this.AccionTexto) {
       case '6':
+        this.clasificacion = true
+        break;
+      case '7':
         this.clasificacion = true
         break;
 
