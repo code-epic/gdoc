@@ -98,8 +98,8 @@ export class LoginService {
     });
   }
   
-  obtenerMenu(){
-
+  obtenerMenu() : any {
+    return this.Aplicacion.Rol.Menu
   }
 
   obtenerSubMenu(idUrl : string) : any{   

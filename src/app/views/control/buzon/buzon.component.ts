@@ -326,6 +326,13 @@ export class BuzonComponent implements OnInit {
   }
 
   insertarObservacion() {
+    if (this.AccionTexto == "0"){
+      this.toastrService.warning(
+        'Debe seleccionar una accion ',
+        `GDoc Wkf.DocumentoObservacion`
+      )
+      return false
+    }
     var usuario = this.loginService.Usuario.id
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify(
@@ -362,11 +369,7 @@ export class BuzonComponent implements OnInit {
           case "7"://Enviar a salida con bifurcacion
             this.redistribuir(9)
             break;
-
-          default:
-
-            this.promoverBuzon()
-            break;
+            
         }
 
 
