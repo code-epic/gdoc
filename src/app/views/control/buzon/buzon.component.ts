@@ -31,7 +31,7 @@ export class BuzonComponent implements OnInit {
 
   public vpendientes = false
 
-  public cmbDestino = ''
+  public cmbDestino = 'S'
 
   public lstAcciones = []
 
@@ -326,7 +326,7 @@ export class BuzonComponent implements OnInit {
   }
 
   insertarObservacion() {
-    if (this.AccionTexto == "0"){
+    if (this.AccionTexto == "S"){
       this.toastrService.warning(
         'Debe seleccionar una accion ',
         `GDoc Wkf.DocumentoObservacion`

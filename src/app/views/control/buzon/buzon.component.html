@@ -266,7 +266,7 @@
     <div class="form-group  col-md-12" *ngIf="clasificacion">
       <label>Area</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
-        <option value="0">SELECCIONE</option>
+        <option value="S">SELECCIONE</option>
         <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
       </select>
     </div>
