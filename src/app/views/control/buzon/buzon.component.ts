@@ -326,7 +326,7 @@ export class BuzonComponent implements OnInit {
   }
 
   insertarObservacion() {
-    if (this.AccionTexto == "S"){
+    if (this.AccionTexto == "S") {
       this.toastrService.warning(
         'Debe seleccionar una accion ',
         `GDoc Wkf.DocumentoObservacion`
@@ -350,6 +350,9 @@ export class BuzonComponent implements OnInit {
       (data) => {
 
         switch (this.AccionTexto) {
+          case "0"://Aceptar y promover el documento
+            this.rechazarBuzon()
+            break;
           case "1"://Rechazar en el estado inicial
             this.rechazarBuzon()
             break;
@@ -369,7 +372,7 @@ export class BuzonComponent implements OnInit {
           case "7"://Enviar a salida con bifurcacion
             this.redistribuir(9)
             break;
-            
+
         }
 
 
