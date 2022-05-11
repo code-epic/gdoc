@@ -351,24 +351,20 @@ export class BuzonComponent implements OnInit {
 
         switch (this.AccionTexto) {
           case "0"://Aceptar y promover el documento
-            this.rechazarBuzon()
+            this.promoverBuzon()
             break;
           case "1"://Rechazar en el estado inicial
             this.rechazarBuzon()
             break;
-
           case "2"://Oficio por opinión
             this.promoverBuzon()
             break;
-
           case "5":// Enviar a Archivo
             this.redistribuir(11)
             break;
-
           case "6":// Enviar a otras areas
             this.redistribuir(0)
             break;
-
           case "7"://Enviar a salida con bifurcacion
             this.redistribuir(9)
             break;
