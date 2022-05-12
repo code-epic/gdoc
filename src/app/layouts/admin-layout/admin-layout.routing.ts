@@ -171,7 +171,7 @@ export const AdminLayoutRoutes: Routes = [
         canActivate:[AuthGuardGuard] 
     },
     { 
-        path: 'constancia', 
+        path: 'constancia/:id', 
         component: ConstanciaComponent,
         canActivate:[AuthGuardGuard] 
     }

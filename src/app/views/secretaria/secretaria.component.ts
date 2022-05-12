@@ -192,8 +192,6 @@ export class SecretariaComponent implements OnInit {
     } else {
       this.modalService.open(content)
     }
-
-
   }
 
 

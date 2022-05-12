@@ -348,7 +348,6 @@ export class BuzonComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-
         switch (this.AccionTexto) {
           case "0"://Aceptar y promover el documento
             this.promoverBuzon()
@@ -368,11 +367,7 @@ export class BuzonComponent implements OnInit {
           case "7"://Enviar a salida con bifurcacion
             this.redistribuir(9)
             break;
-
         }
-
-
-
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);

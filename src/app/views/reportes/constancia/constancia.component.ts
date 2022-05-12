@@ -3,6 +3,7 @@ import { IDocumento, IWKFAlerta } from '../../../services/control/documentos.ser
 import { ApiService, IAPICore} from 'src/app/services/apicore/api.service';
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 import { LoginService } from 'src/app/services/seguridad/login.service'
+import { ActivatedRoute } from '@angular/router';
  
 @Component({
   selector: 'app-constancia',
@@ -50,20 +51,17 @@ export class ConstanciaComponent implements OnInit {
 
   };
 
-  public fcreacion: any
-  public forigen: any
-
-  public fcreacionDate: NgbDate | null
-  public forigenDate: NgbDate | null
-
-  public fplazo: any
-
   constructor(
     private apiService: ApiService,
     private loginService: LoginService,
+    private rutaActiva: ActivatedRoute,
     public formatter: NgbDateParserFormatter,) { }
 
   ngOnInit(): void {
+    if (this.rutaActiva.snapshot.params.id != undefined) {
+      var id = this.rutaActiva.snapshot.params.id
+        this.consultarDocumento(id)
+      }
 
   }
 
@@ -78,10 +76,10 @@ export class ConstanciaComponent implements OnInit {
         data.Cuerpo.forEach(e => {
           this.Doc = e
 
-          this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
-          this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
+          this.Doc.fcreacion = e.fcreacion.substring(0, 10)
+          this.Doc.forigen = e.forigen.substring(0, 10)
           if (e.alerta != null) {
-            this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
+            const fplazo = e.alerta.substring(0, 10)
             this.WAlerta.activo = 1
             this.WAlerta.documento = this.Doc.wfdocumento
             this.WAlerta.estado = this.estadoActual
