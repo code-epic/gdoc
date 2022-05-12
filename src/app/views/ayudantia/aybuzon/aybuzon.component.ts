@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { UtilService } from 'src/app/services/util/util.service';
 
 
 
@@ -92,18 +93,31 @@ export class AybuzonComponent implements OnInit {
   public cmbAcciones = [
     { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
     { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
-    { 'valor': '2', 'texto': 'ELABORAR OFICIO DE OPINION', 'visible': '1' },
-    { 'valor': '3', 'texto': 'EN MANOS DEL DIRECTOR DEL DESPACHO', 'visible': '1' },
-    { 'valor': '4', 'texto': 'EN MANOS DEL SUB DIRECTOR DEL DESPACHO', 'visible': '1' },
-    { 'valor': '5', 'texto': 'ARCHIVAR', 'visible': '1' },
-    { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '1' },
-    { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' }]
+    { 'valor': '2', 'texto': 'EN MANOS DEL MAYOR GENERAL', 'visible': '1' },
+    { 'valor': '5', 'texto': 'ATURORIZADO', 'visible': '2' },
+    { 'valor': '6', 'texto': 'ARCHIVAR', 'visible': '2' },
+    { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' },
+    { 'valor': '8', 'texto': 'REDISTRIBUCION', 'visible': '2' }]
+
+
+  public bzBusqueda = []
+  public bzAlertasO = []
+  public bzAlertas = []
+  public buscar = ''
+  public posicionPagina = 0
+
+  public extender_plazo: any
+
+  longitud = 0;
+  pageSize = 10;
+
 
   constructor(
     private apiService: ApiService,
     config: NgbModalConfig,
     private ruta: Router,
     private toastrService: ToastrService,
+    private utilService: UtilService,
     private loginService: LoginService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
@@ -116,8 +130,55 @@ export class AybuzonComponent implements OnInit {
     this.listarEstados()
     this.seleccionNavegacion(0)
 
+    this.ConsultarAlertas()
+
   }
 
+
+  seleccionLista(event) {
+    this.longitud = 0;
+    this.pageSize = 10;
+    const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
+    if (event.charCode == 13) {
+      this.longitud = this.bzBusqueda.length
+      if (this.posicionPagina == 3) {
+        this.bzBusqueda = this.bzAlertasO.filter((e) => {
+          return patron.test(this.utilService.ConvertirCadena(e.busqueda))
+        })
+        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+      }
+      this.buscar = ''
+    }
+  }
+
+
+
+
+
+  async ConsultarAlertas() {
+    this.xAPI.funcion = 'WKF_CAlertas'
+    this.xAPI.parametros = '2,2'
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.bzAlertasO = data.Cuerpo.map((e) => {
+          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
+          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
+          e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto
+          e.busqueda = this.utilService.ConvertirCadena(
+            e.ncontrol + e.remitente + e.plazo + e.texto
+          )
+          return e
+        }
+        )
+        this.bzBusqueda = this.bzAlertasO
+        this.longitud = this.bzBusqueda.length
+        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+      },
+      (error) => {
+
+      }
+    )
+  }
 
   open(content, id) {
     this.numControl = id
@@ -143,11 +204,12 @@ export class AybuzonComponent implements OnInit {
         break
       case 1:
         this.cargarAcciones(1)
-        this.xAPI.funcion = 'WKF_CSubDocumento'
+        //this.xAPI.funcion = 'WKF_CSubDocumento'
         this.xAPI.parametros = this.estadoActual + ',' + 2
         this.listarBuzon(this.bzProcesados)
         break
       case 2:
+        this.cargarAcciones(2)
         this.xAPI.parametros = this.estadoActual + ',' + 3
         this.listarBuzon(this.bzPendientes)
         break
@@ -300,7 +362,7 @@ export class AybuzonComponent implements OnInit {
   selAccion() {
     this.clasificacion = false
     switch (this.AccionTexto) {
-      case '6':
+      case '8':
         this.clasificacion = true
         break;
 

@@ -7,98 +7,19 @@
 <div class="container-fluid mt--9">
   <div class="card col-md-12">
     <div class="row">
-      <div class="col-md-3">
-        <a routerLinkActive="active" [routerLink]="['/control']">
+      <div class="col-md-3" *ngFor="let e of Menu">
+        <a routerLinkActive="active" [routerLink]="[e.url]">
           <div class="card mt-4 mb-4" style="border-color:rgb(195, 211, 211);">
             <div class="card px-lg-2 py-lg-2">
-              <img class="card-img-top" src="./assets/img/brand/documentos.jpg" style="height: 144px;"
-                alt="Card image cap">
+              <img class="card-img-top" src="./assets/img/brand/{{ posicion( e.url ) }}.jpg" style="height: 144px;" alt="Card image cap">
               <div class="card-body">
-                <h4 class="card-title text-center"><strong>CONTROL Y GESTIÓN</strong></h4>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-3">
-        <a routerLinkActive="active" [routerLink]="['/secretaria']">
-          <div class="card mt-4 mb-4" style="border-color:rgb(195, 211, 211);">
-            <div class="card px-lg-2 py-lg-2">
-              <img class="card-img-top" src="./assets/img/brand/secretaria.jpg" style="height: 144px;"
-                alt="Card image cap">
-              <div class="card-body">
-                <h4 class="card-title text-center"><strong>SECRETARÍA</strong></h4>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-3">
-        <a routerLinkActive="active" [routerLink]="['/resoluciones']">
-          <div class="card mt-4 mb-4" style="border-color:rgb(195, 211, 211);">
-            <div class="card px-lg-2 py-lg-2">
-              <img class="card-img-top" src="./assets/img/brand/resoluciones.jpg" style="height: 144px;"
-                alt="Card image cap">
-              <div class="card-body">
-                <h4 class="card-title text-center"><strong>RESOLUCIONES</strong></h4>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-3">
-        <a routerLinkActive="active" [routerLink]="['/ayudantia']">
-          <div class="card mt-4 mb-4" style="border-color:rgb(195, 211, 211);">
-            <div class="card px-lg-2 py-lg-2">
-              <img class="card-img-top" src="./assets/img/brand/ayudantia2.jpg" style="height: 144px;"
-                alt="Card image cap">
-              <div class="card-body">
-                <h4 class="card-title text-center"><strong>AYUDANTÍA</strong></h4>
+                <h4 class="card-title text-center"><strong>{{e.descripcion}}</strong></h4>
               </div>
             </div>
           </div>
         </a>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-3">
-        <a routerLinkActive="active" [routerLink]="['/timonel']">
-          <div class="card mt-4 mb-4" style="border-color:rgb(195, 211, 211);">
-            <div class="card px-lg-2 py-lg-2">
-              <img class="card-img-top" src="./assets/img/brand/timonel.jpg" style="height: 144px;"
-                alt="Card image cap">
-              <div class="card-body">
-                <h4 class="card-title text-center"><strong>TIMONEL</strong></h4>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-3">
-        <a routerLinkActive="active" [routerLink]="['/acami']">
-          <div class="card mt-4 mb-4" style="border-color:rgb(195, 211, 211);">
-            <div class="card px-lg-2 py-lg-2">
-              <img class="card-img-top" src="./assets/img/brand/acami.jpg" style="height: 144px;" alt="Card image cap">
-              <div class="card-body">
-                <h4 class="card-title text-center"><strong>ACAMI</strong></h4>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-3">
-        <a routerLinkActive="active" [routerLink]="['/personal']">
-          <div class="card mt-4 mb-4" style="border-color:rgb(195, 211, 211);">
-            <div class="card px-lg-2 py-lg-2">
-              <img class="card-img-top" src="./assets/img/brand/personal.jpg" style="height: 144px;"
-                alt="Card image cap">
-              <div class="card-body">
-                <h4 class="card-title text-center"><strong>PERSONAL</strong></h4>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>
+  
   </div>
 </div>

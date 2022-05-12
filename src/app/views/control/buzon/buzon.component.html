@@ -169,9 +169,6 @@
                     <div class="col-md-2 texto-lista">
                       {{ e.numc }}
                     </div>
-                    <!-- <div class="col-md-2 texto-lista">
-                      {{ e.fcre | date:"dd-MM-yyyy" }}
-                    </div> -->
                     <div class="col-md-4 texto-lista">
                       {{ e.remi | uppercase }}
                     </div>
@@ -190,9 +187,6 @@
                       <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
                         <mat-icon class="text-info">attach_file</mat-icon>
                       </button>
-                      <!-- <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
-                          <mat-icon  class="text-purple">delete</mat-icon>
-                        </button> -->
 
                     </div>
                   </div>
@@ -272,7 +266,7 @@
     <div class="form-group  col-md-12" *ngIf="clasificacion">
       <label>Area</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
-        <option value="0">SELECCIONE</option>
+        <option value="S">SELECCIONE</option>
         <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
       </select>
     </div>

@@ -52,6 +52,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   public editar: boolean = false
   public puntocuenta: boolean = false
+  public salidavisible : boolean = true
 
 
   public detalle: string = ''
@@ -150,6 +151,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.estadoActual = 9
         this.estadoOrigen = 2
         this.ncontrolv = false
+        this.salidavisible = false
         this.ncontrolt = 'Nro de Salida'
 
       } else {
@@ -387,14 +389,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Si',
       cancelButtonText: 'No'
     }).then((result) => {
-      if (!result.isConfirmed)
-
-      if(this.estadoActual == 9){
-        this.ruta.navigate(['/salidas']);
-        return
+      if (!result.isConfirmed){
+        if(this.estadoActual == 9){
+          this.ruta.navigate(['/salidas']);
+          return
+        }
+        
+        this.ruta.navigate(['/registrar']);
       }
+
       
-      this.ruta.navigate(['/registrar']);
 
     })
   }

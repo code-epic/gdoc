@@ -12,18 +12,40 @@
 
                 <div class="card-header bg-transparent">
                   <div class="row align-items-center">
-                      <div class="col-md-12">
+                      <div class="col-md-11">
                           <h6 class="text-uppercase text-muted ls-1 mb-1">PRINCIPAL</h6>
                           <h2 class="mb-0">Ayudantía</h2>
                       </div>
-                      
+                      <div class="col-md-1">
+                        <div class="media align-items-center">
+                          <div class="example-button-row">
+                            <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                              <mat-icon>reply</mat-icon>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    
                   </div>
                 </div>
             
                 <div class="card-body">
                     <div class="row" >
                        
-                        <div class="col-md-4">
+                        <div class="col-md-3" *ngFor="let item of SubMenu">
+                            <a routerLinkActive="active" [routerLink]="[item.url]">
+                                <div class="card {{item.color}} order-card">
+                                    <div class="card-block">
+                                        <h2 class="text-right text-white"><i class="{{item.icono + ' ' + item.clase}}"></i><span>{{item.nombre}}</span></h2>
+                                        <p class="m-b-0" style="font-size: 13px;">{{item.descripcion}}
+                                          <span class="f-right" id="{{item.nombre}}"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- <div class="col-md-4">
                             <a routerLinkActive="active" [routerLink]="['/aybuzon']">
                                 <div class="card bg-c-blue order-card">
                                     <div class="card-block">
@@ -33,9 +55,9 @@
                                     </div>
                                 </div>
                             </a>
-                        </div>
+                        </div> -->
                         
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <a routerLinkActive="active" [routerLink]="['/procesos']">
                                 <div class="card bg-purple order-card">
                                     <div class="card-block">
@@ -45,7 +67,7 @@
                                     </div>
                                 </div>
                             </a>
-                        </div>
+                        </div> -->
                     </div>
 
                    
