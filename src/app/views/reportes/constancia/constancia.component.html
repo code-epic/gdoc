@@ -1,77 +1,146 @@
+<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
 
-<table width="100%">
-    <thead>
-        <tr>
-            <th class="centrado">Reporte Histórico</th>
-        </tr>
-    </thead>
-    <br>
-    <br>
-    <tr>
-        <td style="width: 70%;" align="center">{{Doc.norigen}}</td>
-        <td style="width: 30%;">
-            <table align="center">
-                <tr>
-                    <td>{{Doc.forigen}}</td>
-                    <td>{{Doc.fcreacion}}</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <br>
-    <br>
-    <br>
-    <br>
-    <tr>
-        <td>
-            <table width=100%>
-                <tr>{{Doc.ncontrol}}</tr>
-                <tr>
-                    <table WIDTH=100% align="center">
-                        <tr>
-                            <td>{{Doc.remitente}}</td>
-                            <td>{{WAlerta.estado}}</td>
-                            <td>{{Doc.tipo}}</td>
-                        </tr>
-                    </table>
-                
-                
-                </tr>
-                <tr>{{Doc.contenido}}</tr>
-                <tr>{{Doc.instrucciones}}</tr>
-                <tr>Acción Historial</tr>
-                <tr>{{WAlerta.estado}}</tr>
-            </table>
-        </td>
-        <td style="width: 20%;">
-            <table align="center">
-                <tr>
-                    <td>{{Doc.codigo}}</td>
-                    <td>{{Doc.nexpediente}}</td>
-                </tr>
-                <tr>
-                    <td colspan="2">{{Doc.privacidad}}</td>
+<div class="container-fluid mt--9">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col-md-10">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Reportes</h6>
+                            <h2 class="mb-0">Reporte Histórico</h2>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>reply</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <ul class="navbar-nav align-items-right d-none d-md-flex">
+                                <li class="nav-item" ngbDropdown placement="bottom-right">
+                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                        <div class="media align-items-center">
+                                            <div class="example-button-row">
+                                                <button mat-icon-button aria-label="">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                        <a routerLinkActive="active" class="dropdown-item">
+                                            <i class="fa fa-plus"></i>
+                                            <span>Agregar Imagen</span>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                       
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group col-md-8">
+                                <label > Número de Origen </label>
+                                <p>{{Doc.norigen}}</p>
+                                
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label > Fecha de Origen </label>
+                                <p>{{Doc.forigen}}</p>
                     
-                </tr>
-                <br>
-                <br>
-                <tr>
-                    <td colspan="2">QR</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <br>
-    <br>
-    <tr>
-        <table class="footer"  align="left">
-            <tr>
-                <td colspan="2">{{Doc.creador}}</td>
-            </tr>
-            <tr>
-                <td colspan="2">{{Doc.fcreacion}}</td>  
-            </tr>
-        </table>
-       
-    </tr>
-</table>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label > Número de Control </label>
+                                <p>{{Doc.fcreacion}}</p>
+                    
+                            </div>
+                        </div>
+                        
+
+
+                        <div class="form-row">   
+                            <div class="form-group col-md-3">
+                                <label> Número de Control </label>
+                                <p>{{Doc.ncontrol}}</p>
+                               
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-8">
+                                <label > Remitente </label>
+                                <p>{{Doc.remitente}}</p>
+                                
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label > Estado </label>
+                                <p>{{WAlerta.estado}}</p>
+                    
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label > Tipo de Documento </label>
+                                <p>{{Doc.tipo}}</p>
+                    
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label > Contenido </label>
+                                <p>{{Doc.contenido}}</p>
+                                
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label > Observación </label>
+                                <p>{{Doc.instrucciones}}</p>
+                                
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label > Acción Historial </label>
+                                <p></p>
+                                
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label > Estado </label>
+                                <p>{{WAlerta.estado}}</p>
+                                
+                            </div>
+                        </div>
+
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Creado por:</label>
+                                <p>{{Doc.creador}}</p>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Fecha de Creación</label>
+                                <p>{{Doc.fcreacion}}</p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
