@@ -121,215 +121,6 @@
                                 </select>
                             </div>
                         </div>
-
-                        <hr class="mb-2">
-                        <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Militares</h6>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label> Componente </label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
-                                    <option value="0">Seleccione</option>
-                                    <option value="Masculino">MASCULINO</option>
-                                    <option value="Femenino">FEMENINO</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label> Categoría </label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
-                                    <option value="0">Seleccione</option>
-                                    <option value="Masculino">MASCULINO</option>
-                                    <option value="Femenino">FEMENINO</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label> Clasificación </label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
-                                    <option value="0">Seleccione</option>
-                                    <option value="Masculino">MASCULINO</option>
-                                    <option value="Femenino">FEMENINO</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label> Grado </label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
-                                    <option value="0">Seleccione</option>
-                                    <option value="Masculino">MASCULINO</option>
-                                    <option value="Femenino">FEMENINO</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label> Fecha de Ingreso FANB </label>
-                                <form class="form-inline">
-                                    <div class="form-group" style="width:100%">
-                                        <div class="input-group" style="width:100%">
-                                            <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia"
-                                                ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
-                                                [placement]="placement" [positionTarget]="buttonEl">
-                                            <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="vi.toggle()"
-                                                    type="button">
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label> Situación </label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
-                                    <option value="0">Seleccione</option>
-                                    <option value="Masculino">MASCULINO</option>
-                                    <option value="Femenino">FEMENINO</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-4">
-                                <label> Número de Resolución </label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.garantia" value="{{Cotizaciones.garantia}}">
-                            </div>
-                            <div class="form-group col-md-8">
-                                <label> Tipo de Resolución </label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
-                                    <option value="0">Seleccione</option>
-                                    <option value="Masculino">MASCULINO</option>
-                                    <option value="Femenino">FEMENINO</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-4">
-                                <label> Fecha de Resolución </label>
-                                <form class="form-inline">
-                                    <div class="form-group" style="width:100%">
-                                        <div class="input-group" style="width:100%">
-                                            <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia"
-                                                ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
-                                                [placement]="placement" [positionTarget]="buttonEl">
-                                            <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="vi.toggle()"
-                                                    type="button">
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label> Ultimo Ascenso </label>
-                                <form class="form-inline">
-                                    <div class="form-group" style="width:100%">
-                                        <div class="input-group" style="width:100%">
-                                            <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia"
-                                                ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
-                                                [placement]="placement" [positionTarget]="buttonEl">
-                                            <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="vi.toggle()"
-                                                    type="button">
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label> Orden de Mérito </label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
-                                    <option value="0">Seleccione</option>
-                                    <option value="Masculino">MASCULINO</option>
-                                    <option value="Femenino">FEMENINO</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-4">
-                                <label> Número Carpeta </label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.modalidad" value="{{Cotizaciones.modalidad}}">
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label> Estatus </label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
-                                    <option value="0">Seleccione</option>
-                                    <option value="Masculino">MASCULINO</option>
-                                    <option value="Femenino">FEMENINO</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label> Carpeta Entrada </label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.modalidad" value="{{Cotizaciones.modalidad}}">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-12">
-                                <label for="txtObjeto">Asunto</label>
-                                <div class="NgxEditor__Wrapper">
-                                    <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
-                                    <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor"
-                                        [(ngModel)]="Cotizaciones.objeto" [disabled]="false"
-                                        [placeholder]="'Escibe aqui...'">
-                                    </ngx-editor>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-12">
-                                <label for="txtObjeto">Observaciones</label>
-                                <div class="NgxEditor__Wrapper">
-                                    <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
-                                    <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor"
-                                        [(ngModel)]="Cotizaciones.objeto" [disabled]="false"
-                                        [placeholder]="'Escibe aqui...'">
-                                    </ngx-editor>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label>Responsable</label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.responsable" value="{{Cotizaciones.responsable}}">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label>Cargo Responsable</label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.cargo_responsable"
-                                    value="{{Cotizaciones.cargo_responsable}}">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="text-right">
-                                    <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
-                                </div>
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>
@@ -354,6 +145,219 @@
                         <li class="list-group-item">Tiempo de Servicio</li>
                         <li class="list-group-item">Histórico Militar</li>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Militares</h6>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label> Componente </label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                <option value="0">Seleccione</option>
+                                <option value="Masculino">MASCULINO</option>
+                                <option value="Femenino">FEMENINO</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label> Categoría </label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                <option value="0">Seleccione</option>
+                                <option value="Masculino">MASCULINO</option>
+                                <option value="Femenino">FEMENINO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label> Clasificación </label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                <option value="0">Seleccione</option>
+                                <option value="Masculino">MASCULINO</option>
+                                <option value="Femenino">FEMENINO</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label> Grado </label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                <option value="0">Seleccione</option>
+                                <option value="Masculino">MASCULINO</option>
+                                <option value="Femenino">FEMENINO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label> Fecha de Ingreso FANB </label>
+                            <form class="form-inline">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
+                                        <input class="form-control" placeholder="AAAA-MM-DD"
+                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia" ngbDatepicker
+                                            #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
+                                            [placement]="placement" [positionTarget]="buttonEl">
+                                        <div class="input-group-append">
+                                            <button #buttonEl class="btn calendario" (click)="vi.toggle()"
+                                                type="button">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label> Situación </label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                <option value="0">Seleccione</option>
+                                <option value="Masculino">MASCULINO</option>
+                                <option value="Femenino">FEMENINO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label> Número de Resolución </label>
+                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.garantia" value="{{Cotizaciones.garantia}}">
+                        </div>
+                        <div class="form-group col-md-8">
+                            <label> Tipo de Resolución </label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                <option value="0">Seleccione</option>
+                                <option value="Masculino">MASCULINO</option>
+                                <option value="Femenino">FEMENINO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label> Fecha de Resolución </label>
+                            <form class="form-inline">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
+                                        <input class="form-control" placeholder="AAAA-MM-DD"
+                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia" ngbDatepicker
+                                            #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
+                                            [placement]="placement" [positionTarget]="buttonEl">
+                                        <div class="input-group-append">
+                                            <button #buttonEl class="btn calendario" (click)="vi.toggle()"
+                                                type="button">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label> Ultimo Ascenso </label>
+                            <form class="form-inline">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
+                                        <input class="form-control" placeholder="AAAA-MM-DD"
+                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia" ngbDatepicker
+                                            #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
+                                            [placement]="placement" [positionTarget]="buttonEl">
+                                        <div class="input-group-append">
+                                            <button #buttonEl class="btn calendario" (click)="vi.toggle()"
+                                                type="button">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label> Orden de Mérito </label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                <option value="0">Seleccione</option>
+                                <option value="Masculino">MASCULINO</option>
+                                <option value="Femenino">FEMENINO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label> Número Carpeta </label>
+                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.modalidad" value="{{Cotizaciones.modalidad}}">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label> Estatus </label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                <option value="0">Seleccione</option>
+                                <option value="Masculino">MASCULINO</option>
+                                <option value="Femenino">FEMENINO</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label> Carpeta Entrada </label>
+                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.modalidad" value="{{Cotizaciones.modalidad}}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtObjeto">Asunto</label>
+                            <div class="NgxEditor__Wrapper">
+                                <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                                <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor"
+                                    [(ngModel)]="Cotizaciones.objeto" [disabled]="false"
+                                    [placeholder]="'Escibe aqui...'">
+                                </ngx-editor>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtObjeto">Observaciones</label>
+                            <div class="NgxEditor__Wrapper">
+                                <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
+                                <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor"
+                                    [(ngModel)]="Cotizaciones.objeto" [disabled]="false"
+                                    [placeholder]="'Escibe aqui...'">
+                                </ngx-editor>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Responsable</label>
+                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.responsable" value="{{Cotizaciones.responsable}}">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Cargo Responsable</label>
+                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Cotizaciones.cargo_responsable" value="{{Cotizaciones.cargo_responsable}}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-right">
+                                <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

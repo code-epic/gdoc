@@ -55,6 +55,8 @@ import { ProcesosComponent } from './views/ayudantia/procesos/procesos.component
 import { RsprocesosComponent } from './views/resoluciones/rsprocesos/rsprocesos.component';
 import { RsbuzonComponent } from './views/resoluciones/rsbuzon/rsbuzon.component';
 import { RsentradasComponent } from './views/resoluciones/rsentradas/rsentradas.component';
+import { ReportesComponent } from './views/reportes/reportes.component';
+import { ConstanciaComponent } from './views/reportes/constancia/constancia.component';
 
 
 
@@ -160,7 +162,9 @@ const ngWizardConfig: NgWizardConfig = {
     ProcesosComponent,
     RsprocesosComponent,
     RsbuzonComponent,
-    RsentradasComponent
+    RsentradasComponent,
+    ReportesComponent,
+    ConstanciaComponent
   ],
   providers:  [
     {

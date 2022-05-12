@@ -24,6 +24,8 @@ import { ProcesosComponent } from 'src/app/views/ayudantia/procesos/procesos.com
 import { RsprocesosComponent } from 'src/app/views/resoluciones/rsprocesos/rsprocesos.component';
 import { RsbuzonComponent } from 'src/app/views/resoluciones/rsbuzon/rsbuzon.component';
 import { RsentradasComponent } from 'src/app/views/resoluciones/rsentradas/rsentradas.component';
+import { ReportesComponent } from 'src/app/views/reportes/reportes.component';
+import { ConstanciaComponent } from 'src/app/views/reportes/constancia/constancia.component';
 
 
 
@@ -161,6 +163,16 @@ export const AdminLayoutRoutes: Routes = [
     { 
         path: 'rsentradas', 
         component: RsentradasComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'reportes', 
+        component: ReportesComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'constancia', 
+        component: ConstanciaComponent,
         canActivate:[AuthGuardGuard] 
     }
 ];

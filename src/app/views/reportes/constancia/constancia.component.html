@@ -1,0 +1,77 @@
+
+<table width="100%">
+    <thead>
+        <tr>
+            <th class="centrado">Reporte Histórico</th>
+        </tr>
+    </thead>
+    <br>
+    <br>
+    <tr>
+        <td style="width: 70%;" align="center">{{Doc.norigen}}</td>
+        <td style="width: 30%;">
+            <table align="center">
+                <tr>
+                    <td>{{Doc.forigen}}</td>
+                    <td>{{Doc.fcreacion}}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <br>
+    <br>
+    <br>
+    <br>
+    <tr>
+        <td>
+            <table width=100%>
+                <tr>{{Doc.ncontrol}}</tr>
+                <tr>
+                    <table WIDTH=100% align="center">
+                        <tr>
+                            <td>{{Doc.remitente}}</td>
+                            <td>{{WAlerta.estado}}</td>
+                            <td>{{Doc.tipo}}</td>
+                        </tr>
+                    </table>
+                
+                
+                </tr>
+                <tr>{{Doc.contenido}}</tr>
+                <tr>{{Doc.instrucciones}}</tr>
+                <tr>Acción Historial</tr>
+                <tr>{{WAlerta.estado}}</tr>
+            </table>
+        </td>
+        <td style="width: 20%;">
+            <table align="center">
+                <tr>
+                    <td>{{Doc.codigo}}</td>
+                    <td>{{Doc.nexpediente}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2">{{Doc.privacidad}}</td>
+                    
+                </tr>
+                <br>
+                <br>
+                <tr>
+                    <td colspan="2">QR</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <br>
+    <br>
+    <tr>
+        <table class="footer"  align="left">
+            <tr>
+                <td colspan="2">{{Doc.creador}}</td>
+            </tr>
+            <tr>
+                <td colspan="2">{{Doc.fcreacion}}</td>  
+            </tr>
+        </table>
+       
+    </tr>
+</table>
