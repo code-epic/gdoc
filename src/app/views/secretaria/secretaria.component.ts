@@ -263,7 +263,6 @@ export class SecretariaComponent implements OnInit {
   async listarBuzon(bz: any) {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data);
         data.Cuerpo.forEach(e => {
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
