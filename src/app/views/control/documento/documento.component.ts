@@ -248,7 +248,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         this.selTipoDocumento()
         this.lstCuenta = JSON.parse(this.Doc.subdocumento)
-        
+        console.log(JSON.parse(this.Doc.subdocumento));
+        console.log(this.lstCuenta);
 
         
       },
