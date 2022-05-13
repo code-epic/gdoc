@@ -164,6 +164,7 @@ export class RegistrarComponent implements OnInit {
     this.xAPI.parametros = '1,1'
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data);
         this.bzAlertasO = data.Cuerpo.map((e) => {
           e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
           e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`

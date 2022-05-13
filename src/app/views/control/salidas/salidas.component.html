@@ -119,7 +119,7 @@
                       {{ e.fcre | date:"dd-MM-yyyy" }}
                     </div>
                     <div class="col-md-4 texto-lista">
-                      {{ e.remi | uppercase }}
+                      {{ e.udep | uppercase }}
                     </div>
                     <div class="col-md-1 texto-lista">
                       {{ e.observacion_accion | uppercase }}
@@ -163,7 +163,7 @@
                       <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.ncontrol )]">{{ e.ncontrol | uppercase }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-4 texto-lista">
-                      {{ e.remitente | uppercase }}
+                      {{ e.unidad | uppercase }}
                     </div>
                     <div class="col-md-2 texto-lista">
                       {{ e.plazo | date:"dd-MM-yyyy" }}
