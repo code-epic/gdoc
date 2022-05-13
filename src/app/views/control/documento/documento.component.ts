@@ -279,7 +279,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //registrar Un documento pasando por el WorkFlow
   registrar() {
-    if (this.Doc.salida == '' || this.Doc.contenido == '' || this.fcreacion == '' || this.forigen == '') {
+    console.log(this.Doc);
+    if (this.Doc.norigen == '' || this.Doc.contenido == '' || this.fcreacion == '' || this.forigen == '') {
       this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
       return
 
