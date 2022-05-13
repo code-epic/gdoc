@@ -247,8 +247,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         });
 
         this.selTipoDocumento()
-        this.lstCuenta = JSON.parse(this.Doc.subdocumento)
-        console.log(JSON.parse(this.Doc.subdocumento));
+        const cuentas = JSON.parse(this.Doc.subdocumento)
+        this.lstCuenta = cuentas.map(e => {
+          return typeof e == 'object'?e: JSON.parse(e)
+        })
+       
         console.log(this.lstCuenta);
 
         
