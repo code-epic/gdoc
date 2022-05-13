@@ -59,7 +59,7 @@
                             </div>
                             
                             <div class="form-group col-md-3">
-                                <label for="tmsOrigen">Fecha Origen</label>
+                                <label for="tmsOrigen">Fecha Origen (*) </label>
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
@@ -79,7 +79,7 @@
                                 </form>
                             </div>
                             <div class="form-group col-md-3">
-                                <label for="tmsCreacion">Fecha Recepción</label>
+                                <label for="tmsCreacion">Fecha Recepción (*) </label>
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
@@ -96,7 +96,7 @@
                                 </form>
                             </div> 
                             <div class="form-group col-md-2">
-                                <label for="txtOrigen">Nro. Origen</label>
+                                <label for="txtOrigen">Nro. Origen (*) </label>
                                 <input type="txtOrigen" class="form-control" 
                                 [ngModelOptions]="{standalone: true}"
                                 [(ngModel)]="Doc.norigen">
@@ -142,7 +142,7 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-12">
-                                <label for="txtContenido">Contenido</label>
+                                <label for="txtContenido">Contenido (*) </label>
                                 <div class="NgxEditor__Wrapper">
                                     <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
                                     <ngx-editor
@@ -193,7 +193,7 @@
                                       <th>Resumen</th>
                                       <th>Detalle</th>
                                   </thead><tbody>
-                                    <tr *ngFor="let el of lstCuenta;let i=index">
+                                    <tr  [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
                                         <td style="text-align:center;width:20px">
                                             
                                             <div class="btn-group" role="group" aria-label="Basic"  *ngIf="el.activo == 0">

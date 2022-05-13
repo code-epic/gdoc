@@ -52,7 +52,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   public editar: boolean = false
   public puntocuenta: boolean = false
-  public salidavisible : boolean = true
+  public salidavisible: boolean = true
 
 
   public detalle: string = ''
@@ -99,7 +99,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     nexpediente: '',
     creador: '',
     archivo: '',
-    privacidad: 0
+    privacidad: 0,
+    subdocumento: ''
   }
 
   public WAlerta: IWKFAlerta = {
@@ -223,16 +224,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
    * @param numBase64  : base64
    */
-  consultarDocumento(numBase64: string) {
+  async consultarDocumento(numBase64: string) {
     const base = atob(numBase64)
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
     this.xAPI.parametros = base
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+      async data => {
         data.Cuerpo.forEach(e => {
           this.Doc = e
-
           this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
           this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
           if (e.alerta != null) {
@@ -245,6 +245,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           }
 
         });
+
+        this.selTipoDocumento()
+        this.lstCuenta = JSON.parse(this.Doc.subdocumento)
+        
+
+        
       },
       (error) => {
         console.error(error)
@@ -258,6 +264,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //obtenerWorkFlow Permite generar los primeros valores de la red del documento
   obtenerWorkFlow() {
+
     this.WkDoc = {
       "nombre": "Control de Gestion",
       "workflow": 2,
@@ -272,6 +279,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //registrar Un documento pasando por el WorkFlow
   registrar() {
+    if (this.Doc.salida == '' || this.Doc.contenido == '' || this.fcreacion == '' || this.forigen == '') {
+      this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
+      return
+
+    }
     this.ngxService.startLoader("loader-aceptar")
     this.obtenerWorkFlow() //Obtener valores de una API
 
@@ -343,13 +355,13 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       return false
     }
     this.xAPI.funcion = 'WKF_IDocumentoDetalle'
-    if (this.estadoActual !=9 ) {
+    if (this.estadoActual != 9) {
       this.Doc.ncontrol = this.utilService.Semillero(data.msj).toUpperCase()
 
-    }else{
+    } else {
       this.Doc.salida = this.Doc.ncontrol.toUpperCase()
       this.Doc.ncontrol = ''
- 
+
     }
     this.Doc.wfdocumento = parseInt(data.msj)
     this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
@@ -389,16 +401,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Si',
       cancelButtonText: 'No'
     }).then((result) => {
-      if (!result.isConfirmed){
-        if(this.estadoActual == 9){
+      if (!result.isConfirmed) {
+        if (this.estadoActual == 9) {
           this.ruta.navigate(['/salidas']);
           return
         }
-        
+
         this.ruta.navigate(['/registrar']);
       }
 
-      
+
 
     })
   }
@@ -420,7 +432,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
+
         this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
         this.ngxService.stopLoader("loader-aceptar")
         this.ruta.navigate(['/registrar']);
@@ -437,7 +449,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   agregarCuenta(): IWKFCuenta {
-
+    console.log(this.lstCuenta);
     if (this.cuenta == '' ||
       this.resumen == '' ||
       this.detalle == '') {
@@ -467,7 +479,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   selEditarCuenta(pos: number) {
-    console.log(this.lstCuenta)
     const wkcuenta = this.lstCuenta[pos]
 
     this.cuenta = wkcuenta.cuenta
@@ -476,7 +487,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.PosicionCuenta = pos
     this.editar = !this.editar
-    console.log(wkcuenta);
   }
 
   eliminarCuenta(pos: number) {

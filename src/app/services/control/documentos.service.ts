@@ -24,6 +24,7 @@ export interface IDocumento {
   creador?: string
   archivo?: string
   historico?: []
+  subdocumento?: string
 
 }
 
