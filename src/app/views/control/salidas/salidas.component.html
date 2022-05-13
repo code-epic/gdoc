@@ -70,7 +70,7 @@
                       </button>
                     </div>
                     <div class="col-md-2 texto-lista">
-                      {{ e.numc| uppercase }}
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-2 texto-lista">
                       {{ e.nori | uppercase }}
@@ -113,7 +113,7 @@
                     </div>
 
                     <div class="col-md-2 texto-lista">
-                      {{ e.numc | uppercase }}
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc | uppercase}} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-2 texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }}
@@ -160,7 +160,7 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-2 texto-lista">
-                      {{ e.ncontrol | uppercase }}
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.ncontrol )]">{{ e.ncontrol | uppercase }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-4 texto-lista">
                       {{ e.remitente | uppercase }}

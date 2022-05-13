@@ -487,6 +487,15 @@ export class BuzonComponent implements OnInit {
     }
   }
 
+
+  //Consultar un enlace
+  constancia(id: string){
+    const estado = 1
+    const estatus = 1
+    return  btoa(estado + ',' + estatus + ',' + id)
+    //this.ruta.navigate(['/constancia', base])
+  }
+
 }
 
 

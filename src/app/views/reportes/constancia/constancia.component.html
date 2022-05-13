@@ -9,10 +9,10 @@
         <div class="col-xl-12 col-md-12 col-lg-12">
             <div class="card shadow">
                 <div class="card-header bg-transparent">
-                    <div class="row align-items-center">
+                    <div class="row ">
                         <div class="col-md-10">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Reportes</h6>
-                            <h2 class="mb-0">Reporte Histórico</h2>
+                            <h2 class="mb-0">Constancia </h2>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
@@ -44,101 +44,152 @@
                                 </li>
                             </ul>
                         </div>
-                       
+
                     </div>
                 </div>
                 <div class="card-body">
-                    <form>
-                        <div class="form-row">
-                            <div class="form-group col-md-8">
-                                <label > Número de Origen </label>
-                                <p>{{Doc.norigen}}</p>
-                                
-                            </div>
-                            <div class="form-group col-md-2">
-                                <label > Fecha de Origen </label>
-                                <p>{{Doc.forigen}}</p>
-                    
-                            </div>
-                            <div class="form-group col-md-2">
-                                <label > Número de Control </label>
-                                <p>{{Doc.fcreacion}}</p>
-                    
-                            </div>
-                        </div>
-                        
 
-
-                        <div class="form-row">   
-                            <div class="form-group col-md-3">
-                                <label> Número de Control </label>
-                                <p>{{Doc.ncontrol}}</p>
-                               
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-8">
-                                <label > Remitente </label>
-                                <p>{{Doc.remitente}}</p>
-                                
-                            </div>
-                            <div class="form-group col-md-2">
-                                <label > Estado </label>
-                                <p>{{WAlerta.estado}}</p>
-                    
-                            </div>
-                            <div class="form-group col-md-2">
-                                <label > Tipo de Documento </label>
-                                <p>{{Doc.tipo}}</p>
-                    
-                            </div>
-                        </div>
-
+                        <h2 class="mb-0 text-center">REPORTE HISTORICO</h2>
                         <div class="form-row">
                             <div class="form-group col-md-12">
-                                <label > Contenido </label>
-                                <p>{{Doc.contenido}}</p>
-                                
+                                <table summary="" class="table table-bordered table-hover">
+
+                                    <thead>
+                                        <tr>
+                                            <th data-priority="1">Número de Control</th>
+                                            <th data-priority="2">Número de Origen</th>
+                                            <th data-priority="3">Fecha de Origen</th>
+                                            <th data-priority="4">Fecha de Recepción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{Doc.ncontrol | uppercase}}</td>
+                                            <td>{{Doc.norigen | uppercase}}</td>
+                                            <td>{{Doc.forigen}}</td>
+                                            <td>{{Doc.fcreacion}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <br>
+                                <table summary="" class="table table-bordered table-hover">
+
+                                    <thead>
+                                        <tr>
+                                            <th data-priority="1">Tipo de Documento</th>
+                                            <th data-priority="2">Remitente</th>
+                                            <th data-priority="3">Unidad o Dependencia</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{Doc.tipo | uppercase}}</td>
+                                            <td>{{Doc.remitente | uppercase}}</td>
+                                            <td>{{Doc.unidad | uppercase}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <br>
+
+                                <table summary="" class="table table-bordered table-hover">
+
+                                    <thead>
+                                        <tr> <th data-priority="1">Contenido</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><div [innerHTML]="Doc.contenido"></div></td></tr>
+                                    </tbody>
+                                    <thead>
+                                        <tr><th data-priority="1">Instrucciones</th> </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><div [innerHTML]="Doc.instrucciones"></div></td></tr>
+                                    </tbody>
+                                    <thead>
+                                        <tr><th data-priority="1">Historial de Acciones </th> </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><div ></div></td></tr>
+                                    </tbody>
+                                    <thead>
+                                        <tr><th data-priority="1">Historial de Observaciones</th> </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><div [innerHTML]="Doc.instrucciones"></div></td></tr>
+                                    </tbody>
+                                </table>
+                                <br>
+                                <table summary="" class="table table-bordered table-hover">
+
+                                    <thead>
+                                        <tr>
+                                            <th data-priority="1" colspan="2">Firma de Seguimiento</th>
+                                            
+                                            <th data-priority="3" style="width:256px">VALIDADOR QR</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th>UBICACIÓN ACTUAL</th>
+                                            <td></td>
+                                            <td rowspan="3"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>CREADO POR</th>
+                                            <td>{{Doc.creador}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>FECHA DE CREACIÓN</th>
+                                            <td>{{Doc.fcreacion}}</td>
+                                            
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
                             </div>
                         </div>
 
+                        <hr>
                         <div class="form-row">
-                            <div class="form-group col-md-12">
-                                <label > Observación </label>
-                                <p>{{Doc.instrucciones}}</p>
-                                
+                            <div class="form-group col-md-12" style="display: none;">
+                                <table
+                                    summary="This table shows how to create responsive tables using RWD-Table-Patterns' functionality"
+                                    class="table table-bordered table-hover">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Country</th>
+                                            <th data-priority="1">Número de Control</th>
+                                            <th data-priority="2">Número de Origen</th>
+                                            <th data-priority="3">Fecha de Origen</th>
+                                            <th data-priority="4">Fecha de Recepción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Argentina</td>
+                                            <td>Spanish (official), English, Italian, German, French</td>
+                                            <td>41,803,125</td>
+                                            <td>31.3</td>
+                                            <td>2,780,387</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Australia</td>
+                                            <td>English 79%, native and other languages</td>
+                                            <td>23,630,169</td>
+                                            <td>37.3</td>
+                                            <td>7,739,983</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
-                        <div class="form-row">
-                            <div class="form-group col-md-12">
-                                <label > Acción Historial </label>
-                                <p></p>
-                                
-                            </div>
-                        </div>
 
-                        <div class="form-row">
-                            <div class="form-group col-md-12">
-                                <label > Estado </label>
-                                <p>{{WAlerta.estado}}</p>
-                                
-                            </div>
-                        </div>
+                     
 
-
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label>Creado por:</label>
-                                <p>{{Doc.creador}}</p>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label>Fecha de Creación</label>
-                                <p>{{Doc.fcreacion}}</p>
-                            </div>
-                        </div>
-                    </form>
+                      
                 </div>
             </div>
         </div>

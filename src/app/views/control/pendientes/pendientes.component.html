@@ -70,7 +70,7 @@
                     style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                     <div class="row">
                       <div class="col-md-2 texto-lista">
-                        {{ e.ncontrol }}
+                        <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.ncontrol )]">{{ e.ncontrol | uppercase }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                       </div>
                       <div class="col-md-2 texto-lista">
                         {{ e.origen | date:"dd-MM-yyyy" }}

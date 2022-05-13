@@ -179,7 +179,6 @@ export class SalidasComponent implements OnInit {
 
 
   seleccionNavegacion(e) {
-    console.log(e);
     this.bzRecibido = []
     this.bzProcesados = []
     this.bzPendientes = []
@@ -238,13 +237,10 @@ export class SalidasComponent implements OnInit {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
-        console.log(data)
-
         data.Cuerpo.forEach(e => {
 
           var existe = e.anom == '' ? true : false
           var privado = e.priv == 1 ? true : false
-          console.log(e)
           bz.push(
             {
               id: e.id,
@@ -337,7 +333,6 @@ export class SalidasComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.info(this.AccionTexto)
         switch (this.AccionTexto) {
           case "1"://Rechazar en el estado inicial
             this.rechazarBuzon()
@@ -376,7 +371,6 @@ export class SalidasComponent implements OnInit {
           'El documento ha sido enviado al origen',
           `GDoc Wkf.DocumentoObservacion`
         )
-        console.log(data)
         this.seleccionNavegacion(this.selNav)
       },
       (error) => {
@@ -401,7 +395,6 @@ export class SalidasComponent implements OnInit {
     this.xAPI.parametros = `${estatus},${usuario},${this.numControl}`
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log('', data)
         this.seleccionNavegacion(this.selNav)
         this.Observacion = ''
         this.numControl = '0'
@@ -426,7 +419,6 @@ export class SalidasComponent implements OnInit {
           'El documento ha sido redistribuido segun su selección',
           `GDoc Wkf.DocumentoObservacion`
         )
-        console.log(data)
         this.seleccionNavegacion(this.selNav)
       },
       (error) => {
@@ -458,6 +450,15 @@ export class SalidasComponent implements OnInit {
       default:
         break;
     }
+  }
+
+
+  //Consultar un enlace
+  constancia(id: string){
+    const estado = 1
+    const estatus = 1
+    return  btoa(estado + ',' + estatus + ',' + id)
+    //this.ruta.navigate(['/constancia', base])
   }
 
 }

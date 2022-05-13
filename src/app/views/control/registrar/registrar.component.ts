@@ -243,7 +243,6 @@ export class RegistrarComponent implements OnInit {
       (data) => {
 
         this.bzRegistrados = data.Cuerpo.map((e)=> {
-          console.log(e);
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.simbolo = e.tdoc =='PUNTO DE CUENTA'?'( + )': '  ' 
@@ -334,7 +333,6 @@ export class RegistrarComponent implements OnInit {
         this.xAPI.funcion = 'WKF_AUbicacion'
         this.xAPI.valores = ''
         this.xAPI.parametros = `10,1,${llave},${usuario},${id}`
-        // console.info(this.xAPI)
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
             if (data.tipo == 1) {
@@ -445,7 +443,6 @@ export class RegistrarComponent implements OnInit {
           this.xAPI.valores = ''
           this.apiService.Ejecutar(this.xAPI).subscribe(
             (xdata) => {
-              // console.log(xdata)
               if (xdata.tipo == 1) {
                 this.toastrService.success(
                   'Tu archivo ha sido cargado con exito ',
@@ -488,8 +485,7 @@ export class RegistrarComponent implements OnInit {
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
-            i++
-            // console.log('documento actualizado ', data)   
+            i++  
             if (cantidad == i) this.imprimir()
           },
           (errot) => {

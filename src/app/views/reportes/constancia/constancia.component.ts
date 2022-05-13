@@ -75,7 +75,8 @@ export class ConstanciaComponent implements OnInit {
       (data) => {
         data.Cuerpo.forEach(e => {
           this.Doc = e
-
+          this.Doc.contenido = this.Doc.contenido.toUpperCase()
+          this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
           this.Doc.fcreacion = e.fcreacion.substring(0, 10)
           this.Doc.forigen = e.forigen.substring(0, 10)
           if (e.alerta != null) {

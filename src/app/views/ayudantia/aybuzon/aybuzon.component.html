@@ -1,235 +1,228 @@
 <div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
-    <div class="container-fluid">
-        <p></p>
-    </div>    
+  <div class="container-fluid">
+    <p></p>
+  </div>
 </div>
 
 <div class="container-fluid mt--9">
-    <div class="row">
-      <div class="col-xl-12 col-md-12 col-lg-12">
-        <div class="card shadow">
-          <div class="card-header bg-transparent">
-            <div class="row align-items-center">
-              <div class="col-md-11">
-                  <h6 class="text-uppercase text-muted ls-1 mb-1">Ayudantia</h6>
-                  <h2 class="mb-0">Buzón</h2>
-              </div>
-             
-              <div class="col-md-1">
-                <div class="media align-items-center">
-                  <div class="example-button-row">
-                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                      <mat-icon>reply</mat-icon>
-                    </button>
-                  </div>
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-11">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Ayudantia</h6>
+              <h2 class="mb-0">Buzón</h2>
+            </div>
+
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>reply</mat-icon>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-
-          <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
-          (selectedIndexChange)="seleccionNavegacion($event)">
-            <mat-tab>
-              <ng-template mat-tab-label>
-              &nbsp;RECIBIDOS
-              </ng-template>
-              
-                <div class="container">
-          
-
-                  <mat-selection-list #lstDocumentos>
-                    <mat-list *ngFor="let e of bzRecibido; let i=index " 
-                      style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                      <div class="row">
-                        <div class="col-md-1">
-                            <button mat-icon-button aria-label="Example "  class="text-primary" (click)="open(observacion, e.idd)">
-                              <mat-icon>task_alt</mat-icon>
-                            </button>
-                        </div>
-                        <div class="col-md-2 texto-lista">
-                          {{ e.numc }}
-                        </div>
-                        <div class="col-md-2 texto-lista">
-                          {{ e.nori | uppercase }}
-                        </div>
-                        <div class="col-md-2 texto-lista">
-                          {{ e.fcre | date:"dd-MM-yyyy" }}
-                        </div>
-                        <div class="col-md-4 texto-lista">
-                          {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
-                        </div>
-                        <div class="col-md-1 text-right" >
-                          <button mat-icon-button aria-label="Privado" >
-                            <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
-                          </button>
-                         
-                        </div>
-                      </div>
-                    </mat-list>
-                  </mat-selection-list>
-                </div>
-
-              <mat-paginator [length]="lengthOfi"
-                  (page)="pageChangeEvent($event)"
-                  [pageSize]="pageSizeOfi"
-                  [pageSizeOptions]="pageSizeOptions"
-                  (page)="pageEvent = $event"
-                  aria-label="Seleccionar">
-              </mat-paginator>
-              
-            </mat-tab>
-            <mat-tab>
-                <ng-template mat-tab-label>
-                &nbsp;PROCESADOS
-                </ng-template>
-                <div class="container">
-                  <mat-selection-list #lstProcesados>
-                    <mat-list *ngFor="let e of bzProcesados; let i=index " 
-                      style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                      <div class="row">
-                        <div class="col-md-1">
-                          <button mat-icon-button aria-label="Visibilidad" >
-                            <mat-icon  class="text-primary"  (click)="open(observacion, e.idd)">add_circle</mat-icon>
-                          </button>
-                        </div>
-                       
-                        <div class="col-md-2 texto-lista">
-                          {{ e.numc }}
-                        </div>
-                        <div class="col-md-1 texto-lista">
-                          {{ e.nori | uppercase }}
-                        </div>
-                        <div class="col-md-2 texto-lista">
-                          {{ e.fcre | date:"dd-MM-yyyy" }}
-                        </div>
-                        <div class="col-md-4 texto-lista">
-                          {{ e.udep | uppercase }} 
-                        </div>
-                        <div class="col-md-2 text-right" >
-                          <button mat-icon-button aria-label="Privado" >
-                            <mat-icon *ngIf="e.privado" class="text-warning">no_encryption</mat-icon>
-                          </button>
-                          <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
-                            <mat-icon  class="text-pink">edit_note</mat-icon>
-                          </button>
-                          <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
-                            <mat-icon class="text-info">attach_file</mat-icon>
-                          </button>
-
-                        </div>
-                      </div>
-                    </mat-list>
-                  </mat-selection-list>
-                </div>
-
-              <mat-paginator [length]="lengthOfi"
-                  (page)="pageChangeEvent($event)"
-                  [pageSize]="pageSizeOfi"
-                  [pageSizeOptions]="pageSizeOptions"
-                  (page)="pageEvent = $event"
-                  aria-label="Seleccionar">
-              </mat-paginator>
-
-            </mat-tab>
-            <mat-tab>
-              <ng-template mat-tab-label>
-              &nbsp;PENDIENTES
-              </ng-template>
-
-              <div class="container">
-                <mat-selection-list #lstPendientes>
-                  <mat-list *ngFor="let e of bzPendientes; let i=index " 
-                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                    <div class="row">
-                      <div class="col-md-1">
-                        <button mat-icon-button aria-label="Visibilidad" >
-                          <mat-icon  class="text-primary"  (click)="open(observacion, e.idd)">add_circle</mat-icon>
-                        </button>
-                      </div>
-                     
-                      <div class="col-md-2 texto-lista">
-                        {{ e.numc }}
-                      </div>
-                      <div class="col-md-1 texto-lista">
-                        {{ e.nori | uppercase }}
-                      </div>
-                      <div class="col-md-2 texto-lista">
-                        {{ e.fcre | date:"dd-MM-yyyy" }}
-                      </div>
-                      <div class="col-md-4 texto-lista">
-                        {{ e.udep | uppercase }}
-                      </div>
-                      <div class="col-md-2 text-right" >
-                        <button mat-icon-button aria-label="Privado" >
-                          <mat-icon *ngIf="e.privado" class="text-warning">no_encryption</mat-icon>
-                        </button>
-                        <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
-                          <mat-icon  class="text-pink">edit_note</mat-icon>
-                        </button>
-                        <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
-                          <mat-icon class="text-info">attach_file</mat-icon>
-                        </button>
-
-                      </div>
-                    </div>
-                  </mat-list>
-                </mat-selection-list>
-              </div>
-
-            <mat-paginator [length]="lengthOfi"
-                (page)="pageChangeEvent($event)"
-                [pageSize]="pageSizeOfi"
-                [pageSizeOptions]="pageSizeOptions"
-                (page)="pageEvent = $event"
-                aria-label="Seleccionar">
-            </mat-paginator>
-            </mat-tab>
-          
-
-            <mat-tab>
-              <ng-template mat-tab-label>
-                &nbsp;ALERTAS
-              </ng-template>
-  
-              <div class="container">
-                <mat-selection-list #lstAlertas>
-                  <mat-list *ngFor="let e of bzAlertas; let i=index "
-                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                    <div class="row">
-                      <div class="col-md-2 texto-lista">
-                        {{ e.ncontrol }}
-                      </div>
-                      <div class="col-md-4 texto-lista">
-                        {{ e.remitente | uppercase }}
-                      </div>
-                      <div class="col-md-2 texto-lista">
-                        {{ e.plazo | date:"dd-MM-yyyy" }}
-                      </div>
-                      <div class="col-md-3 texto-lista  {{ e.color }}">
-                        {{ e.texto | uppercase }}
-                      </div>
-                      <div class="col-md-1 text-right ">
-                        <button mat-icon-button aria-label="Privado">
-                          <!--  -->
-                          <mat-icon class="text-warning" (click)="open(observacion, e.id_alerta)">today</mat-icon>
-                        </button>
-  
-                      </div>
-                    </div>
-                  </mat-list>
-                </mat-selection-list>
-              </div>
-  
-              <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
-                [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
-              </mat-paginator>
-            </mat-tab>
-
-
-          </mat-tab-group>  
         </div>
+
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
+          (selectedIndexChange)="seleccionNavegacion($event)">
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;RECIBIDOS
+            </ng-template>
+
+            <div class="container">
+
+
+              <mat-selection-list #lstDocumentos>
+                <mat-list *ngFor="let e of bzRecibido; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1">
+                      <button mat-icon-button aria-label="Example " class="text-primary"
+                        (click)="open(observacion, e.idd)">
+                        <mat-icon>task_alt</mat-icon>
+                      </button>
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
+                        &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      {{ e.nori | uppercase }}
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      {{ e.fcre | date:"dd-MM-yyyy" }}
+                    </div>
+                    <div class="col-md-4 texto-lista">
+                      {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
+                    </div>
+                    <div class="col-md-1 text-right">
+                      <button mat-icon-button aria-label="Privado">
+                        <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="lengthOfi" (page)="pageChangeEvent($event)" [pageSize]="pageSizeOfi"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;PROCESADOS
+            </ng-template>
+            <div class="container">
+              <mat-selection-list #lstProcesados>
+                <mat-list *ngFor="let e of bzProcesados; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1">
+                      <button mat-icon-button aria-label="Visibilidad">
+                        <mat-icon class="text-primary" (click)="open(observacion, e.idd)">add_circle</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
+                        &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+                    <div class="col-md-1 texto-lista">
+                      {{ e.nori | uppercase }}
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      {{ e.fcre | date:"dd-MM-yyyy" }}
+                    </div>
+                    <div class="col-md-4 texto-lista">
+                      {{ e.udep | uppercase }}
+                    </div>
+                    <div class="col-md-2 text-right">
+                      <button mat-icon-button aria-label="Privado">
+                        <mat-icon *ngIf="e.privado" class="text-warning">no_encryption</mat-icon>
+                      </button>
+                      <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
+                        <mat-icon class="text-pink">edit_note</mat-icon>
+                      </button>
+                      <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                        <mat-icon class="text-info">attach_file</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="lengthOfi" (page)="pageChangeEvent($event)" [pageSize]="pageSizeOfi"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;PENDIENTES
+            </ng-template>
+
+            <div class="container">
+              <mat-selection-list #lstPendientes>
+                <mat-list *ngFor="let e of bzPendientes; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1">
+                      <button mat-icon-button aria-label="Visibilidad">
+                        <mat-icon class="text-primary" (click)="open(observacion, e.idd)">add_circle</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
+                        &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+                    <div class="col-md-1 texto-lista">
+                      {{ e.nori | uppercase }}
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      {{ e.fcre | date:"dd-MM-yyyy" }}
+                    </div>
+                    <div class="col-md-4 texto-lista">
+                      {{ e.udep | uppercase }}
+                    </div>
+                    <div class="col-md-2 text-right">
+                      <button mat-icon-button aria-label="Privado">
+                        <mat-icon *ngIf="e.privado" class="text-warning">no_encryption</mat-icon>
+                      </button>
+                      <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
+                        <mat-icon class="text-pink">edit_note</mat-icon>
+                      </button>
+                      <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                        <mat-icon class="text-info">attach_file</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="lengthOfi" (page)="pageChangeEvent($event)" [pageSize]="pageSizeOfi"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+          </mat-tab>
+
+
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;ALERTAS
+            </ng-template>
+
+            <div class="container">
+              <mat-selection-list #lstAlertas>
+                <mat-list *ngFor="let e of bzAlertas; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-2 texto-lista">
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.ncontrol )]">{{
+                        e.ncontrol | uppercase }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+                    <div class="col-md-4 texto-lista">
+                      {{ e.remitente | uppercase }}
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      {{ e.plazo | date:"dd-MM-yyyy" }}
+                    </div>
+                    <div class="col-md-3 texto-lista  {{ e.color }}">
+                      {{ e.texto | uppercase }}
+                    </div>
+                    <div class="col-md-1 text-right ">
+                      <button mat-icon-button aria-label="Privado">
+                        <!--  -->
+                        <mat-icon class="text-warning" (click)="open(observacion, e.id_alerta)">today</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+          </mat-tab>
+
+
+        </mat-tab-group>
       </div>
-    </div>    
+    </div>
+  </div>
 </div>
 
 
@@ -260,7 +253,7 @@
       </select>
     </div>
 
-    <div class="form-group  col-md-12"  *ngIf="clasificacion">
+    <div class="form-group  col-md-12" *ngIf="clasificacion">
       <label for="tmsCreacion">Plazo / Alerta</label>
       <div class="form-group" style="width:100%">
         <div class="input-group" style="width:100%">
