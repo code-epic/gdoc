@@ -73,7 +73,7 @@ export class AybuzonComponent implements OnInit {
   public Observacion = ''
   public AccionTexto: string = '0'
 
-  public placement = 'bottom'
+  public placement = 'top'
 
   public WAlerta: IWKFAlerta = {
     documento: 0,
@@ -84,12 +84,11 @@ export class AybuzonComponent implements OnInit {
     usuario: '',
     observacion: ''
   }
+
   public clasificacion = false
-
+  public vplazo = false
   public cmbDestino = ''
-
   public lstAcciones = []
-
   public cmbAcciones = [
     { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
     { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
@@ -98,7 +97,7 @@ export class AybuzonComponent implements OnInit {
     { 'valor': '6', 'texto': 'ARCHIVAR', 'visible': '2' },
     { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' },
     { 'valor': '8', 'texto': 'REDISTRIBUCION', 'visible': '2' }]
-
+  public extender_plazo: any
 
   public bzBusqueda = []
   public bzAlertasO = []
@@ -106,7 +105,7 @@ export class AybuzonComponent implements OnInit {
   public buscar = ''
   public posicionPagina = 0
 
-  public extender_plazo: any
+
 
   longitud = 0;
   pageSize = 10;
@@ -157,7 +156,7 @@ export class AybuzonComponent implements OnInit {
 
   async ConsultarAlertas() {
     this.xAPI.funcion = 'WKF_CAlertas'
-    this.xAPI.parametros = '2,2'
+    this.xAPI.parametros = '5,2'
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.bzAlertasO = data.Cuerpo.map((e) => {
@@ -195,20 +194,21 @@ export class AybuzonComponent implements OnInit {
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
     this.selNav = e
-
+    this.vplazo = true
     switch (e) {
       case 0:
+        this.vplazo = false
         this.cargarAcciones(0)
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
         this.listarBuzon(this.bzRecibido)
         break
       case 1:
         this.cargarAcciones(1)
-        //this.xAPI.funcion = 'WKF_CSubDocumento'
         this.xAPI.parametros = this.estadoActual + ',' + 2
         this.listarBuzon(this.bzProcesados)
         break
       case 2:
+
         this.cargarAcciones(2)
         this.xAPI.parametros = this.estadoActual + ',' + 3
         this.listarBuzon(this.bzPendientes)
@@ -229,7 +229,7 @@ export class AybuzonComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstEstados = data.Cuerpo.filter(e => {return e.esta == 1 });
+        this.lstEstados = data.Cuerpo.filter(e => { return e.esta == 1 });
       },
       (error) => {
 
@@ -240,7 +240,7 @@ export class AybuzonComponent implements OnInit {
   async listarBuzon(bz: any) {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-         data.Cuerpo.forEach(e => {
+        data.Cuerpo.forEach(e => {
 
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
@@ -303,7 +303,10 @@ export class AybuzonComponent implements OnInit {
 
   //editar
   editar(id: string) {
-    this.ruta.navigate(['/documento', id])
+    const estado = this.estadoActual
+    const estatus = this.selNav + 1
+    const base = btoa(estado + ',' + estatus + ',' + id)
+    this.ruta.navigate(['/documento', base])
   }
 
   insertarObservacion() {
@@ -321,31 +324,78 @@ export class AybuzonComponent implements OnInit {
     )
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.toastrService.success(
-          'Se ha promovido el documento',
-          `GDoc Wkf.DocumentoObservacion`
-        )
-        this.promoverBuzon()
+      async data => {
+        switch (this.AccionTexto) {
+          case "0"://Aceptar y promover el documento
+            this.promoverBuzon(0, this.utilService.FechaActual())
+            break;
+          case "1"://Rechazar en el estado inicial
+            this.rechazarBuzon()
+            break;
+          case "2"://Oficio por opinión
+            this.promoverBuzon(1, '')
+            break;
+          case "5":// Enviar a otras areas redistribuir
+            this.promoverBuzon(1, '')
+            break;
+          case "6":// Enviar  a Archivo
+            this.redistribuir(11)
+            break;
+          case "7"://Enviar a salida con bifurcacion
+            this.redistribuir(9)
+            break;
+          case "5":// Enviar a otras areas redistribuir
+            this.redistribuir(0)
+            break;
+        }
+        this.seleccionNavegacion(this.selNav)
+
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
       }) //
   }
 
-  async promoverBuzon() {
+
+  async rechazarBuzon() {
+    this.xAPI.funcion = "WKF_AUbicacionRechazo"
+    this.xAPI.valores = ''
+    this.xAPI.parametros = '1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.toastrService.success(
+          'El documento ha sido enviado al origen',
+          `GDoc Wkf.DocumentoObservacion`
+        )
+        this.seleccionNavegacion(this.selNav)
+      },
+      (error) => {
+        console.error(error)
+      }
+
+    )
+  }
+
+  async promoverBuzon(activo: number, sfecha: string) {
+    const fecha = sfecha == '' ? this.utilService.ConvertirFecha(this.extender_plazo) : sfecha
+
     var usuario = this.loginService.Usuario.id
     var i = 0
     var estatus = 1 //NOTA DE ENTREGA
-    //Buscar en Wk de acuerdo al usuario y la app activa
     this.xAPI.funcion = 'WKF_APromoverEstatus'
     this.xAPI.valores = ''
+
     this.xAPI.parametros = `${estatus},${usuario},${this.numControl}`
     await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+      async data => {
+        await this.guardarAlerta(activo, fecha)
         this.seleccionNavegacion(this.selNav)
         this.Observacion = ''
         this.numControl = '0'
+        this.toastrService.success(
+          'Se ha promovido el documento',
+          `GDoc Wkf.DocumentoObservacion`
+        )
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.PromoverDocumento`);
@@ -353,32 +403,85 @@ export class AybuzonComponent implements OnInit {
 
   }
 
+  async redistribuir(destino: number = 0) {
+    var dst = destino != 0 ? destino : this.cmbDestino
 
-  async cargarAcciones(posicion) {
-    this.lstAcciones = []
-    this.lstAcciones = this.cmbAcciones.filter(e => {return e.visible == posicion});
+    this.xAPI.funcion = "WKF_ARedistribuir"
+    this.xAPI.valores = ''
+    this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
+    console.log(this.xAPI.parametros)
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
+        this.toastrService.success(
+          'El documento ha sido redistribuido segun su selección',
+          `GDoc Wkf.DocumentoObservacion`
+        )
+        this.seleccionNavegacion(this.selNav)
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
   }
 
   selAccion() {
     this.clasificacion = false
+    this.vplazo = true
     switch (this.AccionTexto) {
+      case '0':
+        this.vplazo = false
+        break;
+      case '1':
+        this.vplazo = false
+        break;
+
       case '8':
         this.clasificacion = true
         break;
-
       default:
         break;
     }
   }
-  
 
 
   //Consultar un enlace
-  constancia(id: string){
+  constancia(id: string) {
     const estado = 1
     const estatus = 1
-    return  btoa(estado + ',' + estatus + ',' + id)
+    return btoa(estado + ',' + estatus + ',' + id)
     //this.ruta.navigate(['/constancia', base])
   }
+
+  //Guardar la alerte define el momento y estadus
+  guardarAlerta(activo: number, fecha: string) {
+    this.WAlerta.activo = activo
+    this.WAlerta.documento = parseInt(this.numControl)
+    this.WAlerta.estado = this.estadoActual
+    this.WAlerta.estatus = this.selNav + 1
+    this.WAlerta.usuario = this.loginService.Usuario.id
+    this.WAlerta.observacion = this.Observacion.toUpperCase()
+    this.WAlerta.fecha = fecha
+
+    this.xAPI.funcion = 'WKF_AAlertas'
+    this.xAPI.parametros = ''
+    console.log(this.WAlerta);
+    this.xAPI.valores = JSON.stringify(this.WAlerta)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async alerData => {
+        console.log(alerData)
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
+      }) //
+  }
+
+  async cargarAcciones(posicion) {
+    this.lstAcciones = []
+    this.lstAcciones = this.cmbAcciones.filter(e => { return e.visible == posicion });
+  }
+
+
+
 
 }

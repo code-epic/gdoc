@@ -23,7 +23,8 @@ export interface IDocumento {
   privacidad?: number
   creador?: string
   archivo?: string
-  historico?: []
+  historial?: string
+  traza?: string
   subdocumento?: string
 
 }

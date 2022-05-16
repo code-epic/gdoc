@@ -243,30 +243,49 @@
 
 <ng-template #observacion let-modal>
   <div class="modal-header header bg-gradient-info">
-    <h4 class="modal-title text-white" id="modal-basic-title">Promover Documento</h4>
+    <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
   </div>
   <div class="modal-body">
     <div class="form-group col-md-12">
       <label for="txtobservacion">Observaciones</label>
-      <textarea class="form-control" cols="30" rows="3"  [ngModelOptions]="{standalone: true}"
-      [(ngModel)]="Observacion"></textarea>
+      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="Observacion"></textarea>
     </div>
     <div class="form-group  col-md-12">
       <label>Acción</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}"
-          [(ngModel)]="AccionTexto">
-        <option value="0">NO APLICA</option>
-        <option value="1">POR FIRMA</option>
-        <option value="2">OPINION JURIDICA</option>
-        <option value="3">POR OPINION</option>
-              
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
+        (change)="selAccion()">
+        <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
       </select>
+
+    </div>
+    <div class="form-group  col-md-12" *ngIf="clasificacion">
+      <label>Area</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
+        <option value="S">SELECCIONE</option>
+        <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
+      </select>
+    </div>
+
+    <div class="form-group  col-md-12"  *ngIf="vplazo">
+      <label for="tmsCreacion">Plazo / Alerta</label>
+      <div class="form-group" style="width:100%">
+        <div class="input-group" style="width:100%">
+          <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+            [positionTarget]="buttonEl">
+          <div class="input-group-append">
+            <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn bg-gradient-info text-white "  (click)="insertarObservacion();modal.close('Save')"> 
-      <span class="fa fa-check"></span>&nbsp;&nbsp;Promover </button>
-    <button  class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+    <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
   </div>
 </ng-template>

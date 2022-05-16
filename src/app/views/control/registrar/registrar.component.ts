@@ -31,6 +31,9 @@ export class RegistrarComponent implements OnInit {
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
 
+  public estadoActual = 1
+  public estatusAcutal = 1
+
   public paginador = 10
   public focus;
   public xAPI: IAPICore = {
@@ -164,7 +167,6 @@ export class RegistrarComponent implements OnInit {
     this.xAPI.parametros = '1,1'
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data);
         this.bzAlertasO = data.Cuerpo.map((e) => {
           e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
           e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
@@ -295,8 +297,8 @@ export class RegistrarComponent implements OnInit {
 
   //editar
   editar(id: string) {
-    const estado = 1
-    const estatus = 1
+    const estado = this.estadoActual
+    const estatus = this.selNav + 1 
     const base = btoa(estado + ',' + estatus + ',' + id)
     this.ruta.navigate(['/documento', base])
   }

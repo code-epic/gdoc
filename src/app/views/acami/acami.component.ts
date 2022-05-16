@@ -231,7 +231,10 @@ export class AcamiComponent implements OnInit {
 
   //editar
   editar(id: string) {
-    this.ruta.navigate(['/documento', id])
+    const estado = this.estadoActual
+    const estatus = this.selNav + 1 
+    const base = btoa(estado + ',' + estatus + ',' + id)
+    this.ruta.navigate(['/documento', base])
   }
 
   insertarObservacion() {

@@ -117,6 +117,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstR = [] //Objeto Remitente
   public lstU = [] //Objeto Unidad
   public lstCuenta = [] //Objeto Unidad
+
+  public lstTraza = []
+  public lstHistorial = []
   public titulo = 'Documento'
 
 
@@ -247,12 +250,18 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         });
 
         this.selTipoDocumento()
-        const cuentas = JSON.parse(this.Doc.subdocumento)
-        this.lstCuenta = cuentas.map(e => {
+        const punto_cuenta = this.Doc.subdocumento!=null? JSON.parse(this.Doc.subdocumento): []
+        this.lstCuenta = punto_cuenta.map(e => {
           return typeof e == 'object'?e: JSON.parse(e)
         })
-       
-        console.log(this.lstCuenta);
+        const traza = this.Doc.traza!=null?JSON.parse(this.Doc.traza):[]
+        this.lstTraza = traza.map(e => {
+          return typeof e == 'object'?e: JSON.parse(e)
+        })
+        const historial = this.Doc.historial!=null?JSON.parse(this.Doc.historial):[]
+        this.lstHistorial = historial.map(e => {
+          return typeof e == 'object'?e: JSON.parse(e)
+        })
 
         
       },

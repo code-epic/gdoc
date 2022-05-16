@@ -32,8 +32,10 @@ export class ConstanciaComponent implements OnInit {
     nexpediente: '',
     creador: '',
     archivo: '',
-    privacidad: 0
-
+    privacidad: 0,
+    historial : '',
+    traza:'',
+    subdocumento : ''
   }
 
   public WAlerta: IWKFAlerta = {
@@ -50,6 +52,11 @@ export class ConstanciaComponent implements OnInit {
     funcion: ''
 
   };
+
+  public lstSubDoc = []
+  public lstTraza = []
+  public lstHistorial = []
+
 
   constructor(
     private apiService: ApiService,
@@ -88,6 +95,20 @@ export class ConstanciaComponent implements OnInit {
             this.WAlerta.usuario = this.loginService.Usuario.id
           }
 
+          const punto_cuenta = this.Doc.subdocumento!=null? JSON.parse(this.Doc.subdocumento): []
+          this.lstSubDoc = punto_cuenta.map(e => {
+            return typeof e == 'object'?e: JSON.parse(e)
+          })
+          const traza = this.Doc.traza!=null?JSON.parse(this.Doc.traza):[]
+          this.lstTraza = traza.map(e => {
+            return typeof e == 'object'?e: JSON.parse(e)
+          })
+          const historial = this.Doc.historial!=null?JSON.parse(this.Doc.historial):[]
+          this.lstHistorial = historial.map(e => {
+            return typeof e == 'object'?e: JSON.parse(e)
+          })
+
+         
         });
       },
       (error) => {

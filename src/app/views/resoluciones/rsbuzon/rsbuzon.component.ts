@@ -127,7 +127,6 @@ export class RsbuzonComponent implements OnInit {
 
 
   seleccionNavegacion(e) {
-    console.log(e);
     this.bzRecibido = []
     this.bzProcesados = []
     this.bzPendientes = []
@@ -186,13 +185,11 @@ export class RsbuzonComponent implements OnInit {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
-        console.log(data)
 
         data.Cuerpo.forEach(e => {
 
           var existe = e.anom == '' ? true : false
           var privado = e.priv == 1 ? true : false
-          console.log(e)
           bz.push(
             {
               id: e.id,
@@ -266,7 +263,10 @@ export class RsbuzonComponent implements OnInit {
 
   //editar
   editar(id: string) {
-    this.ruta.navigate(['/documento', id])
+    const estado = this.estadoActual
+    const estatus = this.selNav + 1 
+    const base = btoa(estado + ',' + estatus + ',' + id)
+    this.ruta.navigate(['/documento', base])
   }
 
   insertarObservacion() {
@@ -285,7 +285,6 @@ export class RsbuzonComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.info(this.AccionTexto)
         switch (this.AccionTexto) {
           case "1"://Rechazar en el estado inicial
             this.rechazarBuzon()
