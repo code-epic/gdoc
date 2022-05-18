@@ -49,147 +49,170 @@
                 </div>
                 <div class="card-body">
 
-                        <h2 class="mb-0 text-center">REPORTE HISTORICO</h2>
-                        <div class="form-row">
-                            <div class="form-group col-md-12">
-                                <table summary="" class="table table-bordered table-hover">
+                    <h2 class="mb-0 text-center">REPORTE HISTORICO</h2>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <table summary="" class="table table-bordered table-hover">
 
-                                    <thead>
-                                        <tr>
-                                            <th data-priority="1">Número de Control</th>
-                                            <th data-priority="2">Número de Origen</th>
-                                            <th data-priority="3">Fecha de Origen</th>
-                                            <th data-priority="4">Fecha de Recepción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>{{Doc.ncontrol | uppercase}}</td>
-                                            <td>{{Doc.norigen | uppercase}}</td>
-                                            <td>{{Doc.forigen}}</td>
-                                            <td>{{Doc.fcreacion}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <br>
-                                <table summary="" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th data-priority="1">Número de Control</th>
+                                        <th data-priority="2">Número de Origen</th>
+                                        <th data-priority="3">Fecha de Origen</th>
+                                        <th data-priority="4">Fecha de Recepción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{Doc.ncontrol | uppercase}}</td>
+                                        <td>{{Doc.norigen | uppercase}}</td>
+                                        <td>{{Doc.forigen}}</td>
+                                        <td>{{Doc.fcreacion}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <table summary="" class="table table-bordered table-hover">
 
-                                    <thead>
-                                        <tr>
-                                            <th data-priority="1">Tipo de Documento</th>
-                                            <th data-priority="2">Remitente</th>
-                                            <th data-priority="3">Unidad o Dependencia</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>{{Doc.tipo | uppercase}}</td>
-                                            <td>{{Doc.remitente | uppercase}}</td>
-                                            <td>{{Doc.unidad | uppercase}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <br>
-
-                                <table summary="" class="table table-bordered table-hover">
-
-                                    <thead>
-                                        <tr> <th data-priority="1">Contenido</th></tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td><div [innerHTML]="Doc.contenido"></div></td></tr>
-                                    </tbody>
-                                    <thead>
-                                        <tr><th data-priority="1">Instrucciones</th> </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td><div [innerHTML]="Doc.instrucciones"></div></td></tr>
-                                    </tbody>
-                                    <thead>
-                                        <tr><th data-priority="1">Historial de Acciones </th> </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td><div ></div></td></tr>
-                                    </tbody>
-                                    <thead>
-                                        <tr><th data-priority="1">Historial de Observaciones</th> </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td><div [innerHTML]="Doc.instrucciones"></div></td></tr>
-                                    </tbody>
-                                </table>
-                                <br>
-                                <table summary="" class="table table-bordered table-hover">
-
-                                    <thead>
-                                        <tr>
-                                            <th data-priority="1" colspan="2">Firma de Seguimiento</th>
-                                            
-                                            <th data-priority="3" style="width:256px">VALIDADOR QR</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th>UBICACIÓN ACTUAL</th>
-                                            <td></td>
-                                            <td rowspan="3"></td>
-                                        </tr>
-                                        <tr>
-                                            <th>CREADO POR</th>
-                                            <td>{{Doc.creador}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>FECHA DE CREACIÓN</th>
-                                            <td>{{Doc.fcreacion}}</td>
-                                            
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-
-                            </div>
-                        </div>
-
-                        <hr>
-                        <div class="form-row">
-                            <div class="form-group col-md-12" style="display: none;">
-                                <table
-                                    summary="This table shows how to create responsive tables using RWD-Table-Patterns' functionality"
-                                    class="table table-bordered table-hover">
-
-                                    <thead>
-                                        <tr>
-                                            <th>Country</th>
-                                            <th data-priority="1">Número de Control</th>
-                                            <th data-priority="2">Número de Origen</th>
-                                            <th data-priority="3">Fecha de Origen</th>
-                                            <th data-priority="4">Fecha de Recepción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Argentina</td>
-                                            <td>Spanish (official), English, Italian, German, French</td>
-                                            <td>41,803,125</td>
-                                            <td>31.3</td>
-                                            <td>2,780,387</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Australia</td>
-                                            <td>English 79%, native and other languages</td>
-                                            <td>23,630,169</td>
-                                            <td>37.3</td>
-                                            <td>7,739,983</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                <thead>
+                                    <tr>
+                                        <th data-priority="1">Tipo de Documento</th>
+                                        <th data-priority="2">Remitente</th>
+                                        <th data-priority="3">Unidad o Dependencia</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{Doc.tipo | uppercase}}</td>
+                                        <td>{{Doc.remitente | uppercase}}</td>
+                                        <td>{{Doc.unidad | uppercase}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
                         </div>
 
 
-                     
+                        <table summary="" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th data-priority="1">Contenido</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="form-group  col-md-12 text-justify" [innerHTML]="Doc.contenido"
+                            style="font-size: small; padding: 15px; border: 1px solid #ccc">
+                        </div>
+                        <table summary="" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th data-priority="1">Instrucciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="form-group  col-md-12 text-justify" [innerHTML]="Doc.instrucciones"
+                            style="padding: 15px; border: 1px solid #ccc">
+                        </div>
+                        <br>
 
-                      
+                        <table summary="" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th data-priority="1" colspan="5">Historial de Acciones</th>
+                                </tr>
+                                <tr>
+                                    <th data-priority="1">Fecha</th>
+                                    <th data-priority="1">Departamento</th>
+                                    <th data-priority="1">Estado</th>
+                                    <th data-priority="1">Observacion</th>
+                                    <th data-priority="1">Responsable</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr *ngFor="let e of lstTraza">
+                                    <td>{{e.fecha | date:"dd-MM-yyyy" }}</td>
+                                    <td>{{e.nombre_estado | uppercase }}</td>
+                                    <td>{{e.nombre_estatus  | uppercase }}</td>
+                                    <td>{{e.observacion  | uppercase }}</td>
+                                    <td>{{e.usuario}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br><br>
+
+                        <table summary="" class="table table-bordered table-hover">
+
+                            <thead>
+                                <tr>
+                                    <th data-priority="1" colspan="2">Firma de Seguimiento</th>
+    
+                                    <th data-priority="3" style="width:256px">VALIDADOR QR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>UBICACIÓN ACTUAL</th>
+                                    <td></td>
+                                    <td rowspan="3"></td>
+                                </tr>
+                                <tr>
+                                    <th>CREADO POR</th>
+                                    <td>{{Doc.creador}}</td>
+                                </tr>
+                                <tr>
+                                    <th>FECHA DE CREACIÓN</th>
+                                    <td>{{Doc.fcreacion}}</td>
+    
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+                 
+                    <hr>
+                    <div class="form-row">
+                        <div class="form-group col-md-12" style="display: none;">
+                            <table
+                                summary="This table shows how to create responsive tables using RWD-Table-Patterns' functionality"
+                                class="table table-bordered table-hover">
+
+                                <thead>
+                                    <tr>
+                                        <th>Country</th>
+                                        <th data-priority="1">Número de Control</th>
+                                        <th data-priority="2">Número de Origen</th>
+                                        <th data-priority="3">Fecha de Origen</th>
+                                        <th data-priority="4">Fecha de Recepción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Argentina</td>
+                                        <td>Spanish (official), English, Italian, German, French</td>
+                                        <td>41,803,125</td>
+                                        <td>31.3</td>
+                                        <td>2,780,387</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Australia</td>
+                                        <td>English 79%, native and other languages</td>
+                                        <td>23,630,169</td>
+                                        <td>37.3</td>
+                                        <td>7,739,983</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+
+
+
                 </div>
             </div>
         </div>

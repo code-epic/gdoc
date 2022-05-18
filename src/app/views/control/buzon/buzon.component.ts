@@ -40,12 +40,14 @@ export class BuzonComponent implements OnInit {
   public cmbAcciones = [
     { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
     { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
-    { 'valor': '2', 'texto': 'ELABORAR OFICIO DE OPINION', 'visible': '1' },
+    { 'valor': '2', 'texto': 'ELABORAR OFICIO', 'visible': '1' },
     { 'valor': '3', 'texto': 'EN MANOS DEL DIRECTOR DEL DESPACHO', 'visible': '1' },
     { 'valor': '4', 'texto': 'EN MANOS DEL SUB DIRECTOR DEL DESPACHO', 'visible': '1' },
     { 'valor': '5', 'texto': 'ARCHIVAR', 'visible': '1' },
     { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '1' },
-    { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' }]
+    { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' },
+    { 'valor': '8', 'texto': 'ELABORAR CUADRO DECISORIO', 'visible': '1' },
+    { 'valor': '9', 'texto': 'TIMONEL', 'visible': '2' },]
 
   public paginador = 10
   public focus;
@@ -324,7 +326,7 @@ export class BuzonComponent implements OnInit {
   //editar
   editar(id: string) {
     const estado = this.estadoActual
-    const estatus = this.selNav + 1 
+    const estatus = this.selNav + 1
     const base = btoa(estado + ',' + estatus + ',' + id)
     this.ruta.navigate(['/documento', base])
   }
@@ -382,6 +384,12 @@ export class BuzonComponent implements OnInit {
             break;
           case "7"://Enviar a salida con bifurcacion
             this.redistribuir(9)
+            break;
+          case "8"://Elaborar cuadro decisorio
+            this.promoverBuzon(1, '')
+            break;
+          case "9"://Enviar a Timonel
+            this.redistribuir(6)
             break;
         }
       },

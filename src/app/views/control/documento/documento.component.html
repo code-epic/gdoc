@@ -1,7 +1,7 @@
 <div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
     <div class="container-fluid">
         <p></p>
-    </div>    
+    </div>
 </div>
 
 <div class="container-fluid mt--9">
@@ -16,32 +16,39 @@
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
-                              <div class="example-button-row">
-                                <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                                  <mat-icon>reply</mat-icon>
-                                </button>
-                              </div>
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>reply</mat-icon>
+                                    </button>
+                                </div>
                             </div>
-                          </div>
+                        </div>
                         <div class="col-md-1">
                             <ul class="navbar-nav align-items-right d-none d-md-flex">
-                            <li class="nav-item" ngbDropdown placement="bottom-right">
-                                <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                                <div class="media align-items-center">
-                                    <div class="example-button-row">
-                                    <button mat-icon-button aria-label="Example icon-button with a heart icon">
-                                        <mat-icon>more_vert</mat-icon>
-                                    </button>
-                                    </div>
-                                </div>
-                                </a>
-                                <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                                    <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
-                                      <i class="ni ni-settings-gear-65"></i>
-                                      <span>Configuración</span>
+                                <li class="nav-item" ngbDropdown placement="bottom-right">
+                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                        <div class="media align-items-center">
+                                            <div class="example-button-row">
+                                                <button mat-icon-button
+                                                    aria-label="Example icon-button with a heart icon">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </a>
-                                  </div>
-                            </li>
+                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                        <a routerLinkActive="active" [routerLink]="['/configuracion']"
+                                            class="dropdown-item">
+                                            <i class="ni ni-settings-gear-65"></i>
+                                            <span>Configuración</span>
+                                        </a>
+                                        <a routerLinkActive="active" (click)="verArchivos(archivos)"
+                                            class="dropdown-item">
+                                            <i class="ni ni-bullet-list-67"></i>
+                                            <span>Ver Archivos</span>
+                                        </a>
+                                    </div>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -51,26 +58,24 @@
                     <form role="form">
                         <div class="form-row">
                             <div class="form-group col-md-2">
-                                <label for="txtControl"> {{ncontrolt}} </label>                    
-                                <input type="text" class="form-control" id="txtControl" 
-                                [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Doc.ncontrol" [readonly]="ncontrolv"
-                                >
+                                <label for="txtControl"> {{ncontrolt}} </label>
+                                <input type="text" class="form-control" id="txtControl"
+                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.ncontrol"
+                                    [readonly]="ncontrolv">
                             </div>
-                            
+
                             <div class="form-group col-md-3">
                                 <label for="tmsOrigen">Fecha Origen (*) </label>
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
-                                            <input class="form-control" placeholder="AAAA-MM-DD" 
-                                            [ngModelOptions]="{standalone: true}"
-                                            [(ngModel)]="forigen" ngbDatepicker #fo="ngbDatepicker" 
-                                            [value]="formatter.format(forigenDate)"
-                                            [placement]="placement" [positionTarget]="buttonEl">
+                                            <input class="form-control" placeholder="AAAA-MM-DD"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="forigen"
+                                                ngbDatepicker #fo="ngbDatepicker"
+                                                [value]="formatter.format(forigenDate)" [placement]="placement"
+                                                [positionTarget]="buttonEl">
                                             <div class="input-group-append">
-                                                <button #buttonEl 
-                                                    class="btn calendario" (click)="fo.toggle()" 
+                                                <button #buttonEl class="btn calendario" (click)="fo.toggle()"
                                                     type="button">
                                                 </button>
                                             </div>
@@ -83,60 +88,54 @@
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
-                                            <input class="form-control" placeholder="AAAA-MM-DD" 
-                                            [ngModelOptions]="{standalone: true}"
-                                            [value]="formatter.format(fcreacionDate)"
-                                            [(ngModel)]="fcreacion" ngbDatepicker #fc="ngbDatepicker" 
-                                            [placement]="placement" [positionTarget]="buttonEl">
+                                            <input class="form-control" placeholder="AAAA-MM-DD"
+                                                [ngModelOptions]="{standalone: true}"
+                                                [value]="formatter.format(fcreacionDate)" [(ngModel)]="fcreacion"
+                                                ngbDatepicker #fc="ngbDatepicker" [placement]="placement"
+                                                [positionTarget]="buttonEl">
                                             <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button"></button>
+                                                <button #buttonEl class="btn calendario" (click)="fc.toggle()"
+                                                    type="button"></button>
                                             </div>
                                         </div>
                                     </div>
                                 </form>
-                            </div> 
+                            </div>
                             <div class="form-group col-md-2">
                                 <label for="txtOrigen">Nro. Origen (*) </label>
-                                <input type="txtOrigen" class="form-control" 
-                                [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Doc.norigen">
+                                <input type="txtOrigen" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.norigen">
                             </div>
                             <div class="form-group col-md-2" *ngIf="salidavisible">
                                 <label for="txtSalida">{{salida}}</label>
-                                <input type="txtSalida" class="form-control" 
-                                value ="{{Doc.salida}}" 
-                                [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Doc.salida"
-                                >
+                                <input type="txtSalida" class="form-control" value="{{Doc.salida}}"
+                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.salida">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label for="cmbTipoDocumento">Tipo de Documento</label>
-                                <select class="form-control" 
-                                    [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Doc.tipo"  value ="{{Doc.tipo}}" (change)="selTipoDocumento()">
+                                <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" (change)="selTipoDocumento()">
                                     <option value="0">Seleccione</option>
-                                    <option *ngFor="let x of lstT" value="{{x.nomb}}" >{{ x.nomb }}  </option> 
-                                   
+                                    <option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </option>
+
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="cmbRemitente">Remitente</label>
-                                <select class="form-control" 
-                                    [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Doc.remitente"  value ="{{Doc.remitente}}">
+                                <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.remitente" value="{{Doc.remitente}}">
                                     <option value="0">Seleccione</option>
-                                    <option *ngFor="let x of lstR" value="{{x.nomb}}" >{{ x.nomb }}</option> 
+                                    <option *ngFor="let x of lstR" value="{{x.nomb}}">{{ x.nomb }}</option>
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="cmbUnidad">Unidad o Dependencia</label>
-                                <select class="form-control" 
-                                    [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Doc.unidad"  value ="{{Doc.unidad}}">
+                                <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}">
                                     <option value="0">Seleccione</option>
-                                    <option *ngFor="let x of lstU" value="{{x.nomb}}" >{{ x.nomb }}  </option> 
+                                    <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
                                 </select>
                             </div>
                         </div>
@@ -145,12 +144,8 @@
                                 <label for="txtContenido">Contenido (*) </label>
                                 <div class="NgxEditor__Wrapper">
                                     <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
-                                    <ngx-editor
-                                    [ngModelOptions]="{standalone: true}"
-                                    [editor]="editor"
-                                    [(ngModel)]="Doc.contenido"
-                                    [disabled]="false"
-                                    [placeholder]="'Escibe aqui...'">
+                                    <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor"
+                                        [(ngModel)]="Doc.contenido" [disabled]="false" [placeholder]="'Escibe aqui...'">
                                     </ngx-editor>
                                 </div>
                             </div>
@@ -158,59 +153,70 @@
 
                         <div class="form-row" *ngIf="puntocuenta">
                             <div class="form-group col-md-2">
-                                <label >Cuenta</label>
-                                <input type="text" 
-                                class="form-control"  [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="cuenta" value="{{cuenta}}" >
+                                <label>Cuenta</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="cuenta" value="{{cuenta}}">
                             </div>
                             <div class="form-group col-md-6">
-                                <label >Resumen de Contenido</label>
-                                <input type="text" 
-                                class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="resumen"  value="{{resumen}}">
+                                <label>Resumen de Contenido</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="resumen" value="{{resumen}}">
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="cmbUnidad">Fecha cuenta</label>
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="detalle"  value="{{detalle}}">
-                                        <div class="input-group-prepend">
-                                            <button *ngIf="!editar" type="button" class="btn btn-success"  (click)="agregarCuenta()">
-                                                <i class="fa fa-plus" aria-hidden="true"></i>
-                                            </button>
-                                            <button *ngIf="editar" type="button" class="btn btn-primary"  (click)="editarCuenta()">
-                                                <i class="fa fa-edit" aria-hidden="true"></i>
-                                            </button>
-                                           
-                                        </div>
-                                </div> 
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="detalle" value="{{detalle}}">
+                                    <div class="input-group-prepend">
+                                        <button *ngIf="!editar" type="button" class="btn btn-success"
+                                            (click)="agregarCuenta()">
+                                            <i class="fa fa-plus" aria-hidden="true"></i>
+                                        </button>
+                                        <button *ngIf="editar" type="button" class="btn btn-primary"
+                                            (click)="editarCuenta()">
+                                            <i class="fa fa-edit" aria-hidden="true"></i>
+                                        </button>
+
+                                    </div>
+                                </div>
 
                             </div>
                             <div class="form-group col-md-12">
                                 <table class="table align-items-center table-flush" style="width:100%">
                                     <thead class="thead-light">
-                                      <th style="text-align:center;width:20px">Acción</th>
-                                      <th>Cuenta</th>
-                                      <th>Resumen</th>
-                                      <th>Detalle</th>
-                                  </thead><tbody>
-                                    <tr  [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
-                                        <td style="text-align:center;width:20px">
-                                            
-                                            <div class="btn-group" role="group" aria-label="Basic"  *ngIf="el.activo == 0">
-                                                <button type="button" class="btn btn-primary btn-sm" (click)="selEditarCuenta( i )"><i class="fa fa-edit" aria-hidden="true"  ></i></button>
-                                                <button type="button" class="btn btn-danger btn-sm" (click)="eliminarCuenta( i )"><i class="fa fa-trash" aria-hidden="true"  ></i></button>
-                                            </div>
-                                            <button *ngIf="el.activo != 0" type="button" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> &nbsp;&nbsp;En Proceso  </button>
-                                        </td>
-                                        <td>{{ el.cuenta }}</td>
-                                        <td>{{ el.resumen.substring(0,20) }}... </td>
-                                        <td>{{ el.detalle.substring(0,20) }}...</td>
-                                        
-                                    </tr>
+                                        <th style="text-align:center;width:20px">Acción</th>
+                                        <th>Cuenta</th>
+                                        <th>Resumen</th>
+                                        <th>Detalle</th>
+                                    </thead>
+                                    <tbody>
+                                        <tr [ngModelOptions]="{standalone: true}"
+                                            *ngFor="let el of lstCuenta;let i=index">
+                                            <td style="text-align:center;width:20px">
 
-                                  </tbody></table>
-                            
+                                                <div class="btn-group" role="group" aria-label="Basic"
+                                                    *ngIf="el.activo == 0">
+                                                    <button type="button" class="btn btn-primary btn-sm"
+                                                        (click)="selEditarCuenta( i )"><i class="fa fa-edit"
+                                                            aria-hidden="true"></i></button>
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        (click)="eliminarCuenta( i )"><i class="fa fa-trash"
+                                                            aria-hidden="true"></i></button>
+                                                </div>
+                                                <button *ngIf="el.activo != 0" type="button"
+                                                    class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                                    &nbsp;&nbsp;En Proceso </button>
+                                            </td>
+                                            <td>{{ el.cuenta }}</td>
+                                            <td>{{ el.resumen.substring(0,20) }}... </td>
+                                            <td>{{ el.detalle.substring(0,20) }}...</td>
+
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
                             </div>
                         </div>
 
@@ -220,31 +226,29 @@
                                 <label for="txtInstrucciones">Instrucciones Generales</label>
                                 <div class="NgxEditor__Wrapper">
                                     <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
-                                    <ngx-editor
-                                    [editor]="xeditor"
-                                    [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Doc.instrucciones"
-                                    [disabled]="false"
-                                    [placeholder]="'Escibe aqui...'">
+                                    <ngx-editor [editor]="xeditor" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Doc.instrucciones" [disabled]="false"
+                                        [placeholder]="'Escibe aqui...'">
                                     </ngx-editor>
-                                </div>        
+                                </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-8">
-                               
+
                                 <div class="row">
                                     <div class="form-group col-md-6">
                                         <label for="tmsCreacion">Plazo / Alerta</label>
                                         <form class="form-inline">
                                             <div class="form-group" style="width:100%">
                                                 <div class="input-group" style="width:100%">
-                                                    <input class="form-control" placeholder="AAAA-MM-DD" 
-                                                    [ngModelOptions]="{standalone: true}"
-                                                    [(ngModel)]="fplazo" ngbDatepicker #fd="ngbDatepicker" 
-                                                    [placement]="placement" [positionTarget]="buttonEl">
+                                                    <input class="form-control" placeholder="AAAA-MM-DD"
+                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="fplazo"
+                                                        ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+                                                        [positionTarget]="buttonEl">
                                                     <div class="input-group-append">
-                                                        <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+                                                        <button #buttonEl class="btn calendario" (click)="fd.toggle()"
+                                                            type="button"></button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -252,49 +256,46 @@
                                     </div>
 
                                     <div class="form-group col-md-6">
-                                        <label >Privacidad / Nivel de Acceso</label>
-                                        <select class="form-control" 
-                                            [ngModelOptions]="{standalone: true}"
-                                            [(ngModel)]="Doc.privacidad"  value ="{{Doc.privacidad}}">
+                                        <label>Privacidad / Nivel de Acceso</label>
+                                        <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="Doc.privacidad" value="{{Doc.privacidad}}">
                                             <option value="0">PUBLICO</option>
                                             <option value="1">CONFIDENCIAL</option>
                                         </select>
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="">Código de Archivo</label>
-                                        <input type="text" class="form-control" 
-                                        [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.codigo" value="{{ Doc.codigo }}">
+                                        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="Doc.codigo" value="{{ Doc.codigo }}">
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="">Expediente</label>
-                                        <input type="text" class="form-control" 
-                                        [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
+                                        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
                                     </div>
-                                    
-                                    
-                                </div> 
-                                
+
+
+                                </div>
+
                             </div>
-                            <div class="col-md-4" >
+                            <div class="col-md-4">
                                 <label for="txtobservacion">Lista de Asociación</label>
-                                <textarea class="form-control" name="" id="observacion" 
-                                cols="30" rows="6"   readonly></textarea>
-                            </div>  
+                                <textarea class="form-control" name="" id="observacion" cols="30" rows="6"
+                                    readonly></textarea>
+                            </div>
                         </div>
                         <hr>
-                        <div class="row">                   
+                        <div class="row">
                             <div class="col-md-12">
                                 <div class="text-right">
-                                    <button class="btn bg-primary text-white" (click) = "registrar()">Aceptar</button>
-                                </div>                           
-                            </div>                   
-                        </div>                               
+                                    <button class="btn bg-primary text-white" (click)="registrar()">Aceptar</button>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
-        </div>   
+        </div>
     </div>
 
 
@@ -303,6 +304,54 @@
 
 
 
+    <!-- Adjuntar Imagenes al Documento -->
+    <ng-template #archivos let-c="close" let-d="dismiss">
+        <div class="modal-header header bg-gradient-success">
+            <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
+
+        </div>
+        <div class="modal-body">
+
+
+            <div class="form-group row">
+
+                <div class="form-group col-md-4" *ngFor="let img of lstImg">
+                    <div class="card card-profile">
+                        <div class="card-header bg-info" 
+                            style="background-image: url('./assets/img/theme/inn.svg'); height: 64px;">
+                            <div class="card-avatar text-center" >
+                                <a href="javascript:;">
+                                    <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
+                                        style="width:64px;z-index: 1; margin-top: -5px;">
+                                </a>
+                            </div>
+                        </div>
+                        <br>
+
+                        <div class="card-body pt-0">
+                            <div class="d-flex justify-content-between">
+                                <a href="javascript:;" class="btn btn-sm  btn-primary mt-3">Descargar</a>
+                                <a href="javascript:;" class="btn btn-sm btn-default float-right mt-3">Historial</a>
+                            </div>
+                            <br><br>
+                            <div class="text-center">
+                                <div class="font-weight-50">
+                                    Publicado<span class="font-weight-light">, 2022-07-05</span>
+                                    <br>
+                                    <h5 class="h4" style="font-size: 10px;">0c521f27fb1b3311d686d511b668e5bd4</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
 
 
 
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+                <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+        </div>
+    </ng-template>

@@ -1,15 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Pipe, SecurityContext } from '@angular/core';
 import { IDocumento, IWKFAlerta } from '../../../services/control/documentos.service'
 import { ApiService, IAPICore} from 'src/app/services/apicore/api.service';
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 import { LoginService } from 'src/app/services/seguridad/login.service'
 import { ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
  
+
+
+
+
 @Component({
   selector: 'app-constancia',
   templateUrl: './constancia.component.html',
-  styleUrls: ['./constancia.component.scss']
+  styleUrls: ['./constancia.component.scss'],
+  
 })
+
+
+
 export class ConstanciaComponent implements OnInit {
 
 
@@ -57,9 +66,12 @@ export class ConstanciaComponent implements OnInit {
   public lstTraza = []
   public lstHistorial = []
 
+  public safeHtml : SafeHtml
+
 
   constructor(
     private apiService: ApiService,
+    private domSanitizer: DomSanitizer,
     private loginService: LoginService,
     private rutaActiva: ActivatedRoute,
     public formatter: NgbDateParserFormatter,) { }
@@ -107,8 +119,10 @@ export class ConstanciaComponent implements OnInit {
           this.lstHistorial = historial.map(e => {
             return typeof e == 'object'?e: JSON.parse(e)
           })
-
-         
+          //this.safeHtml = this.domSanitizer.bypassSecurityTrustHtml(this.Doc.contenido)
+          //console.log(this.safeHtml);
+          this.Doc.contenido = this.domSanitizer.sanitize(SecurityContext.HTML, this.Doc.contenido)
+          console.log(this.lstTraza);
         });
       },
       (error) => {

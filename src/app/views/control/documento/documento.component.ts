@@ -120,6 +120,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   public lstTraza = []
   public lstHistorial = []
+  public lstImg = []
   public titulo = 'Documento'
 
 
@@ -585,6 +586,17 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.puntocuenta = false
     this.lstCuenta = []
     if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') this.puntocuenta = true
+  }
+
+
+
+  //Listar los archivos asociados al documento
+  verArchivos(content){
+    this.lstImg.push({a:1})
+    this.lstImg.push({a:1})
+    this.lstImg.push({a:1})
+    this.modalService.open(content, { size:'lg' })
+
   }
 
   ngOnDestroy(): void {
