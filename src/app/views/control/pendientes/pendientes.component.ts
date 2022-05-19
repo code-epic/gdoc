@@ -51,15 +51,13 @@ export class PendientesComponent implements OnInit {
 
   }
 
-
   seleccionLista(event) {
     this.longitud = 0;
-    this.pageSize = 10;
-    
+
     if (event.charCode == 13) {
       const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
       this.longitud = this.bzBusqueda.length
-      this.bzBusqueda = this.bzSeguimientoO.filter((e) => { return patron.test(e.busqueda)})
+      this.bzBusqueda = this.bzSeguimientoO.filter((e) => { return patron.test(e.busqueda) })
       this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize)
     }
 
@@ -72,12 +70,12 @@ export class PendientesComponent implements OnInit {
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
-          e.busqueda = this.utilService.ConvertirCadena( 
+          e.busqueda = this.utilService.ConvertirCadena(
             e.ncontrol + ' ' + e.contenido + e.estatus_nombre + ' ' + e.remitente + ' ' + e.nombre
             + ' ' + e.creado
-            )
+          )
           return e
-        } )
+        })
 
         this.bzBusqueda = this.bzSeguimientoO
         this.longitud = this.bzBusqueda.length
@@ -101,6 +99,7 @@ export class PendientesComponent implements OnInit {
 
 
   pageChangeEvent(e) {
+    this.pageSize = e.pageSize
     this.recorrerElementos(e.pageIndex)
   }
 
@@ -108,6 +107,7 @@ export class PendientesComponent implements OnInit {
     let pag = this.pageSize * pagina
     this.bzSeguimiento = this.bzBusqueda.slice(pag, pag + this.pageSize)
   }
+
   insertarObservacion() {
 
   }
@@ -115,10 +115,10 @@ export class PendientesComponent implements OnInit {
 
 
   //Consultar un enlace
-  constancia(id: string){
+  constancia(id: string) {
     const estado = 1
     const estatus = 1
-    return  btoa(estado + ',' + estatus + ',' + id)
+    return btoa(estado + ',' + estatus + ',' + id)
     //this.ruta.navigate(['/constancia', base])
   }
 

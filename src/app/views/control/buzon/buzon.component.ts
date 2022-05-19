@@ -84,6 +84,7 @@ export class BuzonComponent implements OnInit {
   selNav = 0
 
   public bzRecibido = []
+  public bzRecibido0 = []
   public bzProcesados = []
   public bzPendientes = []
   public bzCerrados = []
@@ -150,21 +151,33 @@ export class BuzonComponent implements OnInit {
   }
 
 
+  // seleccionLista(event) {
+  //   this.longitud = 0;
+  //   this.pageSize = 10;
+  //   const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
+  //   if (event.charCode == 13) {
+  //     this.longitud = this.bzBusqueda.length
+  //     if (this.posicionPagina == 3) {
+  //       this.bzBusqueda = this.bzAlertasO.filter((e) => {
+  //         return patron.test(this.utilService.ConvertirCadena(e.busqueda))
+  //       })
+  //       this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+  //     }
+  //     this.buscar = ''
+  //   }
+  // }
   seleccionLista(event) {
     this.longitud = 0;
-    this.pageSize = 10;
-    const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
+
     if (event.charCode == 13) {
+      const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
       this.longitud = this.bzBusqueda.length
-      if (this.posicionPagina == 3) {
-        this.bzBusqueda = this.bzAlertasO.filter((e) => {
-          return patron.test(this.utilService.ConvertirCadena(e.busqueda))
-        })
-        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
-      }
-      this.buscar = ''
+      this.bzRecibido = this.bzAlertasO.filter((e) => { return patron.test(e.busqueda) })
+      this.bzAlertasO = this.bzRecibido.slice(0, this.pageSize)
     }
+
   }
+
 
 
 
@@ -262,8 +275,6 @@ export class BuzonComponent implements OnInit {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
-        console.log(data)
-
         data.Cuerpo.forEach(e => {
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
@@ -273,10 +284,12 @@ export class BuzonComponent implements OnInit {
           bz.push(e)
         })//Registros recorridos como elementos
 
-        this.longitud = data.Cuerpo.length
+        //this.longitud = data.Cuerpo.length
+        this.longitud = this.bzRecibido.length
         if (this.longitud > 0) {
           this.estilocheck = ''
-          this.recorrerElementos(1, this.bzRecibido)
+          this.bzRecibido0=this.bzRecibido
+          this.recorrerElementos(0)
         }
 
       },
@@ -287,8 +300,13 @@ export class BuzonComponent implements OnInit {
   }
 
 
+  // pageChangeEvent(e) {
+  //   this.pageSize = e.pageSize
+  //   this.recorrerElementos(e.pageIndex +1, this.lst)
+  // }
   pageChangeEvent(e) {
-    this.recorrerElementos(e.pageIndex + 1, this.lst)
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex)
   }
 
   updateAllComplete() {
@@ -316,11 +334,20 @@ export class BuzonComponent implements OnInit {
 
 
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion: number, lista: any) {
-    if (posicion > 1) posicion = posicion * 10
-    this.lst = lista.slice(posicion, posicion + this.pageSize)
-
+  recorrerElementos(pagina: number) {
+    let pag = this.pageSize * pagina
+    console.log(pag)
+    console.log(this.pageSize)
+    this.bzRecibido = this.bzRecibido0.slice(pag, pag + this.pageSize)
+   
   }
+  // }
+  // recorrerElementos(pagina: number, lista: any) {
+  //   let pag = this.pageSize * pagina
+  //   this.lst = lista.slice(pag, pag + this.pageSize)
+  // }
+
+  
 
 
   //editar
@@ -421,7 +448,23 @@ export class BuzonComponent implements OnInit {
 
 
   async promoverBuzon(activo: number, sfecha: string) {
-    const fecha = sfecha == '' ? this.utilService.ConvertirFecha(this.extender_plazo) : sfecha
+    var fecha = ''
+    if (sfecha == '') {
+      console.log(this.extender_plazo)
+      if (this.extender_plazo == undefined) {
+        this.toastrService.warning(
+          'Debe seleccionar una fecha ',
+          `GDoc Wkf.DocumentoObservacion`
+        )
+        return false
+      } else {
+        fecha = this.utilService.ConvertirFecha(this.extender_plazo)
+      }
+    } else {
+      fecha = sfecha
+    }
+
+    sfecha == '' ? this.utilService.ConvertirFecha(this.extender_plazo) : sfecha
 
     var usuario = this.loginService.Usuario.id
     var i = 0
