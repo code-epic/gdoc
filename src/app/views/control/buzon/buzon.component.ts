@@ -105,7 +105,6 @@ export class BuzonComponent implements OnInit {
     private loginService: LoginService,
     private modalService: NgbModal) {
       
-
   }
 
   ngOnInit(): void {

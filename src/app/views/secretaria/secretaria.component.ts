@@ -43,19 +43,17 @@ export class SecretariaComponent implements OnInit {
   lst = []
   public lstEstados = [] //Listar Estados
 
-  lengthOfi = 0;
-  pageSizeOfi = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 100];
+  longitud = 0;
+  pageSize = 10;
+  pageSizeOptions: number[] = [5, 10, 25, 50,  100];
 
   // MatPaginator Output
   pageEvent: PageEvent;
 
   selNav = 0
 
-  public bzRecibido = []
-  public bzProcesados = []
-  public bzPendientes = []
-  public bzCerrados = []
+  public buzon = []
+  public bzOriginal = []
 
   public estilocheck = 'none'
 
@@ -106,10 +104,6 @@ export class SecretariaComponent implements OnInit {
 
   public extender_plazo: any
 
-  longitud = 0;
-  pageSize = 10;
-
-
   public posicionPagina = 0
   public placement = 'bottom'
 
@@ -132,7 +126,6 @@ export class SecretariaComponent implements OnInit {
   ngOnInit(): void {
     this.listarEstados()
     this.seleccionNavegacion(0)
-    this.ConsultarAlertas()
 
   }
 
@@ -193,44 +186,37 @@ export class SecretariaComponent implements OnInit {
   }
 
   seleccionNavegacion(e) {
-    this.bzRecibido = []
-    this.bzProcesados = []
-    this.bzPendientes = []
-    this.bzCerrados = []
+    this.buzon = []
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
     this.selNav = e
     this.vministerial = true
     this.tministerial = '4'
+    this.cargarAcciones(e)
     switch (e) {
       case 0:
-        this.cargarAcciones(0)
+        
         this.clasificacion = false
         this.vministerial = false
         this.tministerial = '12'
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
-        this.listarBuzon(this.bzRecibido)
+        this.listarBuzon()
         break
       case 1:
-        this.cargarAcciones(1)
         this.clasificacion = false
 
         this.xAPI.funcion = 'WKF_CSubDocumento'
         this.xAPI.parametros = this.estadoActual + ',' + 2
-        this.listarBuzon(this.bzProcesados)
+        this.listarBuzon()
         break
       case 2:
-        this.cargarAcciones(2)
         this.clasificacion = false
 
         this.xAPI.parametros = this.estadoActual + ',' + 3
-        this.listarBuzon(this.bzPendientes)
+        this.listarBuzon()
         break
-      case 4:
-        this.xAPI.parametros = this.estadoActual + ',' + 4
-        this.listarBuzon(this.bzCerrados)
-        break
-      default:
+      case 3:
+        this.ConsultarAlertas()
         break
     }
 
@@ -251,7 +237,8 @@ export class SecretariaComponent implements OnInit {
     )
   }
 
-  async listarBuzon(bz: any) {
+  async listarBuzon() {
+    var bz = []
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         data.Cuerpo.forEach(e => {
@@ -263,10 +250,11 @@ export class SecretariaComponent implements OnInit {
           bz.push(e)
         })//Registros recorridos como elementos
 
-        this.lengthOfi = data.Cuerpo.length
-        if (this.lengthOfi > 0) {
+        this.longitud = bz.length
+        if (this.longitud > 0) {
           this.estilocheck = ''
-          this.recorrerElementos(1, this.bzRecibido)
+          this.bzOriginal = bz
+          this.recorrerElementos(0)
         }
 
       },
@@ -277,37 +265,16 @@ export class SecretariaComponent implements OnInit {
   }
 
 
+
   pageChangeEvent(e) {
-    this.recorrerElementos(e.pageIndex + 1, this.lst)
-  }
-
-  updateAllComplete() {
-    this.allComplete = this.bzRecibido != null && this.bzRecibido.every(t => t.completed);
-  }
-
-  setAll(completed: boolean) {
-    this.allComplete = completed;
-    if (this.bzRecibido == null) {
-      return;
-    }
-
-    this.bzRecibido.forEach(t => (t.completed = completed));
-    if (completed == false) {
-      this.estiloclasificar = 'none'
-    } else {
-      this.estiloclasificar = ''
-    }
-  }
-
-  someComplete(): boolean {
-    if (this.bzRecibido == null) return false;
-    return this.bzRecibido.filter(t => t.completed).length > 0 && !this.allComplete;
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex)
   }
 
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion: number, lista: any) {
-    if (posicion > 1) posicion = posicion * 10
-    this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
+  recorrerElementos(pagina: number) {
+    let pag = this.pageSize * pagina
+    this.buzon = this.bzOriginal.slice(pag, pag + this.pageSize)
 
   }
 
