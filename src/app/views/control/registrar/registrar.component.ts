@@ -108,6 +108,9 @@ export class RegistrarComponent implements OnInit {
   };
   public strRuta: string = ''
 
+  public bzOriginal = [] //Listado Original
+  public buzon = []
+
 
   public bzBusqueda = []
   public bzAlertasO = []
@@ -139,7 +142,6 @@ export class RegistrarComponent implements OnInit {
     this.editor = new Editor();
     this.listarEstados()
     this.listarBuzon(0)
-    this.ConsultarAlertas()
 
   }
 
@@ -157,9 +159,6 @@ export class RegistrarComponent implements OnInit {
       this.buscar = ''
     }
   }
-
-
-
 
 
   async ConsultarAlertas() {
@@ -222,15 +221,13 @@ export class RegistrarComponent implements OnInit {
   }
 
 
-
-
   listarEstados() {
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstEstados = data.Cuerpo.filter(e => {return e.esta == 1});
+        this.lstEstados = data.Cuerpo.filter(e => { return e.esta == 1 });
       },
       (error) => {
 
@@ -239,24 +236,27 @@ export class RegistrarComponent implements OnInit {
   }
 
   listarBuzon(e) {
+    var bz = []
+
     this.selNav = e
     this.seleccionNavegacion()
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
-        this.bzRegistrados = data.Cuerpo.map((e)=> {
+        bz = data.Cuerpo.map((e) => {
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
-          e.simbolo = e.tdoc =='PUNTO DE CUENTA'?'( + )': '  ' 
+          e.simbolo = e.tdoc == 'PUNTO DE CUENTA' ? '( + )' : '  '
           e.completed = false
           return e
         })//Registros recorridos como elementos
 
-        this.lengthOfi = data.Cuerpo.length
-        if (this.lengthOfi > 0) {
+        this.longitud = bz.length
+        if (this.longitud > 0) {
           this.estilocheck = ''
-          this.recorrerElementos(1, this.bzRegistrados)
+          this.bzOriginal = bz
+          this.recorrerElementos(0)
         }
 
       },
@@ -268,7 +268,8 @@ export class RegistrarComponent implements OnInit {
 
 
   pageChangeEvent(e) {
-    this.recorrerElementos(e.pageIndex + 1, this.lst)
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex)
   }
 
 
@@ -283,31 +284,34 @@ export class RegistrarComponent implements OnInit {
       case 1:
         this.xAPI.parametros = '1,2'
         break;
+      case 2:
+        this.ConsultarAlertas()
+        break;
       default:
         break;
     }
   }
 
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion: number, lista: any) {
-    if (posicion > 1) posicion = posicion * 10
-    this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
+  recorrerElementos(pagina: number) {
+    let pag = this.pageSize * pagina
+    this.buzon = this.bzOriginal.slice(pag, pag + this.pageSize)
 
   }
 
   //editar
   editar(id: string) {
     const estado = this.estadoActual
-    const estatus = this.selNav + 1 
+    const estatus = this.selNav + 1
     const base = btoa(estado + ',' + estatus + ',' + id)
     this.ruta.navigate(['/documento', base])
   }
 
   //Consultar un enlace
-  constancia(id: string){
+  constancia(id: string) {
     const estado = 1
     const estatus = 1
-    return  btoa(estado + ',' + estatus + ',' + id)
+    return btoa(estado + ',' + estatus + ',' + id)
     //this.ruta.navigate(['/constancia', base])
   }
 
@@ -488,7 +492,7 @@ export class RegistrarComponent implements OnInit {
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
-            i++  
+            i++
             if (cantidad == i) this.imprimir()
           },
           (errot) => {
