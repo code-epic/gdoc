@@ -82,7 +82,7 @@
               </mat-selection-list>
 
               <mat-selection-list #lstDocumentos>
-                <mat-list *ngFor="let e of bzRegistrados; let i=index "
+                <mat-list *ngFor="let e of buzon; let i=index "
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
@@ -123,7 +123,7 @@
               </mat-selection-list>
             </div>
 
-            <mat-paginator [length]="lengthOfi" (page)="pageChangeEvent($event)" [pageSize]="pageSizeOfi"
+            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
 
