@@ -55,7 +55,8 @@
           </div>
         </div>
 
-        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs">
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
+        (selectedIndexChange)="seleccionNavegacion($event)">
           <mat-tab>
             <ng-template mat-tab-label>
               &nbsp;REGISTRADOS
@@ -201,7 +202,7 @@
 
             <div class="container">
               <mat-selection-list #lstAlertas>
-                <mat-list *ngFor="let e of bzAlertas; let i=index "
+                <mat-list *ngFor="let e of buzon; let i=index "
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-2 texto-lista">

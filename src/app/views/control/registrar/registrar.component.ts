@@ -141,7 +141,7 @@ export class RegistrarComponent implements OnInit {
   ngOnInit(): void {
     this.editor = new Editor();
     this.listarEstados()
-    this.listarBuzon(0)
+    this.seleccionNavegacion(0)
 
   }
 
@@ -166,7 +166,7 @@ export class RegistrarComponent implements OnInit {
     this.xAPI.parametros = '1,1'
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.bzAlertasO = data.Cuerpo.map((e) => {
+        this.bzAlertas = data.Cuerpo.map((e) => {
           e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
           e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
           e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto
@@ -176,9 +176,12 @@ export class RegistrarComponent implements OnInit {
           return e
         }
         )
-        this.bzBusqueda = this.bzAlertasO
-        this.longitud = this.bzBusqueda.length
-        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+        // this.bzBusqueda = this.bzAlertasO
+        this.longitud = this.bzAlertas.length
+        // this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+        this.bzOriginal = this.bzAlertas
+        this.pageSize = 10
+        this.recorrerElementos(0)
       },
       (error) => {
 
@@ -235,15 +238,10 @@ export class RegistrarComponent implements OnInit {
     )
   }
 
-  listarBuzon(e) {
+  listarBuzon() {
     var bz = []
-
-    this.selNav = e
-    this.seleccionNavegacion()
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-
         bz = data.Cuerpo.map((e) => {
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
@@ -256,6 +254,7 @@ export class RegistrarComponent implements OnInit {
         if (this.longitud > 0) {
           this.estilocheck = ''
           this.bzOriginal = bz
+          this.pageSize = 10
           this.recorrerElementos(0)
         }
 
@@ -273,16 +272,19 @@ export class RegistrarComponent implements OnInit {
   }
 
 
-  seleccionNavegacion() {
+  seleccionNavegacion(e) {
+    this.selNav = e
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
-
-    switch (this.selNav) {
+    
+    switch (e) {
       case 0:
         this.xAPI.parametros = '1,1'
+        this.listarBuzon()
         break;
       case 1:
         this.xAPI.parametros = '1,2'
+        this.listarBuzon()
         break;
       case 2:
         this.ConsultarAlertas()
@@ -535,7 +537,7 @@ export class RegistrarComponent implements OnInit {
           `GDoc Wkf.ReversarDocumento`
         );
         this.bzRegistrados = []
-        this.listarBuzon(0)
+        this.seleccionNavegacion(0)
 
 
 
