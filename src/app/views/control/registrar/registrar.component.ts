@@ -108,6 +108,9 @@ export class RegistrarComponent implements OnInit {
   };
   public strRuta: string = ''
 
+  public bzOriginal = [] //Listado Original
+  public buzon = []
+
 
   public bzBusqueda = []
   public bzAlertasO = []
@@ -138,8 +141,7 @@ export class RegistrarComponent implements OnInit {
   ngOnInit(): void {
     this.editor = new Editor();
     this.listarEstados()
-    this.listarBuzon(0)
-    this.ConsultarAlertas()
+    this.seleccionNavegacion(0)
 
   }
 
@@ -159,15 +161,12 @@ export class RegistrarComponent implements OnInit {
   }
 
 
-
-
-
   async ConsultarAlertas() {
     this.xAPI.funcion = 'WKF_CAlertas'
     this.xAPI.parametros = '1,1'
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.bzAlertasO = data.Cuerpo.map((e) => {
+        this.bzAlertas = data.Cuerpo.map((e) => {
           e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
           e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
           e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto
@@ -177,9 +176,12 @@ export class RegistrarComponent implements OnInit {
           return e
         }
         )
-        this.bzBusqueda = this.bzAlertasO
-        this.longitud = this.bzBusqueda.length
-        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+        // this.bzBusqueda = this.bzAlertasO
+        this.longitud = this.bzAlertas.length
+        // this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+        this.bzOriginal = this.bzAlertas
+        this.pageSize = 10
+        this.recorrerElementos(0)
       },
       (error) => {
 
@@ -222,15 +224,13 @@ export class RegistrarComponent implements OnInit {
   }
 
 
-
-
   listarEstados() {
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstEstados = data.Cuerpo.filter(e => {return e.esta == 1});
+        this.lstEstados = data.Cuerpo.filter(e => { return e.esta == 1 });
       },
       (error) => {
 
@@ -238,25 +238,24 @@ export class RegistrarComponent implements OnInit {
     )
   }
 
-  listarBuzon(e) {
-    this.selNav = e
-    this.seleccionNavegacion()
-
+  listarBuzon() {
+    var bz = []
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-
-        this.bzRegistrados = data.Cuerpo.map((e)=> {
+        bz = data.Cuerpo.map((e) => {
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
-          e.simbolo = e.tdoc =='PUNTO DE CUENTA'?'( + )': '  ' 
+          e.simbolo = e.tdoc == 'PUNTO DE CUENTA' ? '( + )' : '  '
           e.completed = false
           return e
         })//Registros recorridos como elementos
 
-        this.lengthOfi = data.Cuerpo.length
-        if (this.lengthOfi > 0) {
+        this.longitud = bz.length
+        if (this.longitud > 0) {
           this.estilocheck = ''
-          this.recorrerElementos(1, this.bzRegistrados)
+          this.bzOriginal = bz
+          this.pageSize = 10
+          this.recorrerElementos(0)
         }
 
       },
@@ -268,20 +267,27 @@ export class RegistrarComponent implements OnInit {
 
 
   pageChangeEvent(e) {
-    this.recorrerElementos(e.pageIndex + 1, this.lst)
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex)
   }
 
 
-  seleccionNavegacion() {
+  seleccionNavegacion(e) {
+    this.selNav = e
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
-
-    switch (this.selNav) {
+    
+    switch (e) {
       case 0:
         this.xAPI.parametros = '1,1'
+        this.listarBuzon()
         break;
       case 1:
         this.xAPI.parametros = '1,2'
+        this.listarBuzon()
+        break;
+      case 2:
+        this.ConsultarAlertas()
         break;
       default:
         break;
@@ -289,25 +295,25 @@ export class RegistrarComponent implements OnInit {
   }
 
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion: number, lista: any) {
-    if (posicion > 1) posicion = posicion * 10
-    this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
+  recorrerElementos(pagina: number) {
+    let pag = this.pageSize * pagina
+    this.buzon = this.bzOriginal.slice(pag, pag + this.pageSize)
 
   }
 
   //editar
   editar(id: string) {
     const estado = this.estadoActual
-    const estatus = this.selNav + 1 
+    const estatus = this.selNav + 1
     const base = btoa(estado + ',' + estatus + ',' + id)
     this.ruta.navigate(['/documento', base])
   }
 
   //Consultar un enlace
-  constancia(id: string){
+  constancia(id: string) {
     const estado = 1
     const estatus = 1
-    return  btoa(estado + ',' + estatus + ',' + id)
+    return btoa(estado + ',' + estatus + ',' + id)
     //this.ruta.navigate(['/constancia', base])
   }
 
@@ -488,7 +494,7 @@ export class RegistrarComponent implements OnInit {
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
-            i++  
+            i++
             if (cantidad == i) this.imprimir()
           },
           (errot) => {
@@ -531,7 +537,7 @@ export class RegistrarComponent implements OnInit {
           `GDoc Wkf.ReversarDocumento`
         );
         this.bzRegistrados = []
-        this.listarBuzon(0)
+        this.seleccionNavegacion(0)
 
 
 
