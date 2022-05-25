@@ -57,14 +57,14 @@
                     <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
                     <form role="form">
                         <div class="form-row">
-                            <div class="form-group col-md-2">
+                            <div class="form-group col-md-{{camposalida}}">
                                 <label for="txtControl"> {{ncontrolt}} </label>
                                 <input type="text" class="form-control" id="txtControl"
                                     [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.ncontrol"
                                     [readonly]="ncontrolv">
                             </div>
 
-                            <div class="form-group col-md-3">
+                            <div class="form-group col-md-3" *ngIf="forigenv">
                                 <label for="tmsOrigen">Fecha Origen (*) </label>
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
@@ -83,8 +83,8 @@
                                     </div>
                                 </form>
                             </div>
-                            <div class="form-group col-md-3">
-                                <label for="tmsCreacion">Fecha Recepción (*) </label>
+                            <div class="form-group col-md-{{camposfechasalida}}">
+                                <label for="tmsCreacion">{{fsalida}}</label>
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
@@ -101,12 +101,12 @@
                                     </div>
                                 </form>
                             </div>
-                            <div class="form-group col-md-2">
+                            <div class="form-group col-md-2" *ngIf="origenvisible">
                                 <label for="txtOrigen">Nro. Origen (*) </label>
                                 <input type="txtOrigen" class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Doc.norigen">
                             </div>
-                            <div class="form-group col-md-2" *ngIf="salidavisible">
+                            <div class="form-group col-md-{{camponumsalida}}" *ngIf="salidavisible">
                                 <label for="txtSalida">{{salida}}</label>
                                 <input type="txtSalida" class="form-control" value="{{Doc.salida}}"
                                     [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.salida">
@@ -123,7 +123,7 @@
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
-                                <label for="cmbRemitente">Remitente</label>
+                                <label for="cmbRemitente">{{remitentet}}</label>
                                 <select class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Doc.remitente" value="{{Doc.remitente}}">
                                     <option value="0">Seleccione</option>
