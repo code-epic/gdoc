@@ -314,44 +314,54 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = JSON.stringify(this.WkDoc)
   }
 
-  // insertarObservacion() {
-  //   if (this.AccionTexto == "S") {
-  //     this.toastrService.warning(
-  //       'Debe seleccionar una accion ',
-  //       `GDoc Wkf.DocumentoObservacion`
-  //     )
-  //     return false
-  //   }
-  //   const usuario = this.loginService.Usuario.id
-  //   this.xAPI.funcion = 'WKF_IDocumentoObservacion'
-  //   this.xAPI.valores = JSON.stringify(
-  //     {
-  //       "documento": this.numControl,
-  //       "estado": this.estadoActual, //Estado que ocupa
-  //       "estatus": this.selNav + 1,
-  //       "observacion": this.Observacion.toUpperCase(),
-  //       "accion": this.AccionTexto,
-  //       "usuario": usuario
-  //     }
-  //   )
+  insertarObservacion() {
+    const usuario = this.loginService.Usuario.id
+    this.xAPI.funcion = 'WKF_IDocumentoObservacion'
+    this.xAPI.valores = JSON.stringify(
+      {
+        "documento": this.Doc.ncontrol,
+        "estado": this.estadoActual, //Estado que ocupa
+        "estatus": this.estadoOrigen,
+        "observacion": 'DOCUMENTO EDITADO EN SALIDA',
+        "accion": '20',
+        "usuario": usuario
+      }
+    )
 
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
 
-  //   this.xAPI.parametros = ''
-  //   this.apiService.Ejecutar(this.xAPI).subscribe(
-  //     async data => {
-  //       switch (this.AccionTexto) {
-  //         case "0"://Aceptar y promover el documento
-  //           this.promoverBuzon(0, this.utilService.FechaActual())
-  //           break;
-  //         case "1"://Rechazar en el estado inicial
-  //           this.rechazarBuzon()
-  //           break;
-  //       }
-  //     },
-  //     (errot) => {
-  //       this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
-  //     }) //
-  // }
+        this.guardarAlerta(1,this.WAlerta.fecha)
+
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
+      }) //
+  }
+
+  //Guardar la alerte define el momento y estadus
+  guardarAlerta(activo: number, fecha: string) {
+    this.WAlerta.activo = activo
+    this.WAlerta.documento = parseInt(this.Doc.ncontrol)
+    this.WAlerta.estado = this.estadoActual
+    this.WAlerta.estatus = this.estadoOrigen
+    this.WAlerta.usuario = this.loginService.Usuario.id
+    this.WAlerta.observacion = 'DOCUMENTO EDITADO EN SALIDA'
+    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
+
+    this.xAPI.funcion = 'WKF_AAlertas'
+    this.xAPI.parametros = ''
+    console.log(this.WAlerta);
+    this.xAPI.valores = JSON.stringify(this.WAlerta)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async alerData => {
+        console.log(alerData)
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
+      }) //
+  }
 
   //registrar Un documento pasando por el WorkFlow
   registrar() {
