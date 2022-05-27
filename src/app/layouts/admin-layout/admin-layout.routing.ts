@@ -26,6 +26,7 @@ import { RsbuzonComponent } from 'src/app/views/resoluciones/rsbuzon/rsbuzon.com
 import { RsentradasComponent } from 'src/app/views/resoluciones/rsentradas/rsentradas.component';
 import { ReportesComponent } from 'src/app/views/reportes/reportes.component';
 import { ConstanciaComponent } from 'src/app/views/reportes/constancia/constancia.component';
+import { MinisterialComponent } from 'src/app/views/secretaria/ministerial/ministerial.component';
 
 
 
@@ -178,6 +179,11 @@ export const AdminLayoutRoutes: Routes = [
     { 
         path: 'constancia/:id', 
         component: ConstanciaComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'ministerial/:id', 
+        component: MinisterialComponent,
         canActivate:[AuthGuardGuard] 
     }
 ];

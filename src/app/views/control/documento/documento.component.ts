@@ -645,9 +645,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.xAPI.parametros = ''
       this.lstCuenta[0].documento = numc
       this.lstCuenta[0].fecha = this.Doc.fcreacion
-      console.log(this.lstCuenta[0]);
+      //console.log(this.lstCuenta[0]);
       this.xAPI.valores = JSON.stringify(this.lstCuenta[0])
-      console.info(this.xAPI);
+      //console.info(this.xAPI);
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           this.lstCuenta.splice(0, 1)

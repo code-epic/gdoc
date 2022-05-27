@@ -64,7 +64,7 @@ export class NavbarComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         sessionStorage.removeItem('token')
-        window.location.href = './';
+        window.location.href = './gdoc';
       }
     })    
   }
