@@ -81,20 +81,18 @@ export class SecretariaComponent implements OnInit {
     { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
     { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
     { 'valor': '2', 'texto': 'ANALISTA', 'visible': '1' },
-    { 'valor': '3', 'texto': 'CUENTA PRESIDENCIAL', 'visible': '1' },
-    { 'valor': '4', 'texto': 'SUB-DIRECCION', 'visible': '1' },
-    { 'valor': '5', 'texto': 'DIRECCION DEL DESPACHO', 'visible': '1' },
-    { 'valor': '6', 'texto': 'TITULAR DEL DESPACHO', 'visible': '1' },
+    { 'valor': '3', 'texto': 'JEFE DE AREA', 'visible': '1' },
+    { 'valor': '4', 'texto': 'BANDEJA DE ESPERA', 'visible': '1' },
+    { 'valor': '5', 'texto': 'PRESIDENCIAL', 'visible': '1' },
+    { 'valor': '6', 'texto': 'ESPERA DE OPINION', 'visible': '1' },
     { 'valor': '7', 'texto': 'CONSULTORIA JURIDICA', 'visible': '1' },
-    { 'valor': '8', 'texto': 'DIV. DE RESOLUCIONES', 'visible': '1' },
-    { 'valor': '9', 'texto': 'ESPERA DE OPINION', 'visible': '1' },
+    { 'valor': '8', 'texto': 'AREA DE RESOLUCIONES', 'visible': '1' },
+    { 'valor': '9', 'texto': 'SUB-DIRECCION', 'visible': '1' },
+    { 'valor': '9', 'texto': 'DIRECCION GENERAL', 'visible': '1' },
+    { 'valor': '9', 'texto': 'DESPACHO DEL MPPD', 'visible': '1' },
     { 'valor': '10', 'texto': 'SALIDA', 'visible': '2' }]
 
-  public lstEstatus = [
-    { 'valor': '6', 'texto': 'TITULAR DEL DESPACHO', 'visible': '0' },
-    { 'valor': '7', 'texto': 'CONSULTORIA JURIDICA', 'visible': '0' },
-    { 'valor': '8', 'texto': 'DIV. DE RESOLUCIONES', 'visible': '0' },
-    { 'valor': '9', 'texto': 'ESPERA DE OPINION', 'visible': '0' }]
+
 
 
   public bzBusqueda = []
@@ -279,12 +277,13 @@ export class SecretariaComponent implements OnInit {
   }
 
   //editar
-  editar(id: string) {
-    const estado = this.estadoActual
-    const estatus = this.selNav + 1 
-    const base = btoa(estado + ',' + estatus + ',' + id)
-    this.ruta.navigate(['/documento', base])
+  editar(e) {
+    
+    const base = btoa( JSON.stringify(e))
+    this.ruta.navigate(['/ministerial', base])
   }
+
+
 
 
   insertarObservacion() {

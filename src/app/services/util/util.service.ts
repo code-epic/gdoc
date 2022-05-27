@@ -13,9 +13,15 @@ export class UtilService {
   }
 
 
-  //Retorna la fecha actual del sistema en formato YYYY-MM-DD
-  FechaActual(): string {
+  /**
+   * Fecha Actual del sistema desde la application
+   * @param dias sumar dias a la fecha actual 
+   * @returns retorna la fecha actual del sistema en formato YYYY-MM-DD
+   */
+  FechaActual(dias : number = 0): string {
     let date = new Date()
+
+    if (dias > 0) date.setDate(date.getDate() + dias)
 
     let output = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
     return output
@@ -24,6 +30,8 @@ export class UtilService {
   ConvertirFecha(fecha: any): string {
     return fecha.year + '-' + + fecha.month + '-' + fecha.day
   }
+
+
 
 
   Semillero(id: string): string {
