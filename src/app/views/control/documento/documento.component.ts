@@ -25,6 +25,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   public ncontrolv = true // visibilidad del input numero de control
   public ncontrolt = 'Nro. Control'
+  public remitentet = 'Remitente'
+  public origenvisible: boolean = true // Visibilidad del Input Numero de Origen
+  public fsalida = 'Fecha de Creación (*)'
+  public forigenv = true // Visibilidad de Input Fecha Origen
+
+  public camposalida = 2
+  public camposfechasalida = 3
+  public camponumsalida = 2
+
 
   masterSelected: boolean;
   checklist: any;
@@ -34,7 +43,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   title = 'Documentos';
-  placement = 'bottom';
+  placement = 'bottom-start';
 
   lineCountCache: number = 0;
   PosicionCuenta: number = -1;
@@ -54,11 +63,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public puntocuenta: boolean = false
   public salidavisible: boolean = true
 
-
   public detalle: string = ''
   public cuenta: string = ''
   public resumen: string = ''
-  public salida: string = 'Salida Asociada'
+  public salida: string = 'Nro. de Salida'
 
 
   public WkDoc: IWKFDocumento = {
@@ -157,13 +165,28 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.estadoOrigen = 2
         this.ncontrolv = false
         this.salidavisible = false
+        this.origenvisible = false
+        this.forigenv = false
         this.ncontrolt = 'Nro de Salida'
+        this.remitentet = 'Destinatario'
+        this.fsalida = 'Fecha de Salida'
+        this.camposalida = 4
+        this.camposfechasalida = 4
+
+
+        if (this.rutaActiva.snapshot.params.numc != undefined) {
+          var numc = this.rutaActiva.snapshot.params.numc
+          this.ncontrolt = 'Nro de Control'
+          this.ncontrolv = true
+          this.salidavisible = true
+          this.camponumsalida = 4
+          
+          this.consultarDocumento(numc)
+        }
 
       } else {
         this.consultarDocumento(id)
       }
-
-
 
     } else {
       this.limpiarDoc()
@@ -251,20 +274,20 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         });
 
         this.selTipoDocumento()
-        const punto_cuenta = this.Doc.subdocumento!=null? JSON.parse(this.Doc.subdocumento): []
+        const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
         this.lstCuenta = punto_cuenta.map(e => {
-          return typeof e == 'object'?e: JSON.parse(e)
+          return typeof e == 'object' ? e : JSON.parse(e)
         })
-        const traza = this.Doc.traza!=null?JSON.parse(this.Doc.traza):[]
+        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
         this.lstTraza = traza.map(e => {
-          return typeof e == 'object'?e: JSON.parse(e)
+          return typeof e == 'object' ? e : JSON.parse(e)
         })
-        const historial = this.Doc.historial!=null?JSON.parse(this.Doc.historial):[]
+        const historial = this.Doc.historial != null ? JSON.parse(this.Doc.historial) : []
         this.lstHistorial = historial.map(e => {
-          return typeof e == 'object'?e: JSON.parse(e)
+          return typeof e == 'object' ? e : JSON.parse(e)
         })
 
-        
+
       },
       (error) => {
         console.error(error)
@@ -291,6 +314,55 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = JSON.stringify(this.WkDoc)
   }
 
+  insertarObservacion() {
+    const usuario = this.loginService.Usuario.id
+    this.xAPI.funcion = 'WKF_IDocumentoObservacion'
+    this.xAPI.valores = JSON.stringify(
+      {
+        "documento": this.Doc.ncontrol,
+        "estado": this.estadoActual, //Estado que ocupa
+        "estatus": this.estadoOrigen,
+        "observacion": 'DOCUMENTO EDITADO EN SALIDA',
+        "accion": '20',
+        "usuario": usuario
+      }
+    )
+
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+
+        this.guardarAlerta(1,this.WAlerta.fecha)
+
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
+      }) //
+  }
+
+  //Guardar la alerte define el momento y estadus
+  guardarAlerta(activo: number, fecha: string) {
+    this.WAlerta.activo = activo
+    this.WAlerta.documento = parseInt(this.Doc.ncontrol)
+    this.WAlerta.estado = this.estadoActual
+    this.WAlerta.estatus = this.estadoOrigen
+    this.WAlerta.usuario = this.loginService.Usuario.id
+    this.WAlerta.observacion = 'DOCUMENTO EDITADO EN SALIDA'
+    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
+
+    this.xAPI.funcion = 'WKF_AAlertas'
+    this.xAPI.parametros = ''
+    console.log(this.WAlerta);
+    this.xAPI.valores = JSON.stringify(this.WAlerta)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async alerData => {
+        console.log(alerData)
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
+      }) //
+  }
+
   //registrar Un documento pasando por el WorkFlow
   registrar() {
     console.log(this.Doc);
@@ -305,6 +377,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
       if (id != 'salida') {
+        this.actualizarDocumentos()
+        return
+      } else  if (this.rutaActiva.snapshot.params.numc != undefined) {
+        var numc = this.rutaActiva.snapshot.params.numc
         this.actualizarDocumentos()
         return
       }
@@ -591,11 +667,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   //Listar los archivos asociados al documento
-  verArchivos(content){
-    this.lstImg.push({a:1})
-    this.lstImg.push({a:1})
-    this.lstImg.push({a:1})
-    this.modalService.open(content, { size:'lg' })
+  verArchivos(content) {
+    this.lstImg.push({ a: 1 })
+    this.lstImg.push({ a: 1 })
+    this.lstImg.push({ a: 1 })
+    this.modalService.open(content, { size: 'lg' })
 
   }
 
