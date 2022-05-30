@@ -102,10 +102,13 @@
                   <mat-list *ngFor="let e of lstProyectos; let i=index "
                     style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                     <div class="row">
+                      <div class="col-md-1 texto-lista">
+                        {{ utilService.zfill(e.id, 4) }}
+                      </div>
                       <div class="col-md-3 texto-lista">
                         {{ e.nombre | uppercase }}
                       </div>
-                      <div class="col-md-3 texto-lista">
+                      <div class="col-md-2 texto-lista">
                         {{ e.ente | uppercase }}
                       </div>
                       <div class="col-md-2 texto-lista">
@@ -123,9 +126,9 @@
                         <button mat-icon-button aria-label="Avance" (click)="open(avance, e.id)">
                           <mat-icon class="text-info">add_circle</mat-icon>
                         </button>
-                        <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
+                        <!-- <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
                           <mat-icon class="text-purple">delete</mat-icon>
-                        </button>
+                        </button> -->
 
 
                       </div>

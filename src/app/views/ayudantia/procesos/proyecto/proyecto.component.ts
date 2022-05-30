@@ -24,6 +24,7 @@ export class ProyectoComponent implements OnInit {
 
 
   public id : string = ''
+  public identificador : number = 0
 
   editor: Editor = new Editor;
 
@@ -65,6 +66,7 @@ export class ProyectoComponent implements OnInit {
   ]
 
   public Proyecto: Proyecto = {
+    identificador : 0,
     nombre: '',
     tipo: '',
     sistema_armas: '',
@@ -150,7 +152,6 @@ export class ProyectoComponent implements OnInit {
   }
 
   async guardar() {
-
     if (this.Proyecto.nombre == '' || this.Proyecto.tipo == '' || this.fdesde == '' || this.Proyecto.objeto == '' || this.fhasta == '' || this.monto_total == '') {
       this.toastrService.warning('Debe ingresar los campos marcados con (*) ya que son requeridos ', `GDoc MPPD Modificar Proyecto`)
       return
@@ -158,20 +159,19 @@ export class ProyectoComponent implements OnInit {
     this.xAPI.funcion = 'MPPD_IProyecto'
     this.xAPI.parametros = ''
     this.Proyecto.usuario = this.loginService.Usuario.id
-    this.Proyecto.fecha_desde = this.utilService.ConvertirFecha(this.fdesde)
-    this.Proyecto.fecha_hasta = this.utilService.ConvertirFecha(this.fhasta)
-    this.Proyecto.fecha_origen = this.utilService.ConvertirFecha(this.flapso)
-
-    console.log(this.Proyecto);
+    if (this.rutaActiva.snapshot.params.id != undefined) {
+      this.xAPI.funcion = 'MPPD_AProyecto'
+    }else {
+      this.Proyecto.fecha_desde = this.utilService.ConvertirFecha(this.fdesde)
+      this.Proyecto.fecha_hasta = this.utilService.ConvertirFecha(this.fhasta)
+      this.Proyecto.fecha_origen = this.utilService.ConvertirFecha(this.flapso)
+    }
     this.xAPI.valores = JSON.stringify(this.Proyecto)
-    console.log(this.xAPI)
-
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.aceptar(data.msj)
+        this.aceptar(this.Proyecto.identificador == 0? data.msj:'' + this.Proyecto.identificador )
         this.ngxService.stopLoader("loader-aceptar")
         this.limpiarFrm()
-
       },
       (errot) => {
 
@@ -184,7 +184,7 @@ export class ProyectoComponent implements OnInit {
 
   protected aceptar(msj: string) {
     Swal.fire({
-      title: 'El Proyecto ha sido  Registrado #' + this.utilService.zfill(msj, 4),
+      title: 'El Proyecto ha sido  procesado #' + this.utilService.zfill(msj, 4),
       text: "¿Desea registar otro documento?",
       icon: 'info',
       showCancelButton: true,

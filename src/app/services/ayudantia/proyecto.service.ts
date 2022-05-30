@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 
 
 export interface Proyecto {
+  identificador ?: number
   nombre: string
   tipo: string
   sistema_armas: string
