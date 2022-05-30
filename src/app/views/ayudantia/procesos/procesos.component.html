@@ -4,6 +4,8 @@
   </div>
 </div>
 <div class="container-fluid mt--9">
+  <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
+  
   <div class="row">
     <div class="col-xl-12 col-md-12 col-lg-12">
       <div class="card shadow">
@@ -217,8 +219,8 @@
           <div class="form-group" style="width:100%">
             <div class="input-group" style="width:100%">
               <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-                [(ngModel)]="Avance.lapso" ngbDatepicker #fo="ngbDatepicker" [value]="formatter.format(favance)"
-                [placement]="placement" [positionTarget]="buttonEl">
+                [(ngModel)]="Avance.fecha" ngbDatepicker #fo="ngbDatepicker" 
+                [placement]="placement" [positionTarget]="buttonEl" readonly>
               <div class="input-group-append">
                 <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button">
                 </button>
@@ -253,12 +255,11 @@
 
 
     <form method="post" enctype="multipart/form-data" id="forma" name="forma">
-      <input type="hidden" name="txtFileID" id="txtFileID" [ngModelOptions]="{standalone: true}"
-        [(ngModel)]="id" value="{{id}}" readonly="readonly">
+      <input type="hidden" name="txtFileID" id="txtFileID"  value="{{'PROY-' + id}}" readonly="readonly">
       <label for="input-folder-2">Seleccionar Archivo</label>
       <div class="file-loading">
         <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file"
-          multiple accept=".jpg .jpeg .png">
+          multiple accept=".jpg,.jpeg,.png">
       </div>
       <div id="errorBlock" class="help-block"></div>
     </form>
@@ -267,7 +268,7 @@
 
   </div>
   <div class="modal-footer">
-    <button class="btn bg-gradient-primary text-white " (click)="insertarObservacion();modal.close('Save')">
+    <button class="btn bg-gradient-primary text-white " (click)="SubirArchivo();modal.close('Save')">
       <span class="fa fa-check"></span>&nbsp;&nbsp;Agregar </button>
     <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>

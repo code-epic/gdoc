@@ -8,6 +8,9 @@ import { Avance } from 'src/app/services/ayudantia/proyecto.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { NgbModal, NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 
+import { ToastrService } from 'ngx-toastr';
+import { LoginService } from 'src/app/services/seguridad/login.service';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 
 @Component({
   selector: 'app-procesos',
@@ -30,10 +33,15 @@ export class ProcesosComponent implements OnInit {
   }
 
   public Avance : Avance = {
-    lapso: '',
+    fecha: '',
     ejecucion: '',
-    monto: ''
+    observacion: '',
+    monto: '',
+    archivo : '',
+    proyecto: 0
   }
+
+  public archivos = []
 
   public placement = 'bottom'
 
@@ -57,6 +65,9 @@ export class ProcesosComponent implements OnInit {
     private ruta: Router,
     public formatter: NgbDateParserFormatter,
     private rutaActiva: ActivatedRoute,
+    private toastrService: ToastrService,
+    private loginService : LoginService, 
+    private ngxService: NgxUiLoaderService,
     private utilService: UtilService) { }
 
   ngOnInit(): void {
@@ -109,6 +120,7 @@ export class ProcesosComponent implements OnInit {
         //   return e
         // }
         // )
+        console.log(data.Cuerpo)
         this.bzBusqueda = data.Cuerpo
         this.longitud = this.bzBusqueda.length
         this.lstProyectos = this.bzBusqueda.slice(0, this.pageSize)
@@ -178,5 +190,47 @@ export class ProcesosComponent implements OnInit {
     this.ruta.navigate(['/' + ruta, base])
   }
   
+  fileSelected(e) {
+    this.archivos.push(e.target.files[0])
+  }
+
+  async SubirArchivo(e) {
+    this.ngxService.startLoader("loader-aceptar")
+
+    var frm = new FormData(document.forms.namedItem("forma"))
+    try {
+      await this.apiService.EnviarArchivos(frm).subscribe(
+        (data) => {
+          this.xAPI.funcion = 'MPPD_IProyectoAvances'
+          this.xAPI.parametros = ''
+          this.Avance.proyecto = parseInt( this.id )
+          this.Avance.archivo =  'PROY-'  + this.id
+          this.Avance.fecha = this.utilService.ConvertirFecha(this.Avance.fecha)
+          this.xAPI.valores = JSON.stringify(this.Avance)
+          this.apiService.Ejecutar(this.xAPI).subscribe(
+            (xdata) => {
+              this.ngxService.stopLoader("loader-aceptar")
+              if (xdata.tipo == 1) {
+                
+                this.toastrService.success(
+                  'Tu archivo ha sido cargado con exito ',
+                  `GDoc Registro`
+                );
+              } else {
+                this.toastrService.error(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+              }
+            },
+            (error) => {
+              this.ngxService.stopLoader("loader-aceptar")
+              this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
+            }
+          )
+        }
+      )
+    } catch (error) {
+      console.error(error)
+    }
+
+  }
 
 }

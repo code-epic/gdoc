@@ -31,7 +31,9 @@ export interface Proyecto {
 }
 
 export interface Avance {
-  lapso: string
+  proyecto : number
+  fecha: string
+  archivo : string
   ejecucion: string
   monto: string
   observacion?: string
