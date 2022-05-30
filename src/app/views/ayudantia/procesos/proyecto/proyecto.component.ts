@@ -92,6 +92,7 @@ export class ProyectoComponent implements OnInit {
   }
 
   public Paises = []
+  monto_total: string;
 
   constructor(
     private apiService: ApiService,
@@ -150,8 +151,8 @@ export class ProyectoComponent implements OnInit {
 
   async guardar() {
 
-    if ( this.id != '') {
-      this.toastrService.warning('Actualizacion pendiente', `GDoc MPPD Modificar Proyecto`)
+    if (this.Proyecto.nombre == '' || this.Proyecto.tipo == '' || this.fdesde == '' || this.Proyecto.objeto == '' || this.fhasta == '' || this.monto_total == '') {
+      this.toastrService.warning('Debe ingresar los campos marcados con (*) ya que son requeridos ', `GDoc MPPD Modificar Proyecto`)
       return
     }
     this.xAPI.funcion = 'MPPD_IProyecto'

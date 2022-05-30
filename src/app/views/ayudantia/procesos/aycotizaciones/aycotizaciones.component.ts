@@ -23,7 +23,7 @@ interface Cotizaciones {
   total: number
   pagado: number
   deuda: number
-  garantia: number
+  garantia: string
   moneda: string
   lapso: string
   modalidad: string
@@ -80,7 +80,7 @@ export class AycotizacionesComponent implements OnInit {
     total: 0,
     pagado: 0,
     deuda: 0,
-    garantia: 0,
+    garantia: '',
     moneda: '',
     lapso: '',
     modalidad: '',
@@ -90,6 +90,7 @@ export class AycotizacionesComponent implements OnInit {
     usuario: '',
     obseravacion: ''
   }
+  total: string;
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
     private utilService: UtilService,
@@ -134,8 +135,8 @@ export class AycotizacionesComponent implements OnInit {
   }
   async guardar() {
 
-    if ( this.id != '') {
-      this.toastrService.warning('Actualizacion pendiente', `GDoc MPPD Modificar Cotizaciones`)
+    if (this.Cotizaciones.nombre == '' || this.Cotizaciones.objeto == '' || this.total == '' || this.fecha == '' || this.vigencia == '') {
+      this.toastrService.warning('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc MPPD Modificar Cotizaciones`)
       return
     }
     console.log(this.Cotizaciones);
@@ -190,7 +191,7 @@ export class AycotizacionesComponent implements OnInit {
     this.Cotizaciones.total = 0
     this.Cotizaciones.pagado = 0
     this.Cotizaciones.deuda = 0
-    this.Cotizaciones.garantia = 0
+    this.Cotizaciones.garantia = ''
     this.Cotizaciones.moneda = ''
     this.Cotizaciones.lapso = ''
     this.Cotizaciones.modalidad = ''
