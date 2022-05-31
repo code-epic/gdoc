@@ -133,6 +133,7 @@ export class AycotizacionesComponent implements OnInit {
       }
     )
   }
+  
   async guardar() {
 
     if (this.Cotizaciones.nombre == '' || this.Cotizaciones.objeto == '' || this.total == '' || this.fecha == '' || this.vigencia == '') {
