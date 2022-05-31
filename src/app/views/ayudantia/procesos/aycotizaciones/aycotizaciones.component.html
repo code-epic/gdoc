@@ -53,19 +53,19 @@
                     <form>
                         <div class="form-row">
                             <div class="form-group col-md-4">
-                                <label > Nombre de la Empresa </label>
+                                <label > Nombre de la Empresa (*) </label>
                                 <input type="text" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}" class="form-control">
                             </div>
                             <div class="form-group col-md-4">
-                                <label for="tmsOrigen">Fecha</label>
+                                <label for="tmsOrigen">Fecha (*)</label>
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
                                                 [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
                                                 ngbDatepicker #fe="ngbDatepicker" [value]="formatter.format(ffecha)"
-                                                [placement]="placement" [positionTarget]="buttonEl">
+                                                [placement]="placement" [positionTarget]="buttonEl" readonly>
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="fe.toggle()"
                                                     type="button">
@@ -76,14 +76,14 @@
                                 </form>
                             </div>
                             <div class="form-group col-md-4">
-                                <label for="tmsOrigen">Vigencia</label>
+                                <label for="tmsOrigen">Vigencia (*)</label>
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
                                                 [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia"
                                                 ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
-                                                [placement]="placement" [positionTarget]="buttonEl">
+                                                [placement]="placement" [positionTarget]="buttonEl" readonly>
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="vi.toggle()"
                                                     type="button">
@@ -96,7 +96,7 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-12">
-                                <label for="txtObjeto">Objeto de la Cotización</label>
+                                <label for="txtObjeto">Objeto de la Cotización (*)</label>
                                 <div class="NgxEditor__Wrapper">
                                     <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
                                     <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor"
@@ -110,25 +110,35 @@
 
                         <div class="form-row">
                            
-                            <div class="form-group col-md-3">
+                            <div class="form-group col-md-2">
                                 <label> Tiempo de Ejecución </label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
                                    
                                     [(ngModel)]="Cotizaciones.lapso" value="{{Cotizaciones.lapso}}">
                             </div>
+                            <div class="form-group col-md-1">
+                                <label> Moneda </label>
+                                <select type="number" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Cotizaciones.moneda" value="{{Cotizaciones.moneda}}"
+                                    (blur)="restar()">
+                                    <option value="VEB">VEB</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="CNY">CNY</option>
+                                </select>
+
+                            </div>
                             <div class="form-group col-md-3">
-                                <label> Monto Total </label>
+                                <label> Monto Total (*)</label>
                                 <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Cotizaciones.total" value="{{Cotizaciones.total}}"
-                                    (blur)="restar()"
-                                    >
+                                    (blur)="restar()">
                             </div>
                             <div class="form-group col-md-3">
                                 <label>Monto Pagado</label>
                                 <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Cotizaciones.pagado" value="{{Cotizaciones.pagado}}" 
-                                    (blur)="restar()"
-                                >
+                                    (blur)="restar()">
                             </div>
                             <div class="form-group col-md-3">
                                 <label>Deuda</label>
@@ -141,7 +151,7 @@
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label>Garantía</label>
-                                <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Cotizaciones.garantia" value="{{Cotizaciones.garantia}}">
                             </div>
                             <div class="form-group col-md-4">

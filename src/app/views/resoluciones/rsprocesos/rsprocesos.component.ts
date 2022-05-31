@@ -29,11 +29,7 @@ export class RsprocesosComponent implements OnInit {
     valores: ''
   }
 
-  public Avance : Avance = {
-    lapso: '',
-    ejecucion: '',
-    monto: ''
-  }
+
 
   public placement = 'bottom'
 

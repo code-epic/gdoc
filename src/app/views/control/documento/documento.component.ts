@@ -180,7 +180,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.ncontrolv = true
           this.salidavisible = true
           this.camponumsalida = 4
-          
+
           this.consultarDocumento(numc)
         }
 
@@ -314,54 +314,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = JSON.stringify(this.WkDoc)
   }
 
-  insertarObservacion() {
-    const usuario = this.loginService.Usuario.id
-    this.xAPI.funcion = 'WKF_IDocumentoObservacion'
-    this.xAPI.valores = JSON.stringify(
-      {
-        "documento": this.Doc.ncontrol,
-        "estado": this.estadoActual, //Estado que ocupa
-        "estatus": this.estadoOrigen,
-        "observacion": 'DOCUMENTO EDITADO EN SALIDA',
-        "accion": '20',
-        "usuario": usuario
-      }
-    )
-
-    this.xAPI.parametros = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-
-        this.guardarAlerta(1,this.WAlerta.fecha)
-
-      },
-      (errot) => {
-        this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
-      }) //
-  }
-
-  //Guardar la alerte define el momento y estadus
-  guardarAlerta(activo: number, fecha: string) {
-    this.WAlerta.activo = activo
-    this.WAlerta.documento = parseInt(this.Doc.ncontrol)
-    this.WAlerta.estado = this.estadoActual
-    this.WAlerta.estatus = this.estadoOrigen
-    this.WAlerta.usuario = this.loginService.Usuario.id
-    this.WAlerta.observacion = 'DOCUMENTO EDITADO EN SALIDA'
-    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
-
-    this.xAPI.funcion = 'WKF_AAlertas'
-    this.xAPI.parametros = ''
-    console.log(this.WAlerta);
-    this.xAPI.valores = JSON.stringify(this.WAlerta)
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async alerData => {
-        console.log(alerData)
-      },
-      (errot) => {
-        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
-      }) //
-  }
 
   //registrar Un documento pasando por el WorkFlow
   registrar() {
@@ -379,7 +331,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       if (id != 'salida') {
         this.actualizarDocumentos()
         return
-      } else  if (this.rutaActiva.snapshot.params.numc != undefined) {
+      } else if (this.rutaActiva.snapshot.params.numc != undefined) {
         var numc = this.rutaActiva.snapshot.params.numc
         this.actualizarDocumentos()
         return
@@ -526,7 +478,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
         this.ngxService.stopLoader("loader-aceptar")
-        this.ruta.navigate(['/registrar']);
+        
+        if (this.rutaActiva.snapshot.params.id != undefined && this.rutaActiva.snapshot.params.id == 'salida') {
+          this.insertarObservacion()
+          
+        }else{
+          this.ruta.navigate(['/registrar']);
+        }
+        
+        
 
       },
       (errot) => {
@@ -539,6 +499,61 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
+  insertarObservacion() {
+    const usuario = this.loginService.Usuario.id
+    this.xAPI.funcion = 'WKF_IDocumentoObservacion'
+    console.log(this.Doc)
+    this.xAPI.valores = JSON.stringify(
+      {
+        "documento": this.Doc.wfdocumento,
+        "estado": this.estadoActual, //Estado que ocupa
+        "estatus": this.estadoOrigen,
+        "observacion": 'DOCUMENTO EDITADO EN SALIDA',
+        "accion": '20',
+        "usuario": usuario
+      }
+    )
+    console.log(this.xAPI)
+
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+
+        console.log('Guardando Observacion')
+
+        await this.guardarAlerta(1)
+        //this.ruta.navigate(['/salidas']);
+
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
+      }) //
+  }
+
+  //Guardar la alerte define el momento y estadus
+  guardarAlerta(activo: number) {
+    
+    this.WAlerta.activo = activo
+    this.WAlerta.documento = this.Doc.wfdocumento
+    this.WAlerta.estado = this.estadoActual
+    this.WAlerta.estatus = this.estadoOrigen
+    this.WAlerta.usuario = this.loginService.Usuario.id
+    this.WAlerta.observacion = 'DOCUMENTO EDITADO EN SALIDA'
+
+    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
+
+    this.xAPI.funcion = 'WKF_AAlertas'
+    this.xAPI.parametros = ''
+    console.log(this.WAlerta);
+    this.xAPI.valores = JSON.stringify(this.WAlerta)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async alerData => {
+        console.log(alerData)
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
+      }) //
+  }
   agregarCuenta(): IWKFCuenta {
     console.log(this.lstCuenta);
     if (this.cuenta == '' ||
