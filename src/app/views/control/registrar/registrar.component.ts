@@ -10,9 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { AngularFileUploaderComponent } from 'angular-file-uploader';
 import { environment } from 'src/environments/environment';
-
 import Swal from 'sweetalert2'
-
 import { Md5 } from "md5-typescript";
 import { UtilService } from 'src/app/services/util/util.service';
 

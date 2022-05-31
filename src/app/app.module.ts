@@ -58,6 +58,7 @@ import { RsentradasComponent } from './views/resoluciones/rsentradas/rsentradas.
 import { ReportesComponent } from './views/reportes/reportes.component';
 import { ConstanciaComponent } from './views/reportes/constancia/constancia.component';
 import { MinisterialComponent } from './views/secretaria/ministerial/ministerial.component';
+import { FichaproyectoComponent } from './views/reportes/fichaproyecto/fichaproyecto.component';
 
 
 
@@ -166,7 +167,8 @@ const ngWizardConfig: NgWizardConfig = {
     RsentradasComponent,
     ReportesComponent,
     ConstanciaComponent,
-    MinisterialComponent
+    MinisterialComponent,
+    FichaproyectoComponent
   ],
   providers:  [
     {

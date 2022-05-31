@@ -20,7 +20,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 export class ProcesosComponent implements OnInit {
 
   xobser: Editor = new Editor;
-  public id : string = ''
+  public id: string = ''
 
   public lstProyectos = []
   public lstCotizaciones = []
@@ -32,12 +32,12 @@ export class ProcesosComponent implements OnInit {
     valores: ''
   }
 
-  public Avance : Avance = {
+  public Avance: Avance = {
     fecha: '',
     ejecucion: '',
     observacion: '',
     monto: '',
-    archivo : '',
+    archivo: '',
     proyecto: 0
   }
 
@@ -47,7 +47,7 @@ export class ProcesosComponent implements OnInit {
 
   public buscar = ''
 
-  public favance : NgbDate | null
+  public favance: NgbDate | null
 
   public posicionPagina = 0
 
@@ -60,20 +60,20 @@ export class ProcesosComponent implements OnInit {
   // MatPaginator Output
   pageEvent: PageEvent;
 
-  constructor( private apiService: ApiService,
+  constructor(private apiService: ApiService,
     private modalService: NgbModal,
     private ruta: Router,
     public formatter: NgbDateParserFormatter,
     private rutaActiva: ActivatedRoute,
     private toastrService: ToastrService,
-    private loginService : LoginService, 
+    private loginService: LoginService,
     private ngxService: NgxUiLoaderService,
     private utilService: UtilService) { }
 
   ngOnInit(): void {
     this.ConsultarProyectos()
     this.xobser = new Editor()
-   
+
 
   }
 
@@ -82,7 +82,7 @@ export class ProcesosComponent implements OnInit {
     this.pageSize = 10;
     // const patron = new RegExp(this.convertirCadena(this.buscar))
     // if (event.charCode == 13) {
-      
+
     //   this.longitud = this.bzBusqueda.length
     //   if(this.posicionPagina == 0 ){
     //     this.bzBusqueda = this.bzSeguimientoO.filter((e) => {
@@ -101,8 +101,6 @@ export class ProcesosComponent implements OnInit {
     // }
 
   }
-
-  
 
 
   async ConsultarProyectos() {
@@ -131,12 +129,13 @@ export class ProcesosComponent implements OnInit {
     )
   }
 
+
   async ConsultarCotizaciones() {
     this.xAPI.funcion = 'MPPD_CCotizaciones'
     this.xAPI.parametros = ''
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
+
         this.bzBusqueda = data.Cuerpo
         this.longitud = this.bzBusqueda.length
         this.lstCotizaciones = this.bzBusqueda.slice(0, this.pageSize)
@@ -163,7 +162,7 @@ export class ProcesosComponent implements OnInit {
     this.posicionPagina = e
     if (e == 1) {
       this.ConsultarCotizaciones()
-    }else{
+    } else {
       this.ConsultarProyectos()
     }
   }
@@ -172,7 +171,7 @@ export class ProcesosComponent implements OnInit {
     this.recorrerElementos(e.pageIndex)
   }
 
-  recorrerElementos(pagina : number){
+  recorrerElementos(pagina: number) {
     let pag = this.pageSize
     pag = pag * pagina
 
@@ -181,15 +180,15 @@ export class ProcesosComponent implements OnInit {
     // }else{
     //   this.bzSeguimiento =  this.bzBusqueda.slice(pag, pag + this.pageSize)
     // }
-   
-   
+
+
   }
 
-  editar(ruta: string, id: string){
+  editar(ruta: string, id: string) {
     const base = btoa(id)
     this.ruta.navigate(['/' + ruta, base])
   }
-  
+
   fileSelected(e) {
     this.archivos.push(e.target.files[0])
   }
@@ -203,15 +202,15 @@ export class ProcesosComponent implements OnInit {
         (data) => {
           this.xAPI.funcion = 'MPPD_IProyectoAvances'
           this.xAPI.parametros = ''
-          this.Avance.proyecto = parseInt( this.id )
-          this.Avance.archivo =  'PROY-'  + this.id
+          this.Avance.proyecto = parseInt(this.id)
+          this.Avance.archivo = 'PROY-' + this.id
           this.Avance.fecha = this.utilService.ConvertirFecha(this.Avance.fecha)
           this.xAPI.valores = JSON.stringify(this.Avance)
           this.apiService.Ejecutar(this.xAPI).subscribe(
             (xdata) => {
               this.ngxService.stopLoader("loader-aceptar")
               if (xdata.tipo == 1) {
-                
+
                 this.toastrService.success(
                   'Tu archivo ha sido cargado con exito ',
                   `GDoc Registro`
