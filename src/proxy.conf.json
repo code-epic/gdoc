@@ -1,11 +1,11 @@
 {
     "/v1/api/*": {
-        "target": "https://10.120.0.58",
+        "target": "https://localhost",
         "secure": false,
         "logLevel": "debug"
     },
     "/devel/api/*": {
-        "target": "http://10.120.0.58",
+        "target": "http://localhost",
         "secure": false,
         "logLevel": "debug"
     }

@@ -16,6 +16,7 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 
 interface Cotizaciones {
+  identificador ?: number  
   nombre: string
   fecha: string
   vigencia: string
@@ -73,6 +74,7 @@ export class AycotizacionesComponent implements OnInit {
   }
 
   public Cotizaciones: Cotizaciones = {
+    identificador : 0,
     nombre: '',
     fecha: '',
     vigencia: '',
@@ -126,7 +128,7 @@ export class AycotizacionesComponent implements OnInit {
         this.Cotizaciones = data.Cuerpo[0]
         this.ffecha = NgbDate.from(this.formatter.parse(this.Cotizaciones.fecha.substring(0, 10)))
         this.fvigencia = NgbDate.from(this.formatter.parse(this.Cotizaciones.vigencia.substring(0, 10)))
-        console.log(this.fecha)
+        
       },
       (error) => {
 
@@ -139,23 +141,26 @@ export class AycotizacionesComponent implements OnInit {
       this.toastrService.warning('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc MPPD Modificar Cotizaciones`)
       return
     }
-    console.log(this.Cotizaciones);
+    
     this.xAPI.funcion = 'MPPD_ICotizaciones'
     this.xAPI.parametros = ''
     this.Cotizaciones.usuario = this.loginService.Usuario.id
 
-    this.Cotizaciones.fecha = this.utilService.ConvertirFecha(this.fecha)
-    this.Cotizaciones.vigencia = this.utilService.ConvertirFecha(this.vigencia)
-
+    if (this.rutaActiva.snapshot.params.id != undefined) {
+      this.xAPI.funcion = 'MPPD_ACotizacion'
+    }else {
+      this.Cotizaciones.fecha = this.utilService.ConvertirFecha(this.fecha)
+      this.Cotizaciones.vigencia = this.utilService.ConvertirFecha(this.vigencia)
+    }
+    
+    console.log(this.Cotizaciones);
     this.xAPI.valores = JSON.stringify(this.Cotizaciones)
     console.log(this.xAPI)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.limpiarFrm()
-
-        this.aceptar(data.msj)
+        this.aceptar(this.Cotizaciones.identificador == 0? data.msj:'' + this.Cotizaciones.identificador )
         this.ngxService.stopLoader("loader-aceptar")
-
       },
       (errot) => {
 
