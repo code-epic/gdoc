@@ -18,6 +18,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox'
 import { MatListModule } from '@angular/material/list'
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+import { CustomPaginator } from './paginator-intl';
 import { ControlComponent } from './views/control/control.component';
 import { SecretariaComponent } from './views/secretaria/secretaria.component';
 import { ResolucionesComponent } from './views/resoluciones/resoluciones.component';
@@ -177,6 +179,10 @@ const ngWizardConfig: NgWizardConfig = {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptorService,
       multi: true
+    },
+    { 
+      provide: MatPaginatorIntl, 
+      useValue: CustomPaginator() 
     }
   ],
   bootstrap: [AppComponent]
