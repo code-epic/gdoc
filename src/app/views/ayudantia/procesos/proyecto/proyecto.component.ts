@@ -30,6 +30,8 @@ export class ProyectoComponent implements OnInit {
 
   xeditor: Editor = new Editor;
 
+  public archivos = []
+
 
 
 
@@ -95,6 +97,7 @@ export class ProyectoComponent implements OnInit {
 
   public Paises = []
   monto_total: string;
+  modalService: any;
 
   constructor(
     private apiService: ApiService,
@@ -150,6 +153,41 @@ export class ProyectoComponent implements OnInit {
       }
     )
   }
+
+  open(content, id) {
+
+    this.modalService.open(content, { size: 'lg' });
+
+  }
+
+  fileSelected(e) {
+    this.archivos.push(e.target.files[0])
+  }
+
+  async SubirArchivo(e) {
+    this.ngxService.startLoader("loader-aceptar")
+    var frm = new FormData(document.forms.namedItem("forma"))
+    try {
+      await this.apiService.EnviarArchivos(frm).subscribe(
+        (data) => {
+          this.toastrService.success(
+            'Tu archivo ha sido cargado con exito ',
+            `GDoc SubDocumentos`
+          );
+          this.ngxService.stopLoader("loader-aceptar")
+        },
+        (error) => {
+          this.ngxService.stopLoader("loader-aceptar")
+          this.toastrService.error(error, `GDoc Wkf.SubDocumentos.Adjunto`);
+        }
+      )
+    } catch (error) {
+      console.error(error)
+    }
+
+  }
+
+
 
   async guardar() {
     if (this.Proyecto.nombre == '' || this.Proyecto.tipo == '' || this.fdesde == '' || this.Proyecto.objeto == '' || this.fhasta == '' || this.monto_total == '') {
