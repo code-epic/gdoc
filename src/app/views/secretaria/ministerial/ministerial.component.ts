@@ -7,6 +7,9 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
+
+import Swal from 'sweetalert2'
 
 
 export interface SubDocumento {
@@ -34,11 +37,15 @@ export class MinisterialComponent implements OnInit {
 
   public lstEstados = [] //Listar Estados
 
+  public original = ''
+
   public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
     valores: ''
   }
+
+  public codigohash = ''
 
   public lstAcciones = [
     { 'valor': '1', 'texto': 'ANALISTA', 'visible': '1' },
@@ -59,12 +66,18 @@ export class MinisterialComponent implements OnInit {
   public posicionPagina = 0
   public placement = 'bottom'
 
+  public cmbDestino = 'S'
 
   public asunto = ''
   public fecha = ''
   public cuenta = ''
   public unidad = ''
   public titulo = ''
+  public archivos = []
+
+
+
+  public lstRedistribucion = [{ 'valor': '1', 'texto': 'REDISTRIBUCION', 'visible': '1' }]
 
 
   public ministerial: any
@@ -110,19 +123,22 @@ export class MinisterialComponent implements OnInit {
     private rutaActiva: ActivatedRoute,
     private loginService: LoginService,
     public formatter: NgbDateParserFormatter,
+    private ngxService: NgxUiLoaderService,
     private modalService: NgbModal) { }
 
   ngOnInit(): void {
     this.editor = new Editor()
-    this.fplazo = NgbDate.from(this.formatter.parse( this.utilService.FechaActual()))
+    this.fplazo = NgbDate.from(this.formatter.parse(this.utilService.FechaActual()))
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
       try {
-        var json = atob(this.rutaActiva.snapshot.params.id)
-        this.ministerial = JSON.parse(json)
+        this.original = this.rutaActiva.snapshot.params.id
+        this.ministerial = JSON.parse(atob(this.original))
         this.listarDatos()
+        this.listarEstados()
+        this.cmbDestino = 'S'
+        this.codigohash = btoa(this.ministerial.id + this.ministerial.idd + this.ministerial.cuenta)
       } catch (error) {
-        console.error('accediendo a un area restringida')
         this.ruta.navigate(['/secretaria', ''])
       }
 
@@ -144,6 +160,15 @@ export class MinisterialComponent implements OnInit {
     )
   }
 
+  open(content, id) {
+
+    this.modalService.open(content, { size: 'lg' });
+
+  }
+
+
+
+
   listarDatos() {
     this.unidad = this.ministerial.udep
     this.cuenta = this.ministerial.cuenta
@@ -155,9 +180,10 @@ export class MinisterialComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
+
         if (data.Cuerpo != undefined && data.Cuerpo.length > 0) {
           this.SubDocumento = data.Cuerpo[0];
+          this.original = btoa(JSON.stringify(data.Cuerpo[0]))
           this.blUpdate = true
         }
       },
@@ -169,7 +195,7 @@ export class MinisterialComponent implements OnInit {
 
   }
 
-  selFecha(){
+  selFecha() {
     this.fecha_alerta = this.utilService.FechaActual()
     switch (this.SubDocumento.estatus) {
       case "5":
@@ -186,7 +212,7 @@ export class MinisterialComponent implements OnInit {
         break;
     }
     this.fplazo = NgbDate.from(this.formatter.parse(this.fecha_alerta))
-    
+
   }
 
   aceptar() {
@@ -197,7 +223,9 @@ export class MinisterialComponent implements OnInit {
     this.SubDocumento.usuario = this.loginService.Usuario.id
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.SubDocumento)
-    console.log(this.blUpdate)
+
+    this.ngxService.startLoader("loader-aceptar")
+
     if (this.blUpdate == false) {
       this.xAPI.funcion = 'WKF_ISubDocVariante'
       this.registrar()
@@ -210,10 +238,12 @@ export class MinisterialComponent implements OnInit {
 
   registrar() {
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data  => {
+      async data => {
         console.log(data);
         this.xAPI.funcion = 'WKF_ISubDocumentoAlerta'
         await this.guardarAlerta(90, this.fecha_alerta)
+        this.ngxService.stopLoader("loader-aceptar")
+        this._aceptar('')
       },
       (error) => {
 
@@ -225,9 +255,10 @@ export class MinisterialComponent implements OnInit {
     console.info('Actualizando informacion ', this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        console.log(data);
         this.xAPI.funcion = 'WKF_ASubDocumentoAlerta'
         await this.guardarAlerta(91, this.fecha_alerta)
+        this.ngxService.stopLoader("loader-aceptar")
+        this._aceptar('')
       },
       (error) => {
 
@@ -260,5 +291,56 @@ export class MinisterialComponent implements OnInit {
   }
 
 
+  protected _aceptar(msj: string) {
+    Swal.fire({
+      title: 'El punto de cuenta ha sido actualizado con exito ',
+      text: "Felicitaciones",
+      icon: 'info',
+      showCancelButton: false,
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'Continuar'
+    }).then((result) => {
+      this.ruta.navigate(['/secretaria']);
+    })
+  }
+
+
+
+  _atras() {
+    if (this.original != btoa(JSON.stringify(this.SubDocumento))) {
+      this.toastrService.warning('Debe guardar los cambios antes de salir de esta pantalla', `GDoc WKF_SubDocumentos`);
+    } else {
+      this.ruta.navigate(['/secretaria']);
+    }
+    return
+  }
+
+
+  fileSelected(e) {
+    this.archivos.push(e.target.files[0])
+  }
+
+  async SubirArchivo(e) {
+    this.ngxService.startLoader("loader-aceptar")
+    var frm = new FormData(document.forms.namedItem("forma"))
+    try {
+      await this.apiService.EnviarArchivos(frm).subscribe(
+        (data) => {
+          this.toastrService.success(
+            'Tu archivo ha sido cargado con exito ',
+            `GDoc SubDocumentos`
+          );
+          this.ngxService.stopLoader("loader-aceptar")
+        },
+        (error) => {
+          this.ngxService.stopLoader("loader-aceptar")
+          this.toastrService.error(error, `GDoc Wkf.SubDocumentos.Adjunto`);
+        }
+      )
+    } catch (error) {
+      console.error(error)
+    }
+
+  }
 
 }
