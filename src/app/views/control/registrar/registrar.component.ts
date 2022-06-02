@@ -242,7 +242,7 @@ export class RegistrarComponent implements OnInit {
   }
 
   async listarBuzon(): Promise<void> {
-
+ 
     this.ngxService.startLoader("loader-aceptar")
 try {
     this.apiService.Ejecutar(this.xAPI).subscribe(

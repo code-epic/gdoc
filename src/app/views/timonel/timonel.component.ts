@@ -148,7 +148,6 @@ export class TimonelComponent implements OnInit {
         });
       },
       (error) => {
-
       }
     )
   }
