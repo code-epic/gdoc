@@ -317,7 +317,8 @@ export class SalidasComponent implements OnInit {
     const estado = this.estadoActual
     const estatus = this.selNav + 1 
     const base = btoa(estado + ',' + estatus + ',' + id)
-    this.ruta.navigate(['/documento', base])
+    console.log(base)
+    this.ruta.navigate(['/documento/salida', base])
   }
 
 

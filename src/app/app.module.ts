@@ -59,6 +59,8 @@ import { RsbuzonComponent } from './views/resoluciones/rsbuzon/rsbuzon.component
 import { RsentradasComponent } from './views/resoluciones/rsentradas/rsentradas.component';
 import { ReportesComponent } from './views/reportes/reportes.component';
 import { ConstanciaComponent } from './views/reportes/constancia/constancia.component';
+import { MinisterialComponent } from './views/secretaria/ministerial/ministerial.component';
+import { FichaproyectoComponent } from './views/reportes/fichaproyecto/fichaproyecto.component';
 
 
 
@@ -166,7 +168,9 @@ const ngWizardConfig: NgWizardConfig = {
     RsbuzonComponent,
     RsentradasComponent,
     ReportesComponent,
-    ConstanciaComponent
+    ConstanciaComponent,
+    MinisterialComponent,
+    FichaproyectoComponent
   ],
   providers:  [
     {

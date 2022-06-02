@@ -53,12 +53,12 @@
                     <form>
                         <div class="form-row">
                             <div class="form-group col-md-6">
-                                <label for="txtNombre"> Nombre del Proyecto </label>
+                                <label for="txtNombre"> Nombre del Proyecto (*) </label>
                                 <input type="txtNombre" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Proyecto.nombre" value="{{Proyecto.nombre}}" class="form-control">
                             </div>
                             <div class="form-group col-md-{{campos}}">
-                                <label for="cmbTipo">Tipo de Proyecto</label>
+                                <label for="cmbTipo">Tipo de Proyecto (*)</label>
                                 <select class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Proyecto.tipo" value="{{Proyecto.tipo}}" (change)="selSistemaArmas()">
                                     <option value="0">Seleccione</option>
@@ -158,7 +158,7 @@
                             </div>
 
                             <div class="form-group col-md-{{camposotros}}">
-                                <label for="txtSistema">Sistema</label>
+                                <label for="txtSistema">Modelo</label>
                                 <input type="txtSistema" class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Proyecto.sistema" value="{{Proyecto.sistema}}">
                             </div>
@@ -167,14 +167,14 @@
 
                         <div class="form-row">
                             <div class="form-group col-md-4">
-                                <label for="tmsDesde">Fecha Desde</label>
+                                <label for="tmsDesde">Fecha Desde (*)</label>
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
                                                 [ngModelOptions]="{standalone: true}" [(ngModel)]="fdesde" ngbDatepicker
                                                 #fd="ngbDatepicker" [value]="formatter.format(fdesdeDate)"
-                                                [placement]="placement" [positionTarget]="buttonEl">
+                                                [placement]="placement" [positionTarget]="buttonEl" readonly>
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="fd.toggle()"
                                                     type="button">
@@ -193,7 +193,7 @@
                                             <input class="form-control" placeholder="AAAA-MM-DD"
                                                 [ngModelOptions]="{standalone: true}" [(ngModel)]="fhasta" ngbDatepicker
                                                 #fh="ngbDatepicker" [value]="formatter.format(fhastaDate)"
-                                                [placement]="placement" [positionTarget]="buttonEl">
+                                                [placement]="placement" [positionTarget]="buttonEl" readonly>
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="fh.toggle()"
                                                     type="button">
@@ -244,46 +244,27 @@
 
                         <div class="form-row">
                             <div class="form-group col-md-3">
-                                <label for="tmsOrigen">Fecha Origen</label>
-                                <form class="form-inline">
-                                    <div class="form-group" style="width:100%">
-                                        <div class="input-group" style="width:100%">
-                                            <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="flapso" ngbDatepicker
-                                                #fo="ngbDatepicker" [value]="formatter.format(flapsoDate)"
-                                                [placement]="placement" [positionTarget]="buttonEl">
-                                            <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="fo.toggle()"
-                                                    type="button">
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for="cmbMoneda">Tipo de Moneda</label>
+                                <label for="cmbMoneda">Moneda</label>
                                 <select class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Proyecto.moneda" value="{{Proyecto.moneda}}">
-                                    <option value="0">Seleccione</option>
-                                    <option value="1">BOLIVARES</option>
-                                    <option value="2">DÓLARES</option>
-                                    <option value="3">EUROS</option>
-                                    <option value="3">YUANES</option>
+                                    <option value="VEB">Bolivares (VEB)</option>
+                                    <option value="USD">Dolares (USD)</option>
+                                    <option value="EUR">Euros (EUR)</option>
+                                    <option value="CNY">Yuanes (CNY)</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-2">
+                            <div class="form-group col-md-3">
                                 <label for="txtMonto">Monto Total</label>
                                 <input type="number" class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Proyecto.monto_total" value="{{Proyecto.monto_total}}">
                             </div>
-                            <div class="form-group col-md-2">
+                            <div class="form-group col-md-3">
                                 <label for="nombre">Monto Pagado</label>
                                 <input type="number" class="form-control" (blur)="restar()"
                                     [ngModelOptions]="{standalone: true}" [(ngModel)]="Proyecto.monto_pagado"
                                     value="{{Proyecto.monto_pagado}}">
                             </div>
-                            <div class="form-group col-md-2">
+                            <div class="form-group col-md-3">
                                 <label for="txtDeuda">Deuda Pendiente</label>
                                 <input type="number" readonly class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Proyecto.monto_deuda" value="{{Proyecto.monto_deuda}}">

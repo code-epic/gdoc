@@ -13,7 +13,6 @@ import { environment } from 'src/environments/environment';
 import { NgxUiLoaderService } from 'ngx-ui-loader'
 
 import Swal from 'sweetalert2'
-
 import { Md5 } from "md5-typescript";
 import { UtilService } from 'src/app/services/util/util.service';
 
