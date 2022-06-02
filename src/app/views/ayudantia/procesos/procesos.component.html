@@ -153,6 +153,9 @@
                   <mat-list *ngFor="let e of lstCotizaciones; let i=index "
                     style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                     <div class="row">
+                      <div class="col-md-1 texto-lista">
+                        <a  routerLinkActive="active"  [routerLink]="['/cotizaciones', e.id]">{{ utilService.zfill(e.id, 4) }} &nbsp;</a>
+                      </div>
                       <div class="col-md-2 texto-lista">
                         {{ e.nombre | uppercase }}
                       </div>
@@ -162,7 +165,7 @@
                       <div class="col-md-2 texto-lista">
                         {{ e.modalidad | uppercase }}
                       </div>
-                      <div class="col-md-4 texto-lista">
+                      <div class="col-md-3 texto-lista">
                         {{ e.responsable | uppercase }}
                       </div>
 
@@ -171,9 +174,9 @@
                         <button mat-icon-button aria-label="Editar" (click)="editar('aycotizaciones', e.id )">
                           <mat-icon class="text-pink">edit_note</mat-icon>
                         </button>
-                        <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
+                        <!-- <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
                           <mat-icon class="text-purple">delete</mat-icon>
-                        </button>
+                        </button> -->
 
                       </div>
                     </div>

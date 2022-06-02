@@ -17,34 +17,20 @@
                         <div class="col-md-1">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
-                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                                        <mat-icon>reply</mat-icon>
+                                    <button mat-icon-button>
+                                        <mat-icon>wallpaper</mat-icon>
                                     </button>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-1">
-                            <ul class="navbar-nav align-items-right d-none d-md-flex">
-                                <li class="nav-item" ngbDropdown placement="bottom-right">
-                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                                        <div class="media align-items-center">
-                                            <div class="example-button-row">
-                                                <button mat-icon-button aria-label="">
-                                                    <mat-icon>more_vert</mat-icon>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                                        <a routerLinkActive="active" class="dropdown-item">
-                                            <i class="fa fa-plus"></i>
-                                            <span>Agregar Imagen</span>
-                                        </a>
-
-
-                                    </div>
-                                </li>
-                            </ul>
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>reply</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -148,7 +134,7 @@
                                     <option value="0">Seleccione</option>
                                     <option value="Presidencia">EJÉRCITO BOLIVARIANO</option>
                                     <option value="Ministerio">ARMADA BOLIVARIANA</option>
-                                    <option value="Presidencia">AVAIACIÓN MILITAR BOLIVARIANA</option>
+                                    <option value="Presidencia">AVIACIÓN MILITAR BOLIVARIANA</option>
                                     <option value="Ministerio">GUARDIA NACIONAL BOLIVARIANA</option>
                                     <option value="Presidencia">CODAI</option>
                                     <option value="Ministerio">COMANDO ÁEREO DEL EJERCITO BOLIVARIANO</option>
@@ -276,6 +262,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="text-right">
+                                    <!-- <button class="btn bg-purple text-white" (click)="open(adjuntar, id)">Agregar Fotos</button> -->
                                     <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
                                 </div>
                             </div>
@@ -285,3 +272,34 @@
             </div>
         </div>
     </div>
+</div>
+
+
+    <ng-template #adjuntar let-c="close" let-d="dismiss">
+        <div class="modal-header header bg-gradient-success">
+          <h4 class="modal-title" id="modal-basic-title">Cargar Archivo </h4>
+      
+        </div>
+        <div class="modal-body">
+      
+      
+          <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+            <input type="hidden" name="txtFileID" id="txtFileID" value="{{codigohash}}" readonly="readonly">
+            <label for="input-folder-2">Seleccionar Archivo</label>
+            <div class="file-loading">
+              <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file"
+                multiple accept=".pdf">
+            </div>
+            <div id="errorBlock" class="help-block"></div>
+          </form>
+      
+      
+      
+        </div>
+        <div class="modal-footer">
+          <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
+            <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
+          <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+            <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+        </div>
+    </ng-template>

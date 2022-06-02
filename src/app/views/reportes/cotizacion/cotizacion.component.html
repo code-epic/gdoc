@@ -23,57 +23,68 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-1">
+                            <ul class="navbar-nav align-items-right d-none d-md-flex">
+                                <li class="nav-item" ngbDropdown placement="bottom-right">
+                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                        <div class="media align-items-center">
+                                            <div class="example-button-row">
+                                                <button mat-icon-button aria-label="">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                        <a routerLinkActive="active" class="dropdown-item">
+                                            <i class="fa fa-plus"></i>
+                                            <span>Agregar Imagen</span>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
 
                     </div>
                 </div>
                 <div class="card-body">
 
-                    <h2 class="mb-0 text-center">{{Proyecto.nombre | uppercase}}</h2>
-                    <div class="form-row text-center">
-                        <div class="form-group col-md-6">
+                    <h2 class="mb-0 text-center">{{Cotizaciones.nombre | uppercase}}</h2>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
                             <table summary="" class="table table-bordered table-hover">
+
+                                <thead>
+                                    <tr>
+                                        <th data-priority="1">Número de Proyecto</th>
+                                        <th data-priority="2">Fecha de Origen</th>
+                                        <th data-priority="3">Fecha de Vigencia</th>
+                                        
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <tr>
-                                        <th>Número de Proyecto</th>
-                                        <td >{{utilService.zfill(Proyecto.identificador, 4)}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th data-priority="1">Sistema</th>
-                                        <td>{{Proyecto.sistema_armas}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th data-priority="1">Objeto</th>
-                                        <td>{{Proyecto.objeto}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th data-priority="1">Empresa que ejecuta el proyecto</th>
-                                        <td>{{Proyecto.empresa}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th data-priority="1">Lapso de ejecución del proyecto</th>
-                                        <td>{{Proyecto.fecha_desde}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th data-priority="1">Monto del contrato</th>
-                                        <td>{{Proyecto.monto_total}}&nbsp;{{Proyecto.moneda}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th data-priority="1">Monto pagado</th>
-                                        <td>{{Proyecto.monto_pagado}}&nbsp;{{Proyecto.moneda}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th data-priority="1">Monto pendiente</th>
-                                        <td>{{Proyecto.monto_deuda}}&nbsp;{{Proyecto.moneda}}</td>
+                                        <td>{{utilService.zfill(Cotizaciones.identificador, 4)}}</td>
+                                        <td>{{Cotizaciones.fecha}}</td>
+                                        <td>{{Cotizaciones.vigencia}}</td>
                                     </tr>
                                 </tbody>
                             </table>
                             <br>
-                        </div>
-                        <div class="form-group col-md-6">
                             <table summary="" class="table table-bordered table-hover">
+
+                                <thead>
+                                    <tr>
+                                        <th data-priority="1">Tipo de Documento</th>
+                                        <th data-priority="2">Remitente</th>
+                                        <th data-priority="3">Unidad o Dependencia</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <tr>
-                                        <th>Número de Proyecto</th>
+                                        <!-- <td>{{Proyecto.tipo | uppercase}}</td>
+                                        <td>{{Proyecto.remitente | uppercase}}</td>
+                                        <td>{{Proyecto.unidad | uppercase}}</td> -->
                                     </tr>
                                 </tbody>
                             </table>
@@ -88,7 +99,7 @@
                                 </tr>
                             </thead>
                         </table>
-                        <div class="form-group  col-md-12 text-justify" [innerHTML]="Proyecto.objeto"
+                        <div class="form-group  col-md-12 text-justify" [innerHTML]="Cotizaciones.objeto"
                             style="font-size: small; padding: 15px; border: 1px solid #ccc">
                         </div>
                         <table summary="" class="table table-bordered table-hover">
@@ -98,9 +109,9 @@
                                 </tr>
                             </thead>
                         </table>
-                        <div class="form-group  col-md-12 text-justify" [innerHTML]="Proyecto.observacion"
+                        <!-- <div class="form-group  col-md-12 text-justify" [innerHTML]="Cotizaciones.observacion"
                             style="padding: 15px; border: 1px solid #ccc">
-                        </div>
+                        </div> -->
                         <br>
 
                         <table summary="" class="table table-bordered table-hover">
@@ -157,10 +168,6 @@
                             </tbody>
                         </table>
                     </div>
-
-
-
-                 
                     <hr>
                     <div class="form-row">
                         <div class="form-group col-md-12" style="display: none;">
