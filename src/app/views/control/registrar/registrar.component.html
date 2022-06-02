@@ -55,7 +55,7 @@
           </div>
         </div>
 
-        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" 
         (selectedIndexChange)="seleccionNavegacion($event)">
           <mat-tab>
             <ng-template mat-tab-label>
@@ -63,6 +63,7 @@
             </ng-template>
 
             <div class="container">
+              <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
               <mat-selection-list #documento>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
@@ -73,7 +74,7 @@
                     </div>
                     <div class="col-md-2">
                       <button mat-icon-button aria-label="Example " (click)="open(content, 0)">
-                        <mat-icon>create_new_folder</mat-icon>
+                        <mat-icon>assignment_turned_in</mat-icon>
                       </button>
                     </div>
 
@@ -201,6 +202,7 @@
             </ng-template>
 
             <div class="container">
+              <ngx-ui-loader [loaderId]="'loader-alertas'"></ngx-ui-loader>
               <mat-selection-list #lstAlertas>
                 <mat-list *ngFor="let e of buzon; let i=index "
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">

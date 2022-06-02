@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { AngularFileUploaderComponent } from 'angular-file-uploader';
 import { environment } from 'src/environments/environment';
+import { NgxUiLoaderService } from 'ngx-ui-loader'
 
 import Swal from 'sweetalert2'
 
@@ -129,6 +130,7 @@ export class RegistrarComponent implements OnInit {
     private toastrService: ToastrService,
     private utilService: UtilService,
     private loginService: LoginService,
+    private ngxService: NgxUiLoaderService,
     private modalService: NgbModal) {
 
     // customize default values of modals used by this component tree
@@ -161,54 +163,55 @@ export class RegistrarComponent implements OnInit {
   }
 
 
-  async ConsultarAlertas() {
+  async ConsultarAlertas(): Promise<void> {
+    this.ngxService.startLoader("loader-alertas")
     this.xAPI.funcion = 'WKF_CAlertas'
     this.xAPI.parametros = '1,1'
-    await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {   
         this.bzAlertas = data.Cuerpo.map((e) => {
-          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
-          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
-          e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto
+          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow';
+          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`;
+          e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto;
           e.busqueda = this.utilService.ConvertirCadena(
             e.ncontrol + e.remitente + e.plazo + e.texto
-          )
-          return e
+          );
+          
+          return e;
+          
         }
-        )
-        // this.bzBusqueda = this.bzAlertasO
-        this.longitud = this.bzAlertas.length
-        // this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
-        this.bzOriginal = this.bzAlertas
-        this.pageSize = 10
-        this.recorrerElementos(0)
+        );
+        this.longitud = this.bzAlertas.length;
+        this.bzOriginal = this.bzAlertas;
+        this.pageSize = 10;
+        this.recorrerElementos(0);
+        this.ngxService.stopLoader("loader-alertas")
       },
       (error) => {
-
       }
     )
   }
 
   updateAllComplete() {
-    this.allComplete = this.bzRegistrados != null && this.bzRegistrados.every(t => t.completed);
+    this.allComplete = this.buzon != null && this.buzon.every(t => t.completed);
   }
 
   someComplete(): boolean {
-    if (this.bzRegistrados == null) {
+    if (this.buzon == null) {
       return false;
     }
 
-    return this.bzRegistrados.filter(t => t.completed).length > 0 && !this.allComplete;
+    return this.buzon.filter(t => t.completed).length > 0 && !this.allComplete;
 
   }
 
   setAll(completed: boolean) {
     this.allComplete = completed;
-    if (this.bzRegistrados == null) {
+    if (this.buzon == null) {
       return;
     }
 
-    this.bzRegistrados.forEach(t => (t.completed = completed));
+    this.buzon.forEach(t => (t.completed = completed));
     if (completed == false) {
       this.estiloclasificar = 'none'
     } else {
@@ -238,31 +241,35 @@ export class RegistrarComponent implements OnInit {
     )
   }
 
-  listarBuzon() {
-    var bz = []
+  async listarBuzon(): Promise<void> {
+
+    this.ngxService.startLoader("loader-aceptar")
+try {
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        bz = data.Cuerpo.map((e) => {
-          e.existe = e.anom == '' ? true : false
-          e.privado = e.priv == 1 ? true : false
-          e.simbolo = e.tdoc == 'PUNTO DE CUENTA' ? '( + )' : '  '
-          e.completed = false
-          return e
-        })//Registros recorridos como elementos
-
-        this.longitud = bz.length
-        if (this.longitud > 0) {
-          this.estilocheck = ''
-          this.bzOriginal = bz
-          this.pageSize = 10
-          this.recorrerElementos(0)
-        }
-
-      },
-      (error) => {
-
+    (data) => {
+      this.buzon = data.Cuerpo.map((e) => {
+        e.existe = e.anom == '' ? true : false;
+        e.privado = e.priv == 1 ? true : false;
+        e.simbolo = e.tdoc == 'PUNTO DE CUENTA' ? '( + )' : '  ';
+        e.completed = false;
+        
+        return e;
+      }); 
+      this.longitud = this.buzon.length;
+      if (this.longitud > 0) {
+        this.estilocheck = '';
+        this.bzOriginal = this.buzon;
+        this.pageSize = 10;
+        this.recorrerElementos(0);
+        this.ngxService.stopLoader("loader-aceptar")
       }
-    )
+    },
+    (error) => {
+    }
+  )
+    } catch (error) {
+      console.error(error)
+    }
   }
 
 
@@ -276,6 +283,8 @@ export class RegistrarComponent implements OnInit {
     this.selNav = e
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
+    this.buzon= []
+    this.bzOriginal= []
     
     switch (e) {
       case 0:
@@ -284,7 +293,7 @@ export class RegistrarComponent implements OnInit {
         break;
       case 1:
         this.xAPI.parametros = '1,2'
-        this.listarBuzon()
+        this.listarBuzon()      
         break;
       case 2:
         this.ConsultarAlertas()
@@ -366,7 +375,7 @@ export class RegistrarComponent implements OnInit {
 
 
   clasificarBuzon() {
-    var lstBz = this.bzRegistrados
+    var lstBz = this.buzon
     var usuario = this.loginService.Usuario.id
     var llave = ``
     var i = 0
@@ -374,11 +383,12 @@ export class RegistrarComponent implements OnInit {
     //Buscar en Wk de acuerdo al usuario y la app activa
     this.xAPI.funcion = 'WKF_AUbicacion'
     this.xAPI.valores = ''
-
+    
     if (this.cmbDestino == 0) {
-      this.toastrService.error('Debe seleccionar un concepto', `GDoc Wkf.Ubicacion`);
+      this.toastrService.error('Debe seleccionar una opción', `GDoc Wkf.Ubicacion`);
       return
     }
+
     lstBz.forEach(e => {
       i++
       if (e.completed == true) {
@@ -386,7 +396,6 @@ export class RegistrarComponent implements OnInit {
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
             this.actualizarBzRegistrados(e.numc, 0)
-
           },
           (errot) => {
             this.toastrService.error(errot, `GDoc Wkf.Estatus`);
@@ -394,12 +403,14 @@ export class RegistrarComponent implements OnInit {
 
       }
     });
+    this.seleccionNavegacion(0)
+    
   }
 
   actualizarBzRegistrados(codigo, tipo) {
     var posicion = 0
     var i = 0
-    this.bzRegistrados.forEach(e => {
+    this.buzon.forEach(e => {
       if (e.numc == codigo) {
         posicion = i
         return
@@ -407,9 +418,9 @@ export class RegistrarComponent implements OnInit {
       i++
     })
     if (tipo == 0) {
-      this.bzRegistrados.splice(posicion, 1)
+      this.buzon.splice(posicion, 1)
     } else {
-      this.bzRegistrados[posicion].existe = false
+      this.buzon[posicion].existe = false
     }
   }
 
