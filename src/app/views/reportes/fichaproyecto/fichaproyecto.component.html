@@ -1,0 +1,220 @@
+<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--9">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row ">
+                        <div class="col-md-10">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Reportes</h6>
+                            <h2 class="mb-0">Ficha </h2>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>reply</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <ul class="navbar-nav align-items-right d-none d-md-flex">
+                                <li class="nav-item" ngbDropdown placement="bottom-right">
+                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                        <div class="media align-items-center">
+                                            <div class="example-button-row">
+                                                <button mat-icon-button aria-label="">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                        <a routerLinkActive="active" class="dropdown-item">
+                                            <i class="fa fa-plus"></i>
+                                            <span>Agregar Imagen</span>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <h2 class="mb-0 text-center">{{Proyecto.nombre | uppercase}}</h2>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <table summary="" class="table table-bordered table-hover">
+
+                                <thead>
+                                    <tr>
+                                        <th data-priority="1">Número de Proyecto</th>
+                                        <th data-priority="2">Fecha de Origen</th>
+                                        <th data-priority="3">Fecha Desde</th>
+                                        <th data-priority="4">Fecha Hasta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{utilService.zfill(Proyecto.identificador, 4)}}</td>
+                                        <td>{{Proyecto.fecha_origen}}</td>
+                                        <td>{{Proyecto.fecha_desde}}</td>
+                                        <td>{{Proyecto.fecha_hasta}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <table summary="" class="table table-bordered table-hover">
+
+                                <thead>
+                                    <tr>
+                                        <th data-priority="1">Tipo de Documento</th>
+                                        <th data-priority="2">Remitente</th>
+                                        <th data-priority="3">Unidad o Dependencia</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <!-- <td>{{Proyecto.tipo | uppercase}}</td>
+                                        <td>{{Proyecto.remitente | uppercase}}</td>
+                                        <td>{{Proyecto.unidad | uppercase}}</td> -->
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                        </div>
+
+
+                        <table summary="" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th data-priority="1">Contenido</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="form-group  col-md-12 text-justify" [innerHTML]="Proyecto.objeto"
+                            style="font-size: small; padding: 15px; border: 1px solid #ccc">
+                        </div>
+                        <table summary="" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th data-priority="1">Instrucciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="form-group  col-md-12 text-justify" [innerHTML]="Proyecto.observacion"
+                            style="padding: 15px; border: 1px solid #ccc">
+                        </div>
+                        <br>
+
+                        <table summary="" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th data-priority="1" colspan="5">Historial de Acciones</th>
+                                </tr>
+                                <tr>
+                                    <th data-priority="1">Fecha</th>
+                                    <th data-priority="1">Departamento</th>
+                                    <th data-priority="1">Estado</th>
+                                    <th data-priority="1">Observacion</th>
+                                    <th data-priority="1">Responsable</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <!-- <tr *ngFor="let e of lstTraza">
+                                    <td>{{e.fecha | date:"dd-MM-yyyy" }}</td>
+                                    <td>{{e.nombre_estado | uppercase }}</td>
+                                    <td>{{e.nombre_estatus  | uppercase }}</td>
+                                    <td>{{e.observacion  | uppercase }}</td>
+                                    <td>{{e.usuario}}</td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+
+                        <br><br>
+
+                        <table summary="" class="table table-bordered table-hover">
+
+                            <thead>
+                                <tr>
+                                    <th data-priority="1" colspan="2">Firma de Seguimiento</th>
+    
+                                    <th data-priority="3" style="width:256px">VALIDADOR QR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>UBICACIÓN ACTUAL</th>
+                                    <td></td>
+                                    <td rowspan="3"></td>
+                                </tr>
+                                <tr>
+                                    <th>CREADO POR</th>
+                                    <!-- <td>{{Doc.creador}}</td> -->
+                                </tr>
+                                <tr>
+                                    <th>FECHA DE CREACIÓN</th>
+                                    <!-- <td>{{Doc.fcreacion}}</td> -->
+    
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+                 
+                    <hr>
+                    <div class="form-row">
+                        <div class="form-group col-md-12" style="display: none;">
+                            <table
+                                summary="This table shows how to create responsive tables using RWD-Table-Patterns' functionality"
+                                class="table table-bordered table-hover">
+
+                                <thead>
+                                    <tr>
+                                        <th>Country</th>
+                                        <th data-priority="1">Número de Control</th>
+                                        <th data-priority="2">Número de Origen</th>
+                                        <th data-priority="3">Fecha de Origen</th>
+                                        <th data-priority="4">Fecha de Recepción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Argentina</td>
+                                        <td>Spanish (official), English, Italian, German, French</td>
+                                        <td>41,803,125</td>
+                                        <td>31.3</td>
+                                        <td>2,780,387</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Australia</td>
+                                        <td>English 79%, native and other languages</td>
+                                        <td>23,630,169</td>
+                                        <td>37.3</td>
+                                        <td>7,739,983</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -27,6 +27,7 @@ import { RsentradasComponent } from 'src/app/views/resoluciones/rsentradas/rsent
 import { ReportesComponent } from 'src/app/views/reportes/reportes.component';
 import { ConstanciaComponent } from 'src/app/views/reportes/constancia/constancia.component';
 import { MinisterialComponent } from 'src/app/views/secretaria/ministerial/ministerial.component';
+import { FichaproyectoComponent } from 'src/app/views/reportes/fichaproyecto/fichaproyecto.component';
 
 
 
@@ -184,6 +185,11 @@ export const AdminLayoutRoutes: Routes = [
     { 
         path: 'ministerial/:id', 
         component: MinisterialComponent,
+        canActivate:[AuthGuardGuard] 
+    },
+    { 
+        path: 'fichaproyecto/:id', 
+        component: FichaproyectoComponent,
         canActivate:[AuthGuardGuard] 
     }
 ];

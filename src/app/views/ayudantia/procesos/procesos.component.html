@@ -103,7 +103,7 @@
                     style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                     <div class="row">
                       <div class="col-md-1 texto-lista">
-                        {{ utilService.zfill(e.id, 4) }}
+                        <a  routerLinkActive="active"  [routerLink]="['/fichaproyecto', e.id]">{{ utilService.zfill(e.id, 4) }} &nbsp;</a>
                       </div>
                       <div class="col-md-3 texto-lista">
                         {{ e.nombre | uppercase }}
