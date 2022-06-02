@@ -163,7 +163,7 @@ export class RegistrarComponent implements OnInit {
 
 
   async ConsultarAlertas(): Promise<void> {
-    this.ngxService.startLoader("loader-alertas")
+    this.ngxService.startLoader("loader-aceptar")
     this.xAPI.funcion = 'WKF_CAlertas'
     this.xAPI.parametros = '1,1'
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -183,8 +183,8 @@ export class RegistrarComponent implements OnInit {
         this.longitud = this.bzAlertas.length;
         this.bzOriginal = this.bzAlertas;
         this.pageSize = 10;
+        this.ngxService.stopLoader("loader-aceptar")
         this.recorrerElementos(0);
-        this.ngxService.stopLoader("loader-alertas")
       },
       (error) => {
       }
@@ -260,8 +260,8 @@ try {
         this.bzOriginal = this.buzon;
         this.pageSize = 10;
         this.recorrerElementos(0);
-        this.ngxService.stopLoader("loader-aceptar")
       }
+      this.ngxService.stopLoader("loader-aceptar")
     },
     (error) => {
     }

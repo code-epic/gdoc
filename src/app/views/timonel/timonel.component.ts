@@ -7,6 +7,7 @@ import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { NgxUiLoaderService } from 'ngx-ui-loader'
 
 
 
@@ -86,6 +87,7 @@ export class TimonelComponent implements OnInit {
     private ruta: Router,
     private toastrService: ToastrService,
     private loginService: LoginService,
+    private ngxService: NgxUiLoaderService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
@@ -154,8 +156,10 @@ export class TimonelComponent implements OnInit {
 
   async listarBuzon() {
     var bz = []
+    this.ngxService.startLoader("loader-progress")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data)
         data.Cuerpo.forEach(e => {
 
           var existe = e.anom == '' ? true : false
@@ -191,10 +195,10 @@ export class TimonelComponent implements OnInit {
           this.bzOriginal = bz
           this.recorrerElementos(0)
         }
-
+        this.ngxService.stopLoader("loader-progress")
       },
       (error) => {
-
+        this.ngxService.stopLoader("loader-progress")
       }
     )
   }
