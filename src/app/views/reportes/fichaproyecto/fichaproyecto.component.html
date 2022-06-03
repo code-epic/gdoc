@@ -30,8 +30,15 @@
 
                     <h2 class="mb-0 text-center">{{Proyecto.nombre | uppercase}}</h2>
                     <div class="form-row text-center">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12">
                             <table summary="" class="table table-bordered table-hover">
+
+                                <thead>
+                                    <tr>
+                                        <th data-priority="1" colspan="2"></th>
+                                        <th data-priority="1" style="width: 550px;"></th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <tr>
                                         <th>Número de Proyecto</th>
@@ -69,28 +76,27 @@
                             </table>
                             <br>
                         </div>
-                        <div class="form-group col-md-6">
-                            <table summary="" class="table table-bordered table-hover">
-                                <tbody>
-                                    <tr>
-                                        <th>Número de Proyecto</th>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <br>
-                        </div>
 
 
                         <table summary="" class="table table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    <th data-priority="1">Contenido</th>
+                                    <th data-priority="1" style="width: 10px;">Fechas y montos</th>
+                                    <th data-priority="2">Ejecución Física</th>
+                                    <th data-priority="3" style="width: 30px;">Observaciones</th>
+                                    
                                 </tr>
                             </thead>
+                            <tbody>
+                                <tr>
+                                    <td data-priority="1">Contenido</td>
+                                    <td data-priority="2">Contenido</td>
+                                    <td data-priority="3">Contenido</td>
+                                    
+                                </tr>
+                            </tbody>
                         </table>
-                        <div class="form-group  col-md-12 text-justify" [innerHTML]="Proyecto.objeto"
-                            style="font-size: small; padding: 15px; border: 1px solid #ccc">
-                        </div>
+                        <div class="form-group  col-md-12 text-justify" style="font-size: small; padding: 15px;"></div>
                         <table summary="" class="table table-bordered table-hover">
                             <thead>
                                 <tr>
@@ -103,7 +109,7 @@
                         </div>
                         <br>
 
-                        <table summary="" class="table table-bordered table-hover">
+                        <!-- <table summary="" class="table table-bordered table-hover">
                             <thead>
                                 <tr>
                                     <th data-priority="1" colspan="5">Historial de Acciones</th>
@@ -118,89 +124,21 @@
                             </thead>
                             <tbody>
 
-                                <!-- <tr *ngFor="let e of lstTraza">
+                                <tr *ngFor="let e of lstTraza">
                                     <td>{{e.fecha | date:"dd-MM-yyyy" }}</td>
                                     <td>{{e.nombre_estado | uppercase }}</td>
                                     <td>{{e.nombre_estatus  | uppercase }}</td>
                                     <td>{{e.observacion  | uppercase }}</td>
                                     <td>{{e.usuario}}</td>
-                                </tr> -->
+                                </tr>
                             </tbody>
-                        </table>
+                        </table> -->
 
                         <br><br>
 
-                        <table summary="" class="table table-bordered table-hover">
-
-                            <thead>
-                                <tr>
-                                    <th data-priority="1" colspan="2">Firma de Seguimiento</th>
-    
-                                    <th data-priority="3" style="width:256px">VALIDADOR QR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th>UBICACIÓN ACTUAL</th>
-                                    <td></td>
-                                    <td rowspan="3"></td>
-                                </tr>
-                                <tr>
-                                    <th>CREADO POR</th>
-                                    <!-- <td>{{Doc.creador}}</td> -->
-                                </tr>
-                                <tr>
-                                    <th>FECHA DE CREACIÓN</th>
-                                    <!-- <td>{{Doc.fcreacion}}</td> -->
-    
-                                </tr>
-                            </tbody>
-                        </table>
+                      
                     </div>
-
-
-
-                 
-                    <hr>
-                    <div class="form-row">
-                        <div class="form-group col-md-12" style="display: none;">
-                            <table
-                                summary="This table shows how to create responsive tables using RWD-Table-Patterns' functionality"
-                                class="table table-bordered table-hover">
-
-                                <thead>
-                                    <tr>
-                                        <th>Country</th>
-                                        <th data-priority="1">Número de Control</th>
-                                        <th data-priority="2">Número de Origen</th>
-                                        <th data-priority="3">Fecha de Origen</th>
-                                        <th data-priority="4">Fecha de Recepción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Argentina</td>
-                                        <td>Spanish (official), English, Italian, German, French</td>
-                                        <td>41,803,125</td>
-                                        <td>31.3</td>
-                                        <td>2,780,387</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Australia</td>
-                                        <td>English 79%, native and other languages</td>
-                                        <td>23,630,169</td>
-                                        <td>37.3</td>
-                                        <td>7,739,983</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-
-
-
-
+                    
                 </div>
             </div>
         </div>

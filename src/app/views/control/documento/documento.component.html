@@ -73,7 +73,7 @@
                                                 [ngModelOptions]="{standalone: true}" [(ngModel)]="forigen"
                                                 ngbDatepicker #fo="ngbDatepicker"
                                                 [value]="formatter.format(forigenDate)" [placement]="placement"
-                                                [positionTarget]="buttonEl">
+                                                [positionTarget]="buttonEl" readonly>
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="fo.toggle()"
                                                     type="button">
@@ -92,7 +92,7 @@
                                                 [ngModelOptions]="{standalone: true}"
                                                 [value]="formatter.format(fcreacionDate)" [(ngModel)]="fcreacion"
                                                 ngbDatepicker #fc="ngbDatepicker" [placement]="placement"
-                                                [positionTarget]="buttonEl">
+                                                [positionTarget]="buttonEl" readonly>
                                             <div class="input-group-append">
                                                 <button #buttonEl class="btn calendario" (click)="fc.toggle()"
                                                     type="button"></button>
@@ -245,7 +245,7 @@
                                                     <input class="form-control" placeholder="AAAA-MM-DD"
                                                         [ngModelOptions]="{standalone: true}" [(ngModel)]="fplazo"
                                                         ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
-                                                        [positionTarget]="buttonEl">
+                                                        [positionTarget]="buttonEl" readonly>
                                                     <div class="input-group-append">
                                                         <button #buttonEl class="btn calendario" (click)="fd.toggle()"
                                                             type="button"></button>
