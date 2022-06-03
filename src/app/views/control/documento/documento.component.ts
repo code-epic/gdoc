@@ -317,8 +317,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //registrar Un documento pasando por el WorkFlow
   registrar() {
-    console.log(this.Doc);
-    if (this.Doc.contenido == '' || this.fcreacion == '') {
+    
+    if (this.Doc.contenido == '' || this.fcreacion == undefined) {
       this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
       return
 
@@ -403,13 +403,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     } else {
       this.Doc.salida = this.Doc.ncontrol.toUpperCase()
-      this.Doc.ncontrol = ''
+      this.Doc.ncontrol = this.Doc.ncontrol.toUpperCase()
 
     }
     this.Doc.wfdocumento = parseInt(data.msj)
     this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
-    this.Doc.forigen = this.utilService.ConvertirFecha(this.forigen)
-    this.Doc.contenido = this.Doc.contenido.toUpperCase()
+    this.Doc.forigen = this.forigen != undefined? this.utilService.ConvertirFecha(this.forigen): this.utilService.ConvertirFecha(this.fcreacion)
+
+
+    this.Doc.contenido = this.Doc.contenido.toUpperCase() 
     this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
 
     this.Doc.creador = this.loginService.Usuario.id
