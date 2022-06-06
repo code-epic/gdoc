@@ -18,9 +18,9 @@
 
 
             <div class="col-md-1">
-              <div class="media align-items-center">
+              <div class="media align-items-center" *ngIf="dwValidate">
                 <div class="example-button-row">
-                  <button mat-icon-button title="Ver Documentos">
+                  <button mat-icon-button title="Ver Documentos" (click)="verArchivos(archivos)">
                     <mat-icon>wallpaper</mat-icon>
                   </button>
                 </div>
@@ -161,8 +161,10 @@
             <div class="row">
               <div class="col-md-12">
                 <div class="text-right">
-                  <button class="btn bg-purple text-white" (click)="open(adjuntar, codigohash)">Adjuntar Documento</button>
-                  <button class="btn bg-success text-white" (click)="aceptar()">Ver Documento</button>
+                  <button class="btn bg-purple text-white" (click)="open(adjuntar, codigohash)">Adjuntar
+                    Documento</button>
+                  <button class="btn bg-success text-white" *ngIf="dwSub" (click)="verArchivos(archivos)">Ver
+                    Documento</button>
                   <button class="btn bg-primary text-white" (click)="aceptar()">Aceptar</button>
                 </div>
               </div>
@@ -236,31 +238,85 @@
   </ng-template>
 
 
-<ng-template #adjuntar let-c="close" let-d="dismiss">
-  <div class="modal-header header bg-gradient-success">
-    <h4 class="modal-title" id="modal-basic-title">Cargar Archivo </h4>
+  <ng-template #adjuntar let-c="close" let-d="dismiss">
+    <div class="modal-header header bg-gradient-success">
+      <h4 class="modal-title" id="modal-basic-title">Cargar Archivo </h4>
 
-  </div>
-  <div class="modal-body">
+    </div>
+    <div class="modal-body">
 
 
-    <form method="post" enctype="multipart/form-data" id="forma" name="forma">
-      <input type="hidden" name="txtFileID" id="txtFileID" value="{{codigohash}}" readonly="readonly">
-      <label for="input-folder-2">Seleccionar Archivo</label>
-      <div class="file-loading">
-        <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file"
-          multiple accept=".pdf">
+      <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+        <input type="hidden" name="txtFileID" id="txtFileID" value="{{codigohash}}" readonly="readonly">
+        <label for="input-folder-2">Seleccionar Archivo</label>
+        <div class="file-loading">
+          <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2"
+            type="file" multiple accept=".pdf">
+        </div>
+        <div id="errorBlock" class="help-block"></div>
+      </form>
+
+
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
+        <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
+      <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+        <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    </div>
+  </ng-template>
+
+
+
+  <!-- Adjuntar Imagenes al Documento -->
+  <ng-template #archivos let-c="close" let-d="dismiss">
+    <div class="modal-header header bg-gradient-success">
+      <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
+
+    </div>
+    <div class="modal-body">
+
+
+      <div class="form-group row">
+        <div class="form-group col-md-4"></div>
+        <div class="form-group col-md-4">
+          <div class="card card-profile">
+            <div class="card-header bg-info" style="background-image: url('./assets/img/theme/inn.svg'); height: 64px;">
+              <div class="card-avatar text-center">
+                <a href="javascript:;">
+                  <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
+                    style="width:64px;z-index: 1; margin-top: -5px;">
+                </a>
+              </div>
+            </div>
+            <br>
+
+            <div class="card-body pt-0">
+              <div class="d-flex justify-content-between">
+                <a [href]="download" target="_blank" rel="noopener noreferrer"
+                  class="btn btn-sm  btn-primary mt-3">Descargar</a>
+                <a href="javascript:;" class="btn btn-sm btn-default float-right mt-3">Historial</a>
+              </div>
+              <br><br>
+              <div class="text-center">
+                <div class="font-weight-50">
+                  Publicado<span class="font-weight-light">, 2022-07-05</span>
+                  <br>
+                  <h5 class="h4" style="font-size: 10px;">0c521f27fb1b3311d686d511b668e5bd4</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-md-4"></div>
       </div>
-      <div id="errorBlock" class="help-block"></div>
-    </form>
 
 
 
-  </div>
-  <div class="modal-footer">
-    <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
-      <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
-    <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
-      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
-  </div>
-</ng-template>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+        <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    </div>
+  </ng-template>

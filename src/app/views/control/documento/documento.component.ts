@@ -10,6 +10,8 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service'
 import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta } from 'src/app/services/control/documentos.service'
 import { LoginService } from 'src/app/services/seguridad/login.service'
 import { UtilService } from 'src/app/services/util/util.service'
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { textChangeRangeIsUnchanged } from 'typescript';
 
 
 @Component({
@@ -131,7 +133,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstImg = []
   public titulo = 'Documento'
 
-
+  public download : any
+  
   public xAPI: IAPICore = {
     funcion: ''
 
@@ -160,20 +163,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
       if (id == 'salida') {
-        this.titulo = 'Salida'
-        this.estadoActual = 9
-        this.estadoOrigen = 2
-        this.ncontrolv = false
-        this.salidavisible = false
-        this.origenvisible = false
-        this.forigenv = false
-        this.ncontrolt = 'Nro de Salida'
-        this.remitentet = 'Destinatario'
-        this.fsalida = 'Fecha de Salida'
-        this.camposalida = 4
-        this.camposfechasalida = 4
-
-
+        this.seleccionarSalida()
         if (this.rutaActiva.snapshot.params.numc != undefined) {
           var numc = this.rutaActiva.snapshot.params.numc
           this.ncontrolt = 'Nro de Control'
@@ -185,6 +175,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         }
 
       } else {
+        if ((this.rutaActiva.snapshot.params.numc != undefined) && (this.rutaActiva.snapshot.params.numc == 'salida')) this.seleccionarSalida()
         this.consultarDocumento(id)
       }
 
@@ -197,6 +188,22 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
+  seleccionarSalida(): boolean {
+
+    this.titulo = 'Salida'
+    this.estadoActual = 9
+    this.estadoOrigen = 2
+    this.ncontrolv = false
+    this.salidavisible = false
+    this.origenvisible = false
+    this.forigenv = false
+    this.ncontrolt = 'Nro de Salida'
+    this.remitentet = 'Destinatario'
+    this.fsalida = 'Fecha de Salida'
+    this.camposalida = 4
+    this.camposfechasalida = 4
+    return true
+  }
 
   listarConfiguracion() {
     this.xAPI.funcion = 'MD_CConfiguracion'
@@ -258,6 +265,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
+
+        console.log(data.Cuerpo)
+
         data.Cuerpo.forEach(e => {
           this.Doc = e
           this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
@@ -286,6 +296,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.lstHistorial = historial.map(e => {
           return typeof e == 'object' ? e : JSON.parse(e)
         })
+
+        //Carga de Documentos
+        this.download = this.apiService.Dws( this.Doc.ncontrol + '/' + this.Doc.archivo )
 
 
       },
@@ -317,22 +330,33 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //registrar Un documento pasando por el WorkFlow
   registrar() {
-    
-    if (this.Doc.contenido == '' || this.fcreacion == undefined) {
-      this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
-      return
 
-    }
+  
     this.ngxService.startLoader("loader-aceptar")
-    this.obtenerWorkFlow() //Obtener valores de una API
+    
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
       if (id != 'salida') {
+        if (this.Doc.contenido == '' || this.fcreacion == undefined) {
+          this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
+          return
+    
+        }
+
+        this.obtenerWorkFlow() //Obtener valores de una API
         this.actualizarDocumentos()
         return
       } else if (this.rutaActiva.snapshot.params.numc != undefined) {
+
+        if (this.Doc.contenido == '' || this.fcreacion == undefined) {
+          this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
+          return
+    
+        }
+
         var numc = this.rutaActiva.snapshot.params.numc
+        this.obtenerWorkFlow() //Obtener valores de una API
         this.actualizarDocumentos()
         return
       }
@@ -408,10 +432,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     }
     this.Doc.wfdocumento = parseInt(data.msj)
     this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
-    this.Doc.forigen = this.forigen != undefined? this.utilService.ConvertirFecha(this.forigen): this.utilService.ConvertirFecha(this.fcreacion)
+    this.Doc.forigen = this.forigen != undefined ? this.utilService.ConvertirFecha(this.forigen) : this.utilService.ConvertirFecha(this.fcreacion)
 
 
-    this.Doc.contenido = this.Doc.contenido.toUpperCase() 
+    this.Doc.contenido = this.Doc.contenido.toUpperCase()
     this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
 
     this.Doc.creador = this.loginService.Usuario.id
@@ -463,8 +487,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   async actualizarDocumentos() {
 
+
     this.Doc.fcreacion = typeof this.fcreacion === 'object' ? this.utilService.ConvertirFecha(this.fcreacion) : this.Doc.fcreacion.substring(0, 10)
-    this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10)
+    this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10) //
     this.Doc.creador = this.loginService.Usuario.id
 
     this.xAPI.funcion = 'WKF_ADocumentoDetalle'
@@ -480,15 +505,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
         this.ngxService.stopLoader("loader-aceptar")
-        
+
         if (this.rutaActiva.snapshot.params.id != undefined && this.rutaActiva.snapshot.params.id == 'salida') {
           this.insertarObservacion()
-          
-        }else{
+
+        } else {
           this.ruta.navigate(['/registrar']);
         }
-        
-        
+
+
 
       },
       (errot) => {
@@ -534,7 +559,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //Guardar la alerte define el momento y estadus
   guardarAlerta(activo: number) {
-    
+
     this.WAlerta.activo = activo
     this.WAlerta.documento = this.Doc.wfdocumento
     this.WAlerta.estado = this.estadoActual

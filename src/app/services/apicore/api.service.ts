@@ -85,6 +85,9 @@ export class ApiService {
     return this.http.post<any>(this.URL + "subirarchivos", frm, httpOptions);
   }
 
+  Dws( peticion : string ) : string {
+    return this.URL + 'dw/' + peticion
+  }
 
 
 }
