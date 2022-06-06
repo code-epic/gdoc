@@ -317,8 +317,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //registrar Un documento pasando por el WorkFlow
   registrar() {
-    
-    if (this.Doc.contenido == '' || this.fcreacion == undefined) {
+
+    if (this.Doc.contenido == '' || this.fcreacion == undefined || this.fplazo == undefined) {
       this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
       return
 
@@ -408,10 +408,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     }
     this.Doc.wfdocumento = parseInt(data.msj)
     this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
-    this.Doc.forigen = this.forigen != undefined? this.utilService.ConvertirFecha(this.forigen): this.utilService.ConvertirFecha(this.fcreacion)
+    this.Doc.forigen = this.forigen != undefined ? this.utilService.ConvertirFecha(this.forigen) : this.utilService.ConvertirFecha(this.fcreacion)
 
 
-    this.Doc.contenido = this.Doc.contenido.toUpperCase() 
+    this.Doc.contenido = this.Doc.contenido.toUpperCase()
     this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
 
     this.Doc.creador = this.loginService.Usuario.id
@@ -480,15 +480,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
         this.ngxService.stopLoader("loader-aceptar")
-        
+
         if (this.rutaActiva.snapshot.params.id != undefined && this.rutaActiva.snapshot.params.id == 'salida') {
           this.insertarObservacion()
-          
-        }else{
+
+        } else {
           this.ruta.navigate(['/registrar']);
         }
-        
-        
+
+
 
       },
       (errot) => {
@@ -534,7 +534,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //Guardar la alerte define el momento y estadus
   guardarAlerta(activo: number) {
-    
+
     this.WAlerta.activo = activo
     this.WAlerta.documento = this.Doc.wfdocumento
     this.WAlerta.estado = this.estadoActual
