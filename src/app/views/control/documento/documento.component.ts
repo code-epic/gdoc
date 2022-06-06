@@ -133,8 +133,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstImg = []
   public titulo = 'Documento'
 
-  public download : any
-  
+  public download: any
+
   public xAPI: IAPICore = {
     funcion: ''
 
@@ -265,9 +265,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-
-        console.log(data.Cuerpo)
-
         data.Cuerpo.forEach(e => {
           this.Doc = e
           this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
@@ -298,7 +295,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         })
 
         //Carga de Documentos
-        this.download = this.apiService.Dws( this.Doc.ncontrol + '/' + this.Doc.archivo )
+        this.download = this.apiService.Dws(this.Doc.ncontrol + '/' + this.Doc.archivo)
 
 
       },
@@ -331,36 +328,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   //registrar Un documento pasando por el WorkFlow
   registrar() {
 
-  
+
     this.ngxService.startLoader("loader-aceptar")
-    
+
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
-      var id = this.rutaActiva.snapshot.params.id
-      if (id != 'salida') {
-        if (this.Doc.contenido == '' || this.fcreacion == undefined) {
-          this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
-          return
-    
-        }
-
-        this.obtenerWorkFlow() //Obtener valores de una API
-        this.actualizarDocumentos()
-        return
-      } else if (this.rutaActiva.snapshot.params.numc != undefined) {
-
-        if (this.Doc.contenido == '' || this.fcreacion == undefined) {
-          this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
-          return
-    
-        }
-
-        var numc = this.rutaActiva.snapshot.params.numc
-        this.obtenerWorkFlow() //Obtener valores de una API
-        this.actualizarDocumentos()
-        return
-      }
-
+      this.obtenerWorkFlow() //Obtener valores de una API
+      this.actualizarDocumentos()
+      return
     }
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -487,6 +462,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   async actualizarDocumentos() {
 
+    if (this.Doc.contenido == '') {
+      this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
+      return
+    }
 
     this.Doc.fcreacion = typeof this.fcreacion === 'object' ? this.utilService.ConvertirFecha(this.fcreacion) : this.Doc.fcreacion.substring(0, 10)
     this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10) //
@@ -494,10 +473,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.xAPI.funcion = 'WKF_ADocumentoDetalle'
     this.xAPI.parametros = ''
+    
+    this.Doc.contenido = this.Doc.contenido.toUpperCase()
+    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
+
     this.xAPI.valores = JSON.stringify(this.Doc)
 
-
     if (this.WAlerta.documento != 0) this.WAlerta.fecha = typeof this.fplazo === 'object' ? this.utilService.ConvertirFecha(this.fplazo) : this.fplazo.substring(0, 10)
+
+  
 
 
     await this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -529,7 +513,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   insertarObservacion() {
     const usuario = this.loginService.Usuario.id
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
-    console.log(this.Doc)
     this.xAPI.valores = JSON.stringify(
       {
         "documento": this.Doc.wfdocumento,
@@ -540,13 +523,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         "usuario": usuario
       }
     )
-    console.log(this.xAPI)
 
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
 
-        console.log('Guardando Observacion')
 
         await this.guardarAlerta(1)
         //this.ruta.navigate(['/salidas']);
@@ -571,7 +552,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
-    console.log(this.WAlerta);
     this.xAPI.valores = JSON.stringify(this.WAlerta)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async alerData => {
@@ -582,7 +562,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       }) //
   }
   agregarCuenta(): IWKFCuenta {
-    console.log(this.lstCuenta);
     if (this.cuenta == '' ||
       this.resumen == '' ||
       this.detalle == '') {
@@ -634,7 +613,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   editarCuenta() {
 
     if (this.PosicionCuenta != -1) {
-      console.log("entrando en datos");
       const wkcuenta: IWKFCuenta = {
         documento: 0,
         cuenta: this.cuenta.toUpperCase(),
@@ -672,9 +650,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.xAPI.parametros = ''
       this.lstCuenta[0].documento = numc
       this.lstCuenta[0].fecha = this.Doc.fcreacion
-      //console.log(this.lstCuenta[0]);
       this.xAPI.valores = JSON.stringify(this.lstCuenta[0])
-      //console.info(this.xAPI);
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           this.lstCuenta.splice(0, 1)
