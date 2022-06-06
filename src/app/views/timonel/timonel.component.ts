@@ -7,6 +7,7 @@ import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { NgxUiLoaderService } from 'ngx-ui-loader'
 
 
 
@@ -56,7 +57,7 @@ export class TimonelComponent implements OnInit {
   public lstEstados = [] //Listar Estados
 
   lengthOfi = 0;
-  pageSizeOfi = 10;
+  pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 25, 100];
 
   // MatPaginator Output
@@ -64,9 +65,8 @@ export class TimonelComponent implements OnInit {
 
   selNav = 0
 
-  public bzRecibido = []
-  public bzProcesados = []
-  public bzPendientes = []
+  public bzOriginal = [] //Listado Original
+  public buzon = []
   public bzCerrados = []
 
   public estilocheck = 'none'
@@ -87,6 +87,7 @@ export class TimonelComponent implements OnInit {
     private ruta: Router,
     private toastrService: ToastrService,
     private loginService: LoginService,
+    private ngxService: NgxUiLoaderService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
@@ -109,9 +110,6 @@ export class TimonelComponent implements OnInit {
 
 
   seleccionNavegacion(e) {
-    this.bzRecibido = []
-    this.bzProcesados = []
-    this.bzPendientes = []
     this.bzCerrados = []
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
@@ -120,20 +118,20 @@ export class TimonelComponent implements OnInit {
     switch (e) {
       case 0:
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
-        this.listarBuzon(this.bzRecibido)
+        this.listarBuzon()
         break
       case 1:
         this.xAPI.funcion = 'WKF_CSubDocumento'
         this.xAPI.parametros = this.estadoActual + ',' + 2
-        this.listarBuzon(this.bzProcesados)
+        this.listarBuzon()
         break
       case 2:
         this.xAPI.parametros = this.estadoActual + ',' + 3
-        this.listarBuzon(this.bzPendientes)
+        this.listarBuzon()
         break
       case 4:
         this.xAPI.parametros = this.estadoActual + ',' + 4
-        this.listarBuzon(this.bzCerrados)
+        this.listarBuzon()
         break
       default:
         break
@@ -152,14 +150,16 @@ export class TimonelComponent implements OnInit {
         });
       },
       (error) => {
-
       }
     )
   }
 
-  async listarBuzon(bz: any) {
+  async listarBuzon() {
+    var bz = []
+    this.ngxService.startLoader("loader-progress")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data)
         data.Cuerpo.forEach(e => {
 
           var existe = e.anom == '' ? true : false
@@ -192,32 +192,35 @@ export class TimonelComponent implements OnInit {
         this.lengthOfi = data.Cuerpo.length
         if (this.lengthOfi > 0) {
           this.estilocheck = ''
-          this.recorrerElementos(1, this.bzRecibido)
+          this.bzOriginal = bz
+          this.recorrerElementos(0)
         }
-
+        this.ngxService.stopLoader("loader-progress")
       },
       (error) => {
-
+        this.ngxService.stopLoader("loader-progress")
       }
     )
   }
 
 
+
   pageChangeEvent(e) {
-    this.recorrerElementos(e.pageIndex + 1, this.lst)
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex)
   }
 
   updateAllComplete() {
-    this.allComplete = this.bzRecibido != null && this.bzRecibido.every(t => t.completed);
+    this.allComplete = this.buzon != null && this.buzon.every(t => t.completed);
   }
 
   setAll(completed: boolean) {
     this.allComplete = completed;
-    if (this.bzRecibido == null) {
+    if (this.buzon == null) {
       return;
     }
 
-    this.bzRecibido.forEach(t => (t.completed = completed));
+    this.buzon.forEach(t => (t.completed = completed));
     if (completed == false) {
       this.estiloclasificar = 'none'
     } else {
@@ -226,14 +229,13 @@ export class TimonelComponent implements OnInit {
   }
 
   someComplete(): boolean {
-    if (this.bzRecibido == null) return false;
-    return this.bzRecibido.filter(t => t.completed).length > 0 && !this.allComplete;
+    if (this.buzon == null) return false;
+    return this.buzon.filter(t => t.completed).length > 0 && !this.allComplete;
   }
 
-  //recorrerElementos para paginar listados
-  recorrerElementos(posicion: number, lista: any) {
-    if (posicion > 1) posicion = posicion * 10
-    this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
+  recorrerElementos(pagina: number) {
+    let pag = this.pageSize * pagina
+    this.buzon = this.bzOriginal.slice(pag, pag + this.pageSize)
 
   }
   //editar

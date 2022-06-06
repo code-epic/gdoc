@@ -74,7 +74,7 @@ export class MinisterialComponent implements OnInit {
   public unidad = ''
   public titulo = ''
   public archivos = []
-
+  public download : any
 
 
   public lstRedistribucion = [{ 'valor': '1', 'texto': 'REDISTRIBUCION', 'visible': '1' }]
@@ -115,6 +115,10 @@ export class MinisterialComponent implements OnInit {
   public fecha_alerta: any
   public fplazo: any
 
+  public dwValidate = false
+
+  public dwSub = false
+
   constructor(private apiService: ApiService,
     config: NgbModalConfig,
     private ruta: Router,
@@ -135,9 +139,13 @@ export class MinisterialComponent implements OnInit {
         this.original = this.rutaActiva.snapshot.params.id
         this.ministerial = JSON.parse(atob(this.original))
         this.listarDatos()
-        this.listarEstados()
-        this.cmbDestino = 'S'
+        //Carga de Documentos
+        this.dwValidate = this.ministerial.anom != ""?true:false
+        this.download = this.apiService.Dws( this.ministerial.numc + '/' + this.ministerial.anom )
         this.codigohash = btoa(this.ministerial.id + this.ministerial.idd + this.ministerial.cuenta)
+        this.cmbDestino = 'S'
+        console.log(this.ministerial)
+        this.listarEstados()
       } catch (error) {
         this.ruta.navigate(['/secretaria', ''])
       }
@@ -186,6 +194,9 @@ export class MinisterialComponent implements OnInit {
           this.original = btoa(JSON.stringify(data.Cuerpo[0]))
           this.blUpdate = true
         }
+        this.dwSub = this.SubDocumento.nombre_archivo != ""?true:false
+        console.log(this.SubDocumento)
+        this.download = this.apiService.Dws( this.codigohash + '/' + this.SubDocumento.nombre_archivo )
       },
       (error) => {
 
@@ -252,7 +263,7 @@ export class MinisterialComponent implements OnInit {
   }
 
   actualizar() {
-    console.info('Actualizando informacion ', this.xAPI)
+    console.info('Actualizando informacion ', this.SubDocumento)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.xAPI.funcion = 'WKF_ASubDocumentoAlerta'
@@ -323,14 +334,20 @@ export class MinisterialComponent implements OnInit {
   async SubirArchivo(e) {
     this.ngxService.startLoader("loader-aceptar")
     var frm = new FormData(document.forms.namedItem("forma"))
+    
     try {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
+          console.log(this.archivos[0].name)
+          this.SubDocumento.nombre_archivo = this.archivos[0].name
+          
+          this.aceptar()
           this.toastrService.success(
             'Tu archivo ha sido cargado con exito ',
             `GDoc SubDocumentos`
           );
-          this.ngxService.stopLoader("loader-aceptar")
+          //this.ngxService.stopLoader("loader-aceptar")
+
         },
         (error) => {
           this.ngxService.stopLoader("loader-aceptar")
@@ -341,6 +358,12 @@ export class MinisterialComponent implements OnInit {
       console.error(error)
     }
 
+  }
+
+
+  //Listar los archivos asociados al documento
+  verArchivos(content) {
+    this.modalService.open(content, { size: 'lg' })
   }
 
 }

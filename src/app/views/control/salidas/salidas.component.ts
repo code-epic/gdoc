@@ -103,6 +103,7 @@ export class SalidasComponent implements OnInit {
 
   public posicionPagina = 0
 
+  public URLDESTINO = '/documento/salida'
   constructor(
     private apiService: ApiService,
     config: NgbModalConfig,
@@ -152,6 +153,7 @@ export class SalidasComponent implements OnInit {
           e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
           e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
           e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto
+
           e.busqueda = this.utilService.ConvertirCadena(
             e.ncontrol + e.remitente + e.plazo + e.texto
           )
@@ -233,30 +235,14 @@ export class SalidasComponent implements OnInit {
   async listarBuzon(bz: any) {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-
         data.Cuerpo.forEach(e => {
-
-          var existe = e.anom == '' ? true : false
-          var privado = e.priv == 1 ? true : false
-          bz.push(
-            {
-              id: e.id,
-              idd: e.idd,
-              numc: e.numc,
-              completed: false,
-              color: 'warn',
-              nori: e.nori,
-              tdoc: e.tdoc,
-              fcre: e.fcre,
-              remi: e.remi,
-              udep: e.udep,
-              anom: e.anom,
-              priv: privado,
-              existe: existe,
-              xaccion: e.accion
-            }
-          )
-
+          e.completed = false
+          e.color = 'warn'
+          e.priv = e.priv == 1 ? true : false
+          e.existe = e.anom == '' ? true : false
+          e.url = e.numc != e.saso ? '/documento/salida' : '/documento'
+          e.xaccion = e.accion
+          bz.push(e)
         })//Registros recorridos como elementos
 
         this.lengthOfi = data.Cuerpo.length
@@ -309,14 +295,21 @@ export class SalidasComponent implements OnInit {
   }
 
 
-   //editar
-   editar(id: string) {
+  //editar
+  editar(id: string, url : string) {
+
+
     const estado = this.estadoActual
-    const estatus = this.selNav + 1 
+    const estatus = this.selNav + 1
     const base = btoa(estado + ',' + estatus + ',' + id)
-    console.log(base)
-    this.ruta.navigate(['/documento/salida', base])
+    if (url == '/documento'){
+      this.ruta.navigate([url, base, 'salida'])
+    }else{
+      this.ruta.navigate([url, base])
+    }
     
+
+
   }
 
 
@@ -433,13 +426,13 @@ export class SalidasComponent implements OnInit {
 
   }
 
-  async cargarAcciones(posicion){
+  async cargarAcciones(posicion) {
     this.lstAcciones = []
     this.cmbAcciones.forEach(e => {
-      if(e.visible==posicion){
+      if (e.visible == posicion) {
         this.lstAcciones.push(e)
       }
-      
+
     });
   }
 
@@ -457,10 +450,10 @@ export class SalidasComponent implements OnInit {
 
 
   //Consultar un enlace
-  constancia(id: string){
+  constancia(id: string) {
     const estado = 1
     const estatus = 1
-    return  btoa(estado + ',' + estatus + ',' + id)
+    return btoa(estado + ',' + estatus + ',' + id)
     //this.ruta.navigate(['/constancia', base])
   }
 
