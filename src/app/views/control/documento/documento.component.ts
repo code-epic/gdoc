@@ -131,6 +131,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstImg = []
   public titulo = 'Documento'
 
+<<<<<<< HEAD
+=======
+  public download: any
+>>>>>>> c13764331bb3ccaaed018fb5e334e789a96c4d80
 
   public xAPI: IAPICore = {
     funcion: ''
@@ -287,6 +291,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           return typeof e == 'object' ? e : JSON.parse(e)
         })
 
+<<<<<<< HEAD
+=======
+        //Carga de Documentos
+        this.download = this.apiService.Dws(this.Doc.ncontrol + '/' + this.Doc.archivo)
+
+>>>>>>> c13764331bb3ccaaed018fb5e334e789a96c4d80
 
       },
       (error) => {
@@ -318,6 +328,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   //registrar Un documento pasando por el WorkFlow
   registrar() {
 
+<<<<<<< HEAD
     if (this.Doc.contenido == '' || this.fcreacion == undefined || this.fplazo == undefined) {
       this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
       return
@@ -337,6 +348,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         return
       }
 
+=======
+
+    this.ngxService.startLoader("loader-aceptar")
+
+
+    if (this.rutaActiva.snapshot.params.id != undefined) {
+      this.obtenerWorkFlow() //Obtener valores de una API
+      this.actualizarDocumentos()
+      return
+>>>>>>> c13764331bb3ccaaed018fb5e334e789a96c4d80
     }
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -463,16 +484,29 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   async actualizarDocumentos() {
 
+<<<<<<< HEAD
+=======
+    if (this.Doc.contenido == '') {
+      this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
+      return
+    }
+
+>>>>>>> c13764331bb3ccaaed018fb5e334e789a96c4d80
     this.Doc.fcreacion = typeof this.fcreacion === 'object' ? this.utilService.ConvertirFecha(this.fcreacion) : this.Doc.fcreacion.substring(0, 10)
     this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10)
     this.Doc.creador = this.loginService.Usuario.id
 
     this.xAPI.funcion = 'WKF_ADocumentoDetalle'
     this.xAPI.parametros = ''
+    
+    this.Doc.contenido = this.Doc.contenido.toUpperCase()
+    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
+
     this.xAPI.valores = JSON.stringify(this.Doc)
 
-
     if (this.WAlerta.documento != 0) this.WAlerta.fecha = typeof this.fplazo === 'object' ? this.utilService.ConvertirFecha(this.fplazo) : this.fplazo.substring(0, 10)
+
+  
 
 
     await this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -504,7 +538,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   insertarObservacion() {
     const usuario = this.loginService.Usuario.id
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
-    console.log(this.Doc)
     this.xAPI.valores = JSON.stringify(
       {
         "documento": this.Doc.wfdocumento,
@@ -515,13 +548,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         "usuario": usuario
       }
     )
-    console.log(this.xAPI)
 
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
 
-        console.log('Guardando Observacion')
 
         await this.guardarAlerta(1)
         //this.ruta.navigate(['/salidas']);
@@ -546,7 +577,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
-    console.log(this.WAlerta);
     this.xAPI.valores = JSON.stringify(this.WAlerta)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async alerData => {
@@ -557,7 +587,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       }) //
   }
   agregarCuenta(): IWKFCuenta {
-    console.log(this.lstCuenta);
     if (this.cuenta == '' ||
       this.resumen == '' ||
       this.detalle == '') {
@@ -609,7 +638,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   editarCuenta() {
 
     if (this.PosicionCuenta != -1) {
-      console.log("entrando en datos");
       const wkcuenta: IWKFCuenta = {
         documento: 0,
         cuenta: this.cuenta.toUpperCase(),
@@ -647,9 +675,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.xAPI.parametros = ''
       this.lstCuenta[0].documento = numc
       this.lstCuenta[0].fecha = this.Doc.fcreacion
-      //console.log(this.lstCuenta[0]);
       this.xAPI.valores = JSON.stringify(this.lstCuenta[0])
-      //console.info(this.xAPI);
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           this.lstCuenta.splice(0, 1)
