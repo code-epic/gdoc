@@ -45,13 +45,8 @@ export class SalidasComponent implements OnInit {
     { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
     { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
     { 'valor': '2', 'texto': 'PROCESAR SALIDA', 'visible': '1' },
-<<<<<<< HEAD
-    { 'valor': '5', 'texto': 'ARCHIVAR', 'visible': '2' },
-    { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' }]
-=======
     { 'valor': '3', 'texto': 'ARCHIVAR', 'visible': '2' },
     { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '2' }]
->>>>>>> c13764331bb3ccaaed018fb5e334e789a96c4d80
 
   public paginador = 10
   public focus;

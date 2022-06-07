@@ -131,10 +131,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstImg = []
   public titulo = 'Documento'
 
-<<<<<<< HEAD
-=======
   public download: any
->>>>>>> c13764331bb3ccaaed018fb5e334e789a96c4d80
 
   public xAPI: IAPICore = {
     funcion: ''
@@ -291,12 +288,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           return typeof e == 'object' ? e : JSON.parse(e)
         })
 
-<<<<<<< HEAD
-=======
         //Carga de Documentos
         this.download = this.apiService.Dws(this.Doc.ncontrol + '/' + this.Doc.archivo)
 
->>>>>>> c13764331bb3ccaaed018fb5e334e789a96c4d80
 
       },
       (error) => {
@@ -328,27 +322,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   //registrar Un documento pasando por el WorkFlow
   registrar() {
 
-<<<<<<< HEAD
-    if (this.Doc.contenido == '' || this.fcreacion == undefined || this.fplazo == undefined) {
-      this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
-      return
-
-    }
-    this.ngxService.startLoader("loader-aceptar")
-    this.obtenerWorkFlow() //Obtener valores de una API
-
-    if (this.rutaActiva.snapshot.params.id != undefined) {
-      var id = this.rutaActiva.snapshot.params.id
-      if (id != 'salida') {
-        this.actualizarDocumentos()
-        return
-      } else if (this.rutaActiva.snapshot.params.numc != undefined) {
-        var numc = this.rutaActiva.snapshot.params.numc
-        this.actualizarDocumentos()
-        return
-      }
-
-=======
 
     this.ngxService.startLoader("loader-aceptar")
 
@@ -357,7 +330,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.obtenerWorkFlow() //Obtener valores de una API
       this.actualizarDocumentos()
       return
->>>>>>> c13764331bb3ccaaed018fb5e334e789a96c4d80
     }
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -484,14 +456,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   async actualizarDocumentos() {
 
-<<<<<<< HEAD
-=======
     if (this.Doc.contenido == '') {
       this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
       return
     }
 
->>>>>>> c13764331bb3ccaaed018fb5e334e789a96c4d80
     this.Doc.fcreacion = typeof this.fcreacion === 'object' ? this.utilService.ConvertirFecha(this.fcreacion) : this.Doc.fcreacion.substring(0, 10)
     this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10)
     this.Doc.creador = this.loginService.Usuario.id
