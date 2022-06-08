@@ -174,6 +174,9 @@
                         <button mat-icon-button aria-label="Editar" (click)="editar('aycotizaciones', e.id )">
                           <mat-icon class="text-pink">edit_note</mat-icon>
                         </button>
+                        <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                          <mat-icon class="text-info">attach_file</mat-icon>
+                        </button>
                         <!-- <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
                           <mat-icon class="text-purple">delete</mat-icon>
                         </button> -->
@@ -277,6 +280,37 @@
     <button class="btn bg-gradient-primary text-white " (click)="SubirArchivo();modal.close('Save')">
       <span class="fa fa-check"></span>&nbsp;&nbsp;Agregar </button>
     <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
+
+
+<ng-template #adjuntar let-c="close" let-d="dismiss">
+  <div class="modal-header header bg-gradient-success">
+    <h4 class="modal-title" id="modal-basic-title">Cargar Archivo en {{ numControl }}</h4>
+
+  </div>
+  <div class="modal-body">
+
+
+    <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+      <input type="hidden" name="txtFileID" id="txtFileID" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="numControl" value="{{numControl}}" readonly="readonly">
+      <label for="input-folder-2">Seleccionar Archivo</label>
+      <div class="file-loading">
+        <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file"
+          multiple accept=".pdf">
+      </div>
+      <div id="errorBlock" class="help-block"></div>
+    </form>
+
+
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
+      <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
+    <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
   </div>
 </ng-template>

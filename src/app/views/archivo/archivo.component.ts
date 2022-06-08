@@ -22,6 +22,8 @@ export class ArchivoComponent implements OnInit {
 
   public clasificacion = false
 
+  public vplazo = false
+
   public nexpediente = ''
   
   public codigo =  ''
@@ -31,7 +33,7 @@ export class ArchivoComponent implements OnInit {
   public lstAcciones = []
 
   public cmbAcciones = [
-    { 'valor': '0', 'texto': 'ARCHIVAR', 'visible': '0' }]
+    { 'valor': '6', 'texto': 'REACTIVAR', 'visible': '0' }]
 
   public paginador = 10
   public focus;
@@ -385,11 +387,9 @@ export class ArchivoComponent implements OnInit {
   selAccion() {
     this.clasificacion = false
     switch (this.AccionTexto) {
-      case '0':
+      case '6':
         this.clasificacion = true
-        break;
-
-      default:
+        this.vplazo = true
         break;
     }
   }

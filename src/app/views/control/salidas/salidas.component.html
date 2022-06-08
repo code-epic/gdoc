@@ -70,7 +70,8 @@
                       </button>
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
+                        &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-2 texto-lista">
                       {{ e.nori | uppercase }}
@@ -113,7 +114,8 @@
                     </div>
 
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc | uppercase}} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc |
+                        uppercase}} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-2 texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }}
@@ -166,7 +168,8 @@
                     </div>
 
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.saso }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.saso }}
+                        &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-4 texto-lista">
                       {{ e.udep | uppercase }}
@@ -180,7 +183,7 @@
                       <button mat-icon-button aria-label="Privado">
                         <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
                       </button>
-              
+
                       <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
                         <mat-icon class="text-info">attach_file</mat-icon>
                       </button>
@@ -206,7 +209,8 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.ncontrol )]">{{ e.ncontrol | uppercase }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.ncontrol )]">{{
+                        e.ncontrol | uppercase }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-4 texto-lista">
                       {{ e.unidad | uppercase }}
@@ -253,20 +257,33 @@
     <div class="form-group  col-md-12">
       <label>Acción</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
-        (change)="selAccion()">
+        (change)="selAccion()" value="{{AccionTexto}}">
         <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
       </select>
 
     </div>
     <div class="form-group  col-md-12" *ngIf="clasificacion">
       <label>Area</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
-        <option value="S">SELECCIONE</option>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino"
+        value="{{cmbDestino}}">
         <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
       </select>
     </div>
 
-    <div class="form-group  col-md-12"  *ngIf="vplazo">
+    <div class="form-row col-md-12" *ngIf="archivar">
+      <div class="form-group col-md-6">
+        <label for="">Código de Archivo</label>
+        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="codigo"
+          value="{{ codigo }}">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="">Expediente</label>
+        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="nexpediente"
+          value="{{ nexpediente }}">
+      </div>
+    </div>
+
+    <div class="form-group  col-md-12" *ngIf="vplazo">
       <label for="tmsCreacion">Plazo / Alerta</label>
       <div class="form-group" style="width:100%">
         <div class="input-group" style="width:100%">
