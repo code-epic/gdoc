@@ -26,6 +26,8 @@ export class SalidasComponent implements OnInit {
 
   public clasificacion = false
 
+  public archivar = false
+
   public vrecibido = true
 
   public vprocesados = false
@@ -34,7 +36,7 @@ export class SalidasComponent implements OnInit {
 
   public vplazo = false
 
-  public cmbDestino = ''
+  public cmbDestino = '0'
 
   public extender_plazo: any
 
@@ -206,23 +208,29 @@ export class SalidasComponent implements OnInit {
 
     switch (e) {
       case 0:
-        this.cargarAcciones(0)
-        this.clasificacion = false
+
 
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
         this.listarBuzon(this.bzRecibido)
+        this.clasificacion = false
+        this.cargarAcciones(0)
+
         break
       case 1:
-        this.cargarAcciones(1)
-        this.clasificacion = false
+
         this.xAPI.parametros = this.estadoActual + ',' + 2
         this.listarBuzon(this.bzProcesados)
+        this.clasificacion = false
+        this.cargarAcciones(1)
+
         break
       case 2:
-        this.cargarAcciones(2)
-        this.clasificacion = false
+
         this.xAPI.parametros = this.estadoActual + ',' + 3
         this.listarBuzon(this.bzPendientes)
+        this.clasificacion = false
+        this.cargarAcciones(2)
+
         break
       case 4:
         this.xAPI.parametros = this.estadoActual + ',' + 4
@@ -258,8 +266,8 @@ export class SalidasComponent implements OnInit {
           e.color = 'warn'
           e.priv = e.priv == 1 ? true : false
           e.existe = e.anom == '' ? true : false
-          const valor =  this.cmbAcciones[e.accion] == undefined ? 'NUEVO DOCUMENTO': this.cmbAcciones[e.accion].texto
-          e.nombre_accion = e.accion != null ?  valor: 'NUEVO DOCUMENTO'
+          const valor = this.cmbAcciones[e.accion] == undefined ? 'NUEVO DOCUMENTO' : this.cmbAcciones[e.accion].texto
+          e.nombre_accion = e.accion != null ? valor : 'NUEVO DOCUMENTO'
           e.url = e.numc != e.saso ? '/documento/salida' : '/documento'
           e.xaccion = e.accion
           bz.push(e)
@@ -283,29 +291,6 @@ export class SalidasComponent implements OnInit {
     this.recorrerElementos(e.pageIndex + 1, this.lst)
   }
 
-  updateAllComplete() {
-    this.allComplete = this.bzRecibido != null && this.bzRecibido.every(t => t.completed);
-  }
-
-  setAll(completed: boolean) {
-    this.allComplete = completed;
-    if (this.bzRecibido == null) {
-      return;
-    }
-
-    this.bzRecibido.forEach(t => (t.completed = completed));
-    if (completed == false) {
-      this.estiloclasificar = 'none'
-    } else {
-      this.estiloclasificar = ''
-    }
-  }
-
-  someComplete(): boolean {
-    if (this.bzRecibido == null) return false;
-    return this.bzRecibido.filter(t => t.completed).length > 0 && !this.allComplete;
-  }
-
 
   //recorrerElementos para paginar listados
   recorrerElementos(posicion: number, lista: any) {
@@ -316,18 +301,18 @@ export class SalidasComponent implements OnInit {
 
 
   //editar
-  editar(id: string, url : string) {
+  editar(id: string, url: string) {
 
 
     const estado = this.estadoActual
     const estatus = this.selNav + 1
     const base = btoa(estado + ',' + estatus + ',' + id)
-    if (url == '/documento'){
+    if (url == '/documento') {
       this.ruta.navigate([url, base, 'salida'])
-    }else{
+    } else {
       this.ruta.navigate([url, base])
     }
-    
+
 
 
   }
@@ -357,7 +342,7 @@ export class SalidasComponent implements OnInit {
             this.rechazarBuzon()
             break;
           case "2"://Oficio por opinión
-            this.promoverBuzon(0,  this.utilService.FechaActual())
+            this.promoverBuzon(0, this.utilService.FechaActual())
             break;
           case "3"://Oficio por opinión
             this.promoverBuzon(1, '')
@@ -463,21 +448,25 @@ export class SalidasComponent implements OnInit {
 
   async cargarAcciones(posicion) {
     this.lstAcciones = []
-    this.cmbAcciones.forEach(e => {
-      if (e.visible == posicion) {
-        this.lstAcciones.push(e)
-      }
+    this.lstAcciones = await this.cmbAcciones.filter(e => {
+      return e.visible == posicion
 
     });
+    this.AccionTexto = posicion == 2 ? '3' : '0'
+    this.selAccion()
   }
 
   selAccion() {
     this.clasificacion = false
     this.vplazo = false
+    this.archivar = false
     switch (this.AccionTexto) {
       case '6':
         this.vplazo = true
         this.clasificacion = true
+        break;
+      case '3':
+        this.archivar = true
         break;
     }
   }
