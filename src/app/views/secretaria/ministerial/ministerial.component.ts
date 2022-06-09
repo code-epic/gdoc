@@ -37,8 +37,9 @@ export class MinisterialComponent implements OnInit {
 
   public lstEstados = [] //Listar Estados
 
+  public estadoActual = 4
+  public estadoOrigen = 2
   public original = ''
-
   public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
@@ -65,9 +66,7 @@ export class MinisterialComponent implements OnInit {
 
   public posicionPagina = 0
   public placement = 'bottom'
-
   public cmbDestino = 'S'
-
   public asunto = ''
   public fecha = ''
   public cuenta = ''
@@ -76,9 +75,7 @@ export class MinisterialComponent implements OnInit {
   public archivos = []
   public download : any
 
-
   public lstRedistribucion = [{ 'valor': '1', 'texto': 'REDISTRIBUCION', 'visible': '1' }]
-
 
   public ministerial: any
 
@@ -86,6 +83,11 @@ export class MinisterialComponent implements OnInit {
 
   public blUpdate = false;
 
+  public numControl = ''
+
+  public Observacion = ''
+
+  public AccionTexto: string = '0'
 
   public SubDocumento: SubDocumento = {
     subdocumento: 0,
@@ -101,7 +103,6 @@ export class MinisterialComponent implements OnInit {
     usuario: ''
   }
 
-
   public WAlerta: IWKFAlerta = {
     documento: 0,
     estado: 0,
@@ -114,9 +115,7 @@ export class MinisterialComponent implements OnInit {
 
   public fecha_alerta: any
   public fplazo: any
-
   public dwValidate = false
-
   public dwSub = false
 
   constructor(private apiService: ApiService,
@@ -134,6 +133,8 @@ export class MinisterialComponent implements OnInit {
     this.editor = new Editor()
     this.fplazo = NgbDate.from(this.formatter.parse(this.utilService.FechaActual()))
 
+    this.extender_plazo = NgbDate.from(this.formatter.parse(this.utilService.FechaActual()))
+
     if (this.rutaActiva.snapshot.params.id != undefined) {
       try {
         this.original = this.rutaActiva.snapshot.params.id
@@ -144,7 +145,6 @@ export class MinisterialComponent implements OnInit {
         this.download = this.apiService.Dws( this.ministerial.numc + '/' + this.ministerial.anom )
         this.codigohash = btoa(this.ministerial.id + this.ministerial.idd + this.ministerial.cuenta)
         this.cmbDestino = 'S'
-        console.log(this.ministerial)
         this.listarEstados()
       } catch (error) {
         this.ruta.navigate(['/secretaria', ''])
@@ -169,13 +169,8 @@ export class MinisterialComponent implements OnInit {
   }
 
   open(content, id) {
-
     this.modalService.open(content, { size: 'lg' });
-
   }
-
-
-
 
   listarDatos() {
     this.unidad = this.ministerial.udep
@@ -223,6 +218,7 @@ export class MinisterialComponent implements OnInit {
         break;
     }
     this.fplazo = NgbDate.from(this.formatter.parse(this.fecha_alerta))
+    this.extender_plazo = NgbDate.from(this.formatter.parse(this.fecha_alerta))
 
   }
 
@@ -250,7 +246,6 @@ export class MinisterialComponent implements OnInit {
   registrar() {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        console.log(data);
         this.xAPI.funcion = 'WKF_ISubDocumentoAlerta'
         await this.guardarAlerta(90, this.fecha_alerta)
         this.ngxService.stopLoader("loader-aceptar")
@@ -263,7 +258,6 @@ export class MinisterialComponent implements OnInit {
   }
 
   actualizar() {
-    console.info('Actualizando informacion ', this.SubDocumento)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         this.xAPI.funcion = 'WKF_ASubDocumentoAlerta'
@@ -280,6 +274,7 @@ export class MinisterialComponent implements OnInit {
 
   //Guardar la alerte define el momento y estadus
   guardarAlerta(activo: number, fecha: string) {
+    
     this.WAlerta.activo = activo
     this.WAlerta.documento = parseInt(this.ministerial.ids)
     this.WAlerta.estado = 4
@@ -365,5 +360,56 @@ export class MinisterialComponent implements OnInit {
   verArchivos(content) {
     this.modalService.open(content, { size: 'lg' })
   }
+
+
+
+  insertarObservacion() {
+    var usuario = this.loginService.Usuario.id
+    this.xAPI.funcion = 'WKF_IDocumentoObservacion'
+    this.xAPI.valores = JSON.stringify(
+      {
+        "documento": this.ministerial.idd,
+        "estado": this.estadoActual, //Estado que ocupa
+        "estatus": 1,
+        "observacion": this.Observacion.toUpperCase(),
+        "accion": this.AccionTexto,
+        "usuario": usuario
+      }
+    )
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+        this.redistribuir(3)
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
+      }) //
+  }
+
+
+  async redistribuir(destino: number = 0) {
+    var dst = destino != 0 ? destino : this.cmbDestino
+
+    this.xAPI.funcion = "WKF_ASubDocumentoRedistribuir"
+    this.xAPI.valores = ''
+    this.xAPI.parametros = dst + ',1,'  + this.loginService.Usuario.id + ',' + this.ministerial.idd + ',' + this.ministerial.cuenta
+    console.log(this.xAPI);
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+        //this.xAPI.funcion = 'WKF_ASubDocumentoAlerta'
+        //await this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
+        this.toastrService.success(
+          'El documento ha sido redistribuido segun su selección',
+          `GDoc Wkf.DocumentoObservacion`
+        )
+        this.ruta.navigate(['/secretaria']);
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  }
+
+
 
 }

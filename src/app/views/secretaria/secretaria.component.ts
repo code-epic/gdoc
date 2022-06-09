@@ -204,7 +204,7 @@ export class SecretariaComponent implements OnInit {
         this.clasificacion = false
 
         this.xAPI.funcion = 'WKF_CSubDocumento'
-        this.xAPI.parametros = this.estadoActual + ',' + 2
+        this.xAPI.parametros = this.estadoActual + ',' + 2 + ',1'
         this.listarBuzon()
         break
       case 2:
@@ -239,6 +239,7 @@ export class SecretariaComponent implements OnInit {
     var bz = []
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        
         data.Cuerpo.forEach(e => {
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false

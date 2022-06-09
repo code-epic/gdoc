@@ -20,6 +20,8 @@ export class BuzonComponent implements OnInit {
   public estadoActual = 2
   public estatusAcutal = 1
 
+  public extender_plazo: any
+
   public clasificacion = false
   public vplazo = false
 
@@ -31,7 +33,7 @@ export class BuzonComponent implements OnInit {
 
   public cmbDestino = 'S'
 
-  public lstAcciones = []
+ 
 
   public cmbAcciones = [
     { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
@@ -52,12 +54,10 @@ export class BuzonComponent implements OnInit {
     parametros: '',
     valores : ''
   }
-  lst = []
+  public lst = []
   public lstEstados = [] //Listar Estados
-
-
-
-  selNav = 0
+  public selNav = 0
+  public lstAcciones = []
 
   public bzOriginal = [] //Listado Original
   public buzon = []
@@ -73,7 +73,7 @@ export class BuzonComponent implements OnInit {
   public numControl = ''
   public Observacion = ''
   public AccionTexto: string = '0'
-  public extender_plazo: any
+
 
   longitud = 0;
   pageSize = 10;
