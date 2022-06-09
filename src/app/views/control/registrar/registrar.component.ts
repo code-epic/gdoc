@@ -36,30 +36,12 @@ export class RegistrarComponent implements OnInit {
 
   public paginador = 10
   public focus;
+  public hashcontrol = ''
+
   public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
-    relacional: false,
-    concurrencia: false,
-    protocolo: '',
-    ruta: '',
-    version: '',
-    retorna: false,
-    migrar: false,
-    http: 0,
-    https: 0,
-    consumidores: '',
-    puertohttp: 0,
-    puertohttps: 0,
-    driver: '',
-    query: '',
-    metodo: '',
-    tipo: '',
-    prioridad: '',
-    entorno: '',
-    logs: false,
-    cache: 0,
-    estatus: false
+    valores: ''
   };
 
   selNav = 0
@@ -221,6 +203,7 @@ export class RegistrarComponent implements OnInit {
 
   open(content, id) {
     this.numControl = id
+    this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
     this.modalService.open(content);
 
   }
@@ -467,7 +450,7 @@ try {
                   'Tu archivo ha sido cargado con exito ',
                   `GDoc Registro`
                 );
-                this.actualizarBzRegistrados(this.numControl, 1)
+                
               } else {
                 this.toastrService.error(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
               }

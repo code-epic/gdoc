@@ -289,7 +289,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         })
 
         //Carga de Documentos
-        this.download = this.apiService.Dws(this.Doc.ncontrol + '/' + this.Doc.archivo)
+        this.download = this.apiService.Dws(   btoa( "D" + this.Doc.ncontrol ) + '/' + this.Doc.archivo)
+       
 
 
       },
@@ -324,10 +325,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
     this.ngxService.startLoader("loader-aceptar")
-
+    this.obtenerWorkFlow() //Obtener valores de una API
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
-      this.obtenerWorkFlow() //Obtener valores de una API
+      
       this.actualizarDocumentos()
       return
     }

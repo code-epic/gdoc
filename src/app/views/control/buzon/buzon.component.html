@@ -125,7 +125,7 @@
                     <div class="col-md-3 texto-lista">
                       {{ e.udep | uppercase }}
                     </div>
-                    <div class="col-md-1 texto-lista">
+                    <div class="col-md-2 texto-lista">
                       {{ e.observacion_accion | uppercase }}
                     </div>
                     <div class="col-md-2 text-right">
@@ -135,7 +135,7 @@
                       <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
                         <mat-icon class="text-pink">edit_note</mat-icon>
                       </button>
-                      <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                      <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
                         <mat-icon class="text-info">attach_file</mat-icon>
                       </button>
 
@@ -184,7 +184,7 @@
                       <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
                         <mat-icon class="text-pink">edit_note</mat-icon>
                       </button>
-                      <button *ngIf="e.existe" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                      <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
                         <mat-icon class="text-info">attach_file</mat-icon>
                       </button>
 
@@ -305,12 +305,10 @@
 
 
     <form method="post" enctype="multipart/form-data" id="forma" name="forma">
-      <input type="hidden" name="txtFileID" id="txtFileID" [ngModelOptions]="{standalone: true}"
-        [(ngModel)]="numControl" value="{{numControl}}" readonly="readonly">
+      <input type="hidden" name="txtFileID" id="txtFileID" value="{{hashcontrol}}" readonly="readonly">
       <label for="input-folder-2">Seleccionar Archivo</label>
       <div class="file-loading">
-        <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file"
-          multiple accept=".pdf">
+        <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file" multiple accept=".pdf">
       </div>
       <div id="errorBlock" class="help-block"></div>
     </form>
