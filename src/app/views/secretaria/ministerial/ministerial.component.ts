@@ -379,7 +379,9 @@ export class MinisterialComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        this.redistribuir(3)
+       
+        this.redistribuir()
+
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);

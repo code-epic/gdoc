@@ -126,6 +126,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstU = [] //Objeto Unidad
   public lstCuenta = [] //Objeto Unidad
 
+  public lstHzAdjunto = [] //Historico de documentos adjuntos
   public lstTraza = []
   public lstHistorial = []
   public lstImg = []
@@ -260,6 +261,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         data.Cuerpo.forEach(e => {
+          
           this.Doc = e
           this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
           this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
@@ -273,25 +275,30 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           }
 
         });
-
+        
         this.selTipoDocumento()
         const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
         this.lstCuenta = punto_cuenta.map(e => {
           return typeof e == 'object' ? e : JSON.parse(e)
         })
+        
+
         const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
-        this.lstTraza = traza.map(e => {
-          return typeof e == 'object' ? e : JSON.parse(e)
-        })
+        this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+
         const historial = this.Doc.historial != null ? JSON.parse(this.Doc.historial) : []
-        this.lstHistorial = historial.map(e => {
-          return typeof e == 'object' ? e : JSON.parse(e)
-        })
+        this.lstHistorial = historial.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+
+        const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
+        this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+
+        console.log( this.lstHzAdjunto )
 
         //Carga de Documentos
         this.download = this.apiService.Dws(   btoa( "D" + this.Doc.ncontrol ) + '/' + this.Doc.archivo)
        
 
+        console.log( this.Doc )
 
       },
       (error) => {
@@ -299,6 +306,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       }
     )
   }
+  
 
   open(content) {
     this.modalService.open(content);

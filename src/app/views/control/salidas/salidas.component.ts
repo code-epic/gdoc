@@ -121,6 +121,8 @@ export class SalidasComponent implements OnInit {
     observacion: ''
   }
 
+  
+
   public placement = 'bottom'
 
   public URLDESTINO = '/documento/salida'
@@ -260,10 +262,12 @@ export class SalidasComponent implements OnInit {
 
   async listarBuzon(bz: any) {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+      async data => {
+        console.log(data.Cuerpo)
         data.Cuerpo.forEach(e => {
           e.completed = false
           e.color = 'warn'
+          e.salida = e.saso != ""? true : false
           e.priv = e.priv == 1 ? true : false
           e.existe = e.anom == '' ? true : false
           const valor = this.cmbAcciones[e.accion] == undefined ? 'NUEVO DOCUMENTO' : this.cmbAcciones[e.accion].texto
@@ -272,13 +276,42 @@ export class SalidasComponent implements OnInit {
           e.xaccion = e.accion
           bz.push(e)
         })//Registros recorridos como elementos
+        
+        await this.listarSubDocumentos()
+        
+      
+      },
+      (error) => {
 
+      }
+    )
+  }
+
+  async listarSubDocumentos() {
+
+    this.xAPI.funcion = 'WKF_CSubDocumento'
+    this.xAPI.parametros = '4,2,9'
+    
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data.Cuerpo)
+        data.Cuerpo.forEach(e => {
+          e.completed = false
+          e.color = 'warn'
+          e.nori = e.cuenta
+          e.cuentas = e.cuenta == ''? '': e.cuenta
+          e.priv = e.priv == 1 ? true : false
+          e.existe = e.anom == '' ? true : false
+          e.xaccion = e.accion
+          this.bzRecibido.push(e)
+        }) //Registros recorridos como elementos
         this.lengthOfi = data.Cuerpo.length
         if (this.lengthOfi > 0) {
           this.estilocheck = ''
           this.recorrerElementos(1, this.bzRecibido)
         }
 
+        
       },
       (error) => {
 

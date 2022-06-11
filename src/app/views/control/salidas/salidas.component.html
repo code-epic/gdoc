@@ -64,10 +64,15 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Example " class="text-primary"
+                      <button mat-icon-button aria-label="Example " *ngIf="e.bOk" class="text-primary"
                         (click)="open(observacion, e.idd)">
                         <mat-icon>task_alt</mat-icon>
                       </button>
+                      <button mat-icon-button aria-label="Example " *ngIf="!e.bOk" class="text-purple"
+                        (click)="open(observacion, e.idd)">
+                        <mat-icon>task_alt</mat-icon>
+                      </button>
+                      
                     </div>
                     <div class="col-md-2 texto-lista">
                       <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
@@ -108,7 +113,7 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Visibilidad">
+                      <button mat-icon-button aria-label="Visibilidad" *ngIf="e.salida">
                         <mat-icon class="text-primary" (click)="open(observacion, e.idd)">add_circle</mat-icon>
                       </button>
                     </div>
