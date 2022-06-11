@@ -26,6 +26,7 @@ export interface IDocumento {
   historial?: string
   traza?: string
   subdocumento?: string
+  hz_adjunto?: string
 
 }
 

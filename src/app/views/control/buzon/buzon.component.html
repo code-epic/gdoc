@@ -305,10 +305,10 @@
 
 
     <form method="post" enctype="multipart/form-data" id="forma" name="forma">
-      <input type="hidden" name="txtFileID" id="txtFileID" value="{{hashcontrol}}" readonly="readonly">
-      <label for="input-folder-2">Seleccionar Archivo</label>
+      <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+      <label>Seleccionar Archivo</label>
       <div class="file-loading">
-        <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file" multiple accept=".pdf">
+        <input (change)="fileSelected($event)" class="file-input" name="archivos" type="file" accept=".pdf">
       </div>
       <div id="errorBlock" class="help-block"></div>
     </form>

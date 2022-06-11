@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatAccordion } from '@angular/material/expansion';
 import { PageEvent } from '@angular/material/paginator';
-import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Editor } from 'ngx-editor';
 import { Router } from '@angular/router';
@@ -104,6 +104,13 @@ export class RegistrarComponent implements OnInit {
   public longitud = 0;
   public pageSize = 10;
   public posicionPagina = 0
+
+  public DocAdjunto : DocumentoAdjunto = {
+    documento : '',
+    archivo : '',
+    usuario : ''
+  }
+
 
   constructor(private apiService: ApiService,
     config: NgbModalConfig,
@@ -435,14 +442,16 @@ try {
   }
 
   async SubirArchivo(e) {
-
     var frm = new FormData(document.forms.namedItem("forma"))
     try {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
           this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
-          this.xAPI.parametros = this.archivos[0].name + ',' + this.loginService.Usuario.id + ',' + this.numControl
-          this.xAPI.valores = ''
+          this.xAPI.parametros =  '' 
+          this.DocAdjunto.archivo = this.archivos[0].name
+          this.DocAdjunto.usuario = this.loginService.Usuario.id
+          this.DocAdjunto.documento = this.numControl
+          this.xAPI.valores = JSON.stringify(this.DocAdjunto)
           this.apiService.Ejecutar(this.xAPI).subscribe(
             (xdata) => {
               if (xdata.tipo == 1) {
@@ -450,9 +459,9 @@ try {
                   'Tu archivo ha sido cargado con exito ',
                   `GDoc Registro`
                 );
-                
+               
               } else {
-                this.toastrService.error(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+                this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
               }
             },
             (error) => {

@@ -4,7 +4,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -99,6 +99,12 @@ export class BuzonComponent implements OnInit {
     fecha: '',
     usuario: '',
     observacion: ''
+  }
+
+  public DocAdjunto : DocumentoAdjunto = {
+    documento : '',
+    archivo : '',
+    usuario : ''
   }
 
   constructor(
@@ -468,14 +474,17 @@ export class BuzonComponent implements OnInit {
   }
 
   async SubirArchivo(e) {
-
     var frm = new FormData(document.forms.namedItem("forma"))
     try {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
           this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
-          this.xAPI.parametros = this.archivos[0].name + ',' + this.loginService.Usuario.id + ',' + this.numControl
-          this.xAPI.valores = ''
+          this.xAPI.parametros =  '' 
+          this.DocAdjunto.archivo = this.archivos[0].name
+          this.DocAdjunto.usuario = this.loginService.Usuario.id
+          this.DocAdjunto.documento = this.numControl
+          this.xAPI.valores = JSON.stringify(this.DocAdjunto)
+
           this.apiService.Ejecutar(this.xAPI).subscribe(
             (xdata) => {
               if (xdata.tipo == 1) {
@@ -485,7 +494,7 @@ export class BuzonComponent implements OnInit {
                 );
                
               } else {
-                this.toastrService.error(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+                this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
               }
             },
             (error) => {
