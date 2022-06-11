@@ -212,7 +212,7 @@
                       <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.ncontrol )]">{{
                         e.ncontrol | uppercase }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
-                    <div class="col-md-4 texto-lista">
+                    <div class="col-md-3 texto-lista">
                       {{ e.unidad | uppercase }}
                     </div>
                     <div class="col-md-2 texto-lista">
@@ -221,9 +221,11 @@
                     <div class="col-md-3 texto-lista  {{ e.color }}">
                       {{ e.texto | uppercase }}
                     </div>
-                    <div class="col-md-1 text-right ">
+                    <div class="col-md-2 text-center">
                       <button mat-icon-button aria-label="Privado">
-                        <!--  -->
+                        <mat-icon class="text-warning" (click)="editar(e.num, e.url)">repeat</mat-icon>
+                      </button>
+                      <button mat-icon-button aria-label="Privado">
                         <mat-icon class="text-warning" (click)="open(alerta, e.id_alerta)">today</mat-icon>
                       </button>
 
