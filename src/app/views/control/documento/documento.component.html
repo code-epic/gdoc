@@ -10,9 +10,19 @@
             <div class="card shadow">
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
-                        <div class="col-md-10">
+                        <div class="col-md-9">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
                             <h2 class="mb-0">Registrar {{titulo}}</h2>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" *ngIf="bPDF"
+                                        (click)="verArchivos(archivos)">
+                                        <mat-icon>wallpaper</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
@@ -42,11 +52,7 @@
                                             <i class="ni ni-settings-gear-65"></i>
                                             <span>Configuración</span>
                                         </a>
-                                        <a routerLinkActive="active" (click)="verArchivos(archivos)"
-                                            class="dropdown-item">
-                                            <i class="ni ni-bullet-list-67"></i>
-                                            <span>Ver Archivos</span>
-                                        </a>
+
                                     </div>
                                 </li>
                             </ul>
@@ -305,7 +311,7 @@
 
 
     <!-- Adjuntar Imagenes al Documento -->
-    <ng-template #archivos let-c="close" let-d="dismiss">
+    <ng-template #archivos let-modal>
         <div class="modal-header header bg-gradient-success">
             <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
 
@@ -313,45 +319,65 @@
         <div class="modal-body">
 
 
-            <div class="form-group row">
-                <div class="form-group col-md-4"></div>
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-12">
                     <div class="card card-profile">
-                        <div class="card-header bg-info" 
-                            style="background-image: url('./assets/img/theme/inn.svg'); height: 64px;">
-                            <div class="card-avatar text-center" >
+                        <div class="card-header bg-info"
+                            style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
+                            <div class="card-avatar text-center">
                                 <a href="javascript:;">
                                     <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
-                                        style="width:64px;z-index: 1; margin-top: -5px;">
+                                        style="width:100px;z-index: 1; margin-top: -5px;">3
                                 </a>
                             </div>
                         </div>
                         <br>
 
                         <div class="card-body pt-0">
+
                             <div class="d-flex justify-content-between">
-                                <a   [href]="download" target="_top" rel="noopener noreferrer" class="btn btn-sm  btn-primary mt-3">Descargar</a>
-                                <a href="javascript:;" class="btn btn-sm btn-default float-right mt-3">Historial</a>
+                                <a [href]="download" target="_top" rel="noopener noreferrer"
+                                    class="btn btn-primary mt-3">Descargar</a>
+                                <a (click)="activarHistorial()" class="btn btn-default float-right mt-3">Historial</a>
                             </div>
                             <br><br>
                             <div class="text-center">
                                 <div class="font-weight-50">
-                                    Publicado<span class="font-weight-light">, 2022-07-05</span>
+                                    Publicado<span class="font-weight-light">, {{ Doc.fcreacion | date:"dd-MM-yy
+                                        hh:mm:ss"}}</span>
                                     <br>
-                                    <h5 class="h4" style="font-size: 10px;">0c521f27fb1b3311d686d511b668e5bd4</h5>
+                                    <h5 class="h4" style="font-size: 10px;">{{ Doc.creador }}</h5>
                                 </div>
                             </div>
+                                <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
+                                    <table class="table">
+                                        <thead class="thead-light">
+                                            <th>Documento</th>
+                                            <th>Usuario</th>
+                                            <th>Fecha</th>
+                                        </thead>
+                                        <tbody>
+
+                                            <tr [ngModelOptions]="{standalone: true}"
+                                                *ngFor="let el of lstHzAdjunto;let i=index">
+
+                                                <td>
+                                                    <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"
+                                                        rel="noopener noreferrer">
+                                                        {{ el.nombre.substring(20,32) }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ el.usuario }}</td>
+                                                <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                         </div>
                     </div>
                 </div>
-                <div class="form-group col-md-4"></div>
-            </div>
-
-
-
         </div>
         <div class="modal-footer">
-            <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+            <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
                 <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
         </div>
     </ng-template>

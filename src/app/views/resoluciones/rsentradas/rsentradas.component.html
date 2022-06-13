@@ -5,13 +5,23 @@
 </div>
 <div class="container-fluid mt--9">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
-                        <div class="col-md-10">
+                        <div class="col-md-9">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
                             <h2 class="mb-0">Registrar Entradas</h2>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" *ngIf="bPDF"
+                                        (click)="verArchivos(archivos)">
+                                        <mat-icon>wallpaper</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
@@ -48,107 +58,95 @@
                 </div>
                 <div class="card-body">
                     <form>
-                        <div class="form-row">
-                            <div class="form-group col-md-12">
-                                <label for="txtObjeto">Cuenta o Oficio</label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.modalidad" value="{{Cotizaciones.modalidad}}">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label> Digital </label>
-                                <input type="text" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}"
-                                    class="form-control">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label> Documento </label>
-                                <input type="text" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}"
-                                    class="form-control">
-                            </div>
-                        </div>
-                        <hr class="mb-1">
-                        <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Personales</h6>
-                        <div class="form-row">
-                            <div class="form-group col-md-2">
-                                <label> Cédula </label>
-                                <input type="text" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}"
-                                    class="form-control">
-                            </div>
-                            <div class="form-group col-md-5">
-                                <label> Nombres </label>
-                                <input type="text" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}"
-                                    class="form-control">
-                            </div>
-                            <div class="form-group col-md-5">
-                                <label> Apellidos </label>
-                                <input type="text" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}"
-                                    class="form-control">
-                            </div>
-                        </div>
+                        <div class="row">
+                            <div class="col-md-9">
 
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="tmsOrigen">Fecha de Nacimiento</label>
-                                <form class="form-inline">
-                                    <div class="form-group" style="width:100%">
-                                        <div class="input-group" style="width:100%">
-                                            <input class="form-control" placeholder="AAAA-MM-DD"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia"
-                                                ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
-                                                [placement]="placement" [positionTarget]="buttonEl">
-                                            <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="vi.toggle()"
-                                                    type="button">
-                                                </button>
-                                            </div>
+                                <div class="row">
+                                    <div class="form-group col-md-12">
+                                        <label for="txtObjeto">Cuenta o Oficio</label>
+                                        <div class="NgxEditor__Wrapper">
+                                            <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
+                                            <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor"
+                                                [(ngModel)]="Resolucion.asunto" [disabled]="false" [placeholder]="'Escibe aqui...'">
+                                            </ngx-editor>
                                         </div>
                                     </div>
-                                </form>
+                                </div>
+
+                                <!-- <hr class="mb-1">
+                            <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Personales</h6> -->
+                                <div class="row">
+                                    <div class="form-group col-md-2">
+                                        <label> Cédula </label>
+                                        <input type="text" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="Resolucion.cedula" value="{{Resolucion.cedula}}"
+                                            class="form-control">
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <label> Nombres </label>
+                                        <input type="text" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="Resolucion.nombres" value="{{Resolucion.nombres}}"
+                                            class="form-control">
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <label> Apellidos </label>
+                                        <input type="text" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="Resolucion.apellidos" value="{{Resolucion.apellidos}}"
+                                            class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label for="tmsOrigen">Fecha de Nacimiento</label>
+                                        <form class="form-inline">
+                                            <div class="form-group" style="width:100%">
+                                                <div class="input-group" style="width:100%">
+                                                    <input class="form-control" placeholder="AAAA-MM-DD"
+                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia"
+                                                        ngbDatepicker #vi="ngbDatepicker"
+                                                        [value]="formatter.format(fvigencia)" [placement]="placement"
+                                                        [positionTarget]="buttonEl">
+                                                    <div class="input-group-append">
+                                                        <button #buttonEl class="btn calendario" (click)="vi.toggle()"
+                                                            type="button">
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label> Sexo </label>
+                                        <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="Resolucion.sexo" value="{{Resolucion.sexo}}">
+                                            <option value="0">Seleccione</option>
+                                            <option value="Masculino">MASCULINO</option>
+                                            <option value="Femenino">FEMENINO</option>
+                                        </select>
+                                    </div>
+                                </div>
+
                             </div>
-                            <div class="form-group col-md-6">
-                                <label> Sexo </label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
-                                    <option value="0">Seleccione</option>
-                                    <option value="Masculino">MASCULINO</option>
-                                    <option value="Femenino">FEMENINO</option>
-                                </select>
+                            <div class="col-md-3">
+                                <div class="row">
+                                    <br><br>
+                                    <div class="col-md-12 text-center">
+                                        <br>
+                                        <img src="https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/13587538/foto.jpg" 
+                                         style="width: 180px; border: 1px; padding:2px">
+                                    </div>
+                                </div>
+                               
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header bg-transparent">
-                    <div class="row align-items-center">
-                        <div class="col-md-12 text-center">
-                            <img src="assets/img/brand/timonel.jpg" class="rounded-circle" style="height: 150px;">
-                        </div>
-                    </div>
-                </div>
 
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Fecha de Creación</li>
-                        <li class="list-group-item">Categoría</li>
-                        <li class="list-group-item">Clasificación</li>
-                        <li class="list-group-item">Situación</li>
-                        <li class="list-group-item">Ultimo Ascenso</li>
-                        <li class="list-group-item">Tiempo de Servicio</li>
-                        <li class="list-group-item">Histórico Militar</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
     </div>
+    <br>
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -158,19 +156,15 @@
                         <div class="form-group col-md-6">
                             <label> Componente </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                [(ngModel)]="Resolucion.componente" value="{{Resolucion.componente}}">
                                 <option value="0">Seleccione</option>
-                                <option value="Masculino">MASCULINO</option>
-                                <option value="Femenino">FEMENINO</option>
                             </select>
                         </div>
                         <div class="form-group col-md-6">
                             <label> Categoría </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                [(ngModel)]="Resolucion.categoria" value="{{Resolucion.categoria}}">
                                 <option value="0">Seleccione</option>
-                                <option value="Masculino">MASCULINO</option>
-                                <option value="Femenino">FEMENINO</option>
                             </select>
                         </div>
                     </div>
@@ -179,19 +173,15 @@
                         <div class="form-group col-md-6">
                             <label> Clasificación </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                [(ngModel)]="Resolucion.clasificacion" value="{{Resolucion.clasificacion}}">
                                 <option value="0">Seleccione</option>
-                                <option value="Masculino">MASCULINO</option>
-                                <option value="Femenino">FEMENINO</option>
                             </select>
                         </div>
                         <div class="form-group col-md-6">
                             <label> Grado </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                [(ngModel)]="Resolucion.grado" value="{{Resolucion.grado}}">
                                 <option value="0">Seleccione</option>
-                                <option value="Masculino">MASCULINO</option>
-                                <option value="Femenino">FEMENINO</option>
                             </select>
                         </div>
                     </div>
@@ -218,10 +208,8 @@
                         <div class="form-group col-md-6">
                             <label> Situación </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                [(ngModel)]="Resolucion.situacion" value="{{Resolucion.situacion}}">
                                 <option value="0">Seleccione</option>
-                                <option value="Masculino">MASCULINO</option>
-                                <option value="Femenino">FEMENINO</option>
                             </select>
                         </div>
                     </div>
@@ -230,86 +218,36 @@
                         <div class="form-group col-md-4">
                             <label> Número de Resolución </label>
                             <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.garantia" value="{{Cotizaciones.garantia}}">
+                                [(ngModel)]="Resolucion.numero" value="{{Resolucion.numero}}">
                         </div>
                         <div class="form-group col-md-8">
                             <label> Tipo de Resolución </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                [(ngModel)]="Resolucion.tipo" value="{{Resolucion.tipo}}">
                                 <option value="0">Seleccione</option>
-                                <option value="Masculino">MASCULINO</option>
-                                <option value="Femenino">FEMENINO</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label> Fecha de Resolución </label>
-                            <form class="form-inline">
-                                <div class="form-group" style="width:100%">
-                                    <div class="input-group" style="width:100%">
-                                        <input class="form-control" placeholder="AAAA-MM-DD"
-                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia" ngbDatepicker
-                                            #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
-                                            [placement]="placement" [positionTarget]="buttonEl">
-                                        <div class="input-group-append">
-                                            <button #buttonEl class="btn calendario" (click)="vi.toggle()"
-                                                type="button">
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label> Ultimo Ascenso </label>
-                            <form class="form-inline">
-                                <div class="form-group" style="width:100%">
-                                    <div class="input-group" style="width:100%">
-                                        <input class="form-control" placeholder="AAAA-MM-DD"
-                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia" ngbDatepicker
-                                            #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
-                                            [placement]="placement" [positionTarget]="buttonEl">
-                                        <div class="input-group-append">
-                                            <button #buttonEl class="btn calendario" (click)="vi.toggle()"
-                                                type="button">
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label> Orden de Mérito </label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
-                                <option value="0">Seleccione</option>
-                                <option value="Masculino">MASCULINO</option>
-                                <option value="Femenino">FEMENINO</option>
-                            </select>
-                        </div>
-                    </div>
+
 
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label> Número Carpeta </label>
                             <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.modalidad" value="{{Cotizaciones.modalidad}}">
+                                [(ngModel)]="Resolucion.carpeta" value="{{Resolucion.carpeta}}">
                         </div>
                         <div class="form-group col-md-4">
                             <label> Estatus </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.nombre" value="{{Cotizaciones.nombre}}">
+                                [(ngModel)]="Resolucion.estatus" value="{{Resolucion.estatus}}">
                                 <option value="0">Seleccione</option>
-                                <option value="Masculino">MASCULINO</option>
-                                <option value="Femenino">FEMENINO</option>
                             </select>
                         </div>
                         <div class="form-group col-md-4">
                             <label> Carpeta Entrada </label>
                             <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.modalidad" value="{{Cotizaciones.modalidad}}">
+                                [(ngModel)]="Resolucion.entrada" value="{{Resolucion.entrada}}">
                         </div>
                     </div>
 
@@ -319,8 +257,7 @@
                             <div class="NgxEditor__Wrapper">
                                 <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
                                 <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor"
-                                    [(ngModel)]="Cotizaciones.objeto" [disabled]="false"
-                                    [placeholder]="'Escibe aqui...'">
+                                    [(ngModel)]="Resolucion.asunto" [disabled]="false" [placeholder]="'Escibe aqui...'">
                                 </ngx-editor>
                             </div>
                         </div>
@@ -332,7 +269,7 @@
                             <div class="NgxEditor__Wrapper">
                                 <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
                                 <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor"
-                                    [(ngModel)]="Cotizaciones.objeto" [disabled]="false"
+                                    [(ngModel)]="Resolucion.observacion " [disabled]="false"
                                     [placeholder]="'Escibe aqui...'">
                                 </ngx-editor>
                             </div>
@@ -343,12 +280,12 @@
                         <div class="form-group col-md-6">
                             <label>Responsable</label>
                             <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.responsable" value="{{Cotizaciones.responsable}}">
+                                [(ngModel)]="Resolucion.responsable" value="{{Resolucion.responsable}}">
                         </div>
                         <div class="form-group col-md-6">
                             <label>Cargo Responsable</label>
                             <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Cotizaciones.cargo_responsable" value="{{Cotizaciones.cargo_responsable}}">
+                                [(ngModel)]="Resolucion.cargo_responsable" value="{{Resolucion.cargo_responsable}}">
                         </div>
                     </div>
                     <div class="row">
@@ -364,3 +301,78 @@
     </div>
     <!-- Fin de Tarjeta Padre -->
 </div>
+
+
+
+
+
+<!-- Adjuntar Imagenes al Documento -->
+<ng-template #archivos let-modal>
+    <div class="modal-header header bg-gradient-success">
+        <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
+
+    </div>
+    <div class="modal-body">
+
+
+        <div class="form-group col-md-12">
+            <div class="card card-profile">
+                <div class="card-header bg-info"
+                    style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
+                    <div class="card-avatar text-center">
+                        <a href="javascript:;">
+                            <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
+                                style="width:100px;z-index: 1; margin-top: -5px;">3
+                        </a>
+                    </div>
+                </div>
+                <br>
+
+                <div class="card-body pt-0">
+
+                    <div class="d-flex justify-content-between">
+                        <a [href]="download" target="_top" rel="noopener noreferrer"
+                            class="btn btn-primary mt-3">Descargar</a>
+                        <a (click)="activarHistorial()" class="btn btn-default float-right mt-3">Historial</a>
+                    </div>
+                    <br><br>
+                    <div class="text-center">
+                        <div class="font-weight-50">
+                            Publicado<span class="font-weight-light">, {{ Doc.fcreacion | date:"dd-MM-yy
+                                hh:mm:ss"}}</span>
+                            <br>
+                            <h5 class="h4" style="font-size: 10px;">{{ Doc.creador }}</h5>
+                        </div>
+                    </div>
+                    <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
+                        <table class="table">
+                            <thead class="thead-light">
+                                <th>Documento</th>
+                                <th>Usuario</th>
+                                <th>Fecha</th>
+                            </thead>
+                            <tbody>
+
+                                <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstHzAdjunto;let i=index">
+
+                                    <td>
+                                        <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"
+                                            rel="noopener noreferrer">
+                                            {{ el.nombre.substring(20,32) }}
+                                        </a>
+                                    </td>
+                                    <td>{{ el.usuario }}</td>
+                                    <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+            <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    </div>
+</ng-template>
