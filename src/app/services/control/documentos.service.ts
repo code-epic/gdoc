@@ -45,17 +45,17 @@ export interface IWKFDocumento {
 
 //IWKFCuenta del WorkFlow
 export interface IWKFCuenta {
-	documento	 ?:	number
-	estado	 ?:	number
-	estatus	 ?:	number
-	activo	 ?:	number
-	resumen	 ?:	string
-	detalle	 ?:	string
-	archivo	 ?:	string
-	privado	 ?:	number
-	fecha	 ?:	string
-	cuenta	 ?:	string
-	usuario	 ?:	string
+  documento?: number
+  estado?: number
+  estatus?: number
+  activo?: number
+  resumen?: string
+  detalle?: string
+  archivo?: string
+  privado?: number
+  fecha?: string
+  cuenta?: string
+  usuario?: string
 }
 
 
@@ -68,6 +68,31 @@ export interface IWKFAlerta {
   fecha?: string
   observacion?: string
   usuario?: string
+}
+
+//Exportar documentos Detalles
+export interface Resolucion {
+  id: string
+  cuenta: string
+  numero: string
+  tipo: string
+  situacion: string
+  cedula: string
+  nombres: string
+  apellidos: string
+  fecha_nacimiento: string
+  sexo: string
+  componente: string
+  categoria: string
+  clasificacion: string
+  grado: string
+  carpeta: string
+  estatus: string
+  entrada: string
+  asunto: string
+  observacion: string
+  responsable: string
+  cargo_responsable: string
 }
 
 

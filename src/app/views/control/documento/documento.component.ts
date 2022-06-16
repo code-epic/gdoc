@@ -39,6 +39,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   checklist: any;
   checkedList: any;
 
+  public bPDF = false
+
   closeResult = '';
 
 
@@ -134,6 +136,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   public download: any
 
+  public bHist = false
+
   public xAPI: IAPICore = {
     funcion: ''
 
@@ -226,9 +230,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     )
   }
 
-
-
-
   limpiarDoc() {
     var dia = this.utilService.FechaActual()
 
@@ -261,7 +262,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         data.Cuerpo.forEach(e => {
-          
+
           this.Doc = e
           this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
           this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
@@ -275,13 +276,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           }
 
         });
-        
+
         this.selTipoDocumento()
         const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
-        this.lstCuenta = punto_cuenta.map(e => {
-          return typeof e == 'object' ? e : JSON.parse(e)
-        })
-        
+        this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
 
         const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
         this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
@@ -292,13 +290,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
         this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
 
-        console.log( this.lstHzAdjunto )
-
         //Carga de Documentos
-        this.download = this.apiService.Dws(   btoa( "D" + this.Doc.ncontrol ) + '/' + this.Doc.archivo)
-       
-
-        console.log( this.Doc )
+        this.bPDF = this.Doc.archivo != "" ? true : false
+        this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
 
       },
       (error) => {
@@ -306,7 +300,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       }
     )
   }
-  
+
+  dwUrl(ncontrol: string, archivo: string): string {
+    return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
+  }
 
   open(content) {
     this.modalService.open(content);
@@ -327,6 +324,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = JSON.stringify(this.WkDoc)
   }
 
+  activarHistorial(){
+    this.bHist = !this.bHist
+  }
 
   //registrar Un documento pasando por el WorkFlow
   registrar() {
@@ -336,7 +336,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.obtenerWorkFlow() //Obtener valores de una API
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
-      
+
       this.actualizarDocumentos()
       return
     }
@@ -476,7 +476,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.xAPI.funcion = 'WKF_ADocumentoDetalle'
     this.xAPI.parametros = ''
-    
+
     this.Doc.contenido = this.Doc.contenido.toUpperCase()
     this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
 
@@ -484,7 +484,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     if (this.WAlerta.documento != 0) this.WAlerta.fecha = typeof this.fplazo === 'object' ? this.utilService.ConvertirFecha(this.fplazo) : this.fplazo.substring(0, 10)
 
-  
+
 
 
     await this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -689,9 +689,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //Listar los archivos asociados al documento
   verArchivos(content) {
-    this.lstImg.push({ a: 1 })
-    this.lstImg.push({ a: 1 })
-    this.lstImg.push({ a: 1 })
+    // this.lstImg.push({ a: 1 })
     this.modalService.open(content, { size: 'lg' })
 
   }
