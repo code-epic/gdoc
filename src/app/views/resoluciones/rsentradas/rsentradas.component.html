@@ -26,72 +26,74 @@
                         <div class="col-md-1">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" *ngIf="bPDF"
+                                        (click)="verHistorial()">
+                                        <mat-icon>history</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
                                     <button mat-icon-button title="Volver Atrás" onclick="history.back()">
                                         <mat-icon>reply</mat-icon>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-1">
-                            <ul class="navbar-nav align-items-right d-none d-md-flex">
-                                <li class="nav-item" ngbDropdown placement="bottom-right">
-                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                                        <div class="media align-items-center">
-                                            <div class="example-button-row">
-                                                <button mat-icon-button aria-label="">
-                                                    <mat-icon>more_vert</mat-icon>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                                        <a routerLinkActive="active" class="dropdown-item">
-                                            <i class="fa fa-plus"></i>
-                                            <span>Agregar Imagen</span>
-                                        </a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+
 
                     </div>
                 </div>
                 <div class="card-body">
                     <form>
                         <div class="row">
+                            <div class="form-group  col-md-6">
+                                <label>Unidad Minsiterial</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="unidad"
+                                  value="{{unidad}}" readonly>
+                              </div>
+                              <div class="form-group  col-md-3">
+                                <label>N. De Cuenta</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cuenta"
+                                  value="{{cuenta}}" readonly>
+                              </div>
+                              <div class="form-group  col-md-3">
+                                <label>Fecha</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
+                                  value="{{fecha}}" readonly>
+                              </div>
+                              
+                        </div>
+                        <div class="row">
                             <div class="col-md-9">
-
                                 <div class="row">
                                     <div class="form-group col-md-12">
-                                        <label for="txtObjeto">Cuenta o Oficio</label>
+                                        <label>Cuenta o Oficio</label>
                                         <div class="NgxEditor__Wrapper">
-                                            <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
-                                            <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor"
-                                                [(ngModel)]="Resolucion.asunto" [disabled]="false" [placeholder]="'Escibe aqui...'">
-                                            </ngx-editor>
+                                          <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor"
+                                          [(ngModel)]="asunto" [disabled]="false" [placeholder]="'Escibe aqui...'">
+                                          </ngx-editor>
                                         </div>
-                                    </div>
+                                      </div>
+
                                 </div>
+                               
 
                                 <!-- <hr class="mb-1">
                             <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Personales</h6> -->
                                 <div class="row">
-                                    <div class="form-group col-md-2">
+                                    <div class="form-group col-md-4">
                                         <label> Cédula </label>
                                         <input type="text" [ngModelOptions]="{standalone: true}"
-                                            [(ngModel)]="Resolucion.cedula" value="{{Resolucion.cedula}}"
+                                            [(ngModel)]="Resolucion.cedula" value="{{Resolucion.cedula}}" (blur)="consultarCedula()"
                                             class="form-control">
                                     </div>
-                                    <div class="form-group col-md-5">
+                                    <div class="form-group col-md-8">
                                         <label> Nombres </label>
                                         <input type="text" [ngModelOptions]="{standalone: true}"
-                                            [(ngModel)]="Resolucion.nombres" value="{{Resolucion.nombres}}"
-                                            class="form-control">
-                                    </div>
-                                    <div class="form-group col-md-5">
-                                        <label> Apellidos </label>
-                                        <input type="text" [ngModelOptions]="{standalone: true}"
-                                            [(ngModel)]="Resolucion.apellidos" value="{{Resolucion.apellidos}}"
+                                            [(ngModel)]="Resolucion.nombres_apellidos" value="{{Resolucion.nombres_apellidos}}"
                                             class="form-control">
                                     </div>
                                 </div>
@@ -103,9 +105,9 @@
                                             <div class="form-group" style="width:100%">
                                                 <div class="input-group" style="width:100%">
                                                     <input class="form-control" placeholder="AAAA-MM-DD"
-                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia"
+                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="forigen"
                                                         ngbDatepicker #vi="ngbDatepicker"
-                                                        [value]="formatter.format(fvigencia)" [placement]="placement"
+                                                        [value]="formatter.format(forigen)" [placement]="placement"
                                                         [positionTarget]="buttonEl">
                                                     <div class="input-group-append">
                                                         <button #buttonEl class="btn calendario" (click)="vi.toggle()"
@@ -130,14 +132,17 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="row">
-                                    <br><br>
-                                    <div class="col-md-12 text-center">
+                                    <div class="col-md-1"></div>
+                                    <div class="col-md-10 text-center">
                                         <br>
-                                        <img src="https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/13587538/foto.jpg" 
-                                         style="width: 180px; border: 1px; padding:2px">
+                                        <div  style="border:1px solid #CCC; padding: 1px;width: 195px" >
+                                            
+                                            <img src="assets/img/theme/ndisponible.jpeg" style="width: 190px">
+                                        </div>
                                     </div>
+                                    <div class="col-md-1"></div>
                                 </div>
-                               
+
                             </div>
                         </div>
                     </form>
@@ -158,6 +163,8 @@
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                                 [(ngModel)]="Resolucion.componente" value="{{Resolucion.componente}}">
                                 <option value="0">Seleccione</option>
+                                <option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}
+                                </option>
                             </select>
                         </div>
                         <div class="form-group col-md-6">
@@ -165,6 +172,8 @@
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                                 [(ngModel)]="Resolucion.categoria" value="{{Resolucion.categoria}}">
                                 <option value="0">Seleccione</option>
+                                <option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -175,6 +184,8 @@
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                                 [(ngModel)]="Resolucion.clasificacion" value="{{Resolucion.clasificacion}}">
                                 <option value="0">Seleccione</option>
+                                <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
+                                    {{e.des_clasificacion}}</option>
                             </select>
                         </div>
                         <div class="form-group col-md-6">
@@ -182,6 +193,7 @@
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                                 [(ngModel)]="Resolucion.grado" value="{{Resolucion.grado}}">
                                 <option value="0">Seleccione</option>
+                                <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
                             </select>
                         </div>
                     </div>
@@ -193,8 +205,8 @@
                                 <div class="form-group" style="width:100%">
                                     <div class="input-group" style="width:100%">
                                         <input class="form-control" placeholder="AAAA-MM-DD"
-                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="vigencia" ngbDatepicker
-                                            #vi="ngbDatepicker" [value]="formatter.format(fvigencia)"
+                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="fcreacion" ngbDatepicker
+                                            #vi="ngbDatepicker" [value]="formatter.format(fcreacion)"
                                             [placement]="placement" [positionTarget]="buttonEl">
                                         <div class="input-group-append">
                                             <button #buttonEl class="btn calendario" (click)="vi.toggle()"
@@ -216,16 +228,22 @@
 
                     <div class="form-row">
                         <div class="form-group col-md-4">
-                            <label> Número de Resolución </label>
-                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.numero" value="{{Resolucion.numero}}">
+                            <mat-form-field class="example-full-width" appearance="fill"  style="width:100%">
+                                <mat-label>Número de Resolución </mat-label>
+                                <input matInput placeholder="" [ngModelOptions]="{standalone: true}" 
+                                    [(ngModel)]="Resolucion.numero" value="{{Resolucion.numero}}">
+                            </mat-form-field>
                         </div>
                         <div class="form-group col-md-8">
-                            <label> Tipo de Resolución </label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.tipo" value="{{Resolucion.tipo}}">
-                                <option value="0">Seleccione</option>
-                            </select>
+                            <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
+                                <mat-label style="width:100%">Tipo de Resolución</mat-label>
+                                <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
+                                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%">
+                                    <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                                        {{option.des_resol}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
                         </div>
                     </div>
 
@@ -234,20 +252,29 @@
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label> Número Carpeta </label>
-                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
                                 [(ngModel)]="Resolucion.carpeta" value="{{Resolucion.carpeta}}">
+                                <option value="0">Seleccione</option>
+                                <option *ngFor="let e of OrdenNumero;" [value]="e.cod_carpeta_og">{{e.des_carpeta_og}}</option>
+                            </select>
+                        </div>
+                      
+                        <div class="form-group col-md-4">
+                            <label> Carpeta Entrada </label>
+                           
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Resolucion.entrada" value="{{Resolucion.entrada}}">
+                                <option value="0">Seleccione</option>
+                                <option *ngFor="let e of Carpetas;" [value]="e.cod_carpeta">{{e.des_carpeta}}</option>
+                            </select>
                         </div>
                         <div class="form-group col-md-4">
                             <label> Estatus </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                                 [(ngModel)]="Resolucion.estatus" value="{{Resolucion.estatus}}">
                                 <option value="0">Seleccione</option>
+                                <option *ngFor="let e of Estados;" [value]="e.cod_estado_resol">{{e.des_estado_resol}}</option>
                             </select>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label> Carpeta Entrada </label>
-                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.entrada" value="{{Resolucion.entrada}}">
                         </div>
                     </div>
 
@@ -267,8 +294,8 @@
                         <div class="form-group col-md-12">
                             <label for="txtObjeto">Observaciones</label>
                             <div class="NgxEditor__Wrapper">
-                                <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
-                                <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor"
+                                <ngx-editor-menu [editor]="xobser"> </ngx-editor-menu>
+                                <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xobser"
                                     [(ngModel)]="Resolucion.observacion " [disabled]="false"
                                     [placeholder]="'Escibe aqui...'">
                                 </ngx-editor>

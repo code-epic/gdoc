@@ -75,11 +75,12 @@ export interface Resolucion {
   id: string
   cuenta: string
   numero: string
+  unidad: string
+  fecha_doc: string
   tipo: string
   situacion: string
   cedula: string
-  nombres: string
-  apellidos: string
+  nombres_apellidos: string
   fecha_nacimiento: string
   sexo: string
   componente: string

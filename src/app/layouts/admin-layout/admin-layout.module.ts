@@ -49,7 +49,7 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
     HttpClientModule,
     NgbModule,
     NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
-    ClipboardModule
+    ClipboardModule,
   ],
   declarations: [
     DashboardComponent

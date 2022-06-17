@@ -6,12 +6,11 @@ import { ResolucionService } from 'src/app/services/resoluciones/resolucion.serv
 import { LoginService } from 'src/app/services/seguridad/login.service';
 
 @Component({
-  selector: 'app-resoluciones',
-  templateUrl: './resoluciones.component.html',
-  styleUrls: ['./resoluciones.component.scss']
+  selector: 'app-rsconfiguracion',
+  templateUrl: './rsconfiguracion.component.html',
+  styleUrls: ['./rsconfiguracion.component.scss']
 })
-export class ResolucionesComponent implements OnInit {
-
+export class RsconfiguracionComponent implements OnInit {
   public focus : boolean = true
   public buscar : string = ''
   lst = []
@@ -35,31 +34,9 @@ export class ResolucionesComponent implements OnInit {
   async  ngOnInit() {
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
-    if  (sessionStorage.getItem("MPPD_CTipoEntrada") == undefined) {
-      for(var i=0; i < 9; i++){
-
-        this.resolucionService.Listar(i) //
-      }
-    }
+    
   }
 
 
-  CMppd(){
-    this.xApi.funcion = "C_Mppd"
-    this.xApi.parametros = this.buscar
-    
-    this.apiService.Ejecutar(this.xApi).subscribe(
-      (data) => {
-        this.lst = data.Cuerpo
-      },
-      (error) => {
-        console.error("Error de conexion a los datos ", error)
-      }
-
-    )
-
-    
-   
-  }
 
 }

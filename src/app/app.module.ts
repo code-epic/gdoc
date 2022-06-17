@@ -1,6 +1,6 @@
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
@@ -62,8 +62,15 @@ import { ConstanciaComponent } from './views/reportes/constancia/constancia.comp
 import { MinisterialComponent } from './views/secretaria/ministerial/ministerial.component';
 import { FichaproyectoComponent } from './views/reportes/fichaproyecto/fichaproyecto.component';
 import { CotizacionComponent } from './views/reportes/cotizacion/cotizacion.component';
-
-
+import { AutocompleteLibModule } from 'angular-ng-autocomplete';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatInputModule } from '@angular/material/input';
+import { RstranscripcionComponent } from './views/resoluciones/rstranscripcion/rstranscripcion.component';
+import { RsrevisionComponent } from './views/resoluciones/rsrevision/rsrevision.component';
+import { RsconfiguracionComponent } from './views/resoluciones/rsconfiguracion/rsconfiguracion.component';
+import { RscdatosbasicosComponent } from './views/resoluciones/rsconfiguracion/rscdatosbasicos/rscdatosbasicos.component';
+import { RsccargamasivaComponent } from './views/resoluciones/rsconfiguracion/rsccargamasiva/rsccargamasiva.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -113,6 +120,8 @@ const ngWizardConfig: NgWizardConfig = {
     FormsModule,
     HttpClientModule,
     ComponentsModule,
+    MatFormFieldModule,
+    MatAutocompleteModule,
     NgbModule,
     RouterModule,
     AppRoutingModule,
@@ -123,7 +132,10 @@ const ngWizardConfig: NgWizardConfig = {
     MatCheckboxModule,
     MatExpansionModule,
     MatButtonToggleModule,
+    AutocompleteLibModule,
     MatListModule,
+    ReactiveFormsModule,
+    MatInputModule,
     MatPaginatorModule,
     NgWizardModule.forRoot(ngWizardConfig),
     NgxEditorModule,
@@ -172,7 +184,13 @@ const ngWizardConfig: NgWizardConfig = {
     ConstanciaComponent,
     MinisterialComponent,
     FichaproyectoComponent,
-    CotizacionComponent
+    CotizacionComponent,
+    ConfiguracionComponent,
+    RstranscripcionComponent,
+    RsrevisionComponent,
+    RscdatosbasicosComponent,
+    RsccargamasivaComponent,
+    RsconfiguracionComponent
   ],
   providers:  [
     {

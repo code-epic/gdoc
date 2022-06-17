@@ -36,7 +36,7 @@ export class MinisterialComponent implements OnInit {
 
 
   public lstEstados = [] //Listar Estados
-
+  public lstHzAdjuntoSub = []
   public estadoActual = 4
   public estadoOrigen = 2
   public original = ''
@@ -73,15 +73,18 @@ export class MinisterialComponent implements OnInit {
   public unidad = ''
   public titulo = ''
   public archivos = []
-  public download : any
+  public download: any
+  public fcreacion: any
+  public creador: any
 
   public lstRedistribucion = [{ 'valor': '1', 'texto': 'REDISTRIBUCION', 'visible': '1' }]
 
   public ministerial: any
 
-  editor: Editor = new Editor;
+  editor: Editor = new Editor
 
-  public blUpdate = false;
+  public blUpdate = false
+  public bHist = false
 
   public numControl = ''
 
@@ -141,10 +144,13 @@ export class MinisterialComponent implements OnInit {
         this.ministerial = JSON.parse(atob(this.original))
         this.listarDatos()
         //Carga de Documentos
-        this.dwValidate = this.ministerial.anom != ""?true:false
-        this.download = this.apiService.Dws( this.ministerial.numc + '/' + this.ministerial.anom )
+        this.dwValidate = this.ministerial.anom != "" ? true : false
+        this.download = this.apiService.Dws(btoa("D" + this.ministerial.numc) + '/' + this.ministerial.anom)
+        //console.log(this.download, this.ministerial.anom);
         this.codigohash = btoa(this.ministerial.id + this.ministerial.idd + this.ministerial.cuenta)
         this.cmbDestino = 'S'
+        this.creador = this.ministerial.usua
+        console.log(this.ministerial);
         this.listarEstados()
       } catch (error) {
         this.ruta.navigate(['/secretaria', ''])
@@ -172,7 +178,12 @@ export class MinisterialComponent implements OnInit {
     this.modalService.open(content, { size: 'lg' });
   }
 
+  activarHistorial() {
+    this.bHist = !this.bHist
+  }
+
   listarDatos() {
+
     this.unidad = this.ministerial.udep
     this.cuenta = this.ministerial.cuenta
     this.fecha = this.ministerial.detalle
@@ -189,9 +200,9 @@ export class MinisterialComponent implements OnInit {
           this.original = btoa(JSON.stringify(data.Cuerpo[0]))
           this.blUpdate = true
         }
-        this.dwSub = this.SubDocumento.nombre_archivo != ""?true:false
-        console.log(this.SubDocumento)
-        this.download = this.apiService.Dws( this.codigohash + '/' + this.SubDocumento.nombre_archivo )
+        this.dwSub = this.SubDocumento.nombre_archivo != "" ? true : false
+        //console.log(this.SubDocumento)
+        //this.download = this.apiService.Dws( this.codigohash + '/' + this.SubDocumento.nombre_archivo )
       },
       (error) => {
 
@@ -274,7 +285,7 @@ export class MinisterialComponent implements OnInit {
 
   //Guardar la alerte define el momento y estadus
   guardarAlerta(activo: number, fecha: string) {
-    
+
     this.WAlerta.activo = activo
     this.WAlerta.documento = parseInt(this.ministerial.ids)
     this.WAlerta.estado = 4
@@ -285,7 +296,6 @@ export class MinisterialComponent implements OnInit {
 
 
     this.xAPI.parametros = ''
-    console.log(this.xAPI.funcion, "Actualizar alertas");
     this.xAPI.valores = JSON.stringify(this.WAlerta)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async alerData => {
@@ -329,13 +339,13 @@ export class MinisterialComponent implements OnInit {
   async SubirArchivo(e) {
     this.ngxService.startLoader("loader-aceptar")
     var frm = new FormData(document.forms.namedItem("forma"))
-    
+
     try {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
           console.log(this.archivos[0].name)
           this.SubDocumento.nombre_archivo = this.archivos[0].name
-          
+
           this.aceptar()
           this.toastrService.success(
             'Tu archivo ha sido cargado con exito ',
@@ -379,7 +389,7 @@ export class MinisterialComponent implements OnInit {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-       
+
         this.redistribuir()
 
       },
@@ -394,7 +404,7 @@ export class MinisterialComponent implements OnInit {
 
     this.xAPI.funcion = "WKF_ASubDocumentoRedistribuir"
     this.xAPI.valores = ''
-    this.xAPI.parametros = dst + ',1,'  + this.loginService.Usuario.id + ',' + this.ministerial.idd + ',' + this.ministerial.cuenta
+    this.xAPI.parametros = dst + ',1,' + this.loginService.Usuario.id + ',' + this.ministerial.idd + ',' + this.ministerial.cuenta
     console.log(this.xAPI);
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {

@@ -63,7 +63,7 @@ export class NavbarComponent implements OnInit {
       confirmButtonText: 'Si, desconectarme!'
     }).then((result) => {
       if (result.isConfirmed) {
-        sessionStorage.removeItem('token')
+        sessionStorage.clear()
         window.location.href = './gdoc';
       }
     })    

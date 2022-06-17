@@ -72,8 +72,13 @@
                     style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                     <div class="row">
                       <div class="col-md-1">
-                        <button mat-icon-button aria-label="Example " class="text-primary"
-                          (click)="open(observacion, e.idd)">
+                        
+                        <button mat-icon-button aria-label="Example " *ngIf="e.bOk" class="text-primary"
+                          (click)="open(observacion, e.idd, 0)">
+                          <mat-icon>task_alt</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Example " *ngIf="!e.bOk" class="text-warning"
+                          (click)="open(observacion, e.idd, e.cuenta)">
                           <mat-icon>task_alt</mat-icon>
                         </button>
                       </div>
@@ -104,7 +109,7 @@
           </mat-tab>
           <mat-tab>
             <ng-template mat-tab-label>
-              &nbsp;PROCESADOS
+              &nbsp;EN PROCESO
             </ng-template>
             <mat-accordion class="example-headers-align">
               <mat-expansion-panel hideToggle *ngFor="let x of lstEstados">
@@ -121,14 +126,18 @@
 
 
                 <mat-selection-list #lstDocumentos>
-                  <mat-list *ngFor="let e of bzProcesados; let i=index "
+                  <mat-list *ngFor="let e of bzRecibido; let i=index "
                     style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                     <div class="row">
                       <div class="col-md-1">
-                        <button mat-icon-button aria-label="Example " class="text-primary"
-                          (click)="open(observacion, e.idd)">
-                          <mat-icon>task_alt</mat-icon>
-                        </button>
+                        <button mat-icon-button aria-label="Example " *ngIf="e.bOk" class="text-primary"
+                        (click)="entrada_open(e.numc)">
+                        <mat-icon>open_in_new</mat-icon>
+                      </button>
+                      <button mat-icon-button aria-label="Example " *ngIf="!e.bOk" class="text-warning"
+                        (click)="entrada_open(e.numc, e.cuenta)">
+                        <mat-icon>open_in_new</mat-icon>
+                      </button>
                       </div>
                       <div class="col-md-2 texto-lista">
                         {{ e.numc }}
