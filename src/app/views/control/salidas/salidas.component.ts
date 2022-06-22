@@ -9,6 +9,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { NgxUiLoaderService } from 'ngx-ui-loader'
 
 
 
@@ -77,7 +78,7 @@ export class SalidasComponent implements OnInit {
     cache: 0,
     estatus: false
   }
-  lst = []
+  public lst = []
   public lstEstados = [] //Listar Estados
 
   lengthOfi = 0;
@@ -89,6 +90,7 @@ export class SalidasComponent implements OnInit {
 
   selNav = 0
 
+  public bzOriginal = [] //Listado Original
   public bzRecibido = []
   public bzProcesados = []
   public bzPendientes = []
@@ -132,6 +134,7 @@ export class SalidasComponent implements OnInit {
     private ruta: Router,
     private toastrService: ToastrService,
     private utilService: UtilService,
+    private ngxService: NgxUiLoaderService,
     private loginService: LoginService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
@@ -207,13 +210,12 @@ export class SalidasComponent implements OnInit {
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
     this.selNav = e
-
+    this.pageSize = 10;
+    
     switch (e) {
       case 0:
-
-
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
-        this.listarBuzon(this.bzRecibido)
+        this.listarBuzon(this.selNav)
         this.clasificacion = false
         this.cargarAcciones(0)
 
@@ -221,22 +223,20 @@ export class SalidasComponent implements OnInit {
       case 1:
 
         this.xAPI.parametros = this.estadoActual + ',' + 2
-        this.listarBuzon(this.bzProcesados)
+        this.listarBuzon(this.selNav)
         this.clasificacion = false
         this.cargarAcciones(1)
 
         break
       case 2:
-
         this.xAPI.parametros = this.estadoActual + ',' + 3
-        this.listarBuzon(this.bzPendientes)
+        this.listarBuzon(this.selNav)
         this.clasificacion = false
         this.cargarAcciones(2)
-
         break
       case 4:
         this.xAPI.parametros = this.estadoActual + ',' + 4
-        this.listarBuzon(this.bzCerrados)
+        this.listarBuzon(this.selNav)
         break
       default:
         break
@@ -260,10 +260,11 @@ export class SalidasComponent implements OnInit {
     )
   }
 
-  async listarBuzon(bz: any) {
+  async listarBuzon(lst: number) {
+    var bz=[]
+    this.ngxService.startLoader("loader-aceptar")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        console.log(data.Cuerpo)
         data.Cuerpo.forEach(e => {
           e.completed = false
           e.color = 'warn'
@@ -276,9 +277,15 @@ export class SalidasComponent implements OnInit {
           e.xaccion = e.accion
           bz.push(e)
         })//Registros recorridos como elementos
-        
-        await this.listarSubDocumentos()
-        
+        //await this.listarSubDocumentos()
+
+        this.longitud = bz.length
+        if (this.longitud > 0) {
+          this.estilocheck = ''
+          this.bzOriginal = bz
+          this.recorrerElementos(0,lst)
+        }
+        this.ngxService.stopLoader("loader-aceptar")
       
       },
       (error) => {
@@ -294,7 +301,6 @@ export class SalidasComponent implements OnInit {
     
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data.Cuerpo)
         data.Cuerpo.forEach(e => {
           e.completed = false
           e.color = 'warn'
@@ -308,10 +314,8 @@ export class SalidasComponent implements OnInit {
         this.lengthOfi = data.Cuerpo.length
         if (this.lengthOfi > 0) {
           this.estilocheck = ''
-          this.recorrerElementos(1, this.bzRecibido)
+          this.recorrerElementos(0, this.lengthOfi)
         }
-
-        
       },
       (error) => {
 
@@ -320,22 +324,32 @@ export class SalidasComponent implements OnInit {
   }
 
 
-  pageChangeEvent(e) {
-    this.recorrerElementos(e.pageIndex + 1, this.lst)
+  pageChangeEvent(e,sel) {
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex,sel)
   }
 
-
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion: number, lista: any) {
-    if (posicion > 1) posicion = posicion * 10
-    this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
-
+  recorrerElementos(posicion: number,sel: number) {
+    let pag = this.pageSize * posicion
+    switch (sel) {
+      case 0:
+        this.bzRecibido= this.bzOriginal.slice(pag, pag + this.pageSize)
+        break
+      case 1:
+        this.bzProcesados= this.bzOriginal.slice(pag, pag + this.pageSize)
+        break
+      case 2:
+        this.bzPendientes= this.bzOriginal.slice(pag, pag + this.pageSize)
+        break
+      default:
+        break
+    }  
   }
 
 
   //editar
   editar(id: string, url: string) {
-
 
     const estado = this.estadoActual
     const estatus = this.selNav + 1
@@ -345,9 +359,6 @@ export class SalidasComponent implements OnInit {
     } else {
       this.ruta.navigate([url, base])
     }
-
-
-
   }
 
 

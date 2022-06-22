@@ -8,6 +8,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { NgxUiLoaderService } from 'ngx-ui-loader'
 
 
 @Component({
@@ -112,6 +113,7 @@ export class SecretariaComponent implements OnInit {
     private ruta: Router,
     private toastrService: ToastrService,
     private utilService: UtilService,
+    private ngxService: NgxUiLoaderService,
     private loginService: LoginService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
@@ -237,6 +239,7 @@ export class SecretariaComponent implements OnInit {
 
   async listarBuzon() {
     var bz = []
+    this.ngxService.startLoader("loader-aceptar")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         
@@ -255,10 +258,10 @@ export class SecretariaComponent implements OnInit {
           this.bzOriginal = bz
           this.recorrerElementos(0)
         }
-
+        this.ngxService.stopLoader("loader-aceptar")
       },
       (error) => {
-
+        this.ngxService.stopLoader("loader-aceptar")
       }
     )
   }
