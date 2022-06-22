@@ -43,7 +43,8 @@ export class RsbuzonComponent implements OnInit {
   public lengthOfi = 0;
   public pageSizeOfi = 10;
   public pageEvent: PageEvent;
-
+  public idd : string = ''
+  public cuenta : string = ''
 
 
   public pageSizeOptions: number[] = [5, 10, 25, 100]
@@ -100,12 +101,29 @@ export class RsbuzonComponent implements OnInit {
   ngOnInit(): void {
     this.listarEstados()
     this.seleccionNavegacion(0)
-    this.listarSubDocumentos()
+    this.listarSubDocumentos(1)
   }
 
-
-  open(content, id) {
+  entrada_open(id, cuenta){
+   
+    if (cuenta != undefined){
+      const xid = btoa('4,2,' + id)
+      const xcuenta = btoa(cuenta)
+      this.ruta.navigate(['/rsentradas', xid, xcuenta ])
+      return
+    }
+    const xid = btoa(id)
+    this.ruta.navigate(['/rsentradas', xid ])
+   
+  }
+  open(content, id, cuenta) {
     this.numControl = id
+    this.idd = ''
+    this.cuenta = ''
+    if( cuenta != undefined ){
+      this.idd =  id
+      this.cuenta = cuenta
+    }
     this.modalService.open(content)
   }
 
@@ -169,6 +187,7 @@ export class RsbuzonComponent implements OnInit {
           return e
         }) //Registros recorridos como elementos
         this.lengthOfi = data.Cuerpo.length
+        if (this.selNav == 1) this.listarSubDocumentos(2)
       },
       (error) => {
 
@@ -176,16 +195,17 @@ export class RsbuzonComponent implements OnInit {
     )
   }
 
-  async listarSubDocumentos() {
+  async listarSubDocumentos(estatus : number) {
 
-    this.xAPI.funcion = 'WKF_CSubDocumento'
-    this.xAPI.parametros = '4,2,3'
-    
+    this.xAPI.funcion = 'WKF_CSubDocumentoResoluciones'
+    this.xAPI.parametros = '4,2,3,' + estatus
+    this.bzSubDocumentos = []
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.bzSubDocumentos = data.Cuerpo.map(e => {
           e.completed = false
           e.color = 'warn'
+          e.bOk = e.cuenta == ''? true: false
           e.cuentas = e.cuenta == ''? '': e.cuenta
           e.priv = e.priv == 1 ? true : false
           e.existe = e.anom == '' ? true : false
@@ -193,7 +213,6 @@ export class RsbuzonComponent implements OnInit {
           return e
         }) //Registros recorridos como elementos
         this.lengthOfi = data.Cuerpo.length
-        console.log(this.bzSubDocumentos)
       },
       (error) => {
 
@@ -202,17 +221,20 @@ export class RsbuzonComponent implements OnInit {
   }
 
   async ConsultarCtrl(id) {
-    console.log(id)
     if (id == 4) {
-     
-      this.bzRecibido = this.bzSubDocumentos //.filter((e) => { return e.ultimo_estado == id })
+      this.bzRecibido = this.bzSubDocumentos
     } else {
       this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
     }
   }
 
   ConsultarProcesados(id) {
-    this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
+    console.log(this.bzSubDocumentos)
+    if (id == 4) {
+      this.bzRecibido = this.bzSubDocumentos
+    } else {
+      this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
+    }
   }
 
   ConsultarPendientes(id) {
@@ -258,14 +280,17 @@ export class RsbuzonComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         switch (this.AccionTexto) {
+          case "0"://Oficio por opinión
+            if (this.idd != '' && this.cuenta != ''){
+              this.promoverPuntoCuenta(3, 2)
+            }else {
+              this.promoverBuzon(0, this.utilService.FechaActual())
+            }
+            
+            break;
           case "1"://Rechazar en el estado inicial
             this.rechazarBuzon()
             break
-
-          // case "2"://Oficio por opinión
-          //   this.promoverBuzon()
-          //   break;
-
           // case "5":// Enviar a Archivo
           //   this.redistribuir(11)
           //   break;
@@ -378,6 +403,32 @@ export class RsbuzonComponent implements OnInit {
     )
   }
 
+
+  /**
+   * 
+   * @param destino 3 es la posicion del estado actual
+   */
+  async promoverPuntoCuenta(destino: number = 0, estatus : number) {
+    var dst = destino != 0 ? destino : this.cmbDestino
+
+    this.xAPI.funcion = "WKF_ASubDocumentoRedistribuir"
+    this.xAPI.valores = ''
+    this.xAPI.parametros = dst + ',' + estatus + ','  + this.loginService.Usuario.id + ',' + this.idd + ',' + this.cuenta
+    console.log(this.xAPI);
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+        //this.xAPI.funcion = 'WKF_ASubDocumentoAlerta'
+        //await this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
+        this.toastrService.success(
+          'El documento ha sido redistribuido segun su selección',
+          `GDoc Wkf.DocumentoObservacion`
+        )
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  }
   async cargarAcciones(posicion) {
     this.lstAcciones = []
     this.lstAcciones = this.cmbAcciones.filter(e => { return e.visible == posicion });
@@ -427,6 +478,49 @@ export class RsbuzonComponent implements OnInit {
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
       }) //
+  }
+
+
+
+
+  fileSelected(e) {
+    //this.archivos.push(e.target.files[0])
+  }
+
+  async SubirArchivo(e) {
+    var frm = new FormData(document.forms.namedItem("forma"))
+    try {
+      await this.apiService.EnviarArchivos(frm).subscribe(
+        (data) => {
+          this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
+          this.xAPI.parametros =  '' 
+          // this.DocAdjunto.archivo = this.archivos[0].name
+          // this.DocAdjunto.usuario = this.loginService.Usuario.id
+          // this.DocAdjunto.documento = this.numControl
+          // this.xAPI.valores = JSON.stringify(this.DocAdjunto)
+
+          // this.apiService.Ejecutar(this.xAPI).subscribe(
+          //   (xdata) => {
+          //     if (xdata.tipo == 1) {
+          //       this.toastrService.success(
+          //         'Tu archivo ha sido cargado con exito ',
+          //         `GDoc Registro`
+          //       );
+               
+          //     } else {
+          //       this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+          //     }
+          //   },
+          //   (error) => {
+          //     this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
+          //   }
+          // )
+        }
+      )
+    } catch (error) {
+      console.error(error)
+    }
+
   }
 
 

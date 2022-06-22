@@ -12,7 +12,7 @@
           <div class="row align-items-center">
             <div class="col-md-10">
               <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
-              <h2 class="mb-0">Buzón</h2>
+              <h2 class="mb-0">Buzón de Revisión</h2>
             </div>
             <div class="col-md-1">
               <div class="media align-items-center">
@@ -49,64 +49,6 @@
 
         <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
           (selectedIndexChange)="seleccionNavegacion($event)">
-          <mat-tab>
-            <ng-template mat-tab-label>
-              &nbsp;RECIBIDOS
-            </ng-template>
-            <mat-accordion class="example-headers-align">
-              <mat-expansion-panel hideToggle *ngFor="let x of lstEstados">
-                <mat-expansion-panel-header (click)="ConsultarCtrl( x.id )">
-                  <mat-panel-title style="font-weight:bold">
-                    {{x.nomb}}
-                  </mat-panel-title>
-                  <mat-panel-description>
-                    {{x.obse}}
-                    
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
-
-
-
-                <mat-selection-list #lstDocumentos>
-                  <mat-list *ngFor="let e of bzRecibido; let i=index "
-                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                    <div class="row">
-                      <div class="col-md-1">
-                        
-                        <button mat-icon-button aria-label="Example " *ngIf="e.bOk" class="text-primary"
-                          (click)="open(observacion, e.idd, 0)">
-                          <mat-icon>task_alt</mat-icon>
-                        </button>
-                        <button mat-icon-button aria-label="Example " *ngIf="!e.bOk" class="text-warning"
-                          (click)="open(observacion, e.idd, e.cuenta)">
-                          <mat-icon>task_alt</mat-icon>
-                        </button>
-                      </div>
-                      <div class="col-md-2 texto-lista">
-                        {{ e.numc }} 
-                      </div>
-                      <div class="col-md-2 texto-lista">
-                        {{ e.cuentas | uppercase }}
-                      </div>
-                      <div class="col-md-2 texto-lista">
-                        {{ e.fcre | date:"dd-MM-yyyy" }}
-                      </div>
-                      <div class="col-md-4 texto-lista">
-                        {{ e.udep | uppercase }}
-                      </div>
-                      <div class="col-md-1 text-right">
-                        <button mat-icon-button aria-label="Privado">
-                          <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
-                        </button>
-
-                      </div>
-                    </div>
-                  </mat-list>
-                </mat-selection-list>
-
-              </mat-expansion-panel>
-            </mat-accordion>
-          </mat-tab>
           <mat-tab>
             <ng-template mat-tab-label>
               &nbsp;EN PROCESO

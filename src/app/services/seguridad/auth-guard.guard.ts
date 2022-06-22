@@ -17,9 +17,7 @@ export class AuthGuardGuard implements CanActivate {
       if (sessionStorage.getItem("token") != undefined ){
         return true;
       }else{
-       
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("id");
+        sessionStorage.clear()
         this.router.navigate(['login']);
         return false;
       }

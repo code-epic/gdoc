@@ -30,28 +30,7 @@ export class TimonelComponent implements OnInit {
   public focus;
   public xAPI: IAPICore = {
     funcion: '',
-    parametros: '',
-    relacional: false,
-    concurrencia: false,
-    protocolo: '',
-    ruta: '',
-    version: '',
-    retorna: false,
-    migrar: false,
-    http: 0,
-    https: 0,
-    consumidores: '',
-    puertohttp: 0,
-    puertohttps: 0,
-    driver: '',
-    query: '',
-    metodo: '',
-    tipo: '',
-    prioridad: '',
-    entorno: '',
-    logs: false,
-    cache: 0,
-    estatus: false
+    parametros: ''
   }
   lst = []
   public lstEstados = [] //Listar Estados

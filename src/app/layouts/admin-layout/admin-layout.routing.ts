@@ -29,173 +29,201 @@ import { ConstanciaComponent } from 'src/app/views/reportes/constancia/constanci
 import { MinisterialComponent } from 'src/app/views/secretaria/ministerial/ministerial.component';
 import { FichaproyectoComponent } from 'src/app/views/reportes/fichaproyecto/fichaproyecto.component';
 import { CotizacionComponent } from 'src/app/views/reportes/cotizacion/cotizacion.component';
+import { RsrevisionComponent } from 'src/app/views/resoluciones/rsrevision/rsrevision.component';
+import { RstranscripcionComponent } from 'src/app/views/resoluciones/rstranscripcion/rstranscripcion.component';
+import { RsconfiguracionComponent } from 'src/app/views/resoluciones/rsconfiguracion/rsconfiguracion.component';
 
 
 
 export const AdminLayoutRoutes: Routes = [
-    { 
-        path: 'dashboard', 
+    {
+        path: 'dashboard',
         component: DashboardComponent,
-        canActivate:[AuthGuardGuard]
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'control', 
+    {
+        path: 'control',
         component: ControlComponent,
-        canActivate:[AuthGuardGuard]
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'registrar', 
+    {
+        path: 'registrar',
         component: RegistrarComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'documento', 
+    {
+        path: 'documento',
         component: DocumentoComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'documento/:id', 
+    {
+        path: 'documento/:id',
         component: DocumentoComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'documento/:id/:numc', 
+    {
+        path: 'documento/:id/:numc',
         component: DocumentoComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'resoluciones', 
+    {
+        path: 'resoluciones',
         component: ResolucionesComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'buzon', 
+    {
+        path: 'buzon',
         component: BuzonComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'salidas', 
+    {
+        path: 'salidas',
         component: SalidasComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'secretaria', 
+    {
+        path: 'secretaria',
         component: SecretariaComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'acami', 
+    {
+        path: 'acami',
         component: AcamiComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'ayudantia', 
+    {
+        path: 'ayudantia',
         component: AyudantiaComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'aybuzon', 
+    {
+        path: 'aybuzon',
         component: AybuzonComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'ayreportes', 
+    {
+        path: 'ayreportes',
         component: AyreportesComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'timonel', 
+    {
+        path: 'timonel',
         component: TimonelComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'personal', 
+    {
+        path: 'personal',
         component: PersonalComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'proyecto', 
+    {
+        path: 'proyecto',
         component: ProyectoComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'proyecto/:id', 
+    {
+        path: 'proyecto/:id',
         component: ProyectoComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'generales', 
+    {
+        path: 'generales',
         component: GeneralesComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'configuracion', 
+    {
+        path: 'configuracion',
         component: ConfiguracionComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'archivo', 
+    {
+        path: 'archivo',
         component: ArchivoComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'procesos', 
+    {
+        path: 'procesos',
         component: ProcesosComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'aycotizaciones', 
+    {
+        path: 'aycotizaciones',
         component: AycotizacionesComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'aycotizaciones/:id', 
+    {
+        path: 'aycotizaciones/:id',
         component: AycotizacionesComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'pendientes', 
+    {
+        path: 'pendientes',
         component: PendientesComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'rsprocesos', 
-        component: RsprocesosComponent,
-        canActivate:[AuthGuardGuard] 
-    },
-    { 
-        path: 'rsbuzon', 
-        component: RsbuzonComponent,
-        canActivate:[AuthGuardGuard] 
-    },
-    { 
-        path: 'rsentradas', 
+    {
+        path: 'rsentradas/:id/:cuenta',
         component: RsentradasComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'reportes', 
+    {
+        path: 'reportes',
         component: ReportesComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'constancia/:id', 
+    {
+        path: 'constancia/:id',
         component: ConstanciaComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'ministerial/:id', 
+    {
+        path: 'ministerial/:id',
         component: MinisterialComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'fichaproyecto/:id', 
+    {
+        path: 'fichaproyecto/:id',
         component: FichaproyectoComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
     },
-    { 
-        path: 'cotizaciones/:id', 
+    {
+        path: 'cotizaciones/:id',
         component: CotizacionComponent,
-        canActivate:[AuthGuardGuard] 
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsbuzon',
+        component: RsbuzonComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsentradas',
+        component: RsentradasComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsentradas/:id',
+        component: RsentradasComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rstranscripcion',
+        component: RstranscripcionComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsrevision',
+        component: RsrevisionComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsprocesos',
+        component: RsprocesosComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsconfiguracion',
+        component: RsconfiguracionComponent,
+        canActivate: [AuthGuardGuard]
     }
 ];

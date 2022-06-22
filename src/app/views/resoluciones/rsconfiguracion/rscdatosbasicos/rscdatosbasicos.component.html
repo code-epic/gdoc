@@ -1,0 +1,177 @@
+<form>
+  <div class="row">
+    <div class="col-md-9">
+      <hr class="mb-1">
+      <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Personales</h6>
+      <div class="row">
+        <div class="form-group col-md-4">
+          <label> Cédula </label>
+          <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.cedula"
+            value="{{DBasico.cedula}}" (blur)="consultarCedula()" class="form-control">
+        </div>
+        <div class="form-group col-md-8">
+          <label> Nombres </label>
+          <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.nombres_apellidos"
+            value="{{DBasico.nombres_apellidos}}" class="form-control">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col-md-6">
+          <label for="tmsOrigen">Fecha de Nacimiento</label>
+          <form class="form-inline">
+            <div class="form-group" style="width:100%">
+              <div class="input-group" style="width:100%">
+                <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                  [(ngModel)]="forigen" ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(forigen)"
+                  [placement]="placement" [positionTarget]="buttonEl">
+                <div class="input-group-append">
+                  <button #buttonEl class="btn calendario" (click)="vi.toggle()" type="button">
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="form-group col-md-6">
+          <label> Sexo </label>
+          <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.sexo"
+            value="{{DBasico.sexo}}">
+            <option value="0">Seleccione</option>
+            <option value="Masculino">MASCULINO</option>
+            <option value="Femenino">FEMENINO</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-md-3">
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10 text-center">
+          <br><br>
+          <div style="border:1px solid #CCC; padding: 1px;width: 160px">
+
+            <img src="assets/img/theme/ndisponible.jpeg" style="width: 155px">
+          </div>
+        </div>
+        <div class="col-md-1"></div>
+      </div>
+
+    </div>
+  </div>
+</form>
+
+
+
+
+
+
+
+
+<hr class="mb-1">
+<h6 class="text-uppercase text-muted ls-1 mb-4">Datos Militares</h6>
+<div class="form-row">
+  <div class="form-group col-md-6">
+    <label> Componente </label>
+    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.componente"
+      value="{{DBasico.componente}}">
+      <option value="0">Seleccione</option>
+      <option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}
+      </option>
+    </select>
+  </div>
+  <div class="form-group col-md-6">
+    <label> Categoría </label>
+    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.categoria"
+      value="{{DBasico.categoria}}">
+      <option value="0">Seleccione</option>
+      <option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}
+      </option>
+    </select>
+  </div>
+</div>
+
+<div class="form-row">
+  <div class="form-group col-md-3">
+    <label> Clasificación </label>
+    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.clasificacion"
+      value="{{DBasico.clasificacion}}">
+      <option value="0">Seleccione</option>
+      <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
+        {{e.des_clasificacion}}</option>
+    </select>
+  </div>
+  <div class="form-group col-md-3">
+    <label> Grado </label>
+    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.grado"
+      value="{{DBasico.grado}}">
+      <option value="0">Seleccione</option>
+      <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
+    </select>
+  </div>
+
+  <div class="form-group col-md-3">
+    <label> Fecha de Graduación </label>
+    <form class="form-inline">
+      <div class="form-group" style="width:100%">
+        <div class="input-group" style="width:100%">
+          <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="fcreacion" ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(fcreacion)"
+            [placement]="placement" [positionTarget]="buttonEl">
+          <div class="input-group-append">
+            <button #buttonEl class="btn calendario" (click)="vi.toggle()" type="button">
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="form-group col-md-3">
+    <label> Situación </label>
+    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.situacion"
+      value="{{DBasico.situacion}}">
+      <option value="0">Seleccione</option>
+    </select>
+  </div>
+</div>
+
+
+<div class="form-row">
+  <div class="form-group col-md-4">
+    <label> Especialidad </label>
+    <select class="form-control">
+      <option value="0">Seleccione</option>
+      <!-- <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
+        {{e.des_clasificacion}}</option> -->
+    </select>
+  </div>
+
+  <div class="form-group col-md-4">
+    <label> Otros Estudios </label>
+    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.otros_estudios"
+      value="{{DBasico.otros_estudios}}" class="form-control">
+  </div>
+
+  <div class="form-group col-md-4">
+    <label> Condición Especial </label>
+    <select class="form-control">
+      <option value="0">Seleccione</option>
+      <option value="NOMBRAMIENTO">NOMBRAMIENTO</option>
+      <!-- <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
+        {{e.des_clasificacion}}</option> -->
+    </select>
+  </div>
+  
+</div>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="text-right">
+      <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<br><br>

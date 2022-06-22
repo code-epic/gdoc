@@ -1,83 +1,83 @@
-
 <div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
-    <div class="container-fluid">
-      <p></p>
-    </div>
+  <div class="container-fluid">
+    <p></p>
+  </div>
 </div>
 <div class="container-fluid mt--9">
-    <div class="row">
-        <div class="col-xl-12 col-md-12 col-lg-12">
-            <div class="card shadow">
-                <div class="card-header bg-transparent">
-                    <div class="row align-items-center">
-                      <div class="col-md-10">
-                          <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
-                          <h2 class="mb-0">Control de Gestión</h2>
-                      </div>
-                      <div class="col-md-1">
-                        <div class="media align-items-center">
-                          <div class="example-button-row">
-                            <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                              <mat-icon>reply</mat-icon>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-md-1">
-                        <ul class="navbar-nav align-items-right d-none d-md-flex">
-                          <li class="nav-item" ngbDropdown placement="bottom-right">
-                            <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                              <div class="media align-items-center">
-                                <div class="example-button-row">
-                                  <button mat-icon-button aria-label="">
-                                    <mat-icon>more_vert</mat-icon>
-                                  </button>
-                                </div>
-                              </div>
-                            </a>
-                            <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                              <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item">
-                                <i class="fa fa-plus"></i>
-                                <span>Nuevo Documento</span>
-                              </a>
-                              <a routerLinkActive="active" [routerLink]="['/generales']" class="dropdown-item">
-                                <i class="fa fa-search"></i>
-                                <span>Notas de Entrega</span>
-                              </a>
-                              <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
-                                <i class="ni ni-settings-gear-65"></i>
-                                <span>Configuración</span>
-                              </a>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                </div>
-            
-                <div class="card-body">
-                    <div class="row" [ngStyle]="{'display':rtarjetas}">
-                        <div class="col-md-3" *ngFor="let item of SubMenu">
-                            <a routerLinkActive="active" [routerLink]="[item.url]">
-                                <div class="card {{item.color}} order-card">
-                                    <div class="card-block">
-                                        <h2 class="text-right text-white"><i class="{{item.icono + ' ' + item.clase}}"></i><span>{{item.nombre}}</span></h2>
-                                        <p class="m-b-0" style="font-size: 13px;">{{item.descripcion}}
-                                          <span class="f-right" id="{{item.nombre}}"></span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="row" [ngStyle]="{'display':rlistado}">
-
-                    </div>
-                </div>
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-10">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
+              <h2 class="mb-0">Control de Gestión</h2>
             </div>
-        </div>    
-        
-    </div>    
-    <!-- Fin de Tarjeta Padre -->
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>reply</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-1">
+              <ul class="navbar-nav align-items-right d-none d-md-flex">
+                <li class="nav-item" ngbDropdown placement="bottom-right">
+                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                    <div class="media align-items-center">
+                      <div class="example-button-row">
+                        <button mat-icon-button aria-label="">
+                          <mat-icon>more_vert</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </a>
+                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                    <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item">
+                      <i class="fa fa-plus"></i>
+                      <span>Nuevo Documento</span>
+                    </a>
+                    <a routerLinkActive="active" [routerLink]="['/generales']" class="dropdown-item">
+                      <i class="fa fa-search"></i>
+                      <span>Notas de Entrega</span>
+                    </a>
+                    <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
+                      <i class="ni ni-settings-gear-65"></i>
+                      <span>Configuración</span>
+                    </a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="row" [ngStyle]="{'display':rtarjetas}">
+            <div class="col-md-3" *ngFor="let item of SubMenu">
+              <a routerLinkActive="active" [routerLink]="[item.url]">
+                <div class="card {{item.color}} order-card">
+                  <div class="card-block">
+                    <h2 class="text-right text-white"><i
+                        class="{{item.icono + ' ' + item.clase}}"></i><span>{{item.nombre}}</span></h2>
+                    <p class="m-b-0" style="font-size: 13px;">{{item.descripcion}}
+                      <span class="f-right" id="{{item.nombre}}"></span>
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="row" [ngStyle]="{'display':rlistado}">
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- Fin de Tarjeta Padre -->
 </div>
