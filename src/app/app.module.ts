@@ -71,6 +71,8 @@ import { RsrevisionComponent } from './views/resoluciones/rsrevision/rsrevision.
 import { RsconfiguracionComponent } from './views/resoluciones/rsconfiguracion/rsconfiguracion.component';
 import { RscdatosbasicosComponent } from './views/resoluciones/rsconfiguracion/rscdatosbasicos/rscdatosbasicos.component';
 import { RsccargamasivaComponent } from './views/resoluciones/rsconfiguracion/rsccargamasiva/rsccargamasiva.component';
+import { RscpublicacionesComponent } from './views/resoluciones/rsconfiguracion/rscpublicaciones/rscpublicaciones.component';
+import { RscgeneralComponent } from './views/resoluciones/rsconfiguracion/rscgeneral/rscgeneral.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -190,7 +192,9 @@ const ngWizardConfig: NgWizardConfig = {
     RsrevisionComponent,
     RscdatosbasicosComponent,
     RsccargamasivaComponent,
-    RsconfiguracionComponent
+    RsconfiguracionComponent,
+    RscpublicacionesComponent,
+    RscgeneralComponent
   ],
   providers:  [
     {

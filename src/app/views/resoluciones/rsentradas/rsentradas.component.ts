@@ -63,10 +63,10 @@ export class RsentradasComponent implements OnInit {
     cedula: '',
     nombres_apellidos: '',
     fecha_nacimiento: '',
-    componente: '0',
-    categoria: '0',
-    clasificacion: '0',
-    grado: '0',
+    componente: '',
+    categoria: '',
+    clasificacion: '',
+    grado: '',
     carpeta: '0',
     estatus: '0',
     entrada: '0',
@@ -199,7 +199,7 @@ export class RsentradasComponent implements OnInit {
     this.OrdenNumero = sessionStorage.getItem("MPPD_COrdenEntrada") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_COrdenEntrada"))) : []
 
 
-
+    console.log(this.Componentes)
 
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
@@ -238,6 +238,8 @@ export class RsentradasComponent implements OnInit {
           }
 
         });
+
+        
 
         //this.selTipoDocumento()
         const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
@@ -287,6 +289,12 @@ export class RsentradasComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.Resolucion = data.Cuerpo[0]
+        console.log(this.Resolucion);
+        this.Resolucion.componente = this.Componentes.filter(e => {return e.cod_componente ==  this.Resolucion.componente })[0].nombre_componente
+        this.Resolucion.categoria = this.Categorias.filter(e => {return e.cod_categoria ==  this.Resolucion.categoria })[0].nombre_categoria
+        this.Resolucion.clasificacion = this.Clasificaciones.filter(e => {return e.cod_clasificacion ==  this.Resolucion.clasificacion })[0].des_clasificacion
+        this.Resolucion.grado = this.Grados.filter(e => {return e.cod_grado ==  this.Resolucion.grado })[0].nombres_grado
+
       },
       (error) => {
         console.error("Error de conexion a los datos ", error)

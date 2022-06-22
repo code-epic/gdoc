@@ -1,1 +1,111 @@
-<p>rsccargamasiva works!</p>
+<br>
+
+<div class="form-row">
+  <div class="form-group col-md-12">
+    <hr class="mb-1">
+    <h6 class="text-uppercase text-muted ls-1 mb-4">Formularios para ascensos masivos</h6>
+  </div>
+  <div class="form-group col-md-4">
+    <label> Tipo </label>
+    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Resolucion.carpeta">
+      <option value="0">Seleccione</option>
+      <option value="RESOLUCION">RESOLUCION</option>
+      <option value="ORDEN GENERAL">ORDEN GENERAL</option>
+    </select>
+  </div>
+  <div class="form-group col-md-4">
+    <label> Estatus </label>
+    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Resolucion.estatus"
+      value="{{Resolucion.estatus}}">
+      <option value="0">Seleccione</option>
+      <option *ngFor="let e of Estados;" [value]="e.cod_estado_resol">{{e.des_estado_resol}}</option>
+    </select>
+  </div>
+  <div class="form-group col-md-4">
+    <label>Responsable</label>
+    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" readonly
+      [(ngModel)]="Resolucion.responsable" value="{{Resolucion.responsable}}">
+  </div>
+</div>
+
+<div class="form-row">
+  <div class="form-group col-md-4">
+    <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
+      <mat-label>Número de Resolución </mat-label>
+      <input matInput placeholder="" [ngModelOptions]="{standalone: true}" [(ngModel)]="Resolucion.numero"
+        value="{{Resolucion.numero}}">
+    </mat-form-field>
+  </div>
+  <div class="form-group col-md-6">
+    <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
+      <mat-label style="width:100%">Tipo de Resolución</mat-label>
+      <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%">
+        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+          {{option.des_resol}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+  <div class="form-group col-md-2">
+    <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
+      <mat-label>Número Carpeta </mat-label>
+      <input matInput placeholder="" [ngModelOptions]="{standalone: true}" [(ngModel)]="Resolucion.carpeta"
+        value="{{Resolucion.carpeta}}">
+    </mat-form-field>
+  </div>
+</div>
+
+<div class="form-row">
+  <div class="form-group col-md-12">
+    <label for="txtObjeto">Asunto</label>
+    <div class="NgxEditor__Wrapper">
+      <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
+      <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor" [(ngModel)]="Resolucion.asunto"
+        [disabled]="false" [placeholder]="'Escibe aqui...'">
+      </ngx-editor>
+    </div>
+  </div>
+</div>
+
+<div class="form-row">
+  <div class="form-group col-md-12">
+    <label for="txtObjeto">Observaciones</label>
+    <div class="NgxEditor__Wrapper">
+      <ngx-editor-menu [editor]="xobser"> </ngx-editor-menu>
+      <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xobser" [(ngModel)]="Resolucion.observacion "
+        [disabled]="false" [placeholder]="'Escibe aqui...'">
+      </ngx-editor>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="form-row">
+  
+  <div class="form-group col-md-6">
+    <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+      <input type="hidden" name="txtFileID" id="txtFileID" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="numControl" value="{{numControl}}" readonly="readonly">
+      <label for="input-folder-2">Seleccionar Archivo</label>
+      <div class="file-loading">
+        <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file"
+          multiple accept=".pdf">
+      </div>
+      <div id="errorBlock" class="help-block"></div>
+    </form>
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="text-right">
+      <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<br><br>

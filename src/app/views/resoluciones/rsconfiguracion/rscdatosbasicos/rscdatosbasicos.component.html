@@ -93,7 +93,7 @@
 </div>
 
 <div class="form-row">
-  <div class="form-group col-md-6">
+  <div class="form-group col-md-3">
     <label> Clasificación </label>
     <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.clasificacion"
       value="{{DBasico.clasificacion}}">
@@ -102,7 +102,7 @@
         {{e.des_clasificacion}}</option>
     </select>
   </div>
-  <div class="form-group col-md-6">
+  <div class="form-group col-md-3">
     <label> Grado </label>
     <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.grado"
       value="{{DBasico.grado}}">
@@ -110,11 +110,9 @@
       <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
     </select>
   </div>
-</div>
 
-<div class="form-row">
-  <div class="form-group col-md-6">
-    <label> Fecha de Ingreso FANB </label>
+  <div class="form-group col-md-3">
+    <label> Fecha de Graduación </label>
     <form class="form-inline">
       <div class="form-group" style="width:100%">
         <div class="input-group" style="width:100%">
@@ -129,7 +127,7 @@
       </div>
     </form>
   </div>
-  <div class="form-group col-md-6">
+  <div class="form-group col-md-3">
     <label> Situación </label>
     <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.situacion"
       value="{{DBasico.situacion}}">
@@ -137,3 +135,43 @@
     </select>
   </div>
 </div>
+
+
+<div class="form-row">
+  <div class="form-group col-md-4">
+    <label> Especialidad </label>
+    <select class="form-control">
+      <option value="0">Seleccione</option>
+      <!-- <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
+        {{e.des_clasificacion}}</option> -->
+    </select>
+  </div>
+
+  <div class="form-group col-md-4">
+    <label> Otros Estudios </label>
+    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.otros_estudios"
+      value="{{DBasico.otros_estudios}}" class="form-control">
+  </div>
+
+  <div class="form-group col-md-4">
+    <label> Condición Especial </label>
+    <select class="form-control">
+      <option value="0">Seleccione</option>
+      <option value="NOMBRAMIENTO">NOMBRAMIENTO</option>
+      <!-- <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
+        {{e.des_clasificacion}}</option> -->
+    </select>
+  </div>
+  
+</div>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="text-right">
+      <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<br><br>

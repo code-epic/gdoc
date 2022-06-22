@@ -92,41 +92,31 @@
                                     </div>
                                     <div class="form-group col-md-8">
                                         <label> Nombres </label>
-                                        <input type="text" [ngModelOptions]="{standalone: true}"
+                                        <input type="text" [ngModelOptions]="{standalone: true}" readonly
                                             [(ngModel)]="Resolucion.nombres_apellidos" value="{{Resolucion.nombres_apellidos}}"
                                             class="form-control">
                                     </div>
                                 </div>
 
                                 <div class="row">
-                                    <div class="form-group col-md-6">
-                                        <label for="tmsOrigen">Fecha de Nacimiento</label>
-                                        <form class="form-inline">
-                                            <div class="form-group" style="width:100%">
-                                                <div class="input-group" style="width:100%">
-                                                    <input class="form-control" placeholder="AAAA-MM-DD"
-                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="forigen"
-                                                        ngbDatepicker #vi="ngbDatepicker"
-                                                        [value]="formatter.format(forigen)" [placement]="placement"
-                                                        [positionTarget]="buttonEl">
-                                                    <div class="input-group-append">
-                                                        <button #buttonEl class="btn calendario" (click)="vi.toggle()"
-                                                            type="button">
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
+
+                                    <div class="col-md-12" style="padding: 15px;">
+                                        <table summary="" class="table table-bordered table-hover">
+            
+                                            <thead>
+                                                <tr>
+                                                    <th data-priority="1">Fecha Nac.: {{ Resolucion.fecha_nacimiento | uppercase}}</th>
+                                                    <th data-priority="2">Sexo:  {{ Resolucion.sexo | uppercase}}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th data-priority="3">Situacion Militar: {{Resolucion.situacion}}</th>
+                                                    <th data-priority="4"></th>
+                                                </tr>
+                                            </thead>
+                                        </table>
                                     </div>
-                                    <div class="form-group col-md-6">
-                                        <label> Sexo </label>
-                                        <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                            [(ngModel)]="Resolucion.sexo" value="{{Resolucion.sexo}}">
-                                            <option value="0">Seleccione</option>
-                                            <option value="Masculino">MASCULINO</option>
-                                            <option value="Femenino">FEMENINO</option>
-                                        </select>
-                                    </div>
+                                   
+                                
                                 </div>
 
                             </div>
@@ -145,8 +135,31 @@
 
                             </div>
                         </div>
+                        <div class="row" style="padding: 15px;">
+                            <table summary="" class="table table-bordered table-hover">
+
+                                <thead>
+                                    <tr>
+                                        <th data-priority="1">Componente</th>
+                                        <th data-priority="2">Categoria</th>
+                                        <th data-priority="3">Clasificación</th>
+                                        <th data-priority="4">Grado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ Resolucion.componente | uppercase}}</td>
+                                        <td>{{ Resolucion.categoria | uppercase}}</td>
+                                        <td>{{ Resolucion.clasificacion }}</td>
+                                        <td>{{ Resolucion.grado }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </form>
                 </div>
+
+
             </div>
         </div>
 
@@ -156,116 +169,15 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Militares</h6>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label> Componente </label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.componente" value="{{Resolucion.componente}}">
-                                <option value="0">Seleccione</option>
-                                <option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label> Categoría </label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.categoria" value="{{Resolucion.categoria}}">
-                                <option value="0">Seleccione</option>
-                                <option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label> Clasificación </label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.clasificacion" value="{{Resolucion.clasificacion}}">
-                                <option value="0">Seleccione</option>
-                                <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
-                                    {{e.des_clasificacion}}</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label> Grado </label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.grado" value="{{Resolucion.grado}}">
-                                <option value="0">Seleccione</option>
-                                <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label> Fecha de Ingreso FANB </label>
-                            <form class="form-inline">
-                                <div class="form-group" style="width:100%">
-                                    <div class="input-group" style="width:100%">
-                                        <input class="form-control" placeholder="AAAA-MM-DD"
-                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="fcreacion" ngbDatepicker
-                                            #vi="ngbDatepicker" [value]="formatter.format(fcreacion)"
-                                            [placement]="placement" [positionTarget]="buttonEl">
-                                        <div class="input-group-append">
-                                            <button #buttonEl class="btn calendario" (click)="vi.toggle()"
-                                                type="button">
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label> Situación </label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.situacion" value="{{Resolucion.situacion}}">
-                                <option value="0">Seleccione</option>
-                            </select>
-                        </div>
-                    </div>
 
                     <div class="form-row">
                         <div class="form-group col-md-4">
-                            <mat-form-field class="example-full-width" appearance="fill"  style="width:100%">
-                                <mat-label>Número de Resolución </mat-label>
-                                <input matInput placeholder="" [ngModelOptions]="{standalone: true}" 
-                                    [(ngModel)]="Resolucion.numero" value="{{Resolucion.numero}}">
-                            </mat-form-field>
-                        </div>
-                        <div class="form-group col-md-8">
-                            <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
-                                <mat-label style="width:100%">Tipo de Resolución</mat-label>
-                                <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
-                                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%">
-                                    <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                                        {{option.des_resol}}
-                                    </mat-option>
-                                </mat-autocomplete>
-                            </mat-form-field>
-                        </div>
-                    </div>
-
-
-
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label> Número Carpeta </label>
+                            <label> Tipo </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.carpeta" value="{{Resolucion.carpeta}}">
+                                [(ngModel)]="Resolucion.tipo" >
                                 <option value="0">Seleccione</option>
-                                <option *ngFor="let e of OrdenNumero;" [value]="e.cod_carpeta_og">{{e.des_carpeta_og}}</option>
-                            </select>
-                        </div>
-                      
-                        <div class="form-group col-md-4">
-                            <label> Carpeta Entrada </label>
-                           
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.entrada" value="{{Resolucion.entrada}}">
-                                <option value="0">Seleccione</option>
-                                <option *ngFor="let e of Carpetas;" [value]="e.cod_carpeta">{{e.des_carpeta}}</option>
+                                <option value="RESOLUCION">RESOLUCION</option>
+                                <option value="ORDEN GENERAL">ORDEN GENERAL</option>
                             </select>
                         </div>
                         <div class="form-group col-md-4">
@@ -276,8 +188,55 @@
                                 <option *ngFor="let e of Estados;" [value]="e.cod_estado_resol">{{e.des_estado_resol}}</option>
                             </select>
                         </div>
+                        <div class="form-group col-md-4">
+                            <label>Responsable</label>
+                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" readonly
+                                [(ngModel)]="Resolucion.responsable" value="{{Resolucion.responsable}}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <mat-form-field class="example-full-width" appearance="fill"  style="width:100%">
+                                <mat-label>Número de Resolución </mat-label>
+                                <input matInput placeholder="" [ngModelOptions]="{standalone: true}" 
+                                    [(ngModel)]="Resolucion.numero" value="{{Resolucion.numero}}">
+                            </mat-form-field>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
+                                <mat-label style="width:100%">Tipo de Resolución</mat-label>
+                                <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
+                                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%">
+                                    <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                                        {{option.des_resol}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <mat-form-field class="example-full-width" appearance="fill"  style="width:100%">
+                                <mat-label>Número Carpeta </mat-label>
+                                <input matInput placeholder="" [ngModelOptions]="{standalone: true}" 
+                                    [(ngModel)]="Resolucion.carpeta" value="{{Resolucion.carpeta}}">
+                            </mat-form-field>
+                        </div>
                     </div>
 
+
+
+                    
+                        
+                      <!-- 
+                        <div class="form-group col-md-4">
+                            <label> Carpeta Entrada </label>
+                           
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Resolucion.entrada" value="{{Resolucion.entrada}}">
+                                <option value="0">Seleccione</option>
+                                <option *ngFor="let e of Carpetas;" [value]="e.cod_carpeta">{{e.des_carpeta}}</option>
+                            </select>
+                        </div> -->
+                       
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <label for="txtObjeto">Asunto</label>
@@ -303,18 +262,6 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label>Responsable</label>
-                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.responsable" value="{{Resolucion.responsable}}">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>Cargo Responsable</label>
-                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.cargo_responsable" value="{{Resolucion.cargo_responsable}}">
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="text-right">

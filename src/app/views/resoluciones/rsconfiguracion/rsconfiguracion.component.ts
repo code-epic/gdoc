@@ -13,6 +13,11 @@ import { LoginService } from 'src/app/services/seguridad/login.service';
 export class RsconfiguracionComponent implements OnInit {
   public focus : boolean = true
   public buscar : string = ''
+  public dbasico : boolean = false
+  public dmasivo : boolean = false 
+  public dgeneral : boolean = false
+  public dpublicaciones : boolean = false 
+  
   lst = []
   lengthOfi = 0;
   pageSizeOfi = 10;
@@ -35,6 +40,12 @@ export class RsconfiguracionComponent implements OnInit {
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
     
+  }
+  desactivar(){
+    this.dbasico = false
+    this.dmasivo = false
+    this.dgeneral = false
+    this.dpublicaciones = false
   }
 
 

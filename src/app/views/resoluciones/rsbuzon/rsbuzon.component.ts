@@ -482,6 +482,49 @@ export class RsbuzonComponent implements OnInit {
 
 
 
+
+  fileSelected(e) {
+    //this.archivos.push(e.target.files[0])
+  }
+
+  async SubirArchivo(e) {
+    var frm = new FormData(document.forms.namedItem("forma"))
+    try {
+      await this.apiService.EnviarArchivos(frm).subscribe(
+        (data) => {
+          this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
+          this.xAPI.parametros =  '' 
+          // this.DocAdjunto.archivo = this.archivos[0].name
+          // this.DocAdjunto.usuario = this.loginService.Usuario.id
+          // this.DocAdjunto.documento = this.numControl
+          // this.xAPI.valores = JSON.stringify(this.DocAdjunto)
+
+          // this.apiService.Ejecutar(this.xAPI).subscribe(
+          //   (xdata) => {
+          //     if (xdata.tipo == 1) {
+          //       this.toastrService.success(
+          //         'Tu archivo ha sido cargado con exito ',
+          //         `GDoc Registro`
+          //       );
+               
+          //     } else {
+          //       this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+          //     }
+          //   },
+          //   (error) => {
+          //     this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
+          //   }
+          // )
+        }
+      )
+    } catch (error) {
+      console.error(error)
+    }
+
+  }
+
+
+
 }
 
 

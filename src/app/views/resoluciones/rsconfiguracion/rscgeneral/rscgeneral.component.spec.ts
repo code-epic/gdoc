@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RsccargamasivaComponent } from './rsccargamasiva.component';
+import { RscgeneralComponent } from './rscgeneral.component';
 
-describe('RsccargamasivaComponent', () => {
-  let component: RsccargamasivaComponent;
-  let fixture: ComponentFixture<RsccargamasivaComponent>;
+describe('RscgeneralComponent', () => {
+  let component: RscgeneralComponent;
+  let fixture: ComponentFixture<RscgeneralComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RsccargamasivaComponent ]
+      declarations: [ RscgeneralComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RsccargamasivaComponent);
+    fixture = TestBed.createComponent(RscgeneralComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
