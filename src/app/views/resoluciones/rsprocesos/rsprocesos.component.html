@@ -22,67 +22,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-1">
-                            <ul class="navbar-nav align-items-right d-none d-md-flex">
-                                <li class="nav-item" ngbDropdown placement="bottom-right">
-                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                                        <div class="media align-items-center">
-                                            <div class="example-button-row">
-                                                <button mat-icon-button aria-label="">
-                                                    <mat-icon>more_vert</mat-icon>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                                        <a routerLinkActive="active" [routerLink]="['/rsentradas']" class="dropdown-item">
-                                            <i class="fa fa-plus"></i>
-                                            <span>Nueva Entrada</span>
-                                        </a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
                 </div>
 
                 <div class="card-body">
-
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-3 text-right">
-
-                            </div>
-                            <div class="col-md-6 text-center">
-
-                                <form class="navbar-search">
-                                    <div class="form-group" [ngClass]="{ 'focused': focus === true }">
-                                        <div class="input-group input-group-alternative">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa fa-search"></i></span>
-                                            </div>
-                                            <input class="form-control" placeholder="Buscar" type="text"
-                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="buscar"
-                                                value="{{buscar}}" (keypress)="seleccionLista($event)"
-                                                (focus)="focus = true" (blur)="focus = false">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa fa-sliders"></i></span>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </form>
-
-                            </div>
-                            <div class="col-md-3">
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
                     <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
                         (selectedIndexChange)="selNavegacion($event)">
                         <mat-tab>

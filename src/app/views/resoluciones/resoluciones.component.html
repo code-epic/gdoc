@@ -12,31 +12,95 @@
 
         <div class="card-header bg-transparent">
           <div class="row align-items-center">
-            <div class="col-md-12">
+            <div class="col-md-10">
               <h6 class="text-uppercase text-muted ls-1 mb-1">PRINCIPAL</h6>
               <h2 class="mb-0">Resoluciones</h2>
+            </div>
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>reply</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-1">
+              <ul class="navbar-nav align-items-right d-none d-md-flex">
+                <li class="nav-item" ngbDropdown placement="bottom-right">
+                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                    <div class="media align-items-center">
+                      <div class="example-button-row">
+                        <button mat-icon-button aria-label="">
+                          <mat-icon>more_vert</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </a>
+                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                    <a routerLinkActive="active" [routerLink]="['/rsentradas']" class="dropdown-item">
+                      <i class="fa fa-plus"></i>
+                      <span>Nueva Entrada</span>
+                    </a>
+                  </div>
+                </li>
+              </ul>
             </div>
 
           </div>
         </div>
 
         <div class="card-body">
-          <div class="row">
+          <div class="container mb-5">
+            <div class="row">
+              <div class="col-md-3 text-right">
 
-            <div class="col-md-3" *ngFor="let item of SubMenu">
-              <a routerLinkActive="active" [routerLink]="[item.url]">
-                <div class="card {{item.color}} order-card">
-                  <div class="card-block">
-                    <h2 class="text-right text-white"><i
-                        class="{{item.icono + ' ' + item.clase}}"></i><span>{{item.nombre}}</span></h2>
-                    <p class="m-b-0" style="font-size: 13px;">{{item.descripcion}}
-                      <span class="f-right" id="{{item.nombre}}"></span>
-                    </p>
+              </div>
+              <div class="col-md-6 text-center">
+
+                <form class="navbar-search">
+                  <div class="form-group" [ngClass]="{ 'focused': focus === true }">
+                    <div class="input-group input-group-alternative">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+                      </div>
+                      <input class="form-control" placeholder="Buscar" type="text" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="buscar" (focus)="focus = true" (blur)="focus = false">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-sliders"></i></span>
+                      </div>
+
+                    </div>
                   </div>
+                </form>
+
+              </div>
+              <div class="col-md-3">
+
+              </div>
+
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col-md-1"></div>
+
+            <div class="col-md-2 text-center" *ngFor="let item of SubMenu">
+              <a routerLinkActive="active" [routerLink]="[item.url]">
+                <div>
+                  <div class="cardround {{item.color}} order-card text-white">
+                    <div class="card-block">
+                      <i class="{{item.icono}}"></i>
+                    </div>
+                  </div>
+                  <p class="m-b-0" style="font-size: 15px">{{item.nombre}}</p>
                 </div>
               </a>
             </div>
-            
+
+
+            <div class="col-md-1"></div>
+
           </div>
         </div>
       </div>

@@ -56,6 +56,13 @@
     background: linear-gradient(45deg, #FF5370, #ff869a);
   }
   
+  .cardround {
+
+    border-radius: 50%;
+    padding: 15px;
+
+
+  }
   
   .card {
     border-radius: 7px;
@@ -72,7 +79,7 @@
   }
   
   .order-card i {
-    font-size: 26px;
+    font-size: 50px;
   }
   
   .f-left {
