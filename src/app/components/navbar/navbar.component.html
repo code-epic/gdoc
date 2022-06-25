@@ -16,7 +16,7 @@
           </div>
         </a>
         <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-          <a class="dropdown-item" (click)="open(content)">
+          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/perfil']">
             <i class="ni ni-single-02"></i>
             <span>Perfil</span>
           </a>
@@ -36,43 +36,6 @@
   </div>
 </nav>
 
-<ng-template #content let-modal>
-  <div class="modal-header header bg-gradient-success font-weight-bold">
-    <h4 class="modal-title text-white" id="modal-basic-title">PERFIL</h4>
-  </div>
-  <div class="modal-body">
-    <div class="col-md-12">
-      <div class="form-row">
-        <div class="form-group col-md-4">
-            <label for="txtControl"> Cédula </label>                    
-            <input type="text" class="form-control" id="txtCedula">
-        </div>
-        <div class="form-group col-md-8">
-          <label for="txtControl"> Área </label>                    
-          <input type="text" class="form-control" id="txtArea">
-        </div>
-      </div>
-    </div>
-    <div class="col-md-12">
-      <div class="form-row">
-        <div class="form-group col-md-6">
-            <label for="txtControl"> Nombres </label>                    
-            <input type="text" class="form-control" id="txtNombre">
-        </div>
-        <div class="form-group col-md-6">
-          <label for="txtControl"> Apellidos </label>                    
-          <input type="text" class="form-control" id="txtApellido">
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn bg-gradient-success text-white "  (click)="clasificarBuzon();modal.close('Save')"> 
-      <span class="fa fa-save"></span>&nbsp;&nbsp;Guardar </button>
-    <button  class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
-      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
-  </div>
-</ng-template>
 
 <ng-template #contra let-modal>
   <div class="modal-header header bg-gradient-success font-weight-bold">

@@ -73,6 +73,7 @@ import { RscdatosbasicosComponent } from './views/resoluciones/rsconfiguracion/r
 import { RsccargamasivaComponent } from './views/resoluciones/rsconfiguracion/rsccargamasiva/rsccargamasiva.component';
 import { RscpublicacionesComponent } from './views/resoluciones/rsconfiguracion/rscpublicaciones/rscpublicaciones.component';
 import { RscgeneralComponent } from './views/resoluciones/rsconfiguracion/rscgeneral/rscgeneral.component';
+import { PerfilComponent } from './views/perfil/perfil.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -194,7 +195,8 @@ const ngWizardConfig: NgWizardConfig = {
     RsccargamasivaComponent,
     RsconfiguracionComponent,
     RscpublicacionesComponent,
-    RscgeneralComponent
+    RscgeneralComponent,
+    PerfilComponent
   ],
   providers:  [
     {

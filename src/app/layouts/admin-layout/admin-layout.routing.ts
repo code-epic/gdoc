@@ -32,7 +32,7 @@ import { CotizacionComponent } from 'src/app/views/reportes/cotizacion/cotizacio
 import { RsrevisionComponent } from 'src/app/views/resoluciones/rsrevision/rsrevision.component';
 import { RstranscripcionComponent } from 'src/app/views/resoluciones/rstranscripcion/rstranscripcion.component';
 import { RsconfiguracionComponent } from 'src/app/views/resoluciones/rsconfiguracion/rsconfiguracion.component';
-
+import { PerfilComponent } from 'src/app/views/perfil/perfil.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -224,6 +224,11 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'rsconfiguracion',
         component: RsconfiguracionComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'perfil',
+        component: PerfilComponent,
         canActivate: [AuthGuardGuard]
     }
 ];

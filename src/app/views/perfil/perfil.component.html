@@ -1,0 +1,147 @@
+<div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
+  style="min-height: 250px; background-image: url(assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
+  <!-- Mask -->
+  <span class="mask bg-gradient-info"></span>
+  <!-- Header container -->
+  <div class="container-fluid d-flex align-items-center">
+    <div class="row">
+      <div class="col-lg-7 col-md-10">
+        <h1 class="display-2 text-white">Hola {{nombre}}</h1>
+        <p class="text-white mt-0 mb-5">Esta es tu página de perfil. Puedes modificar tus datos personales y cambiar tus
+          contraseñas.</p>
+        <!-- <a href="#!" class="btn btn-info">Edit profile</a> -->
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid mt--8">
+  <div class="row">
+    <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
+      <div class="card card-profile shadow">
+        <div class="row justify-content-center">
+          <div class="col-lg-3 order-lg-2">
+            <div class="card-profile-image">
+              <a href="javascript:void(0)">
+                <img src="/assets/img/brand/avatar4.png" class="rounded-circle" style="height:150px;">
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-body pt-8 pt-md-6">
+          <div class="row">
+            <div class="col">
+              <div class="card-profile-stats d-flex justify-content-center mt-md-5">
+                <div>
+                  <span class="heading">22</span>
+                  <span class="description">Archivos</span>
+                </div>
+                <div>
+                  <span class="heading">10</span>
+                  <span class="description">Documentos</span>
+                </div>
+                <div>
+                  <span class="heading">89</span>
+                  <span class="description">Registros</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center">
+            <h3>
+              {{nombre}}<span class="font-weight-light"></span>
+            </h3>
+            <div class="h5 font-weight-300">
+              <i class="ni location_pin mr-2"></i>Caracas, Venezuela
+            </div>
+            <div class="h5 mt-2">
+              <i class="ni business_briefcase-24 mr-2"></i>Analista - Control de Gestión
+            </div>
+            <hr class="my-2" />
+            
+              <h6 class="heading-small text-muted mb-2">Información Militar</h6>
+              <div class="row text-left ">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">Rango:</li>
+                <li class="list-group-item">Componente:</li>
+                <li class="list-group-item">Año de Graduación:</li>
+                <li class="list-group-item">Clasificación:</li>
+                <li class="list-group-item">Último Ascenso:</li>
+              </ul>
+            </div>
+            <hr class="my-4" />
+            <div class="text-center">
+              <a class="btn btn-sm bg-gradient-info text-white" (click)="cerrar()">Cambiar Contraseña</a>
+            </div>   
+            <p></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-8 order-xl-1">
+      <div class="card">
+        <div class="card-header">
+          <div class="row align-items-center">
+            <div class="col-md-10">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Perfil</h6>
+              <h2 class="mb-0">Mi Cuenta</h2>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form>
+            <h6 class="heading-small text-muted mb-4">Información de Usuario</h6>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="cmbTipo">Nombres</label>
+                <input type="text" class="form-control">
+              </div>
+              <div class="form-group col-md-6">
+                <label for="txtEnte"> Apellidos </label>
+                <input type="text" class="form-control">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="cmbTipo">Cedula</label>
+                <input type="text" class="form-control">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="txtEnte">Telefono</label>
+                <input type="text" class="form-control">
+              </div>
+              <div class="form-group col-md-6">
+                <label for="txtEnte">Correo </label>
+                <input type="text" class="form-control">
+              </div>
+            </div>
+            <hr class="my-4" />
+            <!-- Address -->
+            <h6 class="heading-small text-muted mb-4">Información de Contacto</h6>
+            <div class="form-row">
+              <div class="form-group col-md-12">
+                <label for="cmbTipo">Dirección</label>
+                <input type="text" class="form-control">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="cmbTipo">Ciudad</label>
+                <input type="text" class="form-control">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="txtEnte">Pais</label>
+                <input type="text" class="form-control">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="txtEnte">Código Postal </label>
+                <input type="text" class="form-control">
+              </div>
+            </div>
+            <hr class="my-2" />
+          </form>     
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
