@@ -53,6 +53,31 @@
         <div class="card-body">
           <div class="container mb-5">
             <div class="row">
+              <div class="col-md-1"></div>
+
+              <div class="col-md-10 text-center" >
+
+                <div class="row text-center" >
+                  <div class="col-md-1"></div>
+                  <div class="col-md-2 cardround" *ngFor="let item of SubMenu">
+                    <a routerLinkActive="active" [routerLink]="[item.url]">
+                      <div class="text-center botones">
+                        <br>
+                          <h2 class="text-center  {{item.color}}"><i class="{{item.icono}}" style="font-size: 42px;"></i></h2>
+                          <p>{{item.nombre}}</p>
+                      </div>
+                    </a>
+                  </div>
+                  <div class="col-md-1"></div>
+                </div>
+
+              </div>
+
+              <div class="col-md-1"></div>
+
+            </div>
+            <br>
+            <div class="row">
               <div class="col-md-3 text-right">
 
               </div>
@@ -65,7 +90,7 @@
                         <span class="input-group-text"><i class="fa fa-search"></i></span>
                       </div>
                       <input class="form-control" placeholder="Buscar" type="text" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="buscar" (focus)="focus = true" (blur)="focus = false">
+                        [(ngModel)]="buscar" (focus)="focus = true" (blur)="focus = false" (keypress)="Consultar($event)">
                       <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-sliders"></i></span>
                       </div>
@@ -81,28 +106,24 @@
 
             </div>
 
-          </div>
-          <div class="row">
-            <div class="col-md-1"></div>
-
-            <div class="col-md-2 text-center" *ngFor="let item of SubMenu">
-              <a routerLinkActive="active" [routerLink]="[item.url]">
-                <div>
-                  <div class="cardround {{item.color}} order-card text-white">
-                    <div class="card-block">
-                      <i class="{{item.icono}}"></i>
-                    </div>
-                  </div>
-                  <p class="m-b-0" style="font-size: 15px">{{item.nombre}}</p>
-                </div>
-              </a>
+          
+           
+            <hr>
+            <div class="row enlace" *ngFor="let e of lst">
+              <div class="col-md-10">
+                <a href="#">{{ e.skey }} - {{ e.titu }} </a> <br>
+                <p>{{ e.subt }}<br>
+                {{ e.resu }}<br>
+                  <small class=" mr-4"><i class="fa fa-globe"></i>&nbsp; Visitaste esta página 3 veces</small>
+                  <small class=" mr-4"><i class="fa fa-calendar"></i>&nbsp; Última visita: 23ABR21 01:20 p.m</small>
+                  <small class=" mr-4"><i class="fa fa-map-pin"></i>&nbsp; {{ e.ubic }}</small>
+                </p>
+              </div>
+              <div class="col-md-2"></div>
             </div>
-
-
-            <div class="col-md-1"></div>
-
           </div>
         </div>
+      
       </div>
     </div>
   </div>
