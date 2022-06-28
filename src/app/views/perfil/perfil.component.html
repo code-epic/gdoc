@@ -72,6 +72,7 @@
             <hr class="my-3" />
             <div class="text-center">
               <a class="btn btn-sm bg-gradient-info text-white" (click)="cerrar()">Cambiar Contraseña</a>
+              <!-- <a class="btn btn-sm bg-gradient-info text-white" (click)="open(observacion)">Beta</a> -->
             </div>   
             <p></p>
           </div>
@@ -144,3 +145,140 @@
     </div>
   </div>
 </div>
+
+
+<!-- <ng-template #observacion let-modal>
+  <div class="modal-body">
+    <div class="col-md-12 order-xl-2 mb-5 mb-xl-0">
+      
+        <div class="row justify-content-center mb-6">
+          <div class="col-lg-3 order-lg-2">
+            <div class="card-profile-image">
+              <a href="javascript:void(0)">
+                <img src="/assets/img/brand/avatar4.png" class="rounded-circle">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0 pt-md-4">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card-profile-stats d-flex justify-content-center mt-md-4">
+                <div class="col-md-4">
+                  <span class="heading">22</span>
+                  <span class="description">Nombramientos</span>
+                </div>
+                <div class="col-md-4">
+                  <span class="heading">10</span>
+                  <span class="description">Resoluciones</span>
+                </div>
+                <div class="col-md-4">
+                  <span class="heading">89</span>
+                  <span class="description">Entradas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center">
+            <h3>
+              Jessica Jones<span class="font-weight-light"></span>
+            </h3>
+            <br>
+            <br>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <p>Grado</p>
+              </div>
+              <div class="form-group col-md-4">
+                <p>Categoria</p>
+              </div>
+              <div class="form-group col-md-4">
+                <p>Clasificación</p>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <p>Componente</p>
+              </div>
+              <div class="form-group col-md-4">
+                <p>Cargo que ocupa</p>
+              </div>
+              <div class="form-group col-md-4">
+                <p>Última Resolución</p>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <p>Fecha Resolución</p>
+              </div>
+              <div class="form-group col-md-4">
+                <p>Cargo que ocupa</p>
+              </div>
+              <div class="form-group col-md-4">
+                <p>Última Resolución</p>
+              </div>
+            </div>
+            <hr class="my-2" />
+            <p>Asunto</p>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-sm bg-gradient-info mr-4 text-white float-right">
+            <span class="fa fa-print"></span>&nbsp;&nbsp;Imprimir </button>
+        </div>
+       
+        <h2 class="mb-0 text-center">HISTORIAL</h2>
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                
+            </div>
+            <table summary="" class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th data-priority="1">Resoluciones</th>
+                </tr>
+              </thead>
+            </table>
+            <div class="form-group  col-md-12 text-justify" [innerHTML]="Doc.contenido"
+                style="font-size: small; padding: 15px; border: 1px solid #ccc">
+            </div>
+            <table summary="" class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th data-priority="1">Asunto</th>
+                  </tr>
+                </thead>
+            </table>
+            <div class="form-group  col-md-12 text-justify" [innerHTML]="Doc.instrucciones"
+                style="padding: 15px; border: 1px solid #ccc">
+            </div>
+            <br>
+            <table summary="" class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th data-priority="1" colspan="5">Datos Personales:</th>
+                  </tr>
+                  <tr>
+                    <th data-priority="1">Datos Militares</th>
+                    <th data-priority="1">Cargo que ocupa</th>  
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let e of lstTraza">
+                    <td>{{e.fecha | date:"dd-MM-yyyy" }}</td>
+                    <td>{{e.nombre_estado | uppercase }}</td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="col-md-12 text-right">
+          <button class="btn btn-sm bg-info text-white">
+            <span></span>Imprimir </button>
+          <button class="btn btn-sm bg-gradient-danger text-white" (click)="modal.dismiss('Close')">
+            <span></span>Cancelar </button>
+        </div>
+     
+    </div>
+  </div>
+</ng-template> -->

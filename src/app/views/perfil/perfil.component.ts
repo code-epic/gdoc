@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import Swal from 'sweetalert2';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 
 @Component({
   selector: 'app-perfil',
@@ -11,14 +13,14 @@ export class PerfilComponent implements OnInit {
 
   public nombre: string = 'Analista'
 
-  constructor(private loginService: LoginService) { }
+  constructor(
+    private loginService: LoginService,
+    private modalService: NgbModal) { }
 
   ngOnInit(): void {
-
     this.nombre = this.loginService.Usuario.nombre
 
   }
-
 
 
   cerrar(){
@@ -35,5 +37,11 @@ export class PerfilComponent implements OnInit {
       confirmButtonText: 'Guardar'
     })
   }
+
+  open(content) {
+    this.modalService.open(content, {size: 'lg'});
+
+  }
+
 
 }

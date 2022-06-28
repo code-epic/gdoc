@@ -33,6 +33,7 @@ import { RsrevisionComponent } from 'src/app/views/resoluciones/rsrevision/rsrev
 import { RstranscripcionComponent } from 'src/app/views/resoluciones/rstranscripcion/rstranscripcion.component';
 import { RsconfiguracionComponent } from 'src/app/views/resoluciones/rsconfiguracion/rsconfiguracion.component';
 import { PerfilComponent } from 'src/app/views/perfil/perfil.component';
+import { IndiceComponent } from 'src/app/views/reportes/indice/indice.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -230,5 +231,11 @@ export const AdminLayoutRoutes: Routes = [
         path: 'perfil',
         component: PerfilComponent,
         canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'indice',
+        component: IndiceComponent,
+        canActivate: [AuthGuardGuard]
     }
+
 ];
