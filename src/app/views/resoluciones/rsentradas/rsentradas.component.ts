@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 
 
 export interface ITipoResolucion {
@@ -174,6 +175,7 @@ export class RsentradasComponent implements OnInit {
     private rutaActiva: ActivatedRoute,
     private utilService: UtilService,
     private loginService: LoginService,
+    private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
     private ruta: Router) { }
 
@@ -283,6 +285,7 @@ export class RsentradasComponent implements OnInit {
    * Consultar datos generales del militar 
    */
   consultarCedula() {
+    this.ngxService.startLoader("loader-buscar")
     this.xAPI.funcion = 'MPPD_CDatosBasicos'
     this.xAPI.parametros = this.Resolucion.cedula
     this.xAPI.valores = ''
@@ -294,7 +297,7 @@ export class RsentradasComponent implements OnInit {
         this.Resolucion.categoria = this.Categorias.filter(e => {return e.cod_categoria ==  this.Resolucion.categoria })[0].nombre_categoria
         this.Resolucion.clasificacion = this.Clasificaciones.filter(e => {return e.cod_clasificacion ==  this.Resolucion.clasificacion })[0].des_clasificacion
         this.Resolucion.grado = this.Grados.filter(e => {return e.cod_grado ==  this.Resolucion.grado })[0].nombres_grado
-
+        this.ngxService.stopLoader("loader-buscar")
       },
       (error) => {
         console.error("Error de conexion a los datos ", error)

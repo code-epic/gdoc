@@ -51,6 +51,7 @@
         </div>
 
         <div class="card-body">
+          <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
           <div class="container mb-5">
             <div class="row">
               <div class="col-md-1"></div>
@@ -107,8 +108,9 @@
             </div>
 
           
-           
-            <hr>
+            <hr style="margin-top:5px; margin-bottom:5px">
+            
+            <small class="mr-4" style="font-size: 12px;"><i class="fa fa-search"></i>&nbsp;Cerca de {{cantidad | number }} resultados...</small>
             <div class="row enlace" *ngFor="let e of lst">
               <div class="col-md-10">
                 <a href="#">{{ e.skey }} - {{ e.titu }} </a> <br>
@@ -120,6 +122,28 @@
                 </p>
               </div>
               <div class="col-md-2"></div>
+            </div>
+
+            <br>
+            <div class="row">
+
+             <div class="col-md-4"></div>
+             <div class="col-md-4 text-center">
+              <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1"><</a>
+                  </li>
+                  <li class="page-item"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">></a>
+                  </li>
+                </ul>
+              </nav>
+             </div>
+             <div class="col-md-4"></div>
             </div>
           </div>
         </div>

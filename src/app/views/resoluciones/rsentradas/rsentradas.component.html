@@ -4,6 +4,7 @@
     </div>
 </div>
 <div class="container-fluid mt--9">
+    <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -52,19 +53,18 @@
                             <div class="form-group  col-md-6">
                                 <label>Unidad Minsiterial</label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="unidad"
-                                  value="{{unidad}}" readonly>
-                              </div>
-                              <div class="form-group  col-md-3">
+                                    value="{{unidad}}" readonly>
+                            </div>
+                            <div class="form-group  col-md-3">
                                 <label>N. De Cuenta</label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cuenta"
-                                  value="{{cuenta}}" readonly>
-                              </div>
-                              <div class="form-group  col-md-3">
+                                    value="{{cuenta}}" readonly>
+                            </div>
+                            <div class="form-group  col-md-3">
                                 <label>Fecha</label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
-                                  value="{{fecha}}" readonly>
-                              </div>
-                              
+                                    value="{{fecha}}" readonly>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-9">
@@ -72,14 +72,14 @@
                                     <div class="form-group col-md-12">
                                         <label>Cuenta o Oficio</label>
                                         <div class="NgxEditor__Wrapper">
-                                          <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor"
-                                          [(ngModel)]="asunto" [disabled]="false" [placeholder]="'Escibe aqui...'">
-                                          </ngx-editor>
+                                            <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor"
+                                            [(ngModel)]="asunto" [disabled]="false" [placeholder]="'Escibe aqui...'">
+                                            </ngx-editor>
                                         </div>
-                                      </div>
+                                        </div>
 
                                 </div>
-                               
+                                
 
                                 <!-- <hr class="mb-1">
                             <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Personales</h6> -->
@@ -115,7 +115,7 @@
                                             </thead>
                                         </table>
                                     </div>
-                                   
+                                    
                                 
                                 </div>
 
@@ -132,7 +132,15 @@
                                     </div>
                                     <div class="col-md-1"></div>
                                 </div>
-
+                                <div class="row">
+                                    
+                                    <div class="col-md-12 text-center">
+                                        <br>
+                                        <button class="btn btn-success"  style="width: 190px">
+                                            <span class="fa fa-plus"></span>&nbsp;&nbsp;Ver historial</button>
+                                    </div>
+                                    <div class="col-md-1"></div>
+                                </div>
                             </div>
                         </div>
                         <div class="row" style="padding: 15px;">
@@ -155,6 +163,7 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            
                         </div>
                     </form>
                 </div>
@@ -162,7 +171,6 @@
 
             </div>
         </div>
-
     </div>
     <br>
     <div class="row">
