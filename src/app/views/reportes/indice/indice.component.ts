@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-indice',
@@ -13,6 +14,15 @@ export class IndiceComponent implements OnInit {
   public asunto = ''
   public nombramiento = ''
 
+  longitud = 0;
+  pageSize = 10;
+  pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+
+
+  // MatPaginator Output
+  pageEvent: PageEvent;
+
+
   constructor() { }
 
   ngOnInit(): void {
@@ -21,7 +31,7 @@ export class IndiceComponent implements OnInit {
     console.info(this.ref)
     this.data.resoluciones.reverse()
     this.data.entradas.reverse()
-    // console.log(this.data.resoluciones.sort())
+    console.log(this.data.entradas)
     this.filtrarNombramiento()
   }
 
@@ -31,6 +41,10 @@ export class IndiceComponent implements OnInit {
     this.nombramiento = nombramiento.titulo + ' - ' + nombramiento.tipo_descripcion
     this.asunto = nombramiento.asunto.substring(0,100)
     
+  }
+
+  pageChangeEvent(e) {
+    this.pageSize = e.pageSize
   }
 
 }

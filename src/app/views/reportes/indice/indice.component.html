@@ -31,8 +31,103 @@
     </div>
   </div>
 </div>
-<div class="row">
-  <div class="col-md-12 order-xl-2 mb-5 mb-xl-0">
+<div class="row ">
+    <div class="col-md-12 order-xl-2 mb-5 mb-xl-0">
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs">
+            <mat-tab>
+                <ng-template mat-tab-label>
+                &nbsp;RESOLUCIONES
+                </ng-template>
+
+                <div class="container">
+                    <div class="form-row">
+
+                        <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                            <th>NUMERO</th>
+                            <th>DESCRIPCION</th>
+                            <th>FECHA</th>
+                            <th>ASUNTO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let e of data.resoluciones">
+                            <td>{{ e.titulo | uppercase}}</td>
+                            <td>{{ e.tipo_descripcion | uppercase }}</td>
+                            <td>{{ e.fecha }}</td>
+                            <td>{{ e.asunto.substring(0,64) | uppercase }}</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                        <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                            <th>Asunto</th>
+                            </tr>
+                        </thead>
+                        </table>
+                    </div>
+                </div>
+
+                <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+                </mat-paginator>
+
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                &nbsp;ENTRADAS
+                </ng-template>
+                <div class="container">
+                    <div class="form-row">
+
+                        <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                            <th>DIGITAL</th>
+                            <th>NÚMERO CARPETA</th>
+                            <th>FECHA ENTRADA</th>
+                            <th>ASUNTO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let e of data.entradas">
+                            <td>{{ e.digital | uppercase}}</td>
+                            <td>{{ e.numero_carpeta | uppercase }}</td>
+                            <td>{{ e.fecha_entrada }}</td>
+                            <td>{{ e.asunto.substring(0,64) | uppercase }}</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                        <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                            <th>Asunto</th>
+                            </tr>
+                        </thead>
+                        </table>
+                    </div>
+                </div>
+
+                <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+                </mat-paginator>
+
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+
+
+
+
+
+
+
+
+
+  <!-- <div class="col-md-12 order-xl-2 mb-5 mb-xl-0">
 
     <h2 class="mb-0 text-center">RESOLUCIONES</h2>
 
@@ -66,6 +161,6 @@
     </div>
     <br>
 
-  </div>
+  </div> -->
 
 </div>
