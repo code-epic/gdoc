@@ -1,64 +1,71 @@
-<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
-    <div class="container-fluid">
-        <p></p>
-    </div>
-</div>
+<br>
+<div class="row">
+  <div class="col-md-12 order-xl-2 mb-5 mb-xl-0">
 
-<div class="container-fluid mt--9">
-    <div class="row">
-        <div class="col-md-12 order-xl-2 mb-5 mb-xl-0">
-            <h2 class="mb-0 text-center">HISTORIAL</h2>
-            <div class="form-row">
-                <div class="form-group col-md-12">
-                    
-                </div>
-                <table summary="" class="table table-bordered table-hover">
-                  <thead>
-                    <tr>
-                      <th data-priority="1">Resoluciones</th>
-                    </tr>
-                  </thead>
-                </table>
-                <div class="form-group  col-md-12 text-justify"
-                    style="font-size: small; padding: 15px; border: 1px solid #ccc">
-                </div>
-                <table summary="" class="table table-bordered table-hover">
-                    <thead>
-                      <tr>
-                        <th data-priority="1">Asunto</th>
-                      </tr>
-                    </thead>
-                </table>
-                <div class="form-group  col-md-12 text-justify"
-                    style="padding: 15px; border: 1px solid #ccc">
-                </div>
-                <br>
-                <table summary="" class="table table-bordered table-hover">
-                    <thead>
-                      <tr>
-                        <th data-priority="1" colspan="5">Datos Personales:</th>
-                      </tr>
-                      <tr>
-                        <th data-priority="1">Datos Militares</th>
-                        <th data-priority="1">Cargo que ocupa</th>  
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td></td>
-                        <td></td>
-                      </tr>
-                    </tbody>
-                </table>
-            </div>
-            <hr>
-            <div class="col-md-12 text-right">
-              <button class="btn btn-sm bg-info text-white">
-                <span></span>Imprimir </button>
-              <button class="btn btn-sm bg-danger text-white" aria-label="Close">
-                <span></span>Cancelar </button>
-            </div>
-         
-        </div>
+    <h2 class="mb-0 text-center">HISTORIAL</h2>
+    <div class="form-row">
+
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Datos Personales:</th>
+            <th colspan="4">{{ data.cedula + ' - ' + data.nombres_apellidos }}</th>
+          </tr>
+          <tr>
+            <th>Datos Militares</th>
+            <th>Cargo que ocupa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{data.componente + ' ' + data.categoria + ' ' + data.clasificacion + ' ' + data.grado }}</td>
+            <td>{{ nombramiento }}</td>
+          </tr>
+          <tr>
+            <td colspan="2">{{ asunto }}</td>
+
+          </tr>
+        </tbody>
+      </table>
+
     </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12 order-xl-2 mb-5 mb-xl-0">
+
+    <h2 class="mb-0 text-center">RESOLUCIONES</h2>
+
+    <div class="form-row">
+
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>NUMERO</th>
+            <th>DESCRIPCION</th>
+            <th>FECHA</th>
+            <th>ASUNTO</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of data.resoluciones">
+            <td>{{ e.titulo | uppercase}}</td>
+            <td>{{ e.tipo_descripcion | uppercase }}</td>
+            <td>{{ e.fecha }}</td>
+            <td>{{ e.asunto.substring(0,64) | uppercase }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Asunto</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <br>
+
+  </div>
+
 </div>

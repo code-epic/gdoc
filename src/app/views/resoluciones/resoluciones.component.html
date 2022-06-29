@@ -113,11 +113,11 @@
             <small class="mr-4" style="font-size: 12px;"><i class="fa fa-search"></i>&nbsp;Cerca de {{cantidad | number }} resultados...</small>
             <div class="row enlace" *ngFor="let e of lst">
               <div class="col-md-10">
-                <a href="#">{{ e.skey }} - {{ e.titu }} </a> <br>
-                <p>{{ e.subt }}<br>
+                <a (click)="AgregarView(e.score,e.id, indice, e.skey, e.meta.ref, e.tipo);">{{ e.skey }} - {{ e.titu }} </a> <br>
+                <p id="{{ e.skey }}">{{ e.subt }}<br>
                 {{ e.resu }}<br>
-                  <small class=" mr-4"><i class="fa fa-globe"></i>&nbsp; Visitaste esta página 3 veces</small>
-                  <small class=" mr-4"><i class="fa fa-calendar"></i>&nbsp; Última visita: 23ABR21 01:20 p.m</small>
+                  <small class=" mr-4"><i class="fa fa-globe"></i>&nbsp; Visitaste esta página {{ e.view }} veces</small>
+                  <small class=" mr-4"><i class="fa fa-calendar"></i>&nbsp; Última visita: {{ e.fech }}</small>
                   <small class=" mr-4"><i class="fa fa-map-pin"></i>&nbsp; {{ e.ubic }}</small>
                 </p>
               </div>
@@ -153,3 +153,21 @@
   </div>
   <!-- Fin de Tarjeta Padre -->
 </div>
+
+
+
+<ng-template #indice let-modal>
+  <div class="modal-body">
+
+    <app-indice [data]="data" [ref]="ref" [tipo]="tipo"></app-indice>
+
+  </div>
+  <div class="modal-footer">
+    <div class="col-md-12 text-right">
+      <button class="btn btn-sm bg-info text-white">
+        <span></span>Imprimir </button>
+      <button class="btn btn-sm bg-danger text-white" aria-label="Close" (click)="modal.close()" >
+        <span></span>Cancelar </button>
+    </div>
+  </div>
+</ng-template>
