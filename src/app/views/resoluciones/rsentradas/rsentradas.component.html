@@ -92,25 +92,34 @@
                                     </div>
                                     <div class="form-group col-md-8">
                                         <label> Nombres </label>
-                                        <input type="text" [ngModelOptions]="{standalone: true}" readonly
+
+                                        <div class="input-group mb-3">
+                                            <input type="text" [ngModelOptions]="{standalone: true}" readonly
                                             [(ngModel)]="Resolucion.nombres_apellidos" value="{{Resolucion.nombres_apellidos}}"
                                             class="form-control">
+                                            <div class="input-group-prepend">
+                                                <button  type="button" class="btn btn-success"
+                                                    (click)="verHistorialMilitar()">
+                                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
                                     </div>
                                 </div>
 
                                 <div class="row">
 
-                                    <div class="col-md-12" style="padding: 15px;">
+                                    <div class="col-md-12" style="padding: 15px; margin-top:-20px">
                                         <table summary="" class="table table-bordered table-hover">
             
                                             <thead>
                                                 <tr>
-                                                    <th data-priority="1">Fecha Nac.: {{ Resolucion.fecha_nacimiento | uppercase}}</th>
-                                                    <th data-priority="2">Sexo:  {{ Resolucion.sexo | uppercase}}</th>
-                                                </tr>
-                                                <tr>
-                                                    <th data-priority="3">Situacion Militar: {{Resolucion.situacion}}</th>
-                                                    <th data-priority="4"></th>
+                                                    <th>Situacion: {{Resolucion.situacion}}</th>
+                                                    <th  style="width: 250px;">Fecha Nac.: {{ Resolucion.fecha_nacimiento | uppercase}}</th>
+                                                    <th  style="width: 120px;">Sexo:  {{ Resolucion.sexo | uppercase}}</th>
+                                  
+                                                   
                                                 </tr>
                                             </thead>
                                         </table>
@@ -124,42 +133,29 @@
                                 <div class="row">
                                     <div class="col-md-1"></div>
                                     <div class="col-md-10 text-center">
-                                        <br>
-                                        <div  style="border:1px solid #CCC; padding: 1px;width: 195px" >
+                                        <label> Foto</label>
+                                        <div  style="border:1px solid #CCC; padding: 1px;width: 205px" >
                                             
-                                            <img src="assets/img/theme/ndisponible.jpeg" style="width: 190px">
+                                            <img src="assets/img/theme/ndisponible.jpeg" style="width: 195px">
                                         </div>
                                     </div>
                                     <div class="col-md-1"></div>
                                 </div>
-                                <div class="row">
-                                    
-                                    <div class="col-md-12 text-center">
-                                        <br>
-                                        <button class="btn btn-success"  style="width: 190px">
-                                            <span class="fa fa-plus"></span>&nbsp;&nbsp;Ver historial</button>
-                                    </div>
-                                    <div class="col-md-1"></div>
-                                </div>
+                              
                             </div>
                         </div>
-                        <div class="row" style="padding: 15px;">
+                        <div class="row" style="padding: 18px; margin-top:-12px">
                             <table summary="" class="table table-bordered table-hover">
 
                                 <thead>
                                     <tr>
-                                        <th data-priority="1">Componente</th>
-                                        <th data-priority="2">Categoria</th>
-                                        <th data-priority="3">Clasificación</th>
-                                        <th data-priority="4">Grado</th>
+                                        <th colspan="3">Datos Militares: {{Resolucion.componente + ' ' + Resolucion.categoria + ' ' + Resolucion.clasificacion + ' ' + Resolucion.grado }}</th>
+                                        <th style="width: 250px;">Resolucion: {{ nombramiento }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>{{ Resolucion.componente | uppercase}}</td>
-                                        <td>{{ Resolucion.categoria | uppercase}}</td>
-                                        <td>{{ Resolucion.clasificacion }}</td>
-                                        <td>{{ Resolucion.grado }}</td>
+                                        <td colspan="4">{{ xasunto.substring(0,180) | uppercase}}</td>
                                     </tr>
                                 </tbody>
                             </table>

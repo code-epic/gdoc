@@ -75,6 +75,7 @@ import { RscpublicacionesComponent } from './views/resoluciones/rsconfiguracion/
 import { RscgeneralComponent } from './views/resoluciones/rsconfiguracion/rscgeneral/rscgeneral.component';
 import { PerfilComponent } from './views/perfil/perfil.component';
 import { IndiceComponent } from './views/reportes/indice/indice.component';
+import { ContenidoComponent } from './views/reportes/contenido/contenido.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -198,7 +199,8 @@ const ngWizardConfig: NgWizardConfig = {
     RscpublicacionesComponent,
     RscgeneralComponent,
     PerfilComponent,
-    IndiceComponent
+    IndiceComponent,
+    ContenidoComponent
   ],
   providers:  [
     {
