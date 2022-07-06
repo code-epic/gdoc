@@ -6,6 +6,7 @@ import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 
 
 @Component({
@@ -51,6 +52,7 @@ export class AcamiComponent implements OnInit {
 
   lengthOfi = 0;
   pageSizeOfi = 10;
+  pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 25, 100];
 
   // MatPaginator Output
@@ -58,6 +60,7 @@ export class AcamiComponent implements OnInit {
 
   selNav = 0
 
+  public bzOriginal = [] //Listado Original
   public bzRecibido = []
   public bzProcesados = []
   public bzPendientes = []
@@ -81,6 +84,7 @@ export class AcamiComponent implements OnInit {
     private ruta: Router,
     private toastrService: ToastrService,
     private loginService: LoginService,
+    private ngxService: NgxUiLoaderService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
@@ -110,23 +114,24 @@ export class AcamiComponent implements OnInit {
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
     this.selNav = e
+    this.pageSize = 10;
 
     switch (e) {
       case 0:
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
-        this.listarBuzon(this.bzRecibido)
+        this.listarBuzon(this.selNav)
         break
       case 1:
         this.xAPI.parametros =  this.estadoActual + ',' + 2
-        this.listarBuzon(this.bzProcesados)
+        this.listarBuzon(this.selNav)
         break
       case 2:
         this.xAPI.parametros =  this.estadoActual + ',' + 3
-        this.listarBuzon(this.bzPendientes)
+        this.listarBuzon(this.selNav)
         break
       case 4:
         this.xAPI.parametros =  this.estadoActual + ',' + 4
-        this.listarBuzon(this.bzCerrados)
+        this.listarBuzon(this.selNav)
         break
       default:
         break
@@ -150,7 +155,9 @@ export class AcamiComponent implements OnInit {
     )
   }
 
-  async listarBuzon(bz: any) {
+  async listarBuzon(lst: number) {
+   var bz=[]
+    this.ngxService.startLoader("loader-aceptar")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
@@ -182,9 +189,10 @@ export class AcamiComponent implements OnInit {
         this.lengthOfi = data.Cuerpo.length
         if (this.lengthOfi > 0) {
           this.estilocheck = ''
-          this.recorrerElementos(1, this.bzRecibido)
+          this.bzOriginal = bz
+          this.recorrerElementos(0,lst)
         }
-
+        this.ngxService.stopLoader("loader-aceptar")
       },
       (error) => {
 
@@ -193,8 +201,9 @@ export class AcamiComponent implements OnInit {
   }
 
 
-  pageChangeEvent(e) {
-    this.recorrerElementos(e.pageIndex + 1, this.lst)
+  pageChangeEvent(e,sel) {
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex,sel)
   }
 
   updateAllComplete() {
@@ -222,10 +231,21 @@ export class AcamiComponent implements OnInit {
 
 
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion: number, lista: any) {
-    if (posicion > 1) posicion = posicion * 10
-    this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
-
+  recorrerElementos(posicion: number,sel: number) {
+    let pag = this.pageSize * posicion
+    switch (sel) {
+      case 0:
+        this.bzRecibido= this.bzOriginal.slice(pag, pag + this.pageSize)
+        break
+      case 1:
+        this.bzProcesados= this.bzOriginal.slice(pag, pag + this.pageSize)
+        break
+      case 2:
+        this.bzPendientes= this.bzOriginal.slice(pag, pag + this.pageSize)
+        break
+      default:
+        break
+    }  
   }
 
 

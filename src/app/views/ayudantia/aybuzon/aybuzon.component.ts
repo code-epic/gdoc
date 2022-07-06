@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ɵConsole } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
 import { Router } from '@angular/router';
@@ -9,7 +9,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
-
+import { NgxUiLoaderService } from 'ngx-ui-loader'
 
 
 @Component({
@@ -61,6 +61,7 @@ export class AybuzonComponent implements OnInit {
 
   selNav = 0
 
+  public bzOriginal = [] //Listado Original
   public bzRecibido = []
   public bzProcesados = []
   public bzPendientes = []
@@ -118,6 +119,7 @@ export class AybuzonComponent implements OnInit {
     private toastrService: ToastrService,
     private utilService: UtilService,
     private loginService: LoginService,
+    private ngxService: NgxUiLoaderService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
@@ -195,27 +197,29 @@ export class AybuzonComponent implements OnInit {
     this.xAPI.valores = ''
     this.selNav = e
     this.vplazo = true
+    this.pageSize = 10;
+
     switch (e) {
       case 0:
         this.vplazo = false
         this.cargarAcciones(0)
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
-        this.listarBuzon(this.bzRecibido)
+        this.listarBuzon(this.selNav)
         break
       case 1:
         this.cargarAcciones(1)
         this.xAPI.parametros = this.estadoActual + ',' + 2
-        this.listarBuzon(this.bzProcesados)
+        this.listarBuzon(this.selNav)
         break
       case 2:
 
         this.cargarAcciones(2)
         this.xAPI.parametros = this.estadoActual + ',' + 3
-        this.listarBuzon(this.bzPendientes)
+        this.listarBuzon(this.selNav)
         break
       case 4:
         this.xAPI.parametros = this.estadoActual + ',' + 4
-        this.listarBuzon(this.bzCerrados)
+        this.listarBuzon(this.selNav)
         break
       default:
         break
@@ -237,7 +241,9 @@ export class AybuzonComponent implements OnInit {
     )
   }
 
-  async listarBuzon(bz: any) {
+  async listarBuzon(lst: number) {
+    var bz=[]
+    this.ngxService.startLoader("loader-aceptar")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         data.Cuerpo.forEach(e => {
@@ -253,12 +259,13 @@ export class AybuzonComponent implements OnInit {
 
         })//Registros recorridos como elementos
 
-        this.lengthOfi = data.Cuerpo.length
+        this.lengthOfi = bz.length
         if (this.lengthOfi > 0) {
           this.estilocheck = ''
-          this.recorrerElementos(1, this.bzRecibido)
+          this.bzOriginal = bz
+          this.recorrerElementos(0,lst)
         }
-
+        this.ngxService.stopLoader("loader-aceptar")
       },
       (error) => {
 
@@ -267,8 +274,9 @@ export class AybuzonComponent implements OnInit {
   }
 
 
-  pageChangeEvent(e) {
-    this.recorrerElementos(e.pageIndex + 1, this.lst)
+  pageChangeEvent(e,sel) {
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex,sel)
   }
 
   updateAllComplete() {
@@ -295,10 +303,27 @@ export class AybuzonComponent implements OnInit {
   }
 
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion: number, lista: any) {
+  /*recorrerElementos(posicion: number, lista: any) {
     if (posicion > 1) posicion = posicion * 10
     this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
 
+  }*/
+
+  recorrerElementos(posicion: number,sel: number) {
+    let pag = this.pageSize * posicion
+    switch (sel) {
+      case 0:
+        this.bzRecibido= this.bzOriginal.slice(pag, pag + this.pageSize)
+        break
+      case 1:
+        this.bzProcesados= this.bzOriginal.slice(pag, pag + this.pageSize)
+        break
+      case 2:
+        this.bzPendientes= this.bzOriginal.slice(pag, pag + this.pageSize)
+        break
+      default:
+        break
+    }  
   }
 
   //editar
