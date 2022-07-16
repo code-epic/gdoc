@@ -7,6 +7,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Resolucion } from 'src/app/services/control/documentos.service';
 import { ResolucionService } from 'src/app/services/resoluciones/resolucion.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import * as internal from 'stream';
 
 @Component({
   selector: 'app-resoluciones',
@@ -17,11 +18,25 @@ export class ResolucionesComponent implements OnInit {
 
   public focus: boolean = true
   public buscar: string = ''
-  lst = []
-  lengthOfi = 0;
-  pageSizeOfi = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 100];
-  public cantidad : number = 0
+  public lst = []
+  public lengthOfi = 0;
+  public pageSizeOfi = 10;
+  public pageSizeOptions: number[] = [5, 10, 25, 100];
+  public cantidad: number = 0
+
+
+  public blBuscar: boolean = false
+  public antes: boolean = false
+  public despues: boolean = true
+  public paginador: number = 10
+  public de: number = 0
+  public para: number = 9
+  public max_paginador: number = 0
+  public lstPaginas = []
+  public actual : number =  1
+
+  public previaBusqueda : string = ''
+
   public xApi: IAPICore = {
     funcion: '',
     parametros: ''
@@ -53,9 +68,9 @@ export class ResolucionesComponent implements OnInit {
   }
 
   public contador_ponderacion = 0
-  public data : any
-  public ref : any
-  public tipo : any
+  public data: any
+  public ref: any
+  public tipo: any
 
   public SubMenu = []
   public Componentes: any
@@ -95,49 +110,61 @@ export class ResolucionesComponent implements OnInit {
 
   Consultar(event) {
     if (event.charCode == 13) {
-      if ( this.buscar == '') return false
-      this.ngxService.startLoader("loader-buscar")
-      this.xApi.funcion = "MPPD_CGeneral"
-      this.xApi.parametros = this.buscar + ',0,9'
-      this.cantidad = 0
-      this.contador_ponderacion = 0
-      this.lst = []
-      this.apiService.Ejecutar(this.xApi).subscribe(
-        (data) => {
-          
-          
-          if ( data.Cuerpo.length != undefined) {
-            this.lst = data.Cuerpo.map(e => {
-              e.meta = JSON.parse(e.meta)
-              return e
-            })
-            this.cantidad = this.lst[0].cantidad;
-            console.log(this.lst)
-          }
-          
-          this.ngxService.stopLoader("loader-buscar")
-          this.buscar = ""
-        },
-        (error) => {
-          console.error("Error de conexion a los datos ", error)
-        }
-      )
+      this.previaBusqueda = ''
+      if (this.buscar == '') return false
+      this.previaBusqueda = this.buscar
+      this.consultarAPIBuscar()
     }
   }
 
+  consultarAPIBuscar() {
+    this.ngxService.startLoader("loader-buscar")
+    this.xApi.funcion = "MPPD_CGeneral"
+    this.xApi.parametros = this.previaBusqueda + ',' + this.de + ',' + this.paginador
+    console.log(this.previaBusqueda + ',' + this.de + ',' + this.para)
+    this.cantidad = 0
+    this.contador_ponderacion = 0
+    this.lst = []
+    this.apiService.Ejecutar(this.xApi).subscribe(
+      (data) => {
+        console.log(data)
+        if (data.Cuerpo.length != undefined && data.Cuerpo.length > 0) {
 
-  open(content){
+          this.lst = data.Cuerpo.map(e => {
+            e.meta = JSON.parse(e.meta)
+            return e
+          })
+          this.cantidad = this.lst[0].cantidad;
+
+          this.max_paginador = this.cantidad / 10
+
+        }
+
+        this.ngxService.stopLoader("loader-buscar")
+        this.buscar = ""
+        this.MostrarPaginador()
+       
+
+      },
+      (error) => {
+        console.error("Error de conexion a los datos ", error)
+      }
+    )
+  }
+
+
+  open(content) {
     this.modalService.open(content, { size: 'lg' });
   }
 
 
-  AgregarView(score, id, content, cedula, referencia, tipo){
+  AgregarView(score, id, content, cedula, referencia, tipo) {
     this.ngxService.startLoader("loader-buscar")
     this.xApi.funcion = "MPPD_UFulltext"
-    
-    var ponderacion = ( score - this.contador_ponderacion )
+
+    var ponderacion = (score - this.contador_ponderacion)
     this.contador_ponderacion += 0.100
-    this.xApi.parametros = ponderacion + ',' + id 
+    this.xApi.parametros = ponderacion + ',' + id
     this.ref = referencia
     this.tipo = tipo
     this.apiService.Ejecutar(this.xApi).subscribe(
@@ -153,37 +180,79 @@ export class ResolucionesComponent implements OnInit {
   }
 
 
-    /**
-   * Consultar datos generales del militar 
-   */
-  consultarCedula(cedula : string, content) {
-      this.xApi.funcion = 'MPPD_CDatosBasicos'
-      this.xApi.parametros = cedula
-      this.xApi.valores = ''
-      this.apiService.Ejecutar(this.xApi).subscribe(
-        (data) => {
-          
-          this.data = data.Cuerpo.map( e =>{
-            e.resoluciones = JSON.parse(e.resoluciones)
-            e.entradas = JSON.parse(e.entradas)
-            e.componente = this.Componentes.filter(el => {return el.cod_componente ==  e.componente })[0].nombre_componente
-            e.categoria = this.Categorias.filter(el => {return el.cod_categoria ==  e.categoria })[0].nombre_categoria
-            e.clasificacion = this.Clasificaciones.filter(el => {return el.cod_clasificacion ==  e.clasificacion })[0].des_clasificacion
-            e.grado = this.Grados.filter(el => {return el.cod_grado ==  e.grado })[0].nombres_grado
-            return e
-          } )[0]
-         
-          this.ngxService.stopLoader("loader-buscar")
-          this.modalService.open(content, { size: 'xl' });
-          
-        },
-        (error) => {
-          console.error("Error de conexion a los datos ", error)
-          this.ngxService.stopLoader("loader-buscar")
-        }
-  
-      )
-  
+  /**
+ * Consultar datos generales del militar 
+ */
+  consultarCedula(cedula: string, content) {
+    this.xApi.funcion = 'MPPD_CDatosBasicos'
+    this.xApi.parametros = cedula
+    this.xApi.valores = ''
+    this.apiService.Ejecutar(this.xApi).subscribe(
+      (data) => {
+
+        this.data = data.Cuerpo.map(e => {
+          e.resoluciones = JSON.parse(e.resoluciones)
+          e.entradas = JSON.parse(e.entradas)
+          e.componente = this.Componentes.filter(el => { return el.cod_componente == e.componente })[0].nombre_componente
+          e.categoria = this.Categorias.filter(el => { return el.cod_categoria == e.categoria })[0].nombre_categoria
+          e.clasificacion = this.Clasificaciones.filter(el => { return el.cod_clasificacion == e.clasificacion })[0].des_clasificacion
+          e.grado = this.Grados.filter(el => { return el.cod_grado == e.grado })[0].nombres_grado
+          return e
+        })[0]
+
+        this.ngxService.stopLoader("loader-buscar")
+        this.modalService.open(content, { size: 'xl' });
+
+      },
+      (error) => {
+        console.error("Error de conexion a los datos ", error)
+        this.ngxService.stopLoader("loader-buscar")
+      }
+
+    )
+
+  }
+
+
+  MostrarPaginador() {
+    this.blBuscar = true
+    this.lstPaginas = []
+    this.antes = false
+
+    if (this.max_paginador > 10) {
+      this.max_paginador = 10
+      this.despues = true
+    } else {
+      this.despues = false
     }
+    for (var i = 0; i < this.max_paginador; i++) {
+      var color = ''
+
+      if (this.de > 0) {
+        color = this.de/10 == i ?  'bg-info text-white' : ''
+        this.antes = true
+      } 
+      if ( this.de == 0 && i == 0) color = 'bg-info text-white'
+      this.lstPaginas.push({ 
+          "id": i + 1,
+          "color": color
+      } )
+    }
+  }
+  /**
+   * Establecer la posicion del sistema en el buscador
+   */
+  posicion(pos: number) {
+    console.log(pos);
+    if (pos != this.actual) {
+      this.actual = pos 
+      this.de = 10 * (pos - 1)
+      this.para = (this.de - 1)+ 10
+      this.consultarAPIBuscar()
+    }
+    
+    
+  }
+
 
 }
