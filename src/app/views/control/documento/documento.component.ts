@@ -55,15 +55,17 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   public fcreacion: any
   public forigen: any
+  public fcuenta: any
+  public fplazo: any
 
   public fcreacionDate: NgbDate | null
   public forigenDate: NgbDate | null
-
-  public fplazo: any
+  public fcuentaDate: NgbDate | null
 
   public editar: boolean = false
   public puntocuenta: boolean = false
   public salidavisible: boolean = true
+  public resolucion: boolean = false
 
   public detalle: string = ''
   public cuenta: string = ''
@@ -682,8 +684,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   selTipoDocumento() {
     this.puntocuenta = false
     this.lstCuenta = []
-    if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') this.puntocuenta = true
+    if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') this.puntocuenta = true  
   }
+
+  // selTipoDocumentoRs() {
+  //   this.resolucion = false
+  //   if (this.Doc.tipo.toLowerCase() == 'resolucion') this.resolucion = true  
+  // }
+  
 
 
 

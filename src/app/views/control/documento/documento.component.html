@@ -69,7 +69,11 @@
                                     [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.ncontrol"
                                     [readonly]="ncontrolv">
                             </div>
-
+                            <div class="form-group col-md-2" *ngIf="origenvisible">
+                                <label for="txtOrigen">Nro. Origen (*) </label>
+                                <input type="txtOrigen" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.norigen">
+                            </div>
                             <div class="form-group col-md-3" *ngIf="forigenv">
                                 <label for="tmsOrigen">Fecha Origen (*) </label>
                                 <form class="form-inline">
@@ -107,11 +111,6 @@
                                     </div>
                                 </form>
                             </div>
-                            <div class="form-group col-md-2" *ngIf="origenvisible">
-                                <label for="txtOrigen">Nro. Origen (*) </label>
-                                <input type="txtOrigen" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Doc.norigen">
-                            </div>
                             <div class="form-group col-md-{{camponumsalida}}" *ngIf="salidavisible">
                                 <label for="txtSalida">{{salida}}</label>
                                 <input type="txtSalida" class="form-control" value="{{Doc.salida}}"
@@ -119,7 +118,7 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label for="cmbTipoDocumento">Tipo de Documento</label>
                                 <select class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" (change)="selTipoDocumento()">
@@ -128,7 +127,7 @@
 
                                 </select>
                             </div>
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label for="cmbRemitente">{{remitentet}}</label>
                                 <select class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Doc.remitente" value="{{Doc.remitente}}">
@@ -136,8 +135,16 @@
                                     <option *ngFor="let x of lstR" value="{{x.nomb}}">{{ x.nomb }}</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label for="cmbUnidad">Unidad o Dependencia</label>
+                                <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}">
+                                    <option value="0">Seleccione</option>
+                                    <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="cmbUnidad">Componente / Gran Comando</label>
                                 <select class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}">
                                     <option value="0">Seleccione</option>
@@ -158,42 +165,78 @@
                         </div>
 
                         <div class="form-row" *ngIf="puntocuenta">
-                            <div class="form-group col-md-2">
-                                <label>Cuenta</label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="cuenta" value="{{cuenta}}">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label>Resumen de Contenido</label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="resumen" value="{{resumen}}">
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="cmbUnidad">Fecha cuenta</label>
-                                <div class="input-group mb-3">
+                            <div class="form-row col-md-12">
+                                <div class="form-group col-md-2">
+                                    <label>Cuenta</label>
                                     <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="detalle" value="{{detalle}}">
-                                    <div class="input-group-prepend">
-                                        <button *ngIf="!editar" type="button" class="btn btn-success"
-                                            (click)="agregarCuenta()">
-                                            <i class="fa fa-plus" aria-hidden="true"></i>
-                                        </button>
-                                        <button *ngIf="editar" type="button" class="btn btn-primary"
-                                            (click)="editarCuenta()">
-                                            <i class="fa fa-edit" aria-hidden="true"></i>
-                                        </button>
-
-                                    </div>
+                                        [(ngModel)]="cuenta" value="{{cuenta}}">
                                 </div>
-
+                                <div class="form-group col-md-6">
+                                    <label>Resumen de Contenido</label>
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="resumen" value="{{resumen}}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="tmsOrigen">Fecha Cuenta</label>
+                                    <form class="form-inline">
+                                        <div class="form-group" style="width:100%">
+                                            <div class="input-group" style="width:100%">
+                                                <input class="form-control" placeholder="AAAA-MM-DD"
+                                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="fcuenta"
+                                                    ngbDatepicker #fc="ngbDatepicker"
+                                                    [value]="formatter.format(fcuentaDate)" [placement]="placement"
+                                                    [positionTarget]="buttonEl" readonly>
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="fc.toggle()"
+                                                        type="button">
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="form-row col-md-12">
+                                <div class="form-group col-md-2">
+                                    <label>Cédula</label>
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="cuenta" value="{{cuenta}}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Cargo</label>
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="resumen" value="{{resumen}}">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="cmbUnidad">Nombres y Apellidos</label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="detalle" value="{{detalle}}">
+                                        <div class="input-group-prepend">
+                                            <button *ngIf="!editar" type="button" class="btn btn-success"
+                                                (click)="agregarCuenta()">
+                                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </button>
+                                            <button *ngIf="editar" type="button" class="btn btn-primary"
+                                                (click)="editarCuenta()">
+                                                <i class="fa fa-edit" aria-hidden="true"></i>
+                                            </button>
+    
+                                        </div>
+                                    </div>
+    
+                                </div>
                             </div>
                             <div class="form-group col-md-12">
                                 <table class="table align-items-center table-flush" style="width:100%">
                                     <thead class="thead-light">
-                                        <th style="text-align:center;width:20px">Acción</th>
+                                        <th>N°</th>
                                         <th>Cuenta</th>
                                         <th>Resumen</th>
-                                        <th>Detalle</th>
+                                        <th>Fecha</th>
+                                        <th>Cédula</th>
+                                        <th>Cargo</th>
+                                        <th>Nombres y Apellidos</th>
                                     </thead>
                                     <tbody>
                                         <tr [ngModelOptions]="{standalone: true}"
@@ -226,7 +269,79 @@
                             </div>
                         </div>
 
+                        <div class="form-row" *ngIf="resolucion">
+                            <div class="form-row col-md-12">
+                                <div class="form-group col-md-2">
+                                    <label>Cédula</label>
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="cuenta" value="{{cuenta}}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Cargo</label>
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="resumen" value="{{resumen}}">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="cmbUnidad">Nombres y Apellidos</label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="detalle" value="{{detalle}}">
+                                        <div class="input-group-prepend">
+                                            <button *ngIf="!editar" type="button" class="btn btn-success"
+                                                (click)="agregarCuenta()">
+                                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </button>
+                                            <button *ngIf="editar" type="button" class="btn btn-primary"
+                                                (click)="editarCuenta()">
+                                                <i class="fa fa-edit" aria-hidden="true"></i>
+                                            </button>
+    
+                                        </div>
+                                    </div>
+    
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <table class="table align-items-center table-flush" style="width:100%">
+                                    <thead class="thead-light">
+                                        <th>N°</th>
+                                        <th>Cuenta</th>
+                                        <th>Resumen</th>
+                                        <th>Fecha</th>
+                                        <th>Cédula</th>
+                                        <th>Cargo</th>
+                                        <th>Nombres y Apellidos</th>
+                                    </thead>
+                                    <tbody>
+                                        <tr [ngModelOptions]="{standalone: true}"
+                                            *ngFor="let el of lstCuenta;let i=index">
+                                            <td style="text-align:center;width:20px">
 
+                                                <div class="btn-group" role="group" aria-label="Basic"
+                                                    *ngIf="el.activo == 0">
+                                                    <button type="button" class="btn btn-primary btn-sm"
+                                                        (click)="selEditarCuenta( i )"><i class="fa fa-edit"
+                                                            aria-hidden="true"></i></button>
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        (click)="eliminarCuenta( i )"><i class="fa fa-trash"
+                                                            aria-hidden="true"></i></button>
+                                                </div>
+                                                <button *ngIf="el.activo != 0" type="button"
+                                                    class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                                    &nbsp;&nbsp;En Proceso </button>
+                                            </td>
+                                            <td>{{ el.cuenta }}</td>
+                                            <td>{{ el.resumen.substring(0,20) }}... </td>
+                                            <td>{{ el.detalle.substring(0,20) }}...</td>
+
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <label for="txtInstrucciones">Instrucciones Generales</label>
@@ -319,62 +434,62 @@
         <div class="modal-body">
 
 
-                <div class="form-group col-md-12">
-                    <div class="card card-profile">
-                        <div class="card-header bg-info"
-                            style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
-                            <div class="card-avatar text-center">
-                                <a href="javascript:;">
-                                    <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
-                                        style="width:100px;z-index: 1; margin-top: -5px;">3
-                                </a>
+            <div class="form-group col-md-12">
+                <div class="card card-profile">
+                    <div class="card-header bg-info"
+                        style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
+                        <div class="card-avatar text-center">
+                            <a href="javascript:;">
+                                <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
+                                    style="width:100px;z-index: 1; margin-top: -5px;">3
+                            </a>
+                        </div>
+                    </div>
+                    <br>
+
+                    <div class="card-body pt-0">
+
+                        <div class="d-flex justify-content-between">
+                            <a [href]="download" target="_top" rel="noopener noreferrer"
+                                class="btn btn-primary mt-3">Descargar</a>
+                            <a (click)="activarHistorial()" class="btn btn-default float-right mt-3">Historial</a>
+                        </div>
+                        <br><br>
+                        <div class="text-center">
+                            <div class="font-weight-50">
+                                Publicado<span class="font-weight-light">, {{ Doc.fcreacion | date:"dd-MM-yy
+                                    hh:mm:ss"}}</span>
+                                <br>
+                                <h5 class="h4" style="font-size: 10px;">{{ Doc.creador }}</h5>
                             </div>
                         </div>
-                        <br>
+                        <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
+                            <table class="table">
+                                <thead class="thead-light">
+                                    <th>Documento</th>
+                                    <th>Usuario</th>
+                                    <th>Fecha</th>
+                                </thead>
+                                <tbody>
 
-                        <div class="card-body pt-0">
+                                    <tr [ngModelOptions]="{standalone: true}"
+                                        *ngFor="let el of lstHzAdjunto;let i=index">
 
-                            <div class="d-flex justify-content-between">
-                                <a [href]="download" target="_top" rel="noopener noreferrer"
-                                    class="btn btn-primary mt-3">Descargar</a>
-                                <a (click)="activarHistorial()" class="btn btn-default float-right mt-3">Historial</a>
-                            </div>
-                            <br><br>
-                            <div class="text-center">
-                                <div class="font-weight-50">
-                                    Publicado<span class="font-weight-light">, {{ Doc.fcreacion | date:"dd-MM-yy
-                                        hh:mm:ss"}}</span>
-                                    <br>
-                                    <h5 class="h4" style="font-size: 10px;">{{ Doc.creador }}</h5>
-                                </div>
-                            </div>
-                                <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
-                                    <table class="table">
-                                        <thead class="thead-light">
-                                            <th>Documento</th>
-                                            <th>Usuario</th>
-                                            <th>Fecha</th>
-                                        </thead>
-                                        <tbody>
-
-                                            <tr [ngModelOptions]="{standalone: true}"
-                                                *ngFor="let el of lstHzAdjunto;let i=index">
-
-                                                <td>
-                                                    <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"
-                                                        rel="noopener noreferrer">
-                                                        {{ el.nombre.substring(20,32) }}
-                                                    </a>
-                                                </td>
-                                                <td>{{ el.usuario }}</td>
-                                                <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        <td>
+                                            <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"
+                                                rel="noopener noreferrer">
+                                                {{ el.nombre.substring(20,32) }}
+                                            </a>
+                                        </td>
+                                        <td>{{ el.usuario }}</td>
+                                        <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
