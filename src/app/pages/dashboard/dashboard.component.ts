@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import Chart from 'chart.js';
+import { ResolucionService } from 'src/app/services/resoluciones/resolucion.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 
 // core components
@@ -32,6 +33,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     public loginService : LoginService,
+    private resolucionService: ResolucionService,
     public ruta : Router){}
 
   async ngOnInit() {
@@ -40,6 +42,13 @@ export class DashboardComponent implements OnInit {
     this.Menu =  this.loginService.obtenerMenu().filter(
       e => { return e.url != '/principal'}
     )
+
+    if (sessionStorage.getItem("MPPD_CTipoEntrada") == undefined) {
+      for (var i = 0; i < 9; i++) {
+
+        this.resolucionService.Listar(i) //
+      }
+    }
     
     
   }

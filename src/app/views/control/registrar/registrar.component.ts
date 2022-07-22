@@ -15,6 +15,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader'
 import Swal from 'sweetalert2'
 import { Md5 } from "md5-typescript";
 import { UtilService } from 'src/app/services/util/util.service';
+import { error } from 'console';
 
 
 
@@ -105,10 +106,10 @@ export class RegistrarComponent implements OnInit {
   public pageSize = 10;
   public posicionPagina = 0
 
-  public DocAdjunto : DocumentoAdjunto = {
-    documento : '',
-    archivo : '',
-    usuario : ''
+  public DocAdjunto: DocumentoAdjunto = {
+    documento: '',
+    archivo: '',
+    usuario: ''
   }
 
 
@@ -156,7 +157,7 @@ export class RegistrarComponent implements OnInit {
     this.xAPI.funcion = 'WKF_CAlertas'
     this.xAPI.parametros = '1,1'
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {   
+      (data) => {
         this.bzAlertas = data.Cuerpo.map((e) => {
           e.color = e.contador >= 0 ? 'text-red' : 'text-yellow';
           e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`;
@@ -164,9 +165,9 @@ export class RegistrarComponent implements OnInit {
           e.busqueda = this.utilService.ConvertirCadena(
             e.ncontrol + e.remitente + e.plazo + e.texto
           );
-          
+
           return e;
-          
+
         }
         );
         this.longitud = this.bzAlertas.length;
@@ -210,7 +211,7 @@ export class RegistrarComponent implements OnInit {
 
   open(content, id) {
     this.numControl = id
-    this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
+    this.hashcontrol = btoa("D" + this.numControl) //Cifrar documentos
     this.modalService.open(content);
 
   }
@@ -231,31 +232,49 @@ export class RegistrarComponent implements OnInit {
   }
 
   async listarBuzon(): Promise<void> {
- 
+
     this.ngxService.startLoader("loader-aceptar")
-try {
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-    (data) => {
-      this.buzon = data.Cuerpo.map((e) => {
-        e.existe = e.anom == '' ? true : false;
-        e.privado = e.priv == 1 ? true : false;
-        e.simbolo = e.tdoc == 'PUNTO DE CUENTA' ? '( + )' : '  ';
-        e.completed = false;
-        
-        return e;
-      }); 
-      this.longitud = this.buzon.length;
-      if (this.longitud > 0) {
-        this.estilocheck = '';
-        this.bzOriginal = this.buzon;
-        this.pageSize = 10;
-        this.recorrerElementos(0);
-      }
-      this.ngxService.stopLoader("loader-aceptar")
-    },
-    (error) => {
-    }
-  )
+    try {
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+          this.buzon = data.Cuerpo.map((e) => {
+            e.existe = e.anom == '' ? true : false;
+            e.privado = e.priv == 1 ? true : false;
+            e.color = 'green'
+            switch (e.tdoc.toLowerCase()) {
+              case 'punto de cuenta':
+                e.simbolo = "-P"
+                e.color = 'green'
+                break;
+              case 'tramitacion por organo regular':
+                e.simbolo = "-T"
+                e.color = 'brown'
+                break;
+              case 'resolucion':
+                e.simbolo = "-R"
+                e.color = 'orange'
+                break;
+              default:
+                e.simbolo = ''
+                break;
+            }
+
+            e.completed = false;
+
+            return e;
+          });
+          this.longitud = this.buzon.length;
+          if (this.longitud > 0) {
+            this.estilocheck = '';
+            this.bzOriginal = this.buzon;
+            this.pageSize = 10;
+            this.recorrerElementos(0);
+          }
+          this.ngxService.stopLoader("loader-aceptar")
+        },
+        (error) => {
+        }
+      )
     } catch (error) {
       console.error(error)
     }
@@ -272,9 +291,9 @@ try {
     this.selNav = e
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
-    this.buzon= []
-    this.bzOriginal= []
-    
+    this.buzon = []
+    this.bzOriginal = []
+
     switch (e) {
       case 0:
         this.xAPI.parametros = '1,1'
@@ -282,7 +301,7 @@ try {
         break;
       case 1:
         this.xAPI.parametros = '1,2'
-        this.listarBuzon()      
+        this.listarBuzon()
         break;
       case 2:
         this.ConsultarAlertas()
@@ -372,7 +391,7 @@ try {
     //Buscar en Wk de acuerdo al usuario y la app activa
     this.xAPI.funcion = 'WKF_AUbicacion'
     this.xAPI.valores = ''
-    
+
     if (this.cmbDestino == 0) {
       this.toastrService.error('Debe seleccionar una opción', `GDoc Wkf.Ubicacion`);
       return
@@ -393,7 +412,7 @@ try {
       }
     });
     this.seleccionNavegacion(0)
-    
+
   }
 
   actualizarBzRegistrados(codigo, tipo) {
@@ -447,7 +466,7 @@ try {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
           this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
-          this.xAPI.parametros =  '' 
+          this.xAPI.parametros = ''
           this.DocAdjunto.archivo = this.archivos[0].name
           this.DocAdjunto.usuario = this.loginService.Usuario.id
           this.DocAdjunto.documento = this.numControl
@@ -459,7 +478,7 @@ try {
                   'Tu archivo ha sido cargado con exito ',
                   `GDoc Registro`
                 );
-               
+
               } else {
                 this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
               }

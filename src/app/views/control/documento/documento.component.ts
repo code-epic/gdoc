@@ -55,19 +55,29 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   public fcreacion: any
   public forigen: any
+  public fcuenta: any
+  public fplazo: any
 
   public fcreacionDate: NgbDate | null
   public forigenDate: NgbDate | null
+  public fcuentaDate: NgbDate | null
 
-  public fplazo: any
+  public subfechaDate: NgbDate | null
 
   public editar: boolean = false
   public puntocuenta: boolean = false
   public salidavisible: boolean = true
+  public resolucion: boolean = false
 
   public detalle: string = ''
+
   public cuenta: string = ''
   public resumen: string = ''
+  public subfecha: string = ''
+  public cedula: string = ''
+  public cargo: string = ''
+  public nmilitar: string = ''
+
   public salida: string = 'Nro. de Salida'
 
 
@@ -87,6 +97,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     estatus: 0,
     detalle: '',
     resumen: '',
+    cedula: '',
+    cargo: '',
+    nmilitar: '',
     fecha: '',
     usuario: '',
     activo: 0
@@ -103,6 +116,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     tipo: '0',
     remitente: '0',
     unidad: '0',
+    comando: '0',
     contenido: '',
     instrucciones: '',
     codigo: '',
@@ -126,6 +140,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstT = [] //Objeto Tipo documento
   public lstR = [] //Objeto Remitente
   public lstU = [] //Objeto Unidad
+  public lstC = [] //Objeto Comando
   public lstCuenta = [] //Objeto Unidad
 
   public lstHzAdjunto = [] //Historico de documentos adjuntos
@@ -137,6 +152,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public download: any
 
   public bHist = false
+
+  public Componentes: any
+  public Grados: any
+  public Categorias: any
+  public Clasificaciones: any
 
   public xAPI: IAPICore = {
     funcion: ''
@@ -199,7 +219,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     }
 
-
+    this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : []
+    this.Grados = sessionStorage.getItem("MPPD_CGrado") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado"))) : []
+    this.Categorias = sessionStorage.getItem("MPPD_CCategorias") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias"))) : []
+    this.Clasificaciones = sessionStorage.getItem("MPPD_CClasificacion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion"))) : []
 
   }
 
@@ -220,6 +243,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
               break
             case "3":
               this.lstU.push(e)
+              break
+            case "4":
+              this.lstC.push(e)
               break
           }
         });
@@ -275,12 +301,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.WAlerta.usuario = this.loginService.Usuario.id
           }
 
+          
+
         });
 
         this.selTipoDocumento()
         const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
         this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
+        console.log(this.lstCuenta)
         const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
         this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
 
@@ -324,7 +352,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = JSON.stringify(this.WkDoc)
   }
 
-  activarHistorial(){
+  activarHistorial() {
     this.bHist = !this.bHist
   }
 
@@ -564,32 +592,47 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
       }) //
   }
+  
+  
   agregarCuenta(): IWKFCuenta {
-    if (this.cuenta == '' ||
-      this.resumen == '' ||
-      this.detalle == '') {
+    let validar = false
+    
+    switch (this.Doc.tipo.toLowerCase() ) {
+      case "punto de cuenta":
+        if (this.cuenta == '' || this.resumen == '' || this.subfecha == '') validar = true
+        break;
+    
+      default:
+        if (this.cedula == '' || this.cargo == '' || this.nmilitar == '') validar = true
+        break;
+    } 
+   
+    if (validar) { 
       this.toastrService.info('Todos los campos son requeridos', `GDoc Wkf.Agregar Cuentas`)
       return
     }
-
     const wkcuenta: IWKFCuenta = {
       documento: 0,
       cuenta: this.cuenta.toUpperCase(),
       estado: 1,
       estatus: 1,
-      detalle: this.detalle.toUpperCase(),
+      cedula : this.cedula,
+      cargo : this.cargo,
+      nmilitar: this.nmilitar,
+      fecha: typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha):this.utilService.FechaActual(),
       resumen: this.resumen.toUpperCase(),
-      fecha: '',
       usuario: this.loginService.Usuario.id,
       activo: 0
     }
 
     this.lstCuenta.push(wkcuenta)
 
-
+    this.cedula = ''
+    this.cargo = ''
+    this.nmilitar = ''
     this.cuenta = ''
     this.resumen = ''
-    this.detalle = ''
+    this.subfecha = ''
     return wkcuenta
   }
 
@@ -598,7 +641,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.cuenta = wkcuenta.cuenta
     this.resumen = wkcuenta.resumen
-    this.detalle = wkcuenta.detalle
+  
+    this.subfechaDate = NgbDate.from(this.formatter.parse(wkcuenta.fecha.substring(0, 10)))
+    
+    this.cedula = wkcuenta.cedula
+    this.cargo = wkcuenta.cargo
+    this.nmilitar = wkcuenta.nmilitar
 
     this.PosicionCuenta = pos
     this.editar = !this.editar
@@ -609,21 +657,27 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.lstCuenta.splice(pos, 1)
     this.cuenta = ''
     this.resumen = ''
-    this.detalle = ''
+    this.subfecha = ''
+    this.cedula = ''
+    this.cargo = ''
+    this.nmilitar = ''
     this.editar = false
   }
 
   editarCuenta() {
 
     if (this.PosicionCuenta != -1) {
+      
       const wkcuenta: IWKFCuenta = {
         documento: 0,
         cuenta: this.cuenta.toUpperCase(),
         estado: 1,
         estatus: 1,
-        detalle: this.detalle.toUpperCase(),
+        cedula : this.cedula,
+        cargo : this.cargo,
+        nmilitar: this.nmilitar,
+        fecha:  typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha):this.utilService.ConvertirFecha(this.subfechaDate),
         resumen: this.resumen.toUpperCase(),
-        fecha: '',
         usuario: this.loginService.Usuario.id,
         activo: 0
       }
@@ -633,7 +687,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
       this.cuenta = ''
       this.resumen = ''
-      this.detalle = ''
+      this.subfecha = ''
+      this.subfechaDate  = null
+      this.cedula = ''
+      this.cargo = ''
+      this.nmilitar = ''
       this.PosicionCuenta = -1
       this.editar = !this.editar
     }
@@ -644,7 +702,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   async salvarCuentas(numc: number) {
 
     const cant = this.lstCuenta.length
-
+    console.log('entrando en confianza... ', cant)
+    console.log('entrando en confianza... ', this.lstCuenta)
     if (cant == 0) {
       this.ngxService.stopLoader("loader-aceptar")
       return
@@ -652,7 +711,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.xAPI.funcion = 'WKF_ISubDocumento'
       this.xAPI.parametros = ''
       this.lstCuenta[0].documento = numc
-      this.lstCuenta[0].fecha = this.Doc.fcreacion
       this.xAPI.valores = JSON.stringify(this.lstCuenta[0])
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
@@ -681,9 +739,18 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   selTipoDocumento() {
     this.puntocuenta = false
+    this.resolucion = false
     this.lstCuenta = []
-    if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') this.puntocuenta = true
+    if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') {
+      this.puntocuenta = true
+      this.resolucion = true
+    } else if (this.Doc.tipo.toLowerCase() == 'resolucion' || this.Doc.tipo.toLowerCase() == 'tramitacion por organo regular') {
+      this.resolucion = true
+    }
   }
+
+
+
 
 
 
@@ -693,6 +760,52 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.modalService.open(content, { size: 'lg' })
 
   }
+
+
+  /**
+   * Consultar datos generales del militar 
+   */
+  consultarCedula() {
+    if (this.cedula == '') return false
+
+    this.ngxService.startLoader("loader-aceptar")
+    this.xAPI.funcion = 'MPPD_CDatosBasicos'
+    this.xAPI.parametros = this.cedula
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+
+        const militar = data.Cuerpo.map(e => {
+          e.resoluciones = JSON.parse(e.resoluciones)
+          e.entradas = JSON.parse(e.entradas)
+          e.componente = this.Componentes.filter(el => { return el.cod_componente == e.componente })[0].nombre_componente
+          e.categoria = this.Categorias.filter(el => { return el.cod_categoria == e.categoria })[0].nombre_categoria
+          e.clasificacion = this.Clasificaciones.filter(el => { return el.cod_clasificacion == e.clasificacion })[0].des_clasificacion
+          e.grado = this.Grados.filter(el => { return el.cod_grado == e.grado })[0].nombres_grado
+          return e
+        })[0]
+
+        if (data.Cuerpo.length > 0) {
+          this.nmilitar = militar.nombres_apellidos
+          this.cargo = militar.grado + " " + militar.componente
+
+        } else {
+          this.cedula = ""
+          this.nmilitar = ""
+          this.cargo = ""
+          this.toastrService.info("Debe dirigirse al departamento de resoluciones", `GDoc Resoluciones`)
+        }
+
+        this.ngxService.stopLoader("loader-aceptar")
+      },
+      (error) => {
+        console.error("Error de conexion a los datos ", error)
+      }
+
+    )
+
+  }
+
 
   ngOnDestroy(): void {
     this.editor.destroy()

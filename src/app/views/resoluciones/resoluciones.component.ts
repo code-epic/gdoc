@@ -82,7 +82,7 @@ export class ResolucionesComponent implements OnInit {
   public Estados: any
 
   constructor(private apiService: ApiService,
-    private resolucionService: ResolucionService,
+  
     private modalService: NgbModal,
     public dialog: MatDialog,
     public loginService: LoginService,
@@ -92,12 +92,7 @@ export class ResolucionesComponent implements OnInit {
   async ngOnInit() {
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
-    if (sessionStorage.getItem("MPPD_CTipoEntrada") == undefined) {
-      for (var i = 0; i < 9; i++) {
-
-        this.resolucionService.Listar(i) //
-      }
-    }
+   
     this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : []
     this.Grados = sessionStorage.getItem("MPPD_CGrado") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado"))) : []
     this.Categorias = sessionStorage.getItem("MPPD_CCategorias") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias"))) : []

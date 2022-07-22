@@ -14,6 +14,7 @@ export interface IDocumento {
   tipo?: string
   remitente?: string
   unidad?: string
+  comando?: string
   contenido?: string
   instrucciones?: string
   observaciones?: []
@@ -53,6 +54,9 @@ export interface IWKFCuenta {
   detalle?: string
   archivo?: string
   privado?: number
+  cedula?: string
+  cargo?: string
+  nmilitar?: string
   fecha?: string
   cuenta?: string
   usuario?: string
