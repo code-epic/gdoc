@@ -61,7 +61,6 @@
                 </div>
                 <div class="card-body">
                     <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
-                    <form role="form">
                         <div class="form-row">
                             <div class="form-group col-md-{{camposalida}}">
                                 <label for="txtControl"> {{ncontrolt}} </label>
@@ -120,7 +119,7 @@
                         <div class="form-row">
                             <div class="form-group col-md-3">
                                 <label for="cmbTipoDocumento">Tipo de Documento</label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
                                     [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" (change)="selTipoDocumento()">
                                     <option value="0">Seleccione</option>
                                     <option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </option>
@@ -289,7 +288,7 @@
 
                                 <div class="row">
                                     <div class="form-group col-md-6">
-                                        <label for="tmsCreacion">Plazo / Alerta</label>
+                                        <label for="tmsCreacion">Plazo / Alerta (*)</label>
                                         <form class="form-inline">
                                             <div class="form-group" style="width:100%">
                                                 <div class="input-group" style="width:100%">
@@ -343,7 +342,6 @@
                                 </div>
                             </div>
                         </div>
-                    </form>
                 </div>
             </div>
         </div>

@@ -436,12 +436,14 @@ export class RegistrarComponent implements OnInit {
 
 
   ConsultarCtrl(id: string) {
+   
+    this.btnNota = false
+   
     this.UbicacionSeleccionLista = id
     this.xAPI.funcion = 'WKF_CClasificados'
     this.xAPI.valores = ''
     this.xAPI.parametros = id
     this.lstNotaEntrega = []
-    this.btnNota = false
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.lstNotaEntrega = data.Cuerpo
@@ -497,7 +499,7 @@ export class RegistrarComponent implements OnInit {
 
 
   async notaEntrega(id: string) {
-
+    this.btnNota = false
     var cantidad = this.lstNotaEntrega.length
 
     if (cantidad > 0) {

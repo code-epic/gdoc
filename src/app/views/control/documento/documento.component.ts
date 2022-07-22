@@ -157,6 +157,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public Grados: any
   public Categorias: any
   public Clasificaciones: any
+  public serializar : string = ""
+
+  public activarTipo = false // activar tipo de documento
 
   public xAPI: IAPICore = {
     funcion: ''
@@ -214,6 +217,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.consultarDocumento(id)
       }
 
+     
+
+
     } else {
       this.limpiarDoc()
 
@@ -226,6 +232,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
+  validarTipoDoc() : boolean {
+    
+    return this.Doc.tipo.toLowerCase() == 'resolucion' || this.Doc.tipo.toLowerCase() == 'tramitacion por organo regular' || this.Doc.tipo.toLowerCase() == 'punto de cuenta'
+   
+    
+  }
 
   listarConfiguracion() {
     this.xAPI.funcion = 'MD_CConfiguracion'
@@ -308,7 +320,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.selTipoDocumento()
         const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
         this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        console.log(this.lstCuenta)
+        
         const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
         this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
 
@@ -321,7 +333,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         //Carga de Documentos
         this.bPDF = this.Doc.archivo != "" ? true : false
         this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
-
+        
+        this.activarTipo = this.validarTipoDoc()
+       
+        // this.serializar =  btoa( JSON.stringify(this.Doc.norigen))
+        // console.log( this.serializar)
       },
       (error) => {
         console.error(error)
@@ -356,18 +372,42 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.bHist = !this.bHist
   }
 
+  
+  validarCamposObligatorios() : boolean {
+    if (this.titulo == 'Documento') {
+      return this.fcreacion == '' || this.forigen == '' || this.Doc.contenido == '' ||  this.fplazo == ''
+    }else{
+      return this.fcreacion == '' || this.Doc.contenido == '' ||  this.fplazo == ''
+    }
+  }
   //registrar Un documento pasando por el WorkFlow
   registrar() {
 
 
+    // const comparar = btoa( JSON.stringify(this.Doc.norigen) )
+    //   console.info( comparar)
+
+    //   if ( this.serializar == comparar ){
+    //     alert('Son iguales')
+    //     return
+    //   }else{
+    //     return
+    //   }
+      
     this.ngxService.startLoader("loader-aceptar")
     this.obtenerWorkFlow() //Obtener valores de una API
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
-
       this.actualizarDocumentos()
+      
+      
+      return
+    }else if( this.validarCamposObligatorios() ){
+      this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Documentos`)
+      this.ngxService.stopLoader("loader-aceptar")
       return
     }
+
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
