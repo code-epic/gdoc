@@ -13,6 +13,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader'
 
 
 
+
 @Component({
   selector: 'app-salidas',
   templateUrl: './salidas.component.html',

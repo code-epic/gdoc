@@ -73,7 +73,7 @@
                         (click)="open(observacion, e.idd)">
                         <mat-icon>task_alt</mat-icon>
                       </button>
-                      
+
                     </div>
                     <div class="col-md-2 texto-lista">
                       <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
@@ -281,8 +281,11 @@
     <div class="form-row col-md-12" *ngIf="archivar">
       <div class="form-group col-md-6">
         <label for="">Código de Archivo</label>
-        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="codigo"
-          value="{{ codigo }}">
+        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.codigo"
+          value="{{Doc.codigo}}" id="cod">
+          <option value="0">Seleccione</option>
+          <option *ngFor="let x of lstCA" value="{{x.nomb}}">{{ x.nomb }} -- {{ x.obse }}</option>
+        </select>
       </div>
       <div class="form-group col-md-6">
         <label for="">Expediente</label>

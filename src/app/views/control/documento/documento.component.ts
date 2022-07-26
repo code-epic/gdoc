@@ -119,7 +119,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     comando: '0',
     contenido: '',
     instrucciones: '',
-    codigo: '',
+    codigo: '0',
     nexpediente: '',
     creador: '',
     archivo: '',
@@ -141,6 +141,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstR = [] //Objeto Remitente
   public lstU = [] //Objeto Unidad
   public lstC = [] //Objeto Comando
+  public lstCA = [] //Objeto Comando
   public lstCuenta = [] //Objeto Unidad
 
   public lstHzAdjunto = [] //Historico de documentos adjuntos
@@ -157,7 +158,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public Grados: any
   public Categorias: any
   public Clasificaciones: any
-  public serializar : string = ""
+  public serializar: string = ""
 
   public activarTipo = false // activar tipo de documento
 
@@ -217,7 +218,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.consultarDocumento(id)
       }
 
-     
+
 
 
     } else {
@@ -232,11 +233,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
-  validarTipoDoc() : boolean {
-    
+  validarTipoDoc(): boolean {
+
     return this.Doc.tipo.toLowerCase() == 'resolucion' || this.Doc.tipo.toLowerCase() == 'tramitacion por organo regular' || this.Doc.tipo.toLowerCase() == 'punto de cuenta'
-   
-    
+
+
   }
 
   listarConfiguracion() {
@@ -259,6 +260,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             case "4":
               this.lstC.push(e)
               break
+            case "5":
+              this.lstCA.push(e)
+              break
+
           }
         });
       },
@@ -278,7 +283,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.Doc.contenido = ''
     this.Doc.instrucciones = ''
     this.Doc.nexpediente = ''
-    this.Doc.codigo = ''
+    this.Doc.codigo = '0'
     this.Doc.salida = ''
     this.Doc.tipo = '0'
     this.Doc.remitente = '0'
@@ -313,14 +318,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.WAlerta.usuario = this.loginService.Usuario.id
           }
 
-          
+
 
         });
 
         this.selTipoDocumento()
         const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
         this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        
+
         const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
         this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
 
@@ -333,9 +338,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         //Carga de Documentos
         this.bPDF = this.Doc.archivo != "" ? true : false
         this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
-        
+
         this.activarTipo = this.validarTipoDoc()
-       
+
         // this.serializar =  btoa( JSON.stringify(this.Doc.norigen))
         // console.log( this.serializar)
       },
@@ -372,12 +377,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.bHist = !this.bHist
   }
 
-  
-  validarCamposObligatorios() : boolean {
+
+  validarCamposObligatorios(): boolean {
     if (this.titulo == 'Documento') {
-      return this.fcreacion == '' || this.forigen == '' || this.Doc.contenido == '' ||  this.fplazo == ''
-    }else{
-      return this.fcreacion == '' || this.Doc.contenido == '' ||  this.fplazo == ''
+      return this.fcreacion == '' || this.forigen == '' || this.Doc.contenido == '' || this.fplazo == ''
+    } else {
+      return this.fcreacion == '' || this.Doc.contenido == '' || this.fplazo == ''
     }
   }
   //registrar Un documento pasando por el WorkFlow
@@ -393,16 +398,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     //   }else{
     //     return
     //   }
-      
+
     this.ngxService.startLoader("loader-aceptar")
     this.obtenerWorkFlow() //Obtener valores de una API
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
       this.actualizarDocumentos()
-      
-      
+
+
       return
-    }else if( this.validarCamposObligatorios() ){
+    } else if (this.validarCamposObligatorios()) {
       this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Documentos`)
       this.ngxService.stopLoader("loader-aceptar")
       return
@@ -632,22 +637,22 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
       }) //
   }
-  
-  
+
+
   agregarCuenta(): IWKFCuenta {
     let validar = false
-    
-    switch (this.Doc.tipo.toLowerCase() ) {
+
+    switch (this.Doc.tipo.toLowerCase()) {
       case "punto de cuenta":
         if (this.cuenta == '' || this.resumen == '' || this.subfecha == '') validar = true
         break;
-    
+
       default:
         if (this.cedula == '' || this.cargo == '' || this.nmilitar == '') validar = true
         break;
-    } 
-   
-    if (validar) { 
+    }
+
+    if (validar) {
       this.toastrService.info('Todos los campos son requeridos', `GDoc Wkf.Agregar Cuentas`)
       return
     }
@@ -656,10 +661,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       cuenta: this.cuenta.toUpperCase(),
       estado: 1,
       estatus: 1,
-      cedula : this.cedula,
-      cargo : this.cargo,
+      cedula: this.cedula,
+      cargo: this.cargo,
       nmilitar: this.nmilitar,
-      fecha: typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha):this.utilService.FechaActual(),
+      fecha: typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha) : this.utilService.FechaActual(),
       resumen: this.resumen.toUpperCase(),
       usuario: this.loginService.Usuario.id,
       activo: 0
@@ -681,9 +686,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.cuenta = wkcuenta.cuenta
     this.resumen = wkcuenta.resumen
-  
+
     this.subfechaDate = NgbDate.from(this.formatter.parse(wkcuenta.fecha.substring(0, 10)))
-    
+
     this.cedula = wkcuenta.cedula
     this.cargo = wkcuenta.cargo
     this.nmilitar = wkcuenta.nmilitar
@@ -707,16 +712,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   editarCuenta() {
 
     if (this.PosicionCuenta != -1) {
-      
+
       const wkcuenta: IWKFCuenta = {
         documento: 0,
         cuenta: this.cuenta.toUpperCase(),
         estado: 1,
         estatus: 1,
-        cedula : this.cedula,
-        cargo : this.cargo,
+        cedula: this.cedula,
+        cargo: this.cargo,
         nmilitar: this.nmilitar,
-        fecha:  typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha):this.utilService.ConvertirFecha(this.subfechaDate),
+        fecha: typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha) : this.utilService.ConvertirFecha(this.subfechaDate),
         resumen: this.resumen.toUpperCase(),
         usuario: this.loginService.Usuario.id,
         activo: 0
@@ -728,7 +733,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.cuenta = ''
       this.resumen = ''
       this.subfecha = ''
-      this.subfechaDate  = null
+      this.subfechaDate = null
       this.cedula = ''
       this.cargo = ''
       this.nmilitar = ''
@@ -784,7 +789,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') {
       this.puntocuenta = true
       this.resolucion = true
-    } else if (this.Doc.tipo.toLowerCase() == 'resolucion' || this.Doc.tipo.toLowerCase() == 'tramitacion por organo regular') {
+    } else if (this.Doc.tipo.toLowerCase() == 'resolucion' || this.Doc.tipo.toLowerCase() == 'tramitacion por organo regular' || this.Doc.tipo.toLowerCase() == 'comision de servicio') {
       this.resolucion = true
     }
   }
