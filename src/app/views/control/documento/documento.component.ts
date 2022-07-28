@@ -11,6 +11,8 @@ import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta } from 'src/app/servi
 import { LoginService } from 'src/app/services/seguridad/login.service'
 import { UtilService } from 'src/app/services/util/util.service'
 
+import { Location } from '@angular/common';
+
 
 @Component({
   selector: 'app-documento',
@@ -176,6 +178,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     private loginService: LoginService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
+    private location: Location,
     private ruta: Router) {
 
 
@@ -607,6 +610,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         await this.guardarAlerta(1)
         //this.ruta.navigate(['/salidas']);
+        this.location.back()
 
       },
       (errot) => {

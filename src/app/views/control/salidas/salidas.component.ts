@@ -57,27 +57,7 @@ export class SalidasComponent implements OnInit {
   public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
-    relacional: false,
-    concurrencia: false,
-    protocolo: '',
-    ruta: '',
-    version: '',
-    retorna: false,
-    migrar: false,
-    http: 0,
-    https: 0,
-    consumidores: '',
-    puertohttp: 0,
-    puertohttps: 0,
-    driver: '',
-    query: '',
-    metodo: '',
-    tipo: '',
-    prioridad: '',
-    entorno: '',
-    logs: false,
-    cache: 0,
-    estatus: false
+    valores: '',
   }
   public lst = []
   public lstEstados = [] //Listar Estados
@@ -107,11 +87,13 @@ export class SalidasComponent implements OnInit {
   public bzBusqueda = []
   public bzAlertasO = []
   public bzAlertas = []
+  public lstCA = []
   public buscar = ''
   public longitud = 0;
   public pageSize = 10;
   public xtender_plazo = ''
-
+  public codigo = ''
+  public nexpediente = ''
   public posicionPagina = 0
 
   public WAlerta: IWKFAlerta = {
@@ -124,7 +106,7 @@ export class SalidasComponent implements OnInit {
     observacion: ''
   }
 
-  
+
 
   public placement = 'bottom'
 
@@ -148,9 +130,31 @@ export class SalidasComponent implements OnInit {
     this.listarEstados()
     this.seleccionNavegacion(0)
     this.ConsultarAlertas()
+    this.listarConfiguracion()
 
   }
 
+
+  listarConfiguracion() {
+    this.xAPI.funcion = 'MD_CConfiguracion'
+    this.xAPI.parametros = '%'
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+
+        data.Cuerpo.forEach(e => {
+          switch (e.tipo) {
+            case "5":
+              this.lstCA.push(e)
+              break
+
+          }
+        });
+      },
+      error => {
+        console.error('Fallo consultando los datos de Configuraciones')
+      }
+    )
+  }
 
   seleccionLista(event) {
     if (event.charCode == 13) {
@@ -212,7 +216,7 @@ export class SalidasComponent implements OnInit {
     this.xAPI.valores = ''
     this.selNav = e
     this.pageSize = 10;
-    
+
     switch (e) {
       case 0:
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
@@ -262,14 +266,14 @@ export class SalidasComponent implements OnInit {
   }
 
   async listarBuzon(lst: number) {
-    var bz=[]
+    var bz = []
     this.ngxService.startLoader("loader-aceptar")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         data.Cuerpo.forEach(e => {
           e.completed = false
           e.color = 'warn'
-          e.salida = e.saso != ""? true : false
+          e.salida = e.saso != "" ? true : false
           e.priv = e.priv == 1 ? true : false
           e.existe = e.anom == '' ? true : false
           const valor = this.cmbAcciones[e.accion] == undefined ? 'NUEVO DOCUMENTO' : this.cmbAcciones[e.accion].texto
@@ -284,10 +288,10 @@ export class SalidasComponent implements OnInit {
         if (this.longitud > 0) {
           this.estilocheck = ''
           this.bzOriginal = bz
-          this.recorrerElementos(0,lst)
+          this.recorrerElementos(0, lst)
         }
         this.ngxService.stopLoader("loader-aceptar")
-      
+
       },
       (error) => {
 
@@ -299,14 +303,14 @@ export class SalidasComponent implements OnInit {
 
     this.xAPI.funcion = 'WKF_CSubDocumento'
     this.xAPI.parametros = '4,2,9'
-    
+
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         data.Cuerpo.forEach(e => {
           e.completed = false
           e.color = 'warn'
           e.nori = e.cuenta
-          e.cuentas = e.cuenta == ''? '': e.cuenta
+          e.cuentas = e.cuenta == '' ? '' : e.cuenta
           e.priv = e.priv == 1 ? true : false
           e.existe = e.anom == '' ? true : false
           e.xaccion = e.accion
@@ -325,27 +329,27 @@ export class SalidasComponent implements OnInit {
   }
 
 
-  pageChangeEvent(e,sel) {
+  pageChangeEvent(e, sel) {
     this.pageSize = e.pageSize
-    this.recorrerElementos(e.pageIndex,sel)
+    this.recorrerElementos(e.pageIndex, sel)
   }
 
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion: number,sel: number) {
+  recorrerElementos(posicion: number, sel: number) {
     let pag = this.pageSize * posicion
     switch (sel) {
       case 0:
-        this.bzRecibido= this.bzOriginal.slice(pag, pag + this.pageSize)
+        this.bzRecibido = this.bzOriginal.slice(pag, pag + this.pageSize)
         break
       case 1:
-        this.bzProcesados= this.bzOriginal.slice(pag, pag + this.pageSize)
+        this.bzProcesados = this.bzOriginal.slice(pag, pag + this.pageSize)
         break
       case 2:
-        this.bzPendientes= this.bzOriginal.slice(pag, pag + this.pageSize)
+        this.bzPendientes = this.bzOriginal.slice(pag, pag + this.pageSize)
         break
       default:
         break
-    }  
+    }
   }
 
 
@@ -390,7 +394,7 @@ export class SalidasComponent implements OnInit {
             this.promoverBuzon(0, this.utilService.FechaActual())
             break;
           case "3"://Oficio por opinión
-            this.promoverBuzon(1, '')
+            this.redistribuir(11)
             break;
           case "6":// Enviar a otras areas
             this.redistribuir(0)
@@ -477,11 +481,39 @@ export class SalidasComponent implements OnInit {
     console.log(this.xAPI.parametros)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
-        this.toastrService.success(
-          'El documento ha sido redistribuido segun su selección',
-          `GDoc Wkf.DocumentoObservacion`
-        )
+
+        if (this.AccionTexto == '3') {
+          console.log(
+            'El documento ha sido redistribuido segun su selección',
+            `GDoc Wkf.DocumentoObservacion`
+          )
+          this.xAPI.funcion = "WKF_ADocumentoArchivo"
+          this.xAPI.valores = JSON.stringify({
+            codigo: this.codigo,
+            expediente: this.nexpediente,
+            documento: this.numControl
+          })
+          this.xAPI.parametros = ''
+          this.apiService.Ejecutar(this.xAPI).subscribe(
+            (xdata) => {
+              this.toastrService.success(
+                'El documento ha sido redistribuido y actualizado',
+                `GDoc Wkf.Redistribuir`
+              )
+
+            },
+            (error) => {
+              console.error(error, 'Redistribuir')
+            }
+          )
+        } else {
+          this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
+          this.toastrService.success(
+            'El documento ha sido redistribuido segun su selección',
+            `GDoc Wkf.DocumentoObservacion`
+          )
+
+        }
         this.seleccionNavegacion(this.selNav)
       },
       (error) => {
