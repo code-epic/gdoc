@@ -30,7 +30,7 @@
                     <div class="col-md-8">
                         <div class="form-group">
                             <label for="cmbConfiguracion">Seleccionar Configuación</label>
-                            <select class="form-control" [(ngModel)]="tipo" (change)="selTipo()">
+                            <select class="form-control" [(ngModel)]="tipo" (change)="selTipo()" id="tipoconfig">
                                 <option value="0">Seleccione</option>
                                 <option value="1">Tipo de Documento</option>
                                 <option value="2">Remitente</option>
@@ -48,7 +48,7 @@
 
             <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" >
                 <mat-tab>
-                    <ng-template mat-tab-label>
+                    <ng-template mat-tab-label name="regs">
                     &nbsp;REGISTRAR
                     </ng-template>
                     <ngx-ui-loader [loaderId]="'loader-registrar'"></ngx-ui-loader>
@@ -56,7 +56,7 @@
                         <div class="row col-md-12">
                             <div class="form-group col-md-6">
                                 <label for="">Nombre</label>
-                                <input type="text" class="form-control" id="txtControl"
+                                <input type="text" class="form-control" id="nombreconfig"
                                 [(ngModel)]="nombre"  value ="{{ nombre }}">
                             </div>
 
@@ -66,10 +66,10 @@
                                     
                                     <input style="font-size:14px;" type="text" 
                                         class="form-control" [ngModelOptions]="{standalone: true}" 
-                                        [(ngModel)]="observacion"  value ="{{observacion}}" >
+                                        [(ngModel)]="observacion"  value ="{{observacion}}" id="descripcionconfig">
                                     <div class="input-group-prepend">
                                         
-                                        <button *ngIf="registrar" type="button" class="btn btn-primary" (click)="guardar()">
+                                        <button *ngIf="registrar" type="button" class="btn btn-primary" (click)="guardar()" id="registrar">
                                             <i class="fa fa-plus" aria-hidden="true"  ></i> &nbsp; Registar
                                         </button>
                                     </div>

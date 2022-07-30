@@ -27,7 +27,7 @@
             <div class="col-md-1">
               <ul class="navbar-nav align-items-center d-none d-md-flex">
                 <li class="nav-item" ngbDropdown placement="bottom-right">
-                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                  <a class="nav-link pr-0" role="button" ngbDropdownToggle id="more">
                     <div class="media align-items-center">
                       <div class="example-button-row">
                         <button mat-icon-button aria-label="Example icon-button with a heart icon">
@@ -37,7 +37,7 @@
                     </div>
                   </a>
                   <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                    <a routerLinkActive="active" [routerLink]="['/documento/salida']" class="dropdown-item">
+                    <a routerLinkActive="active" [routerLink]="['/documento/salida']" class="dropdown-item" id="salida">
                       <i class="fa fa-plus"></i>
                       <span>Nueva Salida</span>
                     </a>
