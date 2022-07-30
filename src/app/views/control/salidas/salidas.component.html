@@ -266,6 +266,7 @@
       <label>Acción</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
         (change)="selAccion()" value="{{AccionTexto}}">
+        <option value="0">Seleccione</option>
         <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
       </select>
 
@@ -274,6 +275,7 @@
       <label>Area</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino"
         value="{{cmbDestino}}">
+        <option value="0">Seleccione</option>
         <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
       </select>
     </div>
@@ -281,8 +283,8 @@
     <div class="form-row col-md-12" *ngIf="archivar">
       <div class="form-group col-md-6">
         <label for="">Código de Archivo</label>
-        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.codigo"
-          value="{{Doc.codigo}}" id="cod">
+        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="codigo"
+          value="{{codigo}}" id="cod">
           <option value="0">Seleccione</option>
           <option *ngFor="let x of lstCA" value="{{x.nomb}}">{{ x.nomb }} -- {{ x.obse }}</option>
         </select>
