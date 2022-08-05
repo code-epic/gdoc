@@ -256,10 +256,10 @@
                                         <td [style.display]="puntocuenta?'':'none'">{{ el.cuenta }}</td>
                                         <td [style.display]="puntocuenta?'':'none'">{{ el.resumen.substring(0,20) }}...
                                         </td>
-                                        <td [style.display]="puntocuenta?'':'none'">{{ el.fecha }}</td>
+                                        <td [style.display]="puntocuenta?'':'none'">{{ el.fecha.substring(0,10) }}</td>
                                         <td>{{ el.cargo.substring(0,20) }}...</td>
-                                        <td>{{ el.nmilitar.substring(0,20) }}...</td>
-                                        <td>{{ el.cedula }}...</td>
+                                        <td>{{ el.nmilitar.substring(0,25) }}...</td>
+                                        <td>{{ el.cedula }}</td>
                                     </tr>
 
                                 </tbody>

@@ -19,6 +19,8 @@ export class ResolucionesComponent implements OnInit {
   public focus: boolean = true
   public buscar: string = ''
   public lst = []
+  public lstMilitar = []
+
   public lengthOfi = 0;
   public pageSizeOfi = 10;
   public pageSizeOptions: number[] = [5, 10, 25, 100];
@@ -34,11 +36,12 @@ export class ResolucionesComponent implements OnInit {
   public max_paginador: number = 0
   public lstPaginas = []
   public actual : number =  1
+  public slike : string = '%'
 
   public previaBusqueda : string = ''
 
   public xApi: IAPICore = {
-    funcion: '',
+    funcion: 'MPPD_CGeneral',
     parametros: ''
   }
 
@@ -80,6 +83,8 @@ export class ResolucionesComponent implements OnInit {
   public TipoEntradas: any
   public TipoResoluciones: any
   public Estados: any
+  public selected: number = 0
+  
 
   constructor(private apiService: ApiService,
   
@@ -90,6 +95,7 @@ export class ResolucionesComponent implements OnInit {
     public ruta: Router) { }
 
   async ngOnInit() {
+    //this.xApi.funcion = "MPPD_CGeneral"
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
    
@@ -108,21 +114,23 @@ export class ResolucionesComponent implements OnInit {
       this.previaBusqueda = ''
       if (this.buscar == '') return false
       this.previaBusqueda = this.buscar
-      this.consultarAPIBuscar()
+      this.seleccionNavegacion(this.selected)
+      
     }
   }
 
-  consultarAPIBuscar() {
+  consultarAPIBuscar( ) {
+    this.lstMilitar = []
     this.ngxService.startLoader("loader-buscar")
-    this.xApi.funcion = "MPPD_CGeneral"
-    this.xApi.parametros = this.previaBusqueda + ',' + this.de + ',' + this.paginador
-    console.log(this.previaBusqueda + ',' + this.de + ',' + this.para)
+    
+    this.xApi.parametros = this.previaBusqueda + ',' + this.de + ',' + this.paginador + ',' + this.slike
+    console.log(this.previaBusqueda + ',' + this.de + ',' + this.para + ',' + this.slike, this.xApi.funcion)
     this.cantidad = 0
     this.contador_ponderacion = 0
     this.lst = []
     this.apiService.Ejecutar(this.xApi).subscribe(
       (data) => {
-        console.log(data)
+        console.info(data.Cuerpo)
         if (data.Cuerpo.length != undefined && data.Cuerpo.length > 0) {
 
           this.lst = data.Cuerpo.map(e => {
@@ -134,7 +142,9 @@ export class ResolucionesComponent implements OnInit {
           this.max_paginador = this.cantidad / 10
 
         }
-
+        if (this.selected == 3){
+          this.lstMilitar = this.lst
+        }
         this.ngxService.stopLoader("loader-buscar")
         this.buscar = ""
         this.MostrarPaginador()
@@ -148,6 +158,36 @@ export class ResolucionesComponent implements OnInit {
   }
 
 
+
+  seleccionNavegacion(e) {
+    this.selected = e
+    this.xApi.funcion = "MPPD_CGeneral"
+    switch (e) {
+      case 0:
+        
+        this.slike = '%'
+        this.consultarAPIBuscar()
+        break
+      case 1:
+        this.slike = 'C'
+        this.consultarAPIBuscar()
+        break
+      case 2:
+        this.slike = 'R'
+        this.consultarAPIBuscar()
+        break
+      case 3:
+        this.xApi.funcion = "MPPD_CMilitar"
+        this.slike = 'D'
+        this.consultarAPIBuscar()
+      break
+      default:
+        break
+    }
+
+  }
+
+
   open(content) {
     this.modalService.open(content, { size: 'lg' });
   }
@@ -155,7 +195,7 @@ export class ResolucionesComponent implements OnInit {
 
   AgregarView(score, id, content, cedula, referencia, tipo) {
     this.ngxService.startLoader("loader-buscar")
-    this.xApi.funcion = "MPPD_UFulltext"
+    this.xApi.funcion = this.selected != 3? 'MPPD_UFulltext': 'MPPD_UFulltextMilitar'
 
     var ponderacion = (score - this.contador_ponderacion)
     this.contador_ponderacion += 0.100

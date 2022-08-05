@@ -175,8 +175,10 @@ export class RsbuzonComponent implements OnInit {
   }
 
   async listarBuzon() {
+   
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data)
         this.bzOriginal = data.Cuerpo.map(e => {
           e.completed = false
           e.color = 'warn'
@@ -229,10 +231,11 @@ export class RsbuzonComponent implements OnInit {
   }
 
   ConsultarProcesados(id) {
-    console.log(this.bzSubDocumentos)
+    console.log(this.bzSubDocumentos, 'uff -> ', id)
     if (id == 4) {
       this.bzRecibido = this.bzSubDocumentos
     } else {
+      console.log(this.bzOriginal, 'xfff -> ', id)
       this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
     }
   }
