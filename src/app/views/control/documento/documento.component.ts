@@ -522,7 +522,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Si',
-      cancelButtonText: 'No'
+      cancelButtonText: 'No',
+      allowEscapeKey: true,
     }).then((result) => {
       if (!result.isConfirmed) {
         if (this.estadoActual == 9) {

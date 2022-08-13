@@ -134,11 +134,18 @@
                         </div>
                         <div class="form-group col-md-3">
                             <label for="cmbUnidad">Unidad o Dependencia</label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.unidad"
-                                value="{{Doc.unidad}}" id="unid">
-                                <option value="0">Seleccione</option>
-                                <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
-                            </select>
+                            <div class="input-group">
+                                <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}" id="unid">
+                                    <option value="0">Seleccione</option>
+                                    <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
+                                </select>
+                                <div class="input-group-append">
+                                    <button *ngIf="!editar" type="button" class="btn btn-success">
+                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group col-md-3">
                             <label>Componente / Gran Comando</label>
@@ -148,6 +155,20 @@
                                 <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
                             </select>
                         </div>
+                        <div class="form-group col-md-12" >
+                            <table class="table align-items-center table-flush" style="width:100%">
+                                <thead class="thead-light">
+                                    <th>Unidades o Dependencias Seleccionadas</th>
+                                </thead>
+                                <tbody>
+                                    <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
+                                        <td style="text-align:center;width:20px"></td>
+                                        <td>{{ el.cedula }}...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-12">
@@ -316,7 +337,8 @@
                                     <select class="form-control" [ngModelOptions]="{standalone: true}"
                                         [(ngModel)]="Doc.codigo" value="{{Doc.codigo}}" id="cod">
                                         <option value="0">Seleccione</option>
-                                        <option *ngFor="let x of lstCA" value="{{x.nomb}}">{{ x.nomb }} -- {{ x.obse }}</option>
+                                        <option *ngFor="let x of lstCA" value="{{x.nomb}}">{{ x.nomb }} -- {{ x.obse }}
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="form-group col-md-6">

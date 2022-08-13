@@ -69,7 +69,7 @@
                   <div class="row">
                     <div class="col-md-1">
                       <button mat-icon-button aria-label="Example " class="text-primary"
-                        (click)="open(observacion, e.idd)">
+                        (click)="open(observacion, e.idd)" id="recibir">
                         <mat-icon>task_alt</mat-icon>
                       </button>
                     </div>
@@ -111,8 +111,8 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Visibilidad">
-                        <mat-icon class="text-primary" (click)="open(observacion, e.idd)">add_circle</mat-icon>
+                      <button mat-icon-button aria-label="Visibilidad" class="text-primary" (click)="open(observacion, e.idd)" id="procesados">
+                        <mat-icon>add_circle</mat-icon>
                       </button>
                     </div>
 
@@ -161,8 +161,8 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Visibilidad">
-                        <mat-icon class="text-primary" (click)="open(observacion, e.idd)">add_circle</mat-icon>
+                      <button mat-icon-button aria-label="Visibilidad" class="text-primary" (click)="open(observacion, e.idd)" id="pndt">
+                        <mat-icon>add_circle</mat-icon>
                       </button>
                     </div>
 
@@ -258,7 +258,7 @@
     <div class="form-group  col-md-12">
       <label>Acción</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
-        (change)="selAccion()">
+        (change)="selAccion()" id="slcaceptar">
         <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
       </select>
 
@@ -277,9 +277,9 @@
         <div class="input-group" style="width:100%">
           <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
             [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
-            [positionTarget]="buttonEl">
+            [positionTarget]="buttonEl" readonly>
           <div class="input-group-append">
-            <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+            <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button" id="btnplazo"></button>
           </div>
         </div>
       </div>
@@ -287,7 +287,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')">
+    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')" id="btnaceptar">
       <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
     <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
