@@ -195,7 +195,6 @@ export class SecretariaComponent implements OnInit {
     this.cargarAcciones(e)
     switch (e) {
       case 0:
-        
         this.clasificacion = false
         this.vministerial = false
         this.tministerial = '12'
@@ -204,14 +203,12 @@ export class SecretariaComponent implements OnInit {
         break
       case 1:
         this.clasificacion = false
-
         this.xAPI.funcion = 'WKF_CSubDocumento'
         this.xAPI.parametros = this.estadoActual + ',' + 2 + ',1'
         this.listarBuzon()
         break
       case 2:
         this.clasificacion = false
-
         this.xAPI.parametros = this.estadoActual + ',' + 3
         this.listarBuzon()
         break
@@ -244,6 +241,7 @@ export class SecretariaComponent implements OnInit {
       (data) => {
         
         data.Cuerpo.forEach(e => {
+          
           e.existe = e.anom == '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.completed = false

@@ -71,6 +71,10 @@ export class MinisterialComponent implements OnInit {
   public fecha = ''
   public cuenta = ''
   public unidad = ''
+  public comando = ''
+  public cedula = ''
+  public nombre = ''
+  public grado = ''
   public titulo = ''
   public archivos = []
   public download: any
@@ -183,10 +187,14 @@ export class MinisterialComponent implements OnInit {
   }
 
   listarDatos() {
-
+    console.error(this.ministerial)
     this.unidad = this.ministerial.udep
+    this.comando = this.ministerial.comando
     this.cuenta = this.ministerial.cuenta
-    this.fecha = this.ministerial.detalle
+    this.fecha = this.ministerial.fecha.substring(0,10) 
+    this.cedula = this.ministerial.cedula
+    this.nombre = this.ministerial.nombre
+    this.grado = this.ministerial.cargo
     this.asunto = this.ministerial.resumen
 
     this.xAPI.funcion = 'WKF_CSubDocVariante'
