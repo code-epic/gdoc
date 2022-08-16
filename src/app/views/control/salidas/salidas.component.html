@@ -174,7 +174,7 @@
                     </div>
 
                     <div class="col-md-2 texto-lista">
-                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.saso }}
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.saso | uppercase  }}
                         &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-4 texto-lista">

@@ -189,6 +189,7 @@ export class ArchivoComponent implements OnInit {
             {
               id: e.id,
               idd: e.idd,
+              saso: e.saso,
               numc: e.numc,
               completed: false,
               color: 'warn',

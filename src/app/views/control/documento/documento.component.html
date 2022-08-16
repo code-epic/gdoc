@@ -111,7 +111,9 @@
                         <div class="form-group col-md-{{camponumsalida}}" *ngIf="salidavisible">
                             <label for="txtSalida">{{salida}}</label>
                             <input type="txtSalida" class="form-control" value="{{Doc.salida}}"
-                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.salida">
+                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.salida"
+                                (blur) = "consultarDocumentoSalida()" id="txtsalida"
+                            >
                         </div>
                     </div>
                     <div class="form-row">
@@ -140,9 +142,9 @@
                                     <option value="0">Seleccione</option>
                                     <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
                                 </select>
-                                <div class="input-group-append">
-                                    <button *ngIf="!editar" type="button" class="btn btn-success">
-                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                <div class="input-group-append"  *ngIf="booDependencia">
+                                    <button type="button" class="btn btn-success" (click)="agregarDependencia()" id="btndependencia">
+                                        <i class="fa fa-plus" aria-hidden="true"  ></i>
                                     </button>
                                 </div>
                             </div>
@@ -155,15 +157,14 @@
                                 <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-12" >
+                        <div class="form-group col-md-12" *ngIf="booDependencia">
                             <table class="table align-items-center table-flush" style="width:100%">
                                 <thead class="thead-light">
                                     <th>Unidades o Dependencias Seleccionadas</th>
                                 </thead>
                                 <tbody>
-                                    <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
-                                        <td style="text-align:center;width:20px"></td>
-                                        <td>{{ el.cedula }}...</td>
+                                    <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstDependencias;let i=index">                            
+                                        <td>{{ el.nombre }}</td>
                                     </tr>
                                 </tbody>
                             </table>
