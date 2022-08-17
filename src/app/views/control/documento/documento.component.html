@@ -111,9 +111,7 @@
                         <div class="form-group col-md-{{camponumsalida}}" *ngIf="salidavisible">
                             <label for="txtSalida">{{salida}}</label>
                             <input type="txtSalida" class="form-control" value="{{Doc.salida}}"
-                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.salida"
-                                (blur) = "consultarDocumentoSalida()" id="txtsalida"
-                            >
+                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.salida" id="nsal">
                         </div>
                     </div>
                     <div class="form-row">
@@ -142,9 +140,9 @@
                                     <option value="0">Seleccione</option>
                                     <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
                                 </select>
-                                <div class="input-group-append"  *ngIf="booDependencia">
-                                    <button type="button" class="btn btn-success" (click)="agregarDependencia()" id="btndependencia">
-                                        <i class="fa fa-plus" aria-hidden="true"  ></i>
+                                <div class="input-group-append">
+                                    <button *ngIf="!editar" type="button" class="btn btn-success">
+                                        <i class="fa fa-plus" aria-hidden="true"></i>
                                     </button>
                                 </div>
                             </div>
@@ -157,19 +155,20 @@
                                 <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-12" *ngIf="booDependencia">
+                        <div class="form-group col-md-12">
                             <table class="table align-items-center table-flush" style="width:100%">
                                 <thead class="thead-light">
                                     <th>Unidades o Dependencias Seleccionadas</th>
                                 </thead>
                                 <tbody>
-                                    <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstDependencias;let i=index">                            
-                                        <td>{{ el.nombre }}</td>
+                                    <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
+                                        <td style="text-align:center;width:20px"></td>
+                                        <td>{{ el.nombre }}...</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        
+
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-12">
@@ -247,47 +246,62 @@
 
                             </div>
                         </div>
-                        <div class="form-group col-md-12" *ngIf="resolucion">
-                            <table class="table align-items-center table-flush" style="width:100%">
-                                <thead class="thead-light">
-                                    <th>N°</th>
-                                    <th [style.display]="puntocuenta?'':'none'">Cuenta</th>
-                                    <th [style.display]="puntocuenta?'':'none'">Resumen</th>
-                                    <th [style.display]="puntocuenta?'':'none'">Fecha</th>
-                                    <th>Cargo</th>
-                                    <th>Nombres y Apellidos</th>
-                                    <th>Cédula</th>
-                                </thead>
-                                <tbody>
-                                    <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
-                                        <td style="text-align:center;width:20px">
-
-                                            <div class="btn-group" role="group" aria-label="Basic"
-                                                *ngIf="el.activo == 0">
-                                                <button type="button" class="btn btn-primary btn-sm"
-                                                    (click)="selEditarCuenta( i )"><i class="fa fa-edit"
-                                                        aria-hidden="true"></i></button>
-                                                <button type="button" class="btn btn-danger btn-sm"
-                                                    (click)="eliminarCuenta( i )"><i class="fa fa-trash"
-                                                        aria-hidden="true"></i></button>
+                        <div class="form-group col-md-12">
+                            <mat-accordion class="example-headers-align" *ngIf="resolucion">
+                                <mat-expansion-panel [ngModelOptions]="{standalone: true}"
+                                    *ngFor="let el of lstCuenta;let i=index" >
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            <div class="form-row col-md-12 text-center">
+                                                <div class="form-group col-md-3 texto-lista"
+                                                    [style.display]="puntocuenta?'':'none'">
+                                                    {{ el.cuenta }}
+                                                </div>
+                                                <div class="form-group col-md-7 texto-lista"
+                                                    [style.display]="puntocuenta?'':'none'">
+                                                    {{ el.resumen }}
+                                                </div>
+                                                <div class="form-group col-md-2 texto-lista"
+                                                    [style.display]="puntocuenta?'':'none'">
+                                                    {{ el.fecha }}
+                                                </div>
                                             </div>
-                                            <button *ngIf="el.activo != 0" type="button" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-                                                &nbsp;&nbsp;En Proceso </button>
-                                        </td>
-                                        <td [style.display]="puntocuenta?'':'none'">{{ el.cuenta }}</td>
-                                        <td [style.display]="puntocuenta?'':'none'">{{ el.resumen.substring(0,20) }}...
-                                        </td>
-                                        <td [style.display]="puntocuenta?'':'none'">{{ el.fecha.substring(0,10) }}</td>
-                                        <td>{{ el.cargo.substring(0,20) }}...</td>
-                                        <td>{{ el.nmilitar.substring(0,25) }}...</td>
-                                        <td>{{ el.cedula }}</td>
-                                    </tr>
+                                        </mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="form-row col-md-12 text-center">
+                                        <div class="form-group col-md-2 texto-lista">
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                (click)="selEditarCuenta( i )"><i class="fa fa-edit"
+                                                    aria-hidden="true"></i></button>
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                (click)="eliminarCuenta( i )"><i class="fa fa-trash"
+                                                    aria-hidden="true"></i></button>
+                                        </div>
+                                        <div class="form-group col-md-3 texto-lista ">
+                                            {{ el.cargo }}
+                                        </div>
+                                        <div class="form-group col-md-3 texto-lista">
+                                            {{ el.nmilitar }}
+                                        </div>
+                                        <div class="form-group col-md-2 texto-lista">
+                                            {{ el.cedula }}
+                                        </div>
+                                        <div class="form-group col-md-1">
+                                            <mat-checkbox class="example-margin texto-lista" id="check">
+                                            </mat-checkbox>
+                                        </div>
+                                        <div class="form-group col-md-1">
+                                            <mat-checkbox class="example-margin texto-lista" id="check">
+                                            </mat-checkbox>
 
-                                </tbody>
-                            </table>
+                                        </div>
+                                    </div>
+                                </mat-expansion-panel>
+                                
+                            </mat-accordion>
 
                         </div>
+
                     </div>
 
 
