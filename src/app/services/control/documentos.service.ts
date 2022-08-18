@@ -28,7 +28,7 @@ export interface IDocumento {
   traza?: string
   subdocumento?: string
   hz_adjunto?: string
-  dependencias?: string
+
 }
 
 
@@ -60,13 +60,6 @@ export interface IWKFCuenta {
   fecha?: string
   cuenta?: string
   usuario?: string
-}
-
-//IWKFDependencia del WorkFlow
-export interface IWKFDependencia {
-  documento?: number
-  nombre?: string
-  observacion?: string
 }
 
 

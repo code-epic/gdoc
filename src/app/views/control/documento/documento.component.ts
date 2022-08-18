@@ -7,12 +7,11 @@ import { NgxUiLoaderService } from 'ngx-ui-loader'
 import Swal from 'sweetalert2'
 
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service'
-import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta, IWKFDependencia } from 'src/app/services/control/documentos.service'
+import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta } from 'src/app/services/control/documentos.service'
 import { LoginService } from 'src/app/services/seguridad/login.service'
 import { UtilService } from 'src/app/services/util/util.service'
 
 import { Location } from '@angular/common';
-import { Console } from 'console';
 
 
 @Component({
@@ -71,7 +70,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public puntocuenta: boolean = false
   public salidavisible: boolean = true
   public resolucion: boolean = false
-  public activarMensaje = false
 
   public detalle: string = ''
 
@@ -109,11 +107,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     activo: 0
   }
 
-  public WKDependencia: IWKFDependencia = {
-    documento: 0,
-    nombre: '',
-    observacion: ''
-  }
 
   public Doc: IDocumento = {
     ncontrol: '',
@@ -133,29 +126,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     creador: '',
     archivo: '',
     privacidad: 0,
-    subdocumento: '',
-    dependencias: '',
-  }
-  public DocSalida: IDocumento = {
-    ncontrol: '',
-    wfdocumento: 0,
-    fcreacion: '',
-    forigen: '',
-    norigen: '',
-    salida: '',
-    tipo: '0',
-    remitente: '0',
-    unidad: '0',
-    comando: '0',
-    contenido: '',
-    instrucciones: '',
-    codigo: '0',
-    nexpediente: '',
-    creador: '',
-    archivo: '',
-    privacidad: 0,
-    subdocumento: '',
-    dependencias: '',
+    subdocumento: ''
   }
 
   public WAlerta: IWKFAlerta = {
@@ -174,7 +145,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstC = [] //Objeto Comando
   public lstCA = [] //Objeto Comando
   public lstCuenta = [] //Objeto Unidad
-  public lstDependencias = []
 
   public lstHzAdjunto = [] //Historico de documentos adjuntos
   public lstTraza = []
@@ -185,7 +155,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public download: any
 
   public bHist = false
-  public booDependencia = false
 
   public Componentes: any
   public Grados: any
@@ -225,7 +194,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       var id = this.rutaActiva.snapshot.params.id
       if (id == 'salida') {
         this.titulo = 'Salida'
-        this.booDependencia = true
         this.estadoActual = 9
         this.estadoOrigen = 2
         this.ncontrolv = false
@@ -340,6 +308,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         data.Cuerpo.forEach(e => {
+
           this.Doc = e
           this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
           this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
@@ -351,6 +320,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.WAlerta.estatus = this.estadoOrigen
             this.WAlerta.usuario = this.loginService.Usuario.id
           }
+
+
+
         });
 
         this.selTipoDocumento()
@@ -366,9 +338,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
         this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
 
-        const dependencias = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
-        this.lstDependencias = dependencias.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        if (this.lstDependencias.length > 0) this.booDependencia = true
         //Carga de Documentos
         this.bPDF = this.Doc.archivo != "" ? true : false
         this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
@@ -436,11 +405,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.ngxService.startLoader("loader-aceptar")
     this.obtenerWorkFlow() //Obtener valores de una API
 
-    if (this.rutaActiva.snapshot.params.numc != undefined) {
+    if (this.rutaActiva.snapshot.params.id != undefined) {
       this.actualizarDocumentos()
-      return
-    } else if (this.rutaActiva.snapshot.params.id != undefined && this.rutaActiva.snapshot.params.id != 'salida') {
-      this.actualizarDocumentos()
+
+
       return
     } else if (this.validarCamposObligatorios()) {
       this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Documentos`)
@@ -472,16 +440,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
             if (cant > 0) {
               this.salvarCuentas(this.Doc.wfdocumento)
-            } else {
-              this.aceptar(this.Doc.ncontrol)
-              this.limpiarDoc()
-              this.ngxService.stopLoader("loader-aceptar")
-            }
-
-            const cantdep = this.lstDependencias.length
-
-            if (cantdep > 0) {
-              this.salvarDependencias(this.Doc.wfdocumento)
             } else {
               this.aceptar(this.Doc.ncontrol)
               this.limpiarDoc()
@@ -556,8 +514,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   protected aceptar(msj: string) {
-    if (this.activarMensaje) return false
-    this.activarMensaje = true
     Swal.fire({
       title: 'El Documento Registrado es # ' + msj,
       text: "¿Desea registar otro documento?",
@@ -590,8 +546,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
       return
     }
-    let wfd = this.Doc.wfdocumento
-    // console.info(this.Doc)
+
     this.Doc.fcreacion = typeof this.fcreacion === 'object' ? this.utilService.ConvertirFecha(this.fcreacion) : this.Doc.fcreacion.substring(0, 10)
     this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10)
     this.Doc.creador = this.loginService.Usuario.id
@@ -617,7 +572,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         if (this.rutaActiva.snapshot.params.id != undefined && this.rutaActiva.snapshot.params.id == 'salida') {
           this.insertarObservacion()
-          this.salvarDependencias(wfd)
+
         } else {
           this.ruta.navigate(['/registrar']);
         }
@@ -634,8 +589,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   }
-
-
 
   insertarObservacion() {
     const usuario = this.loginService.Usuario.id
@@ -690,19 +643,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       }) //
   }
 
-
-  agregarDependencia(): IWKFDependencia {
-    let validar = false
-
-    const dependencia: IWKFDependencia = {
-      documento: 0,
-      nombre: this.Doc.unidad.toUpperCase(),
-    }
-
-    this.lstDependencias.push(dependencia)
-
-    return dependencia
-  }
 
   agregarCuenta(): IWKFCuenta {
     let validar = false
@@ -812,6 +752,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   async salvarCuentas(numc: number) {
 
     const cant = this.lstCuenta.length
+    console.log('entrando en confianza... ', cant)
+    console.log('entrando en confianza... ', this.lstCuenta)
     if (cant == 0) {
       this.ngxService.stopLoader("loader-aceptar")
       return
@@ -841,38 +783,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       )
     }
   }
-
-  async salvarDependencias(numc: number) {
-
-    const cant = this.lstDependencias.length
-    if (cant == 0) {
-      this.ngxService.stopLoader("loader-aceptar")
-      return
-    } else {
-      this.xAPI.funcion = 'WKF_IDocumentoDependencia'
-      this.xAPI.valores = ''
-      this.xAPI.parametros = numc + ',' + this.lstDependencias[0].nombre
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.lstDependencias.splice(0, 1)
-          const c = this.lstDependencias.length
-          if (c == 0) {
-            this.ngxService.stopLoader("loader-aceptar")
-            this.aceptar(this.Doc.ncontrol)
-            this.limpiarDoc()
-          } else {
-            this.salvarDependencias(numc)
-          }
-        },
-        (errot) => {
-          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`)
-          this.ngxService.stopLoader("loader-aceptar")
-        }
-      )
-    }
-  }
-
-
 
 
 
@@ -945,61 +855,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     )
 
   }
-
-
-
-  /**
-   * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
-   * @param numBase64  : base64
-   */
-   async consultarDocumentoSalida() {
-    
-    this.xAPI.funcion = 'WKF_CDocumentoDetalleSalida'
-    this.xAPI.parametros = '9,1,' + this.Doc.salida
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        data.Cuerpo.forEach(e => {
-          this.DocSalida = e
-          this.fcreacionDate = NgbDate.from(this.formatter.parse(this.DocSalida.fcreacion.substring(0, 10)))
-          this.forigenDate = NgbDate.from(this.formatter.parse(this.DocSalida.forigen.substring(0, 10)))
-          if (e.alerta != null) {
-            this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
-            this.WAlerta.activo = 1
-            this.WAlerta.documento = this.DocSalida.wfdocumento
-            this.WAlerta.estado = this.estadoActual
-            this.WAlerta.estatus = this.estadoOrigen
-            this.WAlerta.usuario = this.loginService.Usuario.id
-          }
-        });
-
-        const punto_cuenta = this.DocSalida.subdocumento != null ? JSON.parse(this.DocSalida.subdocumento) : []
-        this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const traza = this.DocSalida.traza != null ? JSON.parse(this.DocSalida.traza) : []
-        this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const historial = this.DocSalida.historial != null ? JSON.parse(this.DocSalida.historial) : []
-        this.lstHistorial = historial.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const hz_adjunto = this.DocSalida.hz_adjunto != null ? JSON.parse(this.DocSalida.hz_adjunto) : []
-        this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const dependencias = this.DocSalida.dependencias != null ? JSON.parse(this.DocSalida.dependencias) : []
-        this.lstDependencias = dependencias.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        if (this.lstDependencias.length > 0) this.booDependencia = true
-        
-        console.log( this.DocSalida )
-
-      },
-      (error) => {
-        console.error(error)
-      }
-    )
-  }
-
-
-
 
 
   ngOnDestroy(): void {
