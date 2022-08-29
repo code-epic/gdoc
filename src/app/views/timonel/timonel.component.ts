@@ -8,6 +8,8 @@ import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader'
+import { UtilService } from 'src/app/services/util/util.service';
+import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 
 
 
@@ -60,6 +62,27 @@ export class TimonelComponent implements OnInit {
 
   public AccionTexto: string = '0'
 
+
+
+
+  public extender_plazo: any
+  public cmbAcciones = [
+    { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '0' }]
+  public lstAcciones = []
+  public vplazo = false
+  public clasificacion = false
+  public cmbDestino = 'S'
+  public WAlerta: IWKFAlerta = {
+    documento: 0,
+    estado: 0,
+    estatus: 0,
+    activo: 0,
+    fecha: '',
+    usuario: '',
+    observacion: ''
+  }
+  public placement = 'bottom'
+
   constructor(
     private apiService: ApiService,
     config: NgbModalConfig,
@@ -67,6 +90,7 @@ export class TimonelComponent implements OnInit {
     private toastrService: ToastrService,
     private loginService: LoginService,
     private ngxService: NgxUiLoaderService,
+    private utilService: UtilService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
@@ -93,6 +117,8 @@ export class TimonelComponent implements OnInit {
     this.xAPI.funcion = 'WKF_CDocumentos'
     this.xAPI.valores = ''
     this.selNav = e
+    this.clasificacion = false
+    this.cargarAcciones(e)
 
     switch (e) {
       case 0:
@@ -140,33 +166,14 @@ export class TimonelComponent implements OnInit {
       (data) => {
         console.log(data)
         data.Cuerpo.forEach(e => {
-
-          var existe = e.anom == '' ? true : false
-          var privado = e.priv == 1 ? true : false
-          const cuenta = e.cuenta != undefined ? e.cuenta : ''
-          const resumen = e.resumen != undefined ? e.resumen : ''
-          const detalle = e.detalle != undefined ? e.detalle : ''
-
-          bz.push({
-              id: e.id,
-              idd: e.idd,
-              numc: e.numc,
-              completed: false,
-              color: 'warn',
-              nori: e.nori,
-              tdoc: e.tdoc,
-              fcre: e.fcre,
-              remi: e.remi,
-              udep: e.udep,
-              anom: e.anom,
-              priv: privado,
-              cuenta: cuenta,
-              resumen: resumen,
-              detalle: detalle,
-              existe: existe
-          })
-
+          e.existe = e.anom == '' ? true : false
+          e.privado = e.priv == 1 ? true : false
+          e.completed = false
+          //e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
+          e.color = 'warn'
+          bz.push(e)
         })//Registros recorridos como elementos
+
 
         this.lengthOfi = data.Cuerpo.length
         if (this.lengthOfi > 0) {
@@ -182,7 +189,34 @@ export class TimonelComponent implements OnInit {
     )
   }
 
+  async listarSubDocumentos() {
 
+    this.xAPI.funcion = 'WKF_CSubDocumento'
+    this.xAPI.parametros = '4,2,9'
+
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        data.Cuerpo.forEach(e => {
+          e.completed = false
+          e.color = 'warn'
+          e.nori = e.cuenta
+          e.cuentas = e.cuenta == '' ? '' : e.cuenta
+          e.priv = e.priv == 1 ? true : false
+          e.existe = e.anom == '' ? true : false
+          e.xaccion = e.accion
+          this.bzOriginal.push(e)
+        }) //Registros recorridos como elementos
+        this.lengthOfi = data.Cuerpo.length
+        if (this.lengthOfi > 0) {
+          this.estilocheck = ''
+          this.recorrerElementos(0)
+        }
+      },
+      (error) => {
+
+      }
+    )
+  }
 
   pageChangeEvent(e) {
     this.pageSize = e.pageSize
@@ -216,17 +250,29 @@ export class TimonelComponent implements OnInit {
     let pag = this.pageSize * pagina
     this.buzon = this.bzOriginal.slice(pag, pag + this.pageSize)
 
+
+
   }
   //editar
   editar(id: string) {
     const estado = this.estadoActual
-    const estatus = this.selNav + 1 
+    const estatus = this.selNav + 1
     const base = btoa(estado + ',' + estatus + ',' + id)
     this.ruta.navigate(['/documento', base])
   }
 
+
   insertarObservacion() {
-    var usuario = this.loginService.Usuario.id
+
+
+    if (this.AccionTexto == "S") {
+      this.toastrService.warning(
+        'Debe seleccionar una accion ',
+        `GDoc Wkf.DocumentoObservacion`
+      )
+      return false
+    }
+    const usuario = this.loginService.Usuario.id
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify(
       {
@@ -238,38 +284,108 @@ export class TimonelComponent implements OnInit {
         "usuario": usuario
       }
     )
+
+
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.toastrService.success(
-          'Se ha promovido el documento',
-          `GDoc Wkf.DocumentoObservacion`
-        )
-        this.promoverBuzon()
+      async data => {
+        switch (this.AccionTexto) {
+
+          case "6":// Enviar a otras areas
+            this.redistribuir(0)
+            break
+          case "7"://Enviar a salida con bifurcacion
+            this.redistribuir(9)
+            break
+          default:
+            this.toastrService.warning(
+              'Debe seleccionar una accion ',
+              `GDoc Wkf.DocumentoObservacion`
+            )
+            break
+        }
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
       }) //
   }
 
-  async promoverBuzon() {
-    var usuario = this.loginService.Usuario.id
-    var i = 0
-    var estatus = 1 //NOTA DE ENTREGA
-    //Buscar en Wk de acuerdo al usuario y la app activa
-    this.xAPI.funcion = 'WKF_APromoverEstatus'
+
+  async redistribuir(destino: number = 0) {
+    var dst = destino != 0 ? destino : this.cmbDestino
+
+    this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
-    this.xAPI.parametros = `${estatus},${usuario},${this.numControl}`
+    this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
+    console.log(this.xAPI.parametros)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
+        this.toastrService.success(
+          'El documento ha sido redistribuido segun su selección',
+          `GDoc Wkf.DocumentoObservacion`
+        )
         this.seleccionNavegacion(this.selNav)
-        this.Observacion = ''
-        this.numControl = '0'
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  }
+
+  //Guardar la alerte define el momento y estadus
+  guardarAlerta(activo: number, fecha: string) {
+    this.WAlerta.activo = activo
+    this.WAlerta.documento = parseInt(this.numControl)
+    this.WAlerta.estado = this.estadoActual
+    this.WAlerta.estatus = this.selNav + 1
+    this.WAlerta.usuario = this.loginService.Usuario.id
+    this.WAlerta.observacion = this.Observacion.toUpperCase()
+    this.WAlerta.fecha = fecha
+
+    this.xAPI.funcion = 'WKF_AAlertas'
+    this.xAPI.parametros = ''
+    console.log(this.WAlerta);
+    this.xAPI.valores = JSON.stringify(this.WAlerta)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async alerData => {
+        console.log(alerData)
       },
       (errot) => {
-        this.toastrService.error(errot, `GDoc Wkf.PromoverDocumento`);
+        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
       }) //
+  }
 
+  async cargarAcciones(posicion) {
+    this.lstAcciones = []
+    this.lstAcciones = this.cmbAcciones.filter(e => { return e.visible == posicion });
+  }
+
+
+  selAccion() {
+    this.clasificacion = false
+    this.vplazo = true
+    switch (this.AccionTexto) {
+      case '0':
+        this.vplazo = false
+        break;
+      case '1':
+        this.vplazo = false
+        break;
+
+      case '6':
+        this.clasificacion = true
+        break;
+      default:
+        break;
+    }
+  }
+
+  //Consultar un enlace
+  constancia(id: string) {
+    const estado = 1
+    const estatus = 1
+    return btoa(estado + ',' + estatus + ',' + id)
   }
 
 

@@ -952,7 +952,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
    * @param numBase64  : base64
    */
-   async consultarDocumentoSalida() {
+   async consultarDocumentoSalidaOLD() {
     
     this.xAPI.funcion = 'WKF_CDocumentoDetalleSalida'
     this.xAPI.parametros = '9,1,' + this.Doc.salida
@@ -1000,6 +1000,66 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
 
+
+
+
+  /**
+   * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
+   * @param numBase64  : base64
+   */
+   async consultarDocumentoSalida() {
+
+    this.xAPI.funcion = 'WKF_CDocumentoDetalleSalida'
+    this.xAPI.parametros = '9,1,' + this.Doc.salida
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async data => {
+        data.Cuerpo.forEach(e => {
+          this.Doc = e
+          this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
+          this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
+          if (e.alerta != null) {
+            this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
+            this.WAlerta.activo = 1
+            this.WAlerta.documento = this.Doc.wfdocumento
+            this.WAlerta.estado = this.estadoActual
+            this.WAlerta.estatus = this.estadoOrigen
+            this.WAlerta.usuario = this.loginService.Usuario.id
+          }
+          console.log(this.Doc)
+          this.Doc.ncontrol = ''
+        });
+
+        this.selTipoDocumento()
+        const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
+        this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+
+        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
+        this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+
+        const historial = this.Doc.historial != null ? JSON.parse(this.Doc.historial) : []
+        this.lstHistorial = historial.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+
+        const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
+        this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+
+        const dependencias = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
+        this.lstDependencias = dependencias.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        if (this.lstDependencias.length > 0) this.booDependencia = true
+        //Carga de Documentos
+        this.bPDF = this.Doc.archivo != "" ? true : false
+        this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
+
+        this.activarTipo = this.validarTipoDoc()
+
+        // this.serializar =  btoa( JSON.stringify(this.Doc.norigen))
+        // console.log( this.serializar)
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+  }
 
 
   ngOnDestroy(): void {
