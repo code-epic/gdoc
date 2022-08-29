@@ -126,11 +126,8 @@
                     <div class="col-md-2 texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }}
                     </div>
-                    <div class="col-md-4 texto-lista">
-                      {{ e.udep | uppercase }}
-                    </div>
-                    <div class="col-md-1 texto-lista">
-                      {{ e.observacion_accion | uppercase }}
+                    <div class="col-md-5 texto-lista">
+                      {{ e.udep | uppercase }} ({{ e.observacion_accion | uppercase }})
                     </div>
                     <div class="col-md-2 text-right">
                       <button mat-icon-button aria-label="Privado">
@@ -169,12 +166,12 @@
                   <div class="row">
                     <div class="col-md-1">
                       <button mat-icon-button aria-label="Visibilidad">
-                        <mat-icon class="text-primary" (click)="open(observacion, e.idd)">add_circle</mat-icon>
+                        <mat-icon class="text-warning" (click)="open(observacion, e.idd)">logout</mat-icon>
                       </button>
                     </div>
 
                     <div class="col-md-2 texto-lista">
-                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.saso }}
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.saso | uppercase }}
                         &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-4 texto-lista">

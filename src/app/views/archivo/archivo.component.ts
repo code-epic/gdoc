@@ -177,33 +177,14 @@ export class ArchivoComponent implements OnInit {
   async listarBuzon(bz: any) {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-
         console.log(data)
-
         data.Cuerpo.forEach(e => {
-
-          var existe = e.anom == '' ? true : false
-          var privado = e.priv == 1 ? true : false
-          console.log(e)
-          bz.push(
-            {
-              id: e.id,
-              idd: e.idd,
-              numc: e.numc,
-              completed: false,
-              color: 'warn',
-              nori: e.nori,
-              tdoc: e.tdoc,
-              fcre: e.fcre,
-              remi: e.remi,
-              udep: e.udep,
-              anom: e.anom,
-              priv: privado,
-              existe: existe,
-              xaccion: e.accion
-            }
-          )
-
+          e.existe = e.anom == '' ? true : false
+          e.privado =  false
+          e.completed = false
+          //e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
+          e.color = 'warn'
+          bz.push(e)
         })//Registros recorridos como elementos
 
         this.lengthOfi = data.Cuerpo.length

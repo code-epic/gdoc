@@ -57,9 +57,9 @@
 
         <mat-tab-group>
           <mat-tab>
-            <!-- <ng-template mat-tab-label>
-            &nbsp;ARCHIVADOS
-            </ng-template> -->
+             <ng-template mat-tab-label>
+            &nbsp;ARCHIVOS EN PROCESO
+            </ng-template> 
 
             <div class="container">
               <mat-selection-list #lstDocumentos>
@@ -67,9 +67,9 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Example " class="text-primary"
+                      <button mat-icon-button aria-label="Example " class="text-success"
                         (click)="open(observacion, e.idd)">
-                        <mat-icon>add_circle</mat-icon>
+                        <mat-icon>room_preferences</mat-icon>
                       </button>
                     </div>
                     <div class="col-md-2 texto-lista">
@@ -82,15 +82,10 @@
                     <div class="col-md-2 texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }}
                     </div>
-                    <div class="col-md-4 texto-lista">
-                      {{ e.udep | uppercase }}
+                    <div class="col-md-5 texto-lista">
+                      {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
                     </div>
-                    <div class="col-md-1 text-right">
-                      <button mat-icon-button aria-label="Privado">
-                        <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
-                      </button>
-
-                    </div>
+                    
                   </div>
                 </mat-list>
               </mat-selection-list>

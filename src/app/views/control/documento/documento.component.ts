@@ -184,6 +184,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstImg = []
   public lstDependencias = []
   public titulo = 'Documento'
+  public nasociacion = ''
 
   public download: any
 
@@ -327,6 +328,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.Doc.creador = ''
     this.fcreacionDate = NgbDate.from(this.formatter.parse(dia))
     this.fcreacion = dia
+    this.nasociacion = ''
   }
 
   /**
@@ -933,7 +935,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    * @param numBase64  : base64
    */
   async consultarDocumentoSalida() {
-
+    if ( this.Doc.salida == '') return false
+    let dwf = ''
+    if ( this.Doc.norigen != '') dwf = this.Doc.norigen
     this.xAPI.funcion = 'WKF_CDocumentoDetalleSalida'
     this.xAPI.parametros = '9,1,' + this.Doc.salida
     this.xAPI.valores = ''
@@ -951,13 +955,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.WAlerta.estatus = this.estadoOrigen
             this.WAlerta.usuario = this.loginService.Usuario.id
           }
-          console.log(this.Doc)
+          this.nasociacion = this.Doc.ncontrol
           this.Doc.ncontrol = ''
         });
-        console.log(this.Doc)
+
+        this.Doc.norigen = dwf
         this.selTipoDocumento()
         const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
         this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        console.log(this.lstCuenta)
 
         const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
         this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
@@ -970,7 +976,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         const dependencias = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
         this.lstDependencias = dependencias.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        if (this.lstDependencias.length > 0) this.booDependencia = true
+        
         //Carga de Documentos
         this.bPDF = this.Doc.archivo != "" ? true : false
         this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
