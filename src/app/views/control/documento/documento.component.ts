@@ -7,12 +7,11 @@ import { NgxUiLoaderService } from 'ngx-ui-loader'
 import Swal from 'sweetalert2'
 
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service'
-import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta, IWKFDependencia } from 'src/app/services/control/documentos.service'
+import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta, IWKFDependencia} from 'src/app/services/control/documentos.service'
 import { LoginService } from 'src/app/services/seguridad/login.service'
 import { UtilService } from 'src/app/services/util/util.service'
 
 import { Location } from '@angular/common';
-import { Console } from 'console';
 
 
 @Component({
@@ -109,11 +108,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     activo: 0
   }
 
-  public WKDependencia: IWKFDependencia = {
-    documento: 0,
-    nombre: '',
-    observacion: ''
-  }
 
   public Doc: IDocumento = {
     ncontrol: '',
@@ -134,8 +128,25 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     archivo: '',
     privacidad: 0,
     subdocumento: '',
-    dependencias: '',
+    dependencias: ''
   }
+
+  public WAlerta: IWKFAlerta = {
+    documento: 0,
+    estado: 0,
+    estatus: 0,
+    activo: 0,
+    fecha: '',
+    usuario: '',
+    observacion: ''
+  }
+
+  public WKDependencia: IWKFDependencia = {
+    documento: 0,
+    nombre: '',
+    observacion: ''
+  }
+
   public DocSalida: IDocumento = {
     ncontrol: '',
     wfdocumento: 0,
@@ -158,15 +169,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     dependencias: '',
   }
 
-  public WAlerta: IWKFAlerta = {
-    documento: 0,
-    estado: 0,
-    estatus: 0,
-    activo: 0,
-    fecha: '',
-    usuario: '',
-    observacion: ''
-  }
+  public booDependencia = false
 
   public lstT = [] //Objeto Tipo documento
   public lstR = [] //Objeto Remitente
@@ -174,18 +177,17 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public lstC = [] //Objeto Comando
   public lstCA = [] //Objeto Comando
   public lstCuenta = [] //Objeto Unidad
-  public lstDependencias = []
 
   public lstHzAdjunto = [] //Historico de documentos adjuntos
   public lstTraza = []
   public lstHistorial = []
   public lstImg = []
+  public lstDependencias = []
   public titulo = 'Documento'
 
   public download: any
 
   public bHist = false
-  public booDependencia = false
 
   public Componentes: any
   public Grados: any
@@ -194,7 +196,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public serializar: string = ""
 
   public activarTipo = false // activar tipo de documento
-
   public xAPI: IAPICore = {
     funcion: ''
 
@@ -340,6 +341,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         data.Cuerpo.forEach(e => {
+
           this.Doc = e
           this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
           this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
@@ -351,6 +353,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.WAlerta.estatus = this.estadoOrigen
             this.WAlerta.usuario = this.loginService.Usuario.id
           }
+
+
+
         });
 
         this.selTipoDocumento()
@@ -366,9 +371,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
         this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
 
-        const dependencias = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
-        this.lstDependencias = dependencias.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        if (this.lstDependencias.length > 0) this.booDependencia = true
         //Carga de Documentos
         this.bPDF = this.Doc.archivo != "" ? true : false
         this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
@@ -422,17 +424,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   //registrar Un documento pasando por el WorkFlow
   registrar() {
 
-
-    // const comparar = btoa( JSON.stringify(this.Doc.norigen) )
-    //   console.info( comparar)
-
-    //   if ( this.serializar == comparar ){
-    //     alert('Son iguales')
-    //     return
-    //   }else{
-    //     return
-    //   }
-
     this.ngxService.startLoader("loader-aceptar")
     this.obtenerWorkFlow() //Obtener valores de una API
 
@@ -477,7 +468,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
               this.limpiarDoc()
               this.ngxService.stopLoader("loader-aceptar")
             }
-
             const cantdep = this.lstDependencias.length
 
             if (cantdep > 0) {
@@ -591,7 +581,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       return
     }
     let wfd = this.Doc.wfdocumento
-    // console.info(this.Doc)
+
     this.Doc.fcreacion = typeof this.fcreacion === 'object' ? this.utilService.ConvertirFecha(this.fcreacion) : this.Doc.fcreacion.substring(0, 10)
     this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10)
     this.Doc.creador = this.loginService.Usuario.id
@@ -618,6 +608,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         if (this.rutaActiva.snapshot.params.id != undefined && this.rutaActiva.snapshot.params.id == 'salida') {
           this.insertarObservacion()
           this.salvarDependencias(wfd)
+
         } else {
           this.ruta.navigate(['/registrar']);
         }
@@ -634,8 +625,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   }
-
-
 
   insertarObservacion() {
     const usuario = this.loginService.Usuario.id
@@ -689,6 +678,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
       }) //
   }
+
 
 
   agregarDependencia(): IWKFDependencia {
@@ -808,40 +798,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
-
-  async salvarCuentas(numc: number) {
-
-    const cant = this.lstCuenta.length
-    if (cant == 0) {
-      this.ngxService.stopLoader("loader-aceptar")
-      return
-    } else {
-      this.xAPI.funcion = 'WKF_ISubDocumento'
-      this.xAPI.parametros = ''
-      this.lstCuenta[0].documento = numc
-      this.xAPI.valores = JSON.stringify(this.lstCuenta[0])
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.lstCuenta.splice(0, 1)
-          const c = this.lstCuenta.length
-          if (c == 0) {
-            this.ngxService.stopLoader("loader-aceptar")
-            this.aceptar(this.Doc.ncontrol)
-            this.limpiarDoc()
-          } else {
-            this.salvarCuentas(numc)
-          }
-        },
-        (errot) => {
-          this.aceptar(this.Doc.ncontrol)
-          this.limpiarDoc()
-          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`)
-          this.ngxService.stopLoader("loader-aceptar")
-        }
-      )
-    }
-  }
-
   async salvarDependencias(numc: number) {
 
     const cant = this.lstDependencias.length
@@ -873,8 +829,40 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
 
+  async salvarCuentas(numc: number) {
 
-
+    const cant = this.lstCuenta.length
+    console.log('entrando en confianza... ', cant)
+    console.log('entrando en confianza... ', this.lstCuenta)
+    if (cant == 0) {
+      this.ngxService.stopLoader("loader-aceptar")
+      return
+    } else {
+      this.xAPI.funcion = 'WKF_ISubDocumento'
+      this.xAPI.parametros = ''
+      this.lstCuenta[0].documento = numc
+      this.xAPI.valores = JSON.stringify(this.lstCuenta[0])
+      await this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+          this.lstCuenta.splice(0, 1)
+          const c = this.lstCuenta.length
+          if (c == 0) {
+            this.ngxService.stopLoader("loader-aceptar")
+            this.aceptar(this.Doc.ncontrol)
+            this.limpiarDoc()
+          } else {
+            this.salvarCuentas(numc)
+          }
+        },
+        (errot) => {
+          this.aceptar(this.Doc.ncontrol)
+          this.limpiarDoc()
+          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`)
+          this.ngxService.stopLoader("loader-aceptar")
+        }
+      )
+    }
+  }
 
 
   selTipoDocumento() {
@@ -889,18 +877,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-
-
-
   //Listar los archivos asociados al documento
   verArchivos(content) {
     // this.lstImg.push({ a: 1 })
     this.modalService.open(content, { size: 'lg' })
 
   }
-
 
   /**
    * Consultar datos generales del militar 
@@ -946,68 +928,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
-
-
   /**
    * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
    * @param numBase64  : base64
    */
-   async consultarDocumentoSalidaOLD() {
-    
-    this.xAPI.funcion = 'WKF_CDocumentoDetalleSalida'
-    this.xAPI.parametros = '9,1,' + this.Doc.salida
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        data.Cuerpo.forEach(e => {
-          this.DocSalida = e
-          this.fcreacionDate = NgbDate.from(this.formatter.parse(this.DocSalida.fcreacion.substring(0, 10)))
-          this.forigenDate = NgbDate.from(this.formatter.parse(this.DocSalida.forigen.substring(0, 10)))
-          if (e.alerta != null) {
-            this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
-            this.WAlerta.activo = 1
-            this.WAlerta.documento = this.DocSalida.wfdocumento
-            this.WAlerta.estado = this.estadoActual
-            this.WAlerta.estatus = this.estadoOrigen
-            this.WAlerta.usuario = this.loginService.Usuario.id
-          }
-        });
-
-        const punto_cuenta = this.DocSalida.subdocumento != null ? JSON.parse(this.DocSalida.subdocumento) : []
-        this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const traza = this.DocSalida.traza != null ? JSON.parse(this.DocSalida.traza) : []
-        this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const historial = this.DocSalida.historial != null ? JSON.parse(this.DocSalida.historial) : []
-        this.lstHistorial = historial.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const hz_adjunto = this.DocSalida.hz_adjunto != null ? JSON.parse(this.DocSalida.hz_adjunto) : []
-        this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const dependencias = this.DocSalida.dependencias != null ? JSON.parse(this.DocSalida.dependencias) : []
-        this.lstDependencias = dependencias.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        if (this.lstDependencias.length > 0) this.booDependencia = true
-        
-        console.log( this.DocSalida )
-
-      },
-      (error) => {
-        console.error(error)
-      }
-    )
-  }
-
-
-
-
-
-
-  /**
-   * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
-   * @param numBase64  : base64
-   */
-   async consultarDocumentoSalida() {
+  async consultarDocumentoSalida() {
 
     this.xAPI.funcion = 'WKF_CDocumentoDetalleSalida'
     this.xAPI.parametros = '9,1,' + this.Doc.salida
@@ -1029,7 +954,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           console.log(this.Doc)
           this.Doc.ncontrol = ''
         });
-
+        console.log(this.Doc)
         this.selTipoDocumento()
         const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
         this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })

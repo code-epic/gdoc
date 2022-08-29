@@ -62,13 +62,6 @@ export interface IWKFCuenta {
   usuario?: string
 }
 
-//IWKFDependencia del WorkFlow
-export interface IWKFDependencia {
-  documento?: number
-  nombre?: string
-  observacion?: string
-}
-
 
 //Alerta de documentos
 export interface IWKFAlerta {
@@ -107,6 +100,12 @@ export interface Resolucion {
   cargo_responsable: string
 }
 
+//IWKFDependencia del WorkFlow
+export interface IWKFDependencia {
+  documento?: number
+  nombre?: string
+  observacion?: string
+}
 
 @Injectable({
   providedIn: 'root'
