@@ -1,107 +1,154 @@
-
-
-
-<div class="header bg-gradient-red pb-8 pt-4 pt-md-8">
-    <div class="container-fluid">
-      <p></p>
-      </div>
+<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <p></p>
   </div>
-  
-  
-  
-  
-  
-  
-  
-  <div class="container-fluid mt--9">
-    <div class="row">
-      <div class="col-xl-12 col-md-12 col-lg-12">
-        <div class="card shadow">
-          <div class="card-header bg-transparent">
-            <div class="row align-items-center">
-              <div class="col-md-10">
-                <h6 class="text-uppercase text-muted ls-1 mb-1">Control Gestion</h6>
-                <h2 class="mb-0">Módulo de Busquedas Generales</h2>
-              </div>
-              <div class="col-md-2 text-right">
-  
-                
-               
-                  <button  mat-mini-fab color="primary" aria-label="Agregar">
-                    <mat-icon class="waves waves-effect waves-light">more_vert</mat-icon>
-                  </button>
-                
-              </div>
-              
-  
+</div>
+
+<div class="container-fluid mt--9">
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
+        <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-10">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Notas de Entrega</h6>
+              <h2 class="mb-0">Documentos Generales</h2>
             </div>
-          </div>
-          <div class="card-body">
-           <!-- Contenido WEB Configuracion Menu -->
-            
-           <div class="container">
-             <div class="row">
-             
-                <div class="col-md-3">
-                        
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>reply</mat-icon>
+                  </button>
                 </div>
-                <div class="col-md-6">
-                  
-                  <form class="navbar-search">
-                    <div class="form-group" [ngClass]="{ 'focused': focus === true }">
-                      <div class="input-group input-group-alternative">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        </div>
-                        <input class="form-control" placeholder="Buscar" type="text" 
-                        (focus)="focus = true"   [(ngModel)]="buscar" (ngValue)="{buscar}">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text"><i class="fas fa-sliders-h" (click)="CMppd()"></i></span>
-                          &nbsp; 
-                        </div>
+              </div>
+            </div>
+            <div class="col-md-1">
+              <ul class="navbar-nav align-items-right d-none d-md-flex">
+                <li class="nav-item" ngbDropdown placement="bottom-right">
+                  <a class="nav-link pr-0" role="button" ngbDropdownToggle id="more">
+                    <div class="media align-items-center">
+                      <div class="example-button-row">
+                        <button mat-icon-button aria-label="Detalles">
+                          <mat-icon>more_vert</mat-icon>
+                        </button>
                       </div>
                     </div>
-                  </form>
-                  
-                </div>
-                <div class="col-md-3">
-                                      
-                  
-                </div>
-              </div> 
+                  </a>
+                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                    <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item"  id="nuevodocumento">
+                      <i class="fa fa-plus"></i>
+                      <span>Nuevo Documento</span>
+                    </a>
+                    <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item" id="config">
+                      <i class="ni ni-settings-gear-65"></i>
+                      <span>Configuración</span>
+                    </a>
+                  </div>
+                </li>
+              </ul>
             </div>
-  
-  
-            <br>
-  
-            <div class="row">
-                <div class="col-md-12">
-
-                 
-
-                
-                </div>
-            </div>
-        
-  
-  
-  
-       
-            <br>
-  
-  
-  
-  
-  
-         
-            <!-- Card stats -->
-           
-  
-  
           </div>
         </div>
+
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" >
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;NOTAS DE ENTREGA GENERADAS
+            </ng-template>
+
+            <div class="container">
+              <mat-selection-list #lstDocumentos>
+                <mat-list *ngFor="let e of lstNotaEntrega; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+
+                    <div class="col-md-1 text-right">
+                      <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.llave)">
+                        <mat-icon class="text-info">attach_file</mat-icon>
+                      </button>
+                    </div>
+                    <div class="col-md-6 texto-lista">
+                      {{ e.llave  }}
+                    </div>
+                    
+                    
+                    <div class="col-md-3 texto-lista">
+                      {{ e.fecha | date:"dd-MM-yyyy hh:mm" }}
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      {{ e.cantidad | uppercase }} 
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+
+          </mat-tab>
+
+        
+        </mat-tab-group>
       </div>
-    </div>    
+    </div>
   </div>
-  
-  
+</div>
+
+
+
+<!-- Adjuntar Imagenes al Documento -->
+<ng-template #adjuntar let-c="close" let-d="dismiss">
+  <div class="modal-header header bg-gradient-success">
+    <h4 class="modal-title" id="modal-basic-title">Cargar Archivo en {{ numControl }}</h4>
+
+  </div>
+  <div class="modal-body">
+
+
+    <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+      <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+      <label for="input-folder-2">Seleccionar Archivo</label>
+      <div class="file-loading">
+        <input (change)="fileSelected($event)" class="file-input" name="archivos" type="file" accept=".pdf">
+      </div>
+      <div id="errorBlock" class="help-block"></div>
+    </form>
+
+
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
+      <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
+    <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
+
+
+
+<!-- Observaciones generales -->
+<ng-template #observacion let-modal>
+  <div class="modal-header header bg-gradient-primary">
+    <h4 class="modal-title text-white" id="modal-basic-title">Agregar Observación</h4>
+  </div>
+  <div class="modal-body">
+    <div class="col-md-12">
+      <label for="txtobservacion">Observaciones</label>
+      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="Observacion"></textarea>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-primary text-white " (click)="insertarObservacion();modal.close('Save')">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Guardar </button>
+    <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
+

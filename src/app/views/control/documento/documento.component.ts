@@ -280,9 +280,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   listarConfiguracion() {
     this.xAPI.funcion = 'MD_CConfiguracion'
     this.xAPI.parametros = '%'
+   
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-
+      
         data.Cuerpo.forEach(e => {
           switch (e.tipo) {
             case "1":
@@ -342,6 +343,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
+        console.log(data)
         data.Cuerpo.forEach(e => {
 
           this.Doc = e
