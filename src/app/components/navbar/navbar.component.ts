@@ -54,8 +54,8 @@ export class NavbarComponent implements OnInit {
   cerrar(){
     
     Swal.fire({
-      title: 'Esta seguro?',
-      text: "de salir del sistema!",
+      title: 'Salir del Sistema',
+      text: "¿Está seguro que desea salir?",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -64,7 +64,7 @@ export class NavbarComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         sessionStorage.clear()
-        window.location.href = './gdoc';
+        window.location.href = './';
       }
     })    
   }

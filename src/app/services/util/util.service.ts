@@ -18,7 +18,7 @@ export class UtilService {
    * @param dias sumar dias a la fecha actual 
    * @returns retorna la fecha actual del sistema en formato YYYY-MM-DD
    */
-  FechaActual(dias : number = 0): string {
+  FechaActual(dias: number = 0): string {
     let date = new Date()
 
     if (dias > 0) date.setDate(date.getDate() + dias)
@@ -67,6 +67,110 @@ export class UtilService {
   //convertir cadena a minuscula y sin carateres especiales
   ConvertirCadena(cadena: string): string {
     return cadena.toLowerCase().replace(/á/g, "a").replace(/ê/g, "i").replace(/í/g, "i").replace(/ó/g, "o").replace(/ú/g, "u")
+  }
+
+  //Recibe  Fecha Formato: AAAA-MM-DD 00:00:00
+  //Retorna Fecha Formato: DD/MM/AAAA
+  ConvertirFechaHumana(f) {
+    var ISODate = new Date(f).toISOString();
+    var fe = ISODate.substr(0, 10);
+    var fa = fe.split("-");
+    if (fa[0] != "0001") {
+      return fa[2] + "/" + fa[1] + "/" + fa[0];
+    } else {
+      return "";
+    }
+    //return fa[2] + "/" + fa[1] + "/" + fa[0];
+  }
+
+  ConvertirCategoria(abreviatura: string): string {
+    let categoria = ''
+    switch (abreviatura) {
+      case "EFE":
+        categoria = 'EFECTIVO'
+        break;
+      case "ASI":
+        categoria = 'ASIMILADO'
+        break;
+      case "RES":
+        categoria = 'RESERVA'
+        break;
+      case "TRP":
+        categoria = 'TROPA'
+        break;
+      case "HNO":
+        categoria = 'HONORARIOS'
+        break;
+      case "MIL":
+        categoria = 'MILICIA'
+        break;
+
+      default:
+        break;
+    }
+
+    return categoria
+  }
+
+
+  ConvertirClasificacion(abreviatura: string): string {
+    let clasificacion = ''
+    switch (abreviatura) {
+      case "OFI":
+        clasificacion = 'OFICIAL DE COMANDO'
+        break;
+      case "OFIT":
+        clasificacion = 'OFICIAL TECNICO'
+        break;
+      case "OFITR":
+        clasificacion = 'OFICIAL DE TROPA'
+        break;
+      case "TPROF":
+        clasificacion = 'TROPA PROFESIONAL'
+        break;
+      case "TPROA":
+        clasificacion = 'TROPA ALISTADA'
+        break;
+      case "ASI":
+        clasificacion = 'ASIMILADO'
+        break;
+      case "ASIT":
+        clasificacion = 'ASIMILADO TECNICO'
+        break;
+      case "ASI":
+        clasificacion = 'ASIMILADO'
+        break;
+      case "HNO":
+        clasificacion = 'HONORARIOS'
+        break;
+      case "MIL":
+        clasificacion = 'MILICIA'
+        break;
+      default:
+        break;
+    }
+
+    return clasificacion
+  }
+
+
+  ConvertirSituacion(sit): string {
+    let situacion = ''
+    switch (sit) {
+      case "ACT":
+        situacion = 'ACTIVO'
+        break;
+      case "RCP":
+        situacion = 'RETIRADO CON PENSION'
+        break;
+      case "RSP":
+        situacion = 'RETIRADO SIN PENSION'
+        break;
+      case "INV":
+        situacion = 'INVALIDEZ'
+        break;
+    }
+    return situacion
   }
 
 

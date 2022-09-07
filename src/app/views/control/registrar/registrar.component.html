@@ -96,16 +96,18 @@
                       <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="{{e.color}}">{{ e.simbolo }}</font></a>
 
                     </div>
-                    <div class="col-md-2 texto-lista">
+                    <div class="col-md-1 texto-lista">
                       {{ e.nori | uppercase }} 
                     </div>
                     <div class="col-md-2 texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }}
                     </div>
-                    <div class="col-md-3 texto-lista">
+                    <div class="col-md-3 texto-lista"
+                    #tooltip="matTooltip"
+                    matTooltip="  {{ e.udep | uppercase }}">
                       {{ e.udep | uppercase }}
                     </div>
-                    <div class="col-md-2 text-right">
+                    <div class="col-md-3 text-right">
                       <button mat-icon-button aria-label="Privado">
                         <mat-icon *ngIf="e.privado" class="text-warning">no_encryption</mat-icon>
                       </button>
@@ -342,7 +344,7 @@
             <th>N-CONTROL</th>
             <th>N-ORIGEN</th>
             <th>FECHA</th>
-            <th>REMITENTE</th>
+            <th>UNIDAD O DEPENDENCIA</th>
             <th>OBSERVACION</th>
           </thead>
           <tbody>
@@ -351,7 +353,7 @@
               <td align="center">{{e.numc }}</td>
               <td align="center">{{e.nori }}</td>
               <td align="center">{{e.fcre.substring(0,10) }}</td>
-              <td>{{ remitente | uppercase }}</td>
+              <td>{{ e.udep | uppercase }}</td>
               <td></td>
             </tr>
           </tbody>

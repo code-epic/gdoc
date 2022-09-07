@@ -331,11 +331,11 @@ export class MinisterialComponent implements OnInit {
 
 
   _atras() {
-    if (this.original != btoa(JSON.stringify(this.SubDocumento))) {
-      this.toastrService.warning('Debe guardar los cambios antes de salir de esta pantalla', `GDoc WKF_SubDocumentos`);
-    } else {
+    // if (this.original != btoa(JSON.stringify(this.SubDocumento))) {
+    //   this.toastrService.warning('Debe guardar los cambios antes de salir de esta pantalla', `GDoc WKF_SubDocumentos`);
+    // } else {
       this.ruta.navigate(['/secretaria']);
-    }
+    // }
     return
   }
 

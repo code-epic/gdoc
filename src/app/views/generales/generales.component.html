@@ -64,21 +64,24 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
 
-                    <div class="col-md-1 text-right">
+                    <div class="col-md-2 text-left">
                       <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.llave)">
-                        <mat-icon class="text-info">attach_file</mat-icon>
+                        <mat-icon class="text-warning">attach_file</mat-icon>
+                      </button>
+                    
+                      <button mat-icon-button aria-label="Adjuntar" (click)="notaEntrega(e.llave)">
+                        <mat-icon class="text-primary">print</mat-icon>
                       </button>
                     </div>
-                    <div class="col-md-6 texto-lista">
+                    <div class="col-md-6 texto-lista text-left">
                       {{ e.llave  }}
                     </div>
-                    
                     
                     <div class="col-md-3 texto-lista">
                       {{ e.fecha | date:"dd-MM-yyyy hh:mm" }}
                     </div>
-                    <div class="col-md-2 texto-lista">
-                      {{ e.cantidad | uppercase }} 
+                    <div class="col-md-1 texto-lista">
+                       {{ e.cantidad | uppercase }} Reg.
                     </div>
                   </div>
                 </mat-list>
@@ -152,3 +155,60 @@
   </div>
 </ng-template>
 
+
+
+<div style="display: none">
+  <div id="prtNota">
+    <section class="content">
+      <div class="wrapper">
+        <table border="0" style="width:100%">
+          <tr>
+
+            <td align="center">
+              REPÚBLICA BOLIVARIANA DE VENEZUELA <BR>
+              MINISTERIO DEL PODER POPULAR PARA LA DEFENSA<BR>
+            </td>
+
+          </tr>
+        </table>
+
+        <h3 style="text-align:center">NOTA DE ENTREGA DE DOCUMENTO </h3>
+
+
+
+        <table style="width:100%" border="1">
+          <thead>
+            <th>#</th>
+            <th>N-CONTROL</th>
+            <th>N-ORIGEN</th>
+            <th>FECHA</th>
+            <th>UNIDAD O DEPENDENCIA</th>
+            <th>OBSERVACION</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of reportEntrega; let i=index;">
+              <td>{{i + 1}}</td>
+              <td align="center">{{e.numc }}</td>
+              <td align="center">{{e.nori }}</td>
+              <td align="center">{{e.fcre.substring(0,10) }}</td>
+              <td>{{ e.udep | uppercase }}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <br><br><br>
+
+        NOTA:
+
+        <br>
+
+      </div>
+      <div class="footer">
+        <hr>
+        Ministerio del Poder Popular para la Defensa<br>
+        {{llave}}
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,7 +1,9 @@
+<ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
+
 <form>
+  <hr class="mb-1">
   <div class="row">
     <div class="col-md-9">
-      <hr class="mb-1">
       <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Personales</h6>
       <div class="row">
         <div class="form-group col-md-4">
@@ -10,9 +12,16 @@
             value="{{DBasico.cedula}}" (blur)="consultarCedula()" class="form-control">
         </div>
         <div class="form-group col-md-8">
-          <label> Nombres </label>
-          <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.nombres_apellidos"
-            value="{{DBasico.nombres_apellidos}}" class="form-control">
+          <label for="cmbUnidad">Nombres y Apellidos</label>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+              [(ngModel)]="DBasico.nombres_apellidos" value="{{DBasico.nombres_apellidos}}">
+            <div class="input-group-prepend">
+              <button type="button" class="btn btn-info" (click)="consultarIPSFA(detalles)" id="agregar">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -23,7 +32,7 @@
             <div class="form-group" style="width:100%">
               <div class="input-group" style="width:100%">
                 <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-                  [(ngModel)]="forigen" ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(forigen)"
+                  [(ngModel)]="forigen" ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(forigenDate)"
                   [placement]="placement" [positionTarget]="buttonEl">
                 <div class="input-group-append">
                   <button #buttonEl class="btn calendario" (click)="vi.toggle()" type="button">
@@ -38,8 +47,8 @@
           <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.sexo"
             value="{{DBasico.sexo}}">
             <option value="0">Seleccione</option>
-            <option value="Masculino">MASCULINO</option>
-            <option value="Femenino">FEMENINO</option>
+            <option value="M">MASCULINO</option>
+            <option value="F">FEMENINO</option>
           </select>
         </div>
       </div>
@@ -47,15 +56,14 @@
     </div>
     <div class="col-md-3">
       <div class="row">
-        <div class="col-md-1"></div>
+        <div class="col-md-2"></div>
         <div class="col-md-10 text-center">
           <br><br>
           <div style="border:1px solid #CCC; padding: 1px;width: 160px">
-
-            <img src="assets/img/theme/ndisponible.jpeg" style="width: 155px">
+            <img src="{{foto}}" style="width: 155px">
           </div>
         </div>
-        <div class="col-md-1"></div>
+        
       </div>
 
     </div>
@@ -117,10 +125,10 @@
       <div class="form-group" style="width:100%">
         <div class="input-group" style="width:100%">
           <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="fcreacion" ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(fcreacion)"
-            [placement]="placement" [positionTarget]="buttonEl">
+            [(ngModel)]="DBasico.promocion" ngbDatepicker #crea="ngbDatepicker" [value]="formatter.format(fcreacionDate)" 
+            [placement]="placement" [positionTarget]="buttonEle">
           <div class="input-group-append">
-            <button #buttonEl class="btn calendario" (click)="vi.toggle()" type="button">
+            <button #buttonEle class="btn calendario" (click)="crea.toggle()" type="button">
             </button>
           </div>
         </div>
@@ -132,6 +140,10 @@
     <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.situacion"
       value="{{DBasico.situacion}}">
       <option value="0">Seleccione</option>
+      <option value="ACT">ACTIVO</option>
+      <option value="RCP">RETIRADO CON PENSION</option>
+      <option value="RSP">RETIRADO SIN PENSION</option>
+      <option value="INV">INVALIDEZ</option>
     </select>
   </div>
 </div>
@@ -152,7 +164,7 @@
     <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.otros_estudios"
       value="{{DBasico.otros_estudios}}" class="form-control">
   </div>
-  
+
 </div>
 
 <div class="form-row">
@@ -174,7 +186,7 @@
         {{e.des_clasificacion}}</option> -->
     </select>
   </div>
-  
+
 </div>
 
 
@@ -187,3 +199,49 @@
 </div>
 
 <br><br>
+
+
+
+<!-- Adjuntar Imagenes al Documento -->
+<ng-template #detalles let-c="close" let-d="dismiss">
+ 
+  <div class="modal-body">
+    <p>
+      Cedula: {{ipsfa_cedula}} <br>
+      Nombre completo: {{ ipsfa_nombres_apellidos }}  <br>
+      Fecha de nacimiento: {{ ipsfa_fechanacimiento }}  <br> 
+      Sexo: {{ipsfa_sexo}} <br>
+    </p>
+    <hr>
+    <p>
+      Componente: {{ipsfa_componente }} <br>
+      Grado: {{ ipsfa_grado }} <br>
+      Clasificacion: {{ipsfa_clasificacion }} <br>
+
+      Categoria: {{ ipsfa_categoria }} <br>
+      Situacion: {{ipsfa_situacion }} <br>
+      Fecha de Ingreso: {{ ipsfa_fechaingreso }}  <br>
+      Fecha de Último Ascenso: {{ ipsfa_fechaultimoascenso }}  <br> 
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-primary text-white " (click)="AceptarCambios();c('Save')">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar Cambios </button>
+    <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
+
+
+<!-- {
+  $group: {
+      _id: { id: "$id" },
+      uniqueIds: { $addToSet: "$_id" },
+      total: { $sum: 1 }
+  }
+},
+{ 
+  $match : {
+    total : { "$gt" : 1 }
+  }
+} -->

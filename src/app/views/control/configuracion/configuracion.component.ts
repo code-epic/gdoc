@@ -70,9 +70,9 @@ export class ConfiguracionComponent implements OnInit {
       return false
     }
     var configuracion = {
-      "nombre" : this.nombre,
+      "nombre" : this.nombre.toUpperCase(),
       "tipo" : this.tipo,
-      "observacion" : this.observacion,
+      "observacion" : this.observacion.toUpperCase(),
       "usuario" : this.loginService.Usuario.id
     }
 

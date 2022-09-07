@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -37,6 +38,8 @@ export class GeneralesComponent implements OnInit {
   pageSizeOptions: number[] = [5, 10, 25, 100];
 
   public lstNotaEntrega = [] //Listado Original
+  public reportEntrega = []
+
   public buzon = []
   public placement = 'bottom'
   public longitud = 0;
@@ -89,10 +92,12 @@ export class GeneralesComponent implements OnInit {
           this.ngxService.stopLoader("loader-aceptar")
         },
         (error) => {
+          this.ngxService.stopLoader("loader-aceptar")
         }
       )
     } catch (error) {
       console.error(error)
+      this.ngxService.stopLoader("loader-aceptar")
     }
   }
 
@@ -118,6 +123,7 @@ export class GeneralesComponent implements OnInit {
   fileSelected(e) {
     this.archivos.push(e.target.files[0])
   }
+
 
   async SubirArchivo(e) {
     var frm = new FormData(document.forms.namedItem("forma"))
@@ -153,6 +159,103 @@ export class GeneralesComponent implements OnInit {
     // }
 
   }
+
+
+
+  protected aceptar(msj: string) {
+
+    Swal.fire({
+      title: 'Impirmir nota de entrega # ' + msj,
+      text: "¿Desde el PDF o Base de Datos?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'PDF',
+      cancelButtonText: 'Base de datos',
+      allowEscapeKey: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+      } else {
+        this.imprimir()
+      }
+
+
+
+    })
+  }
+
+  notaEntrega(llave: string) {
+
+    this.xAPI.funcion = 'WKF_CNotaEntregaDetalles'
+    this.xAPI.parametros = llave
+
+    this.ngxService.startLoader("loader-aceptar")
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+
+        this.reportEntrega = data.Cuerpo
+        this.aceptar(llave)
+
+        this.ngxService.stopLoader("loader-aceptar")
+      },
+      (error) => {
+      }
+    )
+  }
+
+  imprimir() {
+    var ventana = window.open("", "_blank");
+    var localtime = new Date().toLocaleString();
+    var contenido = document.getElementById('prtNota').innerHTML
+    ventana.document.write(contenido)
+
+    ventana.document.head.innerHTML = ` <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Gestion de Documentos</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    
+    <style type="text/css">
+        @media print {
+            body {
+                  margin: 0px;
+                  font-family: Calibri;
+              }
+              .encabezado{
+                text-align:center;
+              }
+              .footer, .push {
+                  height: 5em;
+                  font-size: 12px;
+              }
+              h3 {
+                text-align:center;
+              }
+              .footer, .push {
+                  height: 5em;
+                  font-size: 12px;
+              }
+              .tabla-contenido {
+                border-collapse: collapse;
+                font-family: Arial, Calibre;
+                font-size: 12px;
+            }
+            .wrapper {
+                min-height: 100%;
+                height: auto !important;
+                height: 100%;
+                margin: 0 auto -5em;
+            }
+        }
+    </style>
+     `;
+    ventana.print()
+    ventana.close()
+  }
+
+
 
 
 

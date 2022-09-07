@@ -463,6 +463,7 @@ export class RegistrarComponent implements OnInit {
   }
 
   async SubirArchivo(e) {
+    this.ngxService.startLoader("loader-aceptar")
     var frm = new FormData(document.forms.namedItem("forma"))
     try {
       await this.apiService.EnviarArchivos(frm).subscribe(
@@ -484,9 +485,11 @@ export class RegistrarComponent implements OnInit {
               } else {
                 this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
               }
+              this.ngxService.stopLoader("loader-aceptar")
             },
             (error) => {
               this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
+              this.ngxService.stopLoader("loader-aceptar")
             }
           )
         }
