@@ -34,6 +34,7 @@ import { RstranscripcionComponent } from 'src/app/views/resoluciones/rstranscrip
 import { RsconfiguracionComponent } from 'src/app/views/resoluciones/rsconfiguracion/rsconfiguracion.component';
 import { PerfilComponent } from 'src/app/views/perfil/perfil.component';
 import { IndiceComponent } from 'src/app/views/reportes/indice/indice.component';
+import { BuscadorComponent } from 'src/app/views/buscador/buscador.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -235,6 +236,11 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'indice',
         component: IndiceComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'buscador',
+        component: BuscadorComponent,
         canActivate: [AuthGuardGuard]
     }
 

@@ -189,7 +189,10 @@ export class RsbuzonComponent implements OnInit {
           return e
         }) //Registros recorridos como elementos
         this.lengthOfi = data.Cuerpo.length
-        if (this.selNav == 1) this.listarSubDocumentos(2)
+        if (this.selNav == 1) {
+          this.listarSubDocumentos(2)
+
+        }
       },
       (error) => {
 
@@ -215,6 +218,9 @@ export class RsbuzonComponent implements OnInit {
           return e
         }) //Registros recorridos como elementos
         this.lengthOfi = data.Cuerpo.length
+        if (this.selNav == 1) {
+          this.bzRecibido.push(this.bzSubDocumentos)
+        }
       },
       (error) => {
 
@@ -227,17 +233,21 @@ export class RsbuzonComponent implements OnInit {
       this.bzRecibido = this.bzSubDocumentos
     } else {
       this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
+     
     }
   }
 
   ConsultarProcesados(id) {
     console.log(this.bzSubDocumentos, 'uff -> ', id)
-    if (id == 4) {
-      this.bzRecibido = this.bzSubDocumentos
-    } else {
-      console.log(this.bzOriginal, 'xfff -> ', id)
-      this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
-    }
+    // if (id == 4) {
+    //   this.bzRecibido = this.bzSubDocumentos
+    // } else {
+    //   console.log(this.bzOriginal, 'xfff -> ', id)
+    //   this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
+    //   console.log( this.bzRecibido )
+    // }
+    this.bzRecibido = this.bzSubDocumentos
+    // this.bzRecibido.push(this.bzOriginal) 
   }
 
   ConsultarPendientes(id) {

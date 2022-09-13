@@ -87,7 +87,7 @@
                         </button>
                       </div>
                       <div class="col-md-2 texto-lista">
-                        {{ e.numc }} 
+                        <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                       </div>
                       <div class="col-md-2 texto-lista">
                         {{ e.cuentas | uppercase }}
@@ -115,8 +115,8 @@
             <ng-template mat-tab-label>
               &nbsp;EN PROCESO
             </ng-template>
-            <mat-accordion class="example-headers-align">
-              <mat-expansion-panel hideToggle *ngFor="let x of lstEstados">
+            <!-- <mat-accordion class="example-headers-align"> -->
+              <!-- <mat-expansion-panel hideToggle *ngFor="let x of lstEstados">
                 <mat-expansion-panel-header (click)="ConsultarProcesados( x.id )">
                   <mat-panel-title style="font-weight:bold">
                     {{x.nomb}}
@@ -125,48 +125,47 @@
                     {{x.obse}}
                     <mat-icon>format_list_numbered_rtl</mat-icon>
                   </mat-panel-description>
-                </mat-expansion-panel-header>
+                </mat-expansion-panel-header> -->
 
-
-
-                <mat-selection-list #lstDocumentos>
-                  <mat-list *ngFor="let e of bzRecibido; let i=index "
-                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                    <div class="row">
-                      <div class="col-md-1">
-                        <button mat-icon-button aria-label="Example " *ngIf="e.bOk" class="text-primary"
-                        (click)="entrada_open(e.numc)">
-                        <mat-icon>open_in_new</mat-icon>
-                      </button>
-                      <button mat-icon-button aria-label="Example " *ngIf="!e.bOk" class="text-warning"
-                        (click)="entrada_open(e.numc, e.cuenta)">
-                        <mat-icon>open_in_new</mat-icon>
-                      </button>
-                      </div>
-                      <div class="col-md-2 texto-lista">
-                        {{ e.numc }}
-                      </div>
-                      <div class="col-md-2 texto-lista">
-                        {{ e.nori | uppercase }}
-                      </div>
-                      <div class="col-md-2 texto-lista">
-                        {{ e.fcre | date:"dd-MM-yyyy" }}
-                      </div>
-                      <div class="col-md-4 texto-lista">
-                        {{ e.udep | uppercase }}
-                      </div>
-                      <div class="col-md-1 text-right">
-                        <button mat-icon-button aria-label="Privado">
-                          <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
+                <div class="container">
+                  <mat-selection-list #lstDocumentos>
+                    <mat-list *ngFor="let e of bzOriginal; let i=index "
+                      style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                      <div class="row">
+                        <div class="col-md-1">
+                          <button mat-icon-button aria-label="Example " *ngIf="e.bOk" class="text-primary"
+                          (click)="entrada_open(e.numc)">
+                          <mat-icon>open_in_new</mat-icon>
                         </button>
+                        <button mat-icon-button aria-label="Example " *ngIf="!e.bOk" class="text-warning"
+                          (click)="entrada_open(e.numc, e.cuenta)">
+                          <mat-icon>open_in_new</mat-icon>
+                        </button>
+                        </div>
+                        <div class="col-md-2 texto-lista">
+                          <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                        </div>
+                        <div class="col-md-2 texto-lista">
+                          {{ e.nori | uppercase }}
+                        </div>
+                        <div class="col-md-2 texto-lista">
+                          {{ e.fcre | date:"dd-MM-yyyy" }}
+                        </div>
+                        <div class="col-md-4 texto-lista">
+                          {{ e.udep | uppercase }}
+                        </div>
+                        <div class="col-md-1 text-right">
+                          <button mat-icon-button aria-label="Privado">
+                            <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
+                          </button>
 
+                        </div>
                       </div>
-                    </div>
-                  </mat-list>
-                </mat-selection-list>
-
-              </mat-expansion-panel>
-            </mat-accordion>
+                    </mat-list>
+                  </mat-selection-list>
+                </div>
+              <!-- </mat-expansion-panel> -->
+            <!-- </mat-accordion> -->
 
 
           </mat-tab>

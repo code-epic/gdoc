@@ -78,6 +78,7 @@ import { RscgeneralComponent } from './views/resoluciones/rsconfiguracion/rscgen
 import { PerfilComponent } from './views/perfil/perfil.component';
 import { IndiceComponent } from './views/reportes/indice/indice.component';
 import { ContenidoComponent } from './views/reportes/contenido/contenido.component';
+import { BuscadorComponent } from './views/buscador/buscador.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -203,7 +204,8 @@ const ngWizardConfig: NgWizardConfig = {
     RscgeneralComponent,
     PerfilComponent,
     IndiceComponent,
-    ContenidoComponent
+    ContenidoComponent,
+    BuscadorComponent
   ],
   providers:  [
     {

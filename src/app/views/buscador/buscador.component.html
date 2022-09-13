@@ -1,0 +1,293 @@
+<div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
+  <div class="container-fluid">
+    <p></p>
+  </div>
+</div>
+<div class="container-fluid mt--9">
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+
+
+      <div class="card shadow">
+
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-11">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">PRINCIPAL</h6>
+              <h2 class="mb-0">Motor de Busquedas</h2>
+            </div>
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>reply</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="col-md-1">
+              <ul class="navbar-nav align-items-right d-none d-md-flex">
+                <li class="nav-item" ngbDropdown placement="bottom-right">
+                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                    <div class="media align-items-center">
+                      <div class="example-button-row">
+                        <button mat-icon-button aria-label="">
+                          <mat-icon>more_vert</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </a>
+                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                    <a routerLinkActive="active" [routerLink]="['/rsentradas']" class="dropdown-item">
+                      <i class="fa fa-plus"></i>
+                      <span>Nueva Entrada</span>
+                    </a>
+                  </div>
+                </li>
+              </ul>
+            </div> -->
+
+          </div>
+        </div>
+
+        <div class="card-body">
+          <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
+          <div class="container mb-5">
+            <div class="row">
+              <div class="col-md-1"></div>
+
+              <div class="col-md-10 text-center">
+
+                <div class="div" style="margin-left: 0%;">
+                  <img src="./assets/img/brand/mppd.png" style="height: 140px;" alt="...">
+                </div>
+
+              </div>
+
+              <div class="col-md-1"></div>
+
+            </div>
+            <br>
+            <div class="row">
+              <div class="col-md-3 text-right">
+
+              </div>
+              <div class="col-md-6 text-center">
+
+                <form class="navbar-search">
+                  <div class="form-group" [ngClass]="{ 'focused': focus === true }">
+                    <div class="input-group input-group-alternative">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+                      </div>
+                      <input class="form-control" placeholder="Buscar" type="text" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="buscar" (focus)="focus = true" (blur)="focus = false"
+                        (keypress)="Consultar($event)">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-sliders"></i></span>
+                      </div>
+
+                    </div>
+                  </div>
+                </form>
+
+              </div>
+              <div class="col-md-3">
+
+              </div>
+
+            </div>
+
+
+            <mat-tab-group *ngIf="blBuscar" (selectedIndexChange)="seleccionNavegacion($event)">
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="example-tab-icon">search</mat-icon>
+                  Todos los documentos
+                </ng-template>
+                <div class="container">
+                  <br>
+                  <small class="mr-5" style="font-size: 14px;" *ngIf="blBuscar">
+                    Cerca de {{cantidad | number }} resultados...
+                  </small>
+                  <br>
+                  <div class="row enlace" *ngFor="let e of lst">
+                    <div class="col-md-10">
+                      <a (click)="AgregarView(e.score,e.id, indice, e.skey, e.meta.ref, e.tipo);">{{ e.skey }} - {{
+                        e.titu }} </a> <br>
+                      <p id="{{ e.skey }}">{{ e.subt }}<br>
+                        {{ e.resu }}<br>
+                        <small class=" mr-4"><i class="fa fa-globe"></i>&nbsp; Visitaste esta página {{ e.view }}
+                          veces</small>
+                        <small class=" mr-4"><i class="fa fa-calendar"></i>&nbsp; Última visita: {{ e.fech }}</small>
+                        <small class=" mr-4"><i class="fa fa-map-pin"></i>&nbsp; {{ e.ubic }}</small>
+                      </p>
+                    </div>
+                    <div class="col-md-2"></div>
+                  </div>
+                </div>
+              </mat-tab>
+
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="example-tab-icon primary">list</mat-icon>
+                  Control de Gestion
+                </ng-template>
+                <div class="container">
+                  <br>
+                  <small class="mr-5" style="font-size: 14px;" *ngIf="blBuscar">
+                    Cerca de {{cantidad | number }} resultados...
+                  </small>
+                  <br>
+                  <div class="row enlace" *ngFor="let e of lst">
+                    <div class="col-md-10">
+                      <a (click)="AgregarView(e.score,e.id, indice, e.skey, e.meta.ref, e.tipo);">{{ e.skey }} - {{
+                        e.titu
+                        }} </a> <br>
+                      <p id="{{ e.skey }}">{{ e.subt }}<br>
+                        {{ e.resu }}<br>
+                        <small class=" mr-4"><i class="fa fa-globe"></i>&nbsp; Visitaste esta página {{ e.view }}
+                          veces</small>
+                        <small class=" mr-4"><i class="fa fa-calendar"></i>&nbsp; Última visita: {{ e.fech }}</small>
+                        <small class=" mr-4"><i class="fa fa-map-pin"></i>&nbsp; {{ e.ubic }}</small>
+                      </p>
+                    </div>
+                    <div class="col-md-2"></div>
+                  </div>
+                </div>
+              </mat-tab>
+
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="example-tab-icon">article</mat-icon>
+                  Resoluciones
+                </ng-template>
+                <div class="container">
+                  <br>
+                  <small class="mr-5" style="font-size: 14px;" *ngIf="blBuscar">
+                    Cerca de {{cantidad | number }} resultados...
+                  </small>
+                  <br>
+                  <div class="row enlace" *ngFor="let e of lst">
+                    <div class="col-md-10">
+                      <a (click)="AgregarView(e.score,e.id, indice, e.skey, e.meta.ref, e.tipo);">{{ e.skey }} - {{
+                        e.titu
+                        }} </a> <br>
+                      <p id="{{ e.skey }}">{{ e.subt }}<br>
+                        {{ e.resu }}<br>
+                        <small class=" mr-4"><i class="fa fa-globe"></i>&nbsp; Visitaste esta página {{ e.view }}
+                          veces</small>
+                        <small class=" mr-4"><i class="fa fa-calendar"></i>&nbsp; Última visita: {{ e.fech }}</small>
+                        <small class=" mr-4"><i class="fa fa-map-pin"></i>&nbsp; {{ e.ubic }}</small>
+                      </p>
+                    </div>
+                    <div class="col-md-2"></div>
+                  </div>
+                </div>
+              </mat-tab>
+
+              
+
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="example-tab-icon">perm_media</mat-icon>
+                  Expediente militar
+                </ng-template>
+                <div class="container">
+                  <br>
+                  <small class="mr-5" style="font-size: 14px;" *ngIf="blBuscar">
+                    Cerca de {{cantidad | number }} resultados...
+                  </small>
+                  <br>
+                  <div class="row enlace" *ngFor="let e of lstMilitar">
+                    <div class="col-md-12">
+                      
+                      <img  align="left"
+                      src="https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/{{ e.skey }}/foto.jpg"
+                      onerror="this.src='assets/img/theme/ndisponible.jpeg'" 
+                      style="width: 75px; vertical-align: top; margin-right: 20px;border-radius: 5%;">
+                      
+                      <a (click)="AgregarView(e.score,e.id, indice, e.skey, e.meta.ref, e.tipo);">{{ e.skey }} - {{
+                        e.titu
+                        }} </a> <br>
+                      <p id="{{ e.skey }}">
+                        {{ e.subt }}<br>
+                        {{ e.resu }}<br>
+                        <small class=" mr-4"><i class="fa fa-globe"></i>&nbsp; Visitaste esta página {{ e.view }}
+                          veces</small>
+                        <small class=" mr-4"><i class="fa fa-calendar"></i>&nbsp; Última visita: {{ e.fech }}</small>
+                        <small class=" mr-4"><i class="fa fa-map-pin"></i>&nbsp; {{ e.ubic }}</small>
+                      </p>
+                    </div>
+                    
+                  </div>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+            <!-- <hr style="margin-top:5px; margin-bottom:5px"> -->
+
+
+
+            <br><br>
+            <div class="row">
+
+              <div class="col-md-3"></div>
+              <div class="col-md-6 text-center">
+                <nav aria-label="Page navigation example" *ngIf="blBuscar">
+
+                  <div class="row">
+                    <div class="col-md-1">
+                      <ul class="pagination justify-content-center">
+                        <li class="page-item">
+                          <a class="page-link" *ngIf="antes" (click)="posicion(actual-1)">
+                            < </a>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-10">
+                      <ul class="pagination justify-content-center">
+                        <li class="page-item" *ngFor="let e of lstPaginas">
+                          <a class="page-link {{ e.color }}" (click)="posicion(e.id)">{{ e.id }}</a>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-1">
+                      <ul class="pagination justify-content-center">
+                        <li class="page-item">
+                          <a class="page-link" *ngIf="despues" (click)="posicion(actual+1)">></a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+
+                </nav>
+              </div>
+              <div class="col-md-3"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- Fin de Tarjeta Padre -->
+</div>
+
+
+
+<ng-template #indice let-modal>
+  <div class="modal-body">
+
+    <app-indice [data]="data" [ref]="ref" [tipo]="tipo"></app-indice>
+
+  </div>
+  <div class="modal-footer">
+    <div class="col-md-12 text-right">
+      <button class="btn btn-sm bg-info text-white">
+        <span></span>Imprimir </button>
+      <button class="btn btn-sm bg-danger text-white" aria-label="Close" (click)="modal.close()">
+        <span></span>Cancelar </button>
+    </div>
+  </div>
+</ng-template>

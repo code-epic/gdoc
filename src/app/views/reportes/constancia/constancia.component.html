@@ -12,7 +12,7 @@
                     <div class="row ">
                         <div class="col-md-11">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Reportes</h6>
-                            <h2 class="mb-0">Constancia </h2>
+                            <h2 class="mb-0">REPORTE HISTORICO </h2>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
@@ -23,13 +23,12 @@
                                 </div>
                             </div>
                         </div>
-                    
+
 
                     </div>
                 </div>
                 <div class="card-body">
 
-                    <h2 class="mb-0 text-center">REPORTE HISTORICO</h2>
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <table summary="" class="table table-bordered table-hover">
@@ -95,6 +94,22 @@
                         </div>
                         <br>
 
+                        <div *ngFor="let e of lstSubDoc" class="form-group  col-md-12 text-justify">
+                            <table style="width: 100%;" class="table table-bordered table-hover">
+                                <tr>
+                                    <th>{{e.nmilitar | uppercase }}</th>
+                                    <th>{{e.cargo | uppercase }}</th>
+                                    <th>CEDULA: {{e.cedula | uppercase }}</th>
+                                    <th>CUENTA: {{e.cuenta | uppercase }}</th>
+                                </tr>
+                            </table>
+
+                            <div class="form-group  col-md-12 text-justify" [innerHTML]="e.resumen"
+                                style="padding: 15px; border: 1px solid #ccc">
+                            </div>
+                        </div>
+                                
+
                         <table summary="" class="table table-bordered table-hover">
                             <thead>
                                 <tr>
@@ -113,21 +128,19 @@
                                 <tr *ngFor="let e of lstTraza">
                                     <td>{{e.fecha | date:"dd-MM-yyyy" }}</td>
                                     <td>{{e.nombre_estado | uppercase }}</td>
-                                    <td>{{e.nombre_estatus  | uppercase }}</td>
-                                    <td>{{e.observacion  | uppercase }}</td>
+                                    <td>{{e.nombre_estatus | uppercase }}</td>
+                                    <td>{{e.observacion | uppercase }}</td>
                                     <td>{{e.usuario}}</td>
                                 </tr>
                             </tbody>
                         </table>
 
-                        <br><br>
+                        <br>
 
                         <table summary="" class="table table-bordered table-hover">
-
                             <thead>
                                 <tr>
                                     <th data-priority="1" colspan="2">Firma de Seguimiento</th>
-    
                                     <th data-priority="3" style="width:256px">VALIDADOR QR</th>
                                 </tr>
                             </thead>
@@ -144,15 +157,15 @@
                                 <tr>
                                     <th>FECHA DE CREACIÓN</th>
                                     <td>{{Doc.fcreacion}}</td>
-    
                                 </tr>
                             </tbody>
                         </table>
+
                     </div>
 
 
 
-                 
+
                     <hr>
                     <div class="form-row">
                         <div class="form-group col-md-12" style="display: none;">
