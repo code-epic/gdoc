@@ -218,6 +218,7 @@ export class RsbuzonComponent implements OnInit {
           return e
         }) //Registros recorridos como elementos
         this.lengthOfi = data.Cuerpo.length
+        console.log(this.bzSubDocumentos, 'uff -> ', this.selNav)
         if (this.selNav == 1) {
           this.bzRecibido.push(this.bzSubDocumentos)
         }

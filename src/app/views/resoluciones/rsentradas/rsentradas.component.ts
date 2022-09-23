@@ -57,7 +57,7 @@ export class RsentradasComponent implements OnInit {
 
   public Resolucion: Resolucion = {
     id: '',
-    cuenta: '13587538',
+    cuenta: '',
     unidad: '',
     fecha_doc: '',
     tipo: '0',

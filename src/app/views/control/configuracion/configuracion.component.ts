@@ -3,6 +3,8 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-configuracion',
@@ -28,6 +30,7 @@ export class ConfiguracionComponent implements OnInit {
   constructor(private apiService: ApiService, 
     private toastrService: ToastrService,
     private loginService: LoginService,
+    private ruta: Router,
     private ngxService: NgxUiLoaderService) { 
 
 
@@ -117,6 +120,50 @@ export class ConfiguracionComponent implements OnInit {
     this.observacion = ""
     this.registrar = !this.registrar
     this.ngxService.stopLoader("loader-registrar")
+  }
+
+  eliminar(id : string){
+    Swal.fire({
+      title: 'Elimiar',
+      text: "¿Está seguro que desea eliminar?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ejecutar(id)
+      }
+    })    
+  }
+
+
+
+  ejecutar(id : string){
+    console.log(id)
+    this.ngxService.startLoader("loader-registrar")
+    this.xApi.funcion = 'MPPD_EConfiguracion'
+    this.xApi.parametros = id
+    this.xApi.valores = ''
+    this.apiService.Ejecutar(this.xApi).subscribe(
+      data => {
+        this.toastrService.success(
+          'Tu archivo ha sido cargado con exito ',
+          `MPPD_EConfiguracion`
+        );
+        this.ngxService.stopLoader("loader-aceptar")
+        this.ruta.navigate(['/principal'])
+      },
+      error => {
+        this.toastrService.error(
+          error,
+          `MPPD_EConfiguracion`
+        );
+        this.ngxService.stopLoader("loader-aceptar")
+        console.error('Fallo consultando los datos de Configuraciones')
+      }
+    )
   }
 
   // testing(){
