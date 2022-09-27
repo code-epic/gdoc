@@ -10,6 +10,7 @@ import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader'
+import Swal from 'sweetalert2';
 
 
 
@@ -578,6 +579,50 @@ export class SalidasComponent implements OnInit {
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
       }) //
+  }
+
+
+
+  mensajeReversarDoc(id: string) {
+    console.log(id)
+    Swal.fire({
+      title: 'Alerta',
+      text: '¿Está seguro que desea reversar este documento?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, estoy seguro'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.reversarDoc(id)
+      }
+    })
+  }
+
+  reversarDoc(id: string) {
+    //WKF_AReversarDocumento
+    var usuario = this.loginService.Usuario.id
+    this.xAPI.funcion = 'WKF_AReversarDocumento'
+    this.xAPI.valores = ''
+    this.xAPI.parametros = '0,1,' + usuario + ',' + id
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+     
+        this.toastrService.success(
+          'Tu documento ha sido reversado ',
+          `GDoc Wkf.ReversarDocumento`
+        );
+        
+        this.seleccionNavegacion(0)
+
+
+
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.ReversarDocumento`);
+      })
+
   }
 
 }

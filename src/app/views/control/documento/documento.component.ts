@@ -7,7 +7,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader'
 import Swal from 'sweetalert2'
 
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service'
-import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta, IWKFDependencia} from 'src/app/services/control/documentos.service'
+import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta, IWKFDependencia } from 'src/app/services/control/documentos.service'
 import { LoginService } from 'src/app/services/seguridad/login.service'
 import { UtilService } from 'src/app/services/util/util.service'
 
@@ -201,6 +201,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     funcion: ''
 
   };
+
+  public xApi : IAPICore = {
+    funcion : '',
+    parametros : ''
+  }
   routerDoc: { numc: string }
 
   constructor(private apiService: ApiService,
@@ -280,10 +285,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   listarConfiguracion() {
     this.xAPI.funcion = 'MD_CConfiguracion'
     this.xAPI.parametros = '%'
-   
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-      
+
         data.Cuerpo.forEach(e => {
           switch (e.tipo) {
             case "1":
@@ -374,6 +379,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
         this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+
+
+        const dependencia = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
+        this.lstDependencias = dependencia.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
 
         //Carga de Documentos
         this.bPDF = this.Doc.archivo != "" ? true : false
@@ -661,9 +670,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //Guardar la alerte define el momento y estadus
   guardarAlerta(activo: number) {
+    this.WAlerta.documento = this.Doc.wfdocumento
 
     this.WAlerta.activo = activo
-    this.WAlerta.documento = this.Doc.wfdocumento
     this.WAlerta.estado = this.estadoActual
     this.WAlerta.estatus = this.estadoOrigen
     this.WAlerta.usuario = this.loginService.Usuario.id
@@ -690,7 +699,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     const dependencia: IWKFDependencia = {
       documento: 0,
-      nombre: this.Doc.unidad.toUpperCase(),
+      nombre:  this.Doc.unidad.toUpperCase() + ' / ' + this.Doc.comando.toUpperCase(),
     }
 
     this.lstDependencias.push(dependencia)
@@ -768,6 +777,30 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.editar = false
   }
 
+  eliminarDependencia(pos: number, id: string) {
+
+    this.ngxService.startLoader("loader-aceptar")
+    this.xAPI.funcion = "WKF_EDocumentoDependencia"
+    this.xAPI.parametros = id.toString()
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        this.lstDependencias.splice(pos, 1)
+        this.ngxService.stopLoader("loader-aceptar")
+      },
+      error => {
+        this.toastrService.error(
+          'Fallo eliminar dependencia',
+          `WKF_EDocumentoDependencia`
+        );
+        this.ngxService.stopLoader("loader-aceptar")
+        console.error('Fallo consultando los datos de Configuraciones',  error)
+      }
+    )
+  
+  }
+
+
   editarCuenta() {
 
     if (this.PosicionCuenta != -1) {
@@ -805,13 +838,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   async salvarDependencias(numc: number) {
 
     const cant = this.lstDependencias.length
+    console.log('cantidad ', cant)
     if (cant == 0) {
       this.ngxService.stopLoader("loader-aceptar")
       return
     } else {
+
       this.xAPI.funcion = 'WKF_IDocumentoDependencia'
       this.xAPI.valores = ''
       this.xAPI.parametros = numc + ',' + this.lstDependencias[0].nombre
+      console.log('insertando dependicia ', this.xAPI)
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           this.lstDependencias.splice(0, 1)
@@ -937,9 +973,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    * @param numBase64  : base64
    */
   async consultarDocumentoSalida() {
-    if ( this.Doc.salida == '') return false
+    if (this.titulo = 'Salida') return false
+    if (this.Doc.salida == '') return false
     let dwf = ''
-    if ( this.Doc.norigen != '') dwf = this.Doc.norigen
+    if (this.Doc.norigen != '') dwf = this.Doc.norigen
     this.xAPI.funcion = 'WKF_CDocumentoDetalleSalida'
     this.xAPI.parametros = '9,1,' + this.Doc.salida
     this.xAPI.valores = ''
@@ -978,7 +1015,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         const dependencias = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
         this.lstDependencias = dependencias.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        
+
         //Carga de Documentos
         this.bPDF = this.Doc.archivo != "" ? true : false
         this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
@@ -992,6 +1029,23 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         console.error(error)
       }
     )
+  }
+
+
+  mensajeAgregarCuenta(id: string) {
+    console.log(id)
+    Swal.fire({
+      title: 'Alerta',
+      text: '¿Desea mantener los datos de la cuenta?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, estoy seguro'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        
+      }
+    })
   }
 
 

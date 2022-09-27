@@ -357,7 +357,6 @@ export class RscdatosbasicosComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
         this.toastrService.success(
           'Tu archivo ha sido cargado con exito ',
           `MPPD_Insertar`

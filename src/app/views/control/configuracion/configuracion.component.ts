@@ -141,7 +141,6 @@ export class ConfiguracionComponent implements OnInit {
 
 
   ejecutar(id : string){
-    console.log(id)
     this.ngxService.startLoader("loader-registrar")
     this.xApi.funcion = 'MPPD_EConfiguracion'
     this.xApi.parametros = id

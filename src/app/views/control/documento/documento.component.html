@@ -158,11 +158,18 @@
                         <div class="form-group col-md-12"  *ngIf="booDependencia" >
                             <table class="table align-items-center table-flush" style="width:100%">
                                 <thead class="thead-light">
+                                    <th># ACC</th>
                                     <th>Unidades o Dependencias Seleccionadas</th>
                                 </thead>
                                 <tbody>
                                     <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstDependencias;let i=index">
-                                        <td>{{ el.nombre }}...</td>
+                                        <td style="width:20px">
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                (click)="eliminarDependencia( i, el.id )"><i class="fa fa-trash"
+                                                aria-hidden="true"></i>
+                                            </button>
+                                        </td>
+                                        <td>{{ el.nombre }}</td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -184,7 +184,7 @@
 
                     <div class="col-md-2 text-right">
                       <button mat-icon-button aria-label="Privado">
-                        <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
+                        <mat-icon  class="text-warning" (click)="mensajeReversarDoc(e.idd)" >history</mat-icon>
                       </button>
 
                       <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
