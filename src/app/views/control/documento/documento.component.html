@@ -208,11 +208,11 @@
                                         <div class="input-group" style="width:100%">
                                             <input class="form-control" placeholder="AAAA-MM-DD"
                                                 [ngModelOptions]="{standalone: true}" [(ngModel)]="subfecha"
-                                                ngbDatepicker #fc="ngbDatepicker"
+                                                ngbDatepicker #fcu="ngbDatepicker"
                                                 [value]="formatter.format(subfechaDate)" [placement]="placement"
                                                 [positionTarget]="buttonEl" readonly>
                                             <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="fc.toggle()"
+                                                <button #buttonEl class="btn calendario" (click)="fcu.toggle()"
                                                     type="button" id="fcuenta">
                                                 </button>
                                             </div>
@@ -239,7 +239,7 @@
                                         [(ngModel)]="nmilitar" value="{{nmilitar}}" disabled>
                                     <div class="input-group-prepend">
                                         <button *ngIf="!editar" type="button" class="btn btn-success"
-                                            (click)="agregarCuenta()" id="agregar">
+                                            (click)="mensajeAgregarCuenta()" id="agregar">
                                             <i class="fa fa-plus" aria-hidden="true"></i>
                                         </button>
                                         <button *ngIf="editar" type="button" class="btn btn-primary"

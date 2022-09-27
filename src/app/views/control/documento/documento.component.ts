@@ -202,9 +202,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   };
 
-  public xApi : IAPICore = {
-    funcion : '',
-    parametros : ''
+  public xApi: IAPICore = {
+    funcion: '',
+    parametros: ''
   }
   routerDoc: { numc: string }
 
@@ -699,7 +699,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     const dependencia: IWKFDependencia = {
       documento: 0,
-      nombre:  this.Doc.unidad.toUpperCase() + ' / ' + this.Doc.comando.toUpperCase(),
+      nombre: this.Doc.unidad.toUpperCase() + ' / ' + this.Doc.comando.toUpperCase(),
     }
 
     this.lstDependencias.push(dependencia)
@@ -707,7 +707,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     return dependencia
   }
 
-  agregarCuenta(): IWKFCuenta {
+  agregarCuenta(tipo: number): IWKFCuenta {
     let validar = false
 
     switch (this.Doc.tipo.toLowerCase()) {
@@ -740,12 +740,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.lstCuenta.push(wkcuenta)
 
+    if (tipo == 1) {
+      this.cuenta = ''
+      this.resumen = ''
+      this.subfecha = ''
+    }
     this.cedula = ''
     this.cargo = ''
     this.nmilitar = ''
-    this.cuenta = ''
-    this.resumen = ''
-    this.subfecha = ''
+
+
     return wkcuenta
   }
 
@@ -794,10 +798,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           `WKF_EDocumentoDependencia`
         );
         this.ngxService.stopLoader("loader-aceptar")
-        console.error('Fallo consultando los datos de Configuraciones',  error)
+        console.error('Fallo consultando los datos de Configuraciones', error)
       }
     )
-  
+
   }
 
 
@@ -1032,20 +1036,25 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
 
-  mensajeAgregarCuenta(id: string) {
-    console.log(id)
-    Swal.fire({
-      title: 'Alerta',
-      text: '¿Desea mantener los datos de la cuenta?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, estoy seguro'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        
-      }
-    })
+  mensajeAgregarCuenta() {
+    if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') {
+      Swal.fire({
+        title: 'Alerta',
+        text: '¿Desea mantener los datos de la cuenta?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, estoy seguro'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.agregarCuenta(0)
+        } else {
+          this.agregarCuenta(1)
+        }
+      })
+    } else {
+      this.agregarCuenta(1)
+    }
   }
 
 
