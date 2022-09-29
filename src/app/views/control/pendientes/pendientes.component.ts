@@ -70,7 +70,7 @@ export class PendientesComponent implements OnInit {
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
-          e.busqueda = this.utilService.ConvertirCadena(
+          e.busqueda = this.utilService.ConvertirCadena(e.norigen + ' ' +
             e.ncontrol + ' ' + e.contenido + e.estatus_nombre + ' ' + e.remitente + ' ' + e.nombre
             + ' ' + e.creado
           )
