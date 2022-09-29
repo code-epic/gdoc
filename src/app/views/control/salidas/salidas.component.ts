@@ -5,7 +5,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -89,6 +89,8 @@ export class SalidasComponent implements OnInit {
   public bzAlertasO = []
   public bzAlertas = []
   public lstCA = []
+  public archivos = []
+
   public buscar = ''
   public longitud = 0;
   public pageSize = 10;
@@ -105,6 +107,12 @@ export class SalidasComponent implements OnInit {
     fecha: '',
     usuario: '',
     observacion: ''
+  }
+
+  public DocAdjunto: DocumentoAdjunto = {
+    documento: '',
+    archivo: '',
+    usuario: ''
   }
 
 
@@ -608,12 +616,12 @@ export class SalidasComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-     
+
         this.toastrService.success(
           'Tu documento ha sido reversado ',
           `GDoc Wkf.ReversarDocumento`
         );
-        
+
         this.seleccionNavegacion(0)
 
 
@@ -624,5 +632,49 @@ export class SalidasComponent implements OnInit {
       })
 
   }
+
+
+  fileSelected(e) {
+    this.archivos.push(e.target.files[0])
+  }
+
+  async SubirArchivo(e) {
+    this.ngxService.startLoader("loader-aceptar")
+    var frm = new FormData(document.forms.namedItem("forma"))
+    try {
+      await this.apiService.EnviarArchivos(frm).subscribe(
+        (data) => {
+          this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
+          this.xAPI.parametros = ''
+          this.DocAdjunto.archivo = this.archivos[0].name
+          this.DocAdjunto.usuario = this.loginService.Usuario.id
+          this.DocAdjunto.documento = this.numControl
+          this.xAPI.valores = JSON.stringify(this.DocAdjunto)
+          this.apiService.Ejecutar(this.xAPI).subscribe(
+            (xdata) => {
+              if (xdata.tipo == 1) {
+                this.toastrService.success(
+                  'Tu archivo ha sido cargado con exito ',
+                  `GDoc Registro`
+                );
+
+              } else {
+                this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+              }
+              this.ngxService.stopLoader("loader-aceptar")
+            },
+            (error) => {
+              this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
+              this.ngxService.stopLoader("loader-aceptar")
+            }
+          )
+        }
+      )
+    } catch (error) {
+      console.error(error)
+    }
+
+  }
+
 
 }
