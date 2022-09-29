@@ -70,15 +70,15 @@
                     style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                     <div class="row">
                       <div class="col-md-2 texto-lista">
-                        <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.ncontrol )]">{{ e.ncontrol | uppercase }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                        <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="{{e.color}}">{{ e.simbolo }}</font></a>
                       </div>
                       <div class="col-md-2 texto-lista">
-                        {{ e.origen | date:"dd-MM-yyyy" }}
+                        {{ e.origen | date:"dd-MM-yyyy" }} | {{ e.norigen | uppercase }}
                       </div>
-                      <div class="col-md-4 texto-lista">
+                      <div class="col-md-5 texto-lista">
                         {{ e.nombre | uppercase }} ( {{ e.estatus_nombre | uppercase }} )
                       </div>
-                      <div class="col-md-4 texto-lista">
+                      <div class="col-md-3 texto-lista">
                         {{ e.unidad | uppercase }}
                       </div>
                     </div>

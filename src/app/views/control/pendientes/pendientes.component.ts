@@ -74,6 +74,29 @@ export class PendientesComponent implements OnInit {
             e.ncontrol + ' ' + e.contenido + e.estatus_nombre + ' ' + e.remitente + ' ' + e.nombre
             + ' ' + e.creado
           )
+          e.numc = e.ncontrol
+          e.existe = e.anom == '' ? true : false;
+          e.privado = e.priv == 1 ? true : false;
+          e.color = 'green'
+          switch (e.tdoc.toLowerCase()) {
+            case 'punto de cuenta':
+              e.simbolo = "-P"
+              e.color = 'green'
+              break;
+            case 'tramitacion por organo regular':
+              e.simbolo = "-T"
+              e.color = 'brown'
+              break;
+            case 'resolucion':
+              e.simbolo = "-R"
+              e.color = 'orange'
+              break;
+            default:
+              e.simbolo = ''
+              break;
+          }
+
+          e.completed = false;
           return e
         })
 
