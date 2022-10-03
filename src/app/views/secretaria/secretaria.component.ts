@@ -242,7 +242,7 @@ export class SecretariaComponent implements OnInit {
         console.log(data)
         data.Cuerpo.forEach(e => {
           
-          e.existe = e.anom == '' ? true : false
+          e.existe = e.anom != '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.completed = false
           e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
