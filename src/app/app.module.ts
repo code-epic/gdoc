@@ -79,6 +79,7 @@ import { PerfilComponent } from './views/perfil/perfil.component';
 import { IndiceComponent } from './views/reportes/indice/indice.component';
 import { ContenidoComponent } from './views/reportes/contenido/contenido.component';
 import { BuscadorComponent } from './views/buscador/buscador.component';
+import { PapeleraComponent } from './views/papelera/papelera.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -205,7 +206,8 @@ const ngWizardConfig: NgWizardConfig = {
     PerfilComponent,
     IndiceComponent,
     ContenidoComponent,
-    BuscadorComponent
+    BuscadorComponent,
+    PapeleraComponent
   ],
   providers:  [
     {

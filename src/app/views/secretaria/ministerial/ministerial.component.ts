@@ -6,7 +6,7 @@ import { Editor } from 'ngx-editor'
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
-import { IWKFAlerta } from 'src/app/services/control/documentos.service';
+import { IDocumento, IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 
 import Swal from 'sweetalert2'
@@ -77,6 +77,9 @@ export class MinisterialComponent implements OnInit {
   public grado = ''
   public titulo = ''
   public archivos = []
+  public lstMinisterial = []
+  public lstCuenta = []
+  
   public download: any
   public fcreacion: any
   public creador: any
@@ -110,6 +113,10 @@ export class MinisterialComponent implements OnInit {
     usuario: ''
   }
 
+  public Documento : IDocumento = {
+    
+  }
+
   public WAlerta: IWKFAlerta = {
     documento: 0,
     estado: 0,
@@ -124,6 +131,7 @@ export class MinisterialComponent implements OnInit {
   public fplazo: any
   public dwValidate = false
   public dwSub = false
+  public doc : any
 
   constructor(private apiService: ApiService,
     config: NgbModalConfig,
@@ -145,19 +153,25 @@ export class MinisterialComponent implements OnInit {
     if (this.rutaActiva.snapshot.params.id != undefined) {
       try {
         this.original = this.rutaActiva.snapshot.params.id
-        this.ministerial = JSON.parse(atob(this.original))
-        this.listarDatos()
+        this.doc = JSON.parse(atob(this.original))
+        this.Documento = this.doc
+        this.Documento.wfdocumento = this.doc.idd
+        //this.listarDatos()
         //Carga de Documentos
-        this.dwValidate = this.ministerial.anom != "" ? true : false
-        this.download = this.apiService.Dws(btoa("D" + this.ministerial.numc) + '/' + this.ministerial.anom)
-        //console.log(this.download, this.ministerial.anom);
-        this.codigohash = btoa(this.ministerial.id + this.ministerial.idd + this.ministerial.cuenta)
+
+        this.unidad = this.doc.udep
+        this.comando = this.doc.coma
+        this.dwValidate = this.doc.anom != "" ? true : false
+        this.download = this.apiService.Dws(btoa("D" + this.doc.numc) + '/' + this.doc.anom)
+        
         this.cmbDestino = 'S'
-        this.creador = this.ministerial.usua
-        console.log(this.ministerial);
+        // this.creador = this.ministerial.usua
+        console.log( 'entrada de datos ', this.Documento );
+        this.consultarSubID(this.Documento.wfdocumento.toString())
+
         this.listarEstados()
       } catch (error) {
-        this.ruta.navigate(['/secretaria', ''])
+        //this.ruta.navigate(['/secretaria', ''])
       }
 
 
@@ -171,6 +185,26 @@ export class MinisterialComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.lstEstados = data.Cuerpo.filter(e => { return e.esta == 1 });
+      },
+      (error) => {
+
+      }
+    )
+  }
+
+  consultarSubID(id : string) {
+    this.xAPI.funcion = 'WKF_CSubDocumentoID'
+    this.xAPI.parametros = '' + id
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.lstCuenta = data.Cuerpo
+        this.asunto = this.lstCuenta[0].resumen
+        this.cuenta = this.lstCuenta[0].cuenta
+        this.fecha = this.lstCuenta[0].fecha.substring(0,10) 
+        this.codigohash = btoa(this.doc.id + this.doc.idd + this.cuenta)
+
       },
       (error) => {
 

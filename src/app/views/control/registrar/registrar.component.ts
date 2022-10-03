@@ -344,7 +344,7 @@ export class RegistrarComponent implements OnInit {
 
 
     Swal.fire({
-      title: '¿Estás seguro que deseas eliminar el documento?',
+      title: '¿Estás seguro que deseas enviar a la papelera el documento?',
       text: '#' + codigo,
       icon: 'warning',
       showCancelButton: true,
@@ -355,10 +355,10 @@ export class RegistrarComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         var usuario = this.loginService.Usuario.id
-        var llave = ``
-        this.xAPI.funcion = 'WKF_AUbicacion'
+        this.xAPI.funcion = 'WKF_ARedistribuir' //'WKF_AUbicacion'
         this.xAPI.valores = ''
-        this.xAPI.parametros = `10,1,${llave},${usuario},${id}`
+        this.xAPI.parametros = `10,10,1,${usuario},${id}`
+        console.log(codigo, id )
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
             if (data.tipo == 1) {

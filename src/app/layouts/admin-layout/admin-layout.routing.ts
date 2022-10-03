@@ -35,6 +35,7 @@ import { RsconfiguracionComponent } from 'src/app/views/resoluciones/rsconfigura
 import { PerfilComponent } from 'src/app/views/perfil/perfil.component';
 import { IndiceComponent } from 'src/app/views/reportes/indice/indice.component';
 import { BuscadorComponent } from 'src/app/views/buscador/buscador.component';
+import { PapeleraComponent } from 'src/app/views/papelera/papelera.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -241,6 +242,11 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'buscador',
         component: BuscadorComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'papelera',
+        component: PapeleraComponent,
         canActivate: [AuthGuardGuard]
     }
 

@@ -203,7 +203,7 @@ export class SecretariaComponent implements OnInit {
         break
       case 1:
         this.clasificacion = false
-        this.xAPI.funcion = 'WKF_CSubDocumento'
+        //this.xAPI.funcion = 'WKF_CSubDocumento'
         this.xAPI.parametros = this.estadoActual + ',' + 2 + ',1'
         this.listarBuzon()
         break
@@ -239,7 +239,7 @@ export class SecretariaComponent implements OnInit {
     this.ngxService.startLoader("loader-aceptar")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
+        console.log(data)
         data.Cuerpo.forEach(e => {
           
           e.existe = e.anom == '' ? true : false
