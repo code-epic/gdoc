@@ -277,23 +277,26 @@ export class MinisterialComponent implements OnInit {
 
   aceptar() {
     this.selFecha()
-    this.SubDocumento.subdocumento = parseInt(this.ministerial.ids)
-    this.SubDocumento.cuenta = this.ministerial.cuenta
+    console.log( this.doc)
+    console.error( this.doc.idd )
+
+    this.SubDocumento.subdocumento = parseInt(this.doc.idd)
+    this.SubDocumento.cuenta = this.cuenta
     this.SubDocumento.fecha = this.fecha_alerta
     this.SubDocumento.usuario = this.loginService.Usuario.id
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.SubDocumento)
 
-    this.ngxService.startLoader("loader-aceptar")
+    // this.ngxService.startLoader("loader-aceptar")
 
-    if (this.blUpdate == false) {
-      this.xAPI.funcion = 'WKF_ISubDocVariante'
-      this.registrar()
-      this.blUpdate = true
-      return
-    }
-    this.xAPI.funcion = 'WKF_ASubDocVariante'
-    this.actualizar()
+    // if (this.blUpdate == false) {
+    //   this.xAPI.funcion = 'WKF_ISubDocVariante'
+    //   this.registrar()
+    //   this.blUpdate = true
+    //   return
+    // }
+    // this.xAPI.funcion = 'WKF_ASubDocVariante'
+    // this.actualizar()
   }
 
   registrar() {

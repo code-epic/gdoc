@@ -75,11 +75,14 @@
                       <div class="col-md-2 texto-lista">
                         {{ e.origen | date:"dd-MM-yyyy" }} | {{ e.norigen | uppercase }}
                       </div>
-                      <div class="col-md-5 texto-lista">
+                      <div class="col-md-4 texto-lista">
                         {{ e.nombre | uppercase }} ( {{ e.estatus_nombre | uppercase }} )
                       </div>
                       <div class="col-md-3 texto-lista">
                         {{ e.unidad | uppercase }}
+                      </div>
+                      <div class="col-md-1 texto-lista">
+                        {{ e.salida | uppercase }}
                       </div>
                     </div>
                   </mat-list>

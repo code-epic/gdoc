@@ -343,7 +343,7 @@
                                     <select class="form-control" [ngModelOptions]="{standalone: true}"
                                         [(ngModel)]="Doc.codigo" value="{{Doc.codigo}}" id="cod">
                                         <option value="0">Seleccione</option>
-                                        <option *ngFor="let x of lstCA" value="{{x.nomb}}">{{ x.nomb }} -- {{ x.obse }}
+                                        <option *ngFor="let x of lstCA" value="{{x.nomb + ' - ' + x.obse}}">{{ x.nomb }} - {{ x.obse }}
                                         </option>
                                     </select>
                                 </div>

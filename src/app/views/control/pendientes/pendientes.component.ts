@@ -3,6 +3,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { PageEvent } from '@angular/material/paginator';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { error } from 'console';
 
 
 @Component({
@@ -69,10 +70,11 @@ export class PendientesComponent implements OnInit {
     this.xAPI.parametros = ''
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data)
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
           e.busqueda = this.utilService.ConvertirCadena(e.norigen + ' ' +
             e.ncontrol + ' ' + e.contenido + e.estatus_nombre + ' ' + e.remitente + ' ' + e.nombre
-            + ' ' + e.creado
+            + ' ' + e.creado + ' ' + e.salida  + ' ' + e.unidad +  ' ' + e.subdocumento
           )
           e.numc = e.ncontrol
           e.existe = e.anom == '' ? true : false;

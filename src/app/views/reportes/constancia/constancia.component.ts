@@ -25,6 +25,7 @@ export class ConstanciaComponent implements OnInit {
   public estadoActual = 1
   public estadoOrigen = 1
   public bCuentas : boolean = false
+  public nexpediente : string = ''
 
   public Doc : IDocumento = {
     ncontrol: '',
@@ -95,6 +96,7 @@ export class ConstanciaComponent implements OnInit {
       (data) => {
         data.Cuerpo.forEach(e => {
           this.Doc = e
+          console.log(this.Doc)
           this.Doc.contenido = this.Doc.contenido.toUpperCase()
           this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
           this.Doc.fcreacion = e.fcreacion.substring(0, 10)
@@ -120,6 +122,9 @@ export class ConstanciaComponent implements OnInit {
           this.lstHistorial = historial.map(e => {
             return typeof e == 'object'?e: JSON.parse(e)
           })
+
+          const codigo = this.Doc.codigo + ' / ' + this.Doc.nexpediente
+          this.nexpediente = codigo.toUpperCase()
           //this.safeHtml = this.domSanitizer.bypassSecurityTrustHtml(this.Doc.contenido)
           //console.log(this.safeHtml);
           this.Doc.contenido = this.domSanitizer.sanitize(SecurityContext.HTML, this.Doc.contenido)

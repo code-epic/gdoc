@@ -96,13 +96,10 @@
                       <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="{{e.color}}">{{ e.simbolo }}</font></a>
 
                     </div>
-                    <div class="col-md-1 texto-lista">
-                      {{ e.nori | uppercase }} 
-                    </div>
                     <div class="col-md-2 texto-lista">
-                      {{ e.fcre | date:"dd-MM-yyyy" }}
+                      {{ e.fcre | date:"dd-MM-yyyy" }} |  {{ e.nori | uppercase }} 
                     </div>
-                    <div class="col-md-3 texto-lista"
+                    <div class="col-md-4 texto-lista"
                     #tooltip="matTooltip"
                     matTooltip="  {{ e.udep | uppercase }}">
                       {{ e.udep | uppercase }}
