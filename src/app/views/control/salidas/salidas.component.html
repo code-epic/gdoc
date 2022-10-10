@@ -134,14 +134,14 @@
                         <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
                       </button>
                       <button mat-icon-button aria-label="Generar Salida" (click)="editar(e.numc, e.url)">
-                        <mat-icon class="text-pink">call_made</mat-icon>
+                        <mat-icon class="text-gray">edit_note</mat-icon>
                       </button>
                       <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
-                        <mat-icon class="text-info">attach_file</mat-icon>
+                        <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
-                      <!-- <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.id)">
-                          <mat-icon  class="text-purple">delete</mat-icon>
-                        </button> -->
+                      <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.idd)">
+                        <mat-icon class="text-gray">delete_outline</mat-icon>
+                      </button>
 
                     </div>
                   </div>
@@ -184,12 +184,13 @@
 
                     <div class="col-md-2 text-right">
                       <button mat-icon-button aria-label="Privado">
-                        <mat-icon  class="text-warning" (click)="mensajeReversarDoc(e.idd)" >history</mat-icon>
+                        <mat-icon  class="text-gray" (click)="mensajeReversarDoc(e.idd)" >history</mat-icon>
                       </button>
 
                       <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
-                        <mat-icon class="text-info">attach_file</mat-icon>
+                        <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
+                     
 
                     </div>
                   </div>

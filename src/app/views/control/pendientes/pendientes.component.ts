@@ -24,7 +24,18 @@ export class PendientesComponent implements OnInit {
   public id_alerta = ''
 
   public buscar = ''
+  public antes: boolean = false
+  public despues: boolean = true
+  public paginador: number = 10
+  public de: number = 0
+  public para: number = 9
   public posicionPagina = 0
+  public cantidad = 0
+  public blBuscar = false
+  public max_paginador: number = 0
+  public lstPaginas = []
+  public actual : number =  1
+
 
   public focus = true
 
@@ -52,6 +63,11 @@ export class PendientesComponent implements OnInit {
 
   }
 
+  seleccionNavegacion(e){
+
+  }
+
+
   seleccionLista(event) {
     this.longitud = 0;
 
@@ -59,7 +75,12 @@ export class PendientesComponent implements OnInit {
       const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
       this.longitud = this.bzBusqueda.length
       this.bzBusqueda = this.bzSeguimientoO.filter((e) => { return patron.test(e.busqueda) })
+      
       this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize)
+      this.max_paginador = this.bzBusqueda.length / 10
+      this.cantidad = this.bzBusqueda.length
+      this.MostrarPaginador()
+      this.buscar = ''
     }
 
   }
@@ -97,7 +118,7 @@ export class PendientesComponent implements OnInit {
               e.simbolo = ''
               break;
           }
-
+          e.resumenl = e.contenido.substring(0,200) 
           e.completed = false;
           return e
         })
@@ -105,6 +126,10 @@ export class PendientesComponent implements OnInit {
         this.bzBusqueda = this.bzSeguimientoO
         this.longitud = this.bzBusqueda.length
         this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize)
+        this.cantidad = this.longitud
+        this.max_paginador = this.cantidad / 10
+        this.blBuscar = true
+        this.MostrarPaginador()
 
       },
       (error) => {
@@ -147,5 +172,51 @@ export class PendientesComponent implements OnInit {
     //this.ruta.navigate(['/constancia', base])
   }
 
+  dwUrl(ncontrol: string, archivo: string): string {
+    return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
+  }
+
+  MostrarPaginador() {
+    this.blBuscar = true
+    this.lstPaginas = []
+    this.antes = false
+
+    if (this.max_paginador > 10) {
+      this.max_paginador = 10
+      this.despues = true
+    } else {
+      this.despues = false
+    }
+    for (var i = 0; i < this.max_paginador; i++) {
+      var color = ''
+
+      if (this.de > 0) {
+        color = this.de/10 == i ?  'bg-info text-white' : ''
+        this.antes = true
+      } 
+      if ( this.de == 0 && i == 0) color = 'bg-info text-white'
+      this.lstPaginas.push({ 
+          "id": i + 1,
+          "color": color
+      } )
+    }
+  }
+
+    /**
+   * Establecer la posicion del sistema en el buscador
+   */
+     posicion(pos: number) {
+      console.log(pos);
+      if (pos != this.actual) {
+        this.actual = pos 
+        this.de = 10 * (pos - 1)
+        this.para = (this.de - 1)+ 10
+        this.bzSeguimiento = this.bzBusqueda.slice( this.de, this.para )
+        //this.consultarAPIBuscar()
+      }
+      
+      
+    }
+  
 
 }

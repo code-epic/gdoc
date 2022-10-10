@@ -66,7 +66,8 @@ import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatTooltipModule} from '@angular/material/tooltip';
+import { MatChipsModule} from '@angular/material/chips';
 
 import { RstranscripcionComponent } from './views/resoluciones/rstranscripcion/rstranscripcion.component';
 import { RsrevisionComponent } from './views/resoluciones/rsrevision/rsrevision.component';
@@ -151,6 +152,7 @@ const ngWizardConfig: NgWizardConfig = {
     MatDialogModule,
     MatCommonModule,
     MatTooltipModule,
+    MatChipsModule,
     ToastContainerModule,
     NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
     MatToolbarModule,

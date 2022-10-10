@@ -232,11 +232,12 @@ export class RegistrarComponent implements OnInit {
   }
 
   async listarBuzon(): Promise<void> {
-
+    console.log('Entrando en listado')
     this.ngxService.startLoader("loader-aceptar")
     try {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
+          console.log(data)
           this.buzon = data.Cuerpo.map((e) => {
             e.existe = e.anom == '' ? true : false;
             e.privado = e.priv == 1 ? true : false;
@@ -273,10 +274,12 @@ export class RegistrarComponent implements OnInit {
           this.ngxService.stopLoader("loader-aceptar")
         },
         (error) => {
+          this.ngxService.stopLoader("loader-aceptar")
         }
       )
     } catch (error) {
       console.error(error)
+      this.ngxService.stopLoader("loader-aceptar")
     }
   }
 

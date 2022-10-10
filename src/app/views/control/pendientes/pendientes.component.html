@@ -65,7 +65,7 @@
           <div class="container">
             <div class="row">
               <div class="col-md-12">
-                <mat-selection-list #lstProcesados>
+                <!-- <mat-selection-list #lstProcesados>
                   <mat-list *ngFor="let e of bzSeguimiento; let i=index "
                     style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                     <div class="row">
@@ -86,16 +86,141 @@
                       </div>
                     </div>
                   </mat-list>
-                </mat-selection-list>
+                </mat-selection-list> -->
+
+
+
+                
+                    <div class="container">
+                      <br>
+                      <small class="mr-5" style="font-size: 16px;" *ngIf="blBuscar">
+                        Cerca de {{ cantidad | number }} resultados...
+                      </small>
+                      <br>
+                      <div class="row enlace" *ngFor="let e of bzSeguimiento; let i=index ">
+                        
+                          <div class="col-md-8">
+                            <a routerLinkActive="active"  
+                                [routerLink]="['/constancia', constancia( e.numc )]">
+                                {{ e.numc }} - {{ e.tdoc }}
+                            </a> 
+                            | {{ e.origen | date:"dd-MM-yyyy" }}
+                          </div>
+                          <div class="col-md-4 text-right">
+                      
+                            <span class="badge rounded-pill text-bg-primary">pdf</span>
+
+                                <a [href]="dwUrl(e.numc, e.archivo)" target="_top"
+                                rel="noopener noreferrer" style="color:darkgrey;font-size: 12px;font-weight: normal;">
+                                 
+                                    
+                                    {{ e.archivo.substring(0,10) }}
+                                    <img  src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" style="width: 12px;margin-top: -3px;"/>
+                                </a>
+                          </div>
+                      
+                        
+                          <div class="col-md-12" style="margin-top: -4px;">
+
+
+
+                        
+                            <!-- <button type="button" class="btn btn-outline-secondary me-2" placement="top"
+                                    ngbPopover="{{ e.contenido }}" popoverTitle="Detalles generales">
+                              General
+                            </button> -->
+
+                            <ng-template #popContent >
+                              <div class="row">
+                                <!-- <div class="col-md-4">{{ e.unidad }}</div> -->
+                                <div class="col-md-12">
+                                  <div [innerHTML]="e.contenido" class="contenido"></div>
+
+                                
+                                </div>
+                              </div>
+                            </ng-template>
+                            <!-- <ng-template #popTitle>{{ e.numc }}</ng-template> -->
+            
+                            {{ e.unidad }} <button mat-button
+                              [ngbPopover]="popContent" 
+                              popoverTitle="Detalles generales">
+                              
+                              Mas...
+                            </button>
+                            <div [innerHTML]="e.resumenl"  class="contenido"></div>
+
+                            <p style="margin-top: -10px;" >
+                              <small class=" mr-3"><i class="fa fa-calendar"></i>&nbsp;{{ e.fecha | date:"dd-MM-yyyy hh:mm" }}</small>
+                              <small class=" mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN {{ e.norigen | uppercase }}</small>
+                              <small class=" mr-3"><i class="fa fa-folder"></i> &nbsp; SALIDA {{ e.salida | uppercase }}</small>
+                      
+                              <small class=" mr-4"><i class="fa fa-globe"></i> &nbsp;
+                                {{ e.nombre | uppercase }} ( {{ e.estatus_nombre | uppercase }} )
+                              </small>
+                            </p>
+                            
+                          
+                          </div>
+                        <!-- <div class="col-md-2"></div> -->
+                        
+                      </div>
+                    </div>
+                
+
+
+
+
               </div>
+
+
+
+
+
+
             </div>
-            <div class="row text-right">
-              <div class="col-md-12">
-                <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
-                  [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
-                </mat-paginator>
+         
+
+            <br><br>
+            <div class="row">
+
+              <div class="col-md-3"></div>
+              <div class="col-md-6 text-center">
+                <nav aria-label="Page navigation example" *ngIf="blBuscar">
+
+                  <div class="row">
+                    <div class="col-md-1">
+                      <ul class="pagination justify-content-center">
+                        <li class="page-item">
+                          <a class="page-link" *ngIf="antes" (click)="posicion(actual-1)">
+                            < </a>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-10">
+                      <ul class="pagination justify-content-center">
+                        <li class="page-item" *ngFor="let e of lstPaginas">
+                          <a class="page-link {{ e.color }}" (click)="posicion(e.id)">{{ e.id }}</a>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-1">
+                      <ul class="pagination justify-content-center">
+                        <li class="page-item">
+                          <a class="page-link" *ngIf="despues" (click)="posicion(actual+1)">></a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+
+                </nav>
               </div>
+              <div class="col-md-3"></div>
             </div>
+
+
+
           </div>
         </div>
       </div>
@@ -103,7 +228,12 @@
 
   </div>
   <!-- Fin de Tarjeta Padre -->
+  <br><br> <br> <br>
 </div>
+
+
+
+
 
 
 

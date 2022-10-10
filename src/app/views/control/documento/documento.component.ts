@@ -977,7 +977,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    * @param numBase64  : base64
    */
   async consultarDocumentoSalida() {
-    if (this.titulo = 'Salida') return false
+    console.log(this.titulo)
+    if (this.titulo == 'Salida') return false
     if (this.Doc.salida == '') return false
     let dwf = ''
     if (this.Doc.norigen != '') dwf = this.Doc.norigen

@@ -677,4 +677,47 @@ export class SalidasComponent implements OnInit {
   }
 
 
+    //eliminar
+    eliminar(codigo: string, id: number) {
+
+
+      Swal.fire({
+        title: '¿Estás seguro que deseas enviar a la papelera el documento?',
+        text: '#' + codigo,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si',
+        cancelButtonText: 'No'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          var usuario = this.loginService.Usuario.id
+          this.xAPI.funcion = 'WKF_ARedistribuir' //'WKF_AUbicacion'
+          this.xAPI.valores = ''
+          this.xAPI.parametros = `10,10,1,${usuario},${id}`
+          console.log(codigo, id )
+          this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data) => {
+              if (data.tipo == 1) {
+                this.toastrService.success(
+                  'Tu archivo ha sido enviado a la papelera con exito ',
+                  `GDoc Wkf.Papelera`
+                );
+                this.seleccionNavegacion(this.selNav)
+  
+              } else {
+                this.toastrService.error(data.msj, `GDoc Wkf.Papelera`);
+              }
+  
+            },
+            (errot) => {
+              this.toastrService.error(errot, `GDoc Wkf.Papelera`);
+            }) //
+  
+        }
+      })
+    }
+  
+
 }
