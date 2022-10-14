@@ -12,6 +12,8 @@ import { LoginService } from 'src/app/services/seguridad/login.service'
 import { UtilService } from 'src/app/services/util/util.service'
 
 import { Location } from '@angular/common';
+import { FormControl } from '@angular/forms';
+import { error } from 'console';
 
 
 @Component({
@@ -80,9 +82,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public cedula: string = ''
   public cargo: string = ''
   public nmilitar: string = ''
-
   public salida: string = 'Nro. de Salida'
-
+  public booPuntoCuenta: boolean = false
 
   public WkDoc: IWKFDocumento = {
     nombre: '',
@@ -128,7 +129,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     archivo: '',
     privacidad: 0,
     subdocumento: '',
-    dependencias: ''
+    dependencias: '',
+    puntodecuenta: '',
   }
 
   public WAlerta: IWKFAlerta = {
@@ -208,6 +210,13 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
   routerDoc: { numc: string }
 
+  toppings = new FormControl('');
+  toppingsaux = new FormControl('');
+
+  lstPC: string[] = []; // Auxiliar para mappear las cuentas de toppings 
+  lstPuntosCuentas: string[] = [];
+  lstPuntosCuentasAux : []
+
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
     private utilService: UtilService,
@@ -230,33 +239,28 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
+      
       if (id == 'salida') {
-        this.titulo = 'Salida'
-        this.booDependencia = true
-        this.estadoActual = 9
-        this.estadoOrigen = 2
-        this.ncontrolv = false
-        this.salidavisible = false
-        this.origenvisible = false
-        this.forigenv = false
-        this.ncontrolt = 'Nro de Salida'
-        this.remitentet = 'Destinatario'
-        this.fsalida = 'Fecha de Salida'
-        this.camposalida = 4
-        this.camposfechasalida = 4
+       this.SalidaTipo()
 
 
         if (this.rutaActiva.snapshot.params.numc != undefined) {
           var numc = this.rutaActiva.snapshot.params.numc
+         
           this.ncontrolt = 'Nro de Control'
           this.ncontrolv = true
           this.salidavisible = true
           this.camponumsalida = 4
 
           this.consultarDocumento(numc)
+
         }
 
       } else {
+        if (this.rutaActiva.snapshot.params.numc != undefined) {
+          var numc = this.rutaActiva.snapshot.params.numc
+          if (numc == 'salida') this.SalidaTipo()
+        }
         this.consultarDocumento(id)
       }
 
@@ -275,11 +279,25 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
+
+  SalidaTipo(){
+    this.titulo = 'Salida'
+    this.booDependencia = true
+    this.estadoActual = 9
+    this.estadoOrigen = 2
+    this.ncontrolv = false
+    this.salidavisible = false
+    this.origenvisible = false
+    this.forigenv = false
+    this.ncontrolt = 'Nro de Salida'
+    this.remitentet = 'Destinatario'
+    this.fsalida = 'Fecha de Salida'
+    this.camposalida = 4
+    this.camposfechasalida = 4
+  }
+
   validarTipoDoc(): boolean {
-
     return this.Doc.tipo.toLowerCase() == 'resolucion' || this.Doc.tipo.toLowerCase() == 'tramitacion por organo regular' || this.Doc.tipo.toLowerCase() == 'punto de cuenta'
-
-
   }
 
   listarConfiguracion() {
@@ -346,6 +364,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
     this.xAPI.parametros = base
     this.xAPI.valores = ''
+    // console.log(this.estadoActual)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         console.log(data)
@@ -384,12 +403,23 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         const dependencia = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
         this.lstDependencias = dependencia.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
 
+
+
+        const cuentasaux = this.Doc.puntodecuenta != null ? JSON.parse(this.Doc.puntodecuenta) : []
+        this.lstPuntosCuentasAux = cuentasaux.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        
+
+        this.toppingsaux.setValue('1')
+   
+        
+        
+
         //Carga de Documentos
         this.bPDF = this.Doc.archivo != "" ? true : false
         this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
 
         this.activarTipo = this.validarTipoDoc()
-
+        
         // this.serializar =  btoa( JSON.stringify(this.Doc.norigen))
         // console.log( this.serializar)
       },
@@ -435,6 +465,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     }
   }
   //registrar Un documento pasando por el WorkFlow
+
   registrar() {
 
     this.ngxService.startLoader("loader-aceptar")
@@ -476,15 +507,21 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
             if (cant > 0) {
               this.salvarCuentas(this.Doc.wfdocumento)
+              
             } else {
               this.aceptar(this.Doc.ncontrol)
               this.limpiarDoc()
               this.ngxService.stopLoader("loader-aceptar")
             }
             const cantdep = this.lstDependencias.length
+            const mpuntocuenta = this.toppings.value.length
 
             if (cantdep > 0) {
               this.salvarDependencias(this.Doc.wfdocumento)
+              if( mpuntocuenta > 0) {
+                this.lstPC = this.toppings.value
+                this.salvarPuntoCuenta(this.Doc.wfdocumento)
+              }
             } else {
               this.aceptar(this.Doc.ncontrol)
               this.limpiarDoc()
@@ -618,11 +655,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
         this.ngxService.stopLoader("loader-aceptar")
 
-        if (this.rutaActiva.snapshot.params.id != undefined && this.rutaActiva.snapshot.params.id == 'salida') {
+        if (this.titulo == 'Salida') {
           this.insertarObservacion()
           this.salvarDependencias(wfd)
+          this.lstPC = this.toppings.value
+         
+          this.salvarPuntoCuenta(wfd)
+          this.ruta.navigate(['/salidas']);
 
         } else {
+  
           this.ruta.navigate(['/registrar']);
         }
 
@@ -660,7 +702,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         await this.guardarAlerta(1)
         //this.ruta.navigate(['/salidas']);
-        this.location.back()
+        //this.location.back()
 
       },
       (errot) => {
@@ -782,7 +824,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   eliminarDependencia(pos: number, id: string) {
-
+  
+    if( id == undefined || id == '') {
+      this.lstDependencias.splice(pos, 1)
+      return false
+    }
     this.ngxService.startLoader("loader-aceptar")
     this.xAPI.funcion = "WKF_EDocumentoDependencia"
     this.xAPI.parametros = id.toString()
@@ -804,7 +850,36 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
+  async salvarPuntoCuenta(numc: number) {
 
+    const cant = this.lstPC.length
+    if (cant == 0) {
+      this.ngxService.stopLoader("loader-aceptar")
+      return
+    } else {
+      const cuenta = this.lstPC[0] 
+      const p_cuenta = cuenta.split('|')
+      this.xAPI.funcion = 'WKF_IPuntoCuentaMultiple'
+      this.xAPI.valores = ''
+      this.xAPI.parametros = numc + ',' + p_cuenta[0].trim() + ',' + p_cuenta[1].trim() + ',1'
+      console.log('insertando puntoscuenta ', this.xAPI)
+      await this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+          this.lstPC.splice(0, 1)
+          const c = this.lstPC.length
+          if (c == 0) {
+            this.ngxService.stopLoader("loader-aceptar")
+          } else {
+            this.salvarPuntoCuenta(numc)
+          }
+        },
+        (errot) => {
+          this.toastrService.error(errot, `GDoc Wkf.IDocumentoPuntoCuenta`)
+          this.ngxService.stopLoader("loader-aceptar")
+        }
+      )
+    }
+  }
   editarCuenta() {
 
     if (this.PosicionCuenta != -1) {
@@ -842,7 +917,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   async salvarDependencias(numc: number) {
 
     const cant = this.lstDependencias.length
-    console.log('cantidad ', cant)
+   
     if (cant == 0) {
       this.ngxService.stopLoader("loader-aceptar")
       return
@@ -858,7 +933,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           const c = this.lstDependencias.length
           if (c == 0) {
             this.ngxService.stopLoader("loader-aceptar")
-            this.aceptar(this.Doc.ncontrol)
+            //this.aceptar(this.Doc.ncontrol)
             this.limpiarDoc()
           } else {
             this.salvarDependencias(numc)
@@ -910,16 +985,50 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   selTipoDocumento() {
+    
     this.puntocuenta = false
     this.resolucion = false
+    this.booPuntoCuenta = false
     this.lstCuenta = []
     if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') {
       this.puntocuenta = true
       this.resolucion = true
     } else if (this.Doc.tipo.toLowerCase() == 'resolucion' || this.Doc.tipo.toLowerCase() == 'tramitacion por organo regular' || this.Doc.tipo.toLowerCase() == 'comision de servicio') {
       this.resolucion = true
+    } else if (this.Doc.tipo.toLowerCase() == 'multiple/punto de cuenta'){
+      if (this.titulo == 'Salida') {
+        this.cargarPuntosdeCuenta()
+
+      }else{
+        this.toastrService.warning("Debe dirigirse al modulo de salida para usar esta opcion", `GDoc Salida`)
+      }
     }
   }
+
+
+  cargarPuntosdeCuenta(){
+    
+    this.ngxService.startLoader("loader-aceptar")
+    this.xAPI.funcion = 'WKF_CPuntoCuentaSalida'
+    this.xAPI.parametros = '5'
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        
+        data.Cuerpo.map(e => {
+          this.lstPuntosCuentas.push(e.cuen + ' | ' + e.udep + ' ' + e.fori.substring(0,10))
+        })
+        this.ngxService.stopLoader("loader-aceptar")
+        this.booPuntoCuenta = true
+      },
+      (error) => {
+        console.error("No existe la funcion ", error)
+        this.ngxService.stopLoader("loader-aceptar")
+      }
+      
+    )
+  }
+
 
   //Listar los archivos asociados al documento
   verArchivos(content) {
@@ -977,7 +1086,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    * @param numBase64  : base64
    */
   async consultarDocumentoSalida() {
-    console.log(this.titulo)
     if (this.titulo == 'Salida') return false
     if (this.Doc.salida == '') return false
     let dwf = ''

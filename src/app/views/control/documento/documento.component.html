@@ -117,12 +117,14 @@
                     <div class="form-row">
                         <div class="form-group col-md-3">
                             <label for="cmbTipoDocumento">Tipo de Documento</label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
-                                [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" (change)="selTipoDocumento()" id="tdoc">
-                                <option value="0">Seleccione</option>
-                                <option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </option>
+                            
+                                <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
+                                    [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" (change)="selTipoDocumento()" id="tdoc">
+                                    <option value="0">Seleccione</option>
+                                    <option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </option>
 
-                            </select>
+                                </select>
+                                
                         </div>
                         <div class="form-group col-md-3">
                             <label for="cmbRemitente">{{remitentet}}</label>
@@ -134,11 +136,19 @@
                         </div>
                         <div class="form-group col-md-3">
                             <label for="cmbUnidad">Unidad o Dependencia</label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}" id="unid">
+                                <option value="0">Seleccione</option>
+                                <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Componente / Gran Comando</label>
                             <div class="input-group">
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}" id="unid">
+                                <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.comando"
+                                    value="{{Doc.comando}}" id="coma">
                                     <option value="0">Seleccione</option>
-                                    <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
+                                    <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
                                 </select>
                                 <div class="input-group-append"   *ngIf="booDependencia">
                                     <button *ngIf="!editar" type="button"  (click)="agregarDependencia()" id="btndependencia" class="btn btn-success">
@@ -147,14 +157,24 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group col-md-3">
-                            <label>Componente / Gran Comando</label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.comando"
-                                value="{{Doc.comando}}" id="coma">
-                                <option value="0">Seleccione</option>
-                                <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
-                            </select>
+
+                        <div class="form-group col-md-6" *ngIf="booPuntoCuenta">
+                            <label>Selecciona el/los punto de cuenta</label>
+                            <mat-form-field style="width: 100%;" >
+                                <mat-select [formControl]="toppings" multiple >
+                                    <mat-option *ngFor="let ptc of lstPuntosCuentas" [value]="ptc">{{ptc}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
                         </div>
+                        <div class="form-group col-md-6" *ngIf="booPuntoCuenta">
+                            <label>Puntos de Cuenta Asociados</label>
+                            <mat-form-field style="width: 100%;" >
+                                <mat-select  [formControl]="toppingsaux">
+                                    <mat-option *ngFor="let e of lstPuntosCuentasAux; let i=index" [value]="i" >{{e.cuenta  + ' ' + e.observacion + ' ' + e.estatus}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
                         <div class="form-group col-md-12"  *ngIf="booDependencia" >
                             <table class="table align-items-center table-flush" style="width:100%">
                                 <thead class="thead-light">
@@ -176,6 +196,9 @@
                         </div>
                         
                     </div>
+
+                    
+
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <label for="txtContenido">Contenido (*) </label>
@@ -453,5 +476,34 @@
         <div class="modal-footer">
             <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
                 <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+        </div>
+    </ng-template>
+
+
+
+
+       <!-- Adjuntar Imagenes al Documento -->
+       <ng-template #punto let-x>
+        <div class="modal-header header bg-gradient-primary">
+            <h4 class="modal-title" id="modal-basic-title">Agregar puntos de cuenta</h4>
+
+        </div>
+        <div class="modal-body">
+            <div class="container">
+                <div class="form-group col-md-12">
+                    <mat-form-field >
+                        <mat-label>Selecciona un punto de cuenta</mat-label>
+                        <mat-select [formControl]="toppings" multiple>
+                            <mat-option *ngFor="let topping of toppingList" [value]="topping">{{topping}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-warning" aria-label="Close" (click)="x.dismiss('Close')">
+                <span class="fa fa-times"></span>&nbsp;&nbsp;Aceptar</button>
         </div>
     </ng-template>

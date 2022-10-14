@@ -6,6 +6,11 @@
     background-position: center;
     border-color: #bbbfc5 !important;
 }
+.example-additional-selection {
+    opacity: 0.75;
+    font-size: 0.75em;
+}
+
 
 #codeEditor, #lineCounter {
     font-family: lucida console, courier new, courier, monospace;
@@ -63,4 +68,9 @@ select{
 }
 textarea {
     text-transform: uppercase;
+}
+
+.seleccion{
+    display: flex;
+    z-index: 1;
 }

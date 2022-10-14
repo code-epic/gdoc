@@ -156,8 +156,7 @@ export class MinisterialComponent implements OnInit {
         this.doc = JSON.parse(atob(this.original))
         this.Documento = this.doc
         this.Documento.wfdocumento = this.doc.idd
-        //this.listarDatos()
-        //Carga de Documentos
+        
 
         this.unidad = this.doc.udep
         this.comando = this.doc.coma
@@ -170,6 +169,8 @@ export class MinisterialComponent implements OnInit {
         this.consultarSubID(this.Documento.wfdocumento.toString())
 
         this.listarEstados()
+        this.listarDatos()
+        //Carga de Documentos
       } catch (error) {
         //this.ruta.navigate(['/secretaria', ''])
       }
@@ -221,18 +222,18 @@ export class MinisterialComponent implements OnInit {
   }
 
   listarDatos() {
-    console.error(this.ministerial)
-    this.unidad = this.ministerial.udep
-    this.comando = this.ministerial.comando
-    this.cuenta = this.ministerial.cuenta
-    this.fecha = this.ministerial.fecha.substring(0,10) 
-    this.cedula = this.ministerial.cedula
-    this.nombre = this.ministerial.nombre
-    this.grado = this.ministerial.cargo
-    this.asunto = this.ministerial.resumen
+    // console.error(this.ministerial)
+    // this.unidad = this.ministerial.udep
+    // this.comando = this.ministerial.comando
+    // this.cuenta = this.ministerial.cuenta
+    // this.fecha = this.ministerial.fecha.substring(0,10) 
+    // this.cedula = this.ministerial.cedula
+    // this.nombre = this.ministerial.nombre
+    // this.grado = this.ministerial.cargo
+    // this.asunto = this.ministerial.resumen
 
     this.xAPI.funcion = 'WKF_CSubDocVariante'
-    this.xAPI.parametros = this.ministerial.ids
+    this.xAPI.parametros = this.doc.idd
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -277,26 +278,25 @@ export class MinisterialComponent implements OnInit {
 
   aceptar() {
     this.selFecha()
-    console.log( this.doc)
-    console.error( this.doc.idd )
-
+    // console.log( this.doc)
+    // console.error( this.doc.idd )
+    this.SubDocumento.accion = this.SubDocumento.accion.toUpperCase()
+    this.SubDocumento.historico = this.SubDocumento.historico.toUpperCase()
     this.SubDocumento.subdocumento = parseInt(this.doc.idd)
     this.SubDocumento.cuenta = this.cuenta
     this.SubDocumento.fecha = this.fecha_alerta
     this.SubDocumento.usuario = this.loginService.Usuario.id
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.SubDocumento)
-
-    // this.ngxService.startLoader("loader-aceptar")
-
-    // if (this.blUpdate == false) {
-    //   this.xAPI.funcion = 'WKF_ISubDocVariante'
-    //   this.registrar()
-    //   this.blUpdate = true
-    //   return
-    // }
-    // this.xAPI.funcion = 'WKF_ASubDocVariante'
-    // this.actualizar()
+    this.ngxService.startLoader("loader-aceptar")
+    if (this.blUpdate == false) {
+      this.xAPI.funcion = 'WKF_ISubDocVariante'
+      this.registrar()
+      this.blUpdate = true
+      return
+    }
+    this.xAPI.funcion = 'WKF_ASubDocVariante'
+    this.actualizar()
   }
 
   registrar() {
@@ -332,11 +332,11 @@ export class MinisterialComponent implements OnInit {
   guardarAlerta(activo: number, fecha: string) {
 
     this.WAlerta.activo = activo
-    this.WAlerta.documento = parseInt(this.ministerial.ids)
+    this.WAlerta.documento = parseInt(this.doc.idd)
     this.WAlerta.estado = 4
     this.WAlerta.estatus = 3
     this.WAlerta.usuario = this.loginService.Usuario.id
-    this.WAlerta.observacion = this.ministerial.cuenta
+    this.WAlerta.observacion = this.cuenta + '|' + this.SubDocumento.estatus.toUpperCase()
     this.WAlerta.fecha = fecha
 
 

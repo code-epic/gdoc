@@ -29,6 +29,7 @@ export interface IDocumento {
   subdocumento?: string
   hz_adjunto?: string
   dependencias?: string
+  puntodecuenta?: string
 }
 
 

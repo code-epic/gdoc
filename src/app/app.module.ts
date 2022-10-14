@@ -68,6 +68,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule} from '@angular/material/tooltip';
 import { MatChipsModule} from '@angular/material/chips';
+import { MatSelectModule } from '@angular/material/select';
 
 import { RstranscripcionComponent } from './views/resoluciones/rstranscripcion/rstranscripcion.component';
 import { RsrevisionComponent } from './views/resoluciones/rsrevision/rsrevision.component';
@@ -143,6 +144,7 @@ const ngWizardConfig: NgWizardConfig = {
     MatExpansionModule,
     MatButtonToggleModule,
     AutocompleteLibModule,
+    MatSelectModule,
     MatListModule,
     ReactiveFormsModule,
     MatInputModule,
