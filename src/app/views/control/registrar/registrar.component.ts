@@ -105,6 +105,7 @@ export class RegistrarComponent implements OnInit {
   public longitud = 0;
   public pageSize = 10;
   public posicionPagina = 0
+  public EstadoDescripcion = ''
 
   public DocAdjunto: DocumentoAdjunto = {
     documento: '',
@@ -223,6 +224,7 @@ export class RegistrarComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data.Cuerpo)
         this.lstEstados = data.Cuerpo.filter(e => { return e.esta == 1 });
       },
       (error) => {
@@ -441,7 +443,7 @@ export class RegistrarComponent implements OnInit {
   ConsultarCtrl(id: string) {
    
     this.btnNota = false
-   
+    this.consultarEstados(id)
     this.UbicacionSeleccionLista = id
     this.xAPI.funcion = 'WKF_CClasificados'
     this.xAPI.valores = ''
@@ -507,11 +509,12 @@ export class RegistrarComponent implements OnInit {
   async notaEntrega(id: string) {
     this.btnNota = false
     var cantidad = this.lstNotaEntrega.length
-
+    
     if (cantidad > 0) {
       var i = 0
       this.lstNotaEntrega.forEach(e => {
         var origen = e.dest
+        
         var estatus = 1
         var usuario = this.loginService.Usuario.id
         var id = e.idd
@@ -656,5 +659,10 @@ export class RegistrarComponent implements OnInit {
     ventana.close()
   }
 
+  consultarEstados(id) {
+    this.lstEstados.map(e => {
+      if ( e.id == id) this.EstadoDescripcion = e.nomb
+    })
 
+  }
 }

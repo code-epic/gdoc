@@ -9,10 +9,10 @@ import { UtilService } from 'src/app/services/util/util.service';
 import { IDocumento, IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import {MatBottomSheet, MatBottomSheetRef} from '@angular/material/bottom-sheet';
-import {MAT_BOTTOM_SHEET_DATA} from '@angular/material/bottom-sheet';
-
+import { Md5 } from "md5-typescript";
 
 import Swal from 'sweetalert2'
+import { DOCUMENT } from '@angular/common';
 
 
 export interface SubDocumento {
@@ -50,6 +50,7 @@ export class MinisterialComponent implements OnInit {
   }
 
   public codigohash = ''
+  public llave = ''
 
   public lstAcciones = [
     { 'valor': '1', 'texto': 'ANALISTA', 'visible': '1' },
@@ -137,12 +138,18 @@ export class MinisterialComponent implements OnInit {
   public dwValidate = false
   public dwSub = false
   public doc : any
+  public lstNotaEntrega = []
   public parametros : string = ''
+  public allComplete: boolean = false
+  public estilocheck = 'none'
+
+  public estiloclasificar = 'none'
 
   @ViewChild('templateBottomSheet') TemplateBottomSheet: TemplateRef<any>;
 
 
   constructor(private _bottomSheet: MatBottomSheet,
+    @Inject(DOCUMENT) document: Document,
     private bottomSheet: MatBottomSheet,
     private apiService: ApiService,
     config: NgbModalConfig,
@@ -167,7 +174,7 @@ export class MinisterialComponent implements OnInit {
         this.doc = JSON.parse(atob(this.original))
         this.Documento = this.doc
         this.Documento.wfdocumento = this.doc.idd
-        
+        this.numControl = this.doc.numc
 
         this.unidad = this.doc.udep
         this.comando = this.doc.coma
@@ -212,16 +219,23 @@ export class MinisterialComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
-        this.lstCuenta = data.Cuerpo
-        this.asunto = this.lstCuenta[0].resumen
-        this.cuenta = this.lstCuenta[0].cuenta
-        this.fecha = this.lstCuenta[0].fecha.substring(0,10) 
-        this.codigohash = btoa(this.doc.id + this.doc.idd + this.cuenta)
-
-        this.parametros = this.cuenta + ',' + this.doc.udep + ' ' + this.doc.fori.substring(0,10)
-        this.cargarPuntoCuentas()
-
+        this.lstCuenta = data.Cuerpo.map(e => {
+          e.completed = false
+          return e
+        })
+        
+        if (this.lstCuenta[0].cuenta != '' && this.lstCuenta[0].cuenta != null) {
+          this.asunto = this.lstCuenta[0].resumen
+          this.cuenta = this.lstCuenta[0].cuenta
+          this.fecha = this.lstCuenta[0].fecha.substring(0,10) 
+          this.codigohash = btoa(this.doc.id + this.doc.idd + this.cuenta)
+          this.lstCuenta[0].completed = false
+          this.parametros = this.cuenta + ',' + this.doc.udep + ' ' + this.doc.fori.substring(0,10)
+          console.log( this.lstCuenta, 'la nota pues')
+          this.cargarPuntoCuentas()
+        }else{
+          this.toastrService.warning('Por favor verifique el punto de cuenta con Control de Gestion', `GDoc Wkf.CSubDocumentoID`);
+        }
       },
       (error) => {
 
@@ -522,6 +536,148 @@ export class MinisterialComponent implements OnInit {
     //this.ruta.navigate(['/constancia', base])
   }
 
+  async transfererirResoluciones(){
+    console.log('transfererirResoluciones')
+    this.lstNotaEntrega = []
+    let i = 0
+    var fecha = new Date().toISOString()
+    let llave = Md5.init(this.cuenta + fecha)
+    await this.lstCuenta.map(e => {
+      if ( e.completed) {
+        const text = (<HTMLInputElement>document.getElementById(i + "-text")).value
+        const nombre = (<HTMLInputElement>document.getElementById(i + "-nomb")).value
+        const cedula = (<HTMLInputElement>document.getElementById(i + "-cedu")).value
+        const cargo = (<HTMLInputElement>document.getElementById(i + "-carg")).value
+        this.lstNotaEntrega.push ( { 
+          id: e.id, 
+          nombre: nombre, 
+          cedula: cedula, 
+          numc: e.numc, 
+          observacion: text, 
+          llave:  llave, 
+          udep : e.udep, 
+          cuenta: e.cuenta,
+          cargo: cargo 
+        } )
+      }
+      i++
+    })
+    await this.notaEntrega()
+    
+  }
+
+
+
+  updateAllComplete() {
+    this.allComplete = this.lstCuenta != null && this.lstCuenta.every(t => t.completed);
+  }
+
+  someComplete(): boolean {
+    if (this.lstCuenta == null) {
+      return false;
+    }
+
+    return this.lstCuenta.filter(t => t.completed).length > 0 && !this.allComplete;
+
+  }
+
+  setAll(completed: boolean) {
+    this.allComplete = completed;
+    if (this.lstCuenta == null) {
+      return;
+    }
+
+    this.lstCuenta.forEach(t => (t.completed = completed));
+    if (completed == false) {
+      this.estiloclasificar = 'none'
+    } else {
+      this.estiloclasificar = ''
+    }
+  }
+
+
+
+  async notaEntrega() {
+  
+    var cantidad = this.lstNotaEntrega.length
+
+    if (cantidad > 0) {
+      var i = 0
+      this.lstNotaEntrega.forEach(e => {
+        var destino = 3
+        var estatus = 1
+        var usuario = this.loginService.Usuario.id
+      
+        this.xAPI.funcion = 'WKF_APromoverSubDocumento'
+        this.xAPI.valores = ''
+        this.xAPI.parametros = destino + ',' + estatus + ',' + e.llave + '|' + e.observacion  + ',' + usuario + ',1,' + e.id
+
+        console.log(this.xAPI , 'reportes')
+
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          (data) => {
+            i++
+            if (cantidad == i) this.imprimir()
+          },
+          (errot) => {
+            this.toastrService.error(errot, `GDoc Wkf.PromoverSubDocumento`);
+          })
+
+      })
+    }
+  }
+
+
+  imprimir() {
+
+ 
+    var ventana = window.open("", "_blank");
+    var localtime = new Date().toLocaleString();
+    var contenido = document.getElementById('prtNota').innerHTML
+    ventana.document.write(contenido)
+
+    ventana.document.head.innerHTML = ` <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Gestion de Documentos</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    
+    <style type="text/css">
+        @media print {
+            body {
+                  margin: 0px;
+                  font-family: Calibri;
+              }
+              .encabezado{
+                text-align:center;
+              }
+              .footer, .push {
+                  height: 5em;
+                  font-size: 12px;
+              }
+              h3 {
+                text-align:center;
+              }
+              .footer, .push {
+                  height: 5em;
+                  font-size: 12px;
+              }
+              .tabla-contenido {
+                border-collapse: collapse;
+                font-family: Arial, Calibre;
+                font-size: 12px;
+            }
+            .wrapper {
+                min-height: 100%;
+                height: auto !important;
+                height: 100%;
+                margin: 0 auto -5em;
+            }
+        }
+    </style>
+     `;
+    ventana.print()
+    ventana.close()
+  }
 
 }
 

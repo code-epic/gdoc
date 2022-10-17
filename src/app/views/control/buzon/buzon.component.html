@@ -68,7 +68,7 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Example " class="text-primary"
+                      <button mat-icon-button aria-label="Example " class="text-gray"
                         (click)="open(observacion, e.idd)" id="recibir">
                         <mat-icon>task_alt</mat-icon>
                       </button>
@@ -80,12 +80,12 @@
                     <div class="col-md-2 texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
                     </div>
-                    <div class="col-md-6 texto-lista">
+                    <div class="col-md-6 texto-detalle">
                       {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
                     </div>
                     <div class="col-md-1 text-right">
                       <button mat-icon-button aria-label="Privado">
-                        <mat-icon *ngIf="e.privado" class="text-warning">no_encryption</mat-icon>
+                        <mat-icon *ngIf="e.privado" class="text-gray">no_encryption</mat-icon>
                       </button>
 
                     </div>
@@ -109,7 +109,7 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Visibilidad" class="text-primary" (click)="open(observacion, e.idd)" id="procesados">
+                      <button mat-icon-button aria-label="Visibilidad" class="text-gray" (click)="open(observacion, e.idd)" id="procesados">
                         <mat-icon>add_circle</mat-icon>
                       </button>
                     </div>
@@ -117,24 +117,16 @@
                     <div class="col-md-2 texto-lista">
                       <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
-                    <div class="col-md-2 texto-lista">
-                      {{ e.fcre | date:"dd-MM-yyyy" }}
-                    </div>
-                    <div class="col-md-3 texto-lista">
-                      {{ e.udep | uppercase }}
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      {{ e.observacion_accion | uppercase }}
+                    <div class="col-md-7 texto-detalle">
+                      <b>{{ e.fcre | date:"dd-MM-yyyy" }} - {{ e.udep | uppercase }}</b>&nbsp;{{ e.observacion_accion | uppercase }}
                     </div>
                     <div class="col-md-2 text-right">
-                      <button mat-icon-button aria-label="Privado">
-                        <mat-icon *ngIf="e.privado" class="text-warning">no_encryption</mat-icon>
-                      </button>
+                      
                       <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
-                        <mat-icon class="text-pink">edit_note</mat-icon>
+                        <mat-icon class="text-gray">edit_note</mat-icon>
                       </button>
                       <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
-                        <mat-icon class="text-info">attach_file</mat-icon>
+                        <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
 
                     </div>
@@ -159,7 +151,7 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Visibilidad" class="text-primary" (click)="open(observacion, e.idd)" id="pndt">
+                      <button mat-icon-button aria-label="Visibilidad" class="text-gray" (click)="open(observacion, e.idd)" id="pndt">
                         <mat-icon>add_circle</mat-icon>
                       </button>
                     </div>
@@ -167,23 +159,18 @@
                     <div class="col-md-2 texto-lista">
                       <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
-                    <div class="col-md-4 texto-lista">
-                      {{ e.udep | uppercase }}
-                    </div>
-                    <div class="col-md-3 texto-lista text-justify">
-                      {{ e.nombre_accion | uppercase }}
+                    <div class="col-md-7 texto-detalle">
+                      <b>{{ e.fcre | date:"dd-MM-yyyy" }} - {{ e.udep | uppercase }}</b>&nbsp;{{ e.nombre_accion | uppercase }}
                     </div>
 
 
                     <div class="col-md-2 text-right">
-                      <button mat-icon-button aria-label="Privado">
-                        <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
-                      </button>
+                      
                       <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
-                        <mat-icon class="text-pink">edit_note</mat-icon>
+                        <mat-icon class="text-gray">edit_note</mat-icon>
                       </button>
                       <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
-                        <mat-icon class="text-info">attach_file</mat-icon>
+                        <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
 
                     </div>

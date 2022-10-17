@@ -74,14 +74,18 @@
                     <div class="col-md-2  texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
                     </div>
-                    <div class="col-md-6 texto-lista">
-                      {{ e.udep | uppercase }}
+                    <div class="col-md-6 texto-detalle">
+                      {{ e.udep | uppercase }} / {{ e.coma | uppercase }}
                     </div>
                     <div class="col-md-1 text-right ">
                       <button mat-icon-button >
                         <mat-icon (click)="open(observacion, e.idd)" id="recibir" class="text-gray">account_tree</mat-icon>
                       </button>
-                     
+                      <a [href]="dwUrl(e.numc, e.anom)" target="_top"
+                      rel="noopener noreferrer" style="color:darkgrey;font-size: 18px;font-weight: normal;">
+                          <!-- {{ e.anom.substring(0,5) }} -->
+                          <img  src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" style="width: 20px;margin-top: 4px;"/>
+                      </a>
                     </div>
                   </div>
                 </mat-list>

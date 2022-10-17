@@ -424,5 +424,7 @@ export class SministerialComponent implements OnInit {
   }
 
 
-
+  dwUrl(ncontrol: string, archivo: string): string {
+    return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
+  }
 }

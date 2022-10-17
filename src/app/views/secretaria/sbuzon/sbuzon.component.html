@@ -61,7 +61,7 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Example " class="text-primary"
+                      <button mat-icon-button aria-label="Example " class="text-gray"
                         (click)="open(observacion, e.idd)">
                         <mat-icon>task_alt</mat-icon>
                       </button>
@@ -69,22 +69,16 @@
                     <div class="col-md-2 texto-lista">
                       <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
-                    <div class="col-md-3 texto-lista">
+                    <div class="col-md-2 texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
                     </div>
-                    <div class="col-md-4 texto-lista">
-                      {{ e.udep | uppercase }}
+                    <div class="col-md-6 texto-detalle">
+                      {{ e.udep | uppercase }} / {{ e.coma | uppercase }}
                     </div>
-                    <div class="col-md-2 text-right"  >
-                      <!-- <button mat-icon-button aria-label="Privado">
-                        <mat-icon *ngIf="e.priv" class="text-warning">no_encryption</mat-icon>
-                      </button> -->
-                    
-
+                    <div class="col-md-1 text-right"  >
                       <a [href]="dwUrl(e.numc, e.anom)" target="_top"
                       rel="noopener noreferrer" style="color:darkgrey;font-size: 18px;font-weight: normal;">
-                          <!-- {{ e.anom.substring(0,5) }} -->
-                          <img  src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" style="width: 26px;margin-top: 4px;"/>
+                          <img  src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" style="width: 20px;margin-top: 4px;"/>
                       </a>
                     </div>
                   </div>
