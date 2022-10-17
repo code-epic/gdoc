@@ -69,6 +69,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule} from '@angular/material/tooltip';
 import { MatChipsModule} from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+
+
 
 import { RstranscripcionComponent } from './views/resoluciones/rstranscripcion/rstranscripcion.component';
 import { RsrevisionComponent } from './views/resoluciones/rsrevision/rsrevision.component';
@@ -82,6 +85,10 @@ import { IndiceComponent } from './views/reportes/indice/indice.component';
 import { ContenidoComponent } from './views/reportes/contenido/contenido.component';
 import { BuscadorComponent } from './views/buscador/buscador.component';
 import { PapeleraComponent } from './views/papelera/papelera.component';
+import { SbuzonComponent } from './views/secretaria/sbuzon/sbuzon.component';
+import { SalertaComponent } from './views/secretaria/salerta/salerta.component';
+import { SministerialComponent } from './views/secretaria/sministerial/sministerial.component';
+import { SpresidencialComponent } from './views/secretaria/spresidencial/spresidencial.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -155,6 +162,7 @@ const ngWizardConfig: NgWizardConfig = {
     MatCommonModule,
     MatTooltipModule,
     MatChipsModule,
+    MatBottomSheetModule,
     ToastContainerModule,
     NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
     MatToolbarModule,
@@ -211,7 +219,11 @@ const ngWizardConfig: NgWizardConfig = {
     IndiceComponent,
     ContenidoComponent,
     BuscadorComponent,
-    PapeleraComponent
+    PapeleraComponent,
+    SbuzonComponent,
+    SalertaComponent,
+    SministerialComponent,
+    SpresidencialComponent
   ],
   providers:  [
     {

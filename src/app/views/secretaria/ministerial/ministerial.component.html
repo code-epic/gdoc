@@ -75,81 +75,66 @@
                 <label>Asunto</label>
                 <div class="NgxEditor__Wrapper">
                   <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor" [(ngModel)]="asunto"
-                   [placeholder]="'Escibe aqui...'">
+                    [placeholder]="'Escibe aqui...'">
                   </ngx-editor>
                 </div>
               </div>
             </div>
-            <!-- <div class="form-group row">
-              <div class="form-group col-md-5">
-                  <label>Grado / Jerarquía</label>
-                  <input type="text" class="form-control"  disabled  [(ngModel)]="grado" [ngModelOptions]="{standalone: true}"
-                  value="{{grado}}" readonly>
-              </div>
-              <div class="form-group col-md-5">
-                  <label for="cmbUnidad">Nombres y Apellidos</label>
-                  <div class="input-group mb-3">
-                      <input type="text" class="form-control" disabled [(ngModel)]="nombre" [ngModelOptions]="{standalone: true}"
-                      value="{{nombre}}" readonly>
-                  </div>
-              </div>
-              <div class="form-group col-md-2">
-                <label>Cédula</label>
-                <input type="text" class="form-control" disabled  [(ngModel)]="cedula" [ngModelOptions]="{standalone: true}"
-                value="{{cedula}}" readonly> 
-              </div>
-            </div> -->
+
             <div class="form-group row">
-              <div class="form-group col-md-12" >
+              <div class="form-group col-md-12">
 
                 <mat-accordion class="example-headers-align">
                   <mat-expansion-panel hideToggle>
-                    <mat-expansion-panel-header >
+                    <mat-expansion-panel-header>
                       <mat-panel-title style="font-weight:bold">
                         Detalles de puntos de cuenta
                       </mat-panel-title>
                       <mat-panel-description>
-                        Listado general 
-                       
+                        Listado general
+
                       </mat-panel-description>
                     </mat-expansion-panel-header>
                     <table class="table align-items-center table-flush" style="width:100%">
                       <thead class="thead-light">
-                          <th>GRADO / COMPONENTE</th>
-                          <th>Nombres y Apellidos</th>
-                          <th>Cédula</th>
-                          <th>Observaciones</th>
+                        <th>GRADO / COMPONENTE</th>
+                        <th>Nombres y Apellidos</th>
+                        <th>Cédula</th>
+                        <th>Observaciones</th>
                       </thead>
                       <tbody>
-                          <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
-                              <td>{{ el.cargo }}</td>
-                              <td>{{ el.nombre }}</td>
-                              <td>{{ el.cedula }}</td>
-                              <td><input type="text" class="form-control" [ngModelOptions]="{standalone: true}" ></td>
-                          </tr>
-  
+                        <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
+                          <td style="width:80px">{{ el.cargo }}</td>
+                          <td style="width:80px">{{ el.nombre }}</td>
+                          <td style="width:60px">{{ el.cedula }}</td>
+                          <td>
+                            <div class="input-group">
+                              <input type="text" class="form-control" [ngModelOptions]="{standalone: true}">
+                              <div class="input-group-append">
+                                <button type="button" (click)="transferirCaso()" id="btndependencia"
+                                  class="btn btn-success">
+                                  <i class="fa fa-share" aria-hidden="true"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+
                       </tbody>
-                  </table>
-                 
-    
-                   
+                    </table>
+
+
+
                   </mat-expansion-panel>
                 </mat-accordion>
 
 
-
-
-
-
-
-
-
-
-                
-
+              </div>
+              <div class="form-group col-md-12 text-right">
+                <button mat-raised-button (click)="openTMS()">Documentos relacionados</button>
+              </div>
             </div>
-            </div>
-            
+
 
 
             <div class="form-group row">
@@ -158,7 +143,7 @@
                 <textarea class="form-control" cols="30" rows="6" [ngModelOptions]="{standalone: true}"
                   [(ngModel)]="SubDocumento.accion"></textarea>
               </div>
-              
+
 
               <div class="form-group col-md-4">
                 <label for="txtobservacion">Historial</label>
@@ -346,75 +331,72 @@
 
 
 
-<!-- Adjuntar Imagenes al Documento -->
-<ng-template #archivos let-modal>
-  <div class="modal-header header bg-gradient-success">
+  <!-- Adjuntar Imagenes al Documento -->
+  <ng-template #archivos let-modal>
+    <div class="modal-header header bg-gradient-success">
       <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
 
-  </div>
-  <div class="modal-body">
+    </div>
+    <div class="modal-body">
 
 
       <div class="form-group col-md-12">
-          <div class="card card-profile">
-              <div class="card-header bg-info"
-                  style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
-                  <div class="card-avatar text-center">
-                      <a href="javascript:;">
-                          <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
-                              style="width:100px;z-index: 1; margin-top: -5px;">3
-                      </a>
-                  </div>
-              </div>
-              <br>
-
-              <div class="card-body pt-0">
-
-                  <div class="d-flex justify-content-between">
-                      <a [href]="download" target="_top" rel="noopener noreferrer"
-                          class="btn btn-primary mt-3">Descargar</a>
-                      <a (click)="activarHistorial()" class="btn btn-default float-right mt-3">Historial</a>
-                  </div>
-                  <br><br>
-                  <div class="text-center">
-                      <div class="font-weight-50">
-                          Publicado<span class="font-weight-light">, {{ fcreacion | date:"dd-MM-yy hh:mm:ss"}}</span>
-                          <br>
-                          <h5 class="h4" style="font-size: 10px;">{{ creador }}</h5>
-                      </div>
-                  </div>
-                  <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
-                      <table class="table">
-                          <thead class="thead-light">
-                              <th>Documento</th>
-                              <th>Usuario</th>
-                              <th>Fecha</th>
-                          </thead>
-                          <tbody>
-
-                              <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstHzAdjunto;let i=index">
-
-                                  <td>
-                                      <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"
-                                          rel="noopener noreferrer">
-                                          {{ el.nombre.substring(20,32) }}
-                                      </a>
-                                  </td>
-                                  <td>{{ el.usuario }}</td>
-                                  <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
+        <div class="card card-profile">
+          <div class="card-header bg-info" style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
+            <div class="card-avatar text-center">
+              <a href="javascript:;">
+                <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
+                  style="width:100px;z-index: 1; margin-top: -5px;">3
+              </a>
+            </div>
           </div>
+          <br>
+
+          <div class="card-body pt-0">
+
+            <div class="d-flex justify-content-between">
+              <a [href]="download" target="_top" rel="noopener noreferrer" class="btn btn-primary mt-3">Descargar</a>
+              <a (click)="activarHistorial()" class="btn btn-default float-right mt-3">Historial</a>
+            </div>
+            <br><br>
+            <div class="text-center">
+              <div class="font-weight-50">
+                Publicado<span class="font-weight-light">, {{ fcreacion | date:"dd-MM-yy hh:mm:ss"}}</span>
+                <br>
+                <h5 class="h4" style="font-size: 10px;">{{ creador }}</h5>
+              </div>
+            </div>
+            <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
+              <table class="table">
+                <thead class="thead-light">
+                  <th>Documento</th>
+                  <th>Usuario</th>
+                  <th>Fecha</th>
+                </thead>
+                <tbody>
+
+                  <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstHzAdjunto;let i=index">
+
+                    <td>
+                      <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top" rel="noopener noreferrer">
+                        {{ el.nombre.substring(20,32) }}
+                      </a>
+                    </td>
+                    <td>{{ el.usuario }}</td>
+                    <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-  </div>
-  <div class="modal-footer">
+    </div>
+    <div class="modal-footer">
       <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
-          <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
-  </div>
-</ng-template>
+        <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    </div>
+  </ng-template>
 
 
 
@@ -427,72 +409,97 @@
 
 
 
-<!-- Adjuntar Imagenes al Documento -->
-<ng-template #subarchivos let-modal>
-  <div class="modal-header header bg-gradient-success">
+  <!-- Adjuntar Imagenes al Documento -->
+  <ng-template #subarchivos let-modal>
+    <div class="modal-header header bg-gradient-success">
       <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
 
-  </div>
-  <div class="modal-body">
+    </div>
+    <div class="modal-body">
 
 
       <div class="form-group col-md-12">
-          <div class="card card-profile">
-              <div class="card-header bg-info"
-                  style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
-                  <div class="card-avatar text-center">
-                      <a href="javascript:;">
-                          <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
-                              style="width:100px;z-index: 1; margin-top: -5px;">3
-                      </a>
-                  </div>
-              </div>
-              <br>
-
-              <div class="card-body pt-0">
-
-                  <div class="d-flex justify-content-between">
-                      <a [href]="download" target="_top" rel="noopener noreferrer"
-                          class="btn btn-primary mt-3">Descargar</a>
-                      <a (click)="activarHistorialSub()" class="btn btn-default float-right mt-3">Historial</a>
-                  </div>
-                  <br><br>
-                  <div class="text-center">
-                      <div class="font-weight-50">
-                          Publicado<span class="font-weight-light">, {{ fcreacionsub | date:"dd-MM-yy hh:mm:ss"}}</span>
-                          <br>
-                          <h5 class="h4" style="font-size: 10px;">{{ creadorsub }}</h5>
-                      </div>
-                  </div>
-                  <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
-                      <table class="table">
-                          <thead class="thead-light">
-                              <th>Documento</th>
-                              <th>Usuario</th>
-                              <th>Fecha</th>
-                          </thead>
-                          <tbody>
-
-                              <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstHzAdjuntoSub;let i=index">
-
-                                  <td>
-                                      <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"
-                                          rel="noopener noreferrer">
-                                          {{ el.nombre.substring(20,32) }}
-                                      </a>
-                                  </td>
-                                  <td>{{ el.usuario }}</td>
-                                  <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
+        <div class="card card-profile">
+          <div class="card-header bg-info" style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
+            <div class="card-avatar text-center">
+              <a href="javascript:;">
+                <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
+                  style="width:100px;z-index: 1; margin-top: -5px;">3
+              </a>
+            </div>
           </div>
+          <br>
+
+          <div class="card-body pt-0">
+
+            <div class="d-flex justify-content-between">
+              <a [href]="download" target="_top" rel="noopener noreferrer" class="btn btn-primary mt-3">Descargar</a>
+              <a (click)="activarHistorialSub()" class="btn btn-default float-right mt-3">Historial</a>
+            </div>
+            <br><br>
+            <div class="text-center">
+              <div class="font-weight-50">
+                Publicado<span class="font-weight-light">, {{ fcreacionsub | date:"dd-MM-yy hh:mm:ss"}}</span>
+                <br>
+                <h5 class="h4" style="font-size: 10px;">{{ creadorsub }}</h5>
+              </div>
+            </div>
+            <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
+              <table class="table">
+                <thead class="thead-light">
+                  <th>Documento</th>
+                  <th>Usuario</th>
+                  <th>Fecha</th>
+                </thead>
+                <tbody>
+
+                  <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstHzAdjuntoSub;let i=index">
+
+                    <td>
+                      <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top" rel="noopener noreferrer">
+                        {{ el.nombre.substring(20,32) }}
+                      </a>
+                    </td>
+                    <td>{{ el.usuario }}</td>
+                    <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-  </div>
-  <div class="modal-footer">
+    </div>
+    <div class="modal-footer">
       <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
-          <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
-  </div>
-</ng-template>
+        <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    </div>
+  </ng-template>
+
+
+  <!-- <button (click)="openTMS()">Open Template Bottom Sheet</button> -->
+
+  <ng-template let-bottomSheetRef="bottomSheetRef" #templateBottomSheet>
+    <div >
+      <table class="table">
+        <thead class="thead-light">
+          <th>Documento</th>
+          <th>Número</th>
+          <th>Fecha</th>
+        </thead>
+        <tbody>
+    
+          <tr  *ngFor="let el of lstHzAdjunto">
+    
+            <td>
+              <a [href]="dwUrl(el.ncontrol, el.archivo)" target="_top" rel="noopener noreferrer"> 
+                {{ el.archivo.substring(22,32) }}
+              </a>
+            </td>
+            <td> <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( el.ncontrol )]">{{ el.ncontrol }} &nbsp;</a></td>
+            <td>{{ el.fech }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-template>

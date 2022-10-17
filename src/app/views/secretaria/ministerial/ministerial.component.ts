@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbDateParserFormatter, NgbModal, NgbDate, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
@@ -8,6 +8,9 @@ import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { IDocumento, IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
+import {MatBottomSheet, MatBottomSheetRef} from '@angular/material/bottom-sheet';
+import {MAT_BOTTOM_SHEET_DATA} from '@angular/material/bottom-sheet';
+
 
 import Swal from 'sweetalert2'
 
@@ -99,6 +102,8 @@ export class MinisterialComponent implements OnInit {
 
   public AccionTexto: string = '0'
 
+  public lstHzAdjunto = []
+
   public SubDocumento: SubDocumento = {
     subdocumento: 0,
     cuenta: '',
@@ -132,8 +137,14 @@ export class MinisterialComponent implements OnInit {
   public dwValidate = false
   public dwSub = false
   public doc : any
+  public parametros : string = ''
 
-  constructor(private apiService: ApiService,
+  @ViewChild('templateBottomSheet') TemplateBottomSheet: TemplateRef<any>;
+
+
+  constructor(private _bottomSheet: MatBottomSheet,
+    private bottomSheet: MatBottomSheet,
+    private apiService: ApiService,
     config: NgbModalConfig,
     private ruta: Router,
     private toastrService: ToastrService,
@@ -164,13 +175,15 @@ export class MinisterialComponent implements OnInit {
         this.download = this.apiService.Dws(btoa("D" + this.doc.numc) + '/' + this.doc.anom)
         
         this.cmbDestino = 'S'
+       
         // this.creador = this.ministerial.usua
-        console.log( 'entrada de datos ', this.Documento );
+        console.log( 'entrada de datos ', this.parametros );
         this.consultarSubID(this.Documento.wfdocumento.toString())
 
         this.listarEstados()
         this.listarDatos()
         //Carga de Documentos
+        
       } catch (error) {
         //this.ruta.navigate(['/secretaria', ''])
       }
@@ -206,6 +219,9 @@ export class MinisterialComponent implements OnInit {
         this.fecha = this.lstCuenta[0].fecha.substring(0,10) 
         this.codigohash = btoa(this.doc.id + this.doc.idd + this.cuenta)
 
+        this.parametros = this.cuenta + ',' + this.doc.udep + ' ' + this.doc.fori.substring(0,10)
+        this.cargarPuntoCuentas()
+
       },
       (error) => {
 
@@ -222,15 +238,6 @@ export class MinisterialComponent implements OnInit {
   }
 
   listarDatos() {
-    // console.error(this.ministerial)
-    // this.unidad = this.ministerial.udep
-    // this.comando = this.ministerial.comando
-    // this.cuenta = this.ministerial.cuenta
-    // this.fecha = this.ministerial.fecha.substring(0,10) 
-    // this.cedula = this.ministerial.cedula
-    // this.nombre = this.ministerial.nombre
-    // this.grado = this.ministerial.cargo
-    // this.asunto = this.ministerial.resumen
 
     this.xAPI.funcion = 'WKF_CSubDocVariante'
     this.xAPI.parametros = this.doc.idd
@@ -244,8 +251,7 @@ export class MinisterialComponent implements OnInit {
           this.blUpdate = true
         }
         this.dwSub = this.SubDocumento.nombre_archivo != "" ? true : false
-        //console.log(this.SubDocumento)
-        //this.download = this.apiService.Dws( this.codigohash + '/' + this.SubDocumento.nombre_archivo )
+
       },
       (error) => {
 
@@ -371,7 +377,7 @@ export class MinisterialComponent implements OnInit {
     // if (this.original != btoa(JSON.stringify(this.SubDocumento))) {
     //   this.toastrService.warning('Debe guardar los cambios antes de salir de esta pantalla', `GDoc WKF_SubDocumentos`);
     // } else {
-      this.ruta.navigate(['/secretaria']);
+      this.ruta.navigate(['/sministerial']);
     // }
     return
   }
@@ -468,5 +474,54 @@ export class MinisterialComponent implements OnInit {
   }
 
 
+  transferirCaso(){
+
+  }
+
+  cargarPuntoCuentas() {
+    this.xAPI.funcion = "WKF_CPuntoCuentaDetalle"
+    this.xAPI.valores = ''
+    this.xAPI.parametros = this.parametros
+    console.log(this.xAPI.parametros);
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        this.lstHzAdjunto = data.Cuerpo
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+    console.log(event);
+
+   
+    // this._bottomSheetRef.dismiss();
+    
+
+
+    // event.preventDefault();
+  }
+
+  openTMS() {
+    this.bottomSheet.open(this.TemplateBottomSheet);
+  }
+
+  closeTMS() {
+    this.bottomSheet.dismiss();
+  }
+
+  dwUrl(ncontrol: string, archivo: string): string {
+    return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
+  }
+
+
+  //Consultar un enlace
+  constancia(id: string) {
+    const estado = 1
+    const estatus = 1
+    return btoa(estado + ',' + estatus + ',' + id)
+    //this.ruta.navigate(['/constancia', base])
+  }
+
 
 }
+

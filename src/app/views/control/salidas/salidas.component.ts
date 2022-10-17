@@ -99,6 +99,8 @@ export class SalidasComponent implements OnInit {
   public nexpediente = ''
   public posicionPagina = 0
 
+  public hashcontrol = ''
+
   public WAlerta: IWKFAlerta = {
     documento: 0,
     estado: 0,
@@ -211,6 +213,7 @@ export class SalidasComponent implements OnInit {
 
   open(content, id) {
     this.numControl = id
+    this.hashcontrol = btoa("D" + this.numControl) //Cifrar documentos
     this.modalService.open(content);
 
   }
@@ -641,6 +644,7 @@ export class SalidasComponent implements OnInit {
   async SubirArchivo(e) {
     this.ngxService.startLoader("loader-aceptar")
     var frm = new FormData(document.forms.namedItem("forma"))
+
     try {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {

@@ -36,6 +36,8 @@ import { PerfilComponent } from 'src/app/views/perfil/perfil.component';
 import { IndiceComponent } from 'src/app/views/reportes/indice/indice.component';
 import { BuscadorComponent } from 'src/app/views/buscador/buscador.component';
 import { PapeleraComponent } from 'src/app/views/papelera/papelera.component';
+import { SbuzonComponent } from 'src/app/views/secretaria/sbuzon/sbuzon.component';
+import { SministerialComponent } from 'src/app/views/secretaria/sministerial/sministerial.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -86,6 +88,26 @@ export const AdminLayoutRoutes: Routes = [
     },
     {
         path: 'secretaria',
+        component: SecretariaComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'sbuzon',
+        component: SbuzonComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'sministerial',
+        component: SministerialComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'spresidencial',
+        component: SecretariaComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'sseguimiento',
         component: SecretariaComponent,
         canActivate: [AuthGuardGuard]
     },
