@@ -33,7 +33,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-1">
+                        <div class="col-md-1" *ngIf="Configurar">
                             <ul class="navbar-nav align-items-right d-none d-md-flex">
                                 <li class="nav-item" ngbDropdown placement="bottom-right">
                                     <a class="nav-link pr-0" role="button" ngbDropdownToggle>
@@ -47,7 +47,7 @@
                                         </div>
                                     </a>
                                     <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                                        <a routerLinkActive="active" [routerLink]="['/configuracion']"
+                                        <a   routerLinkActive="active" [routerLink]="['/configuracion']"
                                             class="dropdown-item">
                                             <i class="ni ni-settings-gear-65"></i>
                                             <span>Configuración</span>

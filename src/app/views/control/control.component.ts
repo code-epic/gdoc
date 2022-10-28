@@ -65,6 +65,8 @@ export class ControlComponent implements OnInit {
 
   public SubMenu = []
 
+  public Configurar : boolean = false
+
   constructor(private apiService: ApiService, 
     public dialog: MatDialog,
     public loginService : LoginService,
@@ -73,11 +75,14 @@ export class ControlComponent implements OnInit {
   async ngOnInit() {
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
-    await this.ConsultarCantidades()
-  }
+    let prv = this.loginService.obtenerPrivilegiosMenu(this.ruta.url)
+    if (prv != undefined && prv.Privilegios != undefined) {
+      prv.Privilegios.forEach(e => {
+        if (e.nombre == "configurar") this.Configurar = true
+      });
+    }
 
-  pageChangeEvent(e){
-    this.recorrerElementos(e.pageIndex+1, this.lst)
+    await this.ConsultarCantidades()
   }
 
   ConsultarCantidades(){
@@ -92,78 +97,9 @@ export class ControlComponent implements OnInit {
       (error) => { console.log(error) }
     )
   }
-  ConsultarOficinas(e){
-
-    this.selNav = e
-    this.seleccionNavegacion()
-    
-    if (this.xAPI.funcion == '') return false;
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.lst = data //Registros recorridos como elementos
-        this.lengthOfi = data.length
-        this.recorrerElementos(1, data)
-      },
-      (error) => { console.log(error) }
-    )
-  }
-
-
-  seleccionNavegacion(){
-    switch (this.selNav) {
-      case 0:
-        this.xAPI.funcion = ''
-        break;
-      case 1:
-        this.xAPI.funcion = 'ConsultarOficinas'
-        break;
-      case 2:
-        this.xAPI.funcion = ''
-        break;
-      case 3:
-        this.xAPI.funcion = ''
-        break;
-    
-      default:
-        break;
-    }
-  }
-
-  //recorrerElementos para paginar listados
-  recorrerElementos(posicion : number, lst : any){
-    if (posicion > 1) posicion = posicion * 10
-    this.oficinas = lst.slice(posicion, posicion + this.pageSizeOfi)    
-  }
-
-
-  openDialog(): void {
-    const dialogRef = this.dialog.open(DialogConfigurar, {
-      width: '550px',
-      data: {name: ''},
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('Cerrar Ventana');
-      //this.animal = result;
-    });
-  }
-
-}
-
-@Component({
-  selector: 'dialog-configurar',
-  templateUrl: 'dialog-configurar.html',
-})
-export class DialogConfigurar {
-  constructor(
-    public dialogRef: MatDialogRef<DialogConfigurar>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {}
-
-  ConfigurarGuardar(): void {
-    this.dialogRef.close();
-  }
+ 
 
 
 
 }
+

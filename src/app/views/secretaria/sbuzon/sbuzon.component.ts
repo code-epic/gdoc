@@ -82,19 +82,9 @@ export class SbuzonComponent implements OnInit {
   public lstAcciones = []
 
   public cmbAcciones = [
-    { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
     { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
-    { 'valor': '2', 'texto': 'ANALISTA', 'visible': '1' },
-    { 'valor': '3', 'texto': 'JEFE DE AREA', 'visible': '1' },
-    { 'valor': '4', 'texto': 'BANDEJA DE ESPERA', 'visible': '1' },
-    { 'valor': '5', 'texto': 'PRESIDENCIAL', 'visible': '1' },
-    { 'valor': '6', 'texto': 'ESPERA DE OPINION', 'visible': '1' },
-    { 'valor': '7', 'texto': 'CONSULTORIA JURIDICA', 'visible': '1' },
-    { 'valor': '8', 'texto': 'AREA DE RESOLUCIONES', 'visible': '1' },
-    { 'valor': '9', 'texto': 'SUB-DIRECCION', 'visible': '1' },
-    { 'valor': '9', 'texto': 'DIRECCION GENERAL', 'visible': '1' },
-    { 'valor': '9', 'texto': 'DESPACHO DEL MPPD', 'visible': '1' },
-    { 'valor': '10', 'texto': 'SALIDA', 'visible': '2' }]
+    { 'valor': '0', 'texto': 'ACEPTAR MINISTERIAL', 'visible': '0' },
+    { 'valor': '2', 'texto': 'ACEPTAR PRESIDENCIAL', 'visible': '0' },]
 
 
 
@@ -317,23 +307,7 @@ export class SbuzonComponent implements OnInit {
           case "2"://Oficio por opinión
             //this.promoverBuzon()
             break;
-          case "3"://Oficio por opinión
-            this.promoverBuzon(1, '')
-            break;
-          case "4"://Oficio por opinión
-            //this.promoverBuzon()
-            break;
-          case "5":// Enviar a Archivo
-            //this.redistribuir(11)
-            break;
-          case "6":// Enviar a otras areas
-            //this.redistribuir(0)
-            break;
-          case "7"://Enviar a salida con bifurcacion
-            //this.redistribuir(9)
-            break;
         }
-        //this.promoverBuzon()
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);

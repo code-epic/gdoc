@@ -102,6 +102,14 @@ export class LoginService {
     return this.Aplicacion.Rol.Menu
   }
 
+  obtenerPrivilegiosMenu(idUrl : string) : any {
+    var App = this.Aplicacion
+    var Menu: any
+    App.Rol.Menu.forEach(e => {if (e.url == idUrl) Menu = e});
+    return Menu
+    
+  }
+
   obtenerSubMenu(idUrl : string) : any{   
     var App = this.Aplicacion
     var SubMenu = [] 

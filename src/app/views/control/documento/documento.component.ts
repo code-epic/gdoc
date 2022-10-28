@@ -197,6 +197,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public Categorias: any
   public Clasificaciones: any
   public serializar: string = ""
+  public Configurar : boolean = false
 
   public activarTipo = false // activar tipo de documento
   public xAPI: IAPICore = {
@@ -216,13 +217,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   lstPC: string[] = []; // Auxiliar para mappear las cuentas de toppings 
   lstPuntosCuentas: string[] = [];
   lstPuntosCuentasAux : []
+  public SubMenu = []
 
+  
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
     private utilService: UtilService,
     private toastrService: ToastrService,
     private rutaActiva: ActivatedRoute,
-    private loginService: LoginService,
+    public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
     private location: Location,
@@ -231,12 +234,21 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+
+    await this.loginService.Iniciar()
+    this.SubMenu = await this.loginService.obtenerSubMenu("/control")
+    let prv = this.loginService.obtenerPrivilegiosMenu("/control")
+    if (prv != undefined && prv.Privilegios != undefined) {
+      prv.Privilegios.forEach(e => {
+        if (e.nombre == "configurar") this.Configurar = true
+      });
+    }
 
     this.editor = new Editor()
     this.xeditor = new Editor()
     this.listarConfiguracion()
-
+   
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
       
@@ -419,7 +431,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
 
         this.activarTipo = this.validarTipoDoc()
-        
+        console.log(this.Doc)
         // this.serializar =  btoa( JSON.stringify(this.Doc.norigen))
         // console.log( this.serializar)
       },
@@ -749,6 +761,130 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     return dependencia
   }
 
+
+  eliminarDependencia(pos: number, id: string) {
+  
+    if( id == undefined || id == '') {
+      this.lstDependencias.splice(pos, 1)
+      return false
+    }
+    this.ngxService.startLoader("loader-aceptar")
+    this.xAPI.funcion = "WKF_EDocumentoDependencia"
+    this.xAPI.parametros = id.toString()
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        this.lstDependencias.splice(pos, 1)
+        this.ngxService.stopLoader("loader-aceptar")
+      },
+      error => {
+        this.toastrService.error(
+          'Fallo eliminar dependencia',
+          `WKF_EDocumentoDependencia`
+        );
+        this.ngxService.stopLoader("loader-aceptar")
+        console.error('Fallo consultando los datos de Configuraciones', error)
+      }
+    )
+
+  }
+
+  async salvarPuntoCuenta(numc: number) {
+
+    const cant = this.lstPC.length
+    if (cant == 0) {
+      this.ngxService.stopLoader("loader-aceptar")
+      return
+    } else {
+      const cuenta = this.lstPC[0] 
+      const p_cuenta = cuenta.split('|')
+      this.xAPI.funcion = 'WKF_IPuntoCuentaMultiple'
+      this.xAPI.valores = ''
+      this.xAPI.parametros = numc + ',' + p_cuenta[0].trim() + ',' + p_cuenta[1].trim() + ',1'
+      // console.log('insertando puntoscuenta ', this.xAPI)
+      await this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+          this.lstPC.splice(0, 1)
+          const c = this.lstPC.length
+          if (c == 0) {
+            this.ngxService.stopLoader("loader-aceptar")
+          } else {
+            this.salvarPuntoCuenta(numc)
+          }
+        },
+        (errot) => {
+          this.toastrService.error(errot, `GDoc Wkf.IDocumentoPuntoCuenta`)
+          this.ngxService.stopLoader("loader-aceptar")
+        }
+      )
+    }
+  }
+
+
+  async salvarDependencias(numc: number) {
+
+    const cant = this.lstDependencias.length
+   
+    if (cant == 0) {
+      this.ngxService.stopLoader("loader-aceptar")
+      return
+    } else {
+
+      this.xAPI.funcion = 'WKF_IDocumentoDependencia'
+      this.xAPI.valores = ''
+      this.xAPI.parametros = numc + ',' + this.lstDependencias[0].nombre
+      console.log('insertando dependicia ', this.xAPI)
+      await this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+          this.lstDependencias.splice(0, 1)
+          const c = this.lstDependencias.length
+          if (c == 0) {
+            this.ngxService.stopLoader("loader-aceptar")
+            //this.aceptar(this.Doc.ncontrol)
+            this.limpiarDoc()
+          } else {
+            this.salvarDependencias(numc)
+          }
+        },
+        (errot) => {
+          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`)
+          this.ngxService.stopLoader("loader-aceptar")
+        }
+      )
+    }
+  }
+  
+  editarCuenta() {
+
+    if (this.PosicionCuenta != -1) {
+      const wkcuenta: IWKFCuenta = {
+        documento: 0,
+        cuenta: this.cuenta.toUpperCase(),
+        estado: 1,
+        estatus: 1,
+        cedula: this.cedula,
+        cargo: this.cargo,
+        nmilitar: this.nmilitar,
+        fecha: typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha) : this.utilService.ConvertirFecha(this.subfechaDate),
+        resumen: this.resumen.toUpperCase(),
+        usuario: this.loginService.Usuario.id,
+        activo: 0
+      }
+
+      this.lstCuenta[this.PosicionCuenta] = wkcuenta
+      this.cuenta = ''
+      this.resumen = ''
+      this.subfecha = ''
+      this.subfechaDate = null
+      this.cedula = ''
+      this.cargo = ''
+      this.nmilitar = ''
+      this.PosicionCuenta = -1
+      this.editar = !this.editar
+    }
+
+  }
+  
   agregarCuenta(tipo: number): IWKFCuenta {
     let validar = false
 
@@ -823,133 +959,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.editar = false
   }
 
-  eliminarDependencia(pos: number, id: string) {
-  
-    if( id == undefined || id == '') {
-      this.lstDependencias.splice(pos, 1)
-      return false
-    }
-    this.ngxService.startLoader("loader-aceptar")
-    this.xAPI.funcion = "WKF_EDocumentoDependencia"
-    this.xAPI.parametros = id.toString()
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-        this.lstDependencias.splice(pos, 1)
-        this.ngxService.stopLoader("loader-aceptar")
-      },
-      error => {
-        this.toastrService.error(
-          'Fallo eliminar dependencia',
-          `WKF_EDocumentoDependencia`
-        );
-        this.ngxService.stopLoader("loader-aceptar")
-        console.error('Fallo consultando los datos de Configuraciones', error)
-      }
-    )
-
-  }
-
-  async salvarPuntoCuenta(numc: number) {
-
-    const cant = this.lstPC.length
-    if (cant == 0) {
-      this.ngxService.stopLoader("loader-aceptar")
-      return
-    } else {
-      const cuenta = this.lstPC[0] 
-      const p_cuenta = cuenta.split('|')
-      this.xAPI.funcion = 'WKF_IPuntoCuentaMultiple'
-      this.xAPI.valores = ''
-      this.xAPI.parametros = numc + ',' + p_cuenta[0].trim() + ',' + p_cuenta[1].trim() + ',1'
-      console.log('insertando puntoscuenta ', this.xAPI)
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.lstPC.splice(0, 1)
-          const c = this.lstPC.length
-          if (c == 0) {
-            this.ngxService.stopLoader("loader-aceptar")
-          } else {
-            this.salvarPuntoCuenta(numc)
-          }
-        },
-        (errot) => {
-          this.toastrService.error(errot, `GDoc Wkf.IDocumentoPuntoCuenta`)
-          this.ngxService.stopLoader("loader-aceptar")
-        }
-      )
-    }
-  }
-  editarCuenta() {
-
-    if (this.PosicionCuenta != -1) {
-
-      const wkcuenta: IWKFCuenta = {
-        documento: 0,
-        cuenta: this.cuenta.toUpperCase(),
-        estado: 1,
-        estatus: 1,
-        cedula: this.cedula,
-        cargo: this.cargo,
-        nmilitar: this.nmilitar,
-        fecha: typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha) : this.utilService.ConvertirFecha(this.subfechaDate),
-        resumen: this.resumen.toUpperCase(),
-        usuario: this.loginService.Usuario.id,
-        activo: 0
-      }
-
-      this.lstCuenta[this.PosicionCuenta] = wkcuenta
-
-
-      this.cuenta = ''
-      this.resumen = ''
-      this.subfecha = ''
-      this.subfechaDate = null
-      this.cedula = ''
-      this.cargo = ''
-      this.nmilitar = ''
-      this.PosicionCuenta = -1
-      this.editar = !this.editar
-    }
-
-  }
-
-  async salvarDependencias(numc: number) {
-
-    const cant = this.lstDependencias.length
-   
-    if (cant == 0) {
-      this.ngxService.stopLoader("loader-aceptar")
-      return
-    } else {
-
-      this.xAPI.funcion = 'WKF_IDocumentoDependencia'
-      this.xAPI.valores = ''
-      this.xAPI.parametros = numc + ',' + this.lstDependencias[0].nombre
-      console.log('insertando dependicia ', this.xAPI)
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.lstDependencias.splice(0, 1)
-          const c = this.lstDependencias.length
-          if (c == 0) {
-            this.ngxService.stopLoader("loader-aceptar")
-            //this.aceptar(this.Doc.ncontrol)
-            this.limpiarDoc()
-          } else {
-            this.salvarDependencias(numc)
-          }
-        },
-        (errot) => {
-          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`)
-          this.ngxService.stopLoader("loader-aceptar")
-        }
-      )
-    }
-  }
-
 
   async salvarCuentas(numc: number) {
-
     const cant = this.lstCuenta.length
     console.log('entrando en confianza... ', cant)
     console.log('entrando en confianza... ', this.lstCuenta)
