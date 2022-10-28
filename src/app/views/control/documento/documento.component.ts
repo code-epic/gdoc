@@ -236,14 +236,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
 
-    await this.loginService.Iniciar()
-    this.SubMenu = await this.loginService.obtenerSubMenu("/control")
-    let prv = this.loginService.obtenerPrivilegiosMenu("/control")
-    if (prv != undefined && prv.Privilegios != undefined) {
-      prv.Privilegios.forEach(e => {
-        if (e.nombre == "configurar") this.Configurar = true
-      });
-    }
+   
 
     this.editor = new Editor()
     this.xeditor = new Editor()
@@ -283,7 +276,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.limpiarDoc()
 
     }
-
+    await this.loginService.Iniciar()
+    this.SubMenu = await this.loginService.obtenerSubMenu("/control")
+    let prv = this.loginService.obtenerPrivilegiosMenu("/control")
+    console.log(prv)
+    if (prv != undefined && prv.Privilegios != undefined) {
+      prv.Privilegios.forEach(e => {
+        if (e.nombre == "configurar") this.Configurar = true
+      });
+    }
     this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : []
     this.Grados = sessionStorage.getItem("MPPD_CGrado") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado"))) : []
     this.Categorias = sessionStorage.getItem("MPPD_CCategorias") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias"))) : []
