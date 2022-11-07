@@ -238,7 +238,7 @@ export class SbuzonComponent implements OnInit {
           e.existe = e.anom != '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.completed = false
-          e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
+          e.nombre_accion = e.accion != null ? e.accion : '' //this.cmbAcciones[e.accion].texto : ''
           e.color = 'warn'
           bz.push(e)
         })//Registros recorridos como elementos
