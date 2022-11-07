@@ -246,20 +246,20 @@
                         </div>
                         <div class="form-row col-md-12" *ngIf="resolucion">
                             <div class="form-group col-md-2">
-                                <label>Cédula</label>
+                                <label>{{sCedula}}</label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="cedula" value="{{cedula}}" (blur)="consultarCedula()" id="cedula">
                             </div>
                             <div class="form-group col-md-5">
-                                <label>Grado / Jerarquía</label>
+                                <label>{{sGrado}}</label>
                                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="cargo" value="{{cargo}}" disabled id="grado">
+                                    [(ngModel)]="cargo" value="{{cargo}}" [disabled]="isPunto" id="grado">
                             </div>
                             <div class="form-group col-md-5">
-                                <label for="cmbUnidad">Nombres y Apellidos</label>
+                                <label for="cmbUnidad">{{sNombre}}</label>
                                 <div class="input-group mb-3">
                                     <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="nmilitar" value="{{nmilitar}}" disabled>
+                                        [(ngModel)]="nmilitar" value="{{nmilitar}}" [disabled]="isPunto">
                                     <div class="input-group-prepend">
                                         <button *ngIf="!editar" type="button" class="btn btn-success"
                                             (click)="mensajeAgregarCuenta()" id="agregar">
@@ -282,9 +282,9 @@
                                     <th [style.display]="puntocuenta?'':'none'">Cuenta</th>
                                     <th [style.display]="puntocuenta?'':'none'">Resumen</th>
                                     <th [style.display]="puntocuenta?'':'none'">Fecha</th>
-                                    <th>Cargo</th>
-                                    <th>Nombres y Apellidos</th>
-                                    <th>Cédula</th>
+                                    <th>{{sCargo}}</th>
+                                    <th>{{sNombre}}</th>
+                                    <th>{{sCedula}}</th>
                                 </thead>
                                 <tbody>
                                     <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">

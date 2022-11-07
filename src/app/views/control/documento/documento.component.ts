@@ -197,7 +197,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public Categorias: any
   public Clasificaciones: any
   public serializar: string = ""
-  public Configurar : boolean = false
+  public Configurar: boolean = false
 
   public activarTipo = false // activar tipo de documento
   public xAPI: IAPICore = {
@@ -216,10 +216,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   lstPC: string[] = []; // Auxiliar para mappear las cuentas de toppings 
   lstPuntosCuentas: string[] = [];
-  lstPuntosCuentasAux : []
+  lstPuntosCuentasAux: []
   public SubMenu = []
 
-  
+  public isPunto: boolean = true
+  public sCedula: string = 'Cédula'
+  public sGrado: string = 'Grado / Jerarquía'
+  public sNombre: string = 'Nombres y Apellidos'
+
+
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
     private utilService: UtilService,
@@ -236,22 +241,22 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
 
-   
+
 
     this.editor = new Editor()
     this.xeditor = new Editor()
     this.listarConfiguracion()
-   
+
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
-      
+
       if (id == 'salida') {
-       this.SalidaTipo()
+        this.SalidaTipo()
 
 
         if (this.rutaActiva.snapshot.params.numc != undefined) {
           var numc = this.rutaActiva.snapshot.params.numc
-         
+
           this.ncontrolt = 'Nro de Control'
           this.ncontrolv = true
           this.salidavisible = true
@@ -292,8 +297,20 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   }
 
+  setDescripcionPunto() {
+    this.sCedula = 'Cédula'
+    this.sGrado = 'Grado / Jerarquía'
+    this.sNombre = 'Nombres y Apellidos'
+  }
 
-  SalidaTipo(){
+  setDescripcionContratos() {
+    this.sCedula = '# Contrato'
+    this.sGrado = 'Rif / Razón Social'
+    this.sNombre = 'Monto Total'
+  }
+
+
+  SalidaTipo() {
     this.titulo = 'Salida'
     this.booDependencia = true
     this.estadoActual = 9
@@ -420,12 +437,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
         const cuentasaux = this.Doc.puntodecuenta != null ? JSON.parse(this.Doc.puntodecuenta) : []
         this.lstPuntosCuentasAux = cuentasaux.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        
+
 
         this.toppingsaux.setValue('1')
-   
-        
-        
+
+
+
 
         //Carga de Documentos
         this.bPDF = this.Doc.archivo != "" ? true : false
@@ -520,7 +537,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
             if (cant > 0) {
               this.salvarCuentas(this.Doc.wfdocumento)
-              
+
             } else {
               this.aceptar(this.Doc.ncontrol)
               this.limpiarDoc()
@@ -531,7 +548,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
             if (cantdep > 0) {
               this.salvarDependencias(this.Doc.wfdocumento)
-              if( mpuntocuenta > 0) {
+              if (mpuntocuenta > 0) {
                 this.lstPC = this.toppings.value
                 this.salvarPuntoCuenta(this.Doc.wfdocumento)
               }
@@ -672,12 +689,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.insertarObservacion()
           this.salvarDependencias(wfd)
           this.lstPC = this.toppings.value
-         
+
           this.salvarPuntoCuenta(wfd)
           this.ruta.navigate(['/salidas']);
 
         } else {
-  
+
           this.ruta.navigate(['/registrar']);
         }
 
@@ -764,8 +781,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   eliminarDependencia(pos: number, id: string) {
-  
-    if( id == undefined || id == '') {
+
+    if (id == undefined || id == '') {
       this.lstDependencias.splice(pos, 1)
       return false
     }
@@ -797,7 +814,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.ngxService.stopLoader("loader-aceptar")
       return
     } else {
-      const cuenta = this.lstPC[0] 
+      const cuenta = this.lstPC[0]
       const p_cuenta = cuenta.split('|')
       this.xAPI.funcion = 'WKF_IPuntoCuentaMultiple'
       this.xAPI.valores = ''
@@ -825,7 +842,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   async salvarDependencias(numc: number) {
 
     const cant = this.lstDependencias.length
-   
+
     if (cant == 0) {
       this.ngxService.stopLoader("loader-aceptar")
       return
@@ -854,7 +871,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       )
     }
   }
-  
+
   editarCuenta() {
 
     if (this.PosicionCuenta != -1) {
@@ -885,7 +902,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     }
 
   }
-  
+
   agregarCuenta(tipo: number): IWKFCuenta {
     let validar = false
 
@@ -997,38 +1014,64 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   selTipoDocumento() {
-    
+    const tipo = this.Doc.tipo.toLowerCase()
     this.puntocuenta = false
     this.resolucion = false
     this.booPuntoCuenta = false
     this.lstCuenta = []
-    if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') {
+
+
+    if (tipo.indexOf('punto') >= 0) {
+      this.setDescripcionPunto()
       this.puntocuenta = true
       this.resolucion = true
-    } else if (this.Doc.tipo.toLowerCase() == 'resolucion' || this.Doc.tipo.toLowerCase() == 'tramitacion por organo regular' || this.Doc.tipo.toLowerCase() == 'comision de servicio') {
-      this.resolucion = true
-    } else if (this.Doc.tipo.toLowerCase() == 'multiple/punto de cuenta'){
-      if (this.titulo == 'Salida') {
-        this.cargarPuntosdeCuenta()
 
-      }else{
-        this.toastrService.warning("Debe dirigirse al modulo de salida para usar esta opcion", `GDoc Salida`)
+      if (tipo.indexOf('contratos') >= 0) {
+        this.setDescripcionContratos()
       }
+
+      if (tipo.indexOf('multiple') >= 0) {
+        this.puntocuenta = false
+        this.resolucion = false
+        if (this.titulo == 'Salida') {
+          console.log('entrando')
+          this.cargarPuntosdeCuenta()
+          return true
+        }
+       
+        this.toastrService.warning("Debe dirigirse al modulo de salida para usar esta opcion", `GDoc Salida`)
+
+        
+        
+      }
+
+      if (this.titulo == 'Salida') {
+        this.puntocuenta = false
+        this.resolucion = false
+      }
+
+
+
+
+    } else if (tipo == 'resolucion' ||
+      tipo == 'tramitacion por organo regular' ||
+      tipo == 'comision de servicio') {
+      this.resolucion = true
     }
   }
 
 
-  cargarPuntosdeCuenta(){
-    
+  cargarPuntosdeCuenta() {
+
     this.ngxService.startLoader("loader-aceptar")
     this.xAPI.funcion = 'WKF_CPuntoCuentaSalida'
     this.xAPI.parametros = '5'
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
+
         data.Cuerpo.map(e => {
-          this.lstPuntosCuentas.push(e.cuen + ' | ' + e.udep + ' ' + e.fori.substring(0,10))
+          this.lstPuntosCuentas.push(e.cuen + ' | ' + e.udep + ' ' + e.fori.substring(0, 10))
         })
         this.ngxService.stopLoader("loader-aceptar")
         this.booPuntoCuenta = true
@@ -1037,7 +1080,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         console.error("No existe la funcion ", error)
         this.ngxService.stopLoader("loader-aceptar")
       }
-      
+
     )
   }
 
@@ -1054,43 +1097,46 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    */
   consultarCedula() {
     if (this.cedula == '') return false
+    this.isPunto = true
+    if (this.Doc.tipo.toLowerCase() == 'despidos/punto de cuenta' || this.Doc.tipo.toLowerCase() == 'contratos/punto de cuenta') {
+      this.isPunto = false
+    } else {
+      this.ngxService.startLoader("loader-aceptar")
+      this.xAPI.funcion = 'MPPD_CDatosBasicos'
+      this.xAPI.parametros = this.cedula
+      this.xAPI.valores = ''
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
 
-    this.ngxService.startLoader("loader-aceptar")
-    this.xAPI.funcion = 'MPPD_CDatosBasicos'
-    this.xAPI.parametros = this.cedula
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+          const militar = data.Cuerpo.map(e => {
+            e.resoluciones = JSON.parse(e.resoluciones)
+            e.entradas = JSON.parse(e.entradas)
+            e.componente = this.Componentes.filter(el => { return el.cod_componente == e.componente })[0].nombre_componente
+            e.categoria = this.Categorias.filter(el => { return el.cod_categoria == e.categoria })[0].nombre_categoria
+            e.clasificacion = this.Clasificaciones.filter(el => { return el.cod_clasificacion == e.clasificacion })[0].des_clasificacion
+            e.grado = this.Grados.filter(el => { return el.cod_grado == e.grado })[0].nombres_grado
+            return e
+          })[0]
 
-        const militar = data.Cuerpo.map(e => {
-          e.resoluciones = JSON.parse(e.resoluciones)
-          e.entradas = JSON.parse(e.entradas)
-          e.componente = this.Componentes.filter(el => { return el.cod_componente == e.componente })[0].nombre_componente
-          e.categoria = this.Categorias.filter(el => { return el.cod_categoria == e.categoria })[0].nombre_categoria
-          e.clasificacion = this.Clasificaciones.filter(el => { return el.cod_clasificacion == e.clasificacion })[0].des_clasificacion
-          e.grado = this.Grados.filter(el => { return el.cod_grado == e.grado })[0].nombres_grado
-          return e
-        })[0]
+          if (data.Cuerpo.length > 0) {
+            this.nmilitar = militar.nombres_apellidos
+            this.cargo = militar.grado + " " + militar.componente
 
-        if (data.Cuerpo.length > 0) {
-          this.nmilitar = militar.nombres_apellidos
-          this.cargo = militar.grado + " " + militar.componente
+          } else {
+            this.cedula = ""
+            this.nmilitar = ""
+            this.cargo = ""
+            this.toastrService.info("Debe dirigirse al departamento de resoluciones", `GDoc Resoluciones`)
+          }
 
-        } else {
-          this.cedula = ""
-          this.nmilitar = ""
-          this.cargo = ""
-          this.toastrService.info("Debe dirigirse al departamento de resoluciones", `GDoc Resoluciones`)
+          this.ngxService.stopLoader("loader-aceptar")
+        },
+        (error) => {
+          console.error("Error de conexion a los datos ", error)
         }
 
-        this.ngxService.stopLoader("loader-aceptar")
-      },
-      (error) => {
-        console.error("Error de conexion a los datos ", error)
-      }
-
-    )
-
+      )
+    }
   }
 
   /**
