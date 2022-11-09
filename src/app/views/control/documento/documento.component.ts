@@ -1097,8 +1097,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    */
   consultarCedula() {
     if (this.cedula == '') return false
-    this.isPunto = true
-    if (this.Doc.tipo.toLowerCase() == 'despidos/punto de cuenta' || this.Doc.tipo.toLowerCase() == 'contratos/punto de cuenta') {
+    this.isPunto = true                
+    if (this.Doc.tipo.toLowerCase() == 'destitucion/punto de cuenta' || this.Doc.tipo.toLowerCase() == 'contratos/punto de cuenta') {
       this.isPunto = false
     } else {
       this.ngxService.startLoader("loader-aceptar")
@@ -1204,7 +1204,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   mensajeAgregarCuenta() {
-    if (this.Doc.tipo.toLowerCase() == 'punto de cuenta') {
+    if (this.Doc.tipo.toLowerCase().indexOf('punto de cuenta') >= 0) {
       Swal.fire({
         title: 'Alerta',
         text: '¿Desea mantener los datos de la cuenta?',

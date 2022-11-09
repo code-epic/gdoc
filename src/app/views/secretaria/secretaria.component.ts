@@ -62,11 +62,11 @@ export class SecretariaComponent implements OnInit {
     
   },
   {
-    url: "/sseguimiento",
+    url: "/pendientes",
     js: "",
-    descripcion: "Seguimiento",
+    descripcion: "Buscador",
     icono: "fa fa-envelope-open",
-    nombre: "Seguimiento",
+    nombre: "Buscador",
     accion: "CargarUrl('control', 'pendientes')",
     clase: "f-left",
     color: "bg-purple",
