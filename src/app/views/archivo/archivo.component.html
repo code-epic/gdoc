@@ -55,7 +55,8 @@
           </div>
         </div>
 
-        <mat-tab-group>
+        <mat-tab-group   mat-stretch-tabs class="example-stretched-tabs" 
+        (selectedIndexChange)="seleccionNavegacion($event)">
           <mat-tab>
              <ng-template mat-tab-label>
             &nbsp;ARCHIVOS EN PROCESO
@@ -76,13 +77,11 @@
                       <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
                         &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
-                    <div class="col-md-2 texto-lista">
-                      {{ e.saso | uppercase }}
+
+                    <div class="col-md-3 texto-lista">
+                      {{ e.fcre | date:"dd-MM-yyyy" }} |  {{ e.saso | uppercase }}
                     </div>
-                    <div class="col-md-2 texto-lista">
-                      {{ e.fcre | date:"dd-MM-yyyy" }}
-                    </div>
-                    <div class="col-md-5 texto-lista">
+                    <div class="col-md-6 texto-detalle">
                       {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
                     </div>
                     
@@ -96,7 +95,39 @@
             </mat-paginator>
 
           </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+           &nbsp;ARCHIVOS CERRADOS
+           </ng-template> 
 
+           <div class="container">
+             <mat-selection-list #lstDocumentos>
+               <mat-list *ngFor="let e of bzProcesados; let i=index "
+                 style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                 <div class="row">
+             
+                   <div class="col-md-2 texto-lista">
+                     <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
+                       &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                   </div>
+
+                   <div class="col-md-3 texto-lista">
+                     {{ e.fcre | date:"dd-MM-yyyy" }} |  {{ e.saso | uppercase }}
+                   </div>
+                   <div class="col-md-6 texto-detalle">
+                     {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
+                   </div>
+                   
+                 </div>
+               </mat-list>
+             </mat-selection-list>
+           </div>
+
+           <mat-paginator [length]="lengthOfi" (page)="pageChangeEvent($event)" [pageSize]="pageSizeOfi"
+             [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+           </mat-paginator>
+
+         </mat-tab>
 
         </mat-tab-group>
       </div>
@@ -109,19 +140,18 @@
     <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
   </div>
   <div class="modal-body">
-    <div class="form-row col-md-12">
-      <div class="form-group col-md-12">
-        <label for="txtobservacion">Observaciones</label>
-        <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
-          [(ngModel)]="Observacion"></textarea>
-      </div>
-      <div class="form-group  col-md-12">
-        <label>Acción</label>
-        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
-          (change)="selAccion()">
-          <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
-        </select>
-      </div>
+    <div class="form-group col-md-12">
+      <label for="txtobservacion">Observaciones</label>
+      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="Observacion"></textarea>
+    </div>
+    <div class="form-group  col-md-12">
+      <label>Acción</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
+        (change)="selAccion()" id="slcaceptar">
+        <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+      </select>
+
     </div>
     <div class="form-group  col-md-12" *ngIf="clasificacion">
       <label>Area</label>
@@ -130,29 +160,30 @@
         <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
       </select>
     </div>
-  </div>
-  <div class="form-group  col-md-12"  *ngIf="vplazo">
-    <label for="tmsCreacion">Plazo / Alerta</label>
-    <div class="form-group" style="width:100%">
-      <div class="input-group" style="width:100%">
-        <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-          [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
-          [positionTarget]="buttonEl" readonly>
-        <div class="input-group-append">
-          <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+
+    <div class="form-group  col-md-12" *ngIf="vplazo">
+      <label for="tmsCreacion">Plazo / Alerta</label>
+      <div class="form-group" style="width:100%">
+        <div class="input-group" style="width:100%">
+          <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+            [positionTarget]="buttonEl" readonly>
+          <div class="input-group-append">
+            <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button" id="btnplazo"></button>
+          </div>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
   <div class="modal-footer">
-    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')">
+    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')"
+      id="btnaceptar">
       <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
     <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
   </div>
 </ng-template>
-
 
 
 <ng-template #adjuntar let-c="close" let-d="dismiss">

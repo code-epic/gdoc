@@ -217,7 +217,8 @@ export class SministerialComponent implements OnInit {
       (data) => {
         console.log(data)
         data.Cuerpo.forEach(e => {
-          
+
+          e.edit = e.tdoc.toLowerCase() == 'punto de cuenta' ? true : false
           e.existe = e.anom != '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.completed = false

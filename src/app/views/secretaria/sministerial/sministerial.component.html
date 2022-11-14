@@ -62,7 +62,7 @@
                     
                     <div class="col-md-1 text-left">
                     
-                      <button mat-icon-button aria-label="Editar" (click)="editar(e)">
+                      <button mat-icon-button aria-label="Editar" (click)="editar(e)" *ngIf="e.edit">
                         <mat-icon class="text-gray">edit_note</mat-icon>
                       </button>
                      

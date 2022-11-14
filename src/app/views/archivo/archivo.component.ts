@@ -5,7 +5,9 @@ import { Router } from '@angular/router';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { UtilService } from 'src/app/services/util/util.service';
 
 
 @Component({
@@ -33,7 +35,10 @@ export class ArchivoComponent implements OnInit {
   public lstAcciones = []
 
   public cmbAcciones = [
-    { 'valor': '6', 'texto': 'REACTIVAR', 'visible': '0' }]
+    { 'valor': '1', 'texto': 'CERRAR DOCUMENTO', 'visible': '0' },
+    { 'valor': '6', 'texto': 'REDISTRIBUCION (REACTIVAR)', 'visible': '0' }
+    
+  ]
 
   public paginador = 10
   public focus;
@@ -80,7 +85,7 @@ export class ArchivoComponent implements OnInit {
   public bzCerrados = []
 
   public estilocheck = 'none'
-
+  public extender_plazo: any
   public estiloclasificar = 'none'
 
   public allComplete: boolean = false
@@ -90,6 +95,17 @@ export class ArchivoComponent implements OnInit {
   public Observacion = ''
 
   public AccionTexto: string = '0'
+  public placement = 'bottom'
+
+  public WAlerta: IWKFAlerta = {
+    documento: 0,
+    estado: 0,
+    estatus: 0,
+    activo: 0,
+    fecha: '',
+    usuario: '',
+    observacion: ''
+  }
 
   constructor(
     private apiService: ApiService,
@@ -97,6 +113,7 @@ export class ArchivoComponent implements OnInit {
     private ruta: Router,
     private toastrService: ToastrService,
     private loginService: LoginService,
+    private utilService: UtilService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
@@ -264,14 +281,18 @@ export class ArchivoComponent implements OnInit {
       (data) => {
         console.info(this.AccionTexto)
         switch (this.AccionTexto) {
-          case "1"://Rechazar en el estado inicial
+          case "0"://Rechazar en el estado inicial
             this.rechazarBuzon()
             break;
-
-
+          case "1"://Rechazar en el estado inicial
+            this.promoverBuzon(0, this.utilService.FechaActual())
+            break;
+          case "6":// Enviar a otras areas
+            this.redistribuir(0)
+            break
           default:
 
-            this.promoverBuzon()
+           
             break;
         }
 
@@ -305,10 +326,26 @@ export class ArchivoComponent implements OnInit {
 
 
 
-  async promoverBuzon() {
+  async promoverBuzon(activo: number, sfecha: string) {
+    var fecha = ''
+    if (sfecha == '') {
+      console.log(this.extender_plazo)
+      if (this.extender_plazo == undefined) {
+        this.toastrService.warning(
+          'Debe seleccionar una fecha ',
+          `GDoc Wkf.DocumentoObservacion`
+        )
+        return false
+      } else {
+        fecha = this.utilService.ConvertirFecha(this.extender_plazo)
+      }
+    } else {
+      fecha = sfecha
+    }
+
+    sfecha == '' ? this.utilService.ConvertirFecha(this.extender_plazo) : sfecha
 
     var usuario = this.loginService.Usuario.id
-
     var i = 0
     var estatus = 1 //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
@@ -317,8 +354,8 @@ export class ArchivoComponent implements OnInit {
 
     this.xAPI.parametros = `${estatus},${usuario},${this.numControl}`
     await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        console.log('', data)
+      async data => {
+        await this.guardarAlerta(activo, fecha)
         this.seleccionNavegacion(this.selNav)
         this.Observacion = ''
         this.numControl = '0'
@@ -333,26 +370,50 @@ export class ArchivoComponent implements OnInit {
 
   }
 
-  async redistribuir() {
+
+  async redistribuir(destino: number = 0) {
+    var dst = destino != 0 ? destino : this.cmbDestino
+
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
-    this.xAPI.parametros = this.cmbDestino + ',' + this.cmbDestino + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
+    this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
+    console.log(this.xAPI.parametros)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
         this.toastrService.success(
           'El documento ha sido redistribuido segun su selección',
           `GDoc Wkf.DocumentoObservacion`
         )
-        console.log(data)
         this.seleccionNavegacion(this.selNav)
       },
       (error) => {
         console.error(error)
       }
-
     )
+  }
 
+  //Guardar la alerte define el momento y estadus
+  guardarAlerta(activo: number, fecha: string) {
+    this.WAlerta.activo = activo
+    this.WAlerta.documento = parseInt(this.numControl)
+    this.WAlerta.estado = this.estadoActual
+    this.WAlerta.estatus = this.selNav + 1
+    this.WAlerta.usuario = this.loginService.Usuario.id
+    this.WAlerta.observacion = this.Observacion.toUpperCase()
+    this.WAlerta.fecha = fecha
 
+    this.xAPI.funcion = 'WKF_AAlertas'
+    this.xAPI.parametros = ''
+    console.log(this.WAlerta);
+    this.xAPI.valores = JSON.stringify(this.WAlerta)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async alerData => {
+        console.log(alerData)
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
+      }) //
   }
 
   async cargarAcciones(posicion){
