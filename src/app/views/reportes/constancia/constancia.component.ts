@@ -1,11 +1,11 @@
 import { Component, OnInit, Pipe, SecurityContext } from '@angular/core';
 import { IDocumento, IWKFAlerta } from '../../../services/control/documentos.service'
-import { ApiService, IAPICore} from 'src/app/services/apicore/api.service';
+import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 import { LoginService } from 'src/app/services/seguridad/login.service'
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
- 
+
 
 
 
@@ -14,7 +14,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   selector: 'app-constancia',
   templateUrl: './constancia.component.html',
   styleUrls: ['./constancia.component.scss'],
-  
+
 })
 
 
@@ -24,10 +24,10 @@ export class ConstanciaComponent implements OnInit {
 
   public estadoActual = 1
   public estadoOrigen = 1
-  public bCuentas : boolean = false
-  public nexpediente : string = ''
+  public bCuentas: boolean = false
+  public nexpediente: string = ''
 
-  public Doc : IDocumento = {
+  public Doc: IDocumento = {
     ncontrol: '',
     wfdocumento: 0,
     fcreacion: '',
@@ -44,9 +44,9 @@ export class ConstanciaComponent implements OnInit {
     creador: '',
     archivo: '',
     privacidad: 0,
-    historial : '',
-    traza:'',
-    subdocumento : ''
+    historial: '',
+    traza: '',
+    subdocumento: ''
   }
 
   public WAlerta: IWKFAlerta = {
@@ -67,8 +67,9 @@ export class ConstanciaComponent implements OnInit {
   public lstSubDoc = []
   public lstTraza = []
   public lstHistorial = []
+  public lstUsuario = []
 
-  public safeHtml : SafeHtml
+  public safeHtml: SafeHtml
 
 
   constructor(
@@ -81,10 +82,15 @@ export class ConstanciaComponent implements OnInit {
   ngOnInit(): void {
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
-        this.consultarDocumento(id)
-      }
+      this.lstUsuario = sessionStorage.getItem("CEP_CUsuario") != undefined ? JSON.parse(atob(sessionStorage.getItem("CEP_CUsuario"))) : []
+
+      this.consultarDocumento(id)
+    }
+
+
 
   }
+
 
 
   consultarDocumento(numBase64: string) {
@@ -96,7 +102,6 @@ export class ConstanciaComponent implements OnInit {
       (data) => {
         data.Cuerpo.forEach(e => {
           this.Doc = e
-          console.log(this.Doc)
           this.Doc.contenido = this.Doc.contenido.toUpperCase()
           this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
           this.Doc.fcreacion = e.fcreacion.substring(0, 10)
@@ -110,26 +115,38 @@ export class ConstanciaComponent implements OnInit {
             this.WAlerta.usuario = this.loginService.Usuario.id
           }
 
-          const punto_cuenta = this.Doc.subdocumento!=null? JSON.parse(this.Doc.subdocumento): []
+          const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
           this.lstSubDoc = punto_cuenta.map(e => {
-            return typeof e == 'object'?e: JSON.parse(e)
+            return typeof e == 'object' ? e : JSON.parse(e)
           })
-          const traza = this.Doc.traza!=null?JSON.parse(this.Doc.traza):[]
+          const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
           this.lstTraza = traza.map(e => {
-            return typeof e == 'object'?e: JSON.parse(e)
+            let el = typeof e == 'object' ? e : JSON.parse(e)
+            let nombre = this.lstUsuario.filter(ex => {
+              return ex._id == el.usuario
+            })
+           
+            el.descripcion = nombre[0].nombre
+            return el
           })
-          const historial = this.Doc.historial!=null?JSON.parse(this.Doc.historial):[]
+          const historial = this.Doc.historial != null ? JSON.parse(this.Doc.historial) : []
           this.lstHistorial = historial.map(e => {
-            return typeof e == 'object'?e: JSON.parse(e)
+            return typeof e == 'object' ? e : JSON.parse(e)
           })
 
           const codigo = this.Doc.codigo + ' / ' + this.Doc.nexpediente
           this.nexpediente = codigo.toUpperCase()
+
+          let nombre = this.lstUsuario.filter(ex => {
+            return ex._id == this.Doc.creador
+          })
+          
+          this.Doc.creador = nombre[0].nombre == undefined? '': nombre[0].nombre
           //this.safeHtml = this.domSanitizer.bypassSecurityTrustHtml(this.Doc.contenido)
           //console.log(this.safeHtml);
           this.Doc.contenido = this.domSanitizer.sanitize(SecurityContext.HTML, this.Doc.contenido)
           // console.log(this.lstTraza);
-          if ( this.lstSubDoc.length > 0) this.bCuentas = true
+          if (this.lstSubDoc.length > 0) this.bCuentas = true
           // console.log(this.lstSubDoc)
         });
       },
@@ -138,5 +155,7 @@ export class ConstanciaComponent implements OnInit {
       }
     )
   }
+
+
 
 }

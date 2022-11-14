@@ -43,12 +43,13 @@ export class DashboardComponent implements OnInit {
       e => { return e.url != '/principal'}
     )
 
-    if (sessionStorage.getItem("MPPD_CTipoEntrada") == undefined) {
-      for (var i = 0; i < 9; i++) {
-
+    if (sessionStorage.getItem("CEP_CUsuario") == undefined) {
+      for (var i = 0; i < 10; i++) {
         this.resolucionService.Listar(i) //
       }
     }
+
+
     
     
   }

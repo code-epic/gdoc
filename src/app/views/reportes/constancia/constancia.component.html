@@ -130,7 +130,7 @@
                                     <td>{{e.nombre_estado | uppercase }}</td>
                                     <td>{{e.nombre_estatus | uppercase }}</td>
                                     <td>{{e.observacion | uppercase }}</td>
-                                    <td>{{e.usuario}}</td>
+                                    <td>{{e.descripcion | uppercase }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -154,7 +154,7 @@
                                 </tr>
                                 <tr>
                                     <th>CREADO POR</th>
-                                    <td>{{Doc.creador}}</td>
+                                    <td>{{Doc.creador | uppercase }}</td>
                                 </tr>
                                 <tr>
                                     <th>FECHA DE CREACIÓN</th>
