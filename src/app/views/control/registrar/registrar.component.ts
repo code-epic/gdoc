@@ -286,11 +286,7 @@ export class RegistrarComponent implements OnInit {
   }
 
 
-  pageChangeEvent(e) {
-    this.pageSize = e.pageSize
-    this.recorrerElementos(e.pageIndex)
-  }
-
+ 
 
   seleccionNavegacion(e) {
     this.selNav = e
@@ -314,6 +310,11 @@ export class RegistrarComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  pageChangeEvent(e) {
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex)
   }
 
   //recorrerElementos para paginar listados

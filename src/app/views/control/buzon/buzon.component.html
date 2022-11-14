@@ -193,11 +193,11 @@
 
             <div class="container">
               <mat-selection-list #lstAlertas>
-                <mat-list *ngFor="let e of bzAlertas; let i=index "
+                <mat-list *ngFor="let e of buzon; let i=index "
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.ncontrol )]">{{ e.ncontrol | uppercase }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.ncontrol )]">{{ e.ncontrol }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-4 texto-lista">
                       {{ e.unidad | uppercase }}
@@ -211,7 +211,7 @@
                     <div class="col-md-1 text-right ">
                       <button mat-icon-button aria-label="Privado">
                         <!--  -->
-                        <mat-icon class="text-warning" (click)="open(observacion, e.id_alerta)">today</mat-icon>
+                        <mat-icon class="text-warning" (click)="open(alerta, e.id_alerta)">today</mat-icon>
                       </button>
 
                     </div>

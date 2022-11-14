@@ -4,6 +4,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
@@ -110,6 +111,7 @@ export class BuzonComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private ruta: Router,
+    private ngxService: NgxUiLoaderService,
     private toastrService: ToastrService,
     private utilService: UtilService,
     private loginService: LoginService,
@@ -122,30 +124,51 @@ export class BuzonComponent implements OnInit {
     this.seleccionNavegacion(0)
   }
 
-  async ConsultarAlertas() {
+
+  seleccionLista(event) {
+    if (event.charCode == 13) {
+      this.longitud = 0;
+      this.pageSize = 10;
+      const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar))
+      this.longitud = this.bzBusqueda.length
+      if (this.posicionPagina == 3) {
+        this.bzBusqueda = this.bzAlertasO.filter((e) => { return patron.test(e.busqueda) })
+        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+      }
+      this.buscar = ''
+    }
+  }
+
+
+  async ConsultarAlertas(): Promise<void> {
+    this.ngxService.startLoader("loader-aceptar")
     this.xAPI.funcion = 'WKF_CAlertas'
     this.xAPI.parametros = '2,2'
-    await this.apiService.Ejecutar(this.xAPI).subscribe(
+    this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.bzAlertasO = data.Cuerpo.map((e) => {
-          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
-          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
-          e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto
+        this.bzAlertas = data.Cuerpo.map((e) => {
+          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow';
+          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`;
+          e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto;
           e.busqueda = this.utilService.ConvertirCadena(
             e.ncontrol + e.remitente + e.plazo + e.texto
-          )
-          return e
+          );
+
+          return e;
+
         }
-        )
-        this.bzBusqueda = this.bzAlertasO
-        this.longitud = this.bzBusqueda.length
-        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize)
+        );
+        this.longitud = this.bzAlertas.length;
+        this.bzOriginal = this.bzAlertas;
+        this.pageSize = 10;
+        this.ngxService.stopLoader("loader-aceptar")
+        this.recorrerElementos(0);
       },
       (error) => {
-
       }
     )
   }
+
 
 
   open(content, id) {
@@ -202,39 +225,91 @@ export class BuzonComponent implements OnInit {
     )
   }
 
-  async listarBuzon() {
-    var bz = []
+  async listarBuzon(): Promise<void> {
+    console.log('Entrando en listado')
+    this.ngxService.startLoader("loader-aceptar")
+    try {
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+          console.log(data)
+          this.buzon = data.Cuerpo.map((e) => {
+            e.existe = e.anom == '' ? true : false;
+            e.privado = e.priv == 1 ? true : false;
+            e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
+            e.color = 'green'
+            switch (e.tdoc.toLowerCase()) {
+              case 'punto de cuenta':
+                e.simbolo = "-P"
+                e.color = 'green'
+                break;
+              case 'tramitacion por organo regular':
+                e.simbolo = "-T"
+                e.color = 'brown'
+                break;
+              case 'resolucion':
+                e.simbolo = "-R"
+                e.color = 'orange'
+                break;
+              default:
+                e.simbolo = ''
+                break;
+            }
 
-    await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        data.Cuerpo.forEach(e => {
-          e.existe = e.anom == '' ? true : false
-          e.privado = e.priv == 1 ? true : false
-          e.completed = false
-          e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
-          e.color = 'warn'
-          bz.push(e)
-        })//Registros recorridos como elementos
+            e.completed = false;
 
-        this.longitud = bz.length
-        if (this.longitud > 0) {
-          this.estilocheck = ''
-          this.bzOriginal = bz
-          this.recorrerElementos(0)
+            return e;
+          });
+          this.longitud = this.buzon.length;
+          if (this.longitud > 0) {
+            this.estilocheck = '';
+            this.bzOriginal = this.buzon;
+            this.pageSize = 10;
+            this.recorrerElementos(0);
+          }
+          this.ngxService.stopLoader("loader-aceptar")
+        },
+        (error) => {
+          this.ngxService.stopLoader("loader-aceptar")
         }
-
-      },
-      (error) => {
-
-      }
-    )
+      )
+    } catch (error) {
+      console.error(error)
+      this.ngxService.stopLoader("loader-aceptar")
+    }
   }
+
+  // async listarBuzon() {
+  //   var bz = []
+
+  //   await this.apiService.Ejecutar(this.xAPI).subscribe(
+  //     (data) => {
+  //       data.Cuerpo.forEach(e => {
+  //         e.existe = e.anom == '' ? true : false
+  //         e.privado = e.priv == 1 ? true : false
+  //         e.completed = false
+  //         e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
+  //         e.color = 'warn'
+  //         bz.push(e)
+  //       })//Registros recorridos como elementos
+
+  //       this.longitud = bz.length
+  //       if (this.longitud > 0) {
+  //         this.estilocheck = ''
+  //         this.bzOriginal = bz
+  //         this.recorrerElementos(0)
+  //       }
+
+  //     },
+  //     (error) => {
+
+  //     }
+  //   )
+  // }
 
   pageChangeEvent(e) {
     this.pageSize = e.pageSize
     this.recorrerElementos(e.pageIndex)
   }
-
 
 
   //recorrerElementos para paginar listados
