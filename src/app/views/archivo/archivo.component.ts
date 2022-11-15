@@ -27,8 +27,8 @@ export class ArchivoComponent implements OnInit {
   public vplazo = false
 
   public nexpediente = ''
-  
-  public codigo =  ''
+
+  public codigo = ''
 
   public cmbDestino = ''
 
@@ -36,8 +36,9 @@ export class ArchivoComponent implements OnInit {
 
   public cmbAcciones = [
     { 'valor': '1', 'texto': 'CERRAR DOCUMENTO', 'visible': '0' },
-    { 'valor': '6', 'texto': 'REDISTRIBUCION (REACTIVAR)', 'visible': '0' }
-    
+    { 'valor': '6', 'texto': 'REDISTRIBUCION (REACTIVAR)', 'visible': '0' },
+    { 'valor': '2', 'texto': 'REDISTRIBUCION (REACTIVAR)', 'visible': '1' }
+
   ]
 
   public paginador = 10
@@ -197,7 +198,7 @@ export class ArchivoComponent implements OnInit {
         console.log(data)
         data.Cuerpo.forEach(e => {
           e.existe = e.anom == '' ? true : false
-          e.privado =  false
+          e.privado = false
           e.completed = false
           //e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
           e.color = 'warn'
@@ -257,7 +258,7 @@ export class ArchivoComponent implements OnInit {
   //editar
   editar(id: string) {
     const estado = this.estadoActual
-    const estatus = this.selNav + 1 
+    const estatus = this.selNav + 1
     const base = btoa(estado + ',' + estatus + ',' + id)
     this.ruta.navigate(['/documento', base])
   }
@@ -287,12 +288,15 @@ export class ArchivoComponent implements OnInit {
           case "1"://Rechazar en el estado inicial
             this.promoverBuzon(0, this.utilService.FechaActual())
             break;
+          case "2"://Rechazar en el estado inicial
+            this.redistribuir(0)
+            break
           case "6":// Enviar a otras areas
             this.redistribuir(0)
             break
           default:
 
-           
+
             break;
         }
 
@@ -416,13 +420,13 @@ export class ArchivoComponent implements OnInit {
       }) //
   }
 
-  async cargarAcciones(posicion){
+  async cargarAcciones(posicion) {
     this.lstAcciones = []
     this.cmbAcciones.forEach(e => {
-      if(e.visible==posicion){
+      if (e.visible == posicion) {
         this.lstAcciones.push(e)
       }
-      
+
     });
   }
 
@@ -433,14 +437,18 @@ export class ArchivoComponent implements OnInit {
         this.clasificacion = true
         this.vplazo = true
         break;
+      case '2':
+        this.clasificacion = true
+        this.vplazo = true
+        break;
     }
   }
 
   //Consultar un enlace
-  constancia(id: string){
+  constancia(id: string) {
     const estado = 1
     const estatus = 1
-    return  btoa(estado + ',' + estatus + ',' + id)
+    return btoa(estado + ',' + estatus + ',' + id)
     //this.ruta.navigate(['/constancia', base])
   }
 

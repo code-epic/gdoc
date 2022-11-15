@@ -106,6 +106,12 @@
                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                  <div class="row">
              
+                  <div class="col-md-1">
+                    <button mat-icon-button aria-label="Example " class="text-success"
+                      (click)="open(observacion, e.idd)">
+                      <mat-icon>room_preferences</mat-icon>
+                    </button>
+                  </div>
                    <div class="col-md-2 texto-lista">
                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
                        &nbsp;<font color="green">{{ e.simbolo }}</font></a>

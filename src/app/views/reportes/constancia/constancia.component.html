@@ -75,7 +75,7 @@
                         <table summary="" class="table table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    <th data-priority="1">Contenido</th>
+                                    <th data-priority="1">Contenido del oficio</th>
                                 </tr>
                             </thead>
                         </table>
@@ -92,21 +92,45 @@
                         <div class="form-group  col-md-12 text-justify" [innerHTML]="Doc.instrucciones"
                             style="padding: 15px; border: 1px solid #ccc">
                         </div>
-                        <br>
 
-                        <div *ngFor="let e of lstSubDoc" class="form-group  col-md-12 text-justify">
-                            <table style="width: 100%;" class="table table-bordered table-hover">
+                        <table summary="" class="table table-bordered table-hover" *ngIf="rcuenta">
+                            <thead>
                                 <tr>
-                                    <th>{{e.nmilitar | uppercase }}</th>
-                                    <th>{{e.cargo | uppercase }}</th>
-                                    <th>CEDULA: {{e.cedula | uppercase }}</th>
-                                    <th>CUENTA: {{e.cuenta | uppercase }}</th>
+                                    <th data-priority="1">Contenido de la cuenta</th>
                                 </tr>
-                            </table>
-
-                            <div class="form-group  col-md-12 text-justify" [innerHTML]="e.resumen"
+                            </thead>
+                        </table>
+                        <div *ngIf="rcuenta" class="form-group  col-md-12 text-justify" [innerHTML]="resumencuenta"
                                 style="padding: 15px; border: 1px solid #ccc">
                             </div>
+
+                        <br>
+                        
+
+                        <div  class="form-group  col-md-12 text-justify">
+                            <table  style="width: 100%;" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>NOMBRE COMPLETO</th>
+                                        <th>CARGO </th>
+                                        <th>CEDULA</th>
+                                        <th>CUENTA</th>
+                                    </tr>
+    
+                                </thead>
+                                <tbody >
+                                    <tr  *ngFor="let e of lstSubDoc" >
+                                        <th>{{e.nmilitar | uppercase }}</th>
+                                        <th>{{e.cargo | uppercase }}</th>
+                                        <th>{{e.cedula | uppercase }}</th>
+                                        <th>{{e.cuenta | uppercase }}</th>
+                                    </tr>
+    
+                                </tbody>
+                                
+                            </table>
+
+                            
                         </div>
                                 
 

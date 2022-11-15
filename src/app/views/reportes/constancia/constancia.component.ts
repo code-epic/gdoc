@@ -70,6 +70,8 @@ export class ConstanciaComponent implements OnInit {
   public lstUsuario = []
 
   public safeHtml: SafeHtml
+  public rcuenta = false
+  public resumencuenta = ''
 
 
   constructor(
@@ -119,6 +121,11 @@ export class ConstanciaComponent implements OnInit {
           this.lstSubDoc = punto_cuenta.map(e => {
             return typeof e == 'object' ? e : JSON.parse(e)
           })
+          
+          if ( this.lstSubDoc.length > 0) {
+            this.resumencuenta = this.lstSubDoc[0].resumen
+            this.rcuenta = true
+          }
           const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
           this.lstTraza = traza.map(e => {
             let el = typeof e == 'object' ? e : JSON.parse(e)
