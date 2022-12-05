@@ -73,6 +73,11 @@ export class ConstanciaComponent implements OnInit {
   public rcuenta = false
   public resumencuenta = ''
 
+  public nCuenta = ''
+  public isPunto: boolean = true
+  public sCedula: string = 'CEDULA'
+  public sGrado: string = 'GRADO /  GERARQUIA'
+  public sNombre: string = 'NOMBRES Y APELLIDOS'
 
   constructor(
     private apiService: ApiService,
@@ -93,7 +98,12 @@ export class ConstanciaComponent implements OnInit {
 
   }
 
-
+  setDescripcionContratos() {
+    this.sCedula = '# CONTRATO'
+    this.sGrado = 'RIF / RAZON SOCIAL'
+    this.sNombre = 'MONTO TOTAL'
+    console.log('conectado')
+  }
 
   consultarDocumento(numBase64: string) {
     const base = atob(numBase64)
@@ -124,6 +134,7 @@ export class ConstanciaComponent implements OnInit {
           
           if ( this.lstSubDoc.length > 0) {
             this.resumencuenta = this.lstSubDoc[0].resumen
+            this.nCuenta = this.lstSubDoc[0].cuenta
             this.rcuenta = true
           }
           const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
@@ -155,6 +166,10 @@ export class ConstanciaComponent implements OnInit {
           // console.log(this.lstTraza);
           if (this.lstSubDoc.length > 0) this.bCuentas = true
           // console.log(this.lstSubDoc)
+          console.log(this.Doc)
+          if (this.Doc.tipo.toLocaleLowerCase().indexOf('contratos') >= 0) {
+            this.setDescripcionContratos()
+          }
         });
       },
       (error) => {

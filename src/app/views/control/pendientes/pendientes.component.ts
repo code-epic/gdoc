@@ -36,6 +36,19 @@ export class PendientesComponent implements OnInit {
   public lstPaginas = []
   public actual : number =  1
 
+  public lstAcciones = [
+    { 'valor': '1', 'texto': 'ANALISTA', 'visible': '1' },
+    { 'valor': '2', 'texto': 'JEFE DE AREA', 'visible': '1' },
+    { 'valor': '3', 'texto': 'BANDEJA DE ESPERA', 'visible': '1' },
+    { 'valor': '4', 'texto': 'PRESIDENCIAL', 'visible': '1' },
+    { 'valor': '5', 'texto': 'ESPERA DE OPINION', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '6', 'texto': 'CONSULTORIA JURIDICA', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '7', 'texto': 'AREA DE RESOLUCIONES', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '8', 'texto': 'SUB-DIRECCION', 'visible': '1' },
+    { 'valor': '9', 'texto': 'DIRECCION GENERAL', 'visible': '1' },
+    { 'valor': '10', 'texto': 'DESPACHO DEL MPPD', 'visible': '1' },  //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '11', 'texto': 'ARCHIVO', 'visible': '1' }
+  ]
 
   public focus = true
 
@@ -101,6 +114,7 @@ export class PendientesComponent implements OnInit {
           e.existe = e.anom == '' ? true : false;
           e.privado = e.priv == 1 ? true : false;
           e.color = 'green'
+          e.s_texto = e.s_estatus != null? ' - ' + this.lstAcciones[e.s_estatus].texto: ''
           switch (e.tdoc.toLowerCase()) {
             case 'punto de cuenta':
               e.simbolo = "-P"
