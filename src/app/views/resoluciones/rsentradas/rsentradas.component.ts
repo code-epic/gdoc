@@ -225,6 +225,7 @@ export class RsentradasComponent implements OnInit {
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
     this.xAPI.parametros = base
     this.xAPI.valores = ''
+    console.log(this.xAPI);
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {

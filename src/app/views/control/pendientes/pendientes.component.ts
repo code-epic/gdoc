@@ -37,6 +37,7 @@ export class PendientesComponent implements OnInit {
   public actual : number =  1
 
   public lstAcciones = [
+    { 'valor': '0', 'texto': 'EN PROCESO', 'visible': '1' },
     { 'valor': '1', 'texto': 'ANALISTA', 'visible': '1' },
     { 'valor': '2', 'texto': 'JEFE DE AREA', 'visible': '1' },
     { 'valor': '3', 'texto': 'BANDEJA DE ESPERA', 'visible': '1' },
@@ -114,7 +115,11 @@ export class PendientesComponent implements OnInit {
           e.existe = e.anom == '' ? true : false;
           e.privado = e.priv == 1 ? true : false;
           e.color = 'green'
-          e.s_texto = e.s_estatus != null? ' - ' + this.lstAcciones[e.s_estatus].texto: ''
+          e.s_texto = ''
+          if (e.s_estatus > 0 || e.s_estatus < 10){
+            e.s_texto = e.s_estatus != null? ' - ' + this.lstAcciones[e.s_estatus].texto: ''
+          }
+          
           switch (e.tdoc.toLowerCase()) {
             case 'punto de cuenta':
               e.simbolo = "-P"
