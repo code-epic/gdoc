@@ -203,11 +203,13 @@
                         <div class="form-group col-md-12">
                             <label for="txtContenido">Contenido del Oficio (*) </label>
                             <div class="NgxEditor__Wrapper">
-                                <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                                <angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="Doc.contenido"></angular-editor>
+
+                                <!-- <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
                                 <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor"
                                     [(ngModel)]="Doc.contenido" [disabled]="false" [placeholder]="'Escibe aqui...'"
                                     id="conte">
-                                </ngx-editor>
+                                </ngx-editor> -->
                             </div>
                         </div>
                     </div>
@@ -323,11 +325,12 @@
                         <div class="form-group col-md-12">
                             <label for="txtInstrucciones">Instrucciones Generales</label>
                             <div class="NgxEditor__Wrapper">
-                                <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
+                                <angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="Doc.instrucciones"></angular-editor>
+                                <!-- <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
                                 <ngx-editor [editor]="xeditor" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Doc.instrucciones" [disabled]="false" [placeholder]="'Escibe aqui...'"
                                     id="inst">
-                                </ngx-editor>
+                                </ngx-editor> -->
                             </div>
                         </div>
                     </div>

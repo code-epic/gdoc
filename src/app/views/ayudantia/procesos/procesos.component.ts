@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Editor } from 'ngx-editor'
 
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,7 +18,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 })
 export class ProcesosComponent implements OnInit {
 
-  xobser: Editor = new Editor;
+  // xobser: Editor = new Editor;
   public id: string = ''
 
   public lstProyectos = []
@@ -72,7 +71,7 @@ export class ProcesosComponent implements OnInit {
 
   ngOnInit(): void {
     this.ConsultarProyectos()
-    this.xobser = new Editor()
+    // this.xobser = new Editor()
 
 
   }

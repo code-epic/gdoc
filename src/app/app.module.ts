@@ -31,7 +31,6 @@ import { RegistrarComponent } from './views/control/registrar/registrar.componen
 import { DocumentoComponent } from './views/control/documento/documento.component';
 import { BuzonComponent } from './views/control/buzon/buzon.component';
 import { SalidasComponent } from './views/control/salidas/salidas.component';
-import { NgxEditorModule } from 'ngx-editor';
 import { ProyectoComponent } from './views/ayudantia/procesos/proyecto/proyecto.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -89,6 +88,9 @@ import { SbuzonComponent } from './views/secretaria/sbuzon/sbuzon.component';
 import { SalertaComponent } from './views/secretaria/salerta/salerta.component';
 import { SministerialComponent } from './views/secretaria/sministerial/sministerial.component';
 import { SpresidencialComponent } from './views/secretaria/spresidencial/spresidencial.component';
+import { AngularEditorModule } from '@kolkov/angular-editor';
+
+
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -122,11 +124,6 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
 }
 
 
-NgxEditorModule.forRoot({
-  locals: {
-    // ...
-  },
-});
 
 const ngWizardConfig: NgWizardConfig = {
   theme: THEME.arrows
@@ -157,13 +154,13 @@ const ngWizardConfig: NgWizardConfig = {
     MatInputModule,
     MatPaginatorModule,
     NgWizardModule.forRoot(ngWizardConfig),
-    NgxEditorModule,
     MatDialogModule,
     MatCommonModule,
     MatTooltipModule,
     MatChipsModule,
     MatBottomSheetModule,
     ToastContainerModule,
+    AngularEditorModule,
     NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
     MatToolbarModule,
     ToastrModule.forRoot({

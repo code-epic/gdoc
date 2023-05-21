@@ -3,7 +3,7 @@ import { MatAccordion } from '@angular/material/expansion';
 import { PageEvent } from '@angular/material/paginator';
 import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Editor } from 'ngx-editor';
+
 import { Router } from '@angular/router';
 
 import { ToastrService } from 'ngx-toastr';
@@ -56,7 +56,7 @@ export class RegistrarComponent implements OnInit {
 
   // MatPaginator Output
   pageEvent: PageEvent;
-  editor: Editor = new Editor;
+  // editor: Editor = new Editor;
 
   public estilocheck = 'none'
 
@@ -131,7 +131,7 @@ export class RegistrarComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.editor = new Editor();
+    // this.editor = new Editor();
     this.listarEstados()
     this.seleccionNavegacion(0)
 

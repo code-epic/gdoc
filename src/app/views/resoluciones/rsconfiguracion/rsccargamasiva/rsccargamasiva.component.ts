@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Editor } from 'ngx-editor';
 
 import { Observable } from 'rxjs';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
@@ -34,8 +33,8 @@ export class RsccargamasivaComponent implements OnInit {
   }
 
 
-  xeditor: Editor = new Editor
-  xobser: Editor = new Editor
+  // xeditor: Editor = new Editor
+  // xobser: Editor = new Editor
 
   public Resolucion: Resolucion = {
     id: '',
@@ -71,8 +70,8 @@ export class RsccargamasivaComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.xeditor = new Editor()
-    this.xobser = new Editor()
+    // this.xeditor = new Editor()
+    // this.xobser = new Editor()
 
     this.TipoResoluciones = sessionStorage.getItem("MPPD_CTipoResolucion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion"))) : []
     this.Estados = sessionStorage.getItem("MPPD_CEstadoResolucion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CEstadoResolucion"))) : []

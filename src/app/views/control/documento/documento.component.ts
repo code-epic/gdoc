@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NgbModal, NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
-import { Editor } from 'ngx-editor'
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader'
 import Swal from 'sweetalert2'
@@ -13,7 +12,6 @@ import { UtilService } from 'src/app/services/util/util.service'
 
 import { Location } from '@angular/common';
 import { FormControl } from '@angular/forms';
-import { error } from 'console';
 
 
 @Component({
@@ -54,8 +52,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   lineCountCache: number = 0;
   PosicionCuenta: number = -1;
 
-  editor: Editor = new Editor;
-  xeditor: Editor = new Editor;
+  // editor: Editor = new Editor;
+  // xeditor: Editor = new Editor;
 
   public fcreacion: any
   public forigen: any
@@ -243,27 +241,20 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
 
-    this.editor = new Editor()
-    this.xeditor = new Editor()
+    // this.editor = new Editor()
+    // this.xeditor = new Editor()
     this.listarConfiguracion()
-
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
-
       if (id == 'salida') {
         this.SalidaTipo()
-
-
         if (this.rutaActiva.snapshot.params.numc != undefined) {
           var numc = this.rutaActiva.snapshot.params.numc
-
           this.ncontrolt = 'Nro de Control'
           this.ncontrolv = true
           this.salidavisible = true
           this.camponumsalida = 4
-
           this.consultarDocumento(numc)
-
         }
 
       } else {
@@ -331,12 +322,13 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   listarConfiguracion() {
+    
     this.xAPI.funcion = 'MD_CConfiguracion'
     this.xAPI.parametros = '%'
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-
+        
         data.Cuerpo.forEach(e => {
           switch (e.tipo) {
             case "1":
@@ -1226,8 +1218,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
-    this.editor.destroy()
-    this.xeditor.destroy()
+    // this.editor.destroy()
+    // this.xeditor.destroy()
   }
 }
 

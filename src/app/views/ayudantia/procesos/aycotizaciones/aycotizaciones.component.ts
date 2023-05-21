@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Editor } from 'ngx-editor'
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Proyecto, Avance } from 'src/app/services/ayudantia/proyecto.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -27,11 +26,11 @@ export class AycotizacionesComponent implements OnInit {
 
   public id : string = ''
 
-  editor: Editor = new Editor;
+  // editor: Editor = new Editor;
 
-  xeditor: Editor = new Editor;
+  // xeditor: Editor = new Editor;
 
-  xobser: Editor = new Editor;
+  // xobser: Editor = new Editor;
 
 
   ffecha: NgbDate | null
@@ -82,11 +81,11 @@ export class AycotizacionesComponent implements OnInit {
     private ruta: Router) { }
 
   ngOnInit(): void {
-    this.editor = new Editor()
+    // this.editor = new Editor()
 
-    this.xeditor = new Editor()
+    // this.xeditor = new Editor()
 
-    this.xobser = new Editor()
+    // this.xobser = new Editor()
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
       this.id = this.rutaActiva.snapshot.params.id

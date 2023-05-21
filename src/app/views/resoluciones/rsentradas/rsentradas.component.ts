@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Editor } from 'ngx-editor'
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 
 import { ActivatedRoute, Router } from '@angular/router'
@@ -33,11 +32,11 @@ export class RsentradasComponent implements OnInit {
 
   public id: string = ''
 
-  editor: Editor = new Editor
+  // editor: Editor = new Editor
 
-  xeditor: Editor = new Editor
+  // xeditor: Editor = new Editor
 
-  xobser: Editor = new Editor
+  // xobser: Editor = new Editor
 
   public estadoActual = 1
   public estadoOrigen = 1
@@ -186,9 +185,9 @@ export class RsentradasComponent implements OnInit {
   ngOnInit(): void {
 
 
-    this.editor = new Editor()
-    this.xeditor = new Editor()
-    this.xobser = new Editor()
+    // this.editor = new Editor()
+    // this.xeditor = new Editor()
+    // this.xobser = new Editor()
     if (this.rutaActiva.snapshot.params.id != undefined) {
       const id = this.rutaActiva.snapshot.params.id
       const cnt = this.rutaActiva.snapshot.params.cuenta

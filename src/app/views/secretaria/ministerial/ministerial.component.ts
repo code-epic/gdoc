@@ -2,7 +2,6 @@ import { Component, OnInit, Inject, TemplateRef, ViewChild } from '@angular/core
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbDateParserFormatter, NgbModal, NgbDate, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Editor } from 'ngx-editor'
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -92,7 +91,7 @@ export class MinisterialComponent implements OnInit {
 
   public ministerial: any
 
-  editor: Editor = new Editor
+  // editor: Editor = new Editor
 
   public blUpdate = false
   public bHist = false
@@ -163,7 +162,7 @@ export class MinisterialComponent implements OnInit {
     private modalService: NgbModal) { }
 
   ngOnInit(): void {
-    this.editor = new Editor()
+    // this.editor = new Editor()
     this.fplazo = NgbDate.from(this.formatter.parse(this.utilService.FechaActual()))
 
     this.extender_plazo = NgbDate.from(this.formatter.parse(this.utilService.FechaActual()))

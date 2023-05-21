@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Editor } from 'ngx-editor'
-
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
@@ -16,7 +14,7 @@ import { NgbModal, NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter }
 })
 export class RsprocesosComponent implements OnInit {
 
-  xobser: Editor = new Editor;
+  // xobser: Editor = new Editor;
   public id : string = ''
 
   public lstProyectos = []
@@ -57,7 +55,7 @@ export class RsprocesosComponent implements OnInit {
 
   ngOnInit(): void {
     this.ConsultarProyectos()
-    this.xobser = new Editor()
+    // this.xobser = new Editor()
    
 
   }
