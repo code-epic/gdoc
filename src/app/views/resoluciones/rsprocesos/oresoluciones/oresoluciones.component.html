@@ -1,0 +1,614 @@
+<div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+<div class="container-fluid mt--9">
+    <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
+                            <h2 class="mb-0">Registrar Resoluciones </h2>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" *ngIf="bPDF"
+                                        (click)="verArchivos(archivos)">
+                                        <mat-icon>wallpaper</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" *ngIf="bPDF" (click)="verHistorial()">
+                                        <mat-icon>history</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Editar" *ngIf="editar_datos">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>arrow_back</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form>
+
+                        <div class="row">
+                            <div class="col-md-12">
+
+
+
+                                <!-- <hr class="mb-1">
+                          <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Personales</h6> -->
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>Cédula</mat-label>
+                                            <input matInput placeholder="Cédula" [ngModelOptions]="{standalone: true}"
+                                                [(ngModel)]="Resolucion.cedula" value="{{Resolucion.cedula}}"
+                                                (blur)="consultarCedula()">
+                                            <mat-icon matSuffix *ngIf="!editar_datos">people</mat-icon>
+                                            <mat-icon matSuffix *ngIf="editar_datos" (click)="Seleccionar()"
+                                                class="text-blue">edit</mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="form-group col-md-8">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>Nombre completo</mat-label>
+
+                                            <input matInput placeholder="Nombre completo"
+                                                [ngModelOptions]="{standalone: true}"
+                                                [(ngModel)]="Resolucion.nombres_apellidos"
+                                                value="{{Resolucion.nombres_apellidos}}" disabled="disabled">
+
+
+
+                                        </mat-form-field>
+
+
+
+                                    </div>
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-md-12" style="padding: 15px; margin-top:-40px">
+                                        <table summary="" class="table table-bordered table-hover">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>Situacion: {{Resolucion.situacion}}</th>
+                                                    <th style="width: 250px;">Fecha Nac.: {{ Resolucion.fecha_nacimiento
+                                                        | uppercase}}</th>
+                                                    <th style="width: 120px;">Sexo: {{ Resolucion.sexo | uppercase}}
+                                                    </th>
+
+
+                                                </tr>
+                                                <tr>
+                                                    <th colspan="3">Datos Militares: {{Resolucion.componente + ' ' +
+                                                        Resolucion.categoria + ' ' + Resolucion.clasificacion + ' ' +
+                                                        Resolucion.grado }}</th>
+                                                </tr>
+                                                <tr>
+
+                                                    <th colspan="3">&Uacute;ltima resoluci&oacute;n: {{ nombramiento }}
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="3">
+                                                        <textarea rows="3" name="text" placeholder=""
+                                                            disabled="disabled"
+                                                            style="width: 100%; border: 0px;">{{ xasunto | uppercase}}</textarea>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="row" style="padding: 18px; margin-top:-12px">
+                            <table summary="" class="table table-bordered table-hover">
+
+                                <thead>
+                                    <tr>
+                                        <th style="width: 250px;">Especialidad:</th>
+                                        <th style="width: 250px;">Área:</th>
+                                        <th style="width: 250px;">Estudios Civiles:</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 250px;"></td>
+                                        <td style="width: 250px;"></td>
+                                        <td style="width: 250px;"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row" [ngStyle]="{'display':contentView}">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="form-row">
+                        <div class="col-md-5">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Formato del Documento</mat-label>
+                                <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="IResolucion.tipo">
+                                    <mat-option value="RESOLUCION">RESOLUCION</mat-option>
+                                    <mat-option value="ORDEN GENERAL">ORDEN GENERAL</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-3">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label style="width:100%">Número de Resolución</mat-label>
+                                <input type="text" matInput [(ngModel)]="IResolucion.numero"
+                                    value="{{IResolucion.numero}}">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Fecha (*)</mat-label>
+                                <input matInput [matDatepicker]="picker">
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+
+                    <div class="form-row">
+
+                        <div class="form-group col-md-{{maxCol}}">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label style="width:100%">Tipo de Resolución</mat-label>
+                                <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto"
+                                    (blur)="seleccionTipo()" [(ngModel)]="Resolucion.tipo">
+                                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%">
+                                    <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                                        {{option.nombre}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                                <mat-icon matSuffix>search</mat-icon>
+                            </mat-form-field>
+                        </div>
+                        <div class="form-group col-md-6" *ngIf='false'>
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Nivel 1</mat-label>
+                                <input matInput placeholder="Nivel 1" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="IResolucion.comando" value="{{IResolucion.comando}}" readonly>
+
+                            </mat-form-field>
+                        </div>
+                        <!-- Unidad -->
+                        <div class="form-group col-md-6" *ngIf="blNombramiento">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label style="width:100%">Unidad</mat-label>
+
+                                <input matInput placeholder="Seleccionar unidad" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="IResolucion.unidad" value="{{IResolucion.unidad}}" readonly>
+                                <mat-icon matSuffix (click)="viewUnidad()">folder</mat-icon>
+
+                            </mat-form-field>
+                        </div>
+
+
+                        <div class="form-group col-md-12" *ngIf="blNombramiento">
+                            <textarea rows="5" name="text" placeholder="Descripcion de la estructura"
+                                style="width: 100%; border: 0px;" disabled="disabled"
+                                readonly>{{ estructura_detalle | uppercase}}</textarea>
+                        </div>
+
+
+
+                        <!-- Corregir -->
+                        <div class="form-group col-md-3" *ngIf="blCorregir">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Vincular Resoluci&oacute;n</mat-label>
+                                <input matInput placeholder="Numero de resolucion" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="cresolucion" value="{{cresolucion}}">
+
+                            </mat-form-field>
+                        </div>
+                        <div class="form-group col-md-3" *ngIf="blCorregir">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Fecha (*)</mat-label>
+                                <input matInput [matDatepicker]="xpicker" [(ngModel)]="fresolucion"
+                                    value="{{fresolucion}}" readonly disabled="disabled">
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker #xpicker></mat-datepicker>
+                            </mat-form-field>
+
+
+                        </div>
+                        <div class="form-group col-md-12" *ngIf="blCorregir">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Asunto de la resolucion</mat-label>
+                                <input matInput placeholder="Asunto de la resolucion"
+                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="dresolucion"
+                                    value="{{dresolucion}}" readonly disabled="disabled">
+
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="form-row" *ngIf="blReserva">
+                        <div class="col-md-6">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Causa</mat-label>
+                                <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="IResolucion.causa" (selectionChange)="getMotivo()">
+                                    <mat-option *ngFor="let e of lstCausa"
+                                        value="{{e.codigo}}">{{e.nombre}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-6">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Motivo</mat-label>
+                                <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="IResolucion.motivo" (selectionChange)="getDetalle()">
+                                    <mat-option *ngFor="let e of lstMotivo"
+                                        value="{{e.codigo}}">{{e.nombre}}</mat-option>
+
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="form-row" *ngIf="blReservaAux">
+                        <div class="form-group col-md-12">
+                            <textarea rows="5" name="text" placeholder="Descripcion de la falta o delito"
+                                style="width: 100%; border: 0px;"></textarea>
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-row" *ngIf="blComision">
+                        <div class="col-md-6">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Fecha Inicio(*)</mat-label>
+                                <input matInput [matDatepicker]="fipicker" [(ngModel)]="finicio" >
+                                <mat-datepicker-toggle matSuffix [for]="fipicker"></mat-datepicker-toggle>
+                                <mat-datepicker #fipicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-6">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Fecha Fin(*)</mat-label>
+                                <input matInput [matDatepicker]="ffpicker" [(ngModel)]="ffin" >
+                                <mat-datepicker-toggle matSuffix [for]="ffpicker"></mat-datepicker-toggle>
+                                <mat-datepicker #ffpicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        
+                        <div class="col-md-6"  *ngIf="blComisionAux">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Pais</mat-label>
+                                <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="IResolucion.pais">
+                                    <mat-option *ngFor="let e of lstPais"
+                                        value="{{e.codigo}}">{{e.nombre}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    
+
+
+  
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtObjeto">Asunto</label>
+                            <div class="NgxEditor__Wrapper">
+                                <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
+                                    [(ngModel)]="Resolucion.asunto"></angular-editor>
+                                <!-- <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                              <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor"
+                                  [(ngModel)]="Resolucion.asunto" [disabled]="false" [placeholder]="'Escibe aqui...'">
+                              </ngx-editor> -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label> Distribuci&oacute;n </label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="IResolucion.distribucion" value="{{IResolucion.distribucion}}">
+                                <option value="0">Seleccione</option>
+                                <option value="1">PUBLICAR</option>
+                                <option value="2">NO PUBLICAR</option>
+                                <option value="3">ENVIADA POR MEDIOS DIGITALES</option>
+                                <option value="4">OTROS</option>
+                                <!-- <option *ngFor="let e of Estados;" [value]="e.cod_estado_resol">{{e.des_estado_resol}} </option> -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtObjeto">Instrucciones especiales</label>
+                            <div class="NgxEditor__Wrapper">
+                                <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
+                                    [(ngModel)]="Resolucion.instrucciones"></angular-editor>
+                                <!-- <ngx-editor-menu [editor]="xobser"> </ngx-editor-menu>
+                            <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xobser"
+                                [(ngModel)]="Resolucion.observacion " [disabled]="false"
+                                [placeholder]="'Escibe aqui...'">
+                            </ngx-editor> -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtObjeto">Observaciones</label>
+                            <div class="NgxEditor__Wrapper">
+                                <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
+                                    [(ngModel)]="Resolucion.observacion"></angular-editor>
+                                <!-- <ngx-editor-menu [editor]="xobser"> </ngx-editor-menu>
+                              <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xobser"
+                                  [(ngModel)]="Resolucion.observacion " [disabled]="false"
+                                  [placeholder]="'Escibe aqui...'">
+                              </ngx-editor> -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-right">
+                                <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" [ngStyle]="{'display':searchView}">
+
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <button mat-icon-button aria-label="volver" (click)="atras()">
+                                <mat-icon class="texto-gray">arrow_back</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-3 text-right">
+
+                        </div>
+                        <div class="col-md-6 text-center">
+
+                            <h2 class="text-warning mb-0" style="font-size:32px">Buscar unidad</h2>
+                            <br>
+                            <form class="navbar-search">
+                                <div class="form-group">
+                                    <div class="input-group input-group-alternative">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa fa-search "></i></span>
+                                        </div>
+                                        <input class="form-control" placeholder="Buscar" type="text"
+                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="buscar"
+                                            (focus)="focus = true" (blur)="focus = false"
+                                            (keypress)="Consultar($event)">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa fa-sliders"></i></span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                        <div class="col-md-3">
+
+                        </div>
+
+                    </div>
+                    <mat-selection-list>
+                        <mat-list *ngFor="let e of lstEstructura; let i=index "
+                            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                            <div class="row">
+
+                                <div class="col-md-2 texto-detalle">
+                                    {{ e.NIVEL_1 | uppercase }}
+                                </div>
+                                <div class="col-md-2 texto-lista">
+                                    {{ e.NIVEL_2 | uppercase}}
+                                </div>
+                                <div class="col-md-3 texto-detalle">
+                                    {{ e.NIVEL_3 | uppercase }}
+                                </div>
+                                <div class="col-md-2 texto-detalle">
+                                    {{ e.NIVEL_4 | uppercase }}
+                                </div>
+                                <div class="col-md-2 texto-detalle">
+                                    {{ e.NIVEL_5 | uppercase }}
+                                </div>
+
+                                <div class="col-md-1 text-right">
+                                    <button mat-icon-button aria-label="asignar" (click)="asignar(e)">
+                                        <mat-icon class="texto-gray">forward</mat-icon>
+                                    </button>
+
+                                </div>
+                            </div>
+                        </mat-list>
+                    </mat-selection-list>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <br><br> <br><br>
+    <br><br> <br><br>
+    <!-- Fin de Tarjeta Padre -->
+</div>
+
+
+
+
+
+<!-- Adjuntar Imagenes al Documento -->
+<ng-template #archivos let-modal>
+    <div class="modal-header header bg-gradient-success">
+        <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
+
+    </div>
+    <div class="modal-body">
+
+
+        <div class="form-group col-md-12">
+            <div class="card card-profile">
+                <div class="card-header bg-info"
+                    style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
+                    <div class="card-avatar text-center">
+                        <a href="javascript:;">
+                            <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
+                                style="width:100px;z-index: 1; margin-top: -5px;">3
+                        </a>
+                    </div>
+                </div>
+                <br>
+
+                <div class="card-body pt-0">
+
+                    <div class="d-flex justify-content-between">
+                        <a [href]="download" target="_top" rel="noopener noreferrer"
+                            class="btn btn-primary mt-3">Descargar</a>
+                        <a (click)="activarHistorial()" class="btn btn-default float-right mt-3">Historial</a>
+                    </div>
+                    <br><br>
+                    <div class="text-center">
+                        <div class="font-weight-50">
+                            Publicado<span class="font-weight-light">, {{ Doc.fcreacion | date:"dd-MM-yy
+                                hh:mm:ss"}}</span>
+                            <br>
+                            <h5 class="h4" style="font-size: 10px;">{{ Doc.creador }}</h5>
+                        </div>
+                    </div>
+                    <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
+                        <table class="table">
+                            <thead class="thead-light">
+                                <th>Documento</th>
+                                <th>Usuario</th>
+                                <th>Fecha</th>
+                            </thead>
+                            <tbody>
+
+                                <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstHzAdjunto;let i=index">
+
+                                    <td>
+                                        <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"
+                                            rel="noopener noreferrer">
+                                            {{ el.nombre.substring(20,32) }}
+                                        </a>
+                                    </td>
+                                    <td>{{ el.usuario }}</td>
+                                    <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+            <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    </div>
+</ng-template>
+
+
+<!-- Adjuntar Imagenes al Documento -->
+<ng-template #detalles let-c="close" let-d="dismiss">
+
+    <div class="modal-body">
+        <p>
+            Cedula: {{ipsfa_cedula}} <br>
+            Nombre completo: {{ ipsfa_nombres_apellidos }} <br>
+            Fecha de nacimiento: {{ ipsfa_fechanacimiento }} <br>
+            Sexo: {{ipsfa_sexo}} <br>
+        </p>
+        <hr>
+        <p>
+            Componente: {{ipsfa_componente }} <br>
+            Grado: {{ ipsfa_grado }} <br>
+            Clasificacion: {{ipsfa_clasificacion }} <br>
+
+            Categoria: {{ ipsfa_categoria }} <br>
+            Situacion: {{ipsfa_situacion }} <br>
+            Fecha de Ingreso: {{ ipsfa_fechaingreso }} <br>
+            Fecha de Último Ascenso: {{ ipsfa_fechaultimoascenso }} <br>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn bg-primary text-white " (click)="AceptarCambios();c('Save')">
+            <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar Cambios </button>
+        <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+            <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    </div>
+</ng-template>

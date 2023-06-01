@@ -38,6 +38,8 @@ import { BuscadorComponent } from 'src/app/views/buscador/buscador.component';
 import { PapeleraComponent } from 'src/app/views/papelera/papelera.component';
 import { SbuzonComponent } from 'src/app/views/secretaria/sbuzon/sbuzon.component';
 import { SministerialComponent } from 'src/app/views/secretaria/sministerial/sministerial.component';
+import { OresolucionesComponent } from 'src/app/views/resoluciones/rsprocesos/oresoluciones/oresoluciones.component';
+import { RsconsultaComponent } from 'src/app/views/resoluciones/rsprocesos/rsconsulta/rsconsulta.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -244,6 +246,16 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'rsprocesos',
         component: RsprocesosComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsprocesos/oresoluciones',
+        component: OresolucionesComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsprocesos/rsconsulta',
+        component: RsconsultaComponent,
         canActivate: [AuthGuardGuard]
     },
     {

@@ -35,9 +35,9 @@ import { ProyectoComponent } from './views/ayudantia/procesos/proyecto/proyecto.
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { NgxUiLoaderModule,  NgxUiLoaderConfig } from "ngx-ui-loader";
+import { NgxUiLoaderModule, NgxUiLoaderConfig } from "ngx-ui-loader";
 
-import { MatCommonModule } from '@angular/material/core';
+import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatCommonModule, MatNativeDateModule } from '@angular/material/core';
 
 import { ConfiguracionComponent } from './views/control/configuracion/configuracion.component';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
@@ -65,11 +65,12 @@ import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule} from '@angular/material/tooltip';
-import { MatChipsModule} from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
-
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule } from '@angular/material-moment-adapter';
 
 
 import { RstranscripcionComponent } from './views/resoluciones/rstranscripcion/rstranscripcion.component';
@@ -89,6 +90,8 @@ import { SalertaComponent } from './views/secretaria/salerta/salerta.component';
 import { SministerialComponent } from './views/secretaria/sministerial/sministerial.component';
 import { SpresidencialComponent } from './views/secretaria/spresidencial/spresidencial.component';
 import { AngularEditorModule } from '@kolkov/angular-editor';
+import { OresolucionesComponent } from './views/resoluciones/rsprocesos/oresoluciones/oresoluciones.component';
+import { RsconsultaComponent } from './views/resoluciones/rsprocesos/rsconsulta/rsconsulta.component';
 
 
 
@@ -163,12 +166,16 @@ const ngWizardConfig: NgWizardConfig = {
     AngularEditorModule,
     NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
     MatToolbarModule,
+    MatDatepickerModule,
+
+    MatNativeDateModule,
     ToastrModule.forRoot({
       closeButton: false,
       newestOnTop: false,
       progressBar: true,
       positionClass: "toast-top-right",
-      preventDuplicates: false    }),
+      preventDuplicates: false
+    }),
     AngularFileUploaderModule
 
   ],
@@ -220,11 +227,13 @@ const ngWizardConfig: NgWizardConfig = {
     SbuzonComponent,
     SalertaComponent,
     SministerialComponent,
-    SpresidencialComponent
+    SpresidencialComponent,
+    OresolucionesComponent,
+    RsconsultaComponent
   ],
-  providers:  [
+  providers: [
     {
-      provide: [ LocationStrategy, AuthGuardGuard,  JsonPipe],
+      provide: [LocationStrategy, AuthGuardGuard, JsonPipe],
       useClass: HashLocationStrategy
     },
     {
@@ -232,10 +241,13 @@ const ngWizardConfig: NgWizardConfig = {
       useClass: AuthInterceptorService,
       multi: true
     },
-    { 
-      provide: MatPaginatorIntl, 
-      useValue: CustomPaginator() 
-    }
+    {
+      provide: MatPaginatorIntl,
+      useValue: CustomPaginator()
+    },
+    {
+      provide: MAT_DATE_LOCALE, useValue: 'en-GB'
+    },
   ],
   bootstrap: [AppComponent]
 })

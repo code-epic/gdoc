@@ -17,122 +17,83 @@
                             <div class="media align-items-center">
                                 <div class="example-button-row">
                                     <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                                        <mat-icon>reply</mat-icon>
+                                        <mat-icon>arrow_back</mat-icon>
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-md-1">
+                            <ul class="navbar-nav align-items-right d-none d-md-flex">
+                                <li class="nav-item" ngbDropdown placement="bottom-right">
+                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                        <div class="media align-items-center">
+                                            <div class="example-button-row">
+                                                <button mat-icon-button aria-label="">
+                                                    <mat-icon>add</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                        <a routerLinkActive="active" [routerLink]="['/documento']"
+                                            class="dropdown-item">
+                                            <i class="fa fa-plus"></i>
+                                            <span>Agregar entrada</span>
+                                        </a>
+                                        <a routerLinkActive="active" [routerLink]="['/rsprocesos/oresoluciones']"
+                                            class="dropdown-item">
+                                            <i class="fa fa-plus"></i>
+                                            <span>Agragar resuelto</span>
+                                        </a>
+
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
-                        (selectedIndexChange)="selNavegacion($event)">
-                        <mat-tab>
-                            <ng-template mat-tab-label>
-                                &nbsp;ENTRADAS
-                            </ng-template>
-
-                            <div class="container">
 
 
-                                <mat-selection-list #lstDocumentos>
-                                    <mat-list *ngFor="let e of lstProyectos; let i=index "
-                                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                                        <div class="row">
-                                            <div class="col-md-3 texto-lista">
-                                                {{ e.nombre | uppercase }}
-                                            </div>
-                                            <div class="col-md-3 texto-lista">
-                                                {{ e.ente | uppercase }}
-                                            </div>
-                                            <div class="col-md-2 texto-lista">
-                                                {{ e.tipo | uppercase }}
-                                            </div>
-                                            <div class="col-md-2 texto-lista  {{ e.color }}">
-                                                {{ e.fecha_origen | date:"dd-MM-yyyy" }}
-                                            </div>
-
-                                            <div class="col-md-2 text-right">
-
-                                                <button mat-icon-button aria-label="Editar"
-                                                    (click)="editar('proyecto', e.id )">
-                                                    <mat-icon class="text-pink">edit_note</mat-icon>
-                                                </button>
-                                                <button mat-icon-button aria-label="Avance"
-                                                    (click)="open(avance, e.id)">
-                                                    <mat-icon class="text-info">add_circle</mat-icon>
-                                                </button>
-                                                <button mat-icon-button aria-label="Eliminar"
-                                                    (click)="eliminar(e.numc, e.id)">
-                                                    <mat-icon class="text-purple">delete</mat-icon>
-                                                </button>
-
-
-                                            </div>
-                                        </div>
-                                    </mat-list>
-                                </mat-selection-list>
+                    <div class="row">
+                        <div class="col-md-1"></div>
+          
+                        <div class="col-md-10 text-center">
+          
+                          <div class="row text-center">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-2 cardround">
+                              <a routerLinkActive="active" [routerLink]="[ 'oresoluciones']">
+                                <div class="text-center botones">
+                                  <br>
+                                  <h2 class="text-center text-green"><i class="fa fa-folder" style="font-size: 42px;"></i>
+                                  </h2>
+                                  <p>Agregar resolucion</p>
+                                </div>
+                              </a>
                             </div>
 
-                            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
-                                [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event"
-                                aria-label="Seleccionar">
-                            </mat-paginator>
-
-                        </mat-tab>
-                        <mat-tab>
-                            <ng-template mat-tab-label>
-                                &nbsp;RESOLUCIONES
-                            </ng-template>
-
-
-                            <div class="container">
-                                <mat-selection-list>
-                                    <mat-list *ngFor="let e of lstCotizaciones; let i=index "
-                                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                                        <div class="row">
-                                            <div class="col-md-2 texto-lista">
-                                                {{ e.nombre | uppercase }}
-                                            </div>
-                                            <div class="col-md-2 texto-lista">
-                                                {{ e.vigencia | date:"dd-MM-yyyy" }}
-                                            </div>
-                                            <div class="col-md-2 texto-lista">
-                                                {{ e.modalidad | uppercase }}
-                                            </div>
-                                            <div class="col-md-4 texto-lista">
-                                                {{ e.responsable | uppercase }}
-                                            </div>
-
-                                            <div class="col-md-2 text-right">
-
-                                                <button mat-icon-button aria-label="Editar"
-                                                    (click)="editar('aycotizaciones', e.id )">
-                                                    <mat-icon class="text-pink">edit_note</mat-icon>
-                                                </button>
-                                                <button mat-icon-button aria-label="Eliminar"
-                                                    (click)="eliminar(e.numc, e.id)">
-                                                    <mat-icon class="text-purple">delete</mat-icon>
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                    </mat-list>
-                                </mat-selection-list>
-                            </div>
-                            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
-                                [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event"
-                                aria-label="Seleccionar">
-                            </mat-paginator>
+                            <div class="col-md-2 cardround">
+                                <a routerLinkActive="active" [routerLink]="[ 'rsconsulta']">
+                                  <div class="text-center botones">
+                                    <br>
+                                    <h2 class="text-center text-red"><i class="fa fa-search" style="font-size: 42px;"></i>
+                                    </h2>
+                                    <p>Consultar</p>
+                                  </div>
+                                </a>
+                              </div>
 
 
-
-                        </mat-tab>
-
-                    </mat-tab-group>
-
-
+                            <div class="col-md-1"></div>
+                          </div>
+          
+                        </div>
+          
+                        <div class="col-md-1"></div>
+          
+                      </div>
                 </div>
             </div>
         </div>

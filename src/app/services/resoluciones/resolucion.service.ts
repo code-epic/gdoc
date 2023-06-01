@@ -33,35 +33,39 @@ export class ResolucionService {
     switch (tipo) {
       case 1:
         this.xAPI.funcion = 'MPPD_CComponente'
-        break;
+        break
       case 2:
         this.xAPI.funcion = 'MPPD_CGrado'
-        break;
+        break
       case 3:
         this.xAPI.funcion = 'MPPD_CTipoResolucion'
-        break;
+        break
       case 4:
         this.xAPI.funcion = 'MPPD_CCategorias'
-        break;
+        break
       case 5:
         this.xAPI.funcion = 'MPPD_CClasificacion'
-        break;
+        break
       case 6:
         this.xAPI.funcion = 'MPPD_CEstadoResolucion'
-        break;
+        break
       case 7:
         this.xAPI.funcion = 'MPPD_COrdenEntrada'
-        break;
+        break
       case 8:
         this.xAPI.funcion = 'MPPD_CCarpetaEntrada'
-        break;
+        break
       case 9:
         this.xAPI.funcion = 'CEP_CUsuario'
-        console.log(this.xAPI)
-        break;
+        
+        break
+      case 10:
+        this.xAPI.funcion = 'MD_CConfiguracion'
+        this.xAPI.parametros = '%'
+        break
       default:
         this.xAPI.funcion = 'MPPD_CTipoEntrada'
-        break;
+        break
     }
 
     const funcion = this.xAPI.funcion

@@ -67,7 +67,10 @@ export class ResolucionesComponent implements OnInit {
     cargo_responsable: '',
     situacion: '',
     sexo: '',
-    numero: '0'
+    numero: '0',
+    gran_comando: '',
+    unidad_comando: '',
+    instrucciones: ''
   }
 
   public contador_ponderacion = 0

@@ -194,6 +194,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public Grados: any
   public Categorias: any
   public Clasificaciones: any
+  public Configuracion: any
   public serializar: string = ""
   public Configurar: boolean = false
 
@@ -243,7 +244,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     // this.editor = new Editor()
     // this.xeditor = new Editor()
-    this.listarConfiguracion()
+
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
       if (id == 'salida') {
@@ -275,7 +276,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu("/control")
     let prv = this.loginService.obtenerPrivilegiosMenu("/control")
-    console.log(prv)
+    // console.log(prv)
     if (prv != undefined && prv.Privilegios != undefined) {
       prv.Privilegios.forEach(e => {
         if (e.nombre == "configurar") this.Configurar = true
@@ -286,6 +287,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.Categorias = sessionStorage.getItem("MPPD_CCategorias") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias"))) : []
     this.Clasificaciones = sessionStorage.getItem("MPPD_CClasificacion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion"))) : []
 
+    this.Configuracion = sessionStorage.getItem("MD_CConfiguracion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion"))) : []
+    this.listarConfiguracion()
   }
 
   setDescripcionPunto() {
@@ -322,38 +325,28 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   listarConfiguracion() {
-    
-    this.xAPI.funcion = 'MD_CConfiguracion'
-    this.xAPI.parametros = '%'
+    // console.log(this.Configuracion)
+    this.Configuracion.forEach(e => {
+      switch (e.tipo) {
+        case "1":
+          this.lstT.push(e)
+          break
+        case "2":
+          this.lstR.push(e)
+          break
+        case "3":
+          this.lstU.push(e)
+          break
+        case "4":
+          this.lstC.push(e)
+          break
+        case "5":
+          this.lstCA.push(e)
+          break
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-        
-        data.Cuerpo.forEach(e => {
-          switch (e.tipo) {
-            case "1":
-              this.lstT.push(e)
-              break
-            case "2":
-              this.lstR.push(e)
-              break
-            case "3":
-              this.lstU.push(e)
-              break
-            case "4":
-              this.lstC.push(e)
-              break
-            case "5":
-              this.lstCA.push(e)
-              break
-
-          }
-        });
-      },
-      error => {
-        console.error('Fallo consultando los datos de Configuraciones')
       }
-    )
+    })
+
   }
 
   limpiarDoc() {
@@ -1030,11 +1023,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.cargarPuntosdeCuenta()
           return true
         }
-       
+
         this.toastrService.warning("Debe dirigirse al modulo de salida para usar esta opcion", `GDoc Salida`)
 
-        
-        
+
+
       }
 
       if (this.titulo == 'Salida') {
@@ -1089,7 +1082,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    */
   consultarCedula() {
     if (this.cedula == '') return false
-    this.isPunto = true                
+    this.isPunto = true
     if (this.Doc.tipo.toLowerCase() == 'destitucion/punto de cuenta' || this.Doc.tipo.toLowerCase() == 'contratos/punto de cuenta') {
       this.isPunto = false
     } else {

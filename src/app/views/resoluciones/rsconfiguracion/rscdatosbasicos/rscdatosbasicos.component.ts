@@ -83,7 +83,10 @@ export class RscdatosbasicosComponent implements OnInit {
     cargo_responsable: '',
     situacion: '',
     sexo: '',
-    numero: '0'
+    numero: '0',
+    gran_comando: '',
+    unidad_comando: '',
+    instrucciones: ''
   }
 
   public DBasico: DBasico = {
