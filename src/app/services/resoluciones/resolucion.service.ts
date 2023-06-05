@@ -8,6 +8,73 @@ export interface Objetos {
   abreviatura: string;
 }
 
+
+export interface IResoluciones {
+  grado: number
+  anio: number
+  asunto: string
+  cedula: string
+  pais: number
+  reserva: number
+  solicitud: number
+  tipo: number
+  unidad: number
+  comando: string
+  comision_fin: string
+  comision_inicio: string
+  creador: string
+  destino: string
+  dia: number
+  distribucion: string
+  estatus: number
+  modificado: string
+  fecha_termino: string
+  falta: string
+  registro: string
+  fecha_resolucion: string
+  formato: string
+  ultimo_ascenso: string
+  instrucciones: string
+  mes: number
+  autor_modificar: string
+  motivo: string
+  numero: string
+  observacion: string
+  orden_merito: number
+  otro_resuelto: string
+  autor_registro: string
+  termino: number
+  documento: number
+  causa: number
+  unidad_texto: string
+}
+
+
+export interface IDatosBasicos {
+  area: string
+  cedula: string
+  categoria: number
+  clasificacion: number
+  componente: number
+  grado: number
+  profesion: string
+  profesionx: string
+  reserva: number
+  solicitud: number
+  tipo: number
+  condicion: number
+  especialidad: number
+  estudios: string
+  nacimiento: string
+  promocion: string
+  fecha_resuelto: string
+  ncomponente: number
+  ngrado: number
+  nombre: string
+  observacion: string
+  sexo: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -57,11 +124,13 @@ export class ResolucionService {
         break
       case 9:
         this.xAPI.funcion = 'CEP_CUsuario'
-        
         break
       case 10:
         this.xAPI.funcion = 'MD_CConfiguracion'
         this.xAPI.parametros = '%'
+        break
+      case 11:
+        this.xAPI.funcion = 'MPPD_CGradoIPSFA'
         break
       default:
         this.xAPI.funcion = 'MPPD_CTipoEntrada'
@@ -71,7 +140,7 @@ export class ResolucionService {
     const funcion = this.xAPI.funcion
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if (tipo == 9 ){
+        if (tipo == 9) {
           if (sessionStorage.getItem(funcion) == undefined) sessionStorage.setItem(funcion, btoa(JSON.stringify(data)))
           return
         }
@@ -83,6 +152,7 @@ export class ResolucionService {
     )
   }
 }
+
 
 
 

@@ -79,7 +79,9 @@ export class RsentradasComponent implements OnInit {
     numero: '0',
     gran_comando: '',
     unidad_comando: '',
-    instrucciones: ''
+    instrucciones: '',
+    n_componente: 0,
+    n_grado: 0
   }
 
   //Lista de sobrecargas

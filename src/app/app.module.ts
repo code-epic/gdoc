@@ -92,7 +92,7 @@ import { SpresidencialComponent } from './views/secretaria/spresidencial/spresid
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { OresolucionesComponent } from './views/resoluciones/rsprocesos/oresoluciones/oresoluciones.component';
 import { RsconsultaComponent } from './views/resoluciones/rsprocesos/rsconsulta/rsconsulta.component';
-
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -167,7 +167,7 @@ const ngWizardConfig: NgWizardConfig = {
     NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
     MatToolbarModule,
     MatDatepickerModule,
-
+    MatSnackBarModule,
     MatNativeDateModule,
     ToastrModule.forRoot({
       closeButton: false,

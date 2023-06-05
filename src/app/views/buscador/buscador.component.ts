@@ -68,7 +68,9 @@ export class BuscadorComponent implements OnInit {
     numero: '0',
     gran_comando: '',
     unidad_comando: '',
-    instrucciones: ''
+    instrucciones: '',
+    n_componente: 0,
+    n_grado: 0
   }
 
   public contador_ponderacion = 0

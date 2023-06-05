@@ -44,7 +44,7 @@ export class DashboardComponent implements OnInit {
     )
 
     if (sessionStorage.getItem("CEP_CUsuario") == undefined) {
-      for (var i = 0; i < 11; i++) {
+      for (var i = 0; i < 12; i++) {
         this.resolucionService.Listar(i) //
       }
     }

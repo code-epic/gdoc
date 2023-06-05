@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { NgbModal, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 
 import Swal from 'sweetalert2'
-import { IDocumento, IResoluciones, IWKFAlerta, IWKFCuenta, Resolucion } from 'src/app/services/control/documentos.service';
+import { IDocumento, IWKFAlerta, IWKFCuenta, Resolucion } from 'src/app/services/control/documentos.service';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -14,6 +14,8 @@ import { UtilService } from 'src/app/services/util/util.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 
 import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { IDatosBasicos, IResoluciones } from 'src/app/services/resoluciones/resolucion.service';
 
 
 
@@ -84,33 +86,70 @@ export class OresolucionesComponent implements OnInit {
   public contentView = ''
   public focus = false
 
-  public IResolucion: IResoluciones = {
+
+  public IDatosBasicos: IDatosBasicos = {
+    area: '',
     cedula: '',
-    tipo: 0,
-    numero: '',
-    fecha: '',
-    asunto: '',
-    pais: 0,
-    destino: '',
-    observacion: '',
-    solicitud: 0,
+    categoria: 0,
+    clasificacion: 0,
+    componente: 0,
+    grado: 0,
+    profesion: '',
+    profesionx: '',
     reserva: 0,
-    fecha_fin: '',
-    termino: 0,
-    autor: '',
-    modificado: '',
-    fecha_modificado: '',
+    solicitud: 0,
+    tipo: 0,
+    condicion: 0,
+    especialidad: 0,
+    estudios: '',
+    nacimiento: '',
+    promocion: '',
+    fecha_resuelto: '',
+    ncomponente: 0,
+    ngrado: 0,
+    nombre: '',
+    observacion: '',
+    sexo: ''
+  }
+
+  public IResolucion: IResoluciones = {
+    grado: 0,
+    anio: 0,
+    asunto: '',
+    cedula: '',
+    pais: 0,
+    reserva: 0,
+    solicitud: 0,
+    tipo: 0,
+    unidad: 0,
     comando: '',
-    instrucciones: '',
-    cod_unidad: '',
-    unidad: '',
+    comision_fin: '',
+    comision_inicio: '',
+    creador: '',
+    destino: '',
+    dia: 0,
     distribucion: '',
     estatus: 0,
-    creador: '',
-    causa: '',
+    modificado: '',
+    fecha_termino: '',
+    falta: '',
+    registro: '',
+    fecha_resolucion: '',
+    formato: '',
+    ultimo_ascenso: '',
+    instrucciones: '',
+    mes: 0,
+    autor_modificar: '',
     motivo: '',
-    detalle: '',
-    falta: ''
+    numero: '',
+    observacion: '',
+    orden_merito: 0,
+    otro_resuelto: '',
+    autor_registro: '',
+    termino: 0,
+    unidad_texto: '',
+    documento: 0,
+    causa: 0
   }
 
 
@@ -139,7 +178,9 @@ export class OresolucionesComponent implements OnInit {
     numero: '',
     gran_comando: '',
     unidad_comando: '',
-    instrucciones: ''
+    instrucciones: '',
+    n_componente: 0,
+    n_grado: 0
   }
 
   //Lista de sobrecargas
@@ -159,49 +200,10 @@ export class OresolucionesComponent implements OnInit {
   public forigenDate: NgbDate | null
 
 
-  public WkCuenta: IWKFCuenta = {
-    documento: 0,
-    cuenta: '',
-    estado: 0,
-    estatus: 0,
-    detalle: '',
-    resumen: '',
-    fecha: '',
-    usuario: '',
-    activo: 0
-  }
 
   public cuenta: string = ''
 
-  public Doc: IDocumento = {
-    ncontrol: '',
-    wfdocumento: 0,
-    fcreacion: '',
-    forigen: '',
-    norigen: '',
-    salida: '',
-    tipo: '0',
-    remitente: '0',
-    unidad: '0',
-    contenido: '',
-    instrucciones: '',
-    codigo: '',
-    nexpediente: '',
-    creador: '',
-    archivo: '',
-    privacidad: 0,
-    subdocumento: ''
-  }
-
-  public WAlerta: IWKFAlerta = {
-    documento: 0,
-    estado: 0,
-    estatus: 0,
-    activo: 0,
-    fecha: '',
-    usuario: '',
-    observacion: ''
-  }
+  
 
   public lstResoluciones: any
   public lstEntradas: any
@@ -231,8 +233,9 @@ export class OresolucionesComponent implements OnInit {
   public nombramiento: string = ''
   public xasunto: string = ''
   public cresolucion = ''
+  public otro_resuelto = ''
   public fresolucion = ''
-  public dresolucion = ''
+  public aresolucion = ''
 
   public blNombramiento: boolean = false
   public blCorregir: boolean = false
@@ -241,7 +244,8 @@ export class OresolucionesComponent implements OnInit {
   public blComision: boolean = false
   public blComisionAux: boolean = false
   public blExtender: boolean = false
-  
+  public blAscenso: boolean = false
+  public blReconocer : boolean = false
 
   public foto_cedula: string = ''
 
@@ -253,11 +257,14 @@ export class OresolucionesComponent implements OnInit {
   public lstMotivo = [] //Objeto Comando
   public lstDetalle = [] //Objeto Comando
   public lstPais = [] //Objeto Comando
+  public GradoIPSFA = [] //Objeto Comando
+  public lstIPSFA = [] //Objeto Comando
 
 
   public finicio = ''
   public ffin = ''
   public CuentaGenera: any
+  public tipo : any
 
   public ipsfa_cedula: string = ''
   public ipsfa_nombres_apellidos: string = ''
@@ -286,7 +293,7 @@ export class OresolucionesComponent implements OnInit {
   myUnidad = new FormControl();
   public Unidad: any
   public maxCol = "12"
-
+  public maxColComision = "6"
 
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
@@ -295,6 +302,7 @@ export class OresolucionesComponent implements OnInit {
     private loginService: LoginService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
+    private _snackBar: MatSnackBar,
     private ruta: Router) { }
 
   ngOnInit(): void {
@@ -306,7 +314,6 @@ export class OresolucionesComponent implements OnInit {
     if (this.rutaActiva.snapshot.params.id != undefined) {
       const id = this.rutaActiva.snapshot.params.id
       const cnt = this.rutaActiva.snapshot.params.cuenta
-      this.consultarDocumento(id, cnt)
     }
     this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : []
     this.Grados = sessionStorage.getItem("MPPD_CGrado") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado"))) : []
@@ -317,6 +324,7 @@ export class OresolucionesComponent implements OnInit {
     this.Estados = sessionStorage.getItem("MPPD_CEstadoResolucion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CEstadoResolucion"))) : []
     this.Carpetas = sessionStorage.getItem("MPPD_CCarpetaEntrada") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetaEntrada"))) : []
     this.OrdenNumero = sessionStorage.getItem("MPPD_COrdenEntrada") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_COrdenEntrada"))) : []
+    this.GradoIPSFA = sessionStorage.getItem("MPPD_CGradoIPSFA") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGradoIPSFA"))) : []
 
     this.Configuracion = sessionStorage.getItem("MD_CConfiguracion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion"))) : []
     this.listarConfiguracion()
@@ -336,6 +344,7 @@ export class OresolucionesComponent implements OnInit {
       map(value => (typeof value === 'string' ? value : value?.name)),
       map(name => (name ? this._filterConfiguracion(name) : this.lstC.slice())),
     );
+
   }
 
 
@@ -345,8 +354,8 @@ export class OresolucionesComponent implements OnInit {
   }
 
   asignar(e) {
-    this.IResolucion.cod_unidad = e.oid
-    this.IResolucion.unidad = this.validarNivel(e)
+    this.IResolucion.unidad = e.oid
+    this.IResolucion.unidad_texto = this.validarNivel(e)
     this.searchView = 'none'
     this.contentView = ''
     this.lstEstructura = []
@@ -422,76 +431,9 @@ export class OresolucionesComponent implements OnInit {
           break
         case "5":
           break
-
       }
     })
 
-  }
-  /**
-  * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
-  * @param numBase64  : base64
-  */
-  async consultarDocumento(numBase64: string, cntBase64: string) {
-    const base = atob(numBase64)
-    this.xAPI.funcion = 'WKF_CDocumentoDetalle'
-    this.xAPI.parametros = base
-    this.xAPI.valores = ''
-    console.log(this.xAPI);
-
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        console.log(data);
-        data.Cuerpo.forEach(e => {
-          console.log(e);
-          this.Doc = e
-          this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
-          this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
-          if (e.alerta != null) {
-            this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
-            this.WAlerta.activo = 1
-            this.WAlerta.documento = this.Doc.wfdocumento
-            this.WAlerta.estado = this.estadoActual
-            this.WAlerta.estatus = this.estadoOrigen
-            this.WAlerta.usuario = this.loginService.Usuario.id
-          }
-
-        });
-
-
-
-        //this.selTipoDocumento()
-        const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
-        this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
-        this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const historial = this.Doc.historial != null ? JSON.parse(this.Doc.historial) : []
-        this.lstHistorial = historial.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
-        this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        //Carga de Documentos
-        this.bPDF = this.Doc.archivo != "" ? true : false
-        this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
-        this.nControl = this.Doc.ncontrol
-        this.unidad = this.Doc.unidad
-        if (cntBase64 != undefined) {
-          this.cuenta = atob(cntBase64)
-
-          this.CuentaGenera = this.lstCuenta.filter(e => {
-            return e.cuenta = this.cuenta
-          });
-          console.log(this.CuentaGenera);
-          this.asunto = this.CuentaGenera[0].resumen
-          this.fecha = this.CuentaGenera[0].detalle
-        }
-      },
-      (error) => {
-        console.error(error)
-      }
-    )
   }
 
   dwUrl(ncontrol: string, archivo: string): string {
@@ -501,15 +443,15 @@ export class OresolucionesComponent implements OnInit {
    * Consultar datos generales del militar 
    */
   consultarCedula() {
-    if (this.Resolucion.cedula == '') return false
-    this.foto_cedula = this.Resolucion.cedula
+    if (this.IResolucion.cedula == '') return false
+
     this.ngxService.startLoader("loader-buscar")
     this.xAPI.funcion = 'MPPD_CDatosBasicos'
-    this.xAPI.parametros = this.Resolucion.cedula
+    this.xAPI.parametros = this.IResolucion.cedula
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        // console.log(data)
+        console.log(data)
         if (data != undefined && data.Cuerpo.length > 0) {
           this.Resolucion = data.Cuerpo[0]
 
@@ -527,6 +469,8 @@ export class OresolucionesComponent implements OnInit {
           }
         }
         this.editar_datos = true;
+        this.cargarGradosIPSFA(this.Resolucion.n_componente);
+
         this.ngxService.stopLoader("loader-buscar")
       },
       (error) => {
@@ -538,16 +482,32 @@ export class OresolucionesComponent implements OnInit {
   }
 
   filtrarNombramiento() {
-
-    console.log(this.lstResoluciones)
     const nombramiento = this.lstResoluciones[0]
-
     this.nombramiento = nombramiento.titulo + ' - ' + nombramiento.tipo_descripcion
     this.xasunto = nombramiento.asunto.substring(0, 100)
-
   }
+
   verHistorialMilitar() {
 
+  }
+
+  async cargarGradosIPSFA(componente: number) {
+    this.lstIPSFA = this.GradoIPSFA.filter(e => {
+      return parseInt(e.componente_id) == componente
+    })
+  }
+
+  async seleccionarGradosIPSFA( grado: number) {
+    let i = 0
+    let pos = 0
+    this.lstIPSFA.forEach(e => {
+      if ( parseInt(e.codigo) == grado) {
+        pos = i
+        return
+      }
+      i++;
+    })
+    this.Resolucion.grado = this.lstIPSFA[pos - 1].codigo;
   }
 
   displayFn(tr: ITipoResolucion): string {
@@ -583,10 +543,9 @@ export class OresolucionesComponent implements OnInit {
   seleccionTipo() {
     this.desactivarVista()
 
-    if (typeof (this.Resolucion.tipo) != 'object') return
-    let rs = this.Resolucion.tipo
-    console.log(rs)
-
+    if (typeof (this.tipo) != 'object') return
+    console.log(this.tipo)
+    let rs = this.tipo
     switch (parseInt(rs.tipo)) {
       case 1:
         this.blNombramiento = true
@@ -606,18 +565,39 @@ export class OresolucionesComponent implements OnInit {
       case 4:
         this.maxCol = "12"
         this.blComision = true
+        this.maxColComision = "6"
         break;
       case 5:
         this.maxCol = "12"
+        this.maxColComision = "6"
         this.blComision = true
-        this.blComisionAux = true
         break;
       case 6:
         this.maxCol = "12"
+        this.maxColComision = "4"
         this.blComision = true
         this.blComisionAux = true
         break;
+      case 7:
+        if (this.Resolucion.cedula != ""){
+          this.maxCol = "4"
+          this.seleccionarGradosIPSFA(this.Resolucion.n_grado)
+          this.blAscenso = true
+        }else{
+          this._snackBar.open("Debe seleccionar una cedula", "OK");
+        }
+        
+        
+        break;
 
+      case 8:
+        
+          this.maxCol = "5"
+         
+          this.blReconocer = true
+      
+        
+        break;
       default:
         break;
     }
@@ -633,11 +613,12 @@ export class OresolucionesComponent implements OnInit {
     this.blComision = false
     this.blComisionAux = false
     this.blExtender = false
+    this.blAscenso = false
+    this.blReconocer = false
   }
 
 
   getCausa(id: string) {
-    console.log(id)
     this.lstCausa = []
     this.lstMotivo = []
     this.xAPI.funcion = "MPPD_CCausaResolucion"
@@ -664,7 +645,7 @@ export class OresolucionesComponent implements OnInit {
     this.lstMotivo = []
     this.xAPI.funcion = "MPPD_CMotivoResolucion"
     this.ngxService.startLoader("loader-buscar")
-    this.xAPI.parametros = this.IResolucion.causa
+    this.xAPI.parametros = this.IResolucion.causa.toString()
     this.xAPI.valores = ''
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -675,7 +656,7 @@ export class OresolucionesComponent implements OnInit {
 
         this.blReserva = true
         this.ngxService.stopLoader("loader-buscar")
-        if (this.IResolucion.causa == "7") this.blReservaAux = true
+        if ( this.IResolucion.causa.toString() == "7") this.blReservaAux = true
       },
       (err) => {
         console.error(err)
@@ -692,6 +673,32 @@ export class OresolucionesComponent implements OnInit {
 
   }
 
+
+  vincular(){
+    if (this.otro_resuelto != "" ) {
+      this.ngxService.startLoader("loader-aceptar")
+      this.xAPI.funcion = 'MPPD_CResuelto'
+      this.xAPI.parametros = this.otro_resuelto + "," + this.Resolucion.cedula
+      this.xAPI.valores = ''
+      console.log(this.xAPI)
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+            console.log(data)
+            let otro = data.Cuerpo
+            
+            this.fresolucion = otro.fecha_resol
+            this.aresolucion = otro.asunto
+        },
+        (error) => {
+          console.error("Error de conexion a los datos ", error)
+          this.ngxService.stopLoader("loader-aceptar")
+        }
+  
+      )
+    }
+  }
+
+
   open(content) {
     this.modalService.open(content);
   }
@@ -701,7 +708,7 @@ export class OresolucionesComponent implements OnInit {
   guardar() {
     // this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
     // this.Doc.forigen = this.forigen != undefined ? this.utilService.ConvertirFecha(this.forigen) : this.utilService.ConvertirFecha(this.fcreacion)
-    this.IResolucion.fecha = this.forigen != undefined ? this.utilService.ConvertirFecha(this.forigen) : this.utilService.ConvertirFecha(this.fcreacion)
+    this.IResolucion.fecha_resolucion = this.forigen != undefined ? this.utilService.ConvertirFecha(this.forigen) : this.utilService.ConvertirFecha(this.fcreacion)
 
   }
 

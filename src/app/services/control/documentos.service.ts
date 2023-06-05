@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { IDatosBasicos, IResoluciones } from '../resoluciones/resolucion.service';
 
 
 
@@ -102,37 +103,17 @@ export interface Resolucion {
   gran_comando: string
   unidad_comando: string
   instrucciones: string
+  n_componente: number
+  n_grado: number
 
 }
 
 
-export interface IResoluciones {
-  cedula: string
-  tipo: number
-  numero: string
-  fecha: string
-  asunto: string
-  pais: number
-  destino: string
-  observacion: string
-  solicitud: number
-  reserva: number
-  fecha_fin: string
-  termino: number
-  autor: string
-  modificado: string
-  fecha_modificado: string
-  comando: string
-  instrucciones: string
-  cod_unidad: string
-  unidad: string
-  distribucion: string
-  estatus: number
-  creador: string
-  causa: string,
-  motivo: string,
-  detalle: string,
-  falta: string
+
+
+export interface Resuelto {
+  Militar : IDatosBasicos
+  Resolucion: IResoluciones
 }
 
 
