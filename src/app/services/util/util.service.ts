@@ -78,9 +78,36 @@ export class UtilService {
     if (fa[0] != "0001") {
       return fa[2] + "/" + fa[1] + "/" + fa[0];
     } else {
-      return "";
+      return "1900-01-01";
     }
     //return fa[2] + "/" + fa[1] + "/" + fa[0];
+  }
+
+    //Recibe  Fecha Formato: DD/MM/AAAA
+  //Retorna Fecha Formato: AAAA-MM-DD
+  ConvertirFechaDia(f : any) {
+    if ( typeof f != 'object' ) {
+      return "1900-01-01";
+    }
+
+    var ISODate = new Date(f).toISOString();
+    var fe = ISODate.substr(0, 10);
+    var fa = fe.split("-");
+    if (fa[0] != "0001") {
+      return fa[0] + "-" + fa[1] + "-" + fa[2];;
+    } else {
+      return "1900-01-01";
+    }
+
+  }
+
+  //Recibe  Fecha Formato: DD/MM/AAAA
+  //Retorna Fecha Formato: AAAA-MM-DD
+  ConvertirFechaHora() {
+    var ISODate = new Date().toISOString();
+    return ISODate.substr(0, 10) + ' ' +  ISODate.substr(11, 8);
+    
+
   }
 
   ConvertirCategoria(abreviatura: string): string {
@@ -175,3 +202,7 @@ export class UtilService {
 
 
 }
+function typeOf(f: any) {
+  throw new Error('Function not implemented.');
+}
+

@@ -83,8 +83,8 @@
 
                                             <input matInput placeholder="Nombre completo"
                                                 [ngModelOptions]="{standalone: true}"
-                                                [(ngModel)]="IDatosBasicos.nombre"
-                                                value="{{IDatosBasicos.nombre}}" disabled="disabled">
+                                                [(ngModel)]="Resolucion.nombres_apellidos"
+                                                value="{{Resolucion.nombres_apellidos}}" disabled="disabled">
 
                                         </mat-form-field>
 
@@ -120,8 +120,8 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td colspan="3">
+                                                <tr style="padding: -10px;"> 
+                                                    <td colspan="3" >
                                                         <textarea rows="3" name="text" placeholder=""
                                                             disabled="disabled"
                                                             style="width: 100%; border: 0px;">{{ xasunto | uppercase}}</textarea>
@@ -137,24 +137,28 @@
                             </div>
 
                         </div>
-                        <div class="row" style="padding: 18px; margin-top:-12px">
-                            <table summary="" class="table table-bordered table-hover">
-
-                                <thead>
-                                    <tr>
-                                        <th style="width: 250px;">Especialidad:</th>
-                                        <th style="width: 250px;">Área:</th>
-                                        <th style="width: 250px;">Estudios Civiles:</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td style="width: 250px;"></td>
-                                        <td style="width: 250px;"></td>
-                                        <td style="width: 250px;"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="row" >
+                            <div class="col-md-4">
+                                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                    <mat-label style="width:100%">Especialidad</mat-label>
+                                    <input type="text" matInput [(ngModel)]="IDatosBasicos.especialidad" 
+                                        value="{{IDatosBasicos.especialidad}}" disabled="disabled">
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-4">
+                                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                    <mat-label style="width:100%">Area</mat-label>
+                                    <input type="text" matInput [(ngModel)]="IDatosBasicos.area"  disabled="disabled"
+                                        value="{{IDatosBasicos.area}}" >
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-4">
+                                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                    <mat-label style="width:100%">Estudios</mat-label>
+                                    <input type="text" matInput [(ngModel)]="IDatosBasicos.estudios"   disabled="disabled"
+                                        value="{{IDatosBasicos.estudios}}">
+                                </mat-form-field>
+                            </div>
 
                         </div>
                     </form>
@@ -176,8 +180,8 @@
                                 <mat-label>Formato del Documento</mat-label>
                                 <mat-select placeholder="Documento" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="IResolucion.documento">
-                                    <mat-option value="RESOLUCION">RESOLUCION</mat-option>
-                                    <mat-option value="ORDEN GENERAL">ORDEN GENERAL</mat-option>
+                                    <mat-option value="0">RESOLUCION</mat-option>
+                                    <mat-option value="1">ORDEN GENERAL</mat-option>
                                 </mat-select>
                             </mat-form-field>
                         </div>
@@ -192,7 +196,7 @@
                         <div class="col-md-4">
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha (*)</mat-label>
-                                <input matInput [matDatepicker]="picker" [(ngModel)]="IResolucion.fecha_resolucion"
+                                <input matInput [matDatepicker]="picker" [(ngModel)]="fecha_resolucion"
                                 [ngModelOptions]="{standalone: true}">
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 <mat-datepicker #picker></mat-datepicker>
@@ -221,7 +225,7 @@
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Grado</mat-label>
                                 <mat-select placeholder="Grado para el ascenso" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="IResolucion.agrado">
+                                    [(ngModel)]="IResolucion.grado">
                                     <mat-option *ngFor="let e of lstIPSFA"
                                         value="{{e.codigo}}">{{e.nombre }} - {{e.descripcion }}</mat-option>
                                 </mat-select>
@@ -229,10 +233,9 @@
                         </div>
                         <div class="col-md-4" *ngIf='blAscenso'>
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                                <mat-label>Fecha Ultimo Ascenso (*)</mat-label>
-                                <input matInput [matDatepicker]="xpicker" [(ngModel)]="IResolucion.ultimo_ascenso"
-                                    value="{{IResolucion.ultimo_ascenso}}" readonly disabled="disabled">
-                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-label>Fecha del Ascenso (*)</mat-label>
+                                <input matInput [matDatepicker]="xpicker" [(ngModel)]="ultimo_ascenso" [ngModelOptions]="{standalone: true}">
+                                <mat-datepicker-toggle matSuffix [for]="xpicker"></mat-datepicker-toggle>
                                 <mat-datepicker #xpicker></mat-datepicker>
                             </mat-form-field>
                         </div>
@@ -306,15 +309,15 @@
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Vincular Resoluci&oacute;n</mat-label>
                                 <input matInput placeholder="Numero de resolucion" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="otro_resuelto" value="{{cresolucion}}" (blur)="vincular()">
+                                    [(ngModel)]="IResolucion.otro_resuelto" (blur)="vincular()">
 
                             </mat-form-field>
                         </div>
                         <div class="form-group col-md-3" *ngIf="blCorregir">
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha (*)</mat-label>
-                                <input matInput [matDatepicker]="xpickerx" [(ngModel)]="fresolucion"
-                                    value="{{fresolucion}}" readonly disabled="disabled">
+                                <input matInput [matDatepicker]="xpickerx" [(ngModel)]="fresolucion" [ngModelOptions]="{standalone: true}"
+                                [ngModelOptions]="{standalone: true}" disabled="disabled">
                                 <mat-datepicker-toggle matSuffix [for]="xpickerx"></mat-datepicker-toggle>
                                 <mat-datepicker #xpickerx></mat-datepicker>
                             </mat-form-field>
@@ -325,8 +328,7 @@
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Asunto de la resolucion</mat-label>
                                 <input matInput placeholder="Asunto de la resolucion"
-                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="aresolucion"
-                                    value="{{aresolucion}}" readonly disabled="disabled">
+                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="aresolucion" disabled="disabled">
 
                             </mat-form-field>
                         </div>
@@ -369,7 +371,7 @@
                         <div class="col-md-{{maxColComision}}">
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha Inicio(*)</mat-label>
-                                <input matInput [matDatepicker]="fipicker" [(ngModel)]="finicio" >
+                                <input matInput [matDatepicker]="fipicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_inicio" >
                                 <mat-datepicker-toggle matSuffix [for]="fipicker"></mat-datepicker-toggle>
                                 <mat-datepicker #fipicker></mat-datepicker>
                             </mat-form-field>
@@ -378,7 +380,7 @@
                         <div class="col-md-{{maxColComision}}">
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha Fin(*)</mat-label>
-                                <input matInput [matDatepicker]="ffpicker" [(ngModel)]="ffin" >
+                                <input matInput [matDatepicker]="ffpicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_fin" >
                                 <mat-datepicker-toggle matSuffix [for]="ffpicker"></mat-datepicker-toggle>
                                 <mat-datepicker #ffpicker></mat-datepicker>
                             </mat-form-field>
@@ -405,7 +407,7 @@
                             <label for="txtObjeto">Asunto</label>
                             <div class="NgxEditor__Wrapper">
                                 <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
-                                    [(ngModel)]="Resolucion.asunto"></angular-editor>
+                                    [(ngModel)]="IResolucion.asunto"></angular-editor>
                             </div>
                         </div>
                     </div>
@@ -414,7 +416,7 @@
                         <div class="form-group col-md-6">
                             <label> Distribuci&oacute;n </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="IResolucion.distribucion" value="{{IResolucion.distribucion}}">
+                                [(ngModel)]="IResolucion.distribucion" >
                                 <option value="0">Seleccione</option>
                                 <option value="1">PUBLICAR</option>
                                 <option value="2">NO PUBLICAR</option>
@@ -429,7 +431,7 @@
                             <label for="txtObjeto">Instrucciones especiales</label>
                             <div class="NgxEditor__Wrapper">
                                 <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
-                                    [(ngModel)]="Resolucion.instrucciones"></angular-editor>
+                                    [(ngModel)]="IResolucion.instrucciones"></angular-editor>
                             </div>
                         </div>
                     </div>
@@ -510,19 +512,19 @@
                             <div class="row">
 
                                 <div class="col-md-2 texto-detalle">
-                                    {{ e.NIVEL_1 | uppercase }}
+                                    {{ e.nivel_1 | uppercase }}
                                 </div>
                                 <div class="col-md-2 texto-lista">
-                                    {{ e.NIVEL_2 | uppercase}}
+                                    {{ e.nivel_2 | uppercase}}
                                 </div>
                                 <div class="col-md-3 texto-detalle">
-                                    {{ e.NIVEL_3 | uppercase }}
+                                    {{ e.nivel_3 | uppercase }}
                                 </div>
                                 <div class="col-md-2 texto-detalle">
-                                    {{ e.NIVEL_4 | uppercase }}
+                                    {{ e.nivel_4 | uppercase }}
                                 </div>
                                 <div class="col-md-2 texto-detalle">
-                                    {{ e.NIVEL_5 | uppercase }}
+                                    {{ e.nivel_5 | uppercase }}
                                 </div>
 
                                 <div class="col-md-1 text-right">

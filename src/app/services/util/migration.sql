@@ -349,4 +349,32 @@ SELECT * FROM datos_basicos db WHERE db.cedula = '18428522'
 
 
 
+DROP TABLE IF EXISTS estructura_temp;
+CREATE TABLE estructura_temp (
+  oid INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  nivel_1	TEXT NOT NULL DEFAULT (''), nivel_2	TEXT NOT NULL DEFAULT (''),
+  abrev_2	VARCHAR(128) NOT NULL DEFAULT (''), ubica_2 TEXT NOT NULL DEFAULT (''),
+  legal_2	TEXT NOT NULL DEFAULT (''), nivel_3	TEXT NOT NULL DEFAULT (''),
+  obs_3	TEXT NOT NULL DEFAULT (''), legal_3	TEXT NOT NULL DEFAULT (''),
+  ubica_3	TEXT NOT NULL DEFAULT (''), abrev_3	VARCHAR(128) NOT NULL DEFAULT (''),
+  nivel_4	TEXT NOT NULL DEFAULT (''),	abrev_4	VARCHAR(128) NOT NULL DEFAULT (''),	
+  legal_4	TEXT NOT NULL DEFAULT (''),	ubica_4	TEXT NOT NULL DEFAULT (''),	
+  obser_4	TEXT NOT NULL DEFAULT (''),	nivel_5	TEXT NOT NULL DEFAULT (''),	
+  ubica_5	TEXT NOT NULL DEFAULT (''),	abrev_5	VARCHAR(128) NOT NULL DEFAULT (''),
+  obser_5	TEXT NOT NULL DEFAULT (''), legal_5	TEXT NOT NULL DEFAULT (''),
+  nivel_6	TEXT NOT NULL DEFAULT (''), legal_6	TEXT NOT NULL DEFAULT (''),
+  abrev_6	VARCHAR(128) NOT NULL DEFAULT (''), ubica_6	TEXT NOT NULL DEFAULT (''),
+  nivel_7	TEXT NOT NULL DEFAULT (''), legal_7	TEXT NOT NULL DEFAULT (''),
+  ubica_7	TEXT NOT NULL DEFAULT (''), nivel_8 TEXT NOT NULL DEFAULT (''),
+  cont TEXT NOT NULL DEFAULT (''),
+  FULLTEXT (nivel_1,cont)
+);
 
+UPDATE estructura_temp SET cont= CONCAT(
+  nivel_1,	' ', nivel_2,	' ', 	abrev_2,	' ', 	ubica_2,	' ', 	legal_2,	' ', 
+  nivel_3,	' ', 	obs_3,	' ',  legal_3,	' ', 	ubica_3,	' ', 	abrev_3,	' ', 	
+  nivel_4,	' ', 	abrev_4,	' ', 	legal_4,	' ', 	ubica_4,	' ', 	obser_4,	' ', 	
+  nivel_5,	' ', 	ubica_5,	' ', 	abrev_5,	' ', 	obser_5,	' ', 	legal_5,	' ', 
+  nivel_6,	' ', 	legal_6,	' ', 	abrev_6,	' ', 	ubica_6,	' ', 	nivel_7,	' ', 
+  legal_7,	' ', 	ubica_7,	' ', 	nivel_8) 
+WHERE oid > 0;

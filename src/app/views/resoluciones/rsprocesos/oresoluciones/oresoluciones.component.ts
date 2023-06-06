@@ -16,6 +16,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { IDatosBasicos, IResoluciones } from 'src/app/services/resoluciones/resolucion.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 
@@ -53,8 +54,7 @@ export class OresolucionesComponent implements OnInit {
     spellcheck: true,
     enableToolbar: false,
     showToolbar: false,
-    placeholder: 'Enter text here...',
-
+    placeholder: '',
   };
 
   public id: string = ''
@@ -100,7 +100,7 @@ export class OresolucionesComponent implements OnInit {
     solicitud: 0,
     tipo: 0,
     condicion: 0,
-    especialidad: 0,
+    especialidad: '',
     estudios: '',
     nacimiento: '',
     promocion: '',
@@ -192,13 +192,11 @@ export class OresolucionesComponent implements OnInit {
   public Estados: any
   public Carpetas: any
   public OrdenNumero: any
-  public fcreacion: any
-  public forigen: any
-  public fplazo: any
 
-  public fcreacionDate: NgbDate | null
-  public forigenDate: NgbDate | null
-
+  public fecha_resolucion: any
+  public ultimo_ascenso: any
+  public comision_inicio: any
+  public comision_fin: any
 
 
   public cuenta: string = ''
@@ -233,7 +231,6 @@ export class OresolucionesComponent implements OnInit {
   public nombramiento: string = ''
   public xasunto: string = ''
   public cresolucion = ''
-  public otro_resuelto = ''
   public fresolucion = ''
   public aresolucion = ''
 
@@ -259,6 +256,7 @@ export class OresolucionesComponent implements OnInit {
   public lstPais = [] //Objeto Comando
   public GradoIPSFA = [] //Objeto Comando
   public lstIPSFA = [] //Objeto Comando
+  public lstC = [] //Objeto Comando
 
 
   public finicio = ''
@@ -282,8 +280,7 @@ export class OresolucionesComponent implements OnInit {
   public ipsfa_situacion: string = ''
   public ipsfa_situacion_ab: string = ''
   public ipsfa_otros_estudios: string = ''
-  public lstU = [] //Objeto Unidad
-  public lstC = [] //Objeto Comando
+
   public buscar: any;
   public estructura_detalle = ""
 
@@ -300,6 +297,7 @@ export class OresolucionesComponent implements OnInit {
     private rutaActiva: ActivatedRoute,
     private utilService: UtilService,
     private loginService: LoginService,
+    private toastrService: ToastrService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
     private _snackBar: MatSnackBar,
@@ -307,10 +305,6 @@ export class OresolucionesComponent implements OnInit {
 
   ngOnInit(): void {
 
-
-    // this.editor = new Editor()
-    // this.xeditor = new Editor()
-    // this.xobser = new Editor()
     if (this.rutaActiva.snapshot.params.id != undefined) {
       const id = this.rutaActiva.snapshot.params.id
       const cnt = this.rutaActiva.snapshot.params.cuenta
@@ -325,10 +319,6 @@ export class OresolucionesComponent implements OnInit {
     this.Carpetas = sessionStorage.getItem("MPPD_CCarpetaEntrada") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetaEntrada"))) : []
     this.OrdenNumero = sessionStorage.getItem("MPPD_COrdenEntrada") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_COrdenEntrada"))) : []
     this.GradoIPSFA = sessionStorage.getItem("MPPD_CGradoIPSFA") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGradoIPSFA"))) : []
-
-    this.Configuracion = sessionStorage.getItem("MD_CConfiguracion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion"))) : []
-    this.listarConfiguracion()
-
 
 
 
@@ -371,7 +361,7 @@ export class OresolucionesComponent implements OnInit {
     for (let [key, value] of el) {
 
 
-      if (key.substring(0, 5) == "NIVEL" && value != "") {
+      if (key.substring(0, 5) == "nivel" && value != "") {
         if (i == 0) this.IResolucion.comando = value + "\n";
         contenido = value + ""
         detalle += tab + "> " + value + "\n";
@@ -414,27 +404,7 @@ export class OresolucionesComponent implements OnInit {
   }
 
 
-  listarConfiguracion() {
-    this.Configuracion.forEach(e => {
-      switch (e.tipo) {
-        case "1":
-          this.lstT.push(e)
-          break
-        case "2":
-          this.lstR.push(e)
-          break
-        case "3":
-          this.lstU.push(e)
-          break
-        case "4":
-          this.lstC.push(e)
-          break
-        case "5":
-          break
-      }
-    })
 
-  }
 
   dwUrl(ncontrol: string, archivo: string): string {
     return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
@@ -507,7 +477,7 @@ export class OresolucionesComponent implements OnInit {
       }
       i++;
     })
-    this.Resolucion.grado = this.lstIPSFA[pos - 1].codigo;
+    this.IResolucion.grado = this.lstIPSFA[pos - 1].codigo;
   }
 
   displayFn(tr: ITipoResolucion): string {
@@ -542,9 +512,14 @@ export class OresolucionesComponent implements OnInit {
 
   seleccionTipo() {
     this.desactivarVista()
+    if (this.IResolucion.cedula == ""){
+      this._snackBar.open("Debe seleccionar una cedula", "OK");
+      return
+    }
 
     if (typeof (this.tipo) != 'object') return
     console.log(this.tipo)
+    this.IResolucion.tipo = this.tipo.codigo
     let rs = this.tipo
     switch (parseInt(rs.tipo)) {
       case 1:
@@ -579,13 +554,10 @@ export class OresolucionesComponent implements OnInit {
         this.blComisionAux = true
         break;
       case 7:
-        if (this.Resolucion.cedula != ""){
           this.maxCol = "4"
           this.seleccionarGradosIPSFA(this.Resolucion.n_grado)
           this.blAscenso = true
-        }else{
-          this._snackBar.open("Debe seleccionar una cedula", "OK");
-        }
+    
         
         
         break;
@@ -670,24 +642,91 @@ export class OresolucionesComponent implements OnInit {
   }
 
   limpiarFrm() {
-
+    this.IResolucion = {
+      grado: 0,
+      anio: 0,
+      asunto: '',
+      cedula: '',
+      pais: 0,
+      reserva: 0,
+      solicitud: 0,
+      tipo: 0,
+      unidad: 0,
+      comando: '',
+      comision_fin: '',
+      comision_inicio: '',
+      creador: '',
+      destino: '',
+      dia: 0,
+      distribucion: '',
+      estatus: 0,
+      modificado: '',
+      fecha_termino: '',
+      falta: '',
+      registro: '',
+      fecha_resolucion: '',
+      formato: '',
+      ultimo_ascenso: '',
+      instrucciones: '',
+      mes: 0,
+      autor_modificar: '',
+      motivo: '',
+      numero: '',
+      observacion: '',
+      orden_merito: 0,
+      otro_resuelto: '',
+      autor_registro: '',
+      termino: 0,
+      unidad_texto: '',
+      documento: 0,
+      causa: 0
+    }
+    this.Resolucion = {
+      id: '',
+      cuenta: '',
+      unidad: '',
+      fecha_doc: '',
+      tipo: {},
+      cedula: '',
+      nombres_apellidos: '',
+      fecha_nacimiento: '',
+      componente: '',
+      categoria: '',
+      clasificacion: '',
+      grado: '',
+      carpeta: '',
+      estatus: '',
+      entrada: '',
+      asunto: '',
+      observacion: '',
+      responsable: '',
+      cargo_responsable: '',
+      situacion: '',
+      sexo: '',
+      numero: '',
+      gran_comando: '',
+      unidad_comando: '',
+      instrucciones: '',
+      n_componente: 0,
+      n_grado: 0
+    }
+  
   }
 
 
   vincular(){
-    if (this.otro_resuelto != "" ) {
+    if (this.IResolucion.otro_resuelto != "" ) {
       this.ngxService.startLoader("loader-aceptar")
       this.xAPI.funcion = 'MPPD_CResuelto'
-      this.xAPI.parametros = this.otro_resuelto + "," + this.Resolucion.cedula
+      this.xAPI.parametros = this.IResolucion.otro_resuelto + "," + this.Resolucion.cedula
       this.xAPI.valores = ''
-      console.log(this.xAPI)
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-            console.log(data)
-            let otro = data.Cuerpo
-            
-            this.fresolucion = otro.fecha_resol
-            this.aresolucion = otro.asunto
+            if( data.Cuerpo != undefined) {
+              let otro = data.Cuerpo[0]
+              this.fresolucion = otro.fecha_resol
+              this.aresolucion = otro.asunto
+            }
         },
         (error) => {
           console.error("Error de conexion a los datos ", error)
@@ -705,11 +744,63 @@ export class OresolucionesComponent implements OnInit {
 
 
 
-  guardar() {
-    // this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
-    // this.Doc.forigen = this.forigen != undefined ? this.utilService.ConvertirFecha(this.forigen) : this.utilService.ConvertirFecha(this.fcreacion)
-    this.IResolucion.fecha_resolucion = this.forigen != undefined ? this.utilService.ConvertirFecha(this.forigen) : this.utilService.ConvertirFecha(this.fcreacion)
+  async guardar() {
+    
+    if (this.IResolucion.cedula == ""){
+      this._snackBar.open("Debe seleccionar una cedula", "OK");
+      return
+    }
+    this.ngxService.startLoader("loader-aceptar")
 
+    this.IResolucion.fecha_resolucion = this.utilService.ConvertirFechaDia(this.fecha_resolucion)
+    this.IResolucion.ultimo_ascenso = this.utilService.ConvertirFechaDia(this.ultimo_ascenso)
+    this.IResolucion.comision_inicio = this.utilService.ConvertirFechaDia(this.comision_inicio)
+    this.IResolucion.comision_fin = this.utilService.ConvertirFechaDia(this.comision_fin)
+    this.IResolucion.modificado = this.utilService.ConvertirFechaHora()
+
+    this.IResolucion.registro = this.utilService.ConvertirFechaHora()
+
+    this.IResolucion.fecha_termino = this.utilService.ConvertirFechaDia(this.comision_fin)
+
+    this.IResolucion.asunto = this.IResolucion.asunto.toUpperCase()
+    this.IResolucion.instrucciones = this.IResolucion.instrucciones.toUpperCase()
+    this.IResolucion.observacion = this.IResolucion.observacion.toUpperCase()
+
+    this.xAPI.funcion = 'MPPD_IResoluciones'
+    this.xAPI.parametros = ''
+    this.xAPI.valores = JSON.stringify(this.IResolucion)
+   
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.aceptar( "" )
+        this.ngxService.stopLoader("loader-aceptar")
+        
+      },
+      (errot) => {
+
+        this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`)
+        this.ngxService.stopLoader("loader-aceptar")
+        this.ruta.navigate(['/rsprocesos']);
+      }
+    )
+
+  }
+
+  protected aceptar(msj: string) {
+    Swal.fire({
+      title: 'La resolucion ha sido  procesada con exito ',
+      text: "¿Desea registar otro documento?",
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'No'
+    }).then((result) => {
+      if (!result.isConfirmed)
+        this.ruta.navigate(['/rsprocesos']);
+        this.limpiarFrm()
+    })
   }
 
   //Listar los archivos asociados al documento

@@ -63,7 +63,7 @@ export interface IDatosBasicos {
   solicitud: number
   tipo: number
   condicion: number
-  especialidad: number
+  especialidad: string
   estudios: string
   nacimiento: string
   promocion: string

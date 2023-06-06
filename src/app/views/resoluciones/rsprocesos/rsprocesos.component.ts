@@ -54,83 +54,18 @@ export class RsprocesosComponent implements OnInit {
     private utilService: UtilService) { }
 
   ngOnInit(): void {
-    this.ConsultarProyectos()
-    // this.xobser = new Editor()
-   
 
   }
 
   seleccionLista(event) {
     this.longitud = 0;
     this.pageSize = 10;
-    // const patron = new RegExp(this.convertirCadena(this.buscar))
-    // if (event.charCode == 13) {
-      
-    //   this.longitud = this.bzBusqueda.length
-    //   if(this.posicionPagina == 0 ){
-    //     this.bzBusqueda = this.bzSeguimientoO.filter((e) => {
-    //       return patron.test(this.convertirCadena(e.busqueda))
-    //     })
-    //     this.bzSeguimiento =  this.bzBusqueda.slice(0, this.pageSize)
-    //   }else{
-    //     this.bzBusqueda = this.bzAlertasO.filter((e) => {
-    //       return patron.test(this.convertirCadena(e.busqueda))
-    //     })
-    //     this.bzAlertas =  this.bzBusqueda.slice(0, this.pageSize)
-
-    //   }
-
-    //   this.buscar = ''
-    // }
 
   }
 
   
 
 
-  async ConsultarProyectos() {
-    this.xAPI.funcion = 'MPPD_CProyectos'
-    this.xAPI.parametros = ''
-    await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        // this.bzAlertasO = data.Cuerpo.map((e) => {
-        //   e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
-        //   e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
-        //   e.texto = e.contador == 0?'Se vence hoy': e.texto
-        //   e.busqueda = this.convertirCadena(
-        //     e.ncontrol + e.remitente + e.plazo + e.texto
-        //   )
-        //   return e
-        // }
-        // )
-        this.bzBusqueda = data.Cuerpo
-        this.longitud = this.bzBusqueda.length
-        this.lstProyectos = this.bzBusqueda.slice(0, this.pageSize)
-      },
-      (error) => {
-
-      }
-    )
-  }
-
-  async ConsultarCotizaciones() {
-    this.xAPI.funcion = 'MPPD_CCotizaciones'
-    this.xAPI.parametros = ''
-    return await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        
-        this.bzBusqueda = data.Cuerpo
-        this.longitud = this.bzBusqueda.length
-        this.lstCotizaciones = this.bzBusqueda.slice(0, this.pageSize)
-
-      },
-      (error) => {
-        console.log('Error en la carga')
-      }
-    )
-
-
-  }
 
   open(content, id) {
     this.id = id
@@ -139,16 +74,7 @@ export class RsprocesosComponent implements OnInit {
   }
 
 
-  selNavegacion(e) {
-    this.longitud = 0;
-    this.pageSize = 10;
-    this.posicionPagina = e
-    if (e == 1) {
-      this.ConsultarCotizaciones()
-    }else{
-      this.ConsultarProyectos()
-    }
-  }
+
 
   pageChangeEvent(e) {
     this.recorrerElementos(e.pageIndex)
