@@ -356,6 +356,27 @@
 
                             </mat-form-field>
                         </div>
+
+                        <div class="col-md-6" *ngIf="blExtender">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Fecha Inicio(*)</mat-label>
+                                <input matInput [matDatepicker]="fipicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_inicio" >
+                                <mat-datepicker-toggle matSuffix [for]="fipicker"></mat-datepicker-toggle>
+                                <mat-datepicker #fipicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-6" *ngIf="blExtender">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Fecha Fin(*)</mat-label>
+                                <input matInput [matDatepicker]="ffpicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_fin" >
+                                <mat-datepicker-toggle matSuffix [for]="ffpicker"></mat-datepicker-toggle>
+                                <mat-datepicker #ffpicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+
+
+
                     </div>
                     <div class="form-row" *ngIf="blReserva">
                         <div class="col-md-6">

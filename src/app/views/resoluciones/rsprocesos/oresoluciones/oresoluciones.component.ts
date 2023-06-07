@@ -550,6 +550,7 @@ export class OresolucionesComponent implements OnInit {
       case 5:
         this.maxCol = "6"
         this.blCorregir = true
+        this.blExtender = true
         break;
       case 6:
         this.maxCol = "12"
