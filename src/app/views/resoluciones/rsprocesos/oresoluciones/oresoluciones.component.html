@@ -60,11 +60,6 @@
 
                         <div class="row">
                             <div class="col-md-12">
-
-
-
-                                <!-- <hr class="mb-1">
-                          <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Personales</h6> -->
                                 <div class="row">
                                     <div class="form-group col-md-4">
                                         <mat-form-field appearance="outline">
@@ -218,6 +213,35 @@
                                     </mat-option>
                                 </mat-autocomplete>
                                 <mat-icon matSuffix>search</mat-icon>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-6"  *ngIf="blComision">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Administracion publica</mat-label>
+                                <mat-select placeholder="Administracion publica" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="IResolucion.solicitud">
+                                    <mat-option *ngFor="let e of lstCausa;" [value]="e.codigo">{{e.nombre}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-6"  *ngIf="blCategoria">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Categoria</mat-label>
+                                <mat-select placeholder="Categoria" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="IDatosBasicos.categoria">
+                                    <mat-option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-6"  *ngIf="blComponente">
+                            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                <mat-label>Componente</mat-label>
+                                <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="IDatosBasicos.componente">
+                                    <mat-option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
+                                </mat-select>
                             </mat-form-field>
                         </div>
 
@@ -399,8 +423,10 @@
                     </div>
                     
 
-
+                    
   
+
+
 
                     <div class="form-row">
                         <div class="form-group col-md-12">

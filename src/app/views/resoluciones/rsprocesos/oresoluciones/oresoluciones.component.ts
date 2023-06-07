@@ -201,7 +201,7 @@ export class OresolucionesComponent implements OnInit {
 
   public cuenta: string = ''
 
-  
+
 
   public lstResoluciones: any
   public lstEntradas: any
@@ -242,7 +242,10 @@ export class OresolucionesComponent implements OnInit {
   public blComisionAux: boolean = false
   public blExtender: boolean = false
   public blAscenso: boolean = false
-  public blReconocer : boolean = false
+  public blReconocer: boolean = false
+  public blCategoria: boolean = false
+  public blComponente: boolean = false
+
 
   public foto_cedula: string = ''
 
@@ -262,7 +265,7 @@ export class OresolucionesComponent implements OnInit {
   public finicio = ''
   public ffin = ''
   public CuentaGenera: any
-  public tipo : any
+  public tipo: any
 
   public ipsfa_cedula: string = ''
   public ipsfa_nombres_apellidos: string = ''
@@ -321,6 +324,7 @@ export class OresolucionesComponent implements OnInit {
     this.GradoIPSFA = sessionStorage.getItem("MPPD_CGradoIPSFA") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGradoIPSFA"))) : []
 
 
+    console.log(this.Categorias)
 
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
@@ -467,11 +471,11 @@ export class OresolucionesComponent implements OnInit {
     })
   }
 
-  async seleccionarGradosIPSFA( grado: number) {
+  async seleccionarGradosIPSFA(grado: number) {
     let i = 0
     let pos = 0
     this.lstIPSFA.forEach(e => {
-      if ( parseInt(e.codigo) == grado) {
+      if (parseInt(e.codigo) == grado) {
         pos = i
         return
       }
@@ -512,7 +516,7 @@ export class OresolucionesComponent implements OnInit {
 
   seleccionTipo() {
     this.desactivarVista()
-    if (this.IResolucion.cedula == ""){
+    if (this.IResolucion.cedula == "") {
       this._snackBar.open("Debe seleccionar una cedula", "OK");
       return
     }
@@ -538,9 +542,10 @@ export class OresolucionesComponent implements OnInit {
         break;
 
       case 4:
-        this.maxCol = "12"
+        this.maxCol = "6"
         this.blComision = true
         this.maxColComision = "6"
+        this.getAdministracion(rs.codigo)
         break;
       case 5:
         this.maxCol = "12"
@@ -554,21 +559,21 @@ export class OresolucionesComponent implements OnInit {
         this.blComisionAux = true
         break;
       case 7:
-          this.maxCol = "4"
-          this.seleccionarGradosIPSFA(this.Resolucion.n_grado)
-          this.blAscenso = true
-    
-        
-        
+        this.maxCol = "4"
+        this.seleccionarGradosIPSFA(this.Resolucion.n_grado)
+        this.blAscenso = true
         break;
-
       case 8:
-        
-          this.maxCol = "5"
-         
-          this.blReconocer = true
-      
-        
+        this.maxCol = "5"
+        this.blReconocer = true
+        break;
+      case 9:
+        this.maxCol = "6"
+        this.blCategoria = true
+        break;
+      case 10:
+        this.maxCol = "6"
+        this.blComponente = true
         break;
       default:
         break;
@@ -587,6 +592,27 @@ export class OresolucionesComponent implements OnInit {
     this.blExtender = false
     this.blAscenso = false
     this.blReconocer = false
+    this.blCategoria = false
+    this.blComponente = false
+  }
+
+
+  getAdministracion(id: string) {
+    this.lstCausa = []
+    this.xAPI.funcion = "MPPD_CCausaResolucion"
+    this.ngxService.startLoader("loader-buscar")
+    this.xAPI.parametros = id
+    this.xAPI.valores = ''
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstCausa = data.Cuerpo
+        this.ngxService.stopLoader("loader-buscar")
+      },
+      (err) => {
+        console.error(err)
+      }
+    )
   }
 
 
@@ -628,7 +654,7 @@ export class OresolucionesComponent implements OnInit {
 
         this.blReserva = true
         this.ngxService.stopLoader("loader-buscar")
-        if ( this.IResolucion.causa.toString() == "7") this.blReservaAux = true
+        if (this.IResolucion.causa.toString() == "7") this.blReservaAux = true
       },
       (err) => {
         console.error(err)
@@ -710,29 +736,29 @@ export class OresolucionesComponent implements OnInit {
       n_componente: 0,
       n_grado: 0
     }
-  
+
   }
 
 
-  vincular(){
-    if (this.IResolucion.otro_resuelto != "" ) {
+  vincular() {
+    if (this.IResolucion.otro_resuelto != "") {
       this.ngxService.startLoader("loader-aceptar")
       this.xAPI.funcion = 'MPPD_CResuelto'
       this.xAPI.parametros = this.IResolucion.otro_resuelto + "," + this.Resolucion.cedula
       this.xAPI.valores = ''
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-            if( data.Cuerpo != undefined) {
-              let otro = data.Cuerpo[0]
-              this.fresolucion = otro.fecha_resol
-              this.aresolucion = otro.asunto
-            }
+          if (data.Cuerpo != undefined) {
+            let otro = data.Cuerpo[0]
+            this.fresolucion = otro.fecha_resol
+            this.aresolucion = otro.asunto
+          }
         },
         (error) => {
           console.error("Error de conexion a los datos ", error)
           this.ngxService.stopLoader("loader-aceptar")
         }
-  
+
       )
     }
   }
@@ -745,8 +771,8 @@ export class OresolucionesComponent implements OnInit {
 
 
   async guardar() {
-    
-    if (this.IResolucion.cedula == ""){
+
+    if (this.IResolucion.cedula == "") {
       this._snackBar.open("Debe seleccionar una cedula", "OK");
       return
     }
@@ -769,12 +795,12 @@ export class OresolucionesComponent implements OnInit {
     this.xAPI.funcion = 'MPPD_IResoluciones'
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.IResolucion)
-   
+
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.aceptar( "" )
+        this.aceptar("")
         this.ngxService.stopLoader("loader-aceptar")
-        
+
       },
       (errot) => {
 
@@ -799,7 +825,7 @@ export class OresolucionesComponent implements OnInit {
     }).then((result) => {
       if (!result.isConfirmed)
         this.ruta.navigate(['/rsprocesos']);
-        this.limpiarFrm()
+      this.limpiarFrm()
     })
   }
 

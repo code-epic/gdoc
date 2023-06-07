@@ -247,29 +247,12 @@
                     </div>
 
 
-
-                    
-                        
-                      <!-- 
-                        <div class="form-group col-md-4">
-                            <label> Carpeta Entrada </label>
-                           
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.entrada" value="{{Resolucion.entrada}}">
-                                <option value="0">Seleccione</option>
-                                <option *ngFor="let e of Carpetas;" [value]="e.cod_carpeta">{{e.des_carpeta}}</option>
-                            </select>
-                        </div> -->
                        
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <label for="txtObjeto">Asunto</label>
                             <div class="NgxEditor__Wrapper">
                                 <angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="Resolucion.asunto"></angular-editor>
-                                <!-- <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
-                                <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor"
-                                    [(ngModel)]="Resolucion.asunto" [disabled]="false" [placeholder]="'Escibe aqui...'">
-                                </ngx-editor> -->
                             </div>
                         </div>
                     </div>
@@ -279,11 +262,6 @@
                             <label for="txtObjeto">Observaciones</label>
                             <div class="NgxEditor__Wrapper">
                                 <angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="Resolucion.observacion"></angular-editor>
-                                <!-- <ngx-editor-menu [editor]="xobser"> </ngx-editor-menu>
-                                <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xobser"
-                                    [(ngModel)]="Resolucion.observacion " [disabled]="false"
-                                    [placeholder]="'Escibe aqui...'">
-                                </ngx-editor> -->
                             </div>
                         </div>
                     </div>
