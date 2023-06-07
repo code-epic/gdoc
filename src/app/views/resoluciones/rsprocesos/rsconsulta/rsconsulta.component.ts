@@ -146,17 +146,15 @@ export class RsconsultaComponent implements OnInit {
   public dbDatos: boolean = false
   public dbResolucion: boolean = false
   public dbTools: boolean = false
-  
+
   public carpeta: string = ''
 
   constructor(private apiService: ApiService,
     private utilService: UtilService,
     private loginService: LoginService,
-    private toastrService: ToastrService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
-    private _snackBar: MatSnackBar,
-    private ruta: Router) { }
+    private _snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
     this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : []
