@@ -324,7 +324,7 @@ export class OresolucionesComponent implements OnInit {
     this.GradoIPSFA = sessionStorage.getItem("MPPD_CGradoIPSFA") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGradoIPSFA"))) : []
 
 
-    console.log(this.Categorias)
+    // console.log(this.Categorias)
 
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
@@ -522,7 +522,7 @@ export class OresolucionesComponent implements OnInit {
     }
 
     if (typeof (this.tipo) != 'object') return
-    console.log(this.tipo)
+    // console.log(this.tipo)
     this.IResolucion.tipo = this.tipo.codigo
     let rs = this.tipo
     switch (parseInt(rs.tipo)) {
@@ -548,9 +548,8 @@ export class OresolucionesComponent implements OnInit {
         this.getAdministracion(rs.codigo)
         break;
       case 5:
-        this.maxCol = "12"
-        this.maxColComision = "6"
-        this.blComision = true
+        this.maxCol = "6"
+        this.blCorregir = true
         break;
       case 6:
         this.maxCol = "12"
