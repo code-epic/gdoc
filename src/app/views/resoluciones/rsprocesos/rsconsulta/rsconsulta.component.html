@@ -73,6 +73,7 @@
                                 <br><br>
                                 <div class="container">
                                     <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
+                                 
                                     <div class="row">
                                         
                                         <div class="form-group col-md-5">
@@ -80,7 +81,7 @@
                                                 <mat-label>Cédula</mat-label>
                                                 <input matInput placeholder="Cédula" [ngModelOptions]="{standalone: true}"
                                                 [(ngModel)]="cedula" 
-                                                (blur)="consultarCedula('')">
+                                                (keypress)="consultarCedula($event)">
                                                 <mat-icon matSuffix>search</mat-icon>
                                             </mat-form-field>
                                         </div>
@@ -89,7 +90,7 @@
                                                 <mat-label>Numero de resuelto</mat-label>
                                                 <input matInput placeholder="Numero de resuelto" [ngModelOptions]="{standalone: true}"
                                                 [(ngModel)]="IResolucion.numero" value="{{IResolucion.numero}}"
-                                                (blur)="consultarResolucion()">
+                                                (keypress)="consultarResolucion($event)">
                                             </mat-form-field>
                                         </div>
                                         <div class="col-md-2">
@@ -102,7 +103,22 @@
                                         </div>
                                         
                                     </div>
+
                                     <hr>
+                                    <div class="row" *ngIf="dbTools">
+                                        <div class="col-md-11">
+
+                                        </div>
+                                        <div class="col-md-1">
+                                            <div class="media align-items-center">
+                                                <div class="example-button-row">
+                                                    <button mat-icon-button title="Volver resuelto" (click)="obtenerResuelto()">
+                                                        <mat-icon style="color:brown">arrow_forward</mat-icon>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="row" *ngIf="dbDatos">
                                         <div class="col-md-1"></div>
                                         <div class="col-md-10">
@@ -198,7 +214,7 @@
                                                 <tbody>
                                                     <tr *ngFor="let e of lstResolucionesS">
                                                         <td>{{ e.fecha_resolucion }}</td>
-                                                        <td> + <a class="enlace" (click)="consultarCedula(e.cedula)" style="font-weight: bold; color: brown;"> {{e.cedula}} </a></td>
+                                                        <td> + <a class="enlace" (click)="obtenerCedula(e.cedula)" style="font-weight: bold; color: brown;"> {{e.cedula}} </a></td>
                                                         <td>{{  obtenerTipo(e.tipo) }}</td>
                                                         <td>
                                                             {{e.administracion}}

@@ -17,7 +17,7 @@ import { UtilService } from 'src/app/services/util/util.service';
 })
 export class RsconsultaComponent implements OnInit {
 
-  public cedula : string = ""
+  public cedula: string = ""
   public resolucion: string = ""
 
   public xAPI: IAPICore = {
@@ -25,7 +25,7 @@ export class RsconsultaComponent implements OnInit {
     parametros: '',
     valores: ''
   }
-  
+
 
   public IDatosBasicos: IDatosBasicos = {
     area: '',
@@ -143,10 +143,12 @@ export class RsconsultaComponent implements OnInit {
   public xasunto: string = ''
   public nombramiento: string = ''
 
-  public dbDatos : boolean = false
-  public dbResolucion : boolean = false
-  public carpeta : string = ''
+  public dbDatos: boolean = false
+  public dbResolucion: boolean = false
+  public dbTools: boolean = false
   
+  public carpeta: string = ''
+
   constructor(private apiService: ApiService,
     private utilService: UtilService,
     private loginService: LoginService,
@@ -168,9 +170,9 @@ export class RsconsultaComponent implements OnInit {
     this.OrdenNumero = sessionStorage.getItem("MPPD_COrdenEntrada") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_COrdenEntrada"))) : []
     this.GradoIPSFA = sessionStorage.getItem("MPPD_CGradoIPSFA") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGradoIPSFA"))) : []
     this.UbicacionCarpetas = sessionStorage.getItem("MPPD_CCarpetas") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetas"))) : []
-    
+
   }
-  
+
   consultar(e) {
     if (e.keyCode == 13) {
 
@@ -191,35 +193,44 @@ export class RsconsultaComponent implements OnInit {
 
   }
 
-  verificar(){
+  verificar() {
 
     this.dbDatos = false
     this.dbResolucion = false
     this.resolucion = ""
-    if (this.IDatosBasicos.cedula != '') {
-      this.consultarCedula('')
+    if (this.cedula != '') {
+      this.consultarCedula(undefined)
       return false
     }
     if (this.IResolucion.numero != '') {
-      this.consultarResolucion()
+      this.consultarResolucion(undefined)
       return false
     }
 
     this._snackBar.open("Debe introducir una cedula o un resuelto", "OK");
     return
-  
+
   }
 
-    /**
-   * Consultar datos generales del militar 
-   */
-    consultarCedula(id : string) {
+  obtenerCedula(id: string) {
+    this.cedula = id
+    this.dbTools = true
+    this.consultarCedula(undefined)
+
+  }
+
+  /**
+ * Consultar datos generales del militar 
+ */
+  consultarCedula(event: any) {
+
+    if (event == undefined || event.charCode == 13) {
       this.dbDatos = false
       this.dbResolucion = false
 
-      if (id != "") this.cedula= id
+
       if (this.cedula == '') return false
-  
+
       this.ngxService.startLoader("loader-buscar")
       this.xAPI.funcion = 'MPPD_CDatosBasicos'
       this.xAPI.parametros = this.cedula
@@ -230,12 +241,12 @@ export class RsconsultaComponent implements OnInit {
           this.cedula = ""
           if (data != undefined && data.Cuerpo.length > 0) {
             this.Resolucion = data.Cuerpo[0]
-  
+
             this.Resolucion.componente = this.Componentes.filter(e => { return e.cod_componente == this.Resolucion.componente })[0].nombre_componente
             this.Resolucion.categoria = this.Categorias.filter(e => { return e.cod_categoria == this.Resolucion.categoria })[0].nombre_categoria
             this.Resolucion.clasificacion = this.Clasificaciones.filter(e => { return e.cod_clasificacion == this.Resolucion.clasificacion })[0].des_clasificacion
             this.Resolucion.grado = this.Grados.filter(e => { return e.cod_grado == this.Resolucion.grado })[0].nombres_grado
-  
+
             if (data.Cuerpo[0].resoluciones != undefined && data.Cuerpo[0].resoluciones != '') {
               this.lstResoluciones = JSON.parse(data.Cuerpo[0].resoluciones).reverse()
               this.filtrarNombramiento()
@@ -247,7 +258,7 @@ export class RsconsultaComponent implements OnInit {
           }
           this.cargarGradosIPSFA(this.Resolucion.n_componente);
           this.IDatosBasicos = data.Cuerpo[0]
-  
+
           this.ngxService.stopLoader("loader-buscar")
           this.dbDatos = true
         },
@@ -255,54 +266,65 @@ export class RsconsultaComponent implements OnInit {
           console.error("Error de conexion a los datos ", error)
           this.ngxService.stopLoader("loader-buscar")
         }
-  
+
       )
-  
-    }
-
-    filtrarNombramiento() {
-      const nombramiento = this.lstResoluciones[0]
-      this.nombramiento = nombramiento.titulo + ' - ' + nombramiento.tipo_descripcion
-      this.xasunto = nombramiento.asunto.substring(0, 100)
-    }
-
-    async cargarGradosIPSFA(componente: number) {
-      this.lstIPSFA = this.GradoIPSFA.filter(e => {
-        return parseInt(e.componente_id) == componente
-      })
-    }
-    
-    obtenerTipo(tipo : any){
-      // console.log(tipo, this.TipoResoluciones)
-      let texto = ""
-      this.TipoResoluciones.forEach(e => {
-        if (e.codigo == tipo ){
-          texto = e.nombre
-        }
-      });
-      return texto
-    }
-
-    obtenerUbicacion(anio : string, codigo :string  ){
-      anio = anio.substring(0,4)
-      this.UbicacionCarpetas.forEach(e => {
-        if (e.anio == anio ){
-          // https://10.190.1.160
-          this.carpeta = '/cdn/' + e.nombre + '/' + codigo + '.pdf'
-        }
-      });
-      
-      return this.carpeta
 
     }
+  }
+
+  filtrarNombramiento() {
+    const nombramiento = this.lstResoluciones[0]
+    this.nombramiento = nombramiento.titulo + ' - ' + nombramiento.tipo_descripcion
+    this.xasunto = nombramiento.asunto.substring(0, 100)
+  }
+
+  async cargarGradosIPSFA(componente: number) {
+    this.lstIPSFA = this.GradoIPSFA.filter(e => {
+      return parseInt(e.componente_id) == componente
+    })
+  }
+
+  obtenerTipo(tipo: any) {
+    // console.log(tipo, this.TipoResoluciones)
+    let texto = ""
+    this.TipoResoluciones.forEach(e => {
+      if (e.codigo == tipo) {
+        texto = e.nombre
+      }
+    });
+    return texto
+  }
+
+  obtenerUbicacion(anio: string, codigo: string) {
+    anio = anio.substring(0, 4)
+    this.UbicacionCarpetas.forEach(e => {
+      if (e.anio == anio) {
+        // https://10.190.1.160
+        this.carpeta = '/cdn/' + e.nombre + '/' + codigo + '.pdf'
+      }
+    });
+
+    return this.carpeta
+
+  }
 
 
 
-    consultarResolucion(){
+
+  obtenerResuelto() {
+    this.IResolucion.numero = this.resolucion
+    this.consultarResolucion(undefined)
+    this.dbTools = false
+
+  }
+  consultarResolucion(event) {
+
+    if (event == undefined || event.charCode == 13) {
+
       this.dbDatos = false
       this.dbResolucion = false
-      if (this.IResolucion.numero== '') return false
-      
+      if (this.IResolucion.numero == '') return false
+
       this.ngxService.startLoader("loader-buscar")
       this.xAPI.funcion = 'MPPD_CResoluciones'
       this.xAPI.parametros = this.IResolucion.numero
@@ -320,13 +342,14 @@ export class RsconsultaComponent implements OnInit {
           console.error("Error de conexion a los datos ", error)
           this.ngxService.stopLoader("loader-buscar")
         }
-  
+
+
       )
-
-
     }
-  
 
-    
+  }
+
+
+
 
 }
