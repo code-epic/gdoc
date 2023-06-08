@@ -245,7 +245,8 @@ export class OresolucionesComponent implements OnInit {
   public blReconocer: boolean = false
   public blCategoria: boolean = false
   public blComponente: boolean = false
-
+  public blAceptar: boolean = false
+  public blAlert: boolean = false
 
   public foto_cedula: string = ''
 
@@ -294,6 +295,8 @@ export class OresolucionesComponent implements OnInit {
   public Unidad: any
   public maxCol = "12"
   public maxColComision = "6"
+  public color = "#e3e6e6";
+
 
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
@@ -391,8 +394,9 @@ export class OresolucionesComponent implements OnInit {
 
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data)
+          
           this.lstEstructura = data.Cuerpo
+          this.buscar = ''
         },
         (err) => {
           console.error(err)
@@ -515,6 +519,7 @@ export class OresolucionesComponent implements OnInit {
 
 
   seleccionTipo() {
+    
     this.desactivarVista()
     if (this.IResolucion.cedula == "") {
       this._snackBar.open("Debe seleccionar una cedula", "OK");
@@ -522,9 +527,10 @@ export class OresolucionesComponent implements OnInit {
     }
 
     if (typeof (this.tipo) != 'object') return
-    // console.log(this.tipo)
+    console.log(this.tipo)
     this.IResolucion.tipo = this.tipo.codigo
     let rs = this.tipo
+    let valor = true
     switch (parseInt(rs.tipo)) {
       case 1:
         this.blNombramiento = true
@@ -532,8 +538,14 @@ export class OresolucionesComponent implements OnInit {
         this.viewUnidad()
         break;
       case 2:
-        this.maxCol = "12"
-        this.getCausa(rs.codigo)
+        
+        if ( this.validarCategoriaCeseReserva ( parseInt(rs.codigo) ) ) {
+          this.maxCol = "12"
+          this.getCausa(rs.codigo)
+          
+        }else {
+          valor = false
+        }
 
         break;
       case 3:
@@ -578,9 +590,20 @@ export class OresolucionesComponent implements OnInit {
       default:
         break;
     }
+
+    this.blAceptar =  valor
   }
 
 
+  validarCategoriaCeseReserva(codigo : number ) {
+    if ( codigo == 9 && this.Resolucion.clasificacion == 'ASIMILADO' ) return true
+    if ( codigo == 10 && this.Resolucion.clasificacion == 'EFECTIVO' ) return true
+    this.toastrService.error(
+      'Error: No coincide el tipo de resolución con la categoría',
+      `GDoc Resoluciones`
+    );
+    return false
+  }
 
   desactivarVista() {
     this.blCorregir = false

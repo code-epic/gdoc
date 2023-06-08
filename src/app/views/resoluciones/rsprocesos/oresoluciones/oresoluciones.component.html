@@ -55,83 +55,111 @@
 
                     </div>
                 </div>
-                <div class="card-body">
-                    <form>
+                <div class="card-body" style="padding-top: -10px;">
+                    <form >
 
+                        <div class="row" style="padding: 15px; border-radius: 30px;" *ngIf="blAlert">
+                            
+                            <div class="col-md-12" style="padding: 15px;background-color: #de5c5c;
+                            font-weight: normal;
+                            font-family: 'Roboto';
+                            font-size: 16px;color: white;">
+                            
+                                Esto es una alerta
+                            </div>
+                            <br><br>
+                        </div>
+                        
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="form-group col-md-4">
-                                        <mat-form-field appearance="outline">
-                                            <mat-label>Cédula</mat-label>
-                                            <input matInput placeholder="Cédula" [ngModelOptions]="{standalone: true}"
-                                                [(ngModel)]="IResolucion.cedula" value="{{IResolucion.cedula}}"
-                                                (blur)="consultarCedula()">
-                                            <mat-icon matSuffix *ngIf="!editar_datos">people</mat-icon>
-                                            <mat-icon matSuffix *ngIf="editar_datos" (click)="Seleccionar()"
-                                                class="text-blue">edit</mat-icon>
-                                        </mat-form-field>
-                                    </div>
-                                    <div class="form-group col-md-8">
-                                        <mat-form-field appearance="outline">
-                                            <mat-label>Nombre completo</mat-label>
+                            <div class="form-group col-md-3">
+                                <mat-form-field appearance="outline"  >
+                                    <mat-label>Cédula</mat-label>
+                                    <input matInput placeholder="Cédula" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="IResolucion.cedula" value="{{IResolucion.cedula}}"
+                                        (blur)="consultarCedula()">
+                                    <mat-icon matSuffix *ngIf="!editar_datos">people</mat-icon>
+                                    <mat-icon matSuffix *ngIf="editar_datos" (click)="Seleccionar()"
+                                        class="text-blue">edit</mat-icon>
+                                </mat-form-field>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Grado</mat-label>
 
-                                            <input matInput placeholder="Nombre completo"
-                                                [ngModelOptions]="{standalone: true}"
-                                                [(ngModel)]="Resolucion.nombres_apellidos"
-                                                value="{{Resolucion.nombres_apellidos}}" disabled="disabled">
+                                    <input matInput placeholder="Nombre completo"
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Resolucion.grado"
+                                        value="{{Resolucion.grado}}" disabled="disabled">
 
-                                        </mat-form-field>
+                                </mat-form-field>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Nombre completo</mat-label>
 
+                                    <input matInput placeholder="Nombre completo"
+                                        [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Resolucion.nombres_apellidos"
+                                        value="{{Resolucion.nombres_apellidos}}" disabled="disabled">
 
-
-                                    </div>
-                                </div>
-
-                                <div class="row">
-
-                                    <div class="col-md-12" style="padding: 15px; margin-top:-40px">
-                                        <table summary="" class="table table-bordered table-hover">
-
-                                            <thead>
-                                                <tr>
-                                                    <th>Situacion: {{Resolucion.situacion}}</th>
-                                                    <th style="width: 250px;">Fecha Nac.: {{ IDatosBasicos.nacimiento
-                                                        | uppercase}}</th>
-                                                    <th style="width: 120px;">Sexo: {{ IDatosBasicos.sexo | uppercase}}
-                                                    </th>
+                                </mat-form-field>
 
 
-                                                </tr>
-                                                <tr>
-                                                    <th colspan="3">Datos Militares: {{Resolucion.componente + ' ' +
-                                                        Resolucion.categoria + ' ' + Resolucion.clasificacion + ' ' +
-                                                        Resolucion.grado }}</th>
-                                                </tr>
-                                                <tr>
-
-                                                    <th colspan="3">&Uacute;ltima resoluci&oacute;n: {{ nombramiento }}
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr style="padding: -10px;"> 
-                                                    <td colspan="3" >
-                                                        <textarea rows="3" name="text" placeholder=""
-                                                            disabled="disabled"
-                                                            style="width: 100%; border: 0px;">{{ xasunto | uppercase}}</textarea>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-
-                                </div>
 
                             </div>
+                        </div>
+
+                        
+                        
+                        <div class="row">
+
+                            <div class="col-md-12" style="padding: 15px; margin-top:-40px">
+                                <table summary="" class="table table-bordered table-hover">
+
+                                    <thead>
+                                        <!-- <tr>
+                                            <th>Situacion: {{Resolucion.situacion}}</th>
+                                            <th style="width: 250px;">Fecha Nac.: {{ IDatosBasicos.nacimiento
+                                                | uppercase}}</th>
+                                            <th style="width: 120px;">Sexo: {{ IDatosBasicos.sexo | uppercase}}
+                                            </th>
+
+
+                                        </tr> -->
+                                        <tr  [ngStyle]="{'background-color': color}">
+                                            <th style="text-align: center;">COMPONENTE</th>
+                                            <th style="text-align: center;">CATEGORIA</th>
+                                            <th style="text-align: center;">CLASIFICACION</th>
+                                            <th style="text-align: center;">SITUACION</th>
+                                        </tr>
+                                        <tr>
+                                            <th style="text-align: center;">{{Resolucion.componente}}</th>
+                                            <th style="text-align: center;">{{Resolucion.categoria}}</th>
+                                            <th style="text-align: center;">{{Resolucion.clasificacion}}</th>
+                                            <th style="text-align: center;"></th>
+                                        </tr>
+                                        <tr>
+
+                                            <th colspan="4">&Uacute;ltima resoluci&oacute;n: {{ nombramiento }} <br>
+                                                <textarea rows="3" name="text" placeholder="" disabled="disabled"
+                                                    style="width: 100%; border: 0px;font-size: 14px;">{{ xasunto | uppercase}}</textarea>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <!-- <tbody>
+                                        <tr style="padding: -10px;"> 
+                                            <td colspan="3" >
+                                                
+                                            </td>
+                                        </tr>
+                                    </tbody> -->
+                                </table>
+                            </div>
+
 
                         </div>
+
+                           
                         <div class="row" >
                             <div class="col-md-4">
                                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
@@ -493,13 +521,15 @@
                         </div>
                     </div>
 
+                    <hr>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="text-right">
-                                <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
+                                <button class="btn bg-primary text-white" (click)="guardar()" *ngIf="blAceptar">Aceptar</button>
                             </div>
                         </div>
                     </div>
+                    <br><br>
                 </div>
             </div>
         </div>
