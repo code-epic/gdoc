@@ -86,7 +86,7 @@ export interface Resolucion {
   tipo: any
   situacion: string
   cedula: string
-  nombres_apellidos: string
+  nombres: string
   fecha_nacimiento: string
   sexo: string
   componente: string

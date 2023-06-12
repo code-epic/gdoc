@@ -99,8 +99,8 @@
 
                                     <input matInput placeholder="Nombre completo"
                                         [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Resolucion.nombres_apellidos"
-                                        value="{{Resolucion.nombres_apellidos}}" disabled="disabled">
+                                        [(ngModel)]="Resolucion.nombres"
+                                        value="{{Resolucion.nombres}}" disabled="disabled">
 
                                 </mat-form-field>
 
@@ -117,15 +117,6 @@
                                 <table summary="" class="table table-bordered table-hover">
 
                                     <thead>
-                                        <!-- <tr>
-                                            <th>Situacion: {{Resolucion.situacion}}</th>
-                                            <th style="width: 250px;">Fecha Nac.: {{ IDatosBasicos.nacimiento
-                                                | uppercase}}</th>
-                                            <th style="width: 120px;">Sexo: {{ IDatosBasicos.sexo | uppercase}}
-                                            </th>
-
-
-                                        </tr> -->
                                         <tr  [ngStyle]="{'background-color': color}">
                                             <th style="text-align: center;">COMPONENTE</th>
                                             <th style="text-align: center;">CATEGORIA</th>
@@ -146,13 +137,6 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <!-- <tbody>
-                                        <tr style="padding: -10px;"> 
-                                            <td colspan="3" >
-                                                
-                                            </td>
-                                        </tr>
-                                    </tbody> -->
                                 </table>
                             </div>
 

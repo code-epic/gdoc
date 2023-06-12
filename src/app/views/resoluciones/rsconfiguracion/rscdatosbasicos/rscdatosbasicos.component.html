@@ -9,13 +9,13 @@
         <div class="form-group col-md-4">
           <label> Cédula </label>
           <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.cedula"
-            value="{{DBasico.cedula}}" (blur)="consultarCedula()" class="form-control">
+            value="{{DBasico.cedula}}" (keypress)="consultarCedula($event)" class="form-control">
         </div>
         <div class="form-group col-md-8">
           <label for="cmbUnidad">Nombres y Apellidos</label>
           <div class="input-group mb-3">
             <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-              [(ngModel)]="DBasico.nombres_apellidos" value="{{DBasico.nombres_apellidos}}">
+              [(ngModel)]="DBasico.nombres" value="{{DBasico.nombres}}">
             <div class="input-group-prepend">
               <button type="button" class="btn btn-info" (click)="consultarIPSFA(detalles)" id="agregar">
                 <i class="fa fa-eye" aria-hidden="true"></i>
@@ -32,7 +32,7 @@
             <div class="form-group" style="width:100%">
               <div class="input-group" style="width:100%">
                 <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-                  [(ngModel)]="DBasico.fecha" ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(forigenDate)"
+                  [(ngModel)]="nacimiento" ngbDatepicker #vi="ngbDatepicker" [value]="formatter.format(forigenDate)"
                   [placement]="placement" [positionTarget]="buttonEl">
                 <div class="input-group-append">
                   <button #buttonEl class="btn calendario" (click)="vi.toggle()" type="button">
@@ -103,7 +103,7 @@
       <div class="form-group" style="width:100%">
         <div class="input-group" style="width:100%">
           <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="DBasico.ingreso" ngbDatepicker #ingre="ngbDatepicker" [value]="formatter.format(fingresoDate)" 
+            [(ngModel)]="ingreso" ngbDatepicker #ingre="ngbDatepicker" [value]="formatter.format(fingresoDate)" 
             [placement]="placement" [positionTarget]="buttonEle">
           <div class="input-group-append">
             <button #buttonEle class="btn calendario" (click)="ingre.toggle()" type="button">
@@ -151,6 +151,7 @@
       <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
     </select>
   </div>
+  
 
   <div class="form-group col-md-3">
     <label> Fecha de Ultimo Ascenso </label>
@@ -158,7 +159,7 @@
       <div class="form-group" style="width:100%">
         <div class="input-group" style="width:100%">
           <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="DBasico.promocion" ngbDatepicker #crea="ngbDatepicker" [value]="formatter.format(fcreacionDate)" 
+            [(ngModel)]="ascenso" ngbDatepicker #crea="ngbDatepicker" [value]="formatter.format(fcreacionDate)" 
             [placement]="placement" [positionTarget]="buttonEle">
           <div class="input-group-append">
             <button #buttonEle class="btn calendario" (click)="crea.toggle()" type="button">

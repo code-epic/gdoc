@@ -112,6 +112,7 @@ export class ConstanciaComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data)
         data.Cuerpo.forEach(e => {
           this.Doc = e
           this.Doc.contenido = this.Doc.contenido.toUpperCase()
@@ -137,16 +138,7 @@ export class ConstanciaComponent implements OnInit {
             this.nCuenta = this.lstSubDoc[0].cuenta
             this.rcuenta = true
           }
-          const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
-          this.lstTraza = traza.map(e => {
-            let el = typeof e == 'object' ? e : JSON.parse(e)
-            let nombre = this.lstUsuario.filter(ex => {
-              return ex._id == el.usuario
-            })
-           
-            el.descripcion = nombre[0].nombre
-            return el
-          })
+          
           const historial = this.Doc.historial != null ? JSON.parse(this.Doc.historial) : []
           this.lstHistorial = historial.map(e => {
             return typeof e == 'object' ? e : JSON.parse(e)
@@ -163,13 +155,24 @@ export class ConstanciaComponent implements OnInit {
           //this.safeHtml = this.domSanitizer.bypassSecurityTrustHtml(this.Doc.contenido)
           //console.log(this.safeHtml);
           this.Doc.contenido = this.domSanitizer.sanitize(SecurityContext.HTML, this.Doc.contenido)
-          // console.log(this.lstTraza);
+          console.log(this.lstTraza);
           if (this.lstSubDoc.length > 0) this.bCuentas = true
           // console.log(this.lstSubDoc)
-          console.log(this.Doc)
           if (this.Doc.tipo.toLocaleLowerCase().indexOf('contratos') >= 0) {
             this.setDescripcionContratos()
           }
+          const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
+          console.log(traza)
+          this.lstTraza = traza.map(e => {
+            console.log(e)
+            let el = typeof e == 'object' ? e : JSON.parse(e)
+            let nombre = this.lstUsuario.filter(ex => {
+              return ex._id == el.usuario
+            })
+           
+            el.descripcion = nombre[0].nombre
+            return el
+          })
         });
       },
       (error) => {

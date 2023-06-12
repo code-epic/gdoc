@@ -1,33 +1,15 @@
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgbDate, NgbDateParserFormatter, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Resolucion } from 'src/app/services/control/documentos.service';
+import { IDatosBasicos } from 'src/app/services/resoluciones/resolucion.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { threadId } from 'worker_threads';
 
 
-
-interface DBasico {
-  cedula: string
-  nombres_apellidos: string
-  fecha: string
-  sexo: string
-  componente: string
-  grado: string
-  clasificacion: string
-  categoria: string
-  situacion: string
-  promocion: string
-  ingreso: string
-  otros_estudios: string
-  especialidad: string
-  estudios: string
-  area: string
-  condicion: number
-  observacion: string
-}
 
 
 @Component({
@@ -68,7 +50,7 @@ export class RscdatosbasicosComponent implements OnInit {
     fecha_doc: '',
     tipo: '0',
     cedula: '',
-    nombres_apellidos: '',
+    nombres: '',
     fecha_nacimiento: '',
     componente: '',
     categoria: '',
@@ -91,24 +73,36 @@ export class RscdatosbasicosComponent implements OnInit {
     n_grado: 0
   }
 
-  public DBasico: DBasico = {
+  public DBasico: IDatosBasicos = {
     cedula: '',
-    nombres_apellidos: '',
+    nombres: '',
+    categoria: 0,
+    grado: 0,
+    componente: 0,
+    clasificacion: 0,
+    resolucion: 0,
+    solicitud: 0,
+    reserva: 0,
     fecha: '',
-    sexo: '',
-    componente: '',
-    grado: '',
-    clasificacion: '',
-    categoria: '',
-    situacion: '',
-    otros_estudios: '',
     promocion: '',
-    ingreso: '', //Ingreso a las FANB
+    sexo: '',
+    profesion: '',
+    profesionx: '',
+    nacimiento: '',
+    orden: 0,
+    n_grado: 0,
+    n_componente: 0,
     especialidad: '',
-    estudios: '',
     area: '',
+    estudios: '',
     condicion: 0,
-    observacion: ''
+    anio: 0,
+    mes: 0,
+    dia: 0,
+    ultimo_ascenso: '',
+    motivo: '',
+    observacion: '',
+    situacion: ''
   }
 
   public ipsfa_cedula: string = ''
@@ -128,6 +122,10 @@ export class RscdatosbasicosComponent implements OnInit {
   public ipsfa_situacion_ab: string = ''
   public ipsfa_otros_estudios: string = ''
 
+  public dbActivar: boolean = false
+  public nacimiento: any = ''
+  public ingreso: any = ''
+  public ascenso: any = ''
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -140,6 +138,7 @@ export class RscdatosbasicosComponent implements OnInit {
     public formatter: NgbDateParserFormatter,
     private toastrService: ToastrService,
     public utilService: UtilService,
+    private _snackBar: MatSnackBar,
     private modalService: NgbModal) { }
 
   ngOnInit(): void {
@@ -161,83 +160,98 @@ export class RscdatosbasicosComponent implements OnInit {
   /**
  * Consultar datos generales del militar 
  */
-  consultarCedula() {
-    let cedula = this.DBasico.cedula
-    this.ngxService.startLoader("loader-aceptar")
-    this.xAPI.funcion = 'MPPD_CDatosBasicos'
-    this.xAPI.parametros = cedula
-    this.xAPI.valores = ''
-    this.foto = 'assets/img/theme/ndisponible.jpeg'
-    this.limpiarDB()
-    this.DBasico.cedula = cedula
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+  consultarCedula(e) {
 
-        if (data.Cuerpo.length > 0) {
-          this.DBasico = data.Cuerpo[0]
+    if (e.keyCode == 13) {
+      if (this.DBasico.cedula == "") {
+        this._snackBar.open("Debe seleccionar una cedula", "OK");
+        return
+      }
+      let cedula = this.DBasico.cedula
+      this.ngxService.startLoader("loader-aceptar")
+      this.xAPI.funcion = 'MPPD_CDatosBasicos'
+      this.xAPI.parametros = cedula
+      this.xAPI.valores = ''
+      this.foto = 'assets/img/theme/ndisponible.jpeg'
+      this.limpiarDB()
+      this.DBasico.cedula = cedula
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+          console.log(data.Cuerpo)
+          if (data.Cuerpo.length > 0) {
+            this.DBasico = data.Cuerpo[0]
 
-          //this.fcreacionDate = NgbDate.from(this.formatter.parse(this.DBasico.fecha.substring(0, 10)))
-          //this.fcreacionDate = NgbDate.from(this.formatter.parse(this.DBasico.promocion.substring(0, 10)))
-          this.foto = 'https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/' + this.DBasico.cedula + '/foto.jpg'
-          this.Resolucion = data.Cuerpo[0]
+            //this.fcreacionDate = NgbDate.from(this.formatter.parse(this.DBasico.fecha.substring(0, 10)))
+            //this.fcreacionDate = NgbDate.from(this.formatter.parse(this.DBasico.promocion.substring(0, 10)))
+            this.foto = 'https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/' + this.DBasico.cedula + '/foto.jpg'
+            this.Resolucion = data.Cuerpo[0]
+            this.nacimiento = NgbDate.from(this.formatter.parse(this.DBasico.nacimiento.substring(0, 10)))
+            this.ingreso = NgbDate.from(this.formatter.parse(this.DBasico.promocion.substring(0, 10)))
+            this.ascenso = NgbDate.from(this.formatter.parse(this.DBasico.ultimo_ascenso.substring(0, 10)))
+            // this.Resolucion.componente = this.Componentes.filter(e => {return e.cod_componente ==  this.Resolucion.componente })[0].nombre_componente
+            // this.Resolucion.categoria = this.Categorias.filter(e => {return e.cod_categoria ==  this.Resolucion.categoria })[0].nombre_categoria
+            // this.Resolucion.clasificacion = this.Clasificaciones.filter(e => {return e.cod_clasificacion ==  this.Resolucion.clasificacion })[0].des_clasificacion
+            // this.Resolucion.grado = this.Grados.filter(e => {return e.cod_grado ==  this.Resolucion.grado })[0].nombres_grado
 
-          // this.Resolucion.componente = this.Componentes.filter(e => {return e.cod_componente ==  this.Resolucion.componente })[0].nombre_componente
-          // this.Resolucion.categoria = this.Categorias.filter(e => {return e.cod_categoria ==  this.Resolucion.categoria })[0].nombre_categoria
-          // this.Resolucion.clasificacion = this.Clasificaciones.filter(e => {return e.cod_clasificacion ==  this.Resolucion.clasificacion })[0].des_clasificacion
-          // this.Resolucion.grado = this.Grados.filter(e => {return e.cod_grado ==  this.Resolucion.grado })[0].nombres_grado
-
-          if (data.Cuerpo[0].resoluciones != undefined && data.Cuerpo[0].resoluciones != '') {
-            this.lstResoluciones = JSON.parse(data.Cuerpo[0].resoluciones).reverse()
-            this.filtrarNombramiento()
+            if (data.Cuerpo[0].resoluciones != undefined && data.Cuerpo[0].resoluciones != '') {
+              this.lstResoluciones = JSON.parse(data.Cuerpo[0].resoluciones).reverse()
+              this.filtrarNombramiento()
+            }
+            if (data.Cuerpo[0].entradas != undefined && data.Cuerpo[0].entradas != '') {
+              this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse()
+            }
           }
-          if (data.Cuerpo[0].entradas != undefined && data.Cuerpo[0].entradas != '') {
-            this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse()
-          }
+          this.dbActivar = true
+          this.ngxService.stopLoader("loader-aceptar")
+
+        },
+        (error) => {
+          console.error("Error de conexion a los datos ", error)
+          this.ngxService.stopLoader("loader-aceptar")
         }
 
-
-        this.ngxService.stopLoader("loader-aceptar")
-
-      },
-      (error) => {
-        console.error("Error de conexion a los datos ", error)
-        this.ngxService.stopLoader("loader-aceptar")
-      }
-
-    )
-
+      )
+    }
   }
 
 
   filtrarNombramiento() {
-
-
     const nombramiento = this.lstResoluciones[0]
-
     this.nombramiento = nombramiento.titulo + ' - ' + nombramiento.tipo_descripcion
     this.xasunto = nombramiento.asunto.substring(0, 100)
-
   }
 
   limpiarDB() {
     this.DBasico = {
       cedula: '',
-      nombres_apellidos: '',
+      nombres: '',
+      categoria: 0,
+      grado: 0,
+      componente: 0,
+      clasificacion: 0,
+      resolucion: 0,
+      solicitud: 0,
+      reserva: 0,
       fecha: '',
-      sexo: '',
-      componente: '',
-      grado: '',
-      clasificacion: '',
-      categoria: '',
-      situacion: '',
-      otros_estudios: '',
       promocion: '',
-      ingreso: '', //Ingreso a las FANB
+      sexo: '',
+      profesion: '',
+      profesionx: '',
+      nacimiento: '',
+      orden: 0,
+      n_grado: 0,
+      n_componente: 0,
       especialidad: '',
-      estudios: '',
       area: '',
+      estudios: '',
       condicion: 0,
-      observacion: ''
+      anio: 0,
+      mes: 0,
+      dia: 0,
+      ultimo_ascenso: '',
+      motivo: '',
+      observacion: '',
+      situacion: ''
     }
     this.nombramiento = ''
     this.xasunto = ''
@@ -247,6 +261,10 @@ export class RscdatosbasicosComponent implements OnInit {
 
   //Consultar datos del IPSFA
   consultarIPSFA(content) {
+    if (this.DBasico.cedula == "") {
+      this._snackBar.open("Debe seleccionar una cedula", "OK");
+      return
+    }
     if (this.ipsfa_cedula == this.DBasico.cedula) {
       this.modalService.open(content)
       return
@@ -306,75 +324,69 @@ export class RscdatosbasicosComponent implements OnInit {
     this.DBasico.sexo = this.ipsfa_sexo == 'MASCULINO' ? 'M' : 'F'
     console.log(this.ipsfa_fechaultimoascenso)
     this.DBasico.situacion = this.ipsfa_situacion_ab
-    this.DBasico.nombres_apellidos = this.ipsfa_nombres_apellidos
+    this.DBasico.nombres = this.ipsfa_nombres_apellidos
+
+
     this.forigenDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechanacimiento_unix))
-    //this.DBasico.fecha = this.ipsfa_fechanacimiento_unix
     this.fingresoDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechaingreso_unix))
-    //this.DBasico.ingreso = this.ipsfa_fechaingreso_unix
     this.fcreacionDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechaascenso_unix))
-    //this.DBasico.promocion = this.ipsfa_fechaascenso_unix
+
   }
 
-  obtenerDatos(): string {
-    let cadena = ''
-    let resolucion = '0'
-    let solicitud = '0'
-    let reserva = '0'
-    let fechanacimiento = ''
-    let ingreso = ''
-    let ascenso = ''
-    if (this.DBasico.fecha != undefined) {
-      fechanacimiento = typeof this.DBasico.fecha === 'object' ? this.utilService.ConvertirFecha(this.DBasico.fecha): this.ipsfa_fechanacimiento_unix
+  obtenerDatos() {
+    if (this.nacimiento != undefined) {
+      this.DBasico.nacimiento = typeof this.nacimiento === 'object' ? this.utilService.ConvertirFecha(this.nacimiento) : this.ipsfa_fechanacimiento_unix
     } else if (this.forigenDate != undefined) {
-      fechanacimiento = this.utilService.ConvertirFecha(this.forigenDate)
-    } 
-    if (this.DBasico.ingreso != undefined) {
-      ingreso = typeof this.DBasico.ingreso === 'object' ? this.utilService.ConvertirFecha(this.DBasico.ingreso): this.ipsfa_fechaingreso_unix
-      
+      this.DBasico.nacimiento = this.utilService.ConvertirFecha(this.forigenDate)
+    }
+
+    if (this.ingreso != undefined) {
+      this.DBasico.promocion = typeof this.ingreso === 'object' ? this.utilService.ConvertirFecha(this.ingreso) : this.ipsfa_fechaingreso_unix
+
     } else if (this.fingresoDate != undefined) {
-      ingreso = this.utilService.ConvertirFecha(this.fingresoDate)
-    } 
-    if (this.DBasico.promocion != undefined) {
-      ascenso = typeof this.DBasico.promocion === 'object' ? this.utilService.ConvertirFecha(this.DBasico.promocion): this.ipsfa_fechaascenso_unix
+      this.DBasico.promocion = this.utilService.ConvertirFecha(this.fingresoDate)
+    }
+
+    if (this.ascenso != undefined) {
+      this.DBasico.ultimo_ascenso = typeof this.ascenso === 'object' ? this.utilService.ConvertirFecha(this.ascenso) : this.ipsfa_fechaascenso_unix
     } else if (this.fcreacionDate != undefined) {
-      ascenso = this.utilService.ConvertirFecha(this.fcreacionDate)
-    } 
-
-
-    //this.DBasico.promocion = this.ipsfa_fechaingreso_unix
-
-    cadena = this.DBasico.cedula + ',' + this.DBasico.nombres_apellidos + ','
-    cadena += this.DBasico.categoria + ',' + this.DBasico.grado + ',' + this.DBasico.componente + ','
-    cadena += this.DBasico.clasificacion + ',' + resolucion + ',' + solicitud + ',' + reserva + ','
-    cadena += ascenso + ',' + ingreso + ',' + this.DBasico.sexo + ','
-    cadena += fechanacimiento + ',' + this.DBasico.especialidad + ',' + this.DBasico.estudios + ','
-    cadena += this.DBasico.area + ',' + this.DBasico.condicion + ',' + this.DBasico.observacion
-
-    return cadena
+      this.DBasico.ultimo_ascenso = this.utilService.ConvertirFecha(this.fcreacionDate)
+    }
   }
 
 
   Aceptar() {
-    console.log(this.obtenerDatos())
+
+    this.obtenerDatos()
     this.ngxService.startLoader("loader-aceptar")
-    this.xAPI.funcion = 'MPPD_IDatosBasicos'
-    this.xAPI.parametros = this.obtenerDatos()
-    this.xAPI.valores = ''
+
+    
+    let funcion = 'MPPD_IDatosBasicos'
+    if (this.dbActivar) funcion = 'MPPD_UDatosBasicos'
+    this.xAPI.funcion = funcion
+    this.xAPI.parametros = ''
+    this.xAPI.valores = JSON.stringify(this.DBasico)
+    console.log(this.xAPI)
+    console.log(this.DBasico)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.toastrService.success(
-          'Tu archivo ha sido cargado con exito ',
-          `MPPD_Insertar`
+          'Los datos han sido actualizados exitosamente ',
+          `MPPD.DatosBasicos`
         );
         this.ngxService.stopLoader("loader-aceptar")
       },
       (error) => {
         this.toastrService.error(
           error,
-          `MPPD_Insertar`
+          `MPPD_DatosBasicos -> Aceptar`
         );
         this.ngxService.stopLoader("loader-aceptar")
       }
     )
   }
 }
+
+
+
+

@@ -61,7 +61,7 @@ export class RsentradasComponent implements OnInit {
     fecha_doc: '',
     tipo: '0',
     cedula: '',
-    nombres_apellidos: '',
+    nombres: '',
     fecha_nacimiento: '',
     componente: '',
     categoria: '',

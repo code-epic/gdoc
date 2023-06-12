@@ -64,15 +64,15 @@
                 <div class="row">
 
                     <div class="col-md-12">
-                  
+                        <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
                         <mat-tab-group mat-stretch-tabs class="example-stretched-tabs">
                             <mat-tab>
                                 <ng-template mat-tab-label>
                                 &nbsp;ESPECIFICA
                                 </ng-template>
-                                <br><br>
+                                <br>
                                 <div class="container">
-                                    <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
+                                    
                                  
                                     <div class="row">
                                         
@@ -139,7 +139,7 @@
                                                     </tr>
                                                     <tr>
                                                         <th>NOMBRE COMPLETO</th>
-                                                        <td>{{IDatosBasicos.nombres_apellidos}}</td>
+                                                        <td>{{IDatosBasicos.nombres}}</td>
                                                     </tr>
                                                     <tr>
                                                         <th>COMPONENTES</th>
@@ -202,11 +202,13 @@
                                             <table style="width: 100%;" class="zigzag" border="1" >
                                                 <thead>
                                                     <tr>
-                                                        <th colspan="5" class="text-center" style="padding: 15px;">FICHA DE DATOS RESOLUCIONES ( {{ resolucion }} ) </th>
+                                                        <th colspan="6" class="text-center" style="padding: 15px;">FICHA DE DATOS RESOLUCIONES ( {{ resolucion }} ) </th>
                                                     </tr>
                                                     <tr>
                                                         <th style="width: 90px;"> FECHA</th>
                                                         <th style="width: 110px;"> CEDULA</th>
+                                                        <th style="width: 110px;"> NOMBRE COMPLETO</th>
+                                                        <th > GRADO</th>
                                                         <th>TIPO</th>
                                                         <th>ASUNTO</th>
                                                     </tr>
@@ -215,7 +217,9 @@
                                                     <tr *ngFor="let e of lstResolucionesS">
                                                         <td>{{ e.fecha_resolucion }}</td>
                                                         <td> + <a class="enlace" (click)="obtenerCedula(e.cedula)" style="font-weight: bold; color: brown;"> {{e.cedula}} </a></td>
-                                                        <td>{{  obtenerTipo(e.tipo) }}</td>
+                                                        <td>{{ e.nombres_apellidos  }}</td>
+                                                        <td>{{ e.grado_abreviado   }}</td>
+                                                        <td><a class="enlace" href="{{ obtenerUbicacion(e.fecha_resolucion, e.numero) }}" target="_blank" style="font-weight: bold; color: brown;"> {{ obtenerTipo(e.tipo) }} </a> </td>
                                                         <td>
                                                             {{e.administracion}}
                                                             <br>
@@ -235,6 +239,94 @@
                                 <ng-template mat-tab-label>
                                 &nbsp;FILTRADA
                                 </ng-template>
+                                <br>
+                                <div class="container">
+                                    <div class="row">
+                                        
+                                        <div class="form-group col-md-5">
+                                            <div class="form-group">
+                                                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                    <mat-label style="width:100%">Tipo de Resolución</mat-label>
+                                                    <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto"
+                                                         [(ngModel)]="tipo">
+                                                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%">
+                                                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                                                            {{option.nombre}}
+                                                        </mat-option>
+                                                    </mat-autocomplete>
+                                                    <mat-icon matSuffix>search</mat-icon>
+                                                </mat-form-field>
+                                            </div>
+                    
+                                        </div>
+                                        <div class="form-group col-md-5">
+                                            <mat-form-field class="example-form-field" appearance="outline">
+                                                <mat-label>Rango del resuelto</mat-label>
+                                                <mat-date-range-input
+                                                  [formGroup]="fechaRango"
+                                                  [rangePicker]="fechaRangoPicker"
+                                                  [comparisonStart]="fechaRango.value.start"
+                                                  [comparisonEnd]="fechaRango.value.end">
+                                                  <input matStartDate placeholder="Start date" formControlName="start">
+                                                  <input matEndDate placeholder="End date" formControlName="end">
+                                                </mat-date-range-input>
+                                                
+                                                <mat-datepicker-toggle matSuffix [for]="fechaRangoPicker"></mat-datepicker-toggle>
+                                                <mat-date-range-picker #fechaRangoPicker></mat-date-range-picker>
+                                              </mat-form-field>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="text-left" style="padding-top: 5px;">
+                                                <div class="example-button-container">
+                                                    <button class="btn bg-success text-white" style="height: 50px;" (click)="FilConsultar()">
+                                                        Listar datos
+                                                    
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <hr>
+                                    <div class="row" *ngIf="dbResolucion">
+                                        
+                                        <div class="col-md-12">
+                                            <table style="width: 100%;" class="zigzag" border="1" >
+                                                <thead>
+                                                    <tr>
+                                                        <th colspan="7" class="text-center" style="padding: 15px;">FICHA DE DATOS RESOLUCIONES ( {{ resolucion }} ) </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th style="width: 90px;"> FECHA</th>
+                                                        <th style="width: 110px;"> CEDULA</th>
+                                                        <th style="width: 110px;"> NOMBRE COMPLETO</th>
+                                                        <th style="width: 110px;"> GRADO</th>
+                                                        <th style="width: 110px;"> RESOLUCION</th>
+                                                        <th>TIPO</th>
+                                                        <th>ASUNTO</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let e of lstResolucionesX">
+                                                        <td>{{ e.fecha_resolucion }}</td>
+                                                        <td> + <a class="enlace" (click)="obtenerCedula(e.cedula)" style="font-weight: bold; color: brown;"> {{e.cedula}} </a></td>
+                                                        <td>{{ e.nombres_apellidos  }}</td>
+                                                        <td>{{ e.grado_abreviado   }}</td>
+                                                        <td>+ <a class="enlace" href="{{ obtenerUbicacion(e.fecha_resolucion, e.numero) }}" target="_blank" style="font-weight: bold; color: brown;"> {{e.numero}} </a> </td>
+                                                        <td>{{ obtenerTipo(e.tipo) }}</td>
+                                                        <td>
+                                                            {{e.administracion}}
+                                                            <br>
+                                                            {{e.asunto}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
                             
                             </mat-tab>
                             <mat-tab>

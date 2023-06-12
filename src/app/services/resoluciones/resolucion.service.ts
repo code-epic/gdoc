@@ -50,29 +50,60 @@ export interface IResoluciones {
 }
 
 
+// export interface IDatosBasicos {
+//   area: string
+//   cedula: string 
+//   categoria: number
+//   clasificacion: number
+//   componente: number
+//   grado: number
+//   profesion: string
+//   profesionx: string
+//   reserva: number
+//   solicitud: number
+//   tipo: number
+//   condicion: number
+//   especialidad: string
+//   estudios: string
+//   nacimiento: string
+//   promocion: string
+//   fecha_resuelto: string
+//   ncomponente: number
+//   ngrado: number
+//   nombre: string
+//   observacion: string
+//   sexo: string
+// }
 export interface IDatosBasicos {
-  area: string
   cedula: string
+  nombres: string
   categoria: number
-  clasificacion: number
-  componente: number
   grado: number
+  componente: number
+  clasificacion: number
+  resolucion: number
+  solicitud: number
+  reserva: number
+  fecha: string
+  promocion: string
+  sexo: string
   profesion: string
   profesionx: string
-  reserva: number
-  solicitud: number
-  tipo: number
-  condicion: number
-  especialidad: string
-  estudios: string
   nacimiento: string
-  promocion: string
-  fecha_resuelto: string
-  ncomponente: number
-  ngrado: number
-  nombre: string
+  orden: number
+  n_grado: number
+  n_componente: number
+  especialidad: string
+  area: string
+  estudios: string
+  motivo: string
   observacion: string
-  sexo: string
+  condicion: number
+  anio: number
+  mes: number
+  dia: number
+  ultimo_ascenso: string
+  situacion: string
 }
 
 @Injectable({
