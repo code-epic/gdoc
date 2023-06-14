@@ -154,6 +154,8 @@ export class RsconsultaComponent implements OnInit {
   public lstResoluciones: any;
   public lstResolucionesS: any; //Solo resoluciones
   public lstResolucionesX: any; //Solo resoluciones
+  public lstResolucionesTipo: any; //Solo resoluciones
+  public lstNombres: any;
 
   public lstEntradas: any;
   public lstIPSFA = []; //Objeto Comando
@@ -164,12 +166,22 @@ export class RsconsultaComponent implements OnInit {
 
   public dbDatos: boolean = false;
   public dbResolucion: boolean = false;
+  public dbResolucionTipo: boolean = false;
+  public dbDatosNombre: boolean = false;
+
   public dbTools: boolean = false;
 
   public carpeta: string = "";
+  public nombre: string = "";
+
+  public busqueda: string = "0";
+
+  public total: number = 0;
+  public cantNombre: number = 0;
 
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
+  selected = new FormControl(0);
 
   constructor(
     private apiService: ApiService,
@@ -239,6 +251,8 @@ export class RsconsultaComponent implements OnInit {
       map((value) => (typeof value === "string" ? value : value?.name)),
       map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
     );
+
+    
   }
 
   displayFn(tr: ITipoResolucion): string {
@@ -261,7 +275,6 @@ export class RsconsultaComponent implements OnInit {
 
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data);
           //this.lstEstructura = data.Cuerpo
         },
         (err) => {
@@ -310,8 +323,7 @@ export class RsconsultaComponent implements OnInit {
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data);
-          this.cedula = "";
+          this.cedula = ""
           if (data != undefined && data.Cuerpo.length > 0) {
             this.Resolucion = data.Cuerpo[0];
 
@@ -399,12 +411,12 @@ export class RsconsultaComponent implements OnInit {
     this.consultarResolucion(undefined);
     this.dbTools = false;
   }
+
   consultarResolucion(event) {
     if (event == undefined || event.charCode == 13) {
       this.dbDatos = false;
       this.dbResolucion = false;
       if (this.IResolucion.numero == "") return false;
-
       this.ngxService.startLoader("loader-buscar");
       this.xAPI.funcion = "MPPD_CResoluciones";
       this.xAPI.parametros = this.IResolucion.numero;
@@ -430,25 +442,38 @@ export class RsconsultaComponent implements OnInit {
     let codigo = "";
     let desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
     let hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
+    this.lstResolucionesX = [];
+    this.lstResolucionesTipo = [];
+    this.total = 0;
     this.dbDatos = false;
     this.dbResolucion = false;
+    this.dbResolucionTipo = false;
     this.ngxService.startLoader("loader-buscar");
-    this.xAPI.funcion = "MPPD_CResolucionesRango";
-
+    this.xAPI.funcion =
+      this.busqueda == "1"
+        ? "MPPD_CResolucionesRangoTipo"
+        : "MPPD_CResolucionesRango";
     if (this.tipo != undefined) {
       if (this.tipo.codigo != undefined)
         codigo = "AND rs.cod_tipo_resol = " + this.tipo.codigo;
     }
-
     this.xAPI.parametros = desde + "," + hasta + "," + codigo;
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+      async (data) => {
         console.log(data);
         this.resolucion = desde + " - " + hasta + " : " + data.Cuerpo.length;
         this.ngxService.stopLoader("loader-buscar");
-        this.lstResolucionesX = data.Cuerpo;
-        this.dbResolucion = true;
+        if (this.busqueda == "1") {
+          this.lstResolucionesTipo = data.Cuerpo;
+          this.dbResolucionTipo = true;
+          this.lstResolucionesTipo.forEach((e) => {
+            this.total += parseInt(e.cantidad);
+          });
+        } else {
+          this.lstResolucionesX = data.Cuerpo;
+          this.dbResolucion = true;
+        }
       },
       (error) => {
         console.error("Error de conexion a los datos ", error);
@@ -456,4 +481,53 @@ export class RsconsultaComponent implements OnInit {
       }
     );
   }
+
+  totalizar(cantidad: any) {
+    this.total += parseInt(cantidad);
+  }
+
+  /**
+   * Consultar datos generales del militar
+   */
+  consultarNombre(event: any) {
+    if (event == undefined || event.charCode == 13) {
+      if (this.nombre == "") return false;
+
+      this.ngxService.startLoader("loader-buscar");
+      this.xAPI.funcion = "MPPD_CDatosBasicosNombre";
+      this.xAPI.parametros = this.nombre;
+      this.xAPI.valores = "";
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+          this.lstNombres = data.Cuerpo;
+          this.cantNombre = data.Cuerpo.length
+          this.ngxService.stopLoader("loader-buscar")
+          this.dbDatosNombre = true
+          this.nombre = ''
+        },
+        (error) => {
+          console.error("Error de conexion a los datos ", error);
+          this.ngxService.stopLoader("loader-buscar");
+        }
+      );
+    }
+  }
+  
+
+  verificarNombre(){
+    this.consultarNombre(undefined) 
+  }
+
+  MoverForm(id : string){
+    this.selected.setValue(0);
+    this.cedula = id
+    this.consultarCedula(undefined)
+  }
+
+
+  obtenerFoto(id: string) {
+    return  'https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/' + id + '/foto.jpg'
+  }
+
+
 }

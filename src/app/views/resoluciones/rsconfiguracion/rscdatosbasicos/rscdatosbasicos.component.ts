@@ -7,8 +7,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Resolucion } from 'src/app/services/control/documentos.service';
 import { IDatosBasicos } from 'src/app/services/resoluciones/resolucion.service';
 import { UtilService } from 'src/app/services/util/util.service';
-import { threadId } from 'worker_threads';
-
+import { AngularEditorConfig } from '@kolkov/angular-editor';
 
 
 
@@ -18,6 +17,14 @@ import { threadId } from 'worker_threads';
   styleUrls: ['./rscdatosbasicos.component.scss']
 })
 export class RscdatosbasicosComponent implements OnInit {
+
+  editorConfig: AngularEditorConfig = {
+    editable: true,
+    spellcheck: true,
+    enableToolbar: false,
+    showToolbar: false,
+    placeholder: '',
+  };
 
   public Componentes: any
   public Grados: any
@@ -95,7 +102,7 @@ export class RscdatosbasicosComponent implements OnInit {
     especialidad: '',
     area: '',
     estudios: '',
-    condicion: 0,
+    condicion: 3,
     anio: 0,
     mes: 0,
     dia: 0,
@@ -180,18 +187,11 @@ export class RscdatosbasicosComponent implements OnInit {
           console.log(data.Cuerpo)
           if (data.Cuerpo.length > 0) {
             this.DBasico = data.Cuerpo[0]
-
-            //this.fcreacionDate = NgbDate.from(this.formatter.parse(this.DBasico.fecha.substring(0, 10)))
-            //this.fcreacionDate = NgbDate.from(this.formatter.parse(this.DBasico.promocion.substring(0, 10)))
             this.foto = 'https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/' + this.DBasico.cedula + '/foto.jpg'
             this.Resolucion = data.Cuerpo[0]
             this.nacimiento = NgbDate.from(this.formatter.parse(this.DBasico.nacimiento.substring(0, 10)))
             this.ingreso = NgbDate.from(this.formatter.parse(this.DBasico.promocion.substring(0, 10)))
             this.ascenso = NgbDate.from(this.formatter.parse(this.DBasico.ultimo_ascenso.substring(0, 10)))
-            // this.Resolucion.componente = this.Componentes.filter(e => {return e.cod_componente ==  this.Resolucion.componente })[0].nombre_componente
-            // this.Resolucion.categoria = this.Categorias.filter(e => {return e.cod_categoria ==  this.Resolucion.categoria })[0].nombre_categoria
-            // this.Resolucion.clasificacion = this.Clasificaciones.filter(e => {return e.cod_clasificacion ==  this.Resolucion.clasificacion })[0].des_clasificacion
-            // this.Resolucion.grado = this.Grados.filter(e => {return e.cod_grado ==  this.Resolucion.grado })[0].nombres_grado
 
             if (data.Cuerpo[0].resoluciones != undefined && data.Cuerpo[0].resoluciones != '') {
               this.lstResoluciones = JSON.parse(data.Cuerpo[0].resoluciones).reverse()
@@ -200,8 +200,9 @@ export class RscdatosbasicosComponent implements OnInit {
             if (data.Cuerpo[0].entradas != undefined && data.Cuerpo[0].entradas != '') {
               this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse()
             }
+            this.dbActivar = true
           }
-          this.dbActivar = true
+          
           this.ngxService.stopLoader("loader-aceptar")
 
         },
@@ -322,36 +323,20 @@ export class RscdatosbasicosComponent implements OnInit {
 
   AceptarCambios() {
     this.DBasico.sexo = this.ipsfa_sexo == 'MASCULINO' ? 'M' : 'F'
-    console.log(this.ipsfa_fechaultimoascenso)
     this.DBasico.situacion = this.ipsfa_situacion_ab
     this.DBasico.nombres = this.ipsfa_nombres_apellidos
 
 
-    this.forigenDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechanacimiento_unix))
-    this.fingresoDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechaingreso_unix))
-    this.fcreacionDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechaascenso_unix))
+    this.nacimiento = NgbDate.from(this.formatter.parse(this.ipsfa_fechanacimiento_unix))
+    this.ingreso = NgbDate.from(this.formatter.parse(this.ipsfa_fechaingreso_unix))
+    this.ascenso = NgbDate.from(this.formatter.parse(this.ipsfa_fechaascenso_unix))
 
   }
 
   obtenerDatos() {
-    if (this.nacimiento != undefined) {
-      this.DBasico.nacimiento = typeof this.nacimiento === 'object' ? this.utilService.ConvertirFecha(this.nacimiento) : this.ipsfa_fechanacimiento_unix
-    } else if (this.forigenDate != undefined) {
-      this.DBasico.nacimiento = this.utilService.ConvertirFecha(this.forigenDate)
-    }
-
-    if (this.ingreso != undefined) {
-      this.DBasico.promocion = typeof this.ingreso === 'object' ? this.utilService.ConvertirFecha(this.ingreso) : this.ipsfa_fechaingreso_unix
-
-    } else if (this.fingresoDate != undefined) {
-      this.DBasico.promocion = this.utilService.ConvertirFecha(this.fingresoDate)
-    }
-
-    if (this.ascenso != undefined) {
-      this.DBasico.ultimo_ascenso = typeof this.ascenso === 'object' ? this.utilService.ConvertirFecha(this.ascenso) : this.ipsfa_fechaascenso_unix
-    } else if (this.fcreacionDate != undefined) {
-      this.DBasico.ultimo_ascenso = this.utilService.ConvertirFecha(this.fcreacionDate)
-    }
+    this.DBasico.nacimiento =this.utilService.ConvertirFecha(this.nacimiento)
+    this.DBasico.promocion =this.utilService.ConvertirFecha(this.ingreso)
+    this.DBasico.ultimo_ascenso = this.utilService.ConvertirFecha(this.ascenso) 
   }
 
 
@@ -360,7 +345,7 @@ export class RscdatosbasicosComponent implements OnInit {
     this.obtenerDatos()
     this.ngxService.startLoader("loader-aceptar")
 
-    
+    this.DBasico.fecha = this.DBasico.fecha!=""?this.DBasico.fecha:"1900-01-01"
     let funcion = 'MPPD_IDatosBasicos'
     if (this.dbActivar) funcion = 'MPPD_UDatosBasicos'
     this.xAPI.funcion = funcion
@@ -375,6 +360,8 @@ export class RscdatosbasicosComponent implements OnInit {
           `MPPD.DatosBasicos`
         );
         this.ngxService.stopLoader("loader-aceptar")
+        this.dbActivar = false
+
       },
       (error) => {
         this.toastrService.error(

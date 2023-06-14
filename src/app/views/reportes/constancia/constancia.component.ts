@@ -102,7 +102,7 @@ export class ConstanciaComponent implements OnInit {
     this.sCedula = '# CONTRATO'
     this.sGrado = 'RIF / RAZON SOCIAL'
     this.sNombre = 'MONTO TOTAL'
-    console.log('conectado')
+    // console.log('conectado')
   }
 
   consultarDocumento(numBase64: string) {
@@ -112,7 +112,7 @@ export class ConstanciaComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
+        // console.log(data)
         data.Cuerpo.forEach(e => {
           this.Doc = e
           this.Doc.contenido = this.Doc.contenido.toUpperCase()
@@ -147,30 +147,30 @@ export class ConstanciaComponent implements OnInit {
           const codigo = this.Doc.codigo + ' / ' + this.Doc.nexpediente
           this.nexpediente = codigo.toUpperCase()
 
+          // console.log('Doc:', this.lstUsuario)
           let nombre = this.lstUsuario.filter(ex => {
-            return ex._id == this.Doc.creador
+            return ex.key == this.Doc.creador
           })
-          
-          this.Doc.creador = nombre[0].nombre == undefined? '': nombre[0].nombre
+          this.Doc.creador = nombre[0].nomb == undefined? '': nombre[0].nomb
           //this.safeHtml = this.domSanitizer.bypassSecurityTrustHtml(this.Doc.contenido)
           //console.log(this.safeHtml);
           this.Doc.contenido = this.domSanitizer.sanitize(SecurityContext.HTML, this.Doc.contenido)
-          console.log(this.lstTraza);
+          // console.log(this.lstTraza);
           if (this.lstSubDoc.length > 0) this.bCuentas = true
           // console.log(this.lstSubDoc)
           if (this.Doc.tipo.toLocaleLowerCase().indexOf('contratos') >= 0) {
             this.setDescripcionContratos()
           }
           const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
-          console.log(traza)
+          // console.log('traza:', traza)
           this.lstTraza = traza.map(e => {
-            console.log(e)
+            // console.log(e)
             let el = typeof e == 'object' ? e : JSON.parse(e)
             let nombre = this.lstUsuario.filter(ex => {
-              return ex._id == el.usuario
+              return ex.key == el.usuario
             })
            
-            el.descripcion = nombre[0].nombre
+            el.descripcion = nombre[0].nomb
             return el
           })
         });

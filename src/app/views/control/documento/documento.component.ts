@@ -12,6 +12,7 @@ import { UtilService } from 'src/app/services/util/util.service'
 
 import { Location } from '@angular/common';
 import { FormControl } from '@angular/forms';
+import { AngularEditorConfig } from '@kolkov/angular-editor';
 
 
 @Component({
@@ -21,6 +22,15 @@ import { FormControl } from '@angular/forms';
 })
 
 export class DocumentoComponent implements OnInit, OnDestroy {
+
+  editorConfig: AngularEditorConfig = {
+    editable: true,
+    spellcheck: true,
+    enableToolbar: false,
+    showToolbar: false,
+    placeholder: '',
+  };
+
 
   public estadoActual = 1
   public estadoOrigen = 1
@@ -1092,7 +1102,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.xAPI.valores = ''
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-
+          
           const militar = data.Cuerpo.map(e => {
             e.resoluciones = JSON.parse(e.resoluciones)
             e.entradas = JSON.parse(e.entradas)
@@ -1104,7 +1114,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           })[0]
 
           if (data.Cuerpo.length > 0) {
-            this.nmilitar = militar.nombres_apellidos
+            this.nmilitar = militar.nombres
             this.cargo = militar.grado + " " + militar.componente
 
           } else {

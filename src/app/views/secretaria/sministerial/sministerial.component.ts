@@ -198,7 +198,7 @@ export class SministerialComponent implements OnInit {
 
   listarEstados() {
     this.xAPI.funcion = 'WKF_CEstados'
-    this.xAPI.parametros = ''
+    this.xAPI.parametros = '%'
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {

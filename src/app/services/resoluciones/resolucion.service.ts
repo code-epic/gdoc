@@ -174,10 +174,6 @@ export class ResolucionService {
     const funcion = this.xAPI.funcion
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        if (tipo == 9) {
-          if (sessionStorage.getItem(funcion) == undefined) sessionStorage.setItem(funcion, btoa(JSON.stringify(data)))
-          return
-        }
         if (sessionStorage.getItem(funcion) == undefined) sessionStorage.setItem(funcion, btoa(JSON.stringify(data.Cuerpo)))
 
       }
