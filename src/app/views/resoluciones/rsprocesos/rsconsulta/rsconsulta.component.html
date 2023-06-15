@@ -136,12 +136,12 @@
                                                         <tr>
                                                             <th>CEDULA</th>
                                                             <td>V-{{IDatosBasicos.cedula}}</td>
-                                                            <td style="width: 250px;" >FOTO</td>
+                                                            <td style="width: 180px;" >FOTO</td>
                                                         </tr>
                                                         <tr>
                                                             <th>GRADO</th>
                                                             <td>{{IDatosBasicos.grado}}</td>
-                                                            <td rowspan="7" style="text-align: center;">
+                                                            <td rowspan="7" valing="center" style="text-align: center;">
                                                                 <div style="border:1px solid #CCC; padding: 1px;width: 160px">
                                                                     <img src="{{ obtenerFoto(IDatosBasicos.cedula) }}" style="width: 155px">
                                                                 </div>
@@ -195,13 +195,17 @@
                                                     <tbody>
                                                         <tr *ngFor="let e of lstResoluciones">
                                                             <td>{{e.fecha}}</td>
-                                                            <td>+ <a class="enlace"
-                                                                    href="{{ obtenerUbicacion(e.fecha, e.titulo) }}"
+                                                            <td><a *ngIf="!validarSeguridad(e)"  class="enlace"
+                                                                    href="{{ obtenerUbicacion(e) }}"
                                                                     target="_blank"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.titulo}} </a> </td>
                                                             <td>{{ obtenerTipo(e.tipo) }}</td>
-                                                            <td>{{e.asunto}}</td>
+                                                            <td  *ngIf="validarSeguridad(e)" style="color:brown;" >
+                                                                
+                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE RESOLUCIONES</b>
+                                                            </td>
+                                                            <td  *ngIf="!validarSeguridad(e)" >{{ e.asunto | uppercase}}</td>
                                                         </tr>
                                                     </tbody>
 
@@ -239,12 +243,16 @@
                                                                     {{e.cedula}} </a></td>
                                                             
                                                             <td>{{ e.fecha_resolucion }}</td>
-                                                            <td><a class="enlace"
-                                                                    href="{{ obtenerUbicacion(e.fecha_resolucion, e.numero) }}"
+                                                            <td><a *ngIf="!validarSeguridad(e)" class="enlace"
+                                                                    href="{{ obtenerUbicacion(e) }}"
                                                                     target="_blank"
                                                                     style="font-weight: bold; color: brown;"> {{
                                                                     obtenerTipo(e.tipo) }} </a> </td>
-                                                            <td>
+                                                            <td  *ngIf="validarSeguridad(e)" style="color:brown;" >
+                                                        
+                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE RESOLUCIONES</b>
+                                                            </td>
+                                                            <td  *ngIf="!validarSeguridad(e)" >
                                                                 {{e.administracion}}
                                                                 <br>
                                                                 {{e.asunto}}
@@ -328,7 +336,7 @@
 
                                         </div>
                                         <hr>
-                                        <div class="row" *ngIf="dbResolucion">
+                                        <div class="row" *ngIf="dbResolucionFil">
 
                                             <div class="col-md-12">
                                                 <table style="width: 100%;" class="zigzag" border="1">
@@ -355,20 +363,24 @@
                                                             <td>{{ e.grado_abreviado }}</td>
                                                             <td>{{ e.nombres_apellidos }}</td>
                                                             
-                                                            <td><a class="enlace" (click)="obtenerCedula(e.cedula)"
+                                                            <td><a class="enlace" (click)="obtenerCedula(e.cedula);MoverForm(e.cedula)"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.cedula}} </a></td>
                                                             
                                                             
-                                                            <td><a class="enlace"
-                                                                    href="{{ obtenerUbicacion(e.fecha_resolucion, e.numero) }}"
+                                                            <td><a *ngIf="!validarSeguridad(e)" class="enlace"
+                                                                    href="{{ obtenerUbicacion(e) }}"
                                                                     target="_blank"
                                                                     style="font-weight: bold; color: brown;">
-                                                                    {{e.numero}} </a> </td>
+                                                                    {{ e.numero }} </a> </td>
                                                             <td>{{ e.fecha_resolucion }}</td>
                                                             <td>{{ obtenerTipo(e.tipo) }}</td>
                                                             <td>{{ e.administracion }}</td>
-                                                            <td>
+                                                            <td *ngIf="validarSeguridad(e)" style="color:brown;" >
+                                                        
+                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE RESOLUCIONES</b>
+                                                            </td>
+                                                            <td  *ngIf="!validarSeguridad(e)">
                                                                 {{e.administracion}}
                                                                 <br>
                                                                 {{e.asunto}}
@@ -402,14 +414,18 @@
                                                     <tbody>
                                                         <tr *ngFor="let e of lstResolucionesTipo; index as i;">
                                                             <td>{{ i+1 }}</td>
-                                                            <td>+ <a class="enlace"
-                                                                    href="{{ obtenerUbicacion(e.fecha_resolucion, e.numero) }}"
+                                                            <td><a *ngIf="!validarSeguridad(e)" class="enlace"
+                                                                    href="{{ obtenerUbicacion(e) }}"
                                                                     target="_blank"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.numero}} </a> </td>
                                                             <td>{{ e.fecha_resolucion }}</td>
                                                             <td>{{ obtenerTipo(e.tipo) }}</td>
-                                                            <td>{{ e.administracion }}</td>
+                                                            <td *ngIf="validarSeguridad(e)" style="color:brown;" >
+                                                        
+                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE RESOLUCIONES</b>
+                                                            </td>
+                                                            <td  *ngIf="!validarSeguridad(e)">{{ e.administracion }}</td>
                                                             <td style="text-align: center; font-weight: bold;">{{ e.cantidad }}</td>
                                                         </tr>
                                                     </tbody>

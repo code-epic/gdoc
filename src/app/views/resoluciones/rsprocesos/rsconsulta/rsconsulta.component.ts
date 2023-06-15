@@ -166,8 +166,10 @@ export class RsconsultaComponent implements OnInit {
 
   public dbDatos: boolean = false;
   public dbResolucion: boolean = false;
+  public dbResolucionFil: boolean = false;
   public dbResolucionTipo: boolean = false;
   public dbDatosNombre: boolean = false;
+  public blConfidencial: boolean = false;
 
   public dbTools: boolean = false;
 
@@ -193,6 +195,10 @@ export class RsconsultaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (this.loginService.Usuario.token != undefined) {
+      let tk = this.loginService.Usuario.token
+      this.blConfidencial = tk=="Confidencial" || tk=="Administrador" ? true : false
+    }
     this.Componentes =
       sessionStorage.getItem("MPPD_CComponente") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
@@ -251,8 +257,6 @@ export class RsconsultaComponent implements OnInit {
       map((value) => (typeof value === "string" ? value : value?.name)),
       map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
     );
-
-    
   }
 
   displayFn(tr: ITipoResolucion): string {
@@ -323,7 +327,8 @@ export class RsconsultaComponent implements OnInit {
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          this.cedula = ""
+          this.cedula = "";
+          console.log(data);
           if (data != undefined && data.Cuerpo.length > 0) {
             this.Resolucion = data.Cuerpo[0];
 
@@ -394,7 +399,16 @@ export class RsconsultaComponent implements OnInit {
     return texto;
   }
 
-  obtenerUbicacion(anio: string, codigo: string) {
+  obtenerUbicacion(e: any) {
+    
+    let anio = e.fecha_resolucion;
+    let codigo = e.numero;
+    if (e.distribucion == 2) {
+      codigo = e.numero + " NO PUBLICAR";
+    } else {
+      codigo = e.numero;
+    }
+
     anio = anio.substring(0, 4);
     this.UbicacionCarpetas.forEach((e) => {
       if (e.anio == anio) {
@@ -404,6 +418,14 @@ export class RsconsultaComponent implements OnInit {
     });
 
     return this.carpeta;
+  }
+
+  validarSeguridad(e): boolean {
+    let validar = false;
+    if (e.distribucion == 2) {
+      validar = this.blConfidencial ? false : true;
+    }
+    return validar;
   }
 
   obtenerResuelto() {
@@ -446,7 +468,7 @@ export class RsconsultaComponent implements OnInit {
     this.lstResolucionesTipo = [];
     this.total = 0;
     this.dbDatos = false;
-    this.dbResolucion = false;
+    this.dbResolucionFil = false;
     this.dbResolucionTipo = false;
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.funcion =
@@ -472,7 +494,7 @@ export class RsconsultaComponent implements OnInit {
           });
         } else {
           this.lstResolucionesX = data.Cuerpo;
-          this.dbResolucion = true;
+          this.dbResolucionFil = true;
         }
       },
       (error) => {
@@ -500,10 +522,10 @@ export class RsconsultaComponent implements OnInit {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           this.lstNombres = data.Cuerpo;
-          this.cantNombre = data.Cuerpo.length
-          this.ngxService.stopLoader("loader-buscar")
-          this.dbDatosNombre = true
-          this.nombre = ''
+          this.cantNombre = data.Cuerpo.length;
+          this.ngxService.stopLoader("loader-buscar");
+          this.dbDatosNombre = true;
+          this.nombre = "";
         },
         (error) => {
           console.error("Error de conexion a los datos ", error);
@@ -512,22 +534,20 @@ export class RsconsultaComponent implements OnInit {
       );
     }
   }
-  
 
-  verificarNombre(){
-    this.consultarNombre(undefined) 
+  verificarNombre() {
+    this.consultarNombre(undefined);
   }
 
-  MoverForm(id : string){
+  MoverForm(id: string) {
     this.selected.setValue(0);
-    this.cedula = id
-    this.consultarCedula(undefined)
+    this.cedula = id;
+    this.consultarCedula(undefined);
   }
-
 
   obtenerFoto(id: string) {
-    return  'https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/' + id + '/foto.jpg'
+    return (
+      "https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/" + id + "/foto.jpg"
+    );
   }
-
-
 }

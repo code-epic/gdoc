@@ -134,7 +134,7 @@ export class RsbuzonComponent implements OnInit {
   open(content, id) {
     this.numControl = id
     //this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
-    this.modalService.open(content);
+    this.modalService.open(content, { centered: true });
 
   }
   seleccionNavegacion(e) {
@@ -187,7 +187,7 @@ export class RsbuzonComponent implements OnInit {
     this.ngxService.startLoader("ldbuzon")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data.Cuerpo.length);
+        console.log(data.Cuerpo[0]);
         this.lstAll = data.Cuerpo
         // this.bzOriginal = data.Cuerpo.map((e) => {
         //   e.completed = false;

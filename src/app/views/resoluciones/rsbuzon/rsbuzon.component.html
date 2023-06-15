@@ -90,26 +90,42 @@
                       </mat-checkbox>
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="{{e.color}}">{{ e.simbolo }}</font></a>
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
+                        &nbsp;<font color="{{e.color}}">{{ e.simbolo }}</font></a>
 
                     </div>
                     <div class="col-md-2 texto-lista">
-                      {{ e.fcre | date:"dd-MM-yyyy" }} |  {{ e.nori | uppercase }} 
+                      {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
                     </div>
-                    <div class="col-md-6 texto-detalle" #tooltip="matTooltip" matTooltip="  {{ e.udep | uppercase }}">
+
+                    <div class="col-md-6 texto-detalle" #tooltip="matTooltip" matTooltip="  {{ e.cont | uppercase }}">
+                      <ng-template #popContent>
+                        <div class="row">
+                          <div class="col-md-12" style="width: 550px;">
+                            <div [innerHTML]="e.cont" class="cont"></div>
+                          </div>
+                        </div>
+                      </ng-template>
+                      <a [ngbPopover]="popContent" popoverTitle="Detalles generales">
+                        Mas...
+                      </a>
                       {{ e.udep | uppercase }}
                     </div>
-                    
                     <div class="col-md-1 text-right">
-                      <a [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer" style="color:darkgrey;font-size: 18px;font-weight: normal;">
-                          <img  src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" style="width: 20px;margin-top: 4px;"/>
+                      <a [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer"
+                        style="color:darkgrey;font-size: 18px;font-weight: normal;">
+                        <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
+                          style="width: 20px;margin-top: 4px;" />
                       </a>
                     </div>
+
+
+
                   </div>
                 </mat-list>
               </mat-selection-list>
-            
-              
+
+
               <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
                 [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
               </mat-paginator>
@@ -296,23 +312,25 @@
 <!-- Clasificacion de Documentos -->
 <ng-template #content let-modal>
   <div class="modal-header header bg-gradient-success">
-    <h4 class="modal-title text-white" id="modal-basic-title">Clasificar Documentos</h4>
+    <h1 style="margin-bottom: -5px; padding-top: -5px;" class="modal-title text-white" id="modal-basic-title" >Asignar numero de carpeta</h1>
   </div>
   <div class="modal-body">
+
     <div class="col-md-12">
       <div class="form-group col-md-12">
         <label>Numero de la carpeta para clasificar</label>
-        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="numCarpeta"  id="numCarpeta">
+        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="numCarpeta"
+          id="numCarpeta">
+          
       </div>
-     
     </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn bg-gradient-success text-white " (click)="clasificarBuzon();modal.close('Save')" id="btncls">
-      <span class="fa fa-share"></span>&nbsp;&nbsp;Crear Carpeta </button>
-    <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
-      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+
+    <div class="col-md-12 text-right" style="padding-right: 30px;">
+      <button class="btn bg-gradient-success text-white " (click)="crearCarpeta();modal.close('Save')" id="btncls">
+        <span class="fa fa-share"></span>&nbsp;&nbsp;Crear Carpeta </button>
+      <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+        <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    </div>
   </div>
 </ng-template>
 
