@@ -3,6 +3,7 @@ import {
   THIS_EXPR,
 } from "@angular/compiler/src/output/output_ast";
 import { Component, OnInit } from "@angular/core";
+import { FormControl } from "@angular/forms";
 import { PageEvent } from "@angular/material/paginator";
 
 import { Router } from "@angular/router";
@@ -21,7 +22,8 @@ import { UtilService } from "src/app/services/util/util.service";
 })
 export class RsbuzonComponent implements OnInit {
   public estadoActual = 3;
-  public estadoOrigen = 1;
+  public estatusActual = 1;
+  public destino = 14;
 
   public extender_plazo: any;
   public clasificacion = false;
@@ -87,12 +89,14 @@ export class RsbuzonComponent implements OnInit {
     observacion: "",
   };
 
-
-  public lstAll : any = []
+  public lstAll: any = [];
   longitud = 0;
   pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 25, 50, 100];
-  public numCarpeta : string = ''
+  public numCarpeta: string = "";
+
+  selected = new FormControl(0);
+  public lstCarpetas = [];
 
   constructor(
     private apiService: ApiService,
@@ -132,10 +136,9 @@ export class RsbuzonComponent implements OnInit {
   // }
 
   open(content, id) {
-    this.numControl = id
+    this.numControl = id;
     //this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
     this.modalService.open(content, { centered: true });
-
   }
   seleccionNavegacion(e) {
     this.bzRecibido = [];
@@ -148,22 +151,21 @@ export class RsbuzonComponent implements OnInit {
     switch (e) {
       case 0:
         this.cargarAcciones(0);
-        this.clasificacion = false;
-        this.xAPI.parametros = this.estadoActual + "," + this.estadoOrigen;
+        this.xAPI.parametros = this.estadoActual + "," + this.estatusActual;
         this.listarBuzon();
         break;
       case 1:
         this.cargarAcciones(1);
-        this.clasificacion = false;
         this.xAPI.parametros = this.estadoActual + "," + 2;
         this.listarBuzon();
         break;
       case 2:
-        this.cargarAcciones(2);
-        this.clasificacion = false;
-        this.xAPI.parametros = this.estadoActual + "," + 3;
-        this.listarBuzon();
+        // this.cargarAcciones(1);
+        this.xAPI.funcion = "WKF_CGrupoCarpetas";
+        this.xAPI.parametros = "";
+        this.listarCarpetas();
         break;
+
       default:
         break;
     }
@@ -184,11 +186,11 @@ export class RsbuzonComponent implements OnInit {
   }
 
   async listarBuzon() {
-    this.ngxService.startLoader("ldbuzon")
+    this.ngxService.startLoader("ldbuzon");
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data.Cuerpo[0]);
-        this.lstAll = data.Cuerpo
+        this.lstAll = data.Cuerpo;
         // this.bzOriginal = data.Cuerpo.map((e) => {
         //   e.completed = false;
         //   e.color = "warn";
@@ -203,21 +205,45 @@ export class RsbuzonComponent implements OnInit {
         //   this.listarSubDocumentos(2);
         this.longitud = this.lstAll.length;
         if (this.longitud > 0) {
-          this.estilocheck = '';
+          this.estilocheck = "";
           this.bzOriginal = this.lstAll;
           this.pageSize = 10;
           this.recorrerElementos(0);
         }
         // }
-        this.ngxService.stopLoader("ldbuzon")
+        this.ngxService.stopLoader("ldbuzon");
       },
       (error) => {}
     );
   }
 
-  
+  async listarCarpetas() {
+    this.ngxService.startLoader("ldcarpetas");
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data.Cuerpo[0]);
+        this.lstCarpetas = data.Cuerpo;
+        // this.bzOriginal = data.Cuerpo.map((e) => {
+        //   e.completed = false;
+        //   e.color = "warn";
+        //   e.cuentas = e.cuenta != "" ? "" : e.nori;
+        //   e.priv = e.priv == 1 ? true : false;
+        //   e.existe = e.anom == "" ? true : false;
+        //   e.xaccion = e.accion;
+        //   return e;
+        // }); //Registros recorridos como elementos
+        // this.lengthOfi = data.Cuerpo.length;
+        // if (this.selNav == 1) {
+        //   this.listarSubDocumentos(2);
 
-  filtrarAddElements(filter: any): any{
+        // }
+        this.ngxService.stopLoader("ldcarpetas");
+      },
+      (error) => {}
+    );
+  }
+
+  filtrarAddElements(filter: any): any {
     this.bzOriginal = filter.map((e) => {
       e.completed = false;
       e.color = "warn";
@@ -226,7 +252,7 @@ export class RsbuzonComponent implements OnInit {
       e.existe = e.anom == "" ? true : false;
       e.xaccion = e.accion;
       return e;
-    }); 
+    });
   }
 
   async listarSubDocumentos(estatus: number) {
@@ -278,10 +304,9 @@ export class RsbuzonComponent implements OnInit {
     // this.bzRecibido.push(this.bzOriginal)
   }
 
-
-
   updateAllComplete() {
-    this.allComplete = this.lstAll != null && this.lstAll.every(t => t.completed);
+    this.allComplete =
+      this.lstAll != null && this.lstAll.every((t) => t.completed);
   }
 
   someComplete(): boolean {
@@ -289,8 +314,9 @@ export class RsbuzonComponent implements OnInit {
       return false;
     }
 
-    return this.lstAll.filter(t => t.completed).length > 0 && !this.allComplete;
-
+    return (
+      this.lstAll.filter((t) => t.completed).length > 0 && !this.allComplete
+    );
   }
 
   setAll(completed: boolean) {
@@ -299,27 +325,23 @@ export class RsbuzonComponent implements OnInit {
       return;
     }
 
-    this.lstAll.forEach(t => (t.completed = completed));
+    this.lstAll.forEach((t) => (t.completed = completed));
     if (completed == false) {
-      this.estiloclasificar = 'none'
+      this.estiloclasificar = "none";
     } else {
-      this.estiloclasificar = ''
+      this.estiloclasificar = "";
     }
   }
 
-  
-
   pageChangeEvent(e) {
-    this.pageSize = e.pageSize
-    this.recorrerElementos(e.pageIndex)
+    this.pageSize = e.pageSize;
+    this.recorrerElementos(e.pageIndex);
   }
-
 
   //recorrerElementos para paginar listados
   recorrerElementos(pagina: number) {
-    let pag = this.pageSize * pagina
-    this.lstAll = this.bzOriginal.slice(pag, pag + this.pageSize)
-
+    let pag = this.pageSize * pagina;
+    this.lstAll = this.bzOriginal.slice(pag, pag + this.pageSize);
   }
 
   //editar
@@ -597,7 +619,63 @@ export class RsbuzonComponent implements OnInit {
   }
 
   dwUrl(ncontrol: string, archivo: string): string {
-    return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
+    return this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
   }
 
+  crearCarpeta() {
+    var lstBz = this.lstAll;
+    var usuario = this.loginService.Usuario.id;
+    var numero = this.numCarpeta;
+    var i = 0;
+    var estatus = 3; //NOTA DE ENTREGA
+    //Buscar en Wk de acuerdo al usuario y la app activa
+    this.xAPI.funcion = "WKF_IUClasificacion";
+    this.xAPI.valores = "";
+    if (this.numCarpeta == "") {
+      this.toastrService.error(
+        "Debe Introducir un numero de carpeta",
+        `GDoc Wkf.Ubicacion`
+      );
+      return;
+    }
+
+    lstBz.forEach((e) => {
+      i++;
+      if (e.completed == true) {
+        this.xAPI.parametros = `${e.idd},${this.estadoActual},${this.destino},${estatus},${numero},${usuario}`;
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          (data) => {
+            this.actualizarBzRegistrados(e.numc, 0);
+          },
+          (errot) => {
+            this.toastrService.error(errot, `GDoc Wkf.Estatus`);
+          }
+        ); //
+      }
+    });
+    //this.seleccionNavegacion(0)
+  }
+
+  actualizarBzRegistrados(codigo, tipo) {
+    var posicion = 0;
+    var i = 0;
+    this.lstAll.forEach((e) => {
+      if (e.numc == codigo) {
+        posicion = i;
+        return;
+      }
+      i++;
+    });
+    if (tipo == 0) {
+      this.lstAll.splice(posicion, 1);
+    } else {
+      this.lstAll[posicion].existe = false;
+    }
+  }
+
+  MoverForm(id: string) {
+    this.selected.setValue(2);
+    // this.cedula = id;
+    // this.consultarCedula(undefined);
+  }
 }
