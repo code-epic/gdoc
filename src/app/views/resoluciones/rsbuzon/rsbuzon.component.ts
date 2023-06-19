@@ -189,7 +189,7 @@ export class RsbuzonComponent implements OnInit {
     this.ngxService.startLoader("ldbuzon");
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data.Cuerpo[0]);
+        //console.log(data.Cuerpo[0]);
         this.lstAll = data.Cuerpo;
         // this.bzOriginal = data.Cuerpo.map((e) => {
         //   e.completed = false;

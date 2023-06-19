@@ -269,8 +269,9 @@
                         </div>
                         <div class="col-md-4" *ngIf='blAscenso'>
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                                <mat-label>Fecha del Ascenso (*)</mat-label>
-                                <input matInput [matDatepicker]="xpicker" [(ngModel)]="ultimo_ascenso" [ngModelOptions]="{standalone: true}">
+                                <mat-label>Fecha del Ascenso ( * )</mat-label>
+                                <input matInput [matDatepicker]="xpicker" [(ngModel)]="ultimo_ascenso" 
+                                [ngModelOptions]="{standalone: true}">
                                 <mat-datepicker-toggle matSuffix [for]="xpicker"></mat-datepicker-toggle>
                                 <mat-datepicker #xpicker></mat-datepicker>
                             </mat-form-field>
@@ -304,9 +305,9 @@
                         <div class="col-md-4" *ngIf='blReconocer'>
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha Ultimo Ascenso (*)</mat-label>
-                                <input matInput [matDatepicker]="xpickers" [(ngModel)]="IResolucion.ultimo_ascenso"
-                                    value="{{IResolucion.ultimo_ascenso}}" readonly disabled="disabled">
-                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <input matInput [matDatepicker]="xpickers" [(ngModel)]="ultimo_ascenso"
+                                [ngModelOptions]="{standalone: true}">
+                                <mat-datepicker-toggle matSuffix [for]="xpickers"></mat-datepicker-toggle>
                                 <mat-datepicker #xpickers></mat-datepicker>
                             </mat-form-field>
                         </div>

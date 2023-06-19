@@ -65,8 +65,8 @@
 
                         <div class="col-md-12">
                             <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
-                            <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" [selectedIndex]="selected.value"
-                            (selectedIndexChange)="selected.setValue($event)">
+                            <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
+                                [selectedIndex]="selected.value" (selectedIndexChange)="selected.setValue($event)">
                                 <mat-tab>
                                     <ng-template mat-tab-label>
                                         &nbsp;ESPECIFICA
@@ -136,14 +136,16 @@
                                                         <tr>
                                                             <th>CEDULA</th>
                                                             <td>V-{{IDatosBasicos.cedula}}</td>
-                                                            <td style="width: 180px;" >FOTO</td>
+                                                            <td style="width: 180px;">FOTO</td>
                                                         </tr>
                                                         <tr>
                                                             <th>GRADO</th>
                                                             <td>{{IDatosBasicos.grado}}</td>
                                                             <td rowspan="7" valing="center" style="text-align: center;">
-                                                                <div style="border:1px solid #CCC; padding: 1px;width: 160px">
-                                                                    <img src="{{ obtenerFoto(IDatosBasicos.cedula) }}" style="width: 155px">
+                                                                <div
+                                                                    style="border:1px solid #CCC; padding: 1px;width: 160px">
+                                                                    <img src="{{ obtenerFoto(IDatosBasicos.cedula) }}"
+                                                                        style="width: 155px">
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -183,7 +185,37 @@
                                                     <thead>
                                                         <tr>
                                                             <th colspan="5" class="text-center" style="padding: 15px;">
-                                                                FICHA DE RESOLUCIONES</th>
+                                                               ENTRADAS</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th style="width: 90px;"> FECHA</th>
+                                                            <th>CUENTA</th>
+                                                            <th>TIPO</th>
+                                                            <th>ASUNTO</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let e of lstEntradas">
+                                                            <td>{{e.fecha_entrada}}</td>
+                                                            <td>{{e.cuenta_oficio}}</td>
+                                                            <td>{{ obtenerTipo(e.tipo) }}</td>
+                                                            <td >{{ e.asunto | uppercase}}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                        <br><br>
+                                        <div class="row" *ngIf="dbDatos">
+                                            <div class="col-md-12">
+                                                <table style="width: 100%;" class="zigzag" border="1">
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="5" class="text-center" style="padding: 15px;">
+                                                               RESOLUCIONES</th>
                                                         </tr>
                                                         <tr>
                                                             <th style="width: 90px;"> FECHA</th>
@@ -195,17 +227,18 @@
                                                     <tbody>
                                                         <tr *ngFor="let e of lstResoluciones">
                                                             <td>{{e.fecha}}</td>
-                                                            <td><a *ngIf="!validarSeguridad(e)"  class="enlace"
-                                                                    href="{{ obtenerUbicacion(e) }}"
-                                                                    target="_blank"
+                                                            <td><a *ngIf="!validarSeguridad(e)" class="enlace"
+                                                                    href="{{ obtenerUbicacion(e) }}" target="_blank"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.titulo}} </a> </td>
                                                             <td>{{ obtenerTipo(e.tipo) }}</td>
-                                                            <td  *ngIf="validarSeguridad(e)" style="color:brown;" >
-                                                                
-                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE RESOLUCIONES</b>
+                                                            <td *ngIf="validarSeguridad(e)" style="color:brown;">
+
+                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
+                                                                    RESOLUCIONES</b>
                                                             </td>
-                                                            <td  *ngIf="!validarSeguridad(e)" >{{ e.asunto | uppercase}}</td>
+                                                            <td *ngIf="!validarSeguridad(e)">{{ e.asunto | uppercase}}
+                                                            </td>
                                                         </tr>
                                                     </tbody>
 
@@ -241,18 +274,18 @@
                                                             <td><a class="enlace" (click)="obtenerCedula(e.cedula)"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.cedula}} </a></td>
-                                                            
+
                                                             <td>{{ e.fecha_resolucion }}</td>
                                                             <td><a *ngIf="!validarSeguridad(e)" class="enlace"
-                                                                    href="{{ obtenerUbicacion(e) }}"
-                                                                    target="_blank"
+                                                                    href="{{ obtenerUbicacion(e) }}" target="_blank"
                                                                     style="font-weight: bold; color: brown;"> {{
                                                                     obtenerTipo(e.tipo) }} </a> </td>
-                                                            <td  *ngIf="validarSeguridad(e)" style="color:brown;" >
-                                                        
-                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE RESOLUCIONES</b>
+                                                            <td *ngIf="validarSeguridad(e)" style="color:brown;">
+
+                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
+                                                                    RESOLUCIONES</b>
                                                             </td>
-                                                            <td  *ngIf="!validarSeguridad(e)" >
+                                                            <td *ngIf="!validarSeguridad(e)">
                                                                 {{e.administracion}}
                                                                 <br>
                                                                 {{e.asunto}}
@@ -273,16 +306,16 @@
                                     </ng-template>
                                     <br>
                                     <div class="container">
-                                        <div class="row">
+                                        <div *ngIf="blFiltro">
 
-                                            <div class="form-group col-md-4">
-                                                <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-6">
                                                     <mat-form-field class="example-full-width" appearance="outline"
                                                         style="width:100%">
                                                         <mat-label style="width:100%">Tipo de Resolución</mat-label>
-                                                        <input type="text" matInput [formControl]="myControl"
+                                                        <input type="text" matInput [formControl]="myControl" (blur)="seleccionTipo()"
                                                             [matAutocomplete]="auto" [(ngModel)]="tipo">
-                                                        <mat-autocomplete #auto="matAutocomplete"
+                                                        <mat-autocomplete #auto="matAutocomplete"  
                                                             [displayWith]="displayFn" style="width:100%">
                                                             <mat-option *ngFor="let option of filteredOptions | async"
                                                                 [value]="option">
@@ -293,49 +326,155 @@
                                                     </mat-form-field>
                                                 </div>
 
-                                            </div>
-                                            <div class="form-group col-md-3">
-                                                <mat-form-field class="example-form-field" appearance="outline">
-                                                    <mat-label>Rango del resuelto</mat-label>
-                                                    <mat-date-range-input [formGroup]="fechaRango"
-                                                        [rangePicker]="fechaRangoPicker"
-                                                        [comparisonStart]="fechaRango.value.start"
-                                                        [comparisonEnd]="fechaRango.value.end">
-                                                        <input matStartDate placeholder="Start date"
-                                                            formControlName="start">
-                                                        <input matEndDate placeholder="End date" formControlName="end">
-                                                    </mat-date-range-input>
-
-                                                    <mat-datepicker-toggle matSuffix
-                                                        [for]="fechaRangoPicker"></mat-datepicker-toggle>
-                                                    <mat-date-range-picker #fechaRangoPicker></mat-date-range-picker>
-                                                </mat-form-field>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <mat-form-field class="example-full-width" appearance="outline"
-                                                    style="width:100%">
-                                                    <mat-label>Tipo de Buscada</mat-label>
-                                                    <mat-select placeholder="Documento"
-                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="busqueda">
-                                                        <mat-option value="0">DETALLADA</mat-option>
-                                                        <mat-option value="1">AGRUPADA</mat-option>
-                                                    </mat-select>
-                                                </mat-form-field>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <div class="text-left" style="padding-top: 5px;">
-                                                    <div class="example-button-container">
-                                                        <button class="btn bg-success text-white" style="height: 50px;"
-                                                            (click)="FilConsultar()">
-                                                            Listar datos
-
-                                                        </button>
-                                                    </div>
+                                                <div class="col-md-6">
+                                                    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                        <mat-label>Causa</mat-label>
+                                                        <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
+                                                            [(ngModel)]="causa" (selectionChange)="getMotivo()">
+                                                            <mat-option value="%">TODOS</mat-option>
+                                                            <mat-option *ngFor="let e of lstCausa"
+                                                                value="{{e.codigo}}">{{e.nombre}}</mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
                                                 </div>
                                             </div>
 
+                                            <div class="row">
+                                                <div class="col-md-4"  >
+                                                    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                        <mat-label>Categoria</mat-label>
+                                                        <mat-select placeholder="Categoria" [ngModelOptions]="{standalone: true}"
+                                                            [(ngModel)]="categoria">
+                                                            <mat-option value="%">TODOS</mat-option>
+                                                            <mat-option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}</mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-4" >
+                                                    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                        <mat-label>Componente</mat-label>
+                                                        <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}"
+                                                            [(ngModel)]="componente">
+                                                            <mat-option value="%">TODOS</mat-option>
+                                                            <mat-option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                </div>
+                        
+                                                <div class="col-md-4">
+                                                    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                        <mat-label>Grado</mat-label>
+                                                        <mat-select placeholder="Grado" [ngModelOptions]="{standalone: true}"
+                                                            [(ngModel)]="grado">
+                                                            <mat-option value="%">TODOS</mat-option>
+                                                            <mat-option *ngFor="let e of Grados"
+                                                                value="{{e.cod_grado}}">{{e.nombre_corto }} - {{e.nombres_grado }}</mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-md-12">
+                                                    <div class="NgxEditor__Wrapper">
+                                                        <angular-editor [placeholder]="'Introduzca el Asunto...'" [config]="editorConfig"
+                                                            [(ngModel)]="asunto"></angular-editor>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                            <div class="row">
+                                                <div class="form-group col-md-12">
+                                                    <div class="NgxEditor__Wrapper">
+                                                        <angular-editor [placeholder]="'Instrucciones especiales'" [config]="editorConfig"
+                                                            [(ngModel)]="instrucciones"></angular-editor>
+                                                    </div>
+                                                </div>
+                                            </div>
+                        
+                                            <div class="row">
+                                                <div class="form-group col-md-12">
+                                                    <div class="NgxEditor__Wrapper">
+                                                        <angular-editor [placeholder]="'Introduzca la Observacion...'" [config]="editorConfig"
+                                                            [(ngModel)]="observaciones"></angular-editor>
+                                                    </div>
+                                                </div>
+                                            </div>  
+
+                                            <div class="row">
+
+                                                
+                                                <div class="col-md-3">
+                                                    <mat-form-field class="example-form-field" appearance="outline">
+                                                        <mat-label>Rango del resuelto</mat-label>
+                                                        <mat-date-range-input [formGroup]="fechaRango"
+                                                            [rangePicker]="fechaRangoPicker"
+                                                            [comparisonStart]="fechaRango.value.start"
+                                                            [comparisonEnd]="fechaRango.value.end">
+                                                            <input matStartDate placeholder="Start date"
+                                                                formControlName="start">
+                                                            <input matEndDate placeholder="End date" formControlName="end">
+                                                        </mat-date-range-input>
+
+                                                        <mat-datepicker-toggle matSuffix
+                                                            [for]="fechaRangoPicker"></mat-datepicker-toggle>
+                                                        <mat-date-range-picker #fechaRangoPicker></mat-date-range-picker>
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        style="width:100%">
+                                                        <mat-label>Tipo de Buscada</mat-label>
+                                                        <mat-select placeholder="Documento"
+                                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="busqueda">
+                                                            <mat-option value="0">DETALLADA</mat-option>
+                                                            <mat-option value="1">AGRUPADA</mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                </div>
+                                                <!-- <div class="col-md-3">
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        style="width:100%">
+                                                        <mat-label>Formato de Campos</mat-label>
+                                                        <mat-select placeholder="Formato"
+                                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="campos">
+                                                            <mat-option value="0">SIMPLES</mat-option>
+                                                            <mat-option value="1">EXTENDIDOS</mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                </div> -->
+                                                <div class="col-md-2">
+                                                    <div class="text-left" style="padding-top: 5px;">
+                                                        <div class="example-button-container">
+                                                            <button class="btn bg-success text-white" style="height: 50px;"
+                                                                (click)="FilConsultar()">
+                                                                Listar datos
+
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
                                         </div>
-                                        <hr>
+                                        <hr *ngIf="blFiltro">
+                                        <div *ngIf="!blFiltro">
+                                            <div class="row">
+                                               
+                                                <div class="col-md-12 text-right">
+                                                    
+                                                        <button class="btn bg-success text-white "
+                                                            (click)="MostrarFiltro();">
+                                                            <span class="fa fa-upload"></span>&nbsp;&nbsp;Mostrar formulario </button>
+
+                                                            <button class="btn bg-info text-white "
+                                                            (click)="downloadCSV();">
+                                                            <span class="fa fa-download"></span>&nbsp;&nbsp;Descargar consulta </button>
+                                                            <br><br>
+                                                    
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                        
                                         <div class="row" *ngIf="dbResolucionFil">
 
                                             <div class="col-md-12">
@@ -362,25 +501,26 @@
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ e.grado_abreviado }}</td>
                                                             <td>{{ e.nombres_apellidos }}</td>
-                                                            
-                                                            <td><a class="enlace" (click)="obtenerCedula(e.cedula);MoverForm(e.cedula)"
+
+                                                            <td><a class="enlace"
+                                                                    (click)="obtenerCedula(e.cedula);MoverForm(e.cedula)"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.cedula}} </a></td>
-                                                            
-                                                            
+
+
                                                             <td><a *ngIf="!validarSeguridad(e)" class="enlace"
-                                                                    href="{{ obtenerUbicacion(e) }}"
-                                                                    target="_blank"
+                                                                    href="{{ obtenerUbicacion(e) }}" target="_blank"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{ e.numero }} </a> </td>
                                                             <td>{{ e.fecha_resolucion }}</td>
                                                             <td>{{ obtenerTipo(e.tipo) }}</td>
                                                             <td>{{ e.administracion }}</td>
-                                                            <td *ngIf="validarSeguridad(e)" style="color:brown;" >
-                                                        
-                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE RESOLUCIONES</b>
+                                                            <td *ngIf="validarSeguridad(e)" style="color:brown;">
+
+                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
+                                                                    RESOLUCIONES</b>
                                                             </td>
-                                                            <td  *ngIf="!validarSeguridad(e)">
+                                                            <td *ngIf="!validarSeguridad(e)">
                                                                 {{e.administracion}}
                                                                 <br>
                                                                 {{e.asunto}}
@@ -403,7 +543,7 @@
                                                                 FICHA DE DATOS RESOLUCIONES ( {{ resolucion }} ) </th>
                                                         </tr>
                                                         <tr>
-                                                            <th >NUM.</th>
+                                                            <th>NUM.</th>
                                                             <th>RESOLUCION</th>
                                                             <th style="width: 150px;">FECHA</th>
                                                             <th>TIPO</th>
@@ -415,26 +555,28 @@
                                                         <tr *ngFor="let e of lstResolucionesTipo; index as i;">
                                                             <td>{{ i+1 }}</td>
                                                             <td><a *ngIf="!validarSeguridad(e)" class="enlace"
-                                                                    href="{{ obtenerUbicacion(e) }}"
-                                                                    target="_blank"
+                                                                    href="{{ obtenerUbicacion(e) }}" target="_blank"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.numero}} </a> </td>
                                                             <td>{{ e.fecha_resolucion }}</td>
                                                             <td>{{ obtenerTipo(e.tipo) }}</td>
-                                                            <td *ngIf="validarSeguridad(e)" style="color:brown;" >
-                                                        
-                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE RESOLUCIONES</b>
+                                                            <td *ngIf="validarSeguridad(e)" style="color:brown;">
+
+                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
+                                                                    RESOLUCIONES</b>
                                                             </td>
-                                                            <td  *ngIf="!validarSeguridad(e)">{{ e.administracion }}</td>
-                                                            <td style="text-align: center; font-weight: bold;">{{ e.cantidad }}</td>
+                                                            <td *ngIf="!validarSeguridad(e)">{{ e.administracion }}</td>
+                                                            <td style="text-align: center; font-weight: bold;">{{
+                                                                e.cantidad }}</td>
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
-                                                            <td colspan="5" style="text-align: right;font-weight: bold;">
+                                                            <td colspan="5"
+                                                                style="text-align: right;font-weight: bold;">
                                                                 TOTAL&nbsp;&nbsp;&nbsp;
                                                             </td>
-                                                            <td  style="text-align: center; font-weight: bold;">
+                                                            <td style="text-align: center; font-weight: bold;">
                                                                 {{ total }}
                                                             </td>
                                                         </tr>
@@ -479,7 +621,7 @@
                                             </div>
                                         </div>
                                         <hr>
-                                      
+
                                         <div class="row" *ngIf="dbDatosNombre">
                                             <div class="col-md-12">
                                                 <table style="width: 100%;" class="zigzag" border="1">
@@ -519,6 +661,62 @@
                                                 </table>
                                             </div>
                                         </div>
+                                    </div>
+                                </mat-tab>
+
+                                <mat-tab>
+                                    <ng-template mat-tab-label>
+                                        &nbsp;BUSCAR POR ARCHIVO
+                                    </ng-template>
+                                    <br>
+                                    <br>
+                                    <div class="container">
+                                        
+                                        <div class="row">
+                                            <div class="col-md-2"></div>
+                                            <div class="col-md-8">
+                                                <p>
+                                                    Los archivo que intente subir por esta via deben  ser de extension *.csv preferiblemente separado por coma (,) 
+                                                    y cumplir con el siguiente formato:
+                                                </p>
+                                                <ul>
+                                                    <li>1.- La codificacion del fichero preferiblemente en UTF-8</li>
+                                                    <li>2.- Deben iniciar sin cabecera o algun titulo de columna.</li>
+                                                    <li>3.- La primera columna del archivo debe contener un campo cedula.</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-2"></div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-1"></div>
+                                            <div class="col-md-10">
+
+                                                <!-- Adjuntar Imagenes al Documento -->
+                                                <form method="post" enctype="multipart/form-data" id="forma"
+                                                    name="forma">
+                                                    <input type="hidden" name="identificador" value="{{codigoSession}}"
+                                                        readonly="readonly">
+                                                    <div class="row">
+                                                        <div class="col-md-9">
+                                                            <div class="input_container">
+                                                                <input id="fileUpload" type="file" name="archivos"
+                                                                    accept=".csv" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <button class="btn bg-success text-white "
+                                                                (click)="SubirArchivo($event);">
+                                                                <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar
+                                                                Archivos </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="col-md-1"></div>
+
+                                        </div>
+                                        <hr>
+
                                     </div>
                                 </mat-tab>
                             </mat-tab-group>

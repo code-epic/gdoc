@@ -1,45 +1,41 @@
-import { Injectable } from '@angular/core';
-
+import { Injectable } from "@angular/core";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class UtilService {
-
-
   //
-  constructor() {
-
-  }
-
+  constructor() {}
 
   /**
    * Fecha Actual del sistema desde la application
-   * @param dias sumar dias a la fecha actual 
+   * @param dias sumar dias a la fecha actual
    * @returns retorna la fecha actual del sistema en formato YYYY-MM-DD
    */
   FechaActual(dias: number = 0): string {
-    let date = new Date()
+    let date = new Date();
 
-    if (dias > 0) date.setDate(date.getDate() + dias)
+    if (dias > 0) date.setDate(date.getDate() + dias);
 
-    let output = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
-    return output
+    let output =
+      date.getFullYear() +
+      "-" +
+      String(date.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(date.getDate()).padStart(2, "0");
+    return output;
   }
   //retorna fecha en formato Dia/Mes/Anio
   ConvertirFecha(fecha: any): string {
-    return fecha.year + '-' + + fecha.month + '-' + fecha.day
+    return fecha.year + "-" + +fecha.month + "-" + fecha.day;
   }
 
-
-
-
   Semillero(id: string): string {
-    var f = new Date()
-    var anio = f.getFullYear().toString().substring(2, 4)
-    var mes = this.zfill((f.getMonth() + 1).toString(), 2)
-    var dia = this.zfill(f.getDate().toString(), 2)
-    return anio + mes + dia + '-' + this.zfill(id, 5)
+    var f = new Date();
+    var anio = f.getFullYear().toString().substring(2, 4);
+    var mes = this.zfill((f.getMonth() + 1).toString(), 2);
+    var dia = this.zfill(f.getDate().toString(), 2);
+    return anio + mes + dia + "-" + this.zfill(id, 5);
   }
 
   public zfill(number, width) {
@@ -49,24 +45,28 @@ export class UtilService {
 
     if (width <= length) {
       if (number < 0) {
-        return ("-" + numberOutput.toString());
+        return "-" + numberOutput.toString();
       } else {
         return numberOutput.toString();
       }
     } else {
       if (number < 0) {
-        return ("-" + (zero.repeat(width - length)) + numberOutput.toString());
+        return "-" + zero.repeat(width - length) + numberOutput.toString();
       } else {
-        return ((zero.repeat(width - length)) + numberOutput.toString());
+        return zero.repeat(width - length) + numberOutput.toString();
       }
     }
-
-
   }
 
   //convertir cadena a minuscula y sin carateres especiales
   ConvertirCadena(cadena: string): string {
-    return cadena.toLowerCase().replace(/á/g, "a").replace(/ê/g, "i").replace(/í/g, "i").replace(/ó/g, "o").replace(/ú/g, "u")
+    return cadena
+      .toLowerCase()
+      .replace(/á/g, "a")
+      .replace(/ê/g, "i")
+      .replace(/í/g, "i")
+      .replace(/ó/g, "o")
+      .replace(/ú/g, "u");
   }
 
   //Recibe  Fecha Formato: AAAA-MM-DD 00:00:00
@@ -83,10 +83,10 @@ export class UtilService {
     //return fa[2] + "/" + fa[1] + "/" + fa[0];
   }
 
-    //Recibe  Fecha Formato: DD/MM/AAAA
+  //Recibe  Fecha Formato: DD/MM/AAAA
   //Retorna Fecha Formato: AAAA-MM-DD
-  ConvertirFechaDia(f : any) {
-    if ( typeof f != 'object' ) {
+  ConvertirFechaDia(f: any) {
+    if (typeof f != "object") {
       return "1900-01-01";
     }
 
@@ -94,115 +94,159 @@ export class UtilService {
     var fe = ISODate.substr(0, 10);
     var fa = fe.split("-");
     if (fa[0] != "0001") {
-      return fa[0] + "-" + fa[1] + "-" + fa[2];;
+      return fa[0] + "-" + fa[1] + "-" + fa[2];
     } else {
       return "1900-01-01";
     }
-
   }
 
   //Recibe  Fecha Formato: DD/MM/AAAA
   //Retorna Fecha Formato: AAAA-MM-DD
   ConvertirFechaHora() {
     var ISODate = new Date().toISOString();
-    return ISODate.substr(0, 10) + ' ' +  ISODate.substr(11, 8);
-    
-
+    return ISODate.substr(0, 10) + " " + ISODate.substr(11, 8);
   }
 
   ConvertirCategoria(abreviatura: string): string {
-    let categoria = ''
+    let categoria = "";
     switch (abreviatura) {
       case "EFE":
-        categoria = 'EFECTIVO'
+        categoria = "EFECTIVO";
         break;
       case "ASI":
-        categoria = 'ASIMILADO'
+        categoria = "ASIMILADO";
         break;
       case "RES":
-        categoria = 'RESERVA'
+        categoria = "RESERVA";
         break;
       case "TRP":
-        categoria = 'TROPA'
+        categoria = "TROPA";
         break;
       case "HNO":
-        categoria = 'HONORARIOS'
+        categoria = "HONORARIOS";
         break;
       case "MIL":
-        categoria = 'MILICIA'
+        categoria = "MILICIA";
         break;
 
       default:
         break;
     }
 
-    return categoria
+    return categoria;
   }
-
 
   ConvertirClasificacion(abreviatura: string): string {
-    let clasificacion = ''
+    let clasificacion = "";
     switch (abreviatura) {
       case "OFI":
-        clasificacion = 'OFICIAL DE COMANDO'
+        clasificacion = "OFICIAL DE COMANDO";
         break;
       case "OFIT":
-        clasificacion = 'OFICIAL TECNICO'
+        clasificacion = "OFICIAL TECNICO";
         break;
       case "OFITR":
-        clasificacion = 'OFICIAL DE TROPA'
+        clasificacion = "OFICIAL DE TROPA";
         break;
       case "TPROF":
-        clasificacion = 'TROPA PROFESIONAL'
+        clasificacion = "TROPA PROFESIONAL";
         break;
       case "TPROA":
-        clasificacion = 'TROPA ALISTADA'
+        clasificacion = "TROPA ALISTADA";
         break;
       case "ASI":
-        clasificacion = 'ASIMILADO'
+        clasificacion = "ASIMILADO";
         break;
       case "ASIT":
-        clasificacion = 'ASIMILADO TECNICO'
+        clasificacion = "ASIMILADO TECNICO";
         break;
       case "ASI":
-        clasificacion = 'ASIMILADO'
+        clasificacion = "ASIMILADO";
         break;
       case "HNO":
-        clasificacion = 'HONORARIOS'
+        clasificacion = "HONORARIOS";
         break;
       case "MIL":
-        clasificacion = 'MILICIA'
+        clasificacion = "MILICIA";
         break;
       default:
         break;
     }
 
-    return clasificacion
+    return clasificacion;
   }
-
 
   ConvertirSituacion(sit): string {
-    let situacion = ''
+    let situacion = "";
     switch (sit) {
       case "ACT":
-        situacion = 'ACTIVO'
+        situacion = "ACTIVO";
         break;
       case "RCP":
-        situacion = 'RETIRADO CON PENSION'
+        situacion = "RETIRADO CON PENSION";
         break;
       case "RSP":
-        situacion = 'RETIRADO SIN PENSION'
+        situacion = "RETIRADO SIN PENSION";
         break;
       case "INV":
-        situacion = 'INVALIDEZ'
+        situacion = "INVALIDEZ";
         break;
     }
-    return situacion
+    return situacion;
   }
 
+  /**
+   * Generar Unico ID
+   * @returns string
+   */
+  GenerarUnicId(): string {
+    return Math.random().toString(36).substr(2, 18);
+  }
 
-}
-function typeOf(f: any) {
-  throw new Error('Function not implemented.');
-}
+  downloadFile(head, data, filename = "data") {
+    let csvData = this.ConvertToCSV(data, head);
+    //console.log(csvData);
+    let blob = new Blob(["\ufeff" + csvData], {
+      type: "text/csv;charset=utf-8;",
+    });
+    let dwldLink = document.createElement("a");
+    let url = URL.createObjectURL(blob);
+    let isSafariBrowser =
+      navigator.userAgent.indexOf("Safari") != -1 &&
+      navigator.userAgent.indexOf("Chrome") == -1;
+    if (isSafariBrowser) {
+      //if Safari open in new window to save file with random filename.
+      dwldLink.setAttribute("target", "_blank");
+    }
+    dwldLink.setAttribute("href", url);
+    dwldLink.setAttribute("download", filename + ".csv");
+    dwldLink.style.visibility = "hidden";
+    document.body.appendChild(dwldLink);
+    dwldLink.click();
+    document.body.removeChild(dwldLink);
+  }
 
+  ConvertToCSV(objArray, headerList) {
+    let array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
+    let str = "";
+    let row = "No,";
+
+    for (let index in headerList) {
+      console.log(index, headerList)
+      row += headerList[index] + ",";
+    }
+    console.log(row)
+    row = row.slice(0, -1);
+    str += row + "\r\n";
+
+    for (let i = 0; i < array.length; i++) {
+      let line = i + 1 + "";
+      for (let index in headerList) {
+        let head = headerList[index];
+        line += "," + array[i][head];
+      }
+      str += line + "\r\n";
+    }
+    return str;
+  }
+}

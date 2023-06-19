@@ -15,6 +15,7 @@ import { UtilService } from "src/app/services/util/util.service";
 import { FormGroup, FormControl } from "@angular/forms";
 import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
+import { AngularEditorConfig } from "@kolkov/angular-editor";
 
 interface ITipoResolucion {
   codigo: string;
@@ -159,6 +160,10 @@ export class RsconsultaComponent implements OnInit {
 
   public lstEntradas: any;
   public lstIPSFA = []; //Objeto Comando
+  public archivos = [];
+  public lstCausa = []; //Objeto Comando
+  public lstMotivo = []; //Objeto Comando
+  public lstDetalle = []; //Objeto Comando
 
   public xasunto: string = "";
   public tipo: any;
@@ -175,29 +180,68 @@ export class RsconsultaComponent implements OnInit {
 
   public carpeta: string = "";
   public nombre: string = "";
+  public grado: string = "%";
+  public componente: string = "%";
+  public categoria: string = "%";
+  public asunto: string = "";
+  public causa: string = "%";
+  public instrucciones: string = "";
+  public observaciones: string = "";
+
+  public blNombramiento: boolean = false;
+  public blCorregir: boolean = false;
+  public blReserva: boolean = false;
+  public blReservaAux: boolean = false;
+  public blComision: boolean = false;
+  public blComisionAux: boolean = false;
+  public blExtender: boolean = false;
+  public blAscenso: boolean = false;
+  public blReconocer: boolean = false;
+  public blCategoria: boolean = false;
+  public blComponente: boolean = false;
+  public blAceptar: boolean = false;
+  public blAlert: boolean = false;
+  public blFiltro: boolean = true;
 
   public busqueda: string = "0";
+  public campos: string = "0";
 
   public total: number = 0;
   public cantNombre: number = 0;
+  public codigoSession: string = "";
+
+  public maxCol = "12";
+  public maxColComision = "6";
+  public color = "#e3e6e6";
 
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
   selected = new FormControl(0);
+  public csvHead : any
+
+  editorConfig: AngularEditorConfig = {
+    editable: true,
+    spellcheck: true,
+    enableToolbar: false,
+    showToolbar: false,
+    placeholder: "",
+  };
 
   constructor(
     private apiService: ApiService,
     private utilService: UtilService,
     private loginService: LoginService,
     private ngxService: NgxUiLoaderService,
+    private toastrService: ToastrService,
     public formatter: NgbDateParserFormatter,
     private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
     if (this.loginService.Usuario.token != undefined) {
-      let tk = this.loginService.Usuario.token
-      this.blConfidencial = tk=="Confidencial" || tk=="Administrador" ? true : false
+      let tk = this.loginService.Usuario.token;
+      this.blConfidencial =
+        tk == "Confidencial" || tk == "Administrador" ? true : false;
     }
     this.Componentes =
       sessionStorage.getItem("MPPD_CComponente") != undefined
@@ -257,6 +301,8 @@ export class RsconsultaComponent implements OnInit {
       map((value) => (typeof value === "string" ? value : value?.name)),
       map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
     );
+
+    this.codigoSession = this.utilService.GenerarUnicId();
   }
 
   displayFn(tr: ITipoResolucion): string {
@@ -359,13 +405,16 @@ export class RsconsultaComponent implements OnInit {
               data.Cuerpo[0].entradas != ""
             ) {
               this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse();
+              //console.log(this.lstEntradas);
             }
+            this.cargarGradosIPSFA(this.Resolucion.n_componente);
+            this.IDatosBasicos = data.Cuerpo[0];
+            this.dbDatos = true;
           }
-          this.cargarGradosIPSFA(this.Resolucion.n_componente);
-          this.IDatosBasicos = data.Cuerpo[0];
+          
 
           this.ngxService.stopLoader("loader-buscar");
-          this.dbDatos = true;
+          
         },
         (error) => {
           console.error("Error de conexion a los datos ", error);
@@ -400,7 +449,6 @@ export class RsconsultaComponent implements OnInit {
   }
 
   obtenerUbicacion(e: any) {
-    
     let anio = e.fecha_resolucion;
     let codigo = e.numero;
     if (e.distribucion == 2) {
@@ -471,35 +519,212 @@ export class RsconsultaComponent implements OnInit {
     this.dbResolucionFil = false;
     this.dbResolucionTipo = false;
     this.ngxService.startLoader("loader-buscar");
-    this.xAPI.funcion =
-      this.busqueda == "1"
-        ? "MPPD_CResolucionesRangoTipo"
-        : "MPPD_CResolucionesRango";
+    var asunto = this.asunto == "" ? "%" : "%" + this.asunto + "%";
+    var grado = this.grado == "" ? "%" : "%" + this.grado + "%";
+    var componente = this.componente == "" ? "%" : "%" + this.componente + "%";
+    var categoria = this.categoria == "" ? "%" : "%" + this.categoria + "%";
+    var instrucciones =
+      this.instrucciones == "" ? "%" : "%" + this.instrucciones + "%";
+    var observaciones =
+      this.observaciones == "" ? "%" : "%" + this.observaciones + "%";
+    var causa = this.causa == "" ? "%" : "%" + this.causa + "%";
+
+    this.xAPI.funcion = "MPPD_CResolucionesRangoTipo";
+    codigo =
+      "AND rs.asunto LIKE '" +
+      asunto +
+      "' AND rs.instrucciones LIKE '" +
+      instrucciones +
+      "' AND  rs.observacion LIKE '" +
+      observaciones +
+      "' AND  rs.cod_solicitud LIKE '" +
+      causa +
+      "'";
+
+    if (this.busqueda != "1") {
+      this.xAPI.funcion = "MPPD_CResolucionesRango";
+      codigo +=
+        " AND db.cod_grado LIKE '" +
+        grado +
+        "' AND db.cod_componente LIKE '" +
+        componente +
+        "' AND db.cod_categoria LIKE '" +
+        categoria +
+        "'";
+    }
+
     if (this.tipo != undefined) {
       if (this.tipo.codigo != undefined)
-        codigo = "AND rs.cod_tipo_resol = " + this.tipo.codigo;
+        codigo += " AND rs.cod_tipo_resol = " + this.tipo.codigo;
     }
+
     this.xAPI.parametros = desde + "," + hasta + "," + codigo;
     this.xAPI.valores = "";
+    //console.log(this.xAPI.parametros)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
-        console.log(data);
+        //console.log(data);
+        this.csvHead = data.Cabecera
         this.resolucion = desde + " - " + hasta + " : " + data.Cuerpo.length;
         this.ngxService.stopLoader("loader-buscar");
         if (this.busqueda == "1") {
           this.lstResolucionesTipo = data.Cuerpo;
           this.dbResolucionTipo = true;
+          this.blFiltro = false;
           this.lstResolucionesTipo.forEach((e) => {
             this.total += parseInt(e.cantidad);
           });
         } else {
           this.lstResolucionesX = data.Cuerpo;
           this.dbResolucionFil = true;
+          this.blFiltro = false;
         }
+        this.asunto = "";
       },
       (error) => {
         console.error("Error de conexion a los datos ", error);
         this.ngxService.stopLoader("loader-buscar");
+      }
+    );
+  }
+
+  MostrarFiltro() {
+    this.blFiltro = true;
+    this.dbResolucionFil = false;
+    this.dbResolucionTipo = false;
+  }
+
+  seleccionTipo() {
+    this.desactivarVista();
+
+    if (typeof this.tipo != "object") return;
+    console.log(this.tipo);
+    this.IResolucion.tipo = this.tipo.codigo;
+    let rs = this.tipo;
+    let valor = true;
+    switch (parseInt(rs.tipo)) {
+      case 1:
+        this.blNombramiento = true;
+        this.maxCol = "6";
+        //this.viewUnidad()
+        break;
+      case 2:
+        this.maxCol = "12";
+        this.getCausa(rs.codigo);
+
+        break;
+      case 3:
+        this.maxCol = "6";
+        this.blCorregir = true;
+        break;
+
+      case 4:
+        this.maxCol = "6";
+        this.blComision = true;
+        this.maxColComision = "6";
+        this.getAdministracion(rs.codigo);
+        break;
+      case 5:
+        this.maxCol = "6";
+        this.blCorregir = true;
+        this.blExtender = true;
+        break;
+      case 6:
+        this.maxCol = "12";
+        this.maxColComision = "4";
+        this.blComision = true;
+        this.blComisionAux = true;
+        break;
+      case 7:
+        this.maxCol = "4";
+        // this.seleccionarGradosIPSFA(this.Resolucion.n_grado)
+        this.blAscenso = true;
+        break;
+      case 8:
+        this.maxCol = "5";
+        this.blReconocer = true;
+        break;
+      case 9:
+        this.maxCol = "6";
+        this.blCategoria = true;
+        break;
+      case 10:
+        this.maxCol = "6";
+        this.blComponente = true;
+        break;
+      default:
+        break;
+    }
+
+    this.blAceptar = valor;
+  }
+
+  desactivarVista() {
+    this.blCorregir = false;
+    this.blNombramiento = false;
+    this.blReserva = false;
+    this.blReservaAux = false;
+    this.blComision = false;
+    this.blComisionAux = false;
+    this.blExtender = false;
+    this.blAscenso = false;
+    this.blReconocer = false;
+    this.blCategoria = false;
+    this.blComponente = false;
+  }
+
+  getAdministracion(id: string) {
+    this.lstCausa = [];
+    this.xAPI.funcion = "MPPD_CCausaResolucion";
+    this.ngxService.startLoader("loader-buscar");
+    this.xAPI.parametros = id;
+    this.xAPI.valores = "";
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstCausa = data.Cuerpo;
+        this.ngxService.stopLoader("loader-buscar");
+      },
+      (err) => {
+        console.error(err);
+      }
+    );
+  }
+
+  getCausa(id: string) {
+    this.lstCausa = [];
+    this.lstMotivo = [];
+    this.xAPI.funcion = "MPPD_CCausaResolucion";
+    this.ngxService.startLoader("loader-buscar");
+    this.xAPI.parametros = id;
+    this.xAPI.valores = "";
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstCausa = data.Cuerpo;
+        this.ngxService.stopLoader("loader-buscar");
+        //
+      },
+      (err) => {
+        console.error(err);
+      }
+    );
+  }
+
+  getMotivo() {
+    this.lstMotivo = [];
+    this.xAPI.funcion = "MPPD_CMotivoResolucion";
+    this.ngxService.startLoader("loader-buscar");
+    this.xAPI.parametros = this.IResolucion.causa.toString();
+    this.xAPI.valores = "";
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstMotivo = data.Cuerpo;
+        this.ngxService.stopLoader("loader-buscar");
+      },
+      (err) => {
+        console.error(err);
       }
     );
   }
@@ -549,5 +774,26 @@ export class RsconsultaComponent implements OnInit {
     return (
       "https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/" + id + "/foto.jpg"
     );
+  }
+
+  fileSelected(e) {
+    this.archivos.push(e.target.files[0]);
+  }
+
+  async SubirArchivo(e) {
+    this.ngxService.startLoader("loader-aceptar");
+    var frm = new FormData(document.forms.namedItem("forma"));
+    try {
+      await this.apiService.EnviarArchivos(frm).subscribe((data) => {
+        console.log("Control", data);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  downloadCSV() {
+    let head = this.csvHead.map(e => {return e.nombre});
+    this.utilService.downloadFile(head, this.lstResolucionesX, "RP-");
   }
 }
