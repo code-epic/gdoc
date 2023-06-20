@@ -796,4 +796,30 @@ export class RsconsultaComponent implements OnInit {
     let head = this.csvHead.map(e => {return e.nombre});
     this.utilService.downloadFile(head, this.lstResolucionesX, "RP-");
   }
+
+  dwUrl(e) {
+
+    let anio = e.fecha_resolucion;
+    let codigo = e.numero;
+    if (e.distribucion == 2) {
+      codigo = e.numero + " NO PUBLICAR";
+    } else {
+      codigo = e.numero;
+    }
+
+    anio = anio.substring(0, 4);
+    this.UbicacionCarpetas.forEach((e) => {
+      if (e.anio == anio) {
+        let peticion = e.nombre+ '/' + codigo + ".pdf" 
+        // https://10.190.1.160
+        // this.carpeta = "/cdn/" + e.nombre + "/" + codigo + ".pdf";
+        this.apiService.DwsCdn(peticion)
+        console.log(peticion)
+        return
+      }
+    });
+
+    //return this.carpeta
+    
+  }
 }

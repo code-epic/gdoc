@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Injectable, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 
 import { ActivatedRoute, Router } from '@angular/router'
-import { NgbModal, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 
 import Swal from 'sweetalert2'
 import { Resolucion } from 'src/app/services/control/documentos.service';
@@ -17,6 +17,16 @@ import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { IDatosBasicos, IResoluciones } from 'src/app/services/resoluciones/resolucion.service';
 import { ToastrService } from 'ngx-toastr';
+
+import {
+	NgbCalendar,
+	NgbDateAdapter,
+	NgbDateParserFormatter,
+	NgbDatepickerModule,
+	NgbDateStruct,
+} from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
+import { JsonPipe } from '@angular/common';
 
 
 
@@ -36,11 +46,62 @@ export interface IConfiguracion {
 }
 
 
+/**
+ * This Service handles how the date is represented in scripts i.e. ngModel.
+ */
+@Injectable()
+export class CustomAdapter extends NgbDateAdapter<string> {
+	readonly DELIMITER = '-';
+
+	fromModel(value: string | null): NgbDateStruct | null {
+		if (value) {
+			const date = value.split(this.DELIMITER);
+			return {
+				day: parseInt(date[0], 10),
+				month: parseInt(date[1], 10),
+				year: parseInt(date[2], 10),
+			};
+		}
+		return null;
+	}
+
+	toModel(date: NgbDateStruct | null): string | null {
+		return date ? date.day + this.DELIMITER + date.month + this.DELIMITER + date.year : null;
+	}
+}
+
+/**
+ * This Service handles how the date is rendered and parsed from keyboard i.e. in the bound input field.
+ */
+@Injectable()
+export class CustomDateParserFormatter extends NgbDateParserFormatter {
+	readonly DELIMITER = '/';
+
+	parse(value: string): NgbDateStruct | null {
+		if (value) {
+			const date = value.split(this.DELIMITER);
+			return {
+				day: parseInt(date[0], 10),
+				month: parseInt(date[1], 10),
+				year: parseInt(date[2], 10),
+			};
+		}
+		return null;
+	}
+
+	format(date: NgbDateStruct | null): string {
+		return date ? date.day + this.DELIMITER + date.month + this.DELIMITER + date.year : '';
+	}
+}
 
 @Component({
   selector: 'app-oresoluciones',
   templateUrl: './oresoluciones.component.html',
-  styleUrls: ['./oresoluciones.component.scss']
+  styleUrls: ['./oresoluciones.component.scss'],
+  providers: [
+		{ provide: NgbDateAdapter, useClass: CustomAdapter },
+		{ provide: NgbDateParserFormatter, useClass: CustomDateParserFormatter },
+	],
 })
 
 
@@ -48,6 +109,7 @@ export interface IConfiguracion {
 
 export class OresolucionesComponent implements OnInit {
 
+  
 
   editorConfig: AngularEditorConfig = {
     editable: true,
@@ -254,6 +316,8 @@ export class OresolucionesComponent implements OnInit {
   public blComponente: boolean = false
   public blAceptar: boolean = false
   public blAlert: boolean = false
+  public blCalendar: boolean = false
+  
 
   public foto_cedula: string = ''
 
@@ -303,6 +367,11 @@ export class OresolucionesComponent implements OnInit {
   public maxCol = "12"
   public maxColComision = "6"
   public color = "#e3e6e6";
+  
+  model1: string;
+	model2: string;
+
+
 
 
   constructor(private apiService: ApiService,
@@ -314,6 +383,7 @@ export class OresolucionesComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
     private _snackBar: MatSnackBar,
+    private ngbCalendar: NgbCalendar, private dateAdapter: NgbDateAdapter<string>,
     private ruta: Router) { }
 
   ngOnInit(): void {
@@ -350,7 +420,13 @@ export class OresolucionesComponent implements OnInit {
     );
 
   }
+	get today() {
+		return this.dateAdapter.toModel(this.ngbCalendar.getToday())!;
+	}
 
+  activarCalendar(){
+    this.blCalendar = true
+  }
 
   atras() {
     this.searchView = 'none'
@@ -530,14 +606,21 @@ export class OresolucionesComponent implements OnInit {
 
   seleccionTipo() {
 
+   
     this.desactivarVista()
     if (this.IResolucion.cedula == "") {
       this._snackBar.open("Debe seleccionar una cedula", "OK");
       return
     }
 
+    if (this.fecha_resolucion == "") {
+      this._snackBar.open("Debe seleccionar una fecha para continuar", "OK");
+      return
+    }
+
+    let fin = this.utilService.SumarAnios( this.fecha_resolucion , 1)
+
     if (typeof (this.tipo) != 'object') return
-    console.log(this.tipo)
     this.IResolucion.tipo = this.tipo.codigo
     let rs = this.tipo
     let valor = true
@@ -564,6 +647,8 @@ export class OresolucionesComponent implements OnInit {
         break;
 
       case 4:
+        this.comision_inicio = this.fecha_resolucion
+        this.comision_fin = fin
         this.maxCol = "6"
         this.blComision = true
         this.maxColComision = "6"

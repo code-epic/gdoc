@@ -86,9 +86,17 @@ export class UtilService {
   //Recibe  Fecha Formato: DD/MM/AAAA
   //Retorna Fecha Formato: AAAA-MM-DD
   ConvertirFechaDia(f: any) {
+    var faux = ''
     if (typeof f != "object") {
-      return "1900-01-01";
+      faux = "1900-01-01"
+      if (f != "") {
+        var fx = f.split("/");
+        faux = fx[2] + "-" + fx[1] + "-" + fx[0];
+      }
+
+      return faux;
     }
+
 
     var ISODate = new Date(f).toISOString();
     var fe = ISODate.substr(0, 10);
@@ -98,6 +106,18 @@ export class UtilService {
     } else {
       return "1900-01-01";
     }
+  }
+
+  SumarAnios(f: any, cant : number) : string {
+    
+    var fx = f.split("-");
+    let num = parseInt(fx[2]) + 1;
+
+    console.log(f, fx, ' --> aunque digan ', num )
+    let cadena = fx[0] + "/" + fx[1] + "/" + num.toString()
+    console.info(cadena)
+    return cadena
+  
   }
 
   //Recibe  Fecha Formato: DD/MM/AAAA
@@ -232,10 +252,10 @@ export class UtilService {
     let row = "No,";
 
     for (let index in headerList) {
-      console.log(index, headerList)
+      console.log(index, headerList);
       row += headerList[index] + ",";
     }
-    console.log(row)
+    console.log(row);
     row = row.slice(0, -1);
     str += row + "\r\n";
 

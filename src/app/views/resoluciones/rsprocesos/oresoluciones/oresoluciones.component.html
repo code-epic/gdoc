@@ -203,10 +203,13 @@
                         <div class="col-md-4">
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha (*)</mat-label>
-                                <input matInput [matDatepicker]="picker" [(ngModel)]="fecha_resolucion"
-                                [ngModelOptions]="{standalone: true}">
-                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                <mat-datepicker #picker></mat-datepicker>
+                                <input matInput placeholder="Fecha de resolucion" 
+                                [ngModelOptions]="{standalone: true}"  ngbDatepicker  #fo="ngbDatepicker" 
+                                [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="fecha_resolucion">
+                                <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button"
+                                id="fori" >edit_calendar</mat-icon>
+
+                                
                             </mat-form-field>
                         </div>
                     </div>
@@ -270,10 +273,13 @@
                         <div class="col-md-4" *ngIf='blAscenso'>
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha del Ascenso ( * )</mat-label>
-                                <input matInput [matDatepicker]="xpicker" [(ngModel)]="ultimo_ascenso" 
-                                [ngModelOptions]="{standalone: true}">
-                                <mat-datepicker-toggle matSuffix [for]="xpicker"></mat-datepicker-toggle>
-                                <mat-datepicker #xpicker></mat-datepicker>
+
+                                <input matInput placeholder="Fecha del Ascenso" 
+                                [ngModelOptions]="{standalone: true}"  ngbDatepicker  #fox="ngbDatepicker" 
+                                [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="ultimo_ascenso">
+                                <mat-icon matSuffix #buttonEl (click)="fox.toggle()" type="button"
+                                id="forix" >edit_calendar</mat-icon>
+
                             </mat-form-field>
                         </div>
 
@@ -305,10 +311,11 @@
                         <div class="col-md-4" *ngIf='blReconocer'>
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha Ultimo Ascenso (*)</mat-label>
-                                <input matInput [matDatepicker]="xpickers" [(ngModel)]="ultimo_ascenso"
-                                [ngModelOptions]="{standalone: true}">
-                                <mat-datepicker-toggle matSuffix [for]="xpickers"></mat-datepicker-toggle>
-                                <mat-datepicker #xpickers></mat-datepicker>
+                                <input matInput placeholder="Fecha del Ascenso" 
+                                [ngModelOptions]="{standalone: true}"  ngbDatepicker  #fox="ngbDatepicker" 
+                                [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="ultimo_ascenso">
+                                <mat-icon matSuffix #buttonEl (click)="fox.toggle()" type="button"
+                                id="forix" >edit_calendar</mat-icon>
                             </mat-form-field>
                         </div>
 
@@ -429,18 +436,29 @@
                         <div class="col-md-{{maxColComision}}">
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha Inicio(*)</mat-label>
-                                <input matInput [matDatepicker]="fipicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_inicio" >
+                                <!-- <input matInput [matDatepicker]="fipicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_inicio" >
                                 <mat-datepicker-toggle matSuffix [for]="fipicker"></mat-datepicker-toggle>
-                                <mat-datepicker #fipicker></mat-datepicker>
+                                <mat-datepicker #fipicker></mat-datepicker> -->
+                                <input matInput placeholder="Fecha Inicio" 
+                                [ngModelOptions]="{standalone: true}"  ngbDatepicker  #foxx="ngbDatepicker" 
+                                [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="comision_inicio">
+                                <mat-icon matSuffix #buttonEl (click)="foxx.toggle()" type="button"
+                                id="forix" >edit_calendar</mat-icon>
                             </mat-form-field>
                         </div>
 
                         <div class="col-md-{{maxColComision}}">
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha Fin(*)</mat-label>
-                                <input matInput [matDatepicker]="ffpicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_fin" >
+                                <!-- <input matInput [matDatepicker]="ffpicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_fin" >
                                 <mat-datepicker-toggle matSuffix [for]="ffpicker"></mat-datepicker-toggle>
-                                <mat-datepicker #ffpicker></mat-datepicker>
+                                <mat-datepicker #ffpicker></mat-datepicker> -->
+                                <input matInput placeholder="Fecha Fin" 
+                                [ngModelOptions]="{standalone: true}"  ngbDatepicker  #foxxx="ngbDatepicker" 
+                                [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="comision_fin">
+                                <mat-icon matSuffix #buttonEl (click)="foxxx.toggle()" type="button"
+                                id="forix" >edit_calendar</mat-icon>
+                                
                             </mat-form-field>
                         </div>
                         

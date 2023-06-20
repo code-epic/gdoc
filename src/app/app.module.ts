@@ -37,7 +37,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { NgxUiLoaderModule, NgxUiLoaderConfig } from "ngx-ui-loader";
 
-import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatCommonModule, MatNativeDateModule } from '@angular/material/core';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatCommonModule, MatNativeDateModule } from '@angular/material/core';
 
 import { ConfiguracionComponent } from './views/control/configuracion/configuracion.component';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
@@ -70,7 +70,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule } from '@angular/material-moment-adapter';
 
 
 import { RstranscripcionComponent } from './views/resoluciones/rstranscripcion/rstranscripcion.component';
@@ -246,8 +245,9 @@ const ngWizardConfig: NgWizardConfig = {
       useValue: CustomPaginator()
     },
     {
-      provide: MAT_DATE_LOCALE, useValue: 'en-GB'
+      provide: MAT_DATE_LOCALE, useValue: 'es-ES'
     },
+    
   ],
   bootstrap: [AppComponent]
 })
