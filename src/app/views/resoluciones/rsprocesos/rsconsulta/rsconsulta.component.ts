@@ -73,69 +73,70 @@ export class RsconsultaComponent implements OnInit {
   public IResolucion: IResoluciones = {
     grado: 0,
     anio: 0,
-    asunto: "",
-    cedula: "",
+    asunto: '',
+    cedula: '',
     pais: 0,
     reserva: 0,
     solicitud: 0,
     tipo: 0,
     unidad: 0,
-    comando: "",
-    comision_fin: "",
-    comision_inicio: "",
-    creador: "",
-    destino: "",
+    comando: '',
+    comision_fin: '',
+    comision_inicio: '',
+    creador: '',
+    destino: '',
     dia: 0,
-    distribucion: "",
+    distribucion: '',
     estatus: 0,
-    modificado: "",
-    fecha_termino: "",
-    falta: "",
-    registro: "",
-    fecha_resolucion: "",
-    formato: "",
-    ultimo_ascenso: "",
-    instrucciones: "",
+    modificado: '',
+    fecha_termino: '',
+    falta: '',
+    registro: '',
+    fecha_resolucion: '',
+    formato: '',
+    ultimo_ascenso: '',
+    instrucciones: '',
     mes: 0,
-    autor_modificar: "",
-    motivo: "",
-    numero: "",
-    observacion: "",
+    autor_modificar: '',
+    motivo: '',
+    numero: '',
+    observacion: '',
     orden_merito: 0,
-    otro_resuelto: "",
-    autor_registro: "",
+    otro_resuelto: '',
+    autor_registro: '',
     termino: 0,
-    unidad_texto: "",
+    unidad_texto: '',
     documento: 0,
     causa: 0,
+    archivo: ''
   };
 
   public Resolucion: Resolucion = {
-    id: "",
-    cuenta: "",
-    unidad: "",
-    fecha_doc: "",
+    id: '',
+    cuenta: '',
+    unidad: '',
+    fecha_doc: '',
     tipo: {},
-    cedula: "",
-    nombres: "",
-    fecha_nacimiento: "",
-    componente: "",
-    categoria: "",
-    clasificacion: "",
-    grado: "",
-    carpeta: "",
-    estatus: "",
-    entrada: "",
-    asunto: "",
-    observacion: "",
-    responsable: "",
-    cargo_responsable: "",
-    situacion: "",
-    sexo: "",
-    numero: "",
-    gran_comando: "",
-    unidad_comando: "",
-    instrucciones: "",
+    cedula: '',
+    nombres: '',
+    fecha_nacimiento: '',
+    componente: '',
+    categoria: '',
+    clasificacion: '',
+    grado: '',
+    carpeta: '',
+    estatus: '',
+    entrada: '',
+    asunto: '',
+    observacion: '',
+    responsable: '',
+    cargo_responsable: '',
+    situacion: '',
+    sexo: '',
+    numero: '',
+    gran_comando: '',
+    unidad_comando: '',
+    instrucciones: '',
     n_componente: 0,
     n_grado: 0,
   };
@@ -165,9 +166,9 @@ export class RsconsultaComponent implements OnInit {
   public lstMotivo = []; //Objeto Comando
   public lstDetalle = []; //Objeto Comando
 
-  public xasunto: string = "";
+  public xasunto: string = '';
   public tipo: any;
-  public nombramiento: string = "";
+  public nombramiento: string = '';
 
   public dbDatos: boolean = false;
   public dbResolucion: boolean = false;
@@ -178,15 +179,15 @@ export class RsconsultaComponent implements OnInit {
 
   public dbTools: boolean = false;
 
-  public carpeta: string = "";
-  public nombre: string = "";
+  public carpeta: string = '';
+  public nombre: string = '';
   public grado: string = "%";
   public componente: string = "%";
   public categoria: string = "%";
-  public asunto: string = "";
+  public asunto: string = '';
   public causa: string = "%";
-  public instrucciones: string = "";
-  public observaciones: string = "";
+  public instrucciones: string = '';
+  public observaciones: string = '';
 
   public blNombramiento: boolean = false;
   public blCorregir: boolean = false;
@@ -205,10 +206,11 @@ export class RsconsultaComponent implements OnInit {
 
   public busqueda: string = "0";
   public campos: string = "0";
+  public dwCedula: string = '';
 
   public total: number = 0;
   public cantNombre: number = 0;
-  public codigoSession: string = "";
+  public codigoSession: string = '';
 
   public maxCol = "12";
   public maxColComision = "6";
@@ -224,7 +226,7 @@ export class RsconsultaComponent implements OnInit {
     spellcheck: true,
     enableToolbar: false,
     showToolbar: false,
-    placeholder: "",
+    placeholder: '',
   };
 
   constructor(
@@ -297,7 +299,7 @@ export class RsconsultaComponent implements OnInit {
     });
 
     this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(""),
+      startWith(''),
       map((value) => (typeof value === "string" ? value : value?.name)),
       map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
     );
@@ -306,7 +308,7 @@ export class RsconsultaComponent implements OnInit {
   }
 
   displayFn(tr: ITipoResolucion): string {
-    return tr && tr.nombre ? tr.nombre : "";
+    return tr && tr.nombre ? tr.nombre : '';
   }
 
   private _filter(name: string): ITipoResolucion[] {
@@ -321,7 +323,7 @@ export class RsconsultaComponent implements OnInit {
     if (e.keyCode == 13) {
       this.xAPI.funcion = "MPPD_CUnidad";
       this.xAPI.parametros = this.cedula;
-      this.xAPI.valores = "";
+      this.xAPI.valores = '';
 
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
@@ -337,12 +339,12 @@ export class RsconsultaComponent implements OnInit {
   verificar() {
     this.dbDatos = false;
     this.dbResolucion = false;
-    this.resolucion = "";
-    if (this.cedula != "") {
+    this.resolucion = '';
+    if (this.cedula != '') {
       this.consultarCedula(undefined);
       return false;
     }
-    if (this.IResolucion.numero != "") {
+    if (this.IResolucion.numero != '') {
       this.consultarResolucion(undefined);
       return false;
     }
@@ -365,16 +367,17 @@ export class RsconsultaComponent implements OnInit {
       this.dbDatos = false;
       this.dbResolucion = false;
 
-      if (this.cedula == "") return false;
+      if (this.cedula == '') return false;
 
       this.ngxService.startLoader("loader-buscar");
       this.xAPI.funcion = "MPPD_CDatosBasicos";
       this.xAPI.parametros = this.cedula;
-      this.xAPI.valores = "";
+      this.xAPI.valores = '';
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          this.cedula = "";
-          console.log(data);
+          this.dwCedula = this.cedula
+          this.cedula = '';
+         
           if (data != undefined && data.Cuerpo.length > 0) {
             this.Resolucion = data.Cuerpo[0];
 
@@ -393,16 +396,17 @@ export class RsconsultaComponent implements OnInit {
 
             if (
               data.Cuerpo[0].resoluciones != undefined &&
-              data.Cuerpo[0].resoluciones != ""
+              data.Cuerpo[0].resoluciones != ''
             ) {
               this.lstResoluciones = JSON.parse(
                 data.Cuerpo[0].resoluciones
               ).reverse();
               this.filtrarNombramiento();
             }
+            console.log(this.lstResoluciones);
             if (
               data.Cuerpo[0].entradas != undefined &&
-              data.Cuerpo[0].entradas != ""
+              data.Cuerpo[0].entradas != ''
             ) {
               this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse();
               //console.log(this.lstEntradas);
@@ -410,6 +414,7 @@ export class RsconsultaComponent implements OnInit {
             this.cargarGradosIPSFA(this.Resolucion.n_componente);
             this.IDatosBasicos = data.Cuerpo[0];
             this.dbDatos = true;
+            this.dbDatosNombre = false
           }
           
 
@@ -439,7 +444,7 @@ export class RsconsultaComponent implements OnInit {
 
   obtenerTipo(tipo: any) {
     // console.log(tipo, this.TipoResoluciones)
-    let texto = "";
+    let texto = '';
     this.TipoResoluciones.forEach((e) => {
       if (e.codigo == tipo) {
         texto = e.nombre;
@@ -798,27 +803,32 @@ export class RsconsultaComponent implements OnInit {
   }
 
   dwUrl(e) {
-
-    let anio = e.fecha_resolucion;
-    let codigo = e.numero;
-    if (e.distribucion == 2) {
-      codigo = e.numero + " NO PUBLICAR";
-    } else {
-      codigo = e.numero;
-    }
-
-    anio = anio.substring(0, 4);
-    this.UbicacionCarpetas.forEach((e) => {
-      if (e.anio == anio) {
-        let peticion = e.nombre+ '/' + codigo + ".pdf" 
-        // https://10.190.1.160
-        // this.carpeta = "/cdn/" + e.nombre + "/" + codigo + ".pdf";
-        this.apiService.DwsCdn(peticion)
-        console.log(peticion)
-        return
+    if (e.archivo != undefined &&  e.archivo != '') {
+      console.log("R" + this.dwCedula)
+      this.apiService.DwsResol(btoa("R" + this.dwCedula) + '/' + e.archivo)
+    }else{
+      let anio = e.fecha_resolucion;
+      let codigo = e.numero;
+      if (e.distribucion == 2) {
+        codigo = e.numero + " NO PUBLICAR";
+      } else {
+        codigo = e.numero;
       }
-    });
-
+  
+      anio = anio.substring(0, 4);
+      this.UbicacionCarpetas.forEach((e) => {
+        if (e.anio == anio) {
+          let peticion = e.nombre+ '/' + codigo + ".pdf" 
+          // https://10.190.1.160
+          // this.carpeta = "/cdn/" + e.nombre + "/" + codigo + ".pdf";
+          this.apiService.DwsCdn(peticion)
+          console.log(peticion)
+          return
+        }
+      });
+  
+    }
+ 
     //return this.carpeta
     
   }

@@ -85,37 +85,37 @@ export class UtilService {
 
   //Recibe  Fecha Formato: DD/MM/AAAA
   //Retorna Fecha Formato: AAAA-MM-DD
-  ConvertirFechaDia(f: any) {
+  ConvertirFechaDia(f: any) : string {
     var faux = ''
     if (typeof f != "object") {
       faux = "1900-01-01"
-      if (f != "") {
-        var fx = f.split("/");
+      if (f != undefined && f != "") {
+        var fx = f.split("-");
         faux = fx[2] + "-" + fx[1] + "-" + fx[0];
       }
-
       return faux;
+    }else{
+      var ISODate = new Date(f).toISOString();
+      var fe = ISODate.substr(0, 10);
+      var fa = fe.split("-");
+      if (fa[0] != "0001") {
+        return fa[0] + "-" + fa[1] + "-" + fa[2];
+      } else {
+        return "1900-01-01";
+      }
     }
 
 
-    var ISODate = new Date(f).toISOString();
-    var fe = ISODate.substr(0, 10);
-    var fa = fe.split("-");
-    if (fa[0] != "0001") {
-      return fa[0] + "-" + fa[1] + "-" + fa[2];
-    } else {
-      return "1900-01-01";
-    }
+    
   }
 
   SumarAnios(f: any, cant : number) : string {
     
     var fx = f.split("-");
-    let num = parseInt(fx[2]) + 1;
+    let num = parseInt(fx[2]) + cant;
 
-    console.log(f, fx, ' --> aunque digan ', num )
-    let cadena = fx[0] + "/" + fx[1] + "/" + num.toString()
-    console.info(cadena)
+   
+    let cadena = fx[0] + "-" + fx[1] + "-" + num.toString()
     return cadena
   
   }

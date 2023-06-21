@@ -95,6 +95,24 @@ export class ApiService {
     return this.URL + 'dw/' + peticion
   }
 
+  DwsResol(peticion : string){
+    let ruta = this.URL + 'dws/' + peticion
+    console.log(ruta)
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+      }),
+      responseType: 'blob' as 'json'
+    };
+    
+    this.http.get(ruta, httpOptions).subscribe((response: any) => {
+      const blob = new Blob([response], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url);
+    });
+  }
+
 
   DwsCdn(peticion : string){
     let ruta = this.URL + 'dwscdn/' + peticion

@@ -77,9 +77,9 @@
                                     <input matInput placeholder="Cédula" [ngModelOptions]="{standalone: true}"
                                         [(ngModel)]="IResolucion.cedula" value="{{IResolucion.cedula}}"
                                         (blur)="consultarCedula()">
-                                    <mat-icon matSuffix *ngIf="!editar_datos">people</mat-icon>
+                                    <mat-icon matSuffix *ngIf="!editar_datos">person_search</mat-icon>
                                     <mat-icon matSuffix *ngIf="editar_datos" (click)="Seleccionar()"
-                                        class="text-blue">edit</mat-icon>
+                                        class="text-blue">person_search</mat-icon>
                                 </mat-form-field>
                             </div>
                             <div class="form-group col-md-3">
@@ -436,9 +436,6 @@
                         <div class="col-md-{{maxColComision}}">
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha Inicio(*)</mat-label>
-                                <!-- <input matInput [matDatepicker]="fipicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_inicio" >
-                                <mat-datepicker-toggle matSuffix [for]="fipicker"></mat-datepicker-toggle>
-                                <mat-datepicker #fipicker></mat-datepicker> -->
                                 <input matInput placeholder="Fecha Inicio" 
                                 [ngModelOptions]="{standalone: true}"  ngbDatepicker  #foxx="ngbDatepicker" 
                                 [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="comision_inicio">
@@ -450,9 +447,6 @@
                         <div class="col-md-{{maxColComision}}">
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Fecha Fin(*)</mat-label>
-                                <!-- <input matInput [matDatepicker]="ffpicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_fin" >
-                                <mat-datepicker-toggle matSuffix [for]="ffpicker"></mat-datepicker-toggle>
-                                <mat-datepicker #ffpicker></mat-datepicker> -->
                                 <input matInput placeholder="Fecha Fin" 
                                 [ngModelOptions]="{standalone: true}"  ngbDatepicker  #foxxx="ngbDatepicker" 
                                 [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="comision_fin">
@@ -490,19 +484,7 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label> Distribuci&oacute;n </label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="IResolucion.distribucion" >
-                                <option value="0">Seleccione</option>
-                                <option value="1">PUBLICAR</option>
-                                <option value="2">NO PUBLICAR</option>
-                                <option value="3">ENVIADA POR MEDIOS DIGITALES</option>
-                                <option value="4">OTROS</option>
-                            </select>
-                        </div>
-                    </div>
+                 
 
                     <div class="form-row">
                         <div class="form-group col-md-12">
@@ -524,11 +506,44 @@
                         </div>
                     </div>
 
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label> Distribuci&oacute;n </label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="IResolucion.distribucion" >
+                                <option value="0">Seleccione</option>
+                                <option value="1">PUBLICAR</option>
+                                <option value="2">NO PUBLICAR</option>
+                                <option value="3">ENVIADA POR MEDIOS DIGITALES</option>
+                                <option value="4">OTROS</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label> Cargar Archivo  </label>
+                            <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+                                <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="input_container">
+                                            <input (change)="fileSelected($event)" id="fileUpload" type="file" name="archivos" accept=".pdf" />
+                                            
+                                        </div>
+                                    </div>
+                                    <!-- <div class="col-md-3">
+                                        <button class="btn bg-success text-white ">
+                                            <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar
+                                            Archivos </button>
+                                    </div> -->
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <hr>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="text-right">
-                                <button class="btn bg-primary text-white" (click)="guardar()" *ngIf="blAceptar">Aceptar</button>
+                                <button class="btn bg-primary text-white" (click)="SubirArchivo()" *ngIf="blAceptar">Aceptar</button>
                             </div>
                         </div>
                     </div>

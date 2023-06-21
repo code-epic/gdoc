@@ -47,6 +47,7 @@ export interface IResoluciones {
   documento: number
   causa: number
   unidad_texto: string
+  archivo: string
 }
 
 

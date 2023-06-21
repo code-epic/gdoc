@@ -35,11 +35,11 @@
                                         </div>
                                     </a>
                                     <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                                        <a routerLinkActive="active" [routerLink]="['/documento']"
+                                        <!-- <a routerLinkActive="active" [routerLink]="['/documento']"
                                             class="dropdown-item">
                                             <i class="fa fa-plus"></i>
                                             <span>Agregar entrada</span>
-                                        </a>
+                                        </a> -->
                                         <a routerLinkActive="active" [routerLink]="['/rsprocesos/oresoluciones']"
                                             class="dropdown-item">
                                             <i class="fa fa-plus"></i>
@@ -74,19 +74,39 @@
                                     <br>
                                     <div class="container">
 
+                                        <div class="row">
+
+                                            <div class="col-md-9">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Nombre Completo</mat-label>
+                                                    <input matInput placeholder="Nombre completo"
+                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="nombre"
+                                                        (keypress)="consultarNombre($event);">
+                                                    <mat-icon matSuffix>search</mat-icon>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-right" style="padding-top: 5px;">
+                                                    <button class="btn bg-primary text-white" style="height: 50px;"
+                                                        (click)="verificarNombre()">
+                                                        Consultar por nombre
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
 
                                         <div class="row">
 
-                                            <div class="form-group col-md-4">
+                                            <div class="col-md-3">
                                                 <mat-form-field appearance="outline">
                                                     <mat-label>Cédula</mat-label>
                                                     <input matInput placeholder="Cédula"
                                                         [ngModelOptions]="{standalone: true}" [(ngModel)]="cedula"
                                                         (keypress)="consultarCedula($event)">
-                                                    <mat-icon matSuffix>peopel</mat-icon>
+                                                    <mat-icon matSuffix>person_search</mat-icon>
                                                 </mat-form-field>
                                             </div>
-                                            <div class="form-group col-md-3">
+                                            <div class="col-md-3">
                                                 <mat-form-field appearance="outline">
                                                     <mat-label>Numero de resuelto</mat-label>
                                                     <input matInput placeholder="Numero de resuelto"
@@ -95,17 +115,17 @@
                                                         (keypress)="consultarResolucion($event)">
                                                 </mat-form-field>
                                             </div>
-                                            <div class="form-group col-md-3">
+                                            <div class="col-md-3">
                                                 <mat-form-field appearance="outline">
                                                     <mat-label>Numero de Orden General</mat-label>
                                                     <input matInput placeholder="Numero de Orden General">
                                                 </mat-form-field>
                                             </div>
-                                            <div class="col-md-2">
-                                                <div class="text-left" style="padding-top: 5px;">
+                                            <div class="col-md-3">
+                                                <div class="text-right" style="padding-top: 5px;">
                                                     <button class="btn bg-primary text-white" style="height: 50px;"
                                                         (click)="verificar()">
-                                                        Consultar
+                                                        Consultar por caso
 
                                                     </button>
                                                 </div>
@@ -114,7 +134,7 @@
                                         </div>
 
                                         <hr>
-                                        <div class="row" *ngIf="dbTools">
+                                        <!-- <div class="row" *ngIf="dbTools">
                                             <div class="col-md-11">
 
                                             </div>
@@ -128,7 +148,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                                         <div class="row" *ngIf="dbDatos">
                                             <div class="col-md-12">
                                                 <table style="width: 100%;" border="1" class="zigzag">
@@ -184,9 +204,53 @@
                                                 </table>
                                             </div>
                                         </div>
-                                        <br><br>
-                                        <div class="row" *ngIf="dbDatos">
+
+                                        <div class="row" *ngIf="dbDatosNombre">
                                             <div class="col-md-12">
+                                                
+                                                <table style="width: 100%;" class="zigzag" border="1">
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="7" class="text-center" style="padding: 15px;">
+                                                                LISTADO GENERAL POR PERSONA </th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th> NUM.</th>
+                                                            <th> GRADO</th>
+                                                            <th> NOMBRE COMPLETO</th>
+                                                            <th style="width: 110px;"> CEDULA</th>
+                                                            <th style="width: 90px;"> FECHA</th>
+                                                            <th>SITUACION</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let e of lstNombres; index as i">
+                                                            <td>{{ i+1 }}</td>
+                                                            <td>{{ e.grado_abreviado }}</td>
+                                                            <td>{{ e.nombres }}</td>
+                                                            <td><a class="enlace" (click)="MoverForm(e.cedula)"
+                                                                    style="font-weight: bold; color: brown;">
+                                                                    {{e.cedula}} </a>
+                                                            </td>
+                                                            <td>
+                                                                {{e.nacimiento}}
+                                                            </td>
+                                                            <td>
+                                                                {{e.situacion}}
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        
+                                        <div class="row" *ngIf="dbDatos">
+                                            
+                                            <div class="col-md-12">
+                                                <br ><br>
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
                                                         <tr>
@@ -214,9 +278,11 @@
                                             </div>
 
                                         </div>
-                                        <br><br>
+
+                                        
                                         <div class="row" *ngIf="dbDatos">
                                             <div class="col-md-12">
+                                                <br ><br>
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
                                                         <tr>
@@ -304,6 +370,8 @@
                                             </div>
 
                                         </div>
+
+                                        
                                     </div>
 
                                 </mat-tab>
@@ -597,80 +665,18 @@
                                     </div>
 
                                 </mat-tab>
-                                <mat-tab >
+                                <!-- <mat-tab >
                                     <ng-template mat-tab-label>
                                         &nbsp;EXPANDIDA
                                     </ng-template>
                                     <br>
                                     <div class="container">
-                                        <div class="row">
-                                            <div class="col-md-1">
-
-                                            </div>
-                                            <div class="form-group col-md-7">
-                                                <mat-form-field appearance="outline">
-                                                    <mat-label>Nombre Completo</mat-label>
-                                                    <input matInput placeholder="Nombre completo"
-                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="nombre"
-                                                        (keypress)="consultarNombre($event);">
-                                                    <mat-icon matSuffix>search</mat-icon>
-                                                </mat-form-field>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="text-left" style="padding-top: 5px;">
-                                                    <button class="btn bg-primary text-white" style="height: 50px;"
-                                                        (click)="verificarNombre()">
-                                                        Consultar Nombre
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-1">
-
-                                            </div>
-                                        </div>
+                                        
                                         <hr>
 
-                                        <div class="row" *ngIf="dbDatosNombre">
-                                            <div class="col-md-12">
-                                                <table style="width: 100%;" class="zigzag" border="1">
-                                                    <thead>
-                                                        <tr>
-                                                            <th colspan="7" class="text-center" style="padding: 15px;">
-                                                                FICHA DE DATOS POR NOMBRE ( {{cantNombre} }) </th>
-                                                        </tr>
-                                                        <tr>
-                                                            <th> NUM.</th>
-                                                            <th> GRADO</th>
-                                                            <th> NOMBRE COMPLETO</th>
-                                                            <th style="width: 110px;"> CEDULA</th>
-                                                            <th style="width: 90px;"> FECHA</th>
-                                                            <th>SITUACION</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr *ngFor="let e of lstNombres; index as i">
-                                                            <td>{{ i+1 }}</td>
-                                                            <td>{{ e.grado_abreviado }}</td>
-                                                            <td>{{ e.nombres }}</td>
-                                                            <td><a class="enlace" (click)="MoverForm(e.cedula)"
-                                                                    style="font-weight: bold; color: brown;">
-                                                                    {{e.cedula}} </a>
-                                                            </td>
-                                                            <td>
-                                                                {{e.nacimiento}}
-                                                            </td>
-                                                            <td>
-                                                                {{e.situacion}}
-                                                            </td>
-
-                                                        </tr>
-                                                    </tbody>
-
-                                                </table>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
-                                </mat-tab>
+                                </mat-tab> -->
 
                                 <mat-tab *ngIf="blConfidencial">
                                     <ng-template mat-tab-label>
