@@ -263,7 +263,8 @@ export class UtilService {
       let line = i + 1 + "";
       for (let index in headerList) {
         let head = headerList[index];
-        let cadena = array[i][head] + ""
+        let texto = array[i][head] + ""
+        let cadena = head=='numero'? "'" + texto: texto
         line += "|" + cadena.replace(/[\r\n]+/gm, "");
       }
       str += line + "\r\n";

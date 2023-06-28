@@ -571,7 +571,7 @@ export class RsconsultaComponent implements OnInit {
 
     var causa =
       this.causa == "%"
-        ? " AND  rs.cod_solicitud LIKE '%' "
+        ? ""
         : " AND  rs.cod_solicitud LIKE '%" + this.causa + "%'";
 
     var grado =
@@ -618,7 +618,7 @@ export class RsconsultaComponent implements OnInit {
     //console.log(this.xAPI.parametros)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
-        //console.log(data);
+        console.log(data);
         this.csvHead = data.Cabecera;
         this.resolucion = desde + " - " + hasta + " : " + data.Cuerpo.length;
         this.ngxService.stopLoader("loader-buscar");
@@ -1002,11 +1002,10 @@ export class RsconsultaComponent implements OnInit {
     switch (valor) {
       case "ACT":
         return "ACTIVO";
-      case "RCP":
-        return "RETIRADO CON PENSION";
-      case "RSP":
-        return "RETIRADO SIN PENSION";
-
+      case "RACT":
+        return "RESERVA ACTIVA";
+      case "CEMP":
+        return "CESE DE EMPLEO";
       default:
         return "SIN ASIGNAR";
     }

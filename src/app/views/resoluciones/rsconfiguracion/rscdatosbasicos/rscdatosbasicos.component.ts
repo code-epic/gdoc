@@ -411,12 +411,12 @@ export class RscdatosbasicosComponent implements OnInit {
     }
     this.ngxService.startLoader("loader-aceptar");
 
-    this.DBasico.fecha =
-      this.DBasico.fecha != "" ? this.DBasico.fecha : "1900-01-01";
+    this.DBasico.fecha = this.DBasico.fecha != "" ? this.DBasico.fecha : "1900-01-01";
     let funcion = "MPPD_IDatosBasicos";
     if (this.dbActivar) funcion = "MPPD_UDatosBasicos";
     this.xAPI.funcion = funcion;
     this.xAPI.parametros = "";
+    this.SituacionMilitar()
     this.xAPI.valores = JSON.stringify(this.DBasico);
     console.log(this.xAPI);
     console.log(this.DBasico);
@@ -436,6 +436,18 @@ export class RscdatosbasicosComponent implements OnInit {
     );
   }
 
+  SituacionMilitar(){
+    switch (this.DBasico.situacion) {
+      case 'RSP' && 'RCP' && 'INV':
+        this.DBasico.situacion = "RACT"
+        break;
+      case 'ACT':
+        this.DBasico.situacion = "ACT"
+      
+    }  
+    
+    
+  }
   seleccionColor() {
     switch (this.DBasico.condicion.toString()) {
       case '1':

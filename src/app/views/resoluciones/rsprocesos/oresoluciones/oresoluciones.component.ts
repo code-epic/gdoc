@@ -769,6 +769,7 @@ export class OresolucionesComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data)
         this.lstCausa = data.Cuerpo;
 
         this.blReserva = true;
@@ -785,16 +786,17 @@ export class OresolucionesComponent implements OnInit {
     this.lstMotivo = [];
     this.xAPI.funcion = "MPPD_CMotivoResolucion";
     this.ngxService.startLoader("loader-buscar");
-    this.xAPI.parametros = this.IResolucion.causa.toString();
+    this.xAPI.parametros = this.IResolucion.solicitud.toString();
     this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data)
         this.lstMotivo = data.Cuerpo;
 
         this.blReserva = true;
         this.ngxService.stopLoader("loader-buscar");
-        if (this.IResolucion.causa.toString() == "7") this.blReservaAux = true;
+        if (this.IResolucion.solicitud.toString() == "7") this.blReservaAux = true;
       },
       (err) => {
         console.error(err);
@@ -959,6 +961,8 @@ export class OresolucionesComponent implements OnInit {
 
     this.ngxService.startLoader("loader-aceptar");
     var frm = new FormData(document.forms.namedItem("forma"));
+    console.log(this.IResolucion)
+    
     try {
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
         this.evaluarDatos();
@@ -973,9 +977,33 @@ export class OresolucionesComponent implements OnInit {
         document.forms.namedItem("forma").reset();
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
-            this.aceptar("");
-            this.ngxService.stopLoader("loader-aceptar");
-            this.resetearFechas(true);
+            let tipo = this.IResolucion.tipo.toString()
+            if( tipo == '9' || tipo == '10'){
+              let datosBasicos = {
+                "cedula": this.IResolucion.cedula,
+                "situacion": tipo =='9'? 'CEMP':'RACT'
+              }
+              this.xAPI.funcion = "MPPD_UDatosBasicosSituacion";
+              this.xAPI.parametros = "";
+              this.xAPI.valores = JSON.stringify(datosBasicos);
+              this.apiService.Ejecutar(this.xAPI).subscribe(
+                (data) => {
+                  this.ngxService.stopLoader("loader-aceptar");
+                  this.resetearFechas(true);
+                  this.aceptar("");
+                },
+                (errot) => {
+                      this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`);
+                      this.ngxService.stopLoader("loader-aceptar");
+                      this.ruta.navigate(["/rsprocesos"]);
+                    }
+                );
+            }else{
+              this.ngxService.stopLoader("loader-aceptar");
+              this.resetearFechas(true);
+              this.aceptar("");
+            }
+            
            
           },
           (errot) => {
@@ -991,7 +1019,7 @@ export class OresolucionesComponent implements OnInit {
     } catch (error) {
       console.error(error);
     }
-
+    
   }
 
 
@@ -1000,14 +1028,15 @@ export class OresolucionesComponent implements OnInit {
     if (typeof this.tipo != "object") return;
     this.IResolucion.tipo = this.tipo.codigo;
     let rs = this.tipo;
+    console.log(rs)
     switch (parseInt(rs.tipo)) {
       case 1:
         this.IResolucion.asunto += ', ' + this.IResolucion.unidad_texto
         break
       case 2:
-        let causa = this.lstCausa.filter(e => {return e.codigo == this.IResolucion.causa})[0].nombre
-        let motivo = this.lstMotivo.filter(e => {return e.codigo == this.IResolucion.motivo})[0].nombre
-        this.IResolucion.asunto += ', ' + causa + ' ' + motivo
+        let solicitud = this.lstCausa.filter(e => {return e.codigo == this.IResolucion.solicitud})[0].nombre
+        let reserva = this.lstMotivo.filter(e => {return e.codigo == this.IResolucion.reserva})[0].nombre
+        this.IResolucion.asunto += ', ' + solicitud + ' ' + reserva
         break;
     }
 

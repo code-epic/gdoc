@@ -45,20 +45,23 @@ export interface ITipoResolucion {
 }
 
 export interface IConfiguracion {
-  id: string;
-  nomb: string;
+  id: string
+  nomb: string
 }
 
 interface UResoluciones {
-  numero: string;
-  fecha_resolucion: string;
-  asunto: string;
-  archivo: string;
-  modificado: string;
-  instrucciones: string;
-  observacion: string;
-  distribucion: string;
-  identificador: number;
+  numero: string
+  fecha_resolucion: string
+  asunto: string
+  archivo: string
+  modificado: string
+  instrucciones: string
+  observacion: string
+  distribucion: string
+  identificador: number
+  reserva: number
+  solicitud: number
+  falta: string
 }
 /**
  * This Service handles how the date is represented in scripts i.e. ngModel.
@@ -205,6 +208,9 @@ export class EresolucionesComponent implements OnInit {
     observacion: "",
     distribucion: "0",
     identificador: 0,
+    reserva: 0,
+    solicitud: 0,
+    falta: ""
   };
 
   public Resolucion: Resolucion = {
@@ -326,6 +332,7 @@ export class EresolucionesComponent implements OnInit {
   public hashcontrol = "";
   public CuentaGenera: any;
   public tipo: any;
+  public ctipo: any;
   public cod_resol_tipo: any;
   public nombres: string = "";
 
@@ -506,7 +513,7 @@ export class EresolucionesComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        
+        console.log(data.Cuerpo)
         if (data != undefined && data.Cuerpo.length > 0) {
           let rs = data.Cuerpo[0];
           this.IResolucion = rs;
@@ -517,7 +524,8 @@ export class EresolucionesComponent implements OnInit {
           );
 
           this.tipo = rs.tipo;
-          this.cod_resol_tipo = rs.cod_resol_tipo;
+          this.ctipo = rs.ctipo;
+          this.cod_resol_tipo = rs.cod_resol_tipo; //VER CLASIFICACION DEL TIPO DE RESOLUCION
           this.autor_creador = rs.registrador + " - " + rs.usuario_registra;
           this.fecha_registro = rs.fecha_registro;
           this.destino = rs.destino;
@@ -602,7 +610,8 @@ export class EresolucionesComponent implements OnInit {
         break;
       case 2:
         this.maxCol = "12";
-        this.getCausa( this.IResolucion.tipo.toString() );
+        // this.getCausa( this.IResolucion.tipo.toString().replace(/[\r\n]+/gm, "") );
+        this.getCausa( this.ctipo ) 
         break;
       case 3:
         this.maxCol = "6";
@@ -696,11 +705,10 @@ export class EresolucionesComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstCausa = data.Cuerpo;
-
-        this.blReserva = true;
-        this.ngxService.stopLoader("loader-buscar");
-        //
+        this.lstCausa = data.Cuerpo
+        this.blReserva = true
+        this.ngxService.stopLoader("loader-buscar")
+        this.getMotivo()
       },
       (err) => {
         console.error(err);
@@ -712,7 +720,7 @@ export class EresolucionesComponent implements OnInit {
     this.lstMotivo = [];
     this.xAPI.funcion = "MPPD_CMotivoResolucion";
     this.ngxService.startLoader("loader-buscar");
-    this.xAPI.parametros = this.IResolucion.causa.toString();
+    this.xAPI.parametros = this.IResolucion.solicitud.toString();
     this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -721,7 +729,7 @@ export class EresolucionesComponent implements OnInit {
 
         this.blReserva = true;
         this.ngxService.stopLoader("loader-buscar");
-        if (this.IResolucion.causa.toString() == "7") this.blReservaAux = true;
+        if (this.IResolucion.solicitud.toString() == "7") this.blReservaAux = true;
       },
       (err) => {
         console.error(err);
@@ -731,6 +739,9 @@ export class EresolucionesComponent implements OnInit {
 
   getDetalle() {}
 
+
+
+  
   limpiarFrm() {
     this.IResolucion = {
       grado: 0,
@@ -871,6 +882,9 @@ export class EresolucionesComponent implements OnInit {
       instrucciones: this.IResolucion.instrucciones,
       observacion: this.IResolucion.observacion,
       distribucion: this.IResolucion.distribucion,
+      reserva: this.IResolucion.reserva,
+      solicitud: this.IResolucion.solicitud,
+      falta: this.IResolucion.falta,
       identificador: this.resolucion.rs.id,
     }
    
@@ -879,15 +893,39 @@ export class EresolucionesComponent implements OnInit {
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.UResolucion);
 
-    console.log(this.UResolucion)
     document.forms.namedItem("forma").reset();
 
     
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-          this.ngxService.stopLoader("loader-aceptar");
-          this.resetearFechas(true);
-          this.aceptar("");
+          if( this.ctipo == '9' || this.ctipo == '10'){
+            let datosBasicos = {
+              "cedula": this.IResolucion.cedula,
+              "situacion": this.ctipo=='9'? 'CEMP':'RACT'
+            }
+            this.xAPI.funcion = "MPPD_UDatosBasicosSituacion";
+            this.xAPI.parametros = "";
+            this.xAPI.valores = JSON.stringify(datosBasicos);
+            this.apiService.Ejecutar(this.xAPI).subscribe(
+              (data) => {
+                this.ngxService.stopLoader("loader-aceptar");
+                this.resetearFechas(true);
+                this.aceptar("");
+              },
+              (errot) => {
+                    this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`);
+                    this.ngxService.stopLoader("loader-aceptar");
+                    this.ruta.navigate(["/rsprocesos"]);
+                  }
+              )
+          }else{
+            this.ngxService.stopLoader("loader-aceptar");
+            this.resetearFechas(true);
+            this.aceptar("");
+          }
+
+
+          
       },
       (errot) => {
             this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`);
@@ -927,22 +965,18 @@ export class EresolucionesComponent implements OnInit {
     }
   }
 
-  Autocompletar() {
-    if (typeof this.tipo != "object") return;
-    this.IResolucion.tipo = this.tipo.codigo;
-    let rs = this.tipo;
-    switch (parseInt(rs.tipo)) {
+  Autocompletar(){
+    
+   
+    
+    switch (parseInt(this.cod_resol_tipo)) {
       case 1:
-        this.IResolucion.asunto += ", " + this.IResolucion.unidad_texto;
-        break;
+        this.IResolucion.asunto += ', ' + this.IResolucion.unidad_texto
+        break
       case 2:
-        let causa = this.lstCausa.filter((e) => {
-          return e.codigo == this.IResolucion.causa;
-        })[0].nombre;
-        let motivo = this.lstMotivo.filter((e) => {
-          return e.codigo == this.IResolucion.motivo;
-        })[0].nombre;
-        this.IResolucion.asunto += ", " + causa + " " + motivo;
+        let solicitud = this.lstCausa.filter(e => {return e.codigo == this.IResolucion.solicitud})[0].nombre
+        let reserva = this.lstMotivo.filter(e => {return e.codigo == this.IResolucion.reserva})[0].nombre
+        this.IResolucion.asunto += ', ' + solicitud + ' ' + reserva
         break;
     }
   }

@@ -173,11 +173,16 @@
     <label> Situación </label>
     <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.situacion"
       value="{{DBasico.situacion}}">
-      <option value="0">Seleccione</option>
+      <option value="0">SELECCIONE</option>
       <option value="ACT">ACTIVO</option>
+      <option value="RACT">RESERVA ACTIVA</option>
+      <option value="CDEM">CESE DEL EMPLEO</option>
+      <option value="RINC">REINCORPORADO</option>
+      <option value="FALL">FALLECIDO</option>
+<!-- 
       <option value="RCP">RETIRADO CON PENSION</option>
       <option value="RSP">RETIRADO SIN PENSION</option>
-      <option value="INV">INVALIDEZ</option>
+      <option value="INV">INVALIDEZ</option> -->
     </select>
   </div>
 </div>

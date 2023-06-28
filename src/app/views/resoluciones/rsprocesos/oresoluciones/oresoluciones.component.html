@@ -403,7 +403,7 @@
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Causa</mat-label>
                                 <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="IResolucion.causa" (selectionChange)="getMotivo()">
+                                    [(ngModel)]="IResolucion.solicitud" (selectionChange)="getMotivo()">
                                     <mat-option *ngFor="let e of lstCausa"
                                         value="{{e.codigo}}">{{e.nombre}}</mat-option>
                                 </mat-select>
@@ -414,7 +414,7 @@
                             <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                                 <mat-label>Motivo</mat-label>
                                 <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="IResolucion.motivo" (selectionChange)="getDetalle()">
+                                    [(ngModel)]="IResolucion.reserva" (selectionChange)="getDetalle()">
                                     <mat-option *ngFor="let e of lstMotivo"
                                         value="{{e.codigo}}">{{e.nombre}}</mat-option>
 
@@ -426,6 +426,8 @@
                     <div class="form-row" *ngIf="blReservaAux">
                         <div class="form-group col-md-12">
                             <textarea rows="5" name="text" placeholder="Descripcion de la falta o delito"
+                            [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="IResolucion.falta" 
                                 style="width: 100%; border: 0px;"></textarea>
                         </div>
                     </div>
@@ -476,10 +478,14 @@
 
                     <div class="form-row">
                         <div class="form-group col-md-12">
-                            <label for="txtObjeto">Asunto</label>
+                            <!-- <label for="txtObjeto">Asunto  [ <a> Importar informaci&oacute;n </a> ] </label> -->
                             <div class="NgxEditor__Wrapper">
+                                <label>
+                                    <mat-icon class="text-blue" matSuffix type="button" id="fori" (click)="Autocompletar()">save_alt</mat-icon> [ Autocompletar datos ] Asunto
+                                </label>
                                 <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
-                                    [(ngModel)]="IResolucion.asunto" (blur)="Autocompletar()"></angular-editor>
+                                    [(ngModel)]="IResolucion.asunto"></angular-editor>
+                                    
                             </div>
                         </div>
                     </div>
