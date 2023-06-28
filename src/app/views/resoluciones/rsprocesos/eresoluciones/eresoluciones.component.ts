@@ -594,7 +594,6 @@ export class EresolucionesComponent implements OnInit {
     let tp = this.cod_resol_tipo;
     let valor = true;
     this.resetearFechas(false);
-    this.tipo;
 
     switch (parseInt(tp)) {
       case 1:
@@ -602,13 +601,8 @@ export class EresolucionesComponent implements OnInit {
         this.maxCol = "6";
         break;
       case 2:
-        if (this.validarCategoriaCeseReserva(parseInt(tp))) {
-          this.maxCol = "12";
-          this.getCausa(tp);
-        } else {
-          valor = false;
-        }
-
+        this.maxCol = "12";
+        this.getCausa( this.IResolucion.tipo.toString() );
         break;
       case 3:
         this.maxCol = "6";
@@ -659,17 +653,7 @@ export class EresolucionesComponent implements OnInit {
     this.blAceptar = valor;
   }
 
-  validarCategoriaCeseReserva(codigo: number) {
-    if (codigo == 9 && this.Resolucion.clasificacion == "ASIMILADOS")
-      return true;
-    if (codigo == 10 && this.Resolucion.clasificacion == "EFECTIVO")
-      return true;
-    this.toastrService.error(
-      "Error: No coincide el tipo de resolución con la categoría",
-      `GDoc Resoluciones`
-    );
-    return false;
-  }
+
 
   desactivarVista() {
     this.blCorregir = false;

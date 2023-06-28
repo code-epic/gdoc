@@ -232,6 +232,15 @@ export class RsconsultaComponent implements OnInit {
   public maxColComision = "6";
   public color = "#e3e6e6";
 
+  public color_acc: string = "transparent";
+  public color_texto: string = "black";
+  public icono_dist: string = "public";
+  public instruccion: string = "";
+  public observacion: string = "";
+  public autor_creador: string = "";
+  public fecha_registro: string = "";
+  public destino: string = "";
+
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
   selected = new FormControl(0);
@@ -244,6 +253,16 @@ export class RsconsultaComponent implements OnInit {
     showToolbar: false,
     placeholder: "",
   };
+
+
+  editorConfigx: AngularEditorConfig = {
+    editable: false,
+    spellcheck: false,
+    enableToolbar: false,
+    showToolbar: false,
+    placeholder: "",
+  };
+
 
   constructor(
     private apiService: ApiService,
@@ -438,6 +457,10 @@ export class RsconsultaComponent implements OnInit {
             this.IDatosBasicos = data.Cuerpo[0];
             this.dbDatos = true;
             this.dbDatosNombre = false;
+
+            console.log(this.IDatosBasicos);
+
+            this.seleccionColor();
           }
 
           this.ngxService.stopLoader("loader-buscar");
@@ -545,35 +568,52 @@ export class RsconsultaComponent implements OnInit {
     this.dbResolucionFil = false;
     this.dbResolucionTipo = false;
     this.ngxService.startLoader("loader-buscar");
-    
-    var causa = this.causa == "%" ? " AND  rs.cod_solicitud LIKE '%' " : " AND  rs.cod_solicitud LIKE '%" + this.causa + "%'";
 
-    var grado = this.grado == "%" ? "" : " AND db.cod_grado ='" + this.grado + "'";
-    var componente = this.componente == "%" ? "" : " AND db.cod_componente ='" + this.componente + "'";
-    var categoria = this.categoria == "%" ? "" : " AND db.cod_categoria ='" + this.categoria + "'";
+    var causa =
+      this.causa == "%"
+        ? " AND  rs.cod_solicitud LIKE '%' "
+        : " AND  rs.cod_solicitud LIKE '%" + this.causa + "%'";
 
-    var instrucciones = this.instrucciones == "" ? "" : " AND rs.instrucciones LIKE '%" + this.instrucciones + "%' ";
-    var asunto = this.asunto == "" ? '': " AND rs.asunto LIKE '%" + this.asunto + "%' ";
-    var observaciones = this.observaciones == "" ? "" :  " AND  rs.observacion LIKE '%" + this.observaciones + "%' ";
+    var grado =
+      this.grado == "%" ? "" : " AND db.cod_grado ='" + this.grado + "'";
+    var componente =
+      this.componente == "%"
+        ? ""
+        : " AND db.cod_componente ='" + this.componente + "'";
+    var categoria =
+      this.categoria == "%"
+        ? ""
+        : " AND db.cod_categoria ='" + this.categoria + "'";
+
+    var instrucciones =
+      this.instrucciones == ""
+        ? ""
+        : " AND rs.instrucciones LIKE '%" + this.instrucciones + "%' ";
+    var asunto =
+      this.asunto == "" ? "" : " AND rs.asunto LIKE '%" + this.asunto + "%' ";
+    var observaciones =
+      this.observaciones == ""
+        ? ""
+        : " AND  rs.observacion LIKE '%" + this.observaciones + "%' ";
 
     this.xAPI.funcion = "MPPD_CResolucionesRangoTipo";
-    codigo = asunto +  instrucciones +  observaciones + causa ;
+    codigo = asunto + instrucciones + observaciones + causa;
 
     if (this.busqueda != "1") {
       this.xAPI.funcion = "MPPD_CResolucionesRango";
-      codigo += grado + componente +  categoria;
+      codigo += grado + componente + categoria;
     }
 
     if (this.tipo != undefined) {
       if (this.tipo.codigo != undefined)
         codigo += " AND rs.cod_tipo_resol = " + this.tipo.codigo;
     }
-    if (estatus == 1){
+    if (estatus == 1) {
       this.xAPI.parametros = "1900-01-01,2025-01-01," + codigo;
-    }else{
+    } else {
       this.xAPI.parametros = desde + "," + hasta + "," + codigo;
     }
-    
+
     this.xAPI.valores = "";
     //console.log(this.xAPI.parametros)
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -827,12 +867,25 @@ export class RsconsultaComponent implements OnInit {
     //   return e.nombre;
     // });
 
-    let head = ['cedula', 'nombre_grado', 'nombres_apellidos', 
-      'nombre_componente', 'nombre_categoria', 
-      'des_clasificacion', 'sexo', 'fecha_resolucion', 
-      'numero','descripcion_tipo', 'asunto', 'nombre_causa', 'nombre_motivo', 'especialidad', 'falta']
+    let head = [
+      "cedula",
+      "nombre_grado",
+      "nombres_apellidos",
+      "nombre_componente",
+      "nombre_categoria",
+      "des_clasificacion",
+      "sexo",
+      "fecha_resolucion",
+      "numero",
+      "descripcion_tipo",
+      "asunto",
+      "nombre_causa",
+      "nombre_motivo",
+      "especialidad",
+      "falta",
+    ];
 
-    console.log(this.lstResolucionesX)
+    console.log(this.lstResolucionesX);
     this.utilService.downloadFile(
       head,
       this.lstResolucionesX,
@@ -852,12 +905,10 @@ export class RsconsultaComponent implements OnInit {
   }
 
   dwUrl(e) {
-    console.log(e)
+    console.log(e);
     if (e.archivo != undefined && e.archivo != "") {
-      let cedula = e.cedula != undefined? e.cedula: this.dwCedula
-      this.apiService.DwsResol(btoa("R" + cedula) + "/" + e.archivo)
-
-
+      let cedula = e.cedula != undefined ? e.cedula : this.dwCedula;
+      this.apiService.DwsResol(btoa("R" + cedula) + "/" + e.archivo);
     } else {
       let anio = e.fecha_resolucion;
       let codigo = e.numero;
@@ -957,7 +1008,95 @@ export class RsconsultaComponent implements OnInit {
         return "RETIRADO SIN PENSION";
 
       default:
-        return 'SIN ASIGNAR'
+        return "SIN ASIGNAR";
     }
+  }
+
+  seleccionColor() {
+    switch (this.IDatosBasicos.condicion.toString()) {
+      case "1":
+        this.color_texto = "black";
+        this.color_acc = "#B4DCFF";
+        return;
+      case "2":
+        this.color_texto = "black";
+        this.color_acc = "#FDFFAD";
+        return;
+      case "3":
+        this.color_texto = "white";
+        this.color_acc = "#C70F03";
+        return;
+      default:
+        this.color_texto = "black";
+        this.color_acc = "transparent";
+        return;
+    }
+  }
+
+  getIcon(e) {
+    
+    switch (e.distribucion.toString() ) {
+      case '2':
+        return "security";
+      case '3':
+        return "no_encryption";
+      default:
+        return "public";
+    }
+  }
+  getIconColor(e) {
+    
+    switch (e.distribucion.toString() ) {
+      case '2':
+        return "orange";
+      case '3':
+        return "red";
+      default:
+        return "green";
+    }
+  }
+
+    /**
+   * Consultar datos generales del militar
+   */
+    getResueltoID(id) {
+      this.ngxService.startLoader("loader-buscar");
+
+      this.xAPI.funcion = "MPPD_CResueltoID";
+      this.xAPI.parametros = id.toString();
+      this.xAPI.valores = {};
+      this.instruccion = ''
+      this.observacion = ''
+
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+          
+          if (data != undefined && data.Cuerpo.length > 0) {
+            let rs = data.Cuerpo[0];
+            console.log(rs)
+           
+            this.autor_creador = rs.registrador + " - " + rs.usuario_registra;
+            this.fecha_registro = rs.fecha_registro;
+            this.instruccion = rs.instruccion
+            this.observacion = rs.observacion
+            this.destino = rs.destino
+
+            this.seleccionTipo();
+          }
+  
+          this.ngxService.stopLoader("loader-buscar");
+        },
+        (error) => {
+          console.error("Error de conexion a los datos ", error);
+        }
+      );
+    }
+
+  detalle(content, e) {
+    //Listar los archivos asociados al documento
+    this.getResueltoID(e.id) 
+    this.modalService.open(content, { size: "lg" });
+
+
   }
 }

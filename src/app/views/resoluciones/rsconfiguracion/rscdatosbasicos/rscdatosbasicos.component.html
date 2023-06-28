@@ -207,24 +207,30 @@
 
   <div class="form-group col-md-6">
     <label> Condición Especial </label>
-    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.condicion"
-      value="{{DBasico.condicion}}">
-      <option value=3>NO APLICA</option>
-      <option value=0>BAJA</option>
-      <option value=1>MEDIA</option>
-      <option value=2>ALTA</option>
+    <select class="form-control" 
+      [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.condicion"
+      value="{{DBasico.condicion}}"
+      (change) ="seleccionColor()"
+      >
+      <option value=0>NO APLICA</option>
+      <option value=1>AZUL</option>
+      <option value=2>AMARILLO</option>
+      <option value=3>ROJO</option>
     </select>
   
   </div>
 
 </div>
 <div class="form-row">
-  <div class="form-group col-md-12">
-    <label> Motivo </label>
-    <!-- <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.observacion"
-      value="{{ DBasico.observacion }}" class="form-control"> -->
-      <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
-                                    [(ngModel)]="DBasico.motivo"></angular-editor>
+  <div class="form-group col-md-12" >
+    <label> Motivo de la condicion </label>
+    <div  [ngStyle]="{'background-color': color}">
+      <angular-editor 
+        [placeholder]="'Introduzca el motivo de la condicion especial...'" 
+        [config]="editorConfig" 
+        [(ngModel)]="DBasico.motivo">
+      </angular-editor>
+    </div>
   </div>
 </div>
 <div class="form-row">

@@ -16,7 +16,6 @@
                         <div class="col-md-1">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
-                                    <!-- onclick="history.back()" -->
                                     <button mat-icon-button title="Volver Atrás" onclick="history.back()">
                                         <mat-icon>arrow_back</mat-icon>
                                     </button>
@@ -36,15 +35,15 @@
                                         </div>
                                     </a>
                                     <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                                        <!-- <a routerLinkActive="active" [routerLink]="['/documento']"
-                                            class="dropdown-item">
-                                            <i class="fa fa-plus"></i>
-                                            <span>Agregar entrada</span>
-                                        </a> -->
                                         <a routerLinkActive="active" [routerLink]="['/rsprocesos/oresoluciones']"
                                             class="dropdown-item">
                                             <i class="fa fa-plus"></i>
                                             <span>Agragar resuelto</span>
+                                        </a>
+                                        <a routerLinkActive="active" [routerLink]="['/rsconfiguracion']"
+                                            class="dropdown-item">
+                                            <i class="fa fa-cogs"></i>
+                                            <span>Configuraciones</span>
                                         </a>
 
                                     </div>
@@ -53,12 +52,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
-
-
-
 
 
                 <div class="card-body">
@@ -77,9 +70,6 @@
                                         &nbsp;ESPECIFICA
                                     </ng-template>
                                     <br>
-
-                                    
-
 
                                     <div class="container" >
 
@@ -164,21 +154,7 @@
                                         </div>
 
                                         <hr>
-                                        <!-- <div class="row" *ngIf="dbTools">
-                                            <div class="col-md-11">
 
-                                            </div>
-                                            <div class="col-md-1">
-                                                <div class="media align-items-center">
-                                                    <div class="example-button-row">
-                                                        <button mat-icon-button title="Volver resuelto"
-                                                            (click)="obtenerResuelto()">
-                                                            <mat-icon style="color:brown">arrow_forward</mat-icon>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> -->
                                         <div class="row" *ngIf="dbDatos">
                                             <div class="col-md-12">
                                                 <table style="width: 100%;" border="1" class="zigzag">
@@ -191,15 +167,23 @@
                                                     <tbody>
                                                         <tr>
                                                             <th>CEDULA</th>
-                                                            <td>V-{{IDatosBasicos.cedula}}</td>
-                                                            <td style="width: 180px;">FOTO</td>
+                                                            <td   [ngStyle]="{'background-color': color_acc}">
+                                                                <font [ngStyle]="{'color': color_texto}">
+                                                                    V-{{IDatosBasicos.cedula}}
+                                                                </font>
+                                                            </td>
+                                                            <th style="width: 180px; text-align: center;" >FOTO</th>
                                                         </tr>
                                                         <tr>
                                                             <th>GRADO</th>
-                                                            <td>{{IDatosBasicos.grado}}</td>
+                                                            <td   [ngStyle]="{'background-color': color_acc}">
+                                                                <font [ngStyle]="{'color': color_texto}">
+                                                                    {{IDatosBasicos.grado}}
+                                                                </font>
+                                                            </td>
                                                             <td rowspan="7" valing="center" style="text-align: center;">
                                                                 <div
-                                                                    style="border:1px solid #CCC; padding: 1px;width: 160px">
+                                                                    style="border:0px solid #CCC; padding: 1px;width: 160px">
                                                                     <img src="{{ obtenerFoto(IDatosBasicos.cedula) }}"
                                                                         style="width: 155px">
                                                                 </div>
@@ -207,7 +191,11 @@
                                                         </tr>
                                                         <tr>
                                                             <th>NOMBRE COMPLETO</th>
-                                                            <td>{{IDatosBasicos.nombres}}</td>
+                                                            <td   [ngStyle]="{'background-color': color_acc}">
+                                                                <font [ngStyle]="{'color': color_texto}">
+                                                                    {{IDatosBasicos.nombres}}
+                                                                </font>
+                                                            </td>
                                                         </tr>
                                                         <tr>
                                                             <th>COMPONENTES</th>
@@ -228,6 +216,14 @@
                                                         <tr>
                                                             <th>SITUACION</th>
                                                             <td>{{ getSituation(IDatosBasicos.situacion) }}</td>
+                                                        </tr>
+                                                        <tr *ngIf="IDatosBasicos.condicion != 0">
+                                                            <th >MOTIVO</th>
+                                                            <td [ngStyle]="{'background-color': color_acc}" colspan="2">
+                                                                <font [ngStyle]="{'color': color_texto}">
+                                                                    {{ IDatosBasicos.motivo | uppercase }}
+                                                                </font>
+                                                            </td>
                                                         </tr>
                                                     </tbody>
 
@@ -341,7 +337,11 @@
                                                                     RESOLUCIONES</b>
                                                             </td>
                                                             <td *ngIf="!validarSeguridad(e)">{{ e.asunto | uppercase}}</td>
-                                                            <td >{{ e.distribucion }}</td>
+                                                            <td >
+                                                                <button mat-icon-button aria-label="Detalle" (click)="detalle( detalles, e)">
+                                                                    <mat-icon class="text-{{getIconColor(e)}}">{{ getIcon( e ) }}</mat-icon>
+                                                                </button>
+                                                            </td>
                                                             <td  style="text-align: center;">
                                                                 <button mat-icon-button aria-label="Editar" (click)="editar( e )">
                                                                     <mat-icon class="text-blue">edit_note</mat-icon>
@@ -870,3 +870,70 @@
 
 
 
+
+
+<!-- Adjuntar Imagenes al Documento -->
+<ng-template #detalles let-c="close" let-d="dismiss">
+    
+    <div class="modal-body">
+        
+
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <label for="txtObjeto">Instrucciones especiales</label>
+                <div class="NgxEditor__Wrapper">
+                    <angular-editor [placeholder]="'Instrucciones...'" [config]="editorConfigx"
+                        [(ngModel)]="instruccion"></angular-editor>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <label for="txtObjeto">Observaciones</label>
+                <div class="NgxEditor__Wrapper">
+                    <angular-editor [placeholder]="'Observaciones...'" [config]="editorConfigx"
+                        [(ngModel)]="observacion"></angular-editor>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="col-md-12" >
+                <table class="table table-bordered table-hover">
+        
+                    <thead>
+                        <tr  style="background-color: #CCC">
+                            <th style="text-align: center;">CREADOR POR</th>
+                            <th style="text-align: center;">FECHA CREACION</th>
+                            
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">{{autor_creador}}</td>
+                            <td style="text-align: center;">{{fecha_registro}}</td>
+                            
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <label for="txtObjeto">Destino</label>
+                <div class="NgxEditor__Wrapper">
+                    <angular-editor [placeholder]="'Destino...'" [config]="editorConfigx"
+                        [(ngModel)]="destino"></angular-editor>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn bg-gradient-info text-white " (click)="c('Save')">
+        <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+     
+    </div>
+  </ng-template>
