@@ -167,6 +167,9 @@ export class ResolucionService {
       case 12:
         this.xAPI.funcion = 'MPPD_CCarpetas'
         break
+      case 13: 
+        this.xAPI.funcion = 'MPPD_CCarpetaEntrada'
+        break
       default:
         this.xAPI.funcion = 'MPPD_CTipoEntrada'
         break

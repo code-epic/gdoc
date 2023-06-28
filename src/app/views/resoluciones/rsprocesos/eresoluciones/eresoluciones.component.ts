@@ -49,6 +49,17 @@ export interface IConfiguracion {
   nomb: string;
 }
 
+interface UResoluciones {
+  numero: string;
+  fecha_resolucion: string;
+  asunto: string;
+  archivo: string;
+  modificado: string;
+  instrucciones: string;
+  observacion: string;
+  distribucion: string;
+  identificador: number;
+}
 /**
  * This Service handles how the date is represented in scripts i.e. ngModel.
  */
@@ -102,15 +113,15 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
 }
 
 @Component({
-  selector: "app-oresoluciones",
-  templateUrl: "./oresoluciones.component.html",
-  styleUrls: ["./oresoluciones.component.scss"],
+  selector: "app-eresoluciones",
+  templateUrl: "./eresoluciones.component.html",
+  styleUrls: ["./eresoluciones.component.scss"],
   providers: [
     { provide: NgbDateAdapter, useClass: CustomAdapter },
     { provide: NgbDateParserFormatter, useClass: CustomDateParserFormatter },
   ],
 })
-export class OresolucionesComponent implements OnInit {
+export class EresolucionesComponent implements OnInit {
   editorConfig: AngularEditorConfig = {
     editable: true,
     spellcheck: true,
@@ -121,11 +132,7 @@ export class OresolucionesComponent implements OnInit {
 
   public id: string = "";
 
-  // editor: Editor = new Editor
-
-  // xeditor: Editor = new Editor
-
-  // xobser: Editor = new Editor
+  @Input() resolucion: any;
 
   public estadoActual = 1;
   public estadoOrigen = 1;
@@ -146,38 +153,6 @@ export class OresolucionesComponent implements OnInit {
   public searchView = "none";
   public contentView = "";
   public focus = false;
-
-  public IDatosBasicos: IDatosBasicos = {
-    area: "",
-    cedula: "",
-    categoria: 0,
-    clasificacion: 0,
-    componente: 0,
-    grado: 0,
-    profesion: "",
-    profesionx: "",
-    reserva: 0,
-    solicitud: 0,
-    condicion: 0,
-    especialidad: "",
-    estudios: "",
-    nacimiento: "",
-    promocion: "",
-    fecha: "",
-    n_componente: 0,
-    n_grado: 0,
-    nombres: "",
-    sexo: "",
-    resolucion: 0,
-    orden: 0,
-    anio: 0,
-    mes: 0,
-    dia: 0,
-    ultimo_ascenso: "",
-    motivo: "",
-    observacion: "",
-    situacion: "",
-  };
 
   public IResolucion: IResoluciones = {
     grado: 0,
@@ -217,7 +192,19 @@ export class OresolucionesComponent implements OnInit {
     unidad_texto: "",
     documento: 0,
     causa: 0,
-    archivo: ""
+    archivo: "",
+  };
+
+  public UResolucion: UResoluciones = {
+    numero: "",
+    fecha_resolucion: "",
+    asunto: "",
+    modificado: "",
+    archivo: "",
+    instrucciones: "",
+    observacion: "",
+    distribucion: "0",
+    identificador: 0,
   };
 
   public Resolucion: Resolucion = {
@@ -260,12 +247,15 @@ export class OresolucionesComponent implements OnInit {
   public Carpetas: any;
   public OrdenNumero: any;
 
+  public distribucion: string = "";
+
   public fecha_resolucion: any;
   public ultimo_ascenso: any;
   public comision_inicio: any;
   public comision_fin: any;
 
   public cuenta: string = "";
+  public identificador: string = "";
 
   public lstResoluciones: any;
   public lstEntradas: any;
@@ -297,6 +287,11 @@ export class OresolucionesComponent implements OnInit {
   public cresolucion = "";
   public fresolucion = "";
   public aresolucion = "";
+  public autor_creador = "";
+  public autor_modificador = "";
+  public fecha_edicion = "";
+  public fecha_registro = "";
+  public destino = "";
 
   public blNombramiento: boolean = false;
   public blCorregir: boolean = false;
@@ -319,35 +314,20 @@ export class OresolucionesComponent implements OnInit {
   myControl = new FormControl();
   public TipoResoluciones: any;
 
-  public lstCausa : any; //Objeto Comando
-  public lstMotivo : any; //Objeto Comando
-  public lstDetalle : any; //Objeto Comando
-  public lstPais : any; //Objeto Comando
-  public GradoIPSFA : any; //Objeto Comando
-  public lstIPSFA : any; //Objeto Comando
-  public lstC : any; //Objeto Comando
-  public archivos : any
+  public lstCausa: any; //Objeto Comando
+  public lstMotivo: any; //Objeto Comando
+  public lstDetalle: any; //Objeto Comando
+  public lstPais: any; //Objeto Comando
+  public GradoIPSFA: any; //Objeto Comando
+  public lstIPSFA: any; //Objeto Comando
+  public lstC: any; //Objeto Comando
+  public archivos: any;
 
-  public hashcontrol = ''
+  public hashcontrol = "";
   public CuentaGenera: any;
   public tipo: any;
-
-  public ipsfa_cedula: string = "";
-  public ipsfa_nombres_apellidos: string = "";
-  public ipsfa_fechanacimiento: string = "";
-  public ipsfa_fechanacimiento_unix: string = "";
-  public ipsfa_fechaingreso: string = "";
-  public ipsfa_fechaingreso_unix: string = "";
-  public ipsfa_fechaultimoascenso: string = "";
-  public ipsfa_fechaascenso_unix: string = "";
-  public ipsfa_sexo: string = "";
-  public ipsfa_componente: string = "";
-  public ipsfa_grado: string = "";
-  public ipsfa_clasificacion: string = "";
-  public ipsfa_categoria: string = "";
-  public ipsfa_situacion: string = "";
-  public ipsfa_situacion_ab: string = "";
-  public ipsfa_otros_estudios: string = "";
+  public cod_resol_tipo: any;
+  public nombres: string = "";
 
   public buscar: any;
   public estructura_detalle = "";
@@ -379,11 +359,6 @@ export class OresolucionesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // if (this.rutaActiva.snapshot.params.id != undefined) {
-    //   const id = this.rutaActiva.snapshot.params.id;
-    //   const cnt = this.rutaActiva.snapshot.params.cuenta;
-    // }
-   
     this.Componentes =
       sessionStorage.getItem("MPPD_CComponente") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
@@ -440,7 +415,14 @@ export class OresolucionesComponent implements OnInit {
         name ? this._filterConfiguracion(name) : this.lstC.slice()
       )
     );
+    // this.resolucion = this.resolucion
+
+    //console.log(this.resolucion.rs);
+    //console.log(this.loginService.Usuario.cedula);
+    // this.IResolucion.numero = this.resolucion.rs
+    this.getResueltoID();
   }
+
   get today() {
     return this.dateAdapter.toModel(this.ngbCalendar.getToday())!;
   }
@@ -511,57 +493,40 @@ export class OresolucionesComponent implements OnInit {
   /**
    * Consultar datos generales del militar
    */
-  consultarCedula() {
-    if (this.IResolucion.cedula == "") return false;
-
+  getResueltoID() {
+    //console.log(this.resolucion.rs.id);
     this.ngxService.startLoader("loader-buscar");
-    this.xAPI.funcion = "MPPD_CDatosBasicos";
-    this.xAPI.parametros = this.IResolucion.cedula;
-    this.xAPI.valores = ''
-    this.xasunto = ''
-    this.archivos = []
+    this.xAPI.funcion = "MPPD_CResueltoID";
+
+    this.xAPI.parametros = this.resolucion.rs.id.toString();
+    this.xAPI.valores = {};
+    this.xasunto = "";
+    this.archivos = [];
     document.forms.namedItem("forma").reset();
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data);
-        if (data != undefined && data.Cuerpo.length > 0) {
-          this.Resolucion = data.Cuerpo[0];
-
-          this.Resolucion.componente = this.Componentes.filter((e) => {
-            return e.cod_componente == this.Resolucion.componente;
-          })[0].nombre_componente;
-          this.Resolucion.categoria = this.Categorias.filter((e) => {
-            return e.cod_categoria == this.Resolucion.categoria;
-          })[0].nombre_categoria;
-          this.Resolucion.clasificacion = this.Clasificaciones.filter((e) => {
-            return e.cod_clasificacion == this.Resolucion.clasificacion;
-          })[0].des_clasificacion;
-          this.Resolucion.grado = this.Grados.filter((e) => {
-            return e.cod_grado == this.Resolucion.grado;
-          })[0].nombres_grado;
-
-          if (
-            data.Cuerpo[0].resoluciones != undefined &&
-            data.Cuerpo[0].resoluciones != ""
-          ) {
-            this.lstResoluciones = JSON.parse(
-              data.Cuerpo[0].resoluciones
-            ).reverse();
-            this.filtrarNombramiento();
-          }
-          if (
-            data.Cuerpo[0].entradas != undefined &&
-            data.Cuerpo[0].entradas != ""
-          ) {
-            this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse();
-          }
-          this.editar_datos = true;
-          this.cargarGradosIPSFA(this.Resolucion.n_componente);
-          this.hashcontrol = btoa("R" + this.IResolucion.cedula) //Cifrar documentos
-
-        }
         
+        if (data != undefined && data.Cuerpo.length > 0) {
+          let rs = data.Cuerpo[0];
+          this.IResolucion = rs;
+          this.myControl.setValue(rs.tipo);
+
+          this.fecha_resolucion = this.utilService.ConvertirFechaDia(
+            this.IResolucion.fecha_resolucion
+          );
+
+          this.tipo = rs.tipo;
+          this.cod_resol_tipo = rs.cod_resol_tipo;
+          this.autor_creador = rs.registrador + " - " + rs.usuario_registra;
+          this.fecha_registro = rs.fecha_registro;
+          this.destino = rs.destino;
+          this.distribucion = rs.distribucion;
+          this.hashcontrol = btoa("R" + this.IResolucion.cedula)
+          // rs.distribucion
+          // this.IResolucion.distribucion = "4";
+          this.seleccionTipo();
+        }
 
         this.ngxService.stopLoader("loader-buscar");
       },
@@ -623,44 +588,23 @@ export class OresolucionesComponent implements OnInit {
     );
   }
 
-  verHistorial() {
-    const estado = 1;
-    const estatus = 1;
-
-    this.ruta.navigate([
-      "/constancia",
-      btoa(estado + "," + estatus + "," + this.nControl),
-    ]);
-  }
-
   seleccionTipo() {
     this.desactivarVista();
-    if (this.IResolucion.cedula == "") {
-      this._snackBar.open("Debe seleccionar una cedula", "OK");
-      return;
-    }
 
-    if (this.fecha_resolucion == "") {
-      this._snackBar.open("Debe seleccionar una fecha para continuar", "OK");
-      return;
-    }
-
-    if (typeof this.tipo != "object") return;
-    this.IResolucion.tipo = this.tipo.codigo;
-    let rs = this.tipo;
+    let tp = this.cod_resol_tipo;
     let valor = true;
     this.resetearFechas(false);
+    this.tipo;
 
-    switch (parseInt(rs.tipo)) {
+    switch (parseInt(tp)) {
       case 1:
         this.blNombramiento = true;
         this.maxCol = "6";
-        this.viewUnidad();
         break;
       case 2:
-        if (this.validarCategoriaCeseReserva(parseInt(rs.codigo))) {
+        if (this.validarCategoriaCeseReserva(parseInt(tp))) {
           this.maxCol = "12";
-          this.getCausa(rs.codigo);
+          this.getCausa(tp);
         } else {
           valor = false;
         }
@@ -678,7 +622,7 @@ export class OresolucionesComponent implements OnInit {
         this.maxCol = "6";
         this.blComision = true;
         this.maxColComision = "6";
-        this.getAdministracion(rs.codigo);
+        this.getAdministracion(tp);
         break;
       case 5:
         this.maxCol = "6";
@@ -740,7 +684,6 @@ export class OresolucionesComponent implements OnInit {
     this.blCategoria = false;
     this.blComponente = false;
   }
-
   getAdministracion(id: string) {
     this.lstCausa = [];
     this.xAPI.funcion = "MPPD_CCausaResolucion";
@@ -802,11 +745,7 @@ export class OresolucionesComponent implements OnInit {
     );
   }
 
-
-
-  getDetalle(){
-
-  }
+  getDetalle() {}
 
   limpiarFrm() {
     this.IResolucion = {
@@ -847,7 +786,7 @@ export class OresolucionesComponent implements OnInit {
       unidad_texto: "",
       documento: 0,
       causa: 0,
-      archivo: ''
+      archivo: "",
     };
     this.Resolucion = {
       id: "",
@@ -915,20 +854,14 @@ export class OresolucionesComponent implements OnInit {
   }
 
   async evaluarDatos() {
-    if (this.IResolucion.cedula == "") {
-      this._snackBar.open("Debe seleccionar una cedula", "OK");
-      return;
-    }
-    this.ngxService.startLoader("loader-aceptar");
+    // this.ngxService.startLoader("loader-aceptar");
     this.IResolucion.fecha_resolucion = this.utilService.ConvertirFechaDia(
       this.fecha_resolucion
     );
     this.IResolucion.ultimo_ascenso = this.utilService.ConvertirFechaDia(
       this.ultimo_ascenso
     );
-    this.IResolucion.comision_inicio = this.utilService.ConvertirFechaDia(
-      this.comision_inicio
-    );
+    this.IResolucion.comision_inicio = this.utilService.ConvertirFechaDia(this.comision_inicio);
     this.IResolucion.comision_fin = this.utilService.ConvertirFechaDia(
       this.comision_fin
     );
@@ -941,95 +874,106 @@ export class OresolucionesComponent implements OnInit {
     );
 
     this.IResolucion.asunto = this.IResolucion.asunto.toUpperCase();
-    this.IResolucion.instrucciones = this.IResolucion.instrucciones.toUpperCase();
+    this.IResolucion.instrucciones =
+      this.IResolucion.instrucciones.toUpperCase();
     this.IResolucion.observacion = this.IResolucion.observacion.toUpperCase();
-    this.IResolucion.autor_registro = this.loginService.Usuario.cedula
+    this.IResolucion.autor_modificar = this.loginService.Usuario.cedula;
+    this.UResolucion = {
+      numero: this.IResolucion.numero,
+      fecha_resolucion: this.IResolucion.fecha_resolucion,
+      modificado: this.loginService.Usuario.cedula,
+      asunto: this.IResolucion.asunto,
+      archivo: this.archivos.length > 0? this.archivos[0].name: this.IResolucion.archivo,
+      instrucciones: this.IResolucion.instrucciones,
+      observacion: this.IResolucion.observacion,
+      distribucion: this.IResolucion.distribucion,
+      identificador: this.resolucion.rs.id,
+    }
+   
+    
+    this.xAPI.funcion = "MPPD_UResoluciones";
+    this.xAPI.parametros = "";
+    this.xAPI.valores = JSON.stringify(this.UResolucion);
+
+    console.log(this.UResolucion)
+    document.forms.namedItem("forma").reset();
 
     
-  }
-
-  fileSelected(e) {
-    this.archivos.push(e.target.files[0])
-  }
-
-
-
-  async SubirArchivo() {
-
-
-    this.ngxService.startLoader("loader-aceptar");
-    var frm = new FormData(document.forms.namedItem("forma"));
-    try {
-      await this.apiService.EnviarArchivos(frm).subscribe((data) => {
-        this.evaluarDatos();
-        this.IResolucion.archivo = this.archivos[0].name
-        this.xAPI.funcion = "MPPD_IResoluciones";
-        this.xAPI.parametros = "";
-        this.xAPI.valores = JSON.stringify(this.IResolucion);
-
-        this.xasunto = ''
-        this.archivos = []
-        this.tipo = ''
-        document.forms.namedItem("forma").reset();
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          (data) => {
-            this.aceptar("");
-            this.ngxService.stopLoader("loader-aceptar");
-            this.resetearFechas(true);
-           
-          },
-          (errot) => {
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+          this.ngxService.stopLoader("loader-aceptar");
+          this.resetearFechas(true);
+          this.aceptar("");
+      },
+      (errot) => {
             this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`);
             this.ngxService.stopLoader("loader-aceptar");
             this.ruta.navigate(["/rsprocesos"]);
           }
-        ),
-          (errot) => {
-            this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`);
-          };
-      });
-    } catch (error) {
-      console.error(error);
-    }
-
+      )
   }
 
+  fileSelected(e) {
+    this.archivos.push(e.target.files[0]);
+  }
 
-  Autocompletar(){
+  async SubirArchivo() {
+    
+    
+    console.log( "R" + this.IResolucion.cedula )
 
+    this.ngxService.startLoader("loader-aceptar");
+    if (this.archivos.length > 0) {
+      console.log('Existen mas archivos')
+      
+      var frm = new FormData(document.forms.namedItem("forma"));
+      try {
+        await this.apiService.EnviarArchivos(frm).subscribe((data) => {
+
+         
+          
+          this.evaluarDatos();
+          
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      this.evaluarDatos();
+    }
+  }
+
+  Autocompletar() {
     if (typeof this.tipo != "object") return;
     this.IResolucion.tipo = this.tipo.codigo;
     let rs = this.tipo;
     switch (parseInt(rs.tipo)) {
       case 1:
-        this.IResolucion.asunto += ', ' + this.IResolucion.unidad_texto
-        break
+        this.IResolucion.asunto += ", " + this.IResolucion.unidad_texto;
+        break;
       case 2:
-        let causa = this.lstCausa.filter(e => {return e.codigo == this.IResolucion.causa})[0].nombre
-        let motivo = this.lstMotivo.filter(e => {return e.codigo == this.IResolucion.motivo})[0].nombre
-        this.IResolucion.asunto += ', ' + causa + ' ' + motivo
+        let causa = this.lstCausa.filter((e) => {
+          return e.codigo == this.IResolucion.causa;
+        })[0].nombre;
+        let motivo = this.lstMotivo.filter((e) => {
+          return e.codigo == this.IResolucion.motivo;
+        })[0].nombre;
+        this.IResolucion.asunto += ", " + causa + " " + motivo;
         break;
     }
-
-    
   }
-
- 
-
 
   protected aceptar(msj: string) {
     Swal.fire({
-      title: "La resolucion ha sido  procesada con exito ",
-      text: "¿Desea registar otro documento?",
+      title: "La resolucion ha sido  actualizada con exito ",
+      text: "Continuar...",
       icon: "info",
-      showCancelButton: true,
+      showCancelButton: false,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Si",
-      cancelButtonText: "No",
+      confirmButtonText: "Aceptar",
     }).then((result) => {
-      if (!result.isConfirmed) this.ruta.navigate(["/rsprocesos"]);
-      this.limpiarFrm();
+      if (result.isConfirmed) this.ruta.navigate(["/rsprocesos"]);
     });
   }
 
@@ -1038,16 +982,39 @@ export class OresolucionesComponent implements OnInit {
     this.modalService.open(content, { size: "lg" });
   }
 
-  AceptarCambios() {
-    // this.Resolucion.sexo = this.ipsfa_sexo == 'MASCULINO' ? 'M' : 'F'
-    // console.log(this.ipsfa_fechaultimoascenso)
-    // this.Resolucion.situacion = this.ipsfa_situacion_ab
-    // this.Resolucion.nombres_apellidos = this.ipsfa_nombres_apellidos
-    // this.forigenDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechanacimiento_unix))
-    // //this.Resolucion.fecha = this.ipsfa_fechanacimiento_unix
-    // this.fingresoDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechaingreso_unix))
-    // //this.Resolucion.ingreso = this.ipsfa_fechaingreso_unix
-    // this.fcreacionDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechaascenso_unix))
-    // //this.Resolucion.promocion = this.ipsfa_fechaascenso_unix
+  ValidarCoordenadas(e, content) {
+    let target = e.target.value.toString();
+    let dist = this.distribucion;
+
+    if (dist == "3" && target != "3") {
+      this.modalService.open(content);
+    } else {
+      if (dist != "3" && target == "3") {
+        this.alerta("");
+      }
+    }
+
+    //this.IResolucion.distribucion = dist
+  }
+
+  AsignarCoordenadana() {
+    this.IResolucion.distribucion = "3";
+    //console.log(this.IResolucion.distribucion);
+  }
+
+  protected alerta(msj: string) {
+    Swal.fire({
+      title: "La resolucion ha sido descargada previamente tantas veces.",
+      text: "Ver detalles de la descarga",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ver mas",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      //if (!result.isConfirmed)
+      //this.limpiarFrm();
+    });
   }
 }

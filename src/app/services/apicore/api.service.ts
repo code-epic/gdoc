@@ -54,6 +54,12 @@ export interface DocumentoAdjunto {
 }
 
 
+export interface WTipoArchivo {
+  ruta	 ?:	string
+	archivo	 ?:	string //CodeEncrypt
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -97,7 +103,7 @@ export class ApiService {
 
   DwsResol(peticion : string){
     let ruta = this.URL + 'dws/' + peticion
-    console.log(ruta)
+    // console.log(ruta)
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -131,4 +137,20 @@ export class ApiService {
       window.open(url);
     });
   }
+
+
+  getDwsCdn(tpf : WTipoArchivo) : Observable<any> {
+    let ruta = this.URL + 'dwscdn'
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+      }),
+      responseType: 'blob' as 'json'
+    };
+    
+    return this.http.post<any>(ruta,  tpf, httpOptions)
+  }
+
 }

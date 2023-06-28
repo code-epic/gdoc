@@ -16,6 +16,7 @@
                         <div class="col-md-1">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
+                                    <!-- onclick="history.back()" -->
                                     <button mat-icon-button title="Volver Atrás" onclick="history.back()">
                                         <mat-icon>arrow_back</mat-icon>
                                     </button>
@@ -62,8 +63,12 @@
 
                 <div class="card-body">
                     <div class="row">
-
+                        
                         <div class="col-md-12">
+                            <app-eresoluciones *ngIf="valEdit" [resolucion]="input_resoluciones"></app-eresoluciones>
+                        </div>
+                        
+                        <div class="col-md-12" *ngIf="!valEdit">
                             <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
                             <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
                                 [selectedIndex]="selected.value" (selectedIndexChange)="selected.setValue($event)">
@@ -72,24 +77,49 @@
                                         &nbsp;ESPECIFICA
                                     </ng-template>
                                     <br>
-                                    <div class="container">
+
+                                    
+
+
+                                    <div class="container" >
 
                                         <div class="row">
 
-                                            <div class="col-md-9">
+                                            <div class="col-md-4">
                                                 <mat-form-field appearance="outline">
                                                     <mat-label>Nombre Completo</mat-label>
                                                     <input matInput placeholder="Nombre completo"
                                                         [ngModelOptions]="{standalone: true}" [(ngModel)]="nombre"
                                                         (keypress)="consultarNombre($event);">
-                                                    <mat-icon matSuffix>search</mat-icon>
                                                 </mat-form-field>
                                             </div>
+                                            <div class="col-md-3" >
+                                                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                    <mat-label>Componente</mat-label>
+                                                    <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}"
+                                                        [(ngModel)]="dbcomponente">
+                                                        <mat-option value="%">TODOS</mat-option>
+                                                        <mat-option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                    
                                             <div class="col-md-3">
+                                                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                    <mat-label>Grado</mat-label>
+                                                    <mat-select placeholder="Grado" [ngModelOptions]="{standalone: true}"
+                                                        [(ngModel)]="dbgrado">
+                                                        <mat-option value="%">TODOS</mat-option>
+                                                        <mat-option *ngFor="let e of Grados"
+                                                            value="{{e.cod_grado}}">{{e.nombre_corto }} - {{e.nombres_grado }}</mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-md-2">
                                                 <div class="text-right" style="padding-top: 5px;">
                                                     <button class="btn bg-primary text-white" style="height: 50px;"
                                                         (click)="verificarNombre()">
-                                                        Consultar por nombre
+                                                        Consultar
                                                     </button>
                                                 </div>
                                             </div>
@@ -155,7 +185,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th colspan="3" class="text-center" style="padding: 15px;">
-                                                                FICHA DE DATOS PERSONALES</th>
+                                                                DATOS BASICOS</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -193,11 +223,11 @@
                                                         </tr>
                                                         <tr>
                                                             <th>SEXO</th>
-                                                            <td></td>
+                                                            <td>{{ getSex(IDatosBasicos.sexo) }}</td>
                                                         </tr>
                                                         <tr>
                                                             <th>SITUACION</th>
-                                                            <td></td>
+                                                            <td>{{ getSituation(IDatosBasicos.situacion) }}</td>
                                                         </tr>
                                                     </tbody>
 
@@ -251,24 +281,24 @@
                                             
                                             <div class="col-md-12">
                                                 <br ><br>
+                                                <h2> ENTRADAS</h2>
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
-                                                        <tr>
-                                                            <th colspan="5" class="text-center" style="padding: 15px;">
-                                                               ENTRADAS</th>
-                                                        </tr>
+                                                       
                                                         <tr>
                                                             <th style="width: 90px;"> FECHA</th>
-                                                            <th>CUENTA</th>
-                                                            <th>TIPO</th>
+                                                            <th tyle="width: 150px;"> CUENTA</th>
                                                             <th>ASUNTO</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr *ngFor="let e of lstEntradas">
                                                             <td>{{e.fecha_entrada}}</td>
-                                                            <td>{{e.cuenta_oficio}}</td>
-                                                            <td>{{ obtenerTipo(e.tipo) }}</td>
+                                                            <td>
+                                                                <a  class="enlace"
+                                                                    (click)="dwUrlEntrada(e)" target="_blank"
+                                                                    style="font-weight: bold; color: brown;">
+                                                                    {{ e.cuenta_oficio }} </a></td>
                                                             <td >{{ e.asunto | uppercase}}
                                                             </td>
                                                         </tr>
@@ -283,21 +313,22 @@
                                         <div class="row" *ngIf="dbDatos">
                                             <div class="col-md-12">
                                                 <br ><br>
+                                                <h2> RESOLUCIONES</h2>
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
                                                         <tr>
-                                                            <th colspan="5" class="text-center" style="padding: 15px;">
-                                                               RESOLUCIONES</th>
-                                                        </tr>
-                                                        <tr>
+                                                            <th>#</th>
                                                             <th style="width: 90px;"> FECHA</th>
                                                             <th>NUMERO</th>
                                                             <th>TIPO</th>
                                                             <th>ASUNTO</th>
+                                                            <th>DISTRI.</th>
+                                                            <th>ACCION</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let e of lstResoluciones">
+                                                        <tr *ngFor="let e of lstResoluciones; index as i">
+                                                            <td valign="center"><b>{{ i + 1 }}</b></td>
                                                             <td>{{e.fecha}}</td>
                                                             <td><a *ngIf="!validarSeguridad(e)" class="enlace"
                                                                     (click)="dwUrl(e)" target="_blank"
@@ -309,7 +340,12 @@
                                                                 <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
                                                                     RESOLUCIONES</b>
                                                             </td>
-                                                            <td *ngIf="!validarSeguridad(e)">{{ e.asunto | uppercase}}
+                                                            <td *ngIf="!validarSeguridad(e)">{{ e.asunto | uppercase}}</td>
+                                                            <td >{{ e.distribucion }}</td>
+                                                            <td  style="text-align: center;">
+                                                                <button mat-icon-button aria-label="Editar" (click)="editar( e )">
+                                                                    <mat-icon class="text-blue">edit_note</mat-icon>
+                                                                </button>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -519,9 +555,20 @@
                                                 <div class="col-md-2">
                                                     <div class="text-left" style="padding-top: 5px;">
                                                         <div class="example-button-container">
-                                                            <button class="btn bg-success text-white" style="height: 50px;"
-                                                                (click)="FilConsultar()">
-                                                                Listar datos
+                                                            <button class="btn bg-primary text-white" style="height: 50px;"
+                                                                (click)="FilConsultar(0)">
+                                                                Consultar datos
+
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="text-left" style="padding-top: 5px;">
+                                                        <div class="example-button-container">
+                                                            <button class="btn bg-warning text-white" style="height: 50px;"
+                                                                (click)="FilConsultar(1)">
+                                                                Listar sin fecha
 
                                                             </button>
                                                         </div>
@@ -536,14 +583,14 @@
                                                
                                                 <div class="col-md-12 text-right">
                                                     
-                                                        <button class="btn bg-success text-white "
-                                                            (click)="MostrarFiltro();">
-                                                            <span class="fa fa-upload"></span>&nbsp;&nbsp;Mostrar formulario </button>
+                                                    <button class="btn bg-success text-white "
+                                                        (click)="MostrarFiltro();">
+                                                        <span class="fa fa-upload"></span>&nbsp;&nbsp;Mostrar formulario </button>
 
-                                                            <button class="btn bg-info text-white "
-                                                            (click)="downloadCSV();">
-                                                            <span class="fa fa-download"></span>&nbsp;&nbsp;Descargar consulta </button>
-                                                            <br><br>
+                                                    <button class="btn bg-info text-white "
+                                                        (click)="downloadCSV();">
+                                                        <span class="fa fa-download"></span>&nbsp;&nbsp;Descargar consulta </button>
+                                                    <br><br>
                                                     
                                                 </div>
                                                 
@@ -665,18 +712,88 @@
                                     </div>
 
                                 </mat-tab>
-                                <!-- <mat-tab >
+                                <mat-tab >
                                     <ng-template mat-tab-label>
                                         &nbsp;EXPANDIDA
                                     </ng-template>
                                     <br>
                                     <div class="container">
-                                        
+                                        <div class="row"  *ngIf="blExpandida">
+                                            <div class="form-group col-md-12">
+                                                
+                                                <textarea  [placeholder]="'Consultar rango de cedula'" 
+                                                class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
+                                                [(ngModel)]="rango_cedula"></textarea>
+                                            </div>
+                                            <div class="form-group col-md-12 text-right">
+                                                <button class="btn bg-success text-white "
+                                                    (click)="ConsultaExpandida();">
+                                                    <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar listado </button>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="row" *ngIf="!blExpandida" >
+                                               
+                                            <div class="col-md-12 text-right">
+                                                
+                                                <button class="btn bg-success text-white "
+                                                    (click)="MostrarFiltroEx();">
+                                                    <span class="fa fa-upload"></span>&nbsp;&nbsp;Mostrar formulario </button>
+
+                                                <button class="btn bg-info text-white "
+                                                    (click)="downloadCSVEx();">
+                                                    <span class="fa fa-download"></span>&nbsp;&nbsp;Descargar consulta </button>
+                                                <br><br>
+                                                
+                                            </div>
+                                            
+                                        </div>
                                         <hr>
 
+                                        <div class="row" *ngIf="!blExpandida">
+                                            <div class="col-md-12">
+                                                
+                                                <table style="width: 100%;" class="zigzag" border="1">
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="7" class="text-center" style="padding: 15px;">
+                                                                LISTADO GENERAL POR PERSONA </th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th> NUM.</th>
+                                                            <th> GRADO</th>
+                                                            <th> NOMBRE COMPLETO</th>
+                                                            <th style="width: 110px;"> CEDULA</th>
+                                                            <th style="width: 90px;"> FECHA</th>
+                                                            <th>SITUACION</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let e of lstRangoCedula; index as i">
+                                                            <td>{{ i+1 }}</td>
+                                                            <td>{{ e.grado_abreviado }}</td>
+                                                            <td>{{ e.nombres }}</td>
+                                                            <td><a class="enlace" (click)="MoverForm(e.cedula)"
+                                                                    style="font-weight: bold; color: brown;">
+                                                                    {{e.cedula}} </a>
+                                                            </td>
+                                                            <td>
+                                                                {{e.nacimiento}}
+                                                            </td>
+                                                            <td>
+                                                                {{e.situacion}}
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+
+                                                </table>
+                                            </div>
+                                        </div>
                                         
                                     </div>
-                                </mat-tab> -->
+                                </mat-tab>
 
                                 <mat-tab *ngIf="blConfidencial">
                                     <ng-template mat-tab-label>
@@ -750,3 +867,6 @@
     </div>
     <!-- Fin de Tarjeta Padre -->
 </div>
+
+
+

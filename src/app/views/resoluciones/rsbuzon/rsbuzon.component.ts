@@ -152,7 +152,7 @@ export class RsbuzonComponent implements OnInit {
       case 0:
         this.cargarAcciones(0);
         this.xAPI.parametros = this.estadoActual + "," + this.estatusActual;
-        this.listarBuzon();
+        //this.listarBuzon();
         break;
       case 1:
         this.cargarAcciones(1);

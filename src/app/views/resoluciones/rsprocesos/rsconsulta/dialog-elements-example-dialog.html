@@ -1,0 +1,35 @@
+<!-- <h1 mat-dialog-title>Dialog with elements</h1> -->
+<div mat-dialog-content>
+  <div class="form-row">
+    <div class="col-md-5">
+      <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+        <mat-label>Formato del Documento</mat-label>
+        <mat-select placeholder="Documento">
+          <mat-option value=0>RESOLUCION</mat-option>
+          <mat-option value=1>ORDEN GENERAL</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-3">
+      <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+        <mat-label style="width:100%">Número de Resolución</mat-label>
+        <input type="text" matInput [(ngModel)]="IResolucion.numero" value="{{IResolucion.numero}}">
+      </mat-form-field>
+    </div>
+    <div class="col-md-4">
+      <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+        <mat-label>Fecha (*)</mat-label>
+        <input matInput placeholder="Fecha de resolucion" [ngModelOptions]="{standalone: true}" ngbDatepicker
+          #fo="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="fecha_resolucion">
+        <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button" id="fori">edit_calendar</mat-icon>
+
+
+      </mat-form-field>
+    </div>
+  </div>
+
+</div>
+<div mat-dialog-actions>
+
+</div>

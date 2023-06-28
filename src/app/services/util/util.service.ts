@@ -249,13 +249,13 @@ export class UtilService {
   ConvertToCSV(objArray, headerList) {
     let array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
     let str = "";
-    let row = "No,";
+    let row = "#Num|";
 
     for (let index in headerList) {
-      console.log(index, headerList);
-      row += headerList[index] + ",";
+      // console.log(index, headerList);
+      row += headerList[index] + "|";
     }
-    console.log(row);
+    // console.log(row);
     row = row.slice(0, -1);
     str += row + "\r\n";
 
@@ -263,7 +263,8 @@ export class UtilService {
       let line = i + 1 + "";
       for (let index in headerList) {
         let head = headerList[index];
-        line += "," + array[i][head];
+        let cadena = array[i][head] + ""
+        line += "|" + cadena.replace(/[\r\n]+/gm, "");
       }
       str += line + "\r\n";
     }

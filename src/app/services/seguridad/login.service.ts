@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 export interface IUsuario{
   nombre : string,
@@ -77,15 +78,13 @@ export class LoginService {
   }
 
   protected getUserDecrypt() : any {    
-    var e = sessionStorage.getItem("token");
-    var s = e.split(".");
-    
-    //var str = Buffer.from(s[1], 'base64').toString();
-    var str = atob( s[1] );
-    this.Token = JSON.parse(str)
-    // console.info(this.Token)
+    var token = sessionStorage.getItem("token");
+    const helper = new JwtHelperService();
+    const decodedToken = helper.decodeToken(token);
+    this.Token = decodedToken
     this.Usuario = this.Token.Usuario
-    return JSON.parse(str);
+    
+    return this.Token
   }
   
   //ObenterAplicacion 

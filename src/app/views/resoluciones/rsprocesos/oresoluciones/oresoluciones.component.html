@@ -479,7 +479,7 @@
                             <label for="txtObjeto">Asunto</label>
                             <div class="NgxEditor__Wrapper">
                                 <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
-                                    [(ngModel)]="IResolucion.asunto"></angular-editor>
+                                    [(ngModel)]="IResolucion.asunto" (blur)="Autocompletar()"></angular-editor>
                             </div>
                         </div>
                     </div>
@@ -511,7 +511,7 @@
                             <label> Distribuci&oacute;n </label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                                 [(ngModel)]="IResolucion.distribucion" >
-                                <option value="0">Seleccione</option>
+                                <option value="0">SELECCIONE</option>
                                 <option value="1">PUBLICAR</option>
                                 <option value="2">NO PUBLICAR</option>
                                 <option value="3">ENVIADA POR MEDIOS DIGITALES</option>
