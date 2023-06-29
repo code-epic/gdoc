@@ -249,7 +249,7 @@ export class UtilService {
   ConvertToCSV(objArray, headerList) {
     let array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
     let str = "";
-    let row = "#Num|";
+    let row = "#num|";
 
     for (let index in headerList) {
       // console.log(index, headerList);
@@ -264,8 +264,7 @@ export class UtilService {
       for (let index in headerList) {
         let head = headerList[index];
         let texto = array[i][head] + ""
-        let cadena = head=='numero'? "'" + texto: texto
-        line += "|" + cadena.replace(/[\r\n]+/gm, "");
+        line += "|" + texto.replace(/[\r\n]+/gm, "").toUpperCase();
       }
       str += line + "\r\n";
     }

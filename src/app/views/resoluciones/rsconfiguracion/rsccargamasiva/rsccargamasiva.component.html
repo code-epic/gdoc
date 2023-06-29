@@ -1,111 +1,302 @@
-<br>
-
-<div class="form-row">
-  <div class="form-group col-md-12">
-    <hr class="mb-1">
-    <h6 class="text-uppercase text-muted ls-1 mb-4">Formularios para ascensos masivos</h6>
-  </div>
-  <div class="form-group col-md-4">
-    <label> Tipo </label>
-    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Resolucion.carpeta">
-      <option value="0">Seleccione</option>
-      <option value="RESOLUCION">RESOLUCION</option>
-      <option value="ORDEN GENERAL">ORDEN GENERAL</option>
-    </select>
-  </div>
-  <div class="form-group col-md-4">
-    <label> Estatus </label>
-    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Resolucion.estatus"
-      value="{{Resolucion.estatus}}">
-      <option value="0">Seleccione</option>
-      <option *ngFor="let e of Estados;" [value]="e.cod_estado_resol">{{e.des_estado_resol}}</option>
-    </select>
-  </div>
-  <div class="form-group col-md-4">
-    <label>Responsable</label>
-    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" readonly
-      [(ngModel)]="Resolucion.responsable" value="{{Resolucion.responsable}}">
-  </div>
-</div>
-
-<div class="form-row">
-  <div class="form-group col-md-4">
-    <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
-      <mat-label>Número de Resolución </mat-label>
-      <input matInput placeholder="" [ngModelOptions]="{standalone: true}" [(ngModel)]="Resolucion.numero"
-        value="{{Resolucion.numero}}">
-    </mat-form-field>
-  </div>
-  <div class="form-group col-md-6">
-    <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
-      <mat-label style="width:100%">Tipo de Resolución</mat-label>
-      <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
-      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%">
-        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-          {{option.des_resol}}
-        </mat-option>
-      </mat-autocomplete>
-    </mat-form-field>
-  </div>
-  <div class="form-group col-md-2">
-    <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
-      <mat-label>Número Carpeta </mat-label>
-      <input matInput placeholder="" [ngModelOptions]="{standalone: true}" [(ngModel)]="Resolucion.carpeta"
-        value="{{Resolucion.carpeta}}">
-    </mat-form-field>
-  </div>
-</div>
-
-<div class="form-row">
-  <div class="form-group col-md-12">
-    <label for="txtObjeto">Asunto</label>
-    <div class="NgxEditor__Wrapper">
-      <!-- <ngx-editor-menu [editor]="xeditor"> </ngx-editor-menu>
-      <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xeditor" [(ngModel)]="Resolucion.asunto"
-        [disabled]="false" [placeholder]="'Escibe aqui...'">
-      </ngx-editor> -->
-    </div>
-  </div>
-</div>
-
-<div class="form-row">
-  <div class="form-group col-md-12">
-    <label for="txtObjeto">Observaciones</label>
-    <div class="NgxEditor__Wrapper">
-      <!-- <ngx-editor-menu [editor]="xobser"> </ngx-editor-menu>
-      <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="xobser" [(ngModel)]="Resolucion.observacion "
-        [disabled]="false" [placeholder]="'Escibe aqui...'">
-      </ngx-editor> -->
-    </div>
-  </div>
-</div>
-
-
-
-
-<div class="form-row">
-  
-  <div class="form-group col-md-6">
-    <form method="post" enctype="multipart/form-data" id="forma" name="forma">
-      <input type="hidden" name="txtFileID" id="txtFileID" [ngModelOptions]="{standalone: true}"
-        [(ngModel)]="numControl" value="{{numControl}}" readonly="readonly">
-      <label for="input-folder-2">Seleccionar Archivo</label>
-      <div class="file-loading">
-        <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file"
-          multiple accept=".pdf">
-      </div>
-      <div id="errorBlock" class="help-block"></div>
-    </form>
-
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12">
-    <div class="text-right">
-      <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
-    </div>
-  </div>
-</div>
+<ngx-ui-loader [loaderId]="'loader-editar'"></ngx-ui-loader>
 
 <br><br>
+
+<div class="form-row">
+
+  <div class="col-md-3" *ngIf='blAscenso'>
+      <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+          <mat-label>Codigo Transaccion</mat-label>
+          <input matInput placeholder="Codigo Transaccion" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="llave" disabled>
+      </mat-form-field>
+  </div>
+    <div class="col-md-3">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Formato del Documento</mat-label>
+            <mat-select placeholder="Documento"  [ngModelOptions]="{standalone: true}" 
+              [(ngModel)]="IResolucion.documento" >
+                <mat-option value=0>RESOLUCION</mat-option>
+                <mat-option value=1>ORDEN GENERAL</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <div class="col-md-3">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label style="width:100%">Número de Resolución</mat-label>
+            <input type="text" matInput [(ngModel)]="IResolucion.numero" value="{{IResolucion.numero}}">
+        </mat-form-field>
+    </div>
+    <div class="col-md-3">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Fecha (*)</mat-label>
+            <input matInput placeholder="Fecha de resolucion" [ngModelOptions]="{standalone: true}" ngbDatepicker
+                #fo="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="fecha_resolucion"
+                value="{{fecha_resolucion}}">
+            <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button" id="fori">edit_calendar</mat-icon>
+
+
+        </mat-form-field>
+    </div>
+</div>
+
+<div class="form-row">
+
+    <div class="form-group col-md-{{maxCol}}">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label style="width:100%">Tipo de Resolución</mat-label>
+            <input type="text" matInput [(ngModel)]="tipo" disabled="disabled">
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+    </div>
+
+
+
+    <div class="col-md-4" *ngIf="blAscenso">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Categoria</mat-label>
+            <mat-select placeholder="Categoria" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="IDatosBasicos.categoria">
+                <mat-option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="col-md-4" *ngIf="blAscenso">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Componente</mat-label>
+            <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="IDatosBasicos.componente">
+                <mat-option *ngFor="let e of Componentes;"
+                    [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <div class="col-md-4" *ngIf='blAscenso'>
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Grado</mat-label>
+            <mat-select placeholder="Grado para el ascenso" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="IResolucion.grado">
+                <mat-option *ngFor="let e of Grados" value="{{e.cod_grado}}">{{e.cod_grado }} -
+                    {{e.nombres_grado }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="col-md-4" *ngIf='blAscenso'>
+      <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+          <mat-label>Cantidad de registros</mat-label>
+          <input matInput placeholder="Orden de Merito" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="IDatosBasicos.orden">
+      </mat-form-field>
+  </div>
+    <div class="col-md-4" *ngIf='blAscenso'>
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Fecha del Ascenso ( * )</mat-label>
+
+            <input matInput placeholder="Fecha del Ascenso" [ngModelOptions]="{standalone: true}" ngbDatepicker
+                #fox="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="ultimo_ascenso">
+            <mat-icon matSuffix #buttonEl (click)="fox.toggle()" type="button" id="forix">edit_calendar</mat-icon>
+
+        </mat-form-field>
+    </div>
+
+
+    <div class="col-md-1" *ngIf='blReconocer'>
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>A&ntilde;o</mat-label>
+            <input type="number" matInput [(ngModel)]="IResolucion.anio" value="{{IResolucion.anio}}">
+
+        </mat-form-field>
+    </div>
+    <div class="col-md-1" *ngIf='blReconocer'>
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Mes</mat-label>
+            <input type="number" matInput [(ngModel)]="IResolucion.mes" value="{{IResolucion.mes}}">
+
+        </mat-form-field>
+    </div>
+    <div class="col-md-1" *ngIf='blReconocer'>
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Dia</mat-label>
+            <input type="number" matInput [(ngModel)]="IResolucion.dia" value="{{IResolucion.dia}}">
+
+        </mat-form-field>
+    </div>
+    <div class="col-md-4" *ngIf='blReconocer'>
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Fecha Ultimo Ascenso (*)</mat-label>
+            <input matInput placeholder="Fecha del Ascenso" [ngModelOptions]="{standalone: true}" ngbDatepicker
+                #fox="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="ultimo_ascenso">
+            <mat-icon matSuffix #buttonEl (click)="fox.toggle()" type="button" id="forix">edit_calendar</mat-icon>
+        </mat-form-field>
+    </div>
+
+    <div class="form-group col-md-6" *ngIf='false'>
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Nivel 1</mat-label>
+            <input matInput placeholder="Nivel 1" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="IResolucion.comando" value="{{IResolucion.comando}}" readonly>
+
+        </mat-form-field>
+    </div>
+
+
+
+    <!-- Corregir -->
+    <div class="form-group col-md-3" *ngIf="blCorregir">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Vincular Resoluci&oacute;n</mat-label>
+            <input matInput placeholder="Numero de resolucion" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="IResolucion.otro_resuelto" (blur)="vincular()">
+
+        </mat-form-field>
+    </div>
+    <div class="form-group col-md-3" *ngIf="blCorregir">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Fecha (*)</mat-label>
+            <input matInput [matDatepicker]="xpickerx" [(ngModel)]="fresolucion" [ngModelOptions]="{standalone: true}"
+                [ngModelOptions]="{standalone: true}" disabled="disabled">
+            <mat-datepicker-toggle matSuffix [for]="xpickerx"></mat-datepicker-toggle>
+            <mat-datepicker #xpickerx></mat-datepicker>
+        </mat-form-field>
+
+
+    </div>
+    <div class="form-group col-md-12" *ngIf="blCorregir">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Asunto de la resolucion</mat-label>
+            <input matInput placeholder="Asunto de la resolucion" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="aresolucion" disabled="disabled">
+
+        </mat-form-field>
+    </div>
+
+    <div class="col-md-6" *ngIf="blExtender">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Fecha Inicio(*)</mat-label>
+            <input matInput [matDatepicker]="fipicker" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="comision_inicio">
+            <mat-datepicker-toggle matSuffix [for]="fipicker"></mat-datepicker-toggle>
+            <mat-datepicker #fipicker></mat-datepicker>
+        </mat-form-field>
+    </div>
+
+    <div class="col-md-6" *ngIf="blExtender">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Fecha Fin(*)</mat-label>
+            <input matInput [matDatepicker]="ffpicker" [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_fin">
+            <mat-datepicker-toggle matSuffix [for]="ffpicker"></mat-datepicker-toggle>
+            <mat-datepicker #ffpicker></mat-datepicker>
+        </mat-form-field>
+    </div>
+
+
+
+</div>
+
+
+<div class="form-row" *ngIf="blComision">
+    <div class="col-md-{{maxColComision}}">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Fecha Inicio(*)</mat-label>
+            <input matInput placeholder="Fecha Inicio" [ngModelOptions]="{standalone: true}" ngbDatepicker
+                #foxx="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="comision_inicio">
+            <mat-icon matSuffix #buttonEl (click)="foxx.toggle()" type="button" id="forix">edit_calendar</mat-icon>
+        </mat-form-field>
+    </div>
+
+    <div class="col-md-{{maxColComision}}">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Fecha Fin(*)</mat-label>
+            <input matInput placeholder="Fecha Fin" [ngModelOptions]="{standalone: true}" ngbDatepicker
+                #foxxx="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="comision_fin">
+            <mat-icon matSuffix #buttonEl (click)="foxxx.toggle()" type="button" id="forix">edit_calendar</mat-icon>
+
+        </mat-form-field>
+    </div>
+
+    <div class="col-md-{{maxColComision}}" *ngIf="blComisionAux">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Pais</mat-label>
+            <mat-select placeholder="Pais" [ngModelOptions]="{standalone: true}" [(ngModel)]="IResolucion.pais">
+                <mat-option *ngFor="let e of lstPais" value="{{e.codigo}}">{{e.nombre}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <div class="NgxEditor__Wrapper">
+            <label>
+               Asunto
+            </label>
+            <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
+                [(ngModel)]="IResolucion.asunto"></angular-editor>
+                
+        </div>
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label for="txtObjeto">Instrucciones especiales</label>
+        <div class="NgxEditor__Wrapper">
+            <angular-editor [placeholder]="'Introduzca el texto con las instrucciones...'" [config]="editorConfig"
+                [(ngModel)]="IResolucion.instrucciones"></angular-editor>
+        </div>
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label for="txtObjeto">Observaciones</label>
+        <div class="NgxEditor__Wrapper">
+            <angular-editor [placeholder]="'Introduzca el texto  para las observaciones...'" [config]="editorConfig"
+                [(ngModel)]="IResolucion.observacion"></angular-editor>
+        </div>
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label> Distribuci&oacute;n </label>
+        <select class="form-control" [ngModelOptions]="{standalone: true}"
+         [(ngModel)]="IResolucion.distribucion"  value="{{IResolucion.distribucion}}">
+            <option value="0">PUBLICAR</option>
+            <option value="1">PUBLICAR</option>
+            <option value="2">CONFIDENCIAL</option>
+            <option value="3">RESERVADO</option>
+        </select>
+    </div>
+    <div class="form-group col-md-6">
+        <label> Cargar Archivo </label>
+        <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+            <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="input_container">
+                        <input (change)="fileSelected($event)" id="fileUpload" type="file" name="archivos"
+                            accept=".pdf,.csv" multiple/>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<hr>
+<div class="row">
+    <div class="col-md-12">
+        <div class="text-right">
+            <button class="btn bg-primary text-white" (click)="SubirArchivo()">Modificar</button>
+        </div>
+    </div>
+</div>
+<br><br>
+
+
+
+

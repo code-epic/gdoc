@@ -153,4 +153,12 @@ export class ApiService {
     return this.http.post<any>(ruta,  tpf, httpOptions)
   }
 
+
+    //Ejecutar Api generales
+    EjecutarProceso(xInterface) : Observable<any>{
+      // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
+      var url = this.URL + "pascensos"
+      //console.info( JSON.stringify(xAPI ))
+      return this.http.post<any>(url, xInterface, this.httpOptions);
+    }
 }

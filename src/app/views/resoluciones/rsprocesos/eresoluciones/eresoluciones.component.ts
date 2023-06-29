@@ -869,10 +869,12 @@ export class EresolucionesComponent implements OnInit {
     );
 
     this.IResolucion.asunto = this.IResolucion.asunto.toUpperCase();
-    this.IResolucion.instrucciones =
-      this.IResolucion.instrucciones.toUpperCase();
+    this.IResolucion.instrucciones = this.IResolucion.instrucciones.toUpperCase();
     this.IResolucion.observacion = this.IResolucion.observacion.toUpperCase();
     this.IResolucion.autor_modificar = this.loginService.Usuario.cedula;
+    
+    console.log(this.archivos, this.archivos.length )
+
     this.UResolucion = {
       numero: this.IResolucion.numero,
       fecha_resolucion: this.IResolucion.fecha_resolucion,
@@ -887,9 +889,11 @@ export class EresolucionesComponent implements OnInit {
       falta: this.IResolucion.falta,
       identificador: this.resolucion.rs.id,
     }
-   
     
-    this.xAPI.funcion = "MPPD_UResoluciones";
+    this.xAPI.funcion = this.archivos.length > 0? 'MPPD_UResoluciones': 'MPPD_UResolucionesSinArchivo'
+    console.log(this.xAPI)
+    console.log(this.UResolucion)
+
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.UResolucion);
 
