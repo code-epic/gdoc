@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit, Output } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import {
   NgbDate,
@@ -133,6 +133,7 @@ export class RscdatosbasicosComponent implements OnInit {
   public ipsfa_otros_estudios: string = "";
 
   public dbActivar: boolean = false;
+  public blPrincipal: boolean = true;
   public nacimiento: any = "";
   public ingreso: any = "";
   public ascenso: any = "";
@@ -143,6 +144,7 @@ export class RscdatosbasicosComponent implements OnInit {
     valores: "",
   };
 
+  @Input() EDITOR: string = "";
 
   constructor(
     private apiService: ApiService,
@@ -191,8 +193,17 @@ export class RscdatosbasicosComponent implements OnInit {
       sessionStorage.getItem("MPPD_COrdenEntrada") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_COrdenEntrada")))
         : [];
+
+    //Recibiendo mensajes del Proveedor
   }
 
+  ngOnChanges() {
+    /** */
+    this.DBasico.cedula = this.EDITOR;
+    this.blPrincipal = false
+
+    if (this.DBasico.cedula != "") this.buscarCedula();
+  }
   /**
    * Consultar datos generales del militar
    */
@@ -202,62 +213,67 @@ export class RscdatosbasicosComponent implements OnInit {
         this._snackBar.open("Debe seleccionar una cedula", "OK");
         return;
       }
-      let cedula = this.DBasico.cedula;
-      this.ngxService.startLoader("loader-aceptar");
-      this.xAPI.funcion = "MPPD_CDatosBasicos";
-      this.xAPI.parametros = cedula;
-      this.xAPI.valores = "";
-      this.foto = "assets/img/theme/ndisponible.jpeg";
-      this.limpiarDB();
-      this.DBasico.cedula = cedula;
-      this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          //console.log(data.Cuerpo);
-          if (data.Cuerpo.length > 0) {
-            this.DBasico = data.Cuerpo[0];
-            this.foto =
-              "https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/" +
-              this.DBasico.cedula +
-              "/foto.jpg";
-            this.Resolucion = data.Cuerpo[0];
-            this.nacimiento = NgbDate.from(
-              this.formatter.parse(this.DBasico.nacimiento.substring(0, 10))
-            );
-            this.ingreso = NgbDate.from(
-              this.formatter.parse(this.DBasico.promocion.substring(0, 10))
-            );
-            this.ascenso = NgbDate.from(
-              this.formatter.parse(this.DBasico.ultimo_ascenso.substring(0, 10))
-            );
-
-            if (
-              data.Cuerpo[0].resoluciones != undefined &&
-              data.Cuerpo[0].resoluciones != ""
-            ) {
-              this.lstResoluciones = JSON.parse(
-                data.Cuerpo[0].resoluciones
-              ).reverse();
-              this.filtrarNombramiento();
-            }
-            if (
-              data.Cuerpo[0].entradas != undefined &&
-              data.Cuerpo[0].entradas != ""
-            ) {
-              this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse();
-            }
-            this.dbActivar = true;
-
-            this.seleccionColor()
-          }
-          
-          this.ngxService.stopLoader("loader-aceptar");
-        },
-        (error) => {
-          console.error("Error de conexion a los datos ", error);
-          this.ngxService.stopLoader("loader-aceptar");
-        }
-      );
+      this.buscarCedula();
     }
+  }
+
+  buscarCedula() {
+    let cedula = this.DBasico.cedula;
+    this.dbActivar = false;
+    this.ngxService.startLoader("loader-aceptar");
+    this.xAPI.funcion = "MPPD_CDatosBasicos";
+    this.xAPI.parametros = cedula;
+    this.xAPI.valores = "";
+    this.foto = "assets/img/theme/ndisponible.jpeg";
+    this.limpiarDB();
+    this.DBasico.cedula = cedula;
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        // console.log(data.Cuerpo);
+        if (data.Cuerpo.length > 0) {
+          this.DBasico = data.Cuerpo[0];
+          this.foto =
+            "https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/" +
+            this.DBasico.cedula +
+            "/foto.jpg";
+          this.Resolucion = data.Cuerpo[0];
+          this.nacimiento = NgbDate.from(
+            this.formatter.parse(this.DBasico.nacimiento.substring(0, 10))
+          );
+          this.ingreso = NgbDate.from(
+            this.formatter.parse(this.DBasico.promocion.substring(0, 10))
+          );
+          this.ascenso = NgbDate.from(
+            this.formatter.parse(this.DBasico.ultimo_ascenso.substring(0, 10))
+          );
+
+          if (
+            data.Cuerpo[0].resoluciones != undefined &&
+            data.Cuerpo[0].resoluciones != ""
+          ) {
+            this.lstResoluciones = JSON.parse(
+              data.Cuerpo[0].resoluciones
+            ).reverse();
+            this.filtrarNombramiento();
+          }
+          if (
+            data.Cuerpo[0].entradas != undefined &&
+            data.Cuerpo[0].entradas != ""
+          ) {
+            this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse();
+          }
+          this.dbActivar = true;
+
+          this.seleccionColor();
+        }
+
+        this.ngxService.stopLoader("loader-aceptar");
+      },
+      (error) => {
+        console.error("Error de conexion a los datos ", error);
+        this.ngxService.stopLoader("loader-aceptar");
+      }
+    );
   }
 
   filtrarNombramiento() {
@@ -321,7 +337,7 @@ export class RscdatosbasicosComponent implements OnInit {
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.info(data);
+        //console.info(data);
 
         if (data.length > 0) {
           const militar = data[0];
@@ -400,7 +416,7 @@ export class RscdatosbasicosComponent implements OnInit {
 
   Aceptar() {
     this.obtenerDatos();
-    console.log(this.DBasico.condicion, " Contenido");
+    let cedula = this.DBasico.cedula
 
     if (this.DBasico.condicion != 0 && this.DBasico.motivo == "") {
       this.toastrService.warning(
@@ -411,15 +427,14 @@ export class RscdatosbasicosComponent implements OnInit {
     }
     this.ngxService.startLoader("loader-aceptar");
 
-    this.DBasico.fecha = this.DBasico.fecha != "" ? this.DBasico.fecha : "1900-01-01";
-    let funcion = "MPPD_IDatosBasicos";
-    if (this.dbActivar) funcion = "MPPD_UDatosBasicos";
-    this.xAPI.funcion = funcion;
+    this.DBasico.fecha =
+      this.DBasico.fecha != "" ? this.DBasico.fecha : "1900-01-01";
+    this.xAPI.funcion = this.dbActivar
+      ? "MPPD_UDatosBasicos"
+      : "MPPD_IDatosBasicos";
     this.xAPI.parametros = "";
-    this.SituacionMilitar()
+    this.SituacionMilitar();
     this.xAPI.valores = JSON.stringify(this.DBasico);
-    console.log(this.xAPI);
-    console.log(this.DBasico);
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.toastrService.success(
@@ -428,6 +443,7 @@ export class RscdatosbasicosComponent implements OnInit {
         );
         this.ngxService.stopLoader("loader-aceptar");
         this.dbActivar = false;
+        if (this.EDITOR != "") this.controlActivo(cedula);
       },
       (error) => {
         this.toastrService.error(error, `MPPD_DatosBasicos -> Aceptar`);
@@ -436,32 +452,33 @@ export class RscdatosbasicosComponent implements OnInit {
     );
   }
 
-  SituacionMilitar(){
+  SituacionMilitar() {
     switch (this.DBasico.situacion) {
-      case 'RSP' && 'RCP' && 'INV':
-        this.DBasico.situacion = "RACT"
+      case "RSP" && "RCP" && "INV":
+        this.DBasico.situacion = "RACT";
         break;
-      case 'ACT':
-        this.DBasico.situacion = "ACT"
-      
-    }  
-    
-    
+      case "ACT":
+        this.DBasico.situacion = "ACT";
+    }
   }
   seleccionColor() {
     switch (this.DBasico.condicion.toString()) {
-      case '1':
+      case "1":
         this.color = "#E3FEFE";
-        return
-      case '2':
+        return;
+      case "2":
         this.color = "#FDFEE3";
-        return
-      case '3':
+        return;
+      case "3":
         this.color = "#FEE7E3";
-        return
+        return;
       default:
         this.color = "#FFFFFF";
-        return
+        return;
     }
+  }
+
+  controlActivo(cedula : string) {
+    this.utilService.contenido$.emit( cedula );
   }
 }

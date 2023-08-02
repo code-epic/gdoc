@@ -7,6 +7,6 @@ export const environment = {
   ID : 'ID-001',
   Url: 'http://10.120.0.58',
   API: '/devel/api/',
-  Hash: ':c521f27fb1b3311d686d511b668e5bd4'
+  Hash: ':6366af5d4c4d4674f9ce04652ad0206c.sse'
 };
 

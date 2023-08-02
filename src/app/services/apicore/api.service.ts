@@ -161,4 +161,18 @@ export class ApiService {
       //console.info( JSON.stringify(xAPI ))
       return this.http.post<any>(url, xInterface, this.httpOptions);
     }
+    //Ejecutar Api generales
+    EjecutarIngreso(xInterface) : Observable<any>{
+      // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
+      var url = this.URL + "pingresos"
+      //console.info( JSON.stringify(xAPI ))
+      return this.http.post<any>(url, xInterface, this.httpOptions);
+    }
+
+    EjecutarLotes(xInterface) : Observable<any>{
+      // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
+      var url = this.URL + "plotes"
+      //console.info( JSON.stringify(xAPI ))
+      return this.http.post<any>(url, xInterface, this.httpOptions);
+    }
 }

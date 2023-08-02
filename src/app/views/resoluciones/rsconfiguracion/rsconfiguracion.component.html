@@ -14,7 +14,7 @@
           <div class="row align-items-center">
             <div class="col-md-11">
               <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
-              <h2 class="mb-0">Configuraciones Generales</h2>
+              <h2 class="mb-0">{{titulo}}</h2>
             </div>
             <div class="col-md-1">
               <div class="media align-items-center">
@@ -37,10 +37,10 @@
 
               <div class="row">
 
-                <div class="col-md-1"></div>
+                <div class="col-md-2"></div>
                 
                 <div class="col-md-2">
-                  <a routerLinkActive="active" (click)="desactivar();dbasico=true">
+                  <a routerLinkActive="active" (click)="desactivar('Datos Basicos');dbasico=true">
                     <div class="text-center rounded botones">
                       <br>
                         <h2 class="text-center text-green"><i class="fa fa-user-circle" style="font-size: 42px;"></i></h2>
@@ -49,38 +49,10 @@
                   </a>
                 </div>
     
-                <div class="col-md-2">
-                  <a routerLinkActive="active" (click)="desactivar();dmasivo=true">
-                    <div class="text-center rounded botones">
-                      <br>
-                        <h2 class="text-center text-blue"><i class="fa fa-tasks" style="font-size: 42px;"></i></h2>
-                        <p>Ascensos</p>
-                    </div>
-                  </a>
-                </div>
-    
-                <div class="col-md-2">
-                  <a routerLinkActive="active" (click)="desactivar();dgeneral=true">
-                    <div class="text-center rounded botones">
-                      <br>
-                        <h2 class="text-center text-red"><i class="fa fa-cog" style="font-size: 42px;"></i></h2>
-                        <p>Generales</p>
-                    </div>
-                  </a>
-                </div>
+        
                 
                 <div class="col-md-2">
-                  <a routerLinkActive="active" (click)="desactivar();dpublicaciones=true">
-                    <div class="text-center rounded botones">
-                      <br>
-                        <h2 class="text-center text-teal"><i class="fa fa-upload" style="font-size: 42px;"></i></h2>
-                        <p>Publicaciones</p>
-                    </div>
-                  </a>
-                </div>
-                
-                <div class="col-md-2">
-                  <a routerLinkActive="active" (click)="desactivar();dpublicaciones=true">
+                  <a routerLinkActive="active" (click)="desactivar('Reportes');dpublicaciones=true">
                     <div class="text-center rounded botones">
                       <br>
                         <h2 class="text-center text-brown"><i class="fa fa-print" style="font-size: 42px;"></i></h2>
@@ -89,7 +61,7 @@
                   </a>
                 </div>
                 
-                <div class="col-md-1"></div>
+                <div class="col-md-2"></div>
     
               </div>
     
@@ -97,21 +69,26 @@
             </div>
             <div class="col-md-1"></div>
           </div>
-         
+          <br><br>
           <div class="row">
             <div class="col-md-12">
               <app-rscdatosbasicos *ngIf="dbasico"></app-rscdatosbasicos>
-              <app-rsccargamasiva *ngIf="dmasivo"></app-rsccargamasiva>
+              <!-- <app-rsccargamasiva *ngIf="dmasivo"></app-rsccargamasiva> -->
               <app-rscgeneral *ngIf="dgeneral"></app-rscgeneral>
               <app-rscpublicaciones *ngIf="dpublicaciones"></app-rscpublicaciones>
 
             </div>
           </div>
-
+          
 
         </div>
       </div>
     </div>
   </div>
   <!-- Fin de Tarjeta Padre -->
+
+  <br><br><br><br><br><br><br><br>
 </div>
+
+
+

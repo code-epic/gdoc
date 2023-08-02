@@ -11,12 +11,12 @@
                     <div class="row align-items-center">
                         <div class="col-md-10">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
-                            <h2 class="mb-0">Procesos</h2>
+                            <h2 class="mb-0">{{titulo}}</h2>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
-                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                    <button mat-icon-button title="Volver Atrás" (click)="irAnterior()">
                                         <mat-icon>arrow_back</mat-icon>
                                     </button>
                                 </div>
@@ -35,7 +35,7 @@
                                         </div>
                                     </a>
                                     <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                                      
+
                                         <a routerLinkActive="active" [routerLink]="['/rsprocesos/oresoluciones']"
                                             class="dropdown-item">
                                             <i class="fa fa-plus"></i>
@@ -58,42 +58,112 @@
 
                     <div class="row">
                         <div class="col-md-1"></div>
-          
                         <div class="col-md-10 text-center">
-          
-                          <div class="row text-center">
-                            <div class="col-md-1"></div>
-                            <div class="col-md-2 cardround">
-                              <a routerLinkActive="active" [routerLink]="[ 'oresoluciones']">
-                                <div class="text-center botones">
-                                  <br>
-                                  <h2 class="text-center text-green"><i class="fa fa-folder" style="font-size: 42px;"></i>
-                                  </h2>
-                                  <p>Agregar resolucion</p>
-                                </div>
-                              </a>
-                            </div>
+                            <div class="row text-center" *ngIf="menu">
+<!-- 
+                                <div class="col-md-2 cardround">
+                                    <a routerLinkActive="active" (click)="desactivar('aresolucion')">
+                                        <div class="text-center botones">
+                                            <br>
+                                            <h2 class="text-center text-green"><i class="fa fa-folder"
+                                                    style="font-size: 42px;"></i>
+                                            </h2>
+                                            <p>Agregar resolucion</p>
+                                        </div>
+                                    </a>
+                                </div> -->
 
-                            <div class="col-md-2 cardround">
-                                <a routerLinkActive="active" [routerLink]="[ 'rsconsulta']">
-                                  <div class="text-center botones">
+                                <div class="col-md-2">
+                                    <a routerLinkActive="active"
+                                        (click)="desactivar('Agragar Entradas');aentradas=true">
+                                        <div class="text-center rounded botones">
+                                            <br>
+                                            <h2 class="text-center text-green"><i class="fa fa-file"
+                                                    style="font-size: 42px;"></i></h2>
+                                            <p>Agragar Entradas</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <a routerLinkActive="active"
+                                        (click)="desactivar('Agragar Resolucion');aresolucion=true">
+                                        <div class="text-center rounded botones">
+                                            <br>
+                                            <h2 class="text-center text-blue"><i class="fa fa-book"
+                                                    style="font-size: 42px;"></i></h2>
+                                            <p>Agragar Resolucion</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+
+                                <div class="col-md-2">
+                                    <a routerLinkActive="active"
+                                        (click)="desactivar('Ingresos por lote');lotes=true">
+                                        <div class="text-center rounded botones">
+                                            <br>
+                                            <h2 class="text-center text-orange"><i class="fa fa-tasks"
+                                                    style="font-size: 42px;"></i></h2>
+                                            <p>Lotes</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-2">
+                                <a routerLinkActive="active" (click)="desactivar('Generales');generales=true">
+                                  <div class="text-center rounded botones">
                                     <br>
-                                    <h2 class="text-center text-red"><i class="fa fa-search" style="font-size: 42px;"></i>
-                                    </h2>
-                                    <p>Consultar</p>
+                                      <h2 class="text-center text-red"><i class="fa fa-cog" style="font-size: 42px;"></i></h2>
+                                      <p>Generales</p>
                                   </div>
                                 </a>
                               </div>
 
+                                <div class="col-md-2">
+                                    <a routerLinkActive="active"
+                                        (click)="desactivar('Publicaciones');dpublicaciones=true">
+                                        <div class="text-center rounded botones">
+                                            <br>
+                                            <h2 class="text-center text-teal"><i class="fa fa-upload"
+                                                    style="font-size: 42px;"></i></h2>
+                                            <p>Publicaciones</p>
+                                        </div>
+                                    </a>
+                                </div>
 
-                            <div class="col-md-1"></div>
-                          </div>
-          
+                                <div class="col-md-2">
+                                    <a routerLinkActive="active"
+                                        (click)="desactivar('Eliminaciones');dpublicaciones=true">
+                                        <div class="text-center rounded botones">
+                                            <br>
+                                            <h2 class="text-center text-purple"><i class="fa fa-trash"
+                                                    style="font-size: 42px;"></i></h2>
+                                            <p>Eliminaciones</p>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-1"></div>
+                                <br><br><br><br>
+                            </div>
+
                         </div>
-          
-                        <div class="col-md-1"></div>
-          
-                      </div>
+
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <app-rsentradas *ngIf="entradas"></app-rsentradas>
+                            <app-rscdatosbasicos *ngIf="dbasico"></app-rscdatosbasicos>
+                            <app-oresoluciones *ngIf="aresolucion"></app-oresoluciones>
+                            <app-rscgeneral *ngIf="lotes"></app-rscgeneral>
+                            <app-rsgenerales *ngIf="generales"></app-rsgenerales>
+                            <app-rscpublicaciones *ngIf="dpublicaciones"></app-rscpublicaciones>
+
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

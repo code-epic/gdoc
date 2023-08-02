@@ -123,3 +123,10 @@ textarea {
     height: 100%;
     width: 100%;
   }
+
+  mat-chip {
+    max-width: 310px;
+    height: 38px;
+    color: aliceblue;
+    background-color: #3b3232;
+  }

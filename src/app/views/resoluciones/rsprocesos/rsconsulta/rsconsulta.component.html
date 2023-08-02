@@ -3,15 +3,15 @@
         <p></p>
     </div>
 </div>
-<div class="container-fluid mt--9">
-    <div class="row">
+<div class="container-fluid mt--9" >
+    <div class="row" >
         <div class="col-xl-12 col-md-12 col-lg-12">
-            <div class="card shadow">
+            <div class="card shadow"  style="margin-top: -40px;">
                 <div class="card-header bg-transparent">
-                    <div class="row align-items-center">
+                    <div class="row align-items-center" style="margin: -10px;">
                         <div class="col-md-10">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
-                            <h2 class="mb-0">Procesos</h2>
+                            <h2 class="mb-0">Modulo de Busqueda</h2>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
@@ -70,10 +70,14 @@
                                         &nbsp;ESPECIFICA
                                     </ng-template>
                                     <br>
+                                    <div *ngIf="blEditor" class="example-large-box " style="margin: 0px;padding: 15px;">
+                                        <app-rscdatosbasicos EDITOR="{{EDITOR}}"></app-rscdatosbasicos>
+                                    </div>
+                                    <div *ngIf="blEspecifico" class="example-large-box " style="margin: 0px;padding: 15px;">
 
-                                    <div class="container" >
+                                     
 
-                                        <div class="row">
+                                        <div class="row" >
 
                                             <div class="col-md-4">
                                                 <mat-form-field appearance="outline">
@@ -153,17 +157,31 @@
 
                                         </div>
 
-                                        <hr>
-
+                                        <div class="row" style="padding-top: 5px">
+                                            <div class="col-md-9">
+                                                <h2 *ngIf="blDatosBasicos" style="margin-top: 10px; margin-left: -3px"> DATOS BASICOS</h2>
+                                            </div>
+                                            <div class="col-md-3">
+                                               
+                                                     <div *ngIf="blResolucionPanel"  class="example-button-row text-right text-white"  >
+                                                        <button style="background-color: #2a9a17;" mat-icon-button title="Volver Atrás" 
+                                                        (click)="volverResolucion()">
+                                                            <mat-icon>open_in_browser</mat-icon>
+                                                        </button>
+                                                    </div>
+                                                    <div *ngIf="blDatosBasicos" class="example-button-row text-right text-white"  >
+                                                        <button style="background-color: #2a9a17;" mat-icon-button title="Editar datos Basicos" 
+                                                        (click)="editarDatosBasicos()">
+                                                            <mat-icon>manage_accounts</mat-icon>
+                                                        </button>
+                                                    </div> 
+                                            
+                                            </div>
+                                        </div>
                                         <div class="row" *ngIf="dbDatos">
+                                            
                                             <div class="col-md-12">
                                                 <table style="width: 100%;" border="1" class="zigzag">
-                                                    <thead>
-                                                        <tr>
-                                                            <th colspan="3" class="text-center" style="padding: 15px;">
-                                                                DATOS BASICOS</th>
-                                                        </tr>
-                                                    </thead>
                                                     <tbody>
                                                         <tr>
                                                             <th>CEDULA</th>
@@ -172,7 +190,8 @@
                                                                     V-{{IDatosBasicos.cedula}}
                                                                 </font>
                                                             </td>
-                                                            <th style="width: 180px; text-align: center;" >FOTO</th>
+                                                            <th style="width: 210px; text-align: center;" >FOTO</th>
+                                                            <th style="text-align: center;" >ASCENSOS</th>
                                                         </tr>
                                                         <tr>
                                                             <th>GRADO</th>
@@ -181,12 +200,27 @@
                                                                     {{IDatosBasicos.grado}}
                                                                 </font>
                                                             </td>
-                                                            <td rowspan="7" valing="center" style="text-align: center;">
+                                                            <td rowspan="9" valing="center" style="text-align: center;">
                                                                 <div
-                                                                    style="border:0px solid #CCC; padding: 1px;width: 160px">
+                                                                    style="border:0px solid #CCC; padding: 1px;width: 190px">
                                                                     <img src="{{ obtenerFoto(IDatosBasicos.cedula) }}"
-                                                                        style="width: 155px">
+                                                                        style="width: 189px">
                                                                 </div>
+                                                            </td>
+                                                            <td rowspan="10" valign="top" style="width: 350px;margin: 0px; padding: 0px">
+                                                               <table style="width: 100%; text-align: center;"  border="1" class="zigzag">
+                                                               
+                                                                <tr *ngFor="let elem of lstAscenso"> 
+                                                                    <td>{{ convertirFecha(elem.fecha_resolucion) }}</td>
+                                                                    <td>{{ obtenerNombreGrado( elem.grado) }}</td>
+                                                                    <td><a *ngIf="!validarSeguridad( elem )" class="enlace"
+                                                                        (click)="dwUrl( elem )" target="_blank"
+                                                                        style="font-weight: bold; color: brown;">
+                                                                        {{elem.titulo}} </a> </td>
+                                                                
+                                                                <td>{{  obtenerOrdenMerito( elem ) }}</td>
+                                                                </tr>
+                                                               </table>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -211,15 +245,27 @@
                                                         </tr>
                                                         <tr>
                                                             <th>SEXO</th>
-                                                            <td>{{ getSex(IDatosBasicos.sexo) }}</td>
+                                                            <td>{{ getSex(IDatosBasicos.sexo)  | uppercase }}</td>
                                                         </tr>
                                                         <tr>
                                                             <th>SITUACION</th>
-                                                            <td>{{ getSituation(IDatosBasicos.situacion) }}</td>
+                                                            <td>{{ getSituation(IDatosBasicos.situacion)  | uppercase }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>FECHA DE PROMOCION</th>
+                                                            <td>{{ convertirFecha(IDatosBasicos.promocion) }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>ESPECIALIDAD</th>
+                                                            <td>{{IDatosBasicos.especialidad  | uppercase}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>OBSERVACIONES</th>
+                                                            <td>{{IDatosBasicos.observaciones  | uppercase}}</td>
                                                         </tr>
                                                         <tr *ngIf="IDatosBasicos.condicion != 0">
                                                             <th >MOTIVO</th>
-                                                            <td [ngStyle]="{'background-color': color_acc}" colspan="2">
+                                                            <td [ngStyle]="{'background-color': color_acc}" colspan="3">
                                                                 <font [ngStyle]="{'color': color_texto}">
                                                                     {{ IDatosBasicos.motivo | uppercase }}
                                                                 </font>
@@ -245,7 +291,8 @@
                                                             <th> GRADO</th>
                                                             <th> NOMBRE COMPLETO</th>
                                                             <th style="width: 110px;"> CEDULA</th>
-                                                            <th style="width: 90px;"> FECHA</th>
+                                                            <th style="width: 90px;"> PROMOCION</th>
+                                                            <th> SEXO </th>
                                                             <th>SITUACION</th>
                                                         </tr>
                                                     </thead>
@@ -254,15 +301,18 @@
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ e.grado_abreviado }}</td>
                                                             <td>{{ e.nombres }}</td>
-                                                            <td><a class="enlace" (click)="MoverForm(e.cedula)"
+                                                            <td><a class="enlace" (click)="MoverForm(e.cedula);volverDatos(0)"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.cedula}} </a>
                                                             </td>
                                                             <td>
-                                                                {{e.nacimiento}}
+                                                                {{ convertirFecha(e.promocion) }}
                                                             </td>
                                                             <td>
-                                                                {{e.situacion}}
+                                                                {{ e.sexo | uppercase  }}
+                                                            </td>
+                                                            <td>
+                                                                {{ getSituation(e.situacion) | uppercase }}
                                                             </td>
 
                                                         </tr>
@@ -325,7 +375,7 @@
                                                     <tbody>
                                                         <tr *ngFor="let e of lstResoluciones; index as i">
                                                             <td valign="center"><b>{{ i + 1 }}</b></td>
-                                                            <td>{{e.fecha}}</td>
+                                                            <td>{{ convertirFecha(e.fecha) }}</td>
                                                             <td><a *ngIf="!validarSeguridad(e)" class="enlace"
                                                                     (click)="dwUrl(e)" target="_blank"
                                                                     style="font-weight: bold; color: brown;">
@@ -361,7 +411,7 @@
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
                                                         <tr>
-                                                            <th colspan="7" class="text-center" style="padding: 15px;">
+                                                            <th colspan="8" class="text-center" style="padding: 15px;">
                                                                 FICHA DE DATOS RESOLUCIONES ( {{ resolucion }} ) </th>
                                                         </tr>
                                                         <tr>
@@ -372,6 +422,7 @@
                                                             <th style="width: 90px;"> FECHA</th>
                                                             <th>TIPO</th>
                                                             <th>ASUNTO</th>
+                                                            <th>CORRECCION</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -379,11 +430,11 @@
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ e.grado_abreviado }}</td>
                                                             <td>{{ e.nombres_apellidos }}</td>
-                                                            <td><a class="enlace" (click)="obtenerCedula(e.cedula)"
+                                                            <td><a class="enlace" (click)="obtenerCedula(e.cedula);volverDatos(1)"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.cedula}} </a></td>
 
-                                                            <td>{{ e.fecha_resolucion }}</td>
+                                                            <td>{{ convertirFecha(e.fecha_resolucion) }}</td>
                                                             <!-- href="{{ obtenerUbicacion(e) }}" -->
                                                             <td><a *ngIf="!validarSeguridad(e)" class="enlace"
                                                                     (click)="dwUrl(e)" target="_blank"
@@ -398,6 +449,12 @@
                                                                 {{e.administracion}}
                                                                 <br>
                                                                 {{e.asunto}}
+                                                            </td>
+                                                            <td>
+                                                                <a *ngIf="!validarSeguridad(e)" class="enlace"
+                                                                    (click)="dwUrlCorreccion(e)" target="_blank"
+                                                                    style="font-weight: bold; color: brown;"> {{
+                                                                    getCorreccion(e) }} </a>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -416,7 +473,7 @@
                                         &nbsp;FILTRADA
                                     </ng-template>
                                     <br>
-                                    <div class="container">
+                                    <div class="example-large-box " style="margin: 0px;padding: 15px;">
                                         <div *ngIf="blFiltro">
 
                                             <div class="row">
@@ -623,7 +680,7 @@
                                                                     (click)="dwUrl(e)" target="_blank"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{ e.numero }} </a> </td>
-                                                            <td>{{ e.fecha_resolucion }}</td>
+                                                            <td>{{ convertirFecha(e.fecha_resolucion) }}</td>
                                                             <td>{{ obtenerTipo(e.tipo) }}</td>
                                                             <td>{{ e.administracion }}</td>
                                                             <td *ngIf="validarSeguridad(e)" style="color:brown;">
@@ -670,7 +727,7 @@
                                                                     (click)="dwUrl(e)" target="_blank"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.numero}} </a> </td>
-                                                            <td>{{ e.fecha_resolucion }}</td>
+                                                            <td>{{ convertirFecha(e.fecha_resolucion) }}</td>
                                                             <td>{{ obtenerTipo(e.tipo) }}</td>
                                                             <td *ngIf="validarSeguridad(e)" style="color:brown;">
 
@@ -873,7 +930,7 @@
                 <label for="txtObjeto">Instrucciones especiales</label>
                 <div class="NgxEditor__Wrapper">
                     <angular-editor [placeholder]="'Instrucciones...'" [config]="editorConfigx"
-                        [(ngModel)]="instruccion"></angular-editor>
+                        [(ngModel)]="instrucciones"></angular-editor>
                 </div>
             </div>
         </div>

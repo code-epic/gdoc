@@ -93,7 +93,11 @@ import { OresolucionesComponent } from './views/resoluciones/rsprocesos/oresoluc
 import { RsconsultaComponent } from './views/resoluciones/rsprocesos/rsconsulta/rsconsulta.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { EresolucionesComponent } from './views/resoluciones/rsprocesos/eresoluciones/eresoluciones.component';
-
+import { MatTreeModule } from '@angular/material/tree';
+import { RsdatosbasicosmasivosComponent } from './views/resoluciones/rsconfiguracion/rsdatosbasicosmasivos/rsdatosbasicosmasivos.component';
+import { RscondecoracionesComponent } from './views/resoluciones/rsconfiguracion/rscondecoraciones/rscondecoraciones.component';
+import { RsgeneralesComponent } from './views/resoluciones/rsconfiguracion/rsgenerales/rsgenerales.component';
+import { RseliminacionesComponent } from './views/resoluciones/rsconfiguracion/rseliminaciones/rseliminaciones.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -147,6 +151,7 @@ const ngWizardConfig: NgWizardConfig = {
     MatTabsModule,
     MatButtonModule,
     MatIconModule,
+    MatTreeModule,
     MatCheckboxModule,
     MatExpansionModule,
     MatButtonToggleModule,
@@ -230,7 +235,11 @@ const ngWizardConfig: NgWizardConfig = {
     SpresidencialComponent,
     OresolucionesComponent,
     RsconsultaComponent,
-    EresolucionesComponent
+    EresolucionesComponent,
+    RsdatosbasicosmasivosComponent,
+    RscondecoracionesComponent,
+    RsgeneralesComponent,
+    RseliminacionesComponent
   ],
   providers: [
     {

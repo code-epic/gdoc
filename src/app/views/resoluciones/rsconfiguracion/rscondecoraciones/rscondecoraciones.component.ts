@@ -129,15 +129,16 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
 }
 
 @Component({
-  selector: "app-rsccargamasiva",
-  templateUrl: "./rsccargamasiva.component.html",
-  styleUrls: ["./rsccargamasiva.component.scss"],
+  selector: 'app-rscondecoraciones',
+  templateUrl: './rscondecoraciones.component.html',
+  styleUrls: ['./rscondecoraciones.component.scss'],
   providers: [
     { provide: NgbDateAdapter, useClass: CustomAdapter },
     { provide: NgbDateParserFormatter, useClass: CustomDateParserFormatter },
   ],
 })
-export class RsccargamasivaComponent implements OnInit {
+
+export class RscondecoracionesComponent implements OnInit {
   editorConfig: AngularEditorConfig = {
     editable: true,
     spellcheck: true,
@@ -371,6 +372,7 @@ export class RsccargamasivaComponent implements OnInit {
   public blAceptar: boolean = false;
   public blAlert: boolean = false;
   public blCalendar: boolean = false;
+  public btnAccion: boolean = true
 
   public foto_cedula: string = "";
 
@@ -403,6 +405,7 @@ export class RsccargamasivaComponent implements OnInit {
   public Unidad: any;
   public maxCol = "12";
   public maxColComision = "6";
+  public maxExtender = "6";
   public color = "#e3e6e6";
   public files = {
     pdf: "",
@@ -494,14 +497,16 @@ export class RsccargamasivaComponent implements OnInit {
     //console.log(this.resolucion.rs);
     //console.log(this.loginService.Usuario.cedula);
     // this.IResolucion.numero = this.resolucion.rs
-    this.getResueltoID('13',7);
+    this.getResueltoID('29',0);
   }
 
   SelTipo(e) {
-    if ( e.value == 3) {
-      this.getResueltoID('35',3);
-    }else {
-      this.getResueltoID('13',7);
+    if ( e.value == 0) {
+      this.getResueltoID('29',0);
+    }else  if ( e.value == 2) {
+      this.getResueltoID('10',2);
+    }else{
+      this.getResueltoID('9',2);
     }
     console.log(e.value, " SELECCIONAR TIPO")
   }
@@ -580,7 +585,7 @@ export class RsccargamasivaComponent implements OnInit {
     //console.log(this.resolucion.rs.id);
 
     //this.tipo = tipo_resolucion=="13"?"ASCENSO":"CORRERGIR - ASCENSO";
-    this.IResolucion.tipo = tipo_resolucion=="13"?13:35;
+    this.IResolucion.tipo = parseInt(tipo_resolucion);
     this.ctipo = tipo_resolucion;
     this.cod_resol_tipo = tipo_reserva; //VER CLASIFICACION DEL TIPO DE RESOLUCION
 
@@ -651,9 +656,14 @@ export class RsccargamasivaComponent implements OnInit {
     console.log(  tp )
     let valor = true;
     this.resetearFechas(false);
-    this.blAscenso = true;
+    this.blAscenso = false;
 
     switch (parseInt(tp)) {
+      case 2:
+      
+          this.maxCol = "12"
+          this.getCausa('9')
+        break
       case 3:
         this.maxCol = "6";
         this.blCorregir = true;
@@ -666,6 +676,55 @@ export class RsccargamasivaComponent implements OnInit {
 
     this.blAceptar = valor;
   }
+
+  getCausa(id: string) {
+    this.lstCausa = []
+    this.lstMotivo = []
+    this.xAPI.funcion = "MPPD_CCausaResolucion"
+    this.ngxService.startLoader("loader-buscar")
+    this.xAPI.parametros = id
+    this.xAPI.valores = ""
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.lstCausa = data.Cuerpo
+
+        this.blReserva = true
+        this.ngxService.stopLoader("loader-buscar")
+        //
+      },
+      (err) => {
+        console.error(err)
+      }
+    )
+  }
+
+  getMotivo() {
+    this.lstMotivo = []
+    this.xAPI.funcion = "MPPD_CMotivoResolucion"
+    this.ngxService.startLoader("loader-buscar")
+    this.xAPI.parametros = this.IResolucion.solicitud.toString()
+    this.xAPI.valores = ""
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstMotivo = data.Cuerpo
+
+        this.blReserva = true
+        this.ngxService.stopLoader("loader-buscar")
+        if (this.IResolucion.solicitud.toString() == "7") this.blReservaAux = true
+      },
+      (err) => {
+        console.error(err)
+      }
+    )
+  }
+
+  getDetalle(){
+
+  }
+
 
   desactivarVista() {
     this.blCorregir = false;
@@ -865,7 +924,7 @@ export class RsccargamasivaComponent implements OnInit {
     this.ngxService.startLoader("loader-aceptar");
     this.evaluarDatos();
     this.files.hash = this.hashcontrol;
-    
+    // this.Ejecutar()
     var frm = new FormData(document.forms.namedItem("forma"));
     try {
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
@@ -883,8 +942,8 @@ export class RsccargamasivaComponent implements OnInit {
 
     this.cargaMasiva = {
       llave: this.llave,
-      nombre: "RESOLUCION DE ASCENSO",
-      funcion: "AscensoEnLote",
+      nombre: "RESOLUCION POR LOTE",
+      funcion: "ResolucionesLote",
       ruta: this.hashcontrol,
       pdf: this.files.pdf,
       csv: this.files.csv,
@@ -900,7 +959,7 @@ export class RsccargamasivaComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.EjecutarAscensos();
+        this.Ejecutar();
       },
       (errot) => {
         this.toastrService.warning(
@@ -912,30 +971,26 @@ export class RsccargamasivaComponent implements OnInit {
     );
   }
 
-  EjecutarAscensos() {
-    let ascender = {
+  Ejecutar() {
+    let otraresol = {
       llave: this.llave,
       numero : this.IResolucion.numero, 
       tipo : this.IResolucion.tipo.toString(), 
-      otro_resuelto: this.IResolucion.otro_resuelto,
-      fecha_resuelto: this.utilService.ConvertirFechaDia(this.fresolucion ),
-      archivo_resuelto: this.archivo_otro + '|' + this.otra_llave,
-      cantidad : this.IDatosBasicos.orden.toString(), 
-      categoria: this.IDatosBasicos.categoria,
-      componente: this.IDatosBasicos.componente,
       fecha: this.IResolucion.fecha_resolucion,
-      ascenso: this.IResolucion.ultimo_ascenso,
+      causa: this.IResolucion.solicitud.toString(),
+      motivo: this.IResolucion.reserva.toString(),
       asunto: this.IResolucion.asunto,
       observacion: this.IResolucion.observacion,
       instruccion: this.IResolucion.instrucciones,
       distribucion: this.IResolucion.distribucion,
-      grado: this.IResolucion.grado,
       usuario: this.loginService.Usuario.cedula,
     };
-    this.apiService.EjecutarProceso(ascender).subscribe(
+
+    this.apiService.EjecutarLotes(otraresol).subscribe(
       (data) => {
         this.ngxService.stopLoader("loader-aceptar");
         this.resetearFechas(true);
+        this.btnAccion = false
         this.aceptar("");
       },
       (errot) => {
@@ -983,3 +1038,4 @@ export class RsccargamasivaComponent implements OnInit {
     });
   }
 }
+

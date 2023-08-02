@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
@@ -176,6 +176,7 @@ export class RsconsultaComponent implements OnInit {
   public lstMotivo = []; //Objeto Comando
   public lstDetalle = []; //Objeto Comando
   public lstRangoCedula = [];
+  public lstAscenso = [];
 
   public xasunto: string = "";
   public tipo: any;
@@ -187,6 +188,7 @@ export class RsconsultaComponent implements OnInit {
   public dbResolucionTipo: boolean = false;
   public dbDatosNombre: boolean = false;
   public blConfidencial: boolean = false;
+  public blDatosBasicos: boolean = false;
   public valEdit: boolean = false;
 
   public dbTools: boolean = false;
@@ -218,6 +220,8 @@ export class RsconsultaComponent implements OnInit {
   public blAlert: boolean = false;
   public blFiltro: boolean = true;
   public blExpandida: boolean = true;
+  public blEditor: boolean = false;
+  public blEspecifico: boolean = true;
 
   public busqueda: string = "0";
   public campos: string = "0";
@@ -254,7 +258,6 @@ export class RsconsultaComponent implements OnInit {
     placeholder: "",
   };
 
-
   editorConfigx: AngularEditorConfig = {
     editable: false,
     spellcheck: false,
@@ -263,6 +266,10 @@ export class RsconsultaComponent implements OnInit {
     placeholder: "",
   };
 
+  public blResolucionPanel: boolean = false;
+  public orden_pagina: number = 0;
+  public EDITOR: string = "";
+  @Input() OCULTAR: boolean = false;
 
   constructor(
     private apiService: ApiService,
@@ -275,6 +282,31 @@ export class RsconsultaComponent implements OnInit {
     public formatter: NgbDateParserFormatter,
     private _snackBar: MatSnackBar
   ) {}
+
+  convertirFecha(fecha: string): string {
+    return fecha != "" ? this.utilService.ConvertirFechaHumana(fecha) : "";
+  }
+  volverResolucion() {
+    this.blResolucionPanel = !this.blResolucionPanel;
+    this.dbResolucion = false;
+    this.dbDatos = false;
+    this.dbDatosNombre = false;
+    this.blDatosBasicos = false;
+
+    if (this.orden_pagina == 1) {
+      this.dbResolucion = true;
+    } else {
+      this.dbDatosNombre = true;
+    }
+  }
+
+  volverDatos(tipo: number) {
+    this.blResolucionPanel = !this.blResolucionPanel;
+    this.dbResolucion = false;
+    this.dbDatos = true;
+    this.dbDatosNombre = false;
+    this.orden_pagina = tipo;
+  }
 
   ngOnInit(): void {
     if (this.loginService.Usuario.token != undefined) {
@@ -347,6 +379,19 @@ export class RsconsultaComponent implements OnInit {
     );
 
     this.codigoSession = this.utilService.GenerarUnicId();
+    this.utilService.contenido$.subscribe((e) => {
+      this.blEditor = false;
+      this.blEspecifico = true;
+      this.cedula = e;
+      this.dbTools = true;
+      this.consultarCedula(undefined);
+    });
+  }
+
+  async ngOnChanges() {
+    /*  */
+    // this.blEditor = !this.OCULTAR
+    // this.blEspecifico = this.OCULTAR
   }
 
   displayFn(tr: ITipoResolucion): string {
@@ -409,6 +454,8 @@ export class RsconsultaComponent implements OnInit {
       this.dbDatos = false;
       this.dbResolucion = false;
       this.dbDatosNombre = false;
+      this.blResolucionPanel = false;
+      this.blDatosBasicos = false;
 
       if (this.cedula == "") return false;
 
@@ -458,7 +505,7 @@ export class RsconsultaComponent implements OnInit {
             this.dbDatos = true;
             this.dbDatosNombre = false;
 
-            console.log(this.IDatosBasicos);
+            this.blDatosBasicos = this.blConfidencial;
 
             this.seleccionColor();
           }
@@ -478,6 +525,10 @@ export class RsconsultaComponent implements OnInit {
     this.nombramiento =
       nombramiento.titulo + " - " + nombramiento.tipo_descripcion;
     this.xasunto = nombramiento.asunto.substring(0, 100);
+    this.lstAscenso = this.lstResoluciones.filter((e) => {
+      return e.tipo == 13 || e.tipo == 35;
+    });
+    console.log(this.lstAscenso);
   }
 
   async cargarGradosIPSFA(componente: number) {
@@ -495,6 +546,22 @@ export class RsconsultaComponent implements OnInit {
       }
     });
     return texto;
+  }
+
+  obtenerNombreGrado(grado: any) {
+    let texto = "";
+    // console.log(this.Grados)
+    this.Grados.forEach((e) => {
+      if (e.cod_grado == grado) {
+        texto = e.nombre_corto;
+      }
+    });
+    return texto;
+  }
+
+  obtenerOrdenMerito(elem: any): string {
+    let cant = elem.cantidad != null ? elem.cantidad - 1 : 0;
+    return elem.orden + " de " + cant;
   }
 
   obtenerUbicacion(e: any) {
@@ -535,6 +602,10 @@ export class RsconsultaComponent implements OnInit {
     if (event == undefined || event.charCode == 13) {
       this.dbDatos = false;
       this.dbResolucion = false;
+      this.dbDatosNombre = false;
+      this.blResolucionPanel = false;
+      this.blDatosBasicos = false;
+
       if (this.IResolucion.numero == "") return false;
       this.ngxService.startLoader("loader-buscar");
       this.xAPI.funcion = "MPPD_CResoluciones";
@@ -542,7 +613,7 @@ export class RsconsultaComponent implements OnInit {
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          //console.log(data);
+          console.log(data);
           this.resolucion = this.IResolucion.numero;
           this.IResolucion.numero = "";
           this.ngxService.stopLoader("loader-buscar");
@@ -567,6 +638,13 @@ export class RsconsultaComponent implements OnInit {
     this.dbDatos = false;
     this.dbResolucionFil = false;
     this.dbResolucionTipo = false;
+
+    this.dbDatos = false;
+    this.dbResolucion = false;
+    this.dbDatosNombre = false;
+    this.blResolucionPanel = false;
+    this.blDatosBasicos = false;
+
     this.ngxService.startLoader("loader-buscar");
 
     var causa =
@@ -796,6 +874,7 @@ export class RsconsultaComponent implements OnInit {
       this.dbDatos = false;
       this.dbResolucion = false;
       this.dbDatosNombre = false;
+      this.blResolucionPanel = false;
       if (this.nombre == "") return false;
 
       this.ngxService.startLoader("loader-buscar");
@@ -812,7 +891,7 @@ export class RsconsultaComponent implements OnInit {
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          //console.log(data);
+          console.log(data);
           this.lstNombres = data.Cuerpo;
           this.cantNombre = data.Cuerpo.length;
           this.ngxService.stopLoader("loader-buscar");
@@ -905,10 +984,17 @@ export class RsconsultaComponent implements OnInit {
   }
 
   dwUrl(e) {
-    console.log(e);
+    // console.log(e);
     if (e.archivo != undefined && e.archivo != "") {
-      let cedula = e.cedula != undefined ? e.cedula : this.dwCedula;
-      this.apiService.DwsResol(btoa("R" + cedula) + "/" + e.archivo);
+      if (e.formato == "") {
+        let cedula = e.cedula != undefined ? e.cedula : this.dwCedula;
+        this.apiService.DwsResol(btoa("R" + cedula) + "/" + e.archivo);
+      } else {
+        let valor = e.titulo == undefined ? e.numero : e.titulo;
+        let acce = btoa("ASC" + valor + e.formato);
+        // console.log(acce)
+        this.apiService.DwsResol(acce + "/" + e.archivo);
+      }
     } else {
       let anio = e.fecha_resolucion;
       let codigo = e.numero;
@@ -929,6 +1015,26 @@ export class RsconsultaComponent implements OnInit {
         }
       });
     }
+  }
+
+  dwUrlCorreccion(e) {
+    if (e.otro_resuelto != undefined && e.otro_resuelto != "") {
+      let valores = e.otro_resuelto.split("|");
+      let acce = btoa("ASC" + valores[0] + valores[3]);
+
+      this.apiService.DwsResol(acce + "/" + valores[2]);
+    }
+  }
+
+  getCorreccion(e) {
+    let valores = [];
+    if (e.otro_resuelto != undefined && e.otro_resuelto != "") {
+      valores = e.otro_resuelto.split("|");
+    }
+
+    return valores.length > 0
+      ? valores[0] + "  " + this.convertirFecha(valores[1])
+      : "";
   }
 
   dwUrlEntrada(e) {
@@ -1006,8 +1112,12 @@ export class RsconsultaComponent implements OnInit {
         return "RESERVA ACTIVA";
       case "CEMP":
         return "CESE DE EMPLEO";
+      case "RINC":
+        return "REINCORPORADO";
+      case "FALL":
+        return "FALLECIDO";
       default:
-        return "SIN ASIGNAR";
+        return "";
     }
   }
 
@@ -1033,69 +1143,70 @@ export class RsconsultaComponent implements OnInit {
   }
 
   getIcon(e) {
-    
-    switch (e.distribucion.toString() ) {
-      case '2':
+    switch (e.distribucion.toString()) {
+      case "2":
         return "security";
-      case '3':
+      case "3":
         return "no_encryption";
       default:
         return "public";
     }
   }
   getIconColor(e) {
-    
-    switch (e.distribucion.toString() ) {
-      case '2':
+    switch (e.distribucion.toString()) {
+      case "2":
         return "orange";
-      case '3':
+      case "3":
         return "red";
       default:
         return "green";
     }
   }
 
-    /**
+  /**
    * Consultar datos generales del militar
    */
-    getResueltoID(id) {
-      this.ngxService.startLoader("loader-buscar");
+  getResueltoID(id) {
+    this.ngxService.startLoader("loader-buscar");
 
-      this.xAPI.funcion = "MPPD_CResueltoID";
-      this.xAPI.parametros = id.toString();
-      this.xAPI.valores = {};
-      this.instruccion = ''
-      this.observacion = ''
+    this.xAPI.funcion = "MPPD_CResueltoID";
+    this.xAPI.parametros = id.toString();
+    this.xAPI.valores = {};
+    this.instruccion = "";
+    this.observacion = "";
 
-      this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          
-          if (data != undefined && data.Cuerpo.length > 0) {
-            let rs = data.Cuerpo[0];
-            console.log(rs)
-           
-            this.autor_creador = rs.registrador + " - " + rs.usuario_registra;
-            this.fecha_registro = rs.fecha_registro;
-            this.instruccion = rs.instruccion
-            this.observacion = rs.observacion
-            this.destino = rs.destino
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        if (data != undefined && data.Cuerpo.length > 0) {
+          let rs = data.Cuerpo[0];
+          // console.log(rs)
 
-            this.seleccionTipo();
-          }
-  
-          this.ngxService.stopLoader("loader-buscar");
-        },
-        (error) => {
-          console.error("Error de conexion a los datos ", error);
+          this.autor_creador = rs.registrador + " - " + rs.usuario_registra;
+          this.fecha_registro = rs.fecha_registro;
+          this.instrucciones = rs.instrucciones;
+          this.observacion = rs.observacion;
+          this.destino = rs.destino;
+
+          this.seleccionTipo();
         }
-      );
-    }
+
+        this.ngxService.stopLoader("loader-buscar");
+      },
+      (error) => {
+        console.error("Error de conexion a los datos ", error);
+      }
+    );
+  }
 
   detalle(content, e) {
     //Listar los archivos asociados al documento
-    this.getResueltoID(e.id) 
+    this.getResueltoID(e.id);
     this.modalService.open(content, { size: "lg" });
+  }
 
-
+  editarDatosBasicos() {
+    this.blEditor = true;
+    this.blEspecifico = false;
+    this.EDITOR = this.IDatosBasicos.cedula;
   }
 }

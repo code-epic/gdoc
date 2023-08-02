@@ -1,0 +1,124 @@
+<ngx-ui-loader [loaderId]="'loader-personal'"></ngx-ui-loader>
+
+<br><br>
+
+<div class="form-row">
+
+  <div class="col-md-2">
+    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+        <mat-label>Codigo Transaccion</mat-label>
+        <input matInput placeholder="Codigo Transaccion" [ngModelOptions]="{standalone: true}" [(ngModel)]="llave"
+            disabled>
+    </mat-form-field>
+  </div>
+
+  <div class="form-group col-md-5">
+    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+      <mat-label>Fecha de Promocion(*)</mat-label>
+      <input matInput placeholder="Fecha de Promocion" [ngModelOptions]="{standalone: true}" ngbDatepicker
+          #fo="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl" [(ngModel)]="ingreso"
+          value="{{ingreso}}">
+      <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button" id="fori">edit_calendar</mat-icon>
+    </mat-form-field>
+  </div>
+  <div class="form-group col-md-5">
+    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+     
+      <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="DBasico.componente">
+          <mat-option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  
+</div>
+
+<div class="form-row">
+
+
+  <div class="form-group col-md-4">
+
+    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+      <mat-select placeholder="Categoría" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="DBasico.categoria">
+          <mat-option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  </div>
+
+  <div class="form-group col-md-4">
+
+    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+      <mat-select placeholder="Clasificación" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="DBasico.clasificacion">
+          <mat-option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion">{{e.des_clasificacion}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  </div>
+
+  <div class="form-group col-md-4">
+
+    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+      <mat-select placeholder="Grado" [ngModelOptions]="{standalone: true}"
+          [(ngModel)]="DBasico.grado">
+          <mat-option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  </div>
+  
+
+
+</div>
+
+
+
+<div class="form-row">
+  <div class="form-group col-md-12">
+      <p>
+          Los archivo que intente subir por esta via deben  ser de extension *.csv separado por coma (,) 
+          y cumplir con el siguiente formato:
+      </p>
+      <ul>
+          <li>1.- La codificacion del fichero preferiblemente en UTF-8</li>
+          <li>2.- Deben iniciar con la cabecera: cedula, nombre_completo, fecha_nacimiento, sexo, especialiad </li>
+          <li>3.- Verifique el archivo antes de subirlo al sistema.</li>
+          <li>4.- Verifique el formato de la fecha de nacimiento debe ser AAAA-MM-DD (1985-23-07).</li>
+          <li>5.- En caso de no poseer la fecha de nacimiento escribir AAAA-MM-DD (1900-01-01).</li>
+      </ul>
+  </div>
+</div>
+
+
+
+<div class="form-row">
+  <div class="form-group col-md-6">
+  </div>
+  <div class="form-group col-md-6">
+      <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+          <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+          <div class="row">
+              <div class="col-md-12">
+                  <div class="input_container">
+                      <input (change)="fileSelected($event)" id="fileUpload" type="file" name="archivos"
+                          accept=".csv" multiple />
+
+                  </div>
+              </div>
+          </div>
+      </form>
+  </div>
+</div>
+
+
+<hr>
+<div class="row">
+    <div class="col-md-12">
+        <div class="text-right">
+            <button class="btn bg-orange text-white" (click)="SubirArchivo()" >Procesar solicitud</button>
+        </div>
+    </div>
+</div>
+<br><br>

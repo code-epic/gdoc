@@ -66,6 +66,8 @@ export class RsbuzonComponent implements OnInit {
   public bzOriginal = [];
   public bzSubDocumentos = [];
   public bzRecibido = [];
+  public lstRecibidos = []
+  public bzClasificar = []
   public bzProcesados = [];
   public bzPendientes = [];
   public lst = [];
@@ -91,12 +93,15 @@ export class RsbuzonComponent implements OnInit {
 
   public lstAll: any = [];
   longitud = 0;
+  posicion = 0
   pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 25, 50, 100];
   public numCarpeta: string = "";
 
   selected = new FormControl(0);
   public lstCarpetas = [];
+  public lstCarpetasAux = [];
+  public codCarpeta = ''
 
   constructor(
     private apiService: ApiService,
@@ -135,15 +140,15 @@ export class RsbuzonComponent implements OnInit {
   //   this.modalService.open(content);
   // }
 
-  open(content, id) {
+  open(content, id, pos) {
     this.numControl = id;
+    this.posicion = pos
+    console.log(this.posicion, ' ', this.numControl)
     //this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
     this.modalService.open(content, { centered: true });
   }
   seleccionNavegacion(e) {
-    this.bzRecibido = [];
-    this.bzProcesados = [];
-    this.bzPendientes = [];
+    
     this.xAPI.funcion = "WKF_CDocumentos";
     this.xAPI.valores = "";
     this.selNav = e;
@@ -152,12 +157,12 @@ export class RsbuzonComponent implements OnInit {
       case 0:
         this.cargarAcciones(0);
         this.xAPI.parametros = this.estadoActual + "," + this.estatusActual;
-        //this.listarBuzon();
+        this.listarBuzon(e);
         break;
       case 1:
         this.cargarAcciones(1);
         this.xAPI.parametros = this.estadoActual + "," + 2;
-        this.listarBuzon();
+        this.listarBuzon(e);
         break;
       case 2:
         // this.cargarAcciones(1);
@@ -185,31 +190,53 @@ export class RsbuzonComponent implements OnInit {
     );
   }
 
-  async listarBuzon() {
+  async listarBuzon(tipo : number) {
+    
+
+    if (tipo == 0) {
+      if (this.bzRecibido.length > 0 ) return
+      
+    }else{
+      if (this.bzClasificar.length > 0 ) return
+    }
+    console.log("iniciando")
+    this.cargarInformacion(tipo)
+
+    
+  }
+
+  async cargarInformacion(tipo){
     this.ngxService.startLoader("ldbuzon");
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        //console.log(data.Cuerpo[0]);
+        
         this.lstAll = data.Cuerpo;
-        // this.bzOriginal = data.Cuerpo.map((e) => {
-        //   e.completed = false;
-        //   e.color = "warn";
-        //   e.cuentas = e.cuenta != "" ? "" : e.nori;
-        //   e.priv = e.priv == 1 ? true : false;
-        //   e.existe = e.anom == "" ? true : false;
-        //   e.xaccion = e.accion;
-        //   return e;
-        // }); //Registros recorridos como elementos
-        // this.lengthOfi = data.Cuerpo.length;
+        let arr =  this.lstAll.map((e) => {
+          e.completed = false;
+          e.color = "warn";
+          e.cuentas = e.cuenta != "" ? "" : e.nori;
+          e.priv = e.priv == 1 ? true : false;
+          e.existe = e.anom == "" ? true : false;
+          e.xaccion = e.accion;
+          return e;
+        }); //Registros recorridos como elementos
+        if (tipo == 0) {
+          this.bzRecibido = arr
+        }else{
+          this.bzClasificar = arr
+        }
+
+
+        this.lengthOfi = data.Cuerpo.length;
         // if (this.selNav == 1) {
         //   this.listarSubDocumentos(2);
-        this.longitud = this.lstAll.length;
-        if (this.longitud > 0) {
-          this.estilocheck = "";
-          this.bzOriginal = this.lstAll;
-          this.pageSize = 10;
-          this.recorrerElementos(0);
-        }
+        //   this.longitud = this.lstAll.length;
+        //   if (this.longitud > 0) {
+        //     this.estilocheck = "";
+        //     this.bzOriginal = this.lstAll;
+        //     this.pageSize = 10;
+        //     this.recorrerElementos(0);
+        //   }
         // }
         this.ngxService.stopLoader("ldbuzon");
       },
@@ -223,6 +250,7 @@ export class RsbuzonComponent implements OnInit {
       (data) => {
         console.log(data.Cuerpo[0]);
         this.lstCarpetas = data.Cuerpo;
+        this.lstCarpetasAux = data.Cuerpo
         // this.bzOriginal = data.Cuerpo.map((e) => {
         //   e.completed = false;
         //   e.color = "warn";
@@ -241,6 +269,26 @@ export class RsbuzonComponent implements OnInit {
       },
       (error) => {}
     );
+  }
+
+  consultarCarpeta(e){
+    if (e.keyCode == 13) {
+      this.filtrarCarpetas(e.target.value)
+      this.codCarpeta = ''
+    }
+  }
+
+  filtrarCarpetas(id : string){
+    if (id == '') {
+      this.lstCarpetas = this.lstCarpetasAux
+    }else {
+      this.lstCarpetas = this.lstCarpetasAux.filter( e => {
+        return e.llav.includes(id)
+      })
+    }
+   
+
+
   }
 
   filtrarAddElements(filter: any): any {
@@ -363,37 +411,23 @@ export class RsbuzonComponent implements OnInit {
       accion: this.AccionTexto,
       usuario: usuario,
     });
+
     this.xAPI.parametros = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         switch (this.AccionTexto) {
           case "0": //Oficio por opinión
-            if (this.idd != "" && this.cuenta != "") {
-              this.promoverPuntoCuenta(3, 2);
-            } else {
+            // console.log(this.idd, this.posicion, ' control ')
+            // if (this.idd != "" && this.cuenta != "") {
+            //   this.promoverPuntoCuenta(3, 2);
+            // } else {
               this.promoverBuzon(0, this.utilService.FechaActual());
-            }
+            // }
 
             break;
           case "1": //Rechazar en el estado inicial
             this.rechazarBuzon();
             break;
-          // case "5":// Enviar a Archivo
-          //   this.redistribuir(11)
-          //   break;
-
-          // case "6":// Enviar a otras areas
-          //   this.redistribuir(0)
-          //   break;
-
-          // case "7"://Enviar a salida con bifurcacion
-          //   this.redistribuir(9)
-          //   break;
-
-          // default:
-
-          //   this.promoverBuzon()
-          //   break;
         }
       },
       (errot) => {
@@ -452,7 +486,8 @@ export class RsbuzonComponent implements OnInit {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         await this.guardarAlerta(activo, fecha);
-        this.seleccionNavegacion(this.selNav);
+        //this.seleccionNavegacion(this.selNav);
+        this.reducirVector ()
         this.Observacion = "";
         this.numControl = "0";
         this.toastrService.success(
@@ -465,6 +500,14 @@ export class RsbuzonComponent implements OnInit {
       }
     ); //
   }
+
+
+  reducirVector(){
+    this.bzRecibido.splice(this.posicion, 1)
+    console.log("Control de datos ")
+
+  }
+
 
   async redistribuir(destino: number = 0) {
     var dst = destino != 0 ? destino : this.cmbDestino;

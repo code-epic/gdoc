@@ -30,6 +30,7 @@ export class RsprocesosComponent implements OnInit {
 
 
   public placement = 'bottom'
+  public titulo = 'Procesos'
 
   public buscar = ''
 
@@ -38,6 +39,14 @@ export class RsprocesosComponent implements OnInit {
   public posicionPagina = 0
 
   public focus = true
+  public dbasico = false
+  public aresolucion = false
+  public lotes = false
+  public dpublicaciones = false
+  public masivo = false
+  public menu = true
+  public generales = false
+  public entradas = false
 
   longitud = 0;
   pageSize = 10;
@@ -73,7 +82,16 @@ export class RsprocesosComponent implements OnInit {
 
   }
 
-
+  desactivar(titulo : string){
+    this.dbasico = false
+    this.aresolucion = false
+    this.lotes = false
+    this.menu = false
+    this.generales = false
+    this.dpublicaciones = false
+    this.entradas = false
+    this.titulo = titulo
+  }
 
 
   pageChangeEvent(e) {
@@ -98,5 +116,21 @@ export class RsprocesosComponent implements OnInit {
     this.ruta.navigate(['/' + ruta, base])
   }
   
+  irAnterior(){
+    if (this.menu){
+      history.back()
+    }else{
+      this.menu = true
+      this.dbasico = false
+      this.aresolucion = false
+      this.entradas = false
+      this.masivo = false
+      this.lotes = false
+      this.generales = false
+      this.dpublicaciones = false
+      this.titulo = 'Procesos'
+    }
+
+  }
 
 }

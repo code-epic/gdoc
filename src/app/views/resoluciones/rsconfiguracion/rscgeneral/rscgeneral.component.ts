@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-rscgeneral',
@@ -7,6 +8,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RscgeneralComponent implements OnInit {
 
+
+  selected = new FormControl(0);
   constructor() { }
 
   ngOnInit(): void {

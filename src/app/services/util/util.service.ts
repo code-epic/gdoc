@@ -1,9 +1,22 @@
-import { Injectable } from "@angular/core";
+import { EventEmitter, Injectable } from "@angular/core";
 
 @Injectable({
   providedIn: "root",
 })
 export class UtilService {
+
+  pagina$ = new EventEmitter<any>();
+  pagina : string = 'Principal'
+
+  contenido$ = new EventEmitter<any>();
+  contenido : []
+  
+  estatusText$ = new EventEmitter<string>();
+  estatusText: string = ''
+
+  titulo$ = new EventEmitter<any>();
+  titulo : string = ''
+  
   //
   constructor() {}
 
@@ -110,7 +123,7 @@ export class UtilService {
   }
 
   SumarAnios(f: any, cant : number) : string {
-    
+    if (f == "") return ""
     var fx = f.split("-");
     let num = parseInt(fx[2]) + cant;
 
