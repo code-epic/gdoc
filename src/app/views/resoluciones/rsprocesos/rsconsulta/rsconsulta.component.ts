@@ -408,6 +408,8 @@ export class RsconsultaComponent implements OnInit {
 
   consultar(e) {
     if (e.keyCode == 13) {
+      this.cedula = this.cedula.replace('.', '')
+      console.log(this.cedula)
       this.xAPI.funcion = "MPPD_CUnidad";
       this.xAPI.parametros = this.cedula;
       this.xAPI.valores = "";
@@ -459,6 +461,8 @@ export class RsconsultaComponent implements OnInit {
 
       if (this.cedula == "") return false;
 
+      this.cedula = this.cedula.replace(/\./g, '')
+      console.log(this.cedula)
       this.ngxService.startLoader("loader-buscar");
       this.xAPI.funcion = "MPPD_CDatosBasicos";
       this.xAPI.parametros = this.cedula;

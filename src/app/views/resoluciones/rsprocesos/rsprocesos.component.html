@@ -134,7 +134,7 @@
 
                                 <div class="col-md-2">
                                     <a routerLinkActive="active"
-                                        (click)="desactivar('Eliminaciones');dpublicaciones=true">
+                                        (click)="desactivar('Eliminaciones');eliminaciones=true">
                                         <div class="text-center rounded botones">
                                             <br>
                                             <h2 class="text-center text-purple"><i class="fa fa-trash"
@@ -160,6 +160,7 @@
                             <app-rscgeneral *ngIf="lotes"></app-rscgeneral>
                             <app-rsgenerales *ngIf="generales"></app-rsgenerales>
                             <app-rscpublicaciones *ngIf="dpublicaciones"></app-rscpublicaciones>
+                            <app-rseliminaciones *ngIf="eliminaciones"></app-rseliminaciones>
 
                         </div>
                     </div>

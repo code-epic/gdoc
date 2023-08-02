@@ -1,1 +1,87 @@
-<p>rseliminaciones works!</p>
+<ngx-ui-loader [loaderId]="'loader-eliminar'"></ngx-ui-loader>
+
+
+<mat-tab-group mat-stretch-tabs class="example-stretched-tabs" dynamicHeight>
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      &nbsp;RESUELTOS
+    </ng-template>
+    <br>
+    <div class="row">
+      <div class="col-md-4"></div>
+      <!-- <div class="col-md-3">
+          <mat-form-field appearance="outline">
+              <mat-label>Cédula</mat-label>
+              <input matInput placeholder="Cédula"
+                  [ngModelOptions]="{standalone: true}" [(ngModel)]="cedula"
+                  (keypress)="consultarCedula($event)">
+              <mat-icon matSuffix>person_search</mat-icon>
+          </mat-form-field>
+      </div> -->
+      <div class="col-md-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Numero de resuelto</mat-label>
+          <input matInput placeholder="Numero de resuelto" [ngModelOptions]="{standalone: true}" [(ngModel)]="numero"
+            value="{{numero}}" (keypress)="consultarResolucion($event)">
+        </mat-form-field>
+      </div>
+      <!-- <div class="col-md-3">
+          <mat-form-field appearance="outline">
+              <mat-label>Numero de Orden General</mat-label>
+              <input matInput placeholder="Numero de Orden General">
+          </mat-form-field>
+      </div> -->
+      <div class="col-md-2">
+        <div class="text-right" style="padding-top: 5px;">
+          <button class="btn bg-primary text-white" style="height: 50px;" (click)="consultarResolucion(undefined)">
+            Consultar 
+          </button>
+        </div>
+      </div>
+
+      <div class="col-md-4"></div>
+
+    </div>
+    <div class="row" *ngIf="detalle">
+      <div class="col-md-1"></div>
+      <div class="col-md-10">
+        RESUMEN <b>{{ resolucion }}</b>: <BR><BR>
+        ACTUALMENTE ESTA RESOLUCION POSEE ( {{ total }}) REGISTROS EN EL SISTEMA
+        PARA BORRAR ESTOS REGISTROS DEBE SOLICITAR LA AUTORIZACION.<br><br>
+
+        <B>
+        <font style="color:brown">
+          NOTA: RECUERDE TENER PRESENTE QUE ESTA ACCION ELIMINA DEL SISTEMA COMPLETAMENTE LA RESOLUCION
+        </font>
+        </B>
+        <hr>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+    <div class="row" *ngIf="detalle">
+      <div class="col-md-9"></div>
+      <div class="col-md-2">
+        <div class="text-right" style="padding-top: 5px;">
+          <button class="btn bg-warning text-white" style="height: 50px;" (click)="eliminar(undefined)">
+            Eliminar 
+          </button>
+        </div>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+
+  </mat-tab>
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      &nbsp;ENTRADAS
+    </ng-template>
+  </mat-tab>
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      &nbsp;PERSONAS
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>

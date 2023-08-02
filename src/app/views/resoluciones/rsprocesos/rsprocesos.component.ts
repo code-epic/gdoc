@@ -47,6 +47,7 @@ export class RsprocesosComponent implements OnInit {
   public menu = true
   public generales = false
   public entradas = false
+  public eliminaciones = false
 
   longitud = 0;
   pageSize = 10;
@@ -90,6 +91,7 @@ export class RsprocesosComponent implements OnInit {
     this.generales = false
     this.dpublicaciones = false
     this.entradas = false
+    this.eliminaciones = false
     this.titulo = titulo
   }
 
@@ -128,6 +130,7 @@ export class RsprocesosComponent implements OnInit {
       this.lotes = false
       this.generales = false
       this.dpublicaciones = false
+      this.eliminaciones = false
       this.titulo = 'Procesos'
     }
 
