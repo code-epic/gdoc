@@ -40,6 +40,7 @@ import { SbuzonComponent } from 'src/app/views/secretaria/sbuzon/sbuzon.componen
 import { SministerialComponent } from 'src/app/views/secretaria/sministerial/sministerial.component';
 import { OresolucionesComponent } from 'src/app/views/resoluciones/rsprocesos/oresoluciones/oresoluciones.component';
 import { RsconsultaComponent } from 'src/app/views/resoluciones/rsprocesos/rsconsulta/rsconsulta.component';
+import { SpresidencialComponent } from 'src/app/views/secretaria/spresidencial/spresidencial.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -105,7 +106,7 @@ export const AdminLayoutRoutes: Routes = [
     },
     {
         path: 'spresidencial',
-        component: SecretariaComponent,
+        component: SpresidencialComponent,
         canActivate: [AuthGuardGuard]
     },
     {
