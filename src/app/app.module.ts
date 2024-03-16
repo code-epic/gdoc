@@ -98,6 +98,7 @@ import { RsdatosbasicosmasivosComponent } from './views/resoluciones/rsconfigura
 import { RscondecoracionesComponent } from './views/resoluciones/rsconfiguracion/rscondecoraciones/rscondecoraciones.component';
 import { RsgeneralesComponent } from './views/resoluciones/rsconfiguracion/rsgenerales/rsgenerales.component';
 import { RseliminacionesComponent } from './views/resoluciones/rsconfiguracion/rseliminaciones/rseliminaciones.component';
+import { ConsultaGeneralComponent } from './views/consulta-general/consulta-general.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -239,7 +240,8 @@ const ngWizardConfig: NgWizardConfig = {
     RsdatosbasicosmasivosComponent,
     RscondecoracionesComponent,
     RsgeneralesComponent,
-    RseliminacionesComponent
+    RseliminacionesComponent,
+    ConsultaGeneralComponent
   ],
   providers: [
     {

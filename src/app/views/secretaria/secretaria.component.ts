@@ -71,6 +71,17 @@ export class SecretariaComponent implements OnInit {
     clase: "f-left",
     color: "bg-purple",
     
+    },
+    {
+    url: "/consulta-general",
+    js: "",
+    descripcion: "Consulta General",
+    icono: "fa fa-search",
+    nombre: "Consulta",
+    accion: "CargarUrl('control', 'pendientes')",
+    clase: "f-left",
+    color: "bg-orange",
+    
   }]
 
   constructor(private apiService: ApiService, 
