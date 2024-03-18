@@ -19,7 +19,7 @@
               <div class="media align-items-center">
                 <div class="example-button-row">
                   <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                    <mat-icon>reply</mat-icon>
+                    <mat-icon>arrow_back</mat-icon>
                   </button>
                 </div>
               </div>
@@ -31,7 +31,8 @@
                     <div class="media align-items-center">
                       <div class="example-button-row">
                         <button mat-icon-button aria-label="Example icon-button with a heart icon">
-                          <mat-icon>arrow_back</mat-icon>
+                          <!-- <mat-icon>arrow_back</mat-icon> -->
+                          <mat-icon>more_vert</mat-icon>
                         </button>
                       </div>
                     </div>
@@ -67,18 +68,24 @@
                       </button>
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
+                        &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-2 texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
                     </div>
-                    <div class="col-md-6 texto-detalle">
+                    <div class="col-md-2 texto-detalle">
+                      <!-- Llama al tipo de documento que se recibe AC 18/03/24 11:00am -->
+                      {{ e.tdoc | uppercase }}
+                    </div>
+                    <div class="col-md-4 texto-detalle">
                       {{ e.udep | uppercase }} / {{ e.coma | uppercase }}
                     </div>
-                    <div class="col-md-1 text-right"  >
-                      <a [href]="dwUrl(e.numc, e.anom)" target="_top"
-                      rel="noopener noreferrer" style="color:darkgrey;font-size: 18px;font-weight: normal;">
-                          <img  src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" style="width: 20px;margin-top: 4px;"/>
+                    <div class="col-md-1 text-right">
+                      <a [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer"
+                        style="color:darkgrey;font-size: 18px;font-weight: normal;">
+                        <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
+                          style="width: 20px;margin-top: 4px;" />
                       </a>
                     </div>
                   </div>
@@ -89,11 +96,7 @@
             <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
-
           </mat-tab>
-         
-    
-
           <mat-tab>
             <ng-template mat-tab-label>
               &nbsp;ALERTAS
@@ -121,7 +124,6 @@
                         <!--  -->
                         <mat-icon class="text-warning" (click)="open(observacion, e.id_alerta)">today</mat-icon>
                       </button>
-
                     </div>
                   </div>
                 </mat-list>
@@ -132,9 +134,6 @@
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
           </mat-tab>
-
-
-
         </mat-tab-group>
       </div>
     </div>
@@ -159,14 +158,14 @@
           <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
         </select>
       </div>
-      <div class="form-group  col-md-4 "  *ngIf="vministerial">
+      <div class="form-group  col-md-4 " *ngIf="vministerial">
         <label>Estatus</label>
         <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbEstatus">
           <option value="0">SELECCIONE</option>
           <option *ngFor="let e of lstEstatus" value="{{e.valor}}">{{e.texto}}</option>
         </select>
       </div>
-      <div class="form-group  col-md-4"  *ngIf="vministerial">
+      <div class="form-group  col-md-4" *ngIf="vministerial">
         <label>Decision del Ministro</label>
         <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDecision">
           <option value="0">SELECCIONE</option>
@@ -199,9 +198,9 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
+
   <div class="modal-footer">
     <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')">
       <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
@@ -210,16 +209,13 @@
   </div>
 </ng-template>
 
-
-
 <ng-template #adjuntar let-c="close" let-d="dismiss">
+
   <div class="modal-header header bg-gradient-success">
     <h4 class="modal-title" id="modal-basic-title">Cargar Archivo en {{ numControl }}</h4>
-
   </div>
+
   <div class="modal-body">
-
-
     <form method="post" enctype="multipart/form-data" id="forma" name="forma">
       <input type="hidden" name="txtFileID" id="txtFileID" [ngModelOptions]="{standalone: true}"
         [(ngModel)]="numControl" value="{{numControl}}" readonly="readonly">
@@ -230,28 +226,23 @@
       </div>
       <div id="errorBlock" class="help-block"></div>
     </form>
-
-
-
   </div>
+
   <div class="modal-footer">
     <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
       <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
     <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
   </div>
+
 </ng-template>
-
-
-
-
 
 <ng-template #ministerial let-modal>
   <div class="modal-header header bg-gradient-info">
     <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
   </div>
   <div class="modal-body">
-   
+
   </div>
   <div class="modal-footer">
     <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')">
