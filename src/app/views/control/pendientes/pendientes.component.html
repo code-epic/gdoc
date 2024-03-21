@@ -3,6 +3,7 @@
     <p></p>
   </div>
 </div>
+
 <div class="container-fluid mt--9">
   <div class="row">
     <div class="col-xl-12 col-md-12 col-lg-12">
@@ -10,7 +11,7 @@
         <div class="card-header bg-transparent">
           <div class="row align-items-center">
             <div class="col-md-11">
-              <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Consulta General</h6>
               <h2 class="mb-0">Seguimiento</h2>
             </div>
             <div class="col-md-1">
@@ -22,178 +23,229 @@
                 </div>
               </div>
             </div>
-
           </div>
         </div>
 
         <div class="card-body">
-
-          <div class="container">
-            <div class="row">
-              <div class="col-md-3 text-right">
-
-              </div>
-              <div class="col-md-6 text-center">
-
-                <form class="navbar-search">
-                  <div class="form-group" [ngClass]="{ 'focused': focus === true }">
-                    <div class="input-group input-group-alternative">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-search"></i></span>
-                      </div>
-                      <input class="form-control" placeholder="Buscar" type="text" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="buscar" value="{{buscar}}" (keypress)="seleccionLista($event)"
-                        (focus)="focus = true" (blur)="focus = false">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-sliders"></i></span>
-                      </div>
-
+          <div class="form-row">
+            <div class="form-group col-md-{{camposalida}}">
+              <label for="txtControl"> {{ncontrolt}} </label>
+              <input type="text" class="form-control" id="txtControl" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="Doc.ncontrol">
+            </div>
+            <div class="form-group col-md-2" *ngIf="origenvisible">
+              <label for="txtOrigen">Nro. Origen</label>
+              <input type="txtOrigen" class="form-control" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="Doc.norigen" id="nori">
+            </div>
+            <div class="form-group col-md-3" *ngIf="forigenv">
+              <label for="tmsOrigen">Fecha Origen</label>
+              <form class="form-inline">
+                <div class="form-group" style="width:100%">
+                  <div class="input-group" style="width:100%">
+                    <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                      [(ngModel)]="forigen" ngbDatepicker #fo="ngbDatepicker" [value]="formatter.format(forigenDate)"
+                      [placement]="placement" [positionTarget]="buttonEl" readonly>
+                    <div class="input-group-append">
+                      <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button" id="fori">
+                      </button>
                     </div>
                   </div>
-                </form>
-
+                </div>
+              </form>
+            </div>
+            <div class="form-group col-md-{{camposfechasalida}}">
+              <label for="tmsCreacion">Fecha de Creacion</label>
+              <form class="form-inline">
+                <div class="form-group" style="width:100%">
+                  <div class="input-group" style="width:100%">
+                    <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                      [value]="formatter.format(fcreacionDate)" [(ngModel)]="fcreacion" ngbDatepicker
+                      #fc="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl" readonly>
+                    <div class="input-group-append">
+                      <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button" id="fcre"></button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="form-group col-md-{{camponumsalida}}" *ngIf="salidavisible">
+              <label for="txtSalida">{{salida}}</label>
+              <input type="txtSalida" class="form-control" value="{{Doc.salida}}" (blur)="consultarDocumentoSalida()"
+                [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.salida">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <label for="cmbTipoDocumento">Tipo de Documento</label>
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
+                [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" (change)="selTipoDocumento()" id="tdoc">
+                <option value="0">Seleccione</option>
+                <option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </option>
+              </select>
+            </div>
+            <div class="form-group col-md-3">
+              <label for="cmbRemitente">{{remitentet}}</label>
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.remitente"
+                value="{{Doc.remitente}}" id="remi">
+                <option value="0">Seleccione</option>
+                <option *ngFor="let x of lstR" value="{{x.nomb}}">{{ x.nomb }}</option>
+              </select>
+            </div>
+            <div class="form-group col-md-3">
+              <label for="cmbUnidad">Unidad o Dependencia</label>
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.unidad"
+                value="{{Doc.unidad}}" id="unid">
+                <option value="0">Seleccione</option>
+                <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
+              </select>
+            </div>
+            <div class="form-group col-md-3">
+              <label>Componente / Gran Comando</label>
+              <div class="input-group">
+                <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.comando"
+                  value="{{Doc.comando}}" id="coma">
+                  <option value="0">Seleccione</option>
+                  <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
+                </select>
+                <div class="input-group-append" *ngIf="booDependencia">
+                  <button *ngIf="!editar" type="button" (click)="agregarDependencia()" id="btndependencia"
+                    class="btn btn-success">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
-              <div class="col-md-3">
-
-              </div>
-
             </div>
 
-          </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label for="tmsCreacion">Plazo / Alerta</label>
+                    <form class="form-inline">
+                      <div class="form-group" style="width:100%">
+                        <div class="input-group" style="width:100%">
+                          <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="fplazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+                            [positionTarget]="buttonEl" readonly>
+                          <div class="input-group-append">
+                            <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"
+                              id="fplazo"></button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
 
+                  <div class="form-group col-md-6">
+                    <label>Privacidad / Nivel de Acceso</label>
+                    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.privacidad"
+                      value="{{Doc.privacidad}}">
+                      <option value="0">PUBLICO</option>
+                      <option value="1">CONFIDENCIAL</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="cmbCodArchivo">Código de Archivo</label>
+                    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.codigo"
+                      value="{{Doc.codigo}}" id="cod">
+                      <option value="0">Seleccione</option>
+                      <option *ngFor="let x of lstCA" value="{{x.nomb + ' - ' + x.obse}}">{{ x.nomb }} - {{ x.obse }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="">Expediente</label>
+                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                      [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="text-right">
+                      <button class="btn bg-primary text-white" id="registrar">
+                        Buscar 
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="container">
             <div class="row">
               <div class="col-md-12">
-                <!-- <mat-selection-list #lstProcesados>
-                  <mat-list *ngFor="let e of bzSeguimiento; let i=index "
-                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                    <div class="row">
-                      <div class="col-md-2 texto-lista">
-                        <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="{{e.color}}">{{ e.simbolo }}</font></a>
-                      </div>
-                      <div class="col-md-2 texto-lista">
-                        {{ e.origen | date:"dd-MM-yyyy" }} | {{ e.norigen | uppercase }}
-                      </div>
-                      <div class="col-md-4 texto-lista">
-                        {{ e.nombre | uppercase }} ( {{ e.estatus_nombre | uppercase }} )
-                      </div>
-                      <div class="col-md-3 texto-lista">
-                        {{ e.unidad | uppercase }}
-                      </div>
-                      <div class="col-md-1 texto-lista">
-                        {{ e.salida | uppercase }}
-                      </div>
+                <div class="container">
+                  <br>
+                  <small class="mr-5" style="font-size: 16px;" *ngIf="blBuscar">
+                    Cerca de {{ cantidad | number }} resultados...
+                  </small>
+                  <br>
+                  <div class="row enlace" *ngFor="let e of bzSeguimiento; let i=index ">
+
+                    <div class="col-md-8">
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">
+                        {{ e.numc }} - {{ e.tdoc }}
+                      </a>
+                      | {{ e.origen | date:"dd-MM-yyyy" }}
                     </div>
-                  </mat-list>
-                </mat-selection-list> -->
+                    <div class="col-md-4 text-right">
 
+                      <span class="badge rounded-pill text-bg-primary">pdf</span>
 
+                      <a [href]="dwUrl(e.numc, e.archivo)" target="_top" rel="noopener noreferrer"
+                        style="color:darkgrey;font-size: 12px;font-weight: normal;">
 
-                
-                    <div class="container">
-                      <br>
-                      <small class="mr-5" style="font-size: 16px;" *ngIf="blBuscar">
-                        Cerca de {{ cantidad | number }} resultados...
-                      </small>
-                      <br>
-                      <div class="row enlace" *ngFor="let e of bzSeguimiento; let i=index ">
-                        
-                          <div class="col-md-8">
-                            <a routerLinkActive="active"  
-                                [routerLink]="['/constancia', constancia( e.numc )]">
-                                {{ e.numc }} - {{ e.tdoc }}
-                            </a> 
-                            | {{ e.origen | date:"dd-MM-yyyy" }}
-                          </div>
-                          <div class="col-md-4 text-right">
-                      
-                            <span class="badge rounded-pill text-bg-primary">pdf</span>
-
-                                <a [href]="dwUrl(e.numc, e.archivo)" target="_top"
-                                rel="noopener noreferrer" style="color:darkgrey;font-size: 12px;font-weight: normal;">
-                                 
-                                    
-                                    {{ e.archivo.substring(0,10) }}
-                                    <img  src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" style="width: 12px;margin-top: -3px;"/>
-                                </a>
-                          </div>
-                      
-                        
-                          <div class="col-md-12" style="margin-top: -4px;">
-
-
-
-                        
-                            <!-- <button type="button" class="btn btn-outline-secondary me-2" placement="top"
-                                    ngbPopover="{{ e.contenido }}" popoverTitle="Detalles generales">
-                              General
-                            </button> -->
-
-                            <ng-template #popContent >
-                              <div class="row">
-                                <!-- <div class="col-md-4">{{ e.unidad }}</div> -->
-                                <div class="col-md-12">
-                                  <div [innerHTML]="e.contenido" class="contenido"></div>
-
-                                
-                                </div>
-                              </div>
-                            </ng-template>
-                            <!-- <ng-template #popTitle>{{ e.numc }}</ng-template> -->
-            
-                            {{ e.unidad }} <button mat-button
-                              [ngbPopover]="popContent" 
-                              popoverTitle="Detalles generales">
-                              
-                              Mas...
-                            </button>
-                            <div [innerHTML]="e.resumenl"  class="contenido"></div>
-
-                            <p style="margin-top: -10px;" >
-                              <small class=" mr-3"><i class="fa fa-calendar"></i>&nbsp;{{ e.fecha | date:"dd-MM-yyyy hh:mm" }}</small>
-                              <small class=" mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN {{ e.norigen | uppercase }}</small>
-                              <small class=" mr-3"><i class="fa fa-folder"></i> &nbsp; SALIDA {{ e.salida | uppercase }}</small>
-                      
-                              <small class=" mr-4"><i class="fa fa-globe"></i> &nbsp;
-                                {{ e.nombre | uppercase }} ( {{ e.estatus_nombre | uppercase }} {{ e.s_texto }} )
-                              </small>
-                            </p>
-                            
-                          
-                          </div>
-                        <!-- <div class="col-md-2"></div> -->
-                        
-                      </div>
+                        {{ e.archivo.substring(0,10) }}
+                        <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
+                          style="width: 12px;margin-top: -3px;" />
+                      </a>
                     </div>
-                
 
+                    <div class="col-md-12" style="margin-top: -4px;">
+                      <ng-template #popContent>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div [innerHTML]="e.contenido" class="contenido"></div>
+                          </div>
+                        </div>
+                      </ng-template>
+                      {{ e.unidad }} 
+                      <button mat-button [ngbPopover]="popContent" popoverTitle="Detalles generales">
+                        Mas...
+                      </button>
+                      <div [innerHTML]="e.resumenl" class="contenido"></div>
 
+                      <p style="margin-top: -10px;">
+                        <small class=" mr-3"><i class="fa fa-calendar"></i>&nbsp;{{ e.fecha | date:"dd-MM-yyyy hh:mm"
+                          }}</small>
+                        <small class=" mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN {{ e.norigen | uppercase
+                          }}</small>
+                        <small class=" mr-3"><i class="fa fa-folder"></i> &nbsp; SALIDA {{ e.salida | uppercase
+                          }}</small>
 
-
+                        <small class=" mr-4"><i class="fa fa-globe"></i> &nbsp;
+                          {{ e.nombre | uppercase }} ( {{ e.estatus_nombre | uppercase }} {{ e.s_texto }} )
+                        </small>
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-
-
-
-
-
-
             </div>
-         
-
             <br><br>
-            <div class="row">
 
+            <div class="row">
               <div class="col-md-3"></div>
               <div class="col-md-6 text-center">
                 <nav aria-label="Page navigation example" *ngIf="blBuscar">
-
                   <div class="row">
                     <div class="col-md-1">
                       <ul class="pagination justify-content-center">
                         <li class="page-item">
-                          <a class="page-link" *ngIf="antes" (click)="posicion(actual-1)">
-                            < </a>
+                          <a class="page-link" *ngIf="antes" (click)="posicion(actual-1)"></a>
                         </li>
                       </ul>
                     </div>
@@ -212,28 +264,14 @@
                       </ul>
                     </div>
                   </div>
-
-
                 </nav>
               </div>
               <div class="col-md-3"></div>
             </div>
-
-
-
           </div>
         </div>
       </div>
     </div>
-
   </div>
   <!-- Fin de Tarjeta Padre -->
-  <br><br> <br> <br>
 </div>
-
-
-
-
-
-
-
