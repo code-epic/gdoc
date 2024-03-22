@@ -99,6 +99,7 @@ import { RscondecoracionesComponent } from './views/resoluciones/rsconfiguracion
 import { RsgeneralesComponent } from './views/resoluciones/rsconfiguracion/rsgenerales/rsgenerales.component';
 import { RseliminacionesComponent } from './views/resoluciones/rsconfiguracion/rseliminaciones/rseliminaciones.component';
 import { ConsultaGeneralComponent } from './views/consulta-general/consulta-general.component';
+import { SbuscadorComponent } from './views/secretaria/sbuscador/sbuscador.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -241,7 +242,8 @@ const ngWizardConfig: NgWizardConfig = {
     RscondecoracionesComponent,
     RsgeneralesComponent,
     RseliminacionesComponent,
-    ConsultaGeneralComponent
+    ConsultaGeneralComponent,
+    SbuscadorComponent
   ],
   providers: [
     {

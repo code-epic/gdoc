@@ -42,6 +42,7 @@ import { OresolucionesComponent } from 'src/app/views/resoluciones/rsprocesos/or
 import { RsconsultaComponent } from 'src/app/views/resoluciones/rsprocesos/rsconsulta/rsconsulta.component';
 import { SpresidencialComponent } from 'src/app/views/secretaria/spresidencial/spresidencial.component';
 import { ConsultaGeneralComponent } from 'src/app/views/consulta-general/consulta-general.component';
+import { SbuscadorComponent } from 'src/app/views/secretaria/sbuscador/sbuscador.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -286,9 +287,18 @@ export const AdminLayoutRoutes: Routes = [
         canActivate: [AuthGuardGuard]
     },
     {
+        path: 'sbuscador',
+        component: SbuscadorComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
         path: 'consulta-general',
         component: ConsultaGeneralComponent,
-        canActivate: [AuthGuardGuard]
+        canActivate: [AuthGuardGuard],
+        children: [{
+            path: 'cargar-archivo',
+            canActivate: [AuthGuardGuard]
+        }]
     }
 
 ];

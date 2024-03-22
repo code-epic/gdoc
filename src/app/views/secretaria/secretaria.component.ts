@@ -62,7 +62,7 @@ export class SecretariaComponent implements OnInit {
     
   },
   {
-    url: "/pendientes",
+    url: "/sbuscador",
     js: "",
     descripcion: "Buscador",
     icono: "fa fa-compass",
