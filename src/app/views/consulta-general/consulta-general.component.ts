@@ -280,7 +280,8 @@ export class ConsultaGeneralComponent implements OnInit {
     private modalService: NgbModal,
     public dialog: MatDialog,
     public formatter: NgbDateParserFormatter,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   convertirFecha(fecha: string): string {
@@ -1212,6 +1213,10 @@ export class ConsultaGeneralComponent implements OnInit {
     this.blEditor = true;
     this.blEspecifico = false;
     this.EDITOR = this.IDatosBasicos.cedula;
+  }
+
+  volver(){
+    this.valEdit = false
   }
 
 }
