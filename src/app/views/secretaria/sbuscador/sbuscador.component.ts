@@ -11,6 +11,8 @@ import { LoginService } from 'src/app/services/seguridad/login.service'
 import { UtilService } from 'src/app/services/util/util.service'
 import { FormControl } from '@angular/forms';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { SubDocumento } from '../ministerial/ministerial.component';
+
 
 @Component({
   selector: 'app-sbuscador',
@@ -18,6 +20,20 @@ import { AngularEditorConfig } from '@kolkov/angular-editor';
   styleUrls: ['./sbuscador.component.scss']
 })
 export class SbuscadorComponent implements OnInit {
+
+  public SubDocumento: SubDocumento = {
+    subdocumento: 0,
+    cuenta: '',
+    estatus: '',
+    decision: '',
+    accion: '',
+    comentario: '',
+    historico: '',
+    archivo: '',
+    nombre_archivo: '',
+    fecha: '',
+    usuario: ''
+  }
 
   public bzBusqueda = []
 
@@ -244,6 +260,8 @@ export class SbuscadorComponent implements OnInit {
   public fcreacionDate: NgbDate | null
   public forigenDate: NgbDate | null
   public fcuentaDate: NgbDate | null
+  public frecepcion: NgbDate | null
+
 
   public subfechaDate: NgbDate | null
 
@@ -398,6 +416,7 @@ export class SbuscadorComponent implements OnInit {
   public sCedula: string = 'Cédula'
   public sGrado: string = 'Grado / Jerarquía'
   public sNombre: string = 'Nombres y Apellidos'
+  public asunto : string
 
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
