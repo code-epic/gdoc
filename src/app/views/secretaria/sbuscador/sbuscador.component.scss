@@ -249,3 +249,35 @@
     display: flex;
     z-index: 1;
   }
+
+  .dropdown-item{
+    cursor: pointer;
+  }
+
+  .item{
+    border: 1px solid #434141;
+    padding: 5px 10px;
+    text-align: center;
+    margin-right: .3rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: ease-in .3s all;
+  }
+
+  .item:hover{
+    background-color: #e0e0e0;
+    transition: ease-in .3s all;
+  }
+
+  .itemActive{
+    color: #fff;
+    background-color: #5E72E4;
+    border: 1px solid #566ce7;
+    transition: ease-in .3s all;
+  }
+
+
+  .itemActive:hover{
+    background-color: #5b71eb;
+    transition: ease-in .3s all;
+  }

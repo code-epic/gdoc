@@ -12,20 +12,46 @@ import { UtilService } from 'src/app/services/util/util.service'
 import { FormControl } from '@angular/forms';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { SubDocumento } from '../ministerial/ministerial.component';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 
 @Component({
   selector: 'app-sbuscador',
   templateUrl: './sbuscador.component.html',
-  styleUrls: ['./sbuscador.component.scss']
+  styleUrls: ['./sbuscador.component.scss'],
+  animations: [
+    trigger('desplazamientoVertical', [
+      state('inicial', style({
+        opacity: 1,   // Cambia la opacidad conforme a tus necesidades
+        transform: 'translateY(0)'  // Remueve el desplazamiento inicial
+      })),
+      state('void', style({
+        opacity: 0,  // Estado cuando el elemento se va
+        transform: 'translateY(-20px)'  // Estado cuando el elemento se va
+      })),
+      transition('void => *', [
+        animate('500ms ease-in')
+      ]),
+      transition('* => void', [
+        animate('500ms ease-out')
+      ])
+    ])
+  ]
 })
 export class SbuscadorComponent implements OnInit {
+
+  estadoInicial = 'inicial'; // Define el estado inicial
+
+  // Función para cambiar el estado inicial
+  cambiarEstadoInicial() {
+    this.estadoInicial = 'nuevoEstado'; // Cambia al nuevo estado según requerido
+  }
 
   public SubDocumento: SubDocumento = {
     subdocumento: 0,
     cuenta: '',
-    estatus: '',
-    decision: '',
+    estatus: '0',
+    decision: '0',
     accion: '',
     comentario: '',
     historico: '',
@@ -33,6 +59,31 @@ export class SbuscadorComponent implements OnInit {
     nombre_archivo: '',
     fecha: '',
     usuario: ''
+  }
+
+  public mbusquedaAvanzada: boolean = false
+
+  public busquedaAvanzada: boolean = false
+  public decisionBool: boolean = false
+  public unidadBool: boolean = false
+  public accionBool: boolean = false
+  public historialBool: boolean = false
+  public asuntoBool: boolean = false
+
+  cbusquedaAvanzada(){
+    this.decisionBool = false
+    this.unidadBool = false
+    this.accionBool = false
+    this.historialBool = false
+    this.asuntoBool = false
+  }
+
+  fbusquedaAvanzada(){
+    if (this.decisionBool || this.unidadBool || this.accionBool || this.historialBool || this.asuntoBool) {
+      return true
+    } else{
+      return false
+    }  
   }
 
   public bzBusqueda = []
