@@ -28,133 +28,54 @@
 
                 <div class="card-body">
                     <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <input type="txtOrigen" class="form-control" [ngModelOptions]="{ standalone: true }"
-                                [(ngModel)]="SubDocumento.cuenta" id="nori" placeholder="Nro. Cuenta" />
+                        <div class="col-md-3">
+                            <mat-form-field appearance="outline">
+                                <mat-label>Nro. Cuenta</mat-label>
+                                <input matInput type="txtOrigen" [ngModelOptions]="{ standalone: true }"
+                                    [(ngModel)]="SubDocumento.cuenta" id="nori" placeholder="Nro. Cuenta" />
+                            </mat-form-field>
                         </div>
 
-                        <div class="form-group col-md-3">
-                            <form class="form-inline">
-                                <div class="form-group" style="width: 100%">
-                                    <div class="input-group" style="width: 100%">
-                                        <input class="form-control" placeholder="AAAA-MM-DD"
-                                            [ngModelOptions]="{ standalone: true }" [(ngModel)]="SubDocumento.fecha"
-                                            ngbDatepicker #fc="ngbDatepicker" [placement]="placement"
-                                            [positionTarget]="buttonEl" placeholer="Fecha de Creacion" />
-                                        <div class="input-group-append">
-                                            <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button"
-                                                id="fcre"></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-                        <div class="form-group col-md-3">
-                            <select class="form-control" [ngModelOptions]="{ standalone: true }"
-                                [(ngModel)]="SubDocumento.estatus" placeholder="Estatus">
-                                <option value="0" selected>ESTATUS</option>
-                                <option *ngFor="let e of lstAcciones" value="{{ e.valor }}">
-                                    {{ e.texto }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <div class="input-group" style="width: 100%">
-                                    <button class="btn bg-primary text-white" id="registrar" style="width: 100%">
-                                        Buscar
-                                        <i class="fa fa-search" aria-hidden="true"></i>
-                                    </button>
-                                </div>
+                        <div class="col-md-3">
+                            <div class="input-group" style="width: 100%">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Fecha de Recepcion</mat-label>
+                                    <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="SubDocumento.fecha"
+                                        placeholer="Fecha de Recepcion" [matDatepicker]="picker" />
+                                    <mat-hint>MM/DD/YYYY</mat-hint>
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </mat-form-field>
                             </div>
                         </div>
 
-                        <div class="col-md-1">
-                            <button mat-icon-button (click)="mbusquedaAvanzada = !mbusquedaAvanzada"
+                        <div class="col-md-3">
+                            <mat-form-field appearance="outline">
+                                <mat-label>Estatus Del Documento</mat-label>
+                                <mat-select [ngModelOptions]="{ standalone: true }"
+                                [(ngModel)]="SubDocumento.estatus" placeholder="Estatus">
+                                <mat-option value="0">ESTATUS DEL DOCUMENTO</mat-option>
+                                <mat-option *ngFor="let e of lstAcciones" value="{{ e.valor }}">
+                                    {{ e.texto }}
+                                </mat-option>
+                            </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-11 col-md-2">
+                            <button mat-raised-button color="primary" id="registrar" style="width: 100%; height: 50px; margin-top: 5px;">
+                                Buscar
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </button>
+                        </div>
+
+                        <div class="col-1">
+                            <button mat-icon-button (click)="openDialog()" style="height: 50px; margin-top: 5px;"
                                 aria-label="Example icon-button with a heart icon">
                                 <!-- <mat-icon>arrow_back</mat-icon> -->
                                 <mat-icon>more_vert</mat-icon>
                             </button>
                         </div>
-                    </div>
-
-                    <div class="container" [@desplazamientoVertical]="estadoInicial" *ngIf="mbusquedaAvanzada">
-                        <div class="row">
-                            <span class="item" (click)="decisionBool = !decisionBool" [ngClass]="decisionBool ? 'itemActive' : ''">
-                                <span>Decision MPPD</span>
-                            </span>
-                            <span class="item" (click)="unidadBool = !unidadBool" [ngClass]="unidadBool ? 'itemActive' : ''">
-                                <span>Unidad</span>
-                            </span>
-                            <span class="item" (click)="accionBool = !accionBool" [ngClass]="accionBool ? 'itemActive' : ''">
-                                <span>Accion tomada</span>
-                            </span>
-                            <span class="item" (click)="historialBool = !historialBool" [ngClass]="historialBool ? 'itemActive' : ''">
-                                <span>Historial</span>
-                            </span>
-                            <span class="item" (click)="asuntoBool = !asuntoBool" [ngClass]="asuntoBool ? 'itemActive' : ''">
-                                <span>Asunto</span>
-                            </span>
-                            <span class="item" (click)="cbusquedaAvanzada()">
-                                <span>Cerrar</span>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="container" [@desplazamientoVertical]="estadoInicial" *ngIf="fbusquedaAvanzada()">
-
-                        <hr>
-
-                        <h2>Busqueda Avanzada</h2>
-
-                        <div class="form-row col-md-12 mb-3" [@desplazamientoVertical]="estadoInicial" *ngIf="decisionBool">
-                            <div class="col-md-6">
-                                <input class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="SubDocumento.comentario" placeholder="Comentario del MPPD">
-                            </div>
-                            <div class="col-md-6">
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="SubDocumento.decision">
-                                    <option value="0" selected>Decision del Ministro</option>
-                                    <option value="APROBADO">APROBADO</option>
-                                    <option value="NEGADO">NEGADO</option>
-                                    <option value="VISTO">VISTO</option>
-                                    <option value="DIFERIDO">DIFERIDO</option>
-                                    <option value="OTRO">OTRO</option>
-                                </select>
-                            </div>
-
-                        </div>
-
-                        <div class="form-row col-md-12" [@desplazamientoVertical]="estadoInicial" *ngIf="unidadBool">
-                            <div class="col-md-6 mb-3">
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="unidad"
-                                value="{{unidad}}" placeholder="Unidad Ministerial">
-                            </div>
-
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="comando"
-                                value="{{comando}}" placeholder="Gran Comando">
-                            </div>
-                        </div>
-
-                        <div class="form-group col-md-12 mt-3" [@desplazamientoVertical]="estadoInicial" *ngIf="accionBool">
-                            <textarea class="form-control" cols="30" rows="1" [ngModelOptions]="{standalone: true}"
-                            [(ngModel)]="SubDocumento.accion" placeholder="Accion Tomada"></textarea>
-                        </div>
-
-                        <div class="form-group col-md-12" [@desplazamientoVertical]="estadoInicial" *ngIf="historialBool">
-                            <textarea type="text" class="form-control" [ngModelOptions]="{ standalone: true }"
-                                [(ngModel)]="SubDocumento.historico" id="historial" cols="30" rows="1" placeholder="Historial"></textarea>
-                        </div>
-
-                        <div class="form-group col-md-12" [@desplazamientoVertical]="estadoInicial" *ngIf="asuntoBool">
-                            <input type="text" class="form-control" [ngModelOptions]="{ standalone: true }"
-                                [(ngModel)]="asunto" id="asunto" placeholder="Asunto">
-                        </div>
-
                     </div>
                 </div>
             </div>

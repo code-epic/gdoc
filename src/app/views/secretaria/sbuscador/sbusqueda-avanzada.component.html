@@ -1,0 +1,101 @@
+<h2 mat-dialog-title>Busqueda Avanzada</h2>
+
+
+<mat-dialog-content>
+    <div class="container">
+
+        <div class="form-row col-md-12">
+            <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                    <mat-label>Tipo de Documento</mat-label>
+                    <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}"
+                        id="tdoc">
+                        <mat-option value="0">Tipo de Documento</mat-option>
+                        <mat-option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                    <mat-label>Decision del Ministro</mat-label>
+                    <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.decision">
+                        <mat-option value="0" selected>Decision del Ministro</mat-option>
+                        <mat-option value="APROBADO">APROBADO</mat-option>
+                        <mat-option value="NEGADO">NEGADO</mat-option>
+                        <mat-option value="VISTO">VISTO</mat-option>
+                        <mat-option value="DIFERIDO">DIFERIDO</mat-option>
+                        <mat-option value="OTRO">OTRO</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+        </div>
+
+        <div class="form-row col-md-12">
+            <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                    <mat-label>Remitente</mat-label>
+                    <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.remitente"
+                        value="{{Doc.remitente}}" id="remi">
+                        <mat-option value="0">Remitente</mat-option>
+                        <mat-option *ngFor="let x of lstR" value="{{x.nomb}}">{{ x.nomb }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                    <mat-label>Comando / Gran Comando</mat-label>
+                    <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.comando" value="{{Doc.comando}}"
+                        id="coma">
+                        <mat-option value="0">Componente / Gran Comando</mat-option>
+                        <mat-option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="form-row col-md-12">
+            <mat-form-field appearance="outline">
+                <mat-label>Unidad o Dependencia</mat-label>
+                <mat-select class="col-md-12" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}" id="unid">
+                    <mat-option value="0">Unidad o Dependencia</mat-option>
+                    <mat-option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="form-row col-md-12">
+            <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                    <mat-label>Accion Tomada</mat-label>
+                    <input matInput [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.accion"
+                        placeholder="Accion Tomada">
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                    <mat-label>Asunto</mat-label>
+                    <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="asunto" placeholder="Asunto">
+                </mat-form-field>
+            </div>
+        </div>
+
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+
+        <button mat-raised-button color="primary" id="registrar" style="width: 200px;">
+            Buscar
+            <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
+
+        <button mat-raised-button (click)="close()">
+            Cerrar
+        </button>
+
+</mat-dialog-actions>
