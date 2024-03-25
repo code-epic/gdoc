@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewContainerRef, ComponentFactoryResolver, Injector, ApplicationRef } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router'
 import { NgbModal, NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
@@ -11,6 +11,10 @@ import { LoginService } from 'src/app/services/seguridad/login.service'
 import { UtilService } from 'src/app/services/util/util.service'
 import { FormControl } from '@angular/forms';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig } from '@angular/material/dialog';
+import { BusquedaAvanzadaComponent } from './busquedaAvanzada.component';
+
+
 
 @Component({
   selector: 'app-pendientes',
@@ -18,6 +22,23 @@ import { AngularEditorConfig } from '@kolkov/angular-editor';
   styleUrls: ['./pendientes.component.scss']
 })
 export class PendientesComponent implements OnInit {
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(BusquedaAvanzadaComponent, {
+      panelClass: 'custom-dialog-container',
+      height: '400px',
+      maxWidth: '90vw',
+      width: '900px',
+
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('El diálogo fue cerrado');
+    });
+  }
+
+  
+
 
   public bzBusqueda = []
 
@@ -407,7 +428,12 @@ export class PendientesComponent implements OnInit {
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
-    private ruta: Router) {
+    private ruta: Router,
+    private dialog: MatDialog,
+    private viewContainerRef: ViewContainerRef,
+    private resolver: ComponentFactoryResolver,
+    private injector: Injector,
+    private appRef: ApplicationRef) {
   }
 
   async ngOnInit() {
@@ -733,13 +759,13 @@ export class PendientesComponent implements OnInit {
     const usuario = this.loginService.Usuario.id
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify({
-        "documento": this.Doc.wfdocumento,
-        "estado": this.estadoActual, //Estado que ocupa
-        "estatus": this.estadoOrigen,
-        "observacion": 'DOCUMENTO EDITADO EN SALIDA',
-        "accion": '20',
-        "usuario": usuario
-      })
+      "documento": this.Doc.wfdocumento,
+      "estado": this.estadoActual, //Estado que ocupa
+      "estatus": this.estadoOrigen,
+      "observacion": 'DOCUMENTO EDITADO EN SALIDA',
+      "accion": '20',
+      "usuario": usuario
+    })
 
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -775,7 +801,7 @@ export class PendientesComponent implements OnInit {
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
       }
-    ) 
+    )
   }
 
   agregarDependencia(): IWKFDependencia {
