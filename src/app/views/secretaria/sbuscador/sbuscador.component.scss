@@ -262,3 +262,16 @@
   .mat-form-field{
     width: 100%;
   }
+
+  mat-label{
+    text-transform: uppercase;
+  }
+
+  mat-hint{
+    span.categoria{
+      text-transform: uppercase;
+    }
+    span.ver{
+      cursor: pointer;
+    }
+  }

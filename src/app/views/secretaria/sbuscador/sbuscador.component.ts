@@ -10,7 +10,7 @@ import { FormControl } from '@angular/forms';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { SubDocumento } from '../ministerial/ministerial.component';
 import { MatDialog } from '@angular/material/dialog';
-import { SbusquedaAvanzada } from './sbusqueda-avanzada.component';
+import { log } from 'console';
 
 
 @Component({
@@ -20,6 +20,27 @@ import { SbusquedaAvanzada } from './sbusqueda-avanzada.component';
 })
 export class SbuscadorComponent implements OnInit {
 
+
+  public SubDocumento: SubDocumento = {
+      subdocumento: 0,
+      cuenta: '',
+      estatus: '',
+      decision: '',
+      accion: '',
+      comentario: '',
+      historico: '',
+      archivo: '',
+      nombre_archivo: '',
+      fecha: '',
+      usuario: ''
+  } 
+
+  public fechaInicio: any
+  public fechaFin: any
+
+  public unidad = ''
+  public comando = ''
+
   estadoInicial = 'inicial'; // Define el estado inicial
 
   // Función para cambiar el estado inicial
@@ -27,24 +48,10 @@ export class SbuscadorComponent implements OnInit {
     this.estadoInicial = 'nuevoEstado'; // Cambia al nuevo estado según requerido
   }
 
-  public SubDocumento: SubDocumento = {
-    subdocumento: 0,
-    cuenta: '',
-    estatus: '',
-    decision: '0',
-    accion: '',
-    comentario: '',
-    historico: '',
-    archivo: '',
-    nombre_archivo: '',
-    fecha: '',
-    usuario: ''
-  } 
+  public mostrarCampos: boolean = false
 
-  openDialog(){
-    const dialogRef = this.dialog.open(SbusquedaAvanzada, {
-      width: '600px'
-    })
+  public verMasCampos() {
+    this.mostrarCampos = !this.mostrarCampos
   }
 
   public bzBusqueda = []
@@ -325,13 +332,13 @@ export class SbuscadorComponent implements OnInit {
     forigen: '',
     norigen: '',
     salida: '',
-    tipo: '0',
-    remitente: '0',
-    unidad: '0',
-    comando: '0',
+    tipo: '',
+    remitente: '',
+    unidad: '',
+    comando: '',
     contenido: '',
     instrucciones: '',
-    codigo: '0',
+    codigo: '',
     nexpediente: '',
     creador: '',
     archivo: '',
@@ -541,7 +548,18 @@ export class SbuscadorComponent implements OnInit {
   }
 
   open(content) {
-    this.modalService.open(content);
+    const modalRef = this.modalService.open(content, {
+      centered: true,
+      windowClass: 'my-custom-modal-class',
+      size: 'lg',
+      backdrop: false
+    });
+    modalRef['_windowCmptRef'].location.nativeElement.style.zIndex = '900';
+  }
+
+  
+  close() {
+    this.modalService.dismissAll();
   }
 
   //obtenerWorkFlow Permite generar los primeros valores de la red del documento
