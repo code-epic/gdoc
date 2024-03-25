@@ -16,7 +16,10 @@
                         <div class="col-md-1">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
-                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                    <button mat-icon-button title="Volver Atrás" (click)="volver()" *ngIf="valEdit">
+                                        <mat-icon>arrow_back</mat-icon>
+                                    </button>
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()" *ngIf="!valEdit">
                                         <mat-icon>arrow_back</mat-icon>
                                     </button>
                                 </div>
@@ -374,7 +377,7 @@
                                                             <td>{{ convertirFecha(e.fecha) }}</td>
                                                             <td><a *ngIf="!validarSeguridad(e)" class="enlace"
                                                                     (click)="dwUrl(e)" target="_blank"
-                                                                    style="font-weight: bold; color: brown;">
+                                                                    style="font-weight: bold; color: brown; ">
                                                                     {{e.titulo}} </a> </td>
                                                             <td>{{ obtenerTipo(e.tipo) }}</td>
                                                             <td *ngIf="validarSeguridad(e)" style="color:brown;">
