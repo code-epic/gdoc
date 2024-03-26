@@ -10,9 +10,9 @@
             <div class="card shadow">
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
-                        <div class="col-md-10">
+                        <div class="col-md-11">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Secretaria</h6>
-                            <h2 class="mb-0">Buscador</h2>
+                            <h2 class="mb-0">Buscador de Documentos</h2>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
@@ -23,290 +23,216 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-1 d-none">
-                            <ul class="navbar-nav align-items-center d-none d-md-flex">
-                              <li class="nav-item" ngbDropdown placement="bottom-right">
-                                <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                                  <div class="media align-items-center">
-                                    <div class="example-button-row">
-                                      <button mat-icon-button aria-label="Example icon-button with a heart icon">
-                                        <!-- <mat-icon>arrow_back</mat-icon> -->
-                                        <mat-icon>more_vert</mat-icon>
-                                      </button>
-                                    </div>
-                                  </div>
-                                </a>
-                                <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                                  <a class="dropdown-item">
-                                    <i class="ni ni-settings-gear-65"></i>
-                                    <span>Filtros</span>
-                                  </a>
-                                </div>
-                              </li>
-                            </ul>
-                          </div>
                     </div>
                 </div>
 
                 <div class="card-body">
                     <div class="form-row">
-
-                        <div class="form-group col-md-4">
-                            <label for="txtOrigen">Nro. Cuenta</label>
-                            <input type="txtOrigen" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="SubDocumento.cuenta" id="nori">
+                        <div class="col-md-3">
+                            <mat-form-field appearance="outline">
+                                <mat-label>Nro. Cuenta</mat-label>
+                                <input matInput type="txtOrigen" [ngModelOptions]="{ standalone: true }"
+                                    [(ngModel)]="SubDocumento.cuenta" id="nori" placeholder="Nro. Cuenta" />
+                            </mat-form-field>
                         </div>
 
-                        <div class="form-group col-md-4">
-                            <label for="tmsCreacion">Fecha de Creacion</label>
-                            <form class="form-inline">
-                                <div class="form-group" style="width:100%">
-                                    <div class="input-group" style="width:100%">
-                                        <input class="form-control" placeholder="AAAA-MM-DD"
-                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.fecha"
-                                            ngbDatepicker #fc="ngbDatepicker" [placement]="placement"
-                                            [positionTarget]="buttonEl" readonly>
-                                        <div class="input-group-append">
-                                            <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button"
-                                                id="fcre"></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-
-                        </div>
-                        
-                        <div class="form-group col-md-4">
-                            <label>Estatus</label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.estatus">
-                                <option value="0">SELECCIONE</option>
-                                <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-12">
-                            <div class="d-flex justify-content-end">
-                                <button class="btn bg-primary text-white" id="registrar">
-                                    Buscar
-                                    <i class="fa fa-search" aria-hidden="true"></i>
-                                </button>
+                        <div class="col-md-3">
+                            <div class="input-group" style="width: 100%">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Fecha de Recepcion</mat-label>
+                                    <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="SubDocumento.fecha"
+                                        placeholer="Fecha de Recepcion" [matDatepicker]="picker" />
+                                    <mat-hint>MM/DD/YYYY</mat-hint>
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </mat-form-field>
                             </div>
                         </div>
 
-                    </div>
-
-                    <div class="form-row d-none">
-                        <div class="form-group col-md-6">
-                            <label for="asunto">Asunto</label>
-                            <textarea type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="asunto"
-                            id="asunto" cols="30" rows="6">
-                            </textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="row">
-                                <div class="form-group col-md-6">
-                                    <label>Estatus</label>
-                                    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.estatus">
-                                        <option value="0">SELECCIONE</option>
-                                        <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="cmbRemitente">Decision del MPPD</label>
-                                    <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.remitente" value="{{Doc.remitente}}" id="remi">
-                                        <option value="0">Seleccione</option>
-                                        <option *ngFor="let x of lstR" value="{{x.nomb}}">{{ x.nomb }}</option>
-                                    </select>
-                                </div>
-                                </div>
-                            <div class="row">
-                            <div class="form-group col-md-6">
-                                <label for="cmbUnidad">Accion Tomada</label>
-                                <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.unidad"
-                                    value="{{Doc.unidad}}" id="unid">
-                                    <option value="0">Seleccione</option>
-                                    <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label>Comentario del MPPD</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control">
-                                    <div class="input-group-append" *ngIf="booDependencia">
-                                        <button *ngIf="!editar" type="button" (click)="agregarDependencia()"
-                                            id="btndependencia" class="btn btn-success">
-                                            <i class="fa fa-plus" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            </div>
+                        <div class="col-md-3">
+                            <mat-form-field appearance="outline">
+                                <mat-label>Estatus Del Documento</mat-label>
+                                <mat-select [ngModelOptions]="{ standalone: true }"
+                                [(ngModel)]="SubDocumento.estatus" placeholder="Estatus">
+                                <mat-option value="0">SELECCIONE</mat-option>
+                                <mat-option *ngFor="let e of lstAcciones" value="{{ e.valor }}">
+                                    {{ e.texto }}
+                                </mat-option>
+                            </mat-select>
+                            </mat-form-field>
                         </div>
 
-                        <div class="col-md-12">
+                        <div class="col-11 col-md-2">
+                            <button mat-raised-button color="primary" id="registrar" style="width: 100%; height: 50px; margin-top: 5px;">
+                                Buscar
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </button>
+                        </div>
 
-                            <div class="row">
-                                <!-- <div class="form-group col-md-6">
-                                        <label for="tmsCreacion">Plazo / Alerta</label>
-                                        <form class="form-inline">
-                                            <div class="form-group" style="width:100%">
-                                                <div class="input-group" style="width:100%">
-                                                    <input class="form-control" placeholder="AAAA-MM-DD"
-                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="fplazo"
-                                                        ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
-                                                        [positionTarget]="buttonEl" readonly>
-                                                    <div class="input-group-append">
-                                                        <button #buttonEl class="btn calendario" (click)="fd.toggle()"
-                                                            type="button" id="fplazo"></button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div> -->
-
-                                <div class="form-group col-md-6" style="width:100%">
-                                    <label>Privacidad / Nivel de Acceso</label>
-                                    <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.privacidad" value="{{Doc.privacidad}}">
-                                        <option value="0">PUBLICO</option>
-                                        <option value="1">CONFIDENCIAL</option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-6" style="width:100%">
-                                    <label for="cmbCodArchivo">Código de Archivo</label>
-                                    <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.codigo" value="{{Doc.codigo}}" id="cod">
-                                        <option value="0">Seleccione</option>
-                                        <option *ngFor="let x of lstCA" value="{{x.nomb + ' - ' + x.obse}}">{{
-                                            x.nomb }} - {{ x.obse }}
-                                        </option>
-                                    </select>
-                                </div>
-                                <!-- <div class="form-group col-md-6">
-                      <label for="">Expediente</label>
-                      <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
-                    </div> -->
-                                <!-- </div> -->
-                                <div class="col-md-12">
-                                    <div class="d-flex justify-content-end">
-                                        <button class="btn bg-primary text-white" id="registrar">
-                                            Buscar
-                                            <i class="fa fa-search" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="col-1">
+                            <button mat-icon-button (click)="open(busqueda_avanzada)" style="height: 50px; margin-top: 5px;"
+                                aria-label="Example icon-button with a heart icon">
+                                <!-- <mat-icon>arrow_back</mat-icon> -->
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
                         </div>
                     </div>
-
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="container">
-                                    <br>
-                                    <small class="mr-5" style="font-size: 16px;" *ngIf="blBuscar">
-                                        Cerca de {{ cantidad | number }} resultados...
-                                    </small>
-                                    <br>
-                                    <div class="row enlace" *ngFor="let e of bzSeguimiento; let i=index ">
-
-                                        <div class="col-md-8">
-                                            <a routerLinkActive="active"
-                                                [routerLink]="['/constancia', constancia( e.numc )]">
-                                                {{ e.numc }} - {{ e.tdoc }}
-                                            </a>
-                                            | {{ e.origen | date:"dd-MM-yyyy" }}
-                                        </div>
-                                        <div class="col-md-4 text-right">
-
-                                            <span class="badge rounded-pill text-bg-primary">pdf</span>
-
-                                            <a [href]="dwUrl(e.numc, e.archivo)" target="_top" rel="noopener noreferrer"
-                                                style="color:darkgrey;font-size: 12px;font-weight: normal;">
-
-                                                {{ e.archivo.substring(0,10) }}
-                                                <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
-                                                    style="width: 12px;margin-top: -3px;" />
-                                            </a>
-                                        </div>
-
-                                        <div class="col-md-12" style="margin-top: -4px;">
-                                            <ng-template #popContent>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div [innerHTML]="e.contenido" class="contenido"></div>
-                                                    </div>
-                                                </div>
-                                            </ng-template>
-                                            {{ e.unidad }}
-                                            <button mat-button [ngbPopover]="popContent"
-                                                popoverTitle="Detalles generales">
-                                                Mas...
-                                            </button>
-                                            <div [innerHTML]="e.resumenl" class="contenido"></div>
-
-                                            <p style="margin-top: -10px;">
-                                                <small class=" mr-3"><i class="fa fa-calendar"></i>&nbsp;{{ e.fecha |
-                                                    date:"dd-MM-yyyy hh:mm"
-                                                    }}</small>
-                                                <small class=" mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN {{
-                                                    e.norigen | uppercase
-                                                    }}</small>
-                                                <small class=" mr-3"><i class="fa fa-folder"></i> &nbsp; SALIDA {{
-                                                    e.salida | uppercase
-                                                    }}</small>
-
-                                                <small class=" mr-4"><i class="fa fa-globe"></i> &nbsp;
-                                                    {{ e.nombre | uppercase }} ( {{ e.estatus_nombre | uppercase }} {{
-                                                    e.s_texto }} )
-                                                </small>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <br><br>
-
-                        <div class="row">
-                            <div class="col-md-3"></div>
-                            <div class="col-md-6 text-center">
-                                <nav aria-label="Page navigation example" *ngIf="blBuscar">
-                                    <div class="row">
-                                        <div class="col-md-1">
-                                            <ul class="pagination justify-content-center">
-                                                <li class="page-item">
-                                                    <a class="page-link" *ngIf="antes" (click)="posicion(actual-1)"></a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-10">
-                                            <ul class="pagination justify-content-center">
-                                                <li class="page-item" *ngFor="let e of lstPaginas">
-                                                    <a class="page-link {{ e.color }}" (click)="posicion(e.id)">{{ e.id
-                                                        }}</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-1">
-                                            <ul class="pagination justify-content-center">
-                                                <li class="page-item">
-                                                    <a class="page-link" *ngIf="despues"
-                                                        (click)="posicion(actual+1)">></a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </nav>
-                            </div>
-                            <div class="col-md-3"></div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
     </div>
     <!-- Fin de Tarjeta Padre -->
+</div>
+
+<ng-template #busqueda_avanzada style="z-index: 2;" #adjuntar let-c="close" let-d="dismiss">
+<div class="modal-header">
+    <h2 class="modal-title">Busqueda Avanzada</h2>
+</div>
+<div class="modal-body">
+    <div class="container">
+
+        <div class="form-row col-md-12">
+            
+                <mat-hint class="col-md-2"><span style="margin-top: 15px; display: block;" class="categoria">Rango de Fecha</span></mat-hint>
+
+            <div class="col-md-5">
+                <div class="input-group" style="width: 100%">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Desde</mat-label>
+                        <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="fechaInicio"
+                            placeholer="Fecha de Recepcion" [matDatepicker]="picker2" />
+                        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                        <mat-datepicker #picker2></mat-datepicker>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="input-group" style="width: 100%">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Hasta</mat-label>
+                        <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="fechaFin"
+                            placeholer="Fecha de Recepcion" [matDatepicker]="picker3" />
+                        <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                        <mat-datepicker #picker3></mat-datepicker>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row col-md-12">
+            
+                <mat-hint class="col-md-2"><span style="margin-top: 10px; display: block;" class="categoria">Tipo de Documento</span></mat-hint>
+
+            <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                    <mat-label>Tipo de Documento</mat-label>
+                    <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}"
+                        id="tdoc">
+                        <mat-option value="0">SELECCIONE</mat-option>
+                        <mat-option value="presidenciales">PRESIDENCIALES</mat-option>
+                        <mat-option value="punto-de-cuenta">PUNTO DE CUENTA</mat-option>
+                        <mat-option value="acuse-de-recibo">ACUSE DE RECIBO</mat-option>
+                        <mat-option value="oficio">OFICIO</mat-option>
+                        <mat-option value="tramitaciones-por-organo-regular">TRAMITACIONES POR ÓRGANO REGULAR</mat-option>                </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+                <mat-form-field appearance="outline">
+                    <mat-label>Decision del Ministro</mat-label>
+                    <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.decision">
+                        <mat-option value="0" selected>SELECCIONE</mat-option>
+                        <mat-option value="APROBADO">APROBADO</mat-option>
+                        <mat-option value="NEGADO">NEGADO</mat-option>
+                        <mat-option value="VISTO">VISTO</mat-option>
+                        <mat-option value="DIFERIDO">DIFERIDO</mat-option>
+                        <mat-option value="OTRO">OTRO</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-4">
+                <mat-form-field appearance="outline">
+                    <mat-label>Remitente</mat-label>
+                    <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.remitente"
+                        value="{{Doc.remitente}}" id="remi">
+                        <mat-option value="0">SELECCIONE</mat-option>
+                        <mat-option *ngFor="let x of lstR" value="{{x.nomb}}">{{ x.nomb }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <mat-hint style="text-align: end;width: 100%; display: block;">
+            <span (click)="verMasCampos()" *ngIf="!mostrarCampos" class="ver">Ver mas campos <i class="fa fa-caret-down"></i></span>
+        </mat-hint>
+
+        <div *ngIf="mostrarCampos">
+            <div class="form-row col-md-12">
+            
+                <mat-hint class="col-md-2"><span style="margin-top: 19px; display: block;" class="categoria">Por Unidades</span></mat-hint>
+
+                <div class="col-md-5">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Comando / Gran Comando</mat-label>
+                        <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.comando" value="{{Doc.comando}}"
+                            id="coma">
+                            <mat-option value="0">SELECCIONE</mat-option>
+                            <mat-option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-5">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Unidad o Dependencia</mat-label>
+                        <mat-select class="col-md-12" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}" id="unid">
+                            <mat-option value="0">SELECCIONE</mat-option>
+                            <mat-option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div class="form-row col-md-12">
+                
+                    <mat-hint class="col-md-2"><span style="margin-top: 10px; display: block;" class="categoria">Por Descripcion</span></mat-hint>
+
+                <div class="col-md-5">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Accion Tomada</mat-label>
+                        <input matInput [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.accion"
+                            placeholder="Accion Tomada">
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-5">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Asunto</mat-label>
+                        <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="asunto" placeholder="Asunto">
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <mat-hint style="text-align: end;width: 100%; display: block;">
+                <span (click)="verMasCampos()" *ngIf="mostrarCampos" class="ver">Ver menos campos <i class="fa fa-caret-up"></i></span>
+            </mat-hint>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal-footer" align="end">
+
+        <button mat-raised-button color="primary" id="registrar" style="width: 200px;">
+            Buscar Documento
+            <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
+
+        <button mat-raised-button  aria-label="Close" (click)="close()" style="margin-left: 5px;">
+            Cerrar
+        </button>
+
+</div>
+</ng-template>

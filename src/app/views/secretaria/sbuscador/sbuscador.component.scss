@@ -48,11 +48,8 @@
   }
   
   .cardround {
-  
     border-radius: 50%;
     padding: 15px;
-  
-  
   }
   
   .card {
@@ -166,21 +163,11 @@
     color: #2a0b5b;
   }
   
-  
-  
   .enlace > div > p > small {
     font-weight: normal;
     color: #978484;
   }
-  
-  .calendario {
-    width: 2.75rem;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAcCAYAAAAEN20fAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEUSURBVEiJ7ZQxToVAEIY/YCHGxN6XGOIpnpaEsBSeQC9ArZbm9TZ6ADyBNzAhQGGl8Riv4BLAWAgmkpBYkH1b8FWT2WK/zJ8ZJ4qiI6XUI3ANnGKWBnht2/ZBDRK3hgVGNsCd7/ui+JkEIrKtqurLpEWaphd933+IyI3LEIdpCYCiKD6HcuOa/nwOa0ScJEnk0BJg0UTUWJRl6RxCYEzEmomsIlPU3IPW+grIAbquy+q6fluy/28RIBeRMwDXdXMgXLj/B2uimRXpui4D9sBeRLKl+1N+L+t6RwbWrZliTTTr1oxYtzVWiTQAcRxvTX+eJMnlUDaO1vpZRO5NS0x48sIwfPc87xg4B04MCzQi8hIEwe4bl1DnFMCN2zsAAAAASUVORK5CYII=)!important;
-    background-repeat: no-repeat;
-    background-size: 23px;
-    background-position: center;
-    border-color: #bbbfc5 !important;
-  }
+
   .example-additional-selection {
     opacity: 0.75;
     font-size: 0.75em;
@@ -234,18 +221,57 @@
     border-radius: 0px 8px 9px 0px;
   
   }
-  
-  input{
-    text-transform: uppercase;
-  }
-  select{
-    text-transform: uppercase;
-  }
-  textarea {
-    text-transform: uppercase;
-  }
-  
+
   .seleccion{
     display: flex;
     z-index: 1;
+  }
+
+  .dropdown-item{
+    cursor: pointer;
+  }
+
+  .item{
+    border: 1px solid #434141;
+    padding: 5px 10px;
+    text-align: center;
+    margin-right: .3rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: ease-in .3s all;
+  }
+
+  .item:hover{
+    background-color: #e0e0e0;
+    transition: ease-in .3s all;
+  }
+
+  .itemActive{
+    color: #fff;
+    background-color: #5E72E4;
+    border: 1px solid #566ce7;
+    transition: ease-in .3s all;
+  }
+
+
+  .itemActive:hover{
+    background-color: #5b71eb;
+    transition: ease-in .3s all;
+  }
+
+  .mat-form-field{
+    width: 100%;
+  }
+
+  mat-label{
+    text-transform: uppercase;
+  }
+
+  mat-hint{
+    span.categoria{
+      text-transform: uppercase;
+    }
+    span.ver{
+      cursor: pointer;
+    }
   }
