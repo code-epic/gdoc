@@ -245,8 +245,7 @@ const ngWizardConfig: NgWizardConfig = {
     RseliminacionesComponent,
     ConsultaGeneralComponent,
     SbuscadorComponent,
-    BusquedaAvanzadaComponent
-  ],
+    BusquedaAvanzadaComponent,  ],
   providers: [
     {
       provide: [LocationStrategy, AuthGuardGuard, JsonPipe],

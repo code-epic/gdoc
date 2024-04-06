@@ -10,7 +10,19 @@ import { FormControl } from '@angular/forms';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { SubDocumento } from '../ministerial/ministerial.component';
 import { MatDialog } from '@angular/material/dialog';
-import { log } from 'console';
+
+export interface Isbusqueda {
+  bnrocontrol?: string,
+  bfrecepcion?: string,
+  bestatus?: string,
+  bclasificacion?: string,
+  bdecision?: string,
+  bremitente?: string,
+  bcomando?: string,
+  bunidad?: string
+  baccion?: string,
+  basunto?: string
+}
 
 
 @Component({
@@ -20,6 +32,30 @@ import { log } from 'console';
 })
 export class SbuscadorComponent implements OnInit {
 
+  public asunto : string = ""
+
+  public Doc: IDocumento = {
+    ncontrol: '',
+    wfdocumento: 0,
+    fcreacion: '',
+    forigen: '',
+    norigen: '',
+    salida: '',
+    tipo: '',
+    remitente: '',
+    unidad: '',
+    comando: '',
+    contenido: '',
+    instrucciones: '',
+    codigo: '',
+    nexpediente: '',
+    creador: '',
+    archivo: '',
+    privacidad: 0,
+    subdocumento: '',
+    dependencias: '',
+    puntodecuenta: '',
+  }
 
   public SubDocumento: SubDocumento = {
       subdocumento: 0,
@@ -34,6 +70,19 @@ export class SbuscadorComponent implements OnInit {
       fecha: '',
       usuario: ''
   } 
+
+  public parametrosBusqueda: Isbusqueda = {
+    bnrocontrol: this.SubDocumento.cuenta,
+    bfrecepcion: this.SubDocumento.fecha,
+    bestatus: this.SubDocumento.estatus,
+    bclasificacion: this.Doc.tipo,
+    bdecision: this.SubDocumento.decision,
+    bremitente: this.Doc.remitente,
+    bcomando: this.Doc.comando,
+    bunidad: this.Doc.unidad,
+    baccion: this.SubDocumento.accion,
+    basunto: this.asunto
+  }
 
   public fechaInicio: any
   public fechaFin: any
@@ -325,29 +374,6 @@ export class SbuscadorComponent implements OnInit {
     activo: 0
   }
 
-  public Doc: IDocumento = {
-    ncontrol: '',
-    wfdocumento: 0,
-    fcreacion: '',
-    forigen: '',
-    norigen: '',
-    salida: '',
-    tipo: '',
-    remitente: '',
-    unidad: '',
-    comando: '',
-    contenido: '',
-    instrucciones: '',
-    codigo: '',
-    nexpediente: '',
-    creador: '',
-    archivo: '',
-    privacidad: 0,
-    subdocumento: '',
-    dependencias: '',
-    puntodecuenta: '',
-  }
-
   public WAlerta: IWKFAlerta = {
     documento: 0,
     estado: 0,
@@ -435,7 +461,6 @@ export class SbuscadorComponent implements OnInit {
   public sCedula: string = 'Cédula'
   public sGrado: string = 'Grado / Jerarquía'
   public sNombre: string = 'Nombres y Apellidos'
-  public asunto : string
 
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
@@ -551,7 +576,7 @@ export class SbuscadorComponent implements OnInit {
     const modalRef = this.modalService.open(content, {
       centered: true,
       windowClass: 'my-custom-modal-class',
-      size: 'lg',
+      size: 'xl',
       backdrop: false
     });
     modalRef['_windowCmptRef'].location.nativeElement.style.zIndex = '900';

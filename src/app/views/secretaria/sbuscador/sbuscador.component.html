@@ -32,7 +32,7 @@
                             <mat-form-field appearance="outline">
                                 <mat-label>Nro. Cuenta</mat-label>
                                 <input matInput type="txtOrigen" [ngModelOptions]="{ standalone: true }"
-                                    [(ngModel)]="SubDocumento.cuenta" id="nori" placeholder="Nro. Cuenta" />
+                                    [(ngModel)]="Doc.ncontrol" id="nori" placeholder="Nro. Cuenta" />
                             </mat-form-field>
                         </div>
 
@@ -40,7 +40,7 @@
                             <div class="input-group" style="width: 100%">
                                 <mat-form-field appearance="outline">
                                     <mat-label>Fecha de Recepcion</mat-label>
-                                    <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="SubDocumento.fecha"
+                                    <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="Doc.forigen"
                                         placeholer="Fecha de Recepcion" [matDatepicker]="picker" />
                                     <mat-hint>MM/DD/YYYY</mat-hint>
                                     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -64,8 +64,8 @@
 
                         <div class="col-11 col-md-2">
                             <button mat-raised-button color="primary" id="registrar" style="width: 100%; height: 50px; margin-top: 5px;">
+                                <i class="fa fa-search" aria-hidden="true"></i> 
                                 Buscar
-                                <i class="fa fa-search" aria-hidden="true"></i>
                             </button>
                         </div>
 
@@ -91,9 +91,9 @@
 <div class="modal-body">
     <div class="container">
 
-        <div class="form-row col-md-12">
+        <div class="form-row col-md-12 d-none">
             
-                <mat-hint class="col-md-2"><span style="margin-top: 15px; display: block;" class="categoria">Rango de Fecha</span></mat-hint>
+                <mat-hint class="col-md-2"><span style="margin-top: 19px; display: block;" class="categoria">Rango de Fecha</span></mat-hint>
 
             <div class="col-md-5">
                 <div class="input-group" style="width: 100%">
@@ -121,11 +121,11 @@
 
         <div class="form-row col-md-12">
             
-                <mat-hint class="col-md-2"><span style="margin-top: 10px; display: block;" class="categoria">Tipo de Documento</span></mat-hint>
+                <mat-hint class="col-md-2"><span style="margin-top: 19px; display: block;" class="categoria">Tipo de Documento</span></mat-hint>
 
             <div class="col-md-3">
                 <mat-form-field appearance="outline">
-                    <mat-label>Tipo de Documento</mat-label>
+                    <mat-label>Clasificacion</mat-label>
                     <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}"
                         id="tdoc">
                         <mat-option value="0">SELECCIONE</mat-option>
@@ -197,7 +197,7 @@
 
             <div class="form-row col-md-12">
                 
-                    <mat-hint class="col-md-2"><span style="margin-top: 10px; display: block;" class="categoria">Por Descripcion</span></mat-hint>
+                    <mat-hint class="col-md-2"><span style="margin-top: 19px; display: block;" class="categoria">Por Descripcion</span></mat-hint>
 
                 <div class="col-md-5">
                     <mat-form-field appearance="outline">
@@ -226,8 +226,8 @@
 <div class="modal-footer" align="end">
 
         <button mat-raised-button color="primary" id="registrar" style="width: 200px;">
+            <i class="fa fa-search" aria-hidden="true"></i> 
             Buscar Documento
-            <i class="fa fa-search" aria-hidden="true"></i>
         </button>
 
         <button mat-raised-button  aria-label="Close" (click)="close()" style="margin-left: 5px;">
