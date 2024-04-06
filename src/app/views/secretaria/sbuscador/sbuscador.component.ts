@@ -112,6 +112,7 @@ export class SbuscadorComponent implements OnInit {
   public id_alerta = ''
 
   public buscar = ''
+  public buscar1 = ''
   public antes: boolean = false
   public despues: boolean = true
   public paginador: number = 10
@@ -168,6 +169,61 @@ export class SbuscadorComponent implements OnInit {
       this.MostrarPaginador()
       this.buscar = ''
     }
+
+    this.close()
+  }
+
+  buscarDocumento(): void {
+    let patron
+    if (this.Doc.ncontrol) {
+      patron = new RegExp(this.utilService.ConvertirCadena(this.Doc.ncontrol));
+      this.realizarBusqueda('ncontrol', patron);
+    }else if (this.Doc.forigen){
+      this.realizarBusquedaFecha(new Date(this.Doc.forigen));
+
+    } else if (this.SubDocumento.estatus) {
+      patron = new RegExp(this.utilService.ConvertirCadena(this.SubDocumento.estatus));
+      this.realizarBusqueda('estatus', patron);
+    }    
+    this.longitud = this.bzBusqueda.length;
+    this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
+    this.max_paginador = this.bzBusqueda.length / 10;
+    this.cantidad = this.bzBusqueda.length;
+    this.MostrarPaginador();
+    this.close()
+  }
+
+  realizarBusquedaFecha(fecha: Date): void {
+    this.bzBusqueda = this.bzSeguimientoO.filter((e) => {
+      const fechaEvento = new Date(e.fecha);
+      return fechaEvento.toDateString() === fecha.toDateString(); // Comparar solo la parte de fecha sin la hora
+    });
+    this.actualizarResultados();
+  }
+
+  realizarBusqueda(campo: string, valor: string): void {
+    this.bzBusqueda = this.bzSeguimientoO.filter((e) => new RegExp(valor).test(e[campo]));
+    console.log(this.bzBusqueda);
+    
+    this.actualizarResultados();
+    this.limpiarCamposBusqueda();
+  }
+
+  actualizarResultados(): void {
+    this.longitud = this.bzBusqueda.length;
+    this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
+    this.max_paginador = this.bzBusqueda.length / 10;
+    this.cantidad = this.bzBusqueda.length;
+    this.MostrarPaginador();
+    this.close();
+  }
+
+  limpiarCamposBusqueda(): void {
+    // Limpiar los campos de búsqueda después de realizar la búsqueda
+    this.Doc.ncontrol = '';
+    this.Doc.forigen = null;
+    this.SubDocumento.estatus = '';
+    // Limpiar el resto de campos de búsqueda según sea necesario
   }
 
   async ConsultarSeguimiento() {
@@ -472,6 +528,7 @@ export class SbuscadorComponent implements OnInit {
   }
 
   async ngOnInit() {
+    await this.ConsultarSeguimiento()
     this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : []
     this.Grados = sessionStorage.getItem("MPPD_CGrado") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado"))) : []
     this.Categorias = sessionStorage.getItem("MPPD_CCategorias") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias"))) : []
@@ -479,6 +536,7 @@ export class SbuscadorComponent implements OnInit {
 
     this.Configuracion = sessionStorage.getItem("MD_CConfiguracion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion"))) : []
     this.listarConfiguracion()
+
   }
 
   validarTipoDoc(): boolean {
