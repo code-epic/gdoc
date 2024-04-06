@@ -102,7 +102,7 @@ export const AdminLayoutRoutes: Routes = [
         canActivate: [AuthGuardGuard]
     },
     {
-        path: 'sministerial',
+        path: 'sministerial/:filtro',
         component: SministerialComponent,
         canActivate: [AuthGuardGuard]
     },
@@ -209,7 +209,12 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'ministerial/:id',
         component: MinisterialComponent,
-        canActivate: [AuthGuardGuard]
+        canActivate: [AuthGuardGuard],
+    },
+    {
+        path: 'ministerial/agregar',
+        component: MinisterialComponent,
+        canActivate: [AuthGuardGuard],
     },
     {
         path: 'fichaproyecto/:id',
@@ -300,5 +305,4 @@ export const AdminLayoutRoutes: Routes = [
             canActivate: [AuthGuardGuard]
         }]
     }
-
 ];

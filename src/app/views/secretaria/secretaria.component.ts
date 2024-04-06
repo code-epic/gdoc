@@ -41,7 +41,7 @@ export class SecretariaComponent implements OnInit {
     
   },
   {
-    url: "/sministerial",
+    url: "/sministerial/ministeriales",
     js: "",
     descripcion: "Ministerial",
     icono: "fa fa-building",
@@ -64,7 +64,7 @@ export class SecretariaComponent implements OnInit {
   {
     url: "/sbuscador",
     js: "",
-    descripcion: "Buscador",
+    descripcion: "Buscador de Documentos",
     icono: "fa fa-compass",
     nombre: "Buscador",
     accion: "CargarUrl('control', 'pendientes')",
@@ -82,7 +82,29 @@ export class SecretariaComponent implements OnInit {
     clase: "f-left",
     color: "bg-orange",
     
-  }]
+  },
+  {
+    url: "/sministerial/tramitaciones-por-organo-regular",
+    js: "",
+    descripcion: "Tramitaciones por organo regular",
+    icono: "fa fa-book",
+    nombre: "TOR",
+    accion: "CargarUrl('control', 'pendientes')",
+    clase: "f-left",
+    color: "bg-info",
+    
+  },
+  {
+    url: "/sministerial/otros-documentos",
+    js: "",
+    descripcion: "Otros Documentos",
+    icono: "fa fa-file",
+    nombre: "Otros",
+    accion: "CargarUrl('control', 'pendientes')",
+    clase: "f-left",
+    color: "bg-gray",
+  }
+]
 
   constructor(private apiService: ApiService, 
     public dialog: MatDialog,

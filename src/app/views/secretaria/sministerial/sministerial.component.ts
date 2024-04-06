@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
@@ -18,7 +18,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader'
 
 export class SministerialComponent implements OnInit {
 
-
+  public titulo = ''
 
   public estadoActual = 4
   public estadoOrigen = 2
@@ -30,6 +30,8 @@ export class SministerialComponent implements OnInit {
     parametros: '',
     valores: ''
   }
+
+  public filtro = 0
 
   public WAlerta: IWKFAlerta = {
     documento: 0,
@@ -102,18 +104,30 @@ export class SministerialComponent implements OnInit {
     private utilService: UtilService,
     private ngxService: NgxUiLoaderService,
     private loginService: LoginService,
+    private rutaActiva: ActivatedRoute,
     private modalService: NgbModal) {
-    // customize default values of modals used by this component tree
     config.backdrop = 'static';
+    
     config.keyboard = false;
-
   }
 
 
   ngOnInit(): void {
     this.listarEstados()
     this.seleccionNavegacion(0)
-
+    let ruta = this.rutaActiva.snapshot.params.filtro
+    console.log(ruta);
+    if (ruta == 'tramitaciones-por-organo-regular')  {
+      this.filtro = 1
+      this.titulo = 'Tramitaciones por Organo Regular'
+    } else if( ruta == 'otros-documentos') {
+      this.filtro = 2
+      this.titulo = 'Otros Documentos'
+    } else if( ruta == 'ministeriales') {
+      this.filtro = 3
+      this.titulo = 'Ministeriales'
+    }
+    
   }
 
 
@@ -224,7 +238,13 @@ export class SministerialComponent implements OnInit {
           e.completed = false
           e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
           e.color = 'warn'
-          bz.push(e)
+          if (this.filtro == 1 && e.tdoc == 'TRAMITACION POR ORGANO REGULAR') {
+            bz.push(e)
+          } else if(this.filtro == 2 && e.tdoc !='PUNTO DE CUENTA' && e.tdoc != 'TRAMITACIONES POR ORGANO REGULAR'){
+            bz.push(e)
+          } else if (this.filtro == 3 && e.tdoc == 'PUNTO DE CUENTA') {
+            bz.push(e)
+          }
         })//Registros recorridos como elementos
 
         this.longitud = bz.length
@@ -261,9 +281,6 @@ export class SministerialComponent implements OnInit {
     const base = btoa( JSON.stringify(e))
     this.ruta.navigate(['/ministerial', base])
   }
-
-
-
 
   insertarObservacion() {
     var usuario = this.loginService.Usuario.id
