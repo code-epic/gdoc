@@ -108,7 +108,7 @@
                     </mat-expansion-panel-header>
                     <table class="table align-items-center table-flush" style="width:100%">
                       <thead class="thead-light">
-                        <th>#</th>
+                        <th> <mat-checkbox [checked]="allComplete" (change)="setAll($event.checked)" color="warn"></mat-checkbox></th>
                         <th>GRADO / COMPONENTE</th>
                         <th>Nombres y Apellidos</th>
                         <th>CEDULA</th>
@@ -123,7 +123,6 @@
                             <mat-checkbox class="example-margin texto-lista" 
                               [(ngModel)]="el.completed"  
                               color="warn" 
-
                               (ngModelChange)="updateAllComplete()">
                             </mat-checkbox>
                           </td>
@@ -140,7 +139,7 @@
 
                     <div class="form-group col-md-12 text-right">
                       <br>
-                      <button mat-raised-button (click)="transfererirResoluciones()">Transferir a Resoluciones</button>
+                      <button mat-raised-button  (click)="transfererirResoluciones();">Transferir a Resoluciones</button>
                     </div>
 
                   </mat-expansion-panel>
