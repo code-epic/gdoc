@@ -271,8 +271,9 @@
     <form method="post" enctype="multipart/form-data" id="forma" name="forma">
       <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
       <label for="input-folder-2">Seleccionar Archivo</label>
-      <div class="file-loading">
-        <input (change)="fileSelected($event)" class="file-input" name="archivos" type="file" accept=".pdf">
+      <div class="custom-file">
+        <input (change)="fileSelected($event)" id="formFile" class="custom-file-input" name="archivos" type="file" accept=".pdf">
+        <label for="formFile" class="custom-file-label">{{lblFile}}</label>
       </div>
       <div id="errorBlock" class="help-block"></div>
     </form>

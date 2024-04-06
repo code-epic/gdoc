@@ -152,6 +152,7 @@ export class MinisterialComponent implements OnInit {
 
   @ViewChild('templateBottomSheet') TemplateBottomSheet: TemplateRef<any>;
   hashcontrol: string;
+  lblFile: any;
 
 
   constructor(
@@ -416,6 +417,7 @@ export class MinisterialComponent implements OnInit {
   }
 
   fileSelected(e) {
+    this.lblFile = e.target.files[0].name
     this.archivos.push(e.target.files[0])
   }
 

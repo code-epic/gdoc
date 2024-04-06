@@ -112,6 +112,7 @@ export class RegistrarComponent implements OnInit {
     archivo: '',
     usuario: ''
   }
+  lblFile: any;
 
 
   constructor(private apiService: ApiService,
@@ -465,6 +466,7 @@ export class RegistrarComponent implements OnInit {
 
 
   fileSelected(e) {
+    this.lblFile = e.target.files[0].name
     this.archivos.push(e.target.files[0])
   }
 
