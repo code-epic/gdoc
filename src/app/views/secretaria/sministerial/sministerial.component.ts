@@ -261,8 +261,6 @@ export class SministerialComponent implements OnInit {
     )
   }
 
-
-
   pageChangeEvent(e) {
     this.pageSize = e.pageSize
     this.recorrerElementos(e.pageIndex)
