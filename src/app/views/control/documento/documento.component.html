@@ -272,13 +272,13 @@
                             </div>
                         </div>
                         <div class="form-group col-md-12" *ngIf="resolucion">
-                            <table class="table align-items-center table-flush" style="width:100%">
+                            <table class="table align-items-center table-flush" style="table-layout: fixed; border-collapse: collapse; width:100%;">
                                 <thead class="thead-light">
                                     <th>N°</th>
                                     <th [style.display]="puntocuenta?'':'none'">Cuenta</th>
                                     <th [style.display]="puntocuenta?'':'none'">Resumen</th>
                                     <th [style.display]="puntocuenta?'':'none'">Fecha</th>
-                                    <th>{{sCargo}}</th>
+                                    <th>{{sGrado}}</th>
                                     <th>{{sNombre}}</th>
                                     <th>{{sCedula}}</th>
                                 </thead>
