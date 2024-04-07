@@ -154,7 +154,7 @@
                     </mat-expansion-panel-header>
                     <table class="table align-items-center table-flush" style="width:100%">
                       <thead class="thead-light">
-                        <th>#</th>
+                        <th> <mat-checkbox [checked]="allComplete" (change)="setAll($event.checked)" color="warn"></mat-checkbox></th>
                         <th>GRADO / COMPONENTE</th>
                         <th>Nombres y Apellidos</th>
                         <th>CEDULA</th>
@@ -163,6 +163,9 @@
                       <tbody>
                         <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
                           <td>
+                            <input type="hidden" class="form-control"  id="{{ i }}-nomb" value="{{ el.nombre }}">
+                            <input type="hidden" class="form-control"  id="{{ i }}-cedu" value="{{ el.cedula }}">
+                            <input type="hidden" class="form-control"  id="{{ i }}-carg" value="{{ el.cargo }}">
                             <input type="hidden" class="form-control" id="{{ i }}-nomb" value="{{ el.nombre }}">
                             <input type="hidden" class="form-control" id="{{ i }}-cedu" value="{{ el.cedula }}">
                             <input type="hidden" class="form-control" id="{{ i }}-carg" value="{{ el.cargo }}">
@@ -183,7 +186,7 @@
 
                     <div class="form-group col-md-12 text-right">
                       <br>
-                      <button mat-raised-button (click)="transfererirResoluciones()">Transferir a Resoluciones</button>
+                      <button mat-raised-button  (click)="transfererirResoluciones();">Transferir a Resoluciones</button>
                     </div>
                   </mat-expansion-panel>
                 </mat-accordion>
