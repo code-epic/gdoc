@@ -9,11 +9,9 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service'
 import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta, IWKFDependencia } from 'src/app/services/control/documentos.service'
 import { LoginService } from 'src/app/services/seguridad/login.service'
 import { UtilService } from 'src/app/services/util/util.service'
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig } from '@angular/material/dialog';
-import { BusquedaAvanzadaComponent } from './busquedaAvanzada.component';
-
 
 
 @Component({
@@ -23,19 +21,34 @@ import { BusquedaAvanzadaComponent } from './busquedaAvanzada.component';
 })
 export class PendientesComponent implements OnInit {
 
-  openDialog(): void {
-    const dialogRef = this.dialog.open(BusquedaAvanzadaComponent, {
-      panelClass: 'custom-dialog-container',
-      height: '400px',
-      maxWidth: '90vw',
-      width: '900px',
 
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('El diálogo fue cerrado');
-    });
+  mostrarCamposAdicionales: boolean = false;
+  mostrarBotonOcultar: boolean = false;
+  
+  activarCamposAdicionales() {
+      this.mostrarCamposAdicionales = !this.mostrarCamposAdicionales; 
+      this.mostrarBotonOcultar = !this.mostrarBotonOcultar; 
   }
+
+
+  // cerrarDialogo(): void {
+  //     this.dialogRef.close();
+  //   }
+
+  // openDialog(): void {
+  //   const dialogRef = this.dialog.open(BusquedaAvanzadaComponent, {
+  //     panelClass: 'custom-dialog-container',
+  //     height: '400px',
+  //     maxWidth: '90vw',
+  //     width: '900px',
+
+  //   });
+
+  //   dialogRef.afterClosed().subscribe(result => {
+  //     console.log('El diálogo fue cerrado');
+  //   });
+  // }
+
 
   
 
@@ -437,6 +450,7 @@ export class PendientesComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.ConsultarSeguimiento()
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
       if (id == 'salida') {
@@ -532,6 +546,17 @@ export class PendientesComponent implements OnInit {
     })
   }
 
+  buscarDocumento(): void {
+    const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
+    this.bzBusqueda = this.bzSeguimientoO.filter((e) => patron.test(e.busqueda));
+    this.longitud = this.bzBusqueda.length;
+    this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
+    this.max_paginador = this.bzBusqueda.length / 10;
+    this.cantidad = this.bzBusqueda.length;
+    this.MostrarPaginador();
+    this.buscar = '';
+  }
+
   limpiarDoc() {
     var dia = this.utilService.FechaActual()
     this.forigen = ''
@@ -541,9 +566,10 @@ export class PendientesComponent implements OnInit {
     this.Doc.nexpediente = ''
     this.Doc.codigo = '0'
     this.Doc.salida = ''
-    this.Doc.tipo = '0'
-    this.Doc.remitente = '0'
-    this.Doc.unidad = '0'
+    this.Doc.tipo = ''
+    this.Doc.remitente = ''
+    this.Doc.unidad = ''
+    this.Doc.comando = ''
     this.Doc.creador = ''
     this.fcreacionDate = NgbDate.from(this.formatter.parse(dia))
     this.fcreacion = dia
@@ -618,7 +644,17 @@ export class PendientesComponent implements OnInit {
   }
 
   open(content) {
-    this.modalService.open(content);
+    const modalRef = this.modalService.open(content, {
+      centered: true,
+      windowClass: 'my-custom-modal-class',
+      size: 'lg',
+      backdrop: false
+    });
+    modalRef['_windowCmptRef'].location.nativeElement.style.zIndex = '900';
+  }
+  
+  close() {
+    this.modalService.dismissAll();
   }
 
   //obtenerWorkFlow Permite generar los primeros valores de la red del documento

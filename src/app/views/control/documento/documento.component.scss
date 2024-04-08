@@ -74,3 +74,10 @@ textarea {
     display: flex;
     z-index: 1;
 }
+th, td { 
+    text-align: center; 
+    white-space: nowrap;
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    margin: 12px 0;
+  }
