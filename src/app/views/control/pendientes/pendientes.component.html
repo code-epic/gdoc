@@ -32,22 +32,12 @@
             margin-left: 5px;
         ">
 
-              <div class="col-md-2" style="
+              <div class="col-md-4" style="
               margin-right: 10px;">
                 <div style="padding-top: 4px;">
                   <mat-form-field appearance="outline">
-                    <mat-label>NOMBRES</mat-label>
+                    <mat-label>NOMBRE COMPLETO</mat-label>
                     <input matInput placeholder="NOMBRES">
-                  </mat-form-field>
-                </div>
-              </div>
-
-              <div class="col-md-2" style="
-              margin-right: 10px;">
-                <div style="padding-top: 4px;">
-                  <mat-form-field appearance="outline">
-                    <mat-label>APELLIDOS</mat-label>
-                    <input matInput placeholder="APELLIDOS">
                   </mat-form-field>
                 </div>
               </div>
@@ -70,6 +60,7 @@
                     <mat-label> TIPO DE NRO.</mat-label>
                     <mat-select>
                       <mat-option value="0" selected>SELECCIONE</mat-option>
+                      <mat-option value="1"> NRO. CEDULA</mat-option>
                       <mat-option value="1"> NRO. CONTROL</mat-option>
                       <mat-option value="2"> NRO. ORIGEN</mat-option>
                       <mat-option value="3"> NRO. SALIDA</mat-option>
@@ -77,18 +68,13 @@
                   </mat-form-field>
                 </div>
               </div>
-
-             
-
-
-
               <div class="col-md-2">
-                <div style="width:100%; padding-top: 12px;">
-                  <button mat-flat-button (click)="buscarDocumento()" color="primary" id="registrar"
-                    style="width: 100%;">
+                <div style="width:100%; padding-top: 9px;">
+                  <button mat-flat-button (click)="buscarDocumento()" id="registrar" color="primary" class="boton-buscar">
                     Buscar &nbsp;
                     <i class="fa fa-search" aria-hidden="true"></i>
                   </button>
+                  
                 </div>
               </div>
 
@@ -115,6 +101,100 @@
                   </li>
                 </ul>
               </div>
+
+              <div class="col-md-10">
+                <div class="row enlace" *ngFor="let e of bzSeguimiento; let i=index ">
+
+                  <div class="col-md-8">
+                    <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">
+                      {{ e.numc }} - {{ e.tdoc }}
+                    </a>
+                    | {{ e.origen | date:"dd-MM-yyyy" }}
+                  </div>
+                  <div class="col-md-4 text-right">
+  
+                    <span class="badge rounded-pill text-bg-primary">pdf</span>
+  
+                    <a [href]="dwUrl(e.numc, e.archivo)" target="_top" rel="noopener noreferrer"
+                      style="color:darkgrey;font-size: 12px;font-weight: normal;">
+  
+                      {{ e.archivo.substring(0,10) }}
+                      <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
+                        style="width: 12px;margin-top: -3px;" />
+                    </a>
+                  </div>
+  
+                  <div class="col-md-12" style="margin-top: -4px;">
+                    <ng-template #popContent>
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div [innerHTML]="e.contenido" class="contenido"></div>
+                        </div>
+                      </div>
+                    </ng-template>
+                    {{ e.unidad }}
+                    <button mat-button [ngbPopover]="popContent" popoverTitle="Detalles generales">
+                      Mas...
+                    </button>
+                    <div [innerHTML]="e.resumenl" class="contenido"></div>
+  
+                    <p style="margin-top: -10px;">
+                      <small class=" mr-3"><i class="fa fa-calendar"></i>&nbsp;{{ e.fecha
+                        |
+                        date:"dd-MM-yyyy hh:mm"
+                        }}</small>
+                      <small class=" mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN {{
+                        e.norigen | uppercase
+                        }}</small>
+                      <small class=" mr-3"><i class="fa fa-folder"></i> &nbsp; SALIDA {{
+                        e.salida | uppercase
+                        }}</small>
+  
+                      <small class=" mr-4"><i class="fa fa-globe"></i> &nbsp;
+                        {{ e.nombre | uppercase }} ( {{ e.estatus_nombre | uppercase }}
+                        {{
+                        e.s_texto }} )
+                      </small>
+                    </p>
+                  </div>
+  
+                  <br><br>
+  
+                  <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6 text-center">
+                      <nav aria-label="Page navigation example" *ngIf="blBuscar">
+                        <div class="row">
+                          <div class="col-md-1">
+                            <ul class="pagination justify-content-center">
+                              <li class="page-item">
+                                <a class="page-link" *ngIf="antes" (click)="posicion(actual-1)"></a>
+                              </li>
+                            </ul>
+                          </div>
+                          <div class="col-md-10">
+                            <ul class="pagination justify-content-center">
+                              <li class="page-item" *ngFor="let e of lstPaginas">
+                                <a class="page-link {{ e.color }}" (click)="posicion(e.id)">{{
+                                  e.id
+                                  }}</a>
+                              </li>
+                            </ul>
+                          </div>
+                          <div class="col-md-1">
+                            <ul class="pagination justify-content-center">
+                              <li class="page-item">
+                                <a class="page-link" *ngIf="despues" (click)="posicion(actual+1)">></a>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </nav>
+                    </div>
+                    <div class="col-md-3"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -130,19 +210,21 @@
             <div class="modal-body" style="padding: 0 24px;">
               <div class="form-row">
 
-                <div class="col-md-5" *ngIf="mostrarCamposAdicionales"  style="display: inline-block;text-align: center; padding-top: 4px; color: gray; width: 100%;">
-                  <label></label>
-                  <mat-radio-group style="display:flex; justify-content: center; gap: 30px;"
-                    [(ngModel)]="Doc.privacidad">
-                    <mat-radio-button color="primary" value="0"> PUBLICO </mat-radio-button>
-                    <mat-radio-button color="warn" value="1"> CONFIDENCIAL </mat-radio-button>
-                  </mat-radio-group>
-                </div>
 
                 <div class="col-md-3">
                   <div style="display: inline-block;text-align: center; padding-top: 4px; width: 100%;">
                     <mat-form-field appearance="outline" color="primary">
-                      <mat-label> FECHA DE...</mat-label>
+                      <mat-label> FECHA INICIO</mat-label>
+                      <input matInput [matDatepicker]="picker" disabled />
+                      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                      <mat-datepicker #picker disabled="false"></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div style="display: inline-block;text-align: center; padding-top: 4px; width: 100%;">
+                    <mat-form-field appearance="outline" color="primary">
+                      <mat-label> FECHA FIN</mat-label>
                       <input matInput [matDatepicker]="picker" disabled />
                       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                       <mat-datepicker #picker disabled="false"></mat-datepicker>
@@ -150,7 +232,7 @@
                   </div>
                 </div>
   
-                <div class="col-md-4" style="display: inline-block;text-align: center; padding-top: 22px; color: gray; width: 100%;">
+                <div class="col-md-6" style="display: inline-block;text-align: center; padding-top: 22px; color: gray; width: 100%;">
                   <mat-radio-group style="display:flex; justify-content: start; gap: 40px;padding-left: 3px;"
                     color="primary">
                     <mat-radio-button value="0"> CREACION </mat-radio-button>
@@ -248,24 +330,6 @@
                 </div>
 
               </div>
-
-              <!-- <div class="row">
-                <div class="col-md-6" *ngIf="mostrarCamposAdicionales" style="margin-bottom: 10px;">
-                  <mat-form-field appearance="outline">
-                    <mat-label [config]="editorConfig">CONTENIDO DEL OFICIO</mat-label>
-                    <textarea matInput [(ngModel)]="Doc.contenido"></textarea>
-                  </mat-form-field>
-                </div>
-                <div class="col-md-6" *ngIf="mostrarCamposAdicionales" style="margin-bottom: 10px;">
-                  <mat-form-field appearance="outline">
-                    <mat-label [config]="editorConfig">INSTRUCCIONES GENERALES</mat-label>
-                    <textarea matInput [(ngModel)]="Doc.instrucciones"></textarea>
-                  </mat-form-field>
-                </div>
-              </div> -->
-              
-
-
               <div class="col-md-12">
 
                 <mat-hint style="text-align: end;width: 100%; display: block; cursor: pointer; padding-right: 0; padding-bottom: 20px;">
@@ -284,105 +348,14 @@
                   Buscar &nbsp;
                   <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
-
+              
+              
                 <button mat-raised-button color="warn" aria-label="Close" (click)="close()"
                   style="margin-left: 5px; width: 100px;">
                   Cancelar
                 </button>
               </div>
-
-              <small class="mr-5" style="font-size: 16px;" *ngIf="blBuscar">
-                Cerca de {{ cantidad | number }} resultados...
-              </small>
-              <div class="row enlace" *ngFor="let e of bzSeguimiento; let i=index ">
-
-                <div class="col-md-8">
-                  <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">
-                    {{ e.numc }} - {{ e.tdoc }}
-                  </a>
-                  | {{ e.origen | date:"dd-MM-yyyy" }}
-                </div>
-                <div class="col-md-4 text-right">
-
-                  <span class="badge rounded-pill text-bg-primary">pdf</span>
-
-                  <a [href]="dwUrl(e.numc, e.archivo)" target="_top" rel="noopener noreferrer"
-                    style="color:darkgrey;font-size: 12px;font-weight: normal;">
-
-                    {{ e.archivo.substring(0,10) }}
-                    <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
-                      style="width: 12px;margin-top: -3px;" />
-                  </a>
-                </div>
-
-                <div class="col-md-12" style="margin-top: -4px;">
-                  <ng-template #popContent>
-                    <div class="row">
-                      <div class="col-md-12">
-                        <div [innerHTML]="e.contenido" class="contenido"></div>
-                      </div>
-                    </div>
-                  </ng-template>
-                  {{ e.unidad }}
-                  <button mat-button [ngbPopover]="popContent" popoverTitle="Detalles generales">
-                    Mas...
-                  </button>
-                  <div [innerHTML]="e.resumenl" class="contenido"></div>
-
-                  <p style="margin-top: -10px;">
-                    <small class=" mr-3"><i class="fa fa-calendar"></i>&nbsp;{{ e.fecha
-                      |
-                      date:"dd-MM-yyyy hh:mm"
-                      }}</small>
-                    <small class=" mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN {{
-                      e.norigen | uppercase
-                      }}</small>
-                    <small class=" mr-3"><i class="fa fa-folder"></i> &nbsp; SALIDA {{
-                      e.salida | uppercase
-                      }}</small>
-
-                    <small class=" mr-4"><i class="fa fa-globe"></i> &nbsp;
-                      {{ e.nombre | uppercase }} ( {{ e.estatus_nombre | uppercase }}
-                      {{
-                      e.s_texto }} )
-                    </small>
-                  </p>
-                </div>
-
-                <br><br>
-
-                <div class="row">
-                  <div class="col-md-3"></div>
-                  <div class="col-md-6 text-center">
-                    <nav aria-label="Page navigation example" *ngIf="blBuscar">
-                      <div class="row">
-                        <div class="col-md-1">
-                          <ul class="pagination justify-content-center">
-                            <li class="page-item">
-                              <a class="page-link" *ngIf="antes" (click)="posicion(actual-1)"></a>
-                            </li>
-                          </ul>
-                        </div>
-                        <div class="col-md-10">
-                          <ul class="pagination justify-content-center">
-                            <li class="page-item" *ngFor="let e of lstPaginas">
-                              <a class="page-link {{ e.color }}" (click)="posicion(e.id)">{{
-                                e.id
-                                }}</a>
-                            </li>
-                          </ul>
-                        </div>
-                        <div class="col-md-1">
-                          <ul class="pagination justify-content-center">
-                            <li class="page-item">
-                              <a class="page-link" *ngIf="despues" (click)="posicion(actual+1)">></a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </nav>
-                  </div>
-                  <div class="col-md-3"></div>
-                </div>
-              </div>
             </div>
+
+
+            

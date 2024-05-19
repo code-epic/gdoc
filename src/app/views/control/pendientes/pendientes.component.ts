@@ -123,6 +123,7 @@ export class PendientesComponent implements OnInit {
   async ConsultarSeguimiento() {
     this.xAPI.funcion = 'WKF_CSeguimiento'
     this.xAPI.parametros = ''
+    console.log("llego ConsultarSeguimiento")
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data)
@@ -165,6 +166,8 @@ export class PendientesComponent implements OnInit {
         this.bzBusqueda = this.bzSeguimientoO
         this.longitud = this.bzBusqueda.length
         this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize)
+        console.log("llego")
+        console.log(this.bzSeguimiento)
         this.cantidad = this.longitud
         this.max_paginador = this.cantidad / 10
         this.blBuscar = true
