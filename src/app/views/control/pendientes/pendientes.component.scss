@@ -257,17 +257,126 @@ mat-form-field  {
   width: 100%;
 }
 
-/* boton.css */
-
 .boton-buscar {
   width: 100%;
   color: white;
   height: 50px;
 }
 
-// .container {
-//   display: flex;
-//   justify-content: flex-end;
-// }
+.div-interno{
+  padding-top: 4px;
+}
 
+.div-interno-superior{
+  margin-right: 10px;
+}
 
+.formulario{
+  margin-left: 5px;
+}
+
+.seleccionar{
+  margin-right: 40px;
+}
+
+.boton-buscar-principal{
+  width: 100%; 
+  padding-top: 9px;
+}
+
+.nabvar{
+  padding: 0 25px 0 0;
+}
+
+.dropdown-item{
+  cursor: pointer;
+}
+
+.logo-buscar{
+  padding-right: 10px;
+}
+
+.texto-detalle-pdf{
+  color: rgb(0, 0, 0);
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.imagen-pdf{
+  width: 12px; 
+  margin-top: -3px;
+}
+
+.contenedor-documento{
+  margin-top: -4px;
+}
+
+.fecha-documento{
+  margin-top: -10px;
+}
+
+.boton-avanzado{
+  margin-bottom: 0px; 
+  padding-bottom: 0px;
+}
+
+.modal-avanzado{
+  padding: 0 24px;
+}
+
+.fechas-avanzado{
+  display: inline-block;
+  text-align: center;
+  padding-top: 4px;
+  width: 100%;
+}
+
+.div-radio-avanzado{
+  display: inline-block;
+  text-align: center;
+  padding-top: 22px;
+  color: gray;
+  width: 100%;
+}
+
+.mat-radio{
+  display: flex;
+  justify-content: start;
+  gap: 40px;
+  padding-left: 3px;
+}
+
+.div-contenido-oficio{
+  margin-bottom: 5px; 
+  padding-right: 5px;
+}
+
+.div-instrucciones-general{
+  margin-bottom: 5px; 
+  padding-left: 7px;
+}
+
+.boton-mostrar-mas-avanzado{
+  text-align: end;
+  width: 100%;
+  display: block;
+  cursor: pointer;
+  padding-right: 0;
+  padding-bottom: 20px;
+}
+
+.div-modal-footer{
+  text-align: end;
+  padding-right: 0;
+}
+.boton-buscar-avanzado{
+  width: 150px;
+}
+.boton-cancelar-avanzado{
+margin-left: 5px; 
+width: 100px;
+}
+
+.template-avanzado{
+ z-index: 2;
+}
