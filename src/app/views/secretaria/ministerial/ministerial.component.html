@@ -65,8 +65,8 @@
               <div class="form-group col-md-2" [ngClass]="edit == 0 ? 'd-none' : ''">
                 <label for="tmsOrigen">Fecha Elaboracion (*) </label>
                 <form class="form-inline">
-                  <div class="form-group" style="width:100%">
-                    <div class="input-group" style="width:100%">
+                  <div class="form-group div-general">
+                    <div class="input-group div-general">
                       <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="fechaElaboracion" ngbDatepicker #fe="ngbDatepicker" readonly
                         [placement]="placement" [positionTarget]="buttonElaboracion" readonly>
@@ -100,8 +100,8 @@
               <div class="form-group col-md-2" [ngClass]="edit == 0 ? 'd-none' : ''">
                 <label for="tmsOrigen">Fecha Origen (*) </label>
                 <form class="form-inline">
-                  <div class="form-group" style="width:100%">
-                    <div class="input-group" style="width:100%">
+                  <div class="form-group div-general">
+                    <div class="input-group div-general">
                       <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="fechaOrigen" ngbDatepicker #fo="ngbDatepicker" readonly [placement]="placement"
                         [positionTarget]="buttonEl" readonly>
@@ -144,7 +144,7 @@
                 <mat-accordion class="example-headers-align">
                   <mat-expansion-panel hideToggle>
                     <mat-expansion-panel-header>
-                      <mat-panel-title style="font-weight:bold">
+                      <mat-panel-title class="mat-panel-title">
                         Detalles de puntos de cuenta
                       </mat-panel-title>
                       <mat-panel-description>
@@ -152,7 +152,7 @@
 
                       </mat-panel-description>
                     </mat-expansion-panel-header>
-                    <table class="table align-items-center table-flush" style="width:100%">
+                    <table class="table align-items-center table-flush table-general">
                       <thead class="thead-light">
                         <th> <mat-checkbox [checked]="allComplete" (change)="setAll($event.checked)" color="warn"></mat-checkbox></th>
                         <th>GRADO / COMPONENTE</th>
@@ -173,9 +173,9 @@
                               (ngModelChange)="updateAllComplete()">
                             </mat-checkbox>
                           </td>
-                          <td style="width:80px">{{ el.cargo }}</td>
-                          <td style="width:80px">{{ el.nombre }}</td>
-                          <td style="width:60px">{{ el.cedula }}</td>
+                          <td class="td-width">{{ el.cargo }}</td>
+                          <td class="td-width">{{ el.nombre }}</td>
+                          <td class="td-width-menor">{{ el.cedula }}</td>
                           <td>
                             <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
                               id="{{i}}-text">
@@ -222,8 +222,8 @@
 
                 <div class="col-md-12">
                   <label for="tmsCreacion">Plazo </label>
-                  <div class="form-group" style="width:100%">
-                    <div class="input-group" style="width:100%">
+                  <div class="form-group div-general">
+                    <div class="input-group div-general">
                       <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="fplazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
                         [positionTarget]="buttonEl" readonly>
@@ -347,11 +347,10 @@
     <div class="modal-body">
       <div class="form-group col-md-12">
         <div class="card card-profile">
-          <div class="card-header bg-info" style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
+          <div class="card-header bg-info card-general">
             <div class="card-avatar text-center">
               <a href="javascript:;">
-                <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
-                  style="width:100px;z-index: 1; margin-top: -5px;">3
+                <img class="img img-raised rounded-circle image" src="./assets/img/theme/pdf2.jpeg">3
               </a>
             </div>
           </div>
@@ -367,10 +366,10 @@
               <div class="font-weight-50">
                 Publicado<span class="font-weight-light">, {{ fcreacion | date:"dd-MM-yy hh:mm:ss"}}</span>
                 <br>
-                <h5 class="h4" style="font-size: 10px;">{{ creador }}</h5>
+                <h5 class="h4 h5-font">{{ creador }}</h5>
               </div>
             </div>
-            <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
+            <div class="div-table" *ngIf="bHist">
               <table class="table">
                 <thead class="thead-light">
                   <th>Documento</th>
@@ -402,11 +401,11 @@
     </div>
   </ng-template>
 
-  <div style="display: none">
+  <div class="div-mayor">
     <div id="prtNota">
       <section class="content">
         <div class="wrapper">
-          <table border="0" style="width:100%">
+          <table border="0" class="table-general">
             <tr>
               <td align="center">
                 REPÚBLICA BOLIVARIANA DE VENEZUELA <BR>
@@ -415,9 +414,9 @@
               </td>
             </tr>
           </table>
-          <h3 style="text-align:center">NOTA DE ENTREGA DE DOCUMENTO {{ cuenta }}</h3>
+          <h3 class="h3-text">NOTA DE ENTREGA DE DOCUMENTO {{ cuenta }}</h3>
 
-          <table style="width:100%" border="1">
+          <table class="table-general" border="1">
             <thead>
               <th>#</th>
               <th>CARGO</th>
