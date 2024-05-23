@@ -271,7 +271,7 @@
 
             <div class="modal-body modal-avanzado">
               <div class="form-row">
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                   <div class="fechas-avanzado">
                     <mat-form-field appearance="outline" color="primary">
                       <mat-label> FECHA INICIO</mat-label>
@@ -283,8 +283,25 @@
                       <mat-datepicker #picker disabled="false"></mat-datepicker>
                     </mat-form-field>
                   </div>
-                </div>
-                <div class="col-md-3">
+                </div> -->
+                <div class="col-md-6">
+                  <mat-form-field class="example-form-field" appearance="outline">
+                      <mat-label>Rango del resuelto</mat-label>
+                      <mat-date-range-input [formGroup]="fechaRango"
+                          [rangePicker]="fechaRangoPicker"
+                          [comparisonStart]="fechaRango.value.start"
+                          [comparisonEnd]="fechaRango.value.end">
+                          <input matStartDate placeholder="Start date"
+                              formControlName="start">
+                          <input matEndDate placeholder="End date" formControlName="end">
+                      </mat-date-range-input>
+
+                      <mat-datepicker-toggle matSuffix
+                          [for]="fechaRangoPicker"></mat-datepicker-toggle>
+                      <mat-date-range-picker #fechaRangoPicker></mat-date-range-picker>
+                  </mat-form-field>
+              </div>
+                <!-- <div class="col-md-3">
                   <div class="fechas-avanzado">
                     <mat-form-field appearance="outline" color="primary">
                       <mat-label> FECHA FIN</mat-label>
@@ -296,7 +313,7 @@
                       <mat-datepicker #picker disabled="false"></mat-datepicker>
                     </mat-form-field>
                   </div>
-                </div>
+                </div> -->
 
                 <div class="col-md-6 div-radio-avanzado">
                   <mat-radio-group class="mat-radio" color="primary">
@@ -445,9 +462,9 @@
                   mat-raised-button
                   color="primary"
                   id="registrar"
-                  class="boton-buscar-avanzado"
+                  class="boton-buscar-avanzado" (click)="buscarYCerrarModal()"
                 >
-                  Buscar &nbsp;
+                  Buscarr &nbsp;
                   <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
 
@@ -456,7 +473,7 @@
                   color="warn"
                   aria-label="Close"
                   (click)="close()"
-                  class="boton-cancelar-avanzado"
+                  class="boton-cancelar-avanzado" (click)="cerrarModal()"
                 >
                   Cancelar
                 </button>
