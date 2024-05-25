@@ -127,9 +127,7 @@
                           (click)="open(busqueda_avanzada)"
                           class="dropdown-item"
                         >
-                          <i
-                            class="fa fa-search logo-buscar"
-                          ></i>
+                          <i class="fa fa-search logo-buscar"></i>
                           <span>Busqueda Avanzada</span>
                         </div>
                       </a>
@@ -306,32 +304,23 @@
 
   <div class="modal-body modal-avanzado">
     <div class="form-row">
-      <div class="col-md-3">
-        <div class="fechas-avanzado">
-          <mat-form-field appearance="outline" color="primary">
-            <mat-label> FECHA INICIO</mat-label>
-            <input matInput [matDatepicker]="picker" disabled />
-            <mat-datepicker-toggle
-              matSuffix
-              [for]="picker"
-            ></mat-datepicker-toggle>
-            <mat-datepicker #picker disabled="false"></mat-datepicker>
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="fechas-avanzado">
-          <mat-form-field appearance="outline" color="primary">
-            <mat-label> FECHA FIN</mat-label>
-            <input matInput [matDatepicker]="picker" disabled />
-            <mat-datepicker-toggle
-              matSuffix
-              [for]="picker"
-            ></mat-datepicker-toggle>
-            <mat-datepicker #picker disabled="false"></mat-datepicker>
-          </mat-form-field>
-        </div>
-      </div>
+      <div class="col-md-6">
+        <mat-form-field class="example-form-field" appearance="outline">
+            <mat-label>Rango del resuelto</mat-label>
+            <mat-date-range-input [formGroup]="fechaRango"
+                [rangePicker]="fechaRangoPicker"
+                [comparisonStart]="fechaRango.value.start"
+                [comparisonEnd]="fechaRango.value.end">
+                <input matStartDate placeholder="Start date"
+                    formControlName="start">
+                <input matEndDate placeholder="End date" formControlName="end">
+            </mat-date-range-input>
+
+            <mat-datepicker-toggle matSuffix
+                [for]="fechaRangoPicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #fechaRangoPicker></mat-date-range-picker>
+        </mat-form-field>
+    </div>
 
       <div class="col-md-6 div-radio-avanzado">
         <mat-radio-group class="mat-radio" color="primary">
@@ -339,20 +328,6 @@
           <mat-radio-button value="1"> ORIGEN </mat-radio-button>
         </mat-radio-group>
       </div>
-
-      <!-- <div class="col-md-5">
-        <div class="div-interno">
-          <mat-form-field appearance="outline">
-            <mat-label>EXPEDIENTE</mat-label>
-            <input
-              matInput
-              [ngModelOptions]="{ standalone: true }"
-              [(ngModel)]="Doc.nexpediente"
-              value="{{ Doc.nexpediente }}"
-            />
-          </mat-form-field>
-        </div>
-      </div> -->
 
       <div class="col-md-4" *ngIf="mostrarCamposAdicionales">
         <div class="div-interno">

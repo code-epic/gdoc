@@ -51,7 +51,7 @@ export class PendientesComponent implements OnInit {
 
 
   
-
+  fechaRango: FormGroup;
 
   public bzBusqueda = []
 
@@ -492,6 +492,13 @@ export class PendientesComponent implements OnInit {
 
     this.Configuracion = sessionStorage.getItem("MD_CConfiguracion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion"))) : []
     this.listarConfiguracion()
+    const today = new Date();
+    const month = today.getMonth();
+    const year = today.getFullYear();
+    this.fechaRango = new FormGroup({
+      start: new FormControl(new Date(year, month, 13)),
+      end: new FormControl(new Date(year, month, 16)),
+    });
   }
 
   setDescripcionPunto() {
@@ -1246,6 +1253,13 @@ export class PendientesComponent implements OnInit {
         console.error(error)
       }
     )
+  }
+  buscarYCerrarModal() {
+    this.modalService.dismissAll();
+  }
+
+  cerrarModal() {
+    this.modalService.dismissAll();
   }
 
   mensajeAgregarCuenta() {

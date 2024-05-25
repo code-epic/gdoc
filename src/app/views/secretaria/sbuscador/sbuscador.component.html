@@ -60,8 +60,13 @@
                             </div>
                           </div>
 
+<<<<<<< HEAD
                         <div class="col-md-2">
                             <div class="input-group" style="width: 100%">
+=======
+                        <div class="col-md-3">
+                            <div class="input-group div-group">
+>>>>>>> a5ee18c77d293e0e4010622bd9beab2eac1295d7
                                 <mat-form-field appearance="outline">
                                     <mat-label>Fecha de Recepcion</mat-label>
                                     <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="Doc.forigen"
@@ -86,8 +91,7 @@
                         </div>
 
                         <div class="col-11 col-md-2">
-                            <button mat-raised-button color="primary" id="registrar"
-                                style="width: 100%; height: 50px; margin-top: 5px;"
+                            <button mat-raised-button color="primary" id="registrar" class="boton-buscar"
                                 (click)="buscarDocumento()"
                                 >
                                 <i class="fa fa-search" aria-hidden="true"></i>
@@ -97,7 +101,7 @@
 
                         <div class="col-1">
                             <button mat-icon-button (click)="open(busqueda_avanzada)"
-                                style="height: 50px; margin-top: 5px;"
+                             class="busquedas-avanzadas"
                                 aria-label="Example icon-button with a heart icon">
                                 <!-- <mat-icon>arrow_back</mat-icon> -->
                                 <mat-icon>more_vert</mat-icon>
@@ -111,7 +115,7 @@
                                 
                                 <div class="container">
                                     <br>
-                                    <small class="mr-5" style="font-size: 16px;" *ngIf="blBuscar">
+                                    <small class="mr-5 small" *ngIf="blBuscar">
                                         Cerca de {{ cantidad | number }} resultados...
                                     </small>
                                     <br>
@@ -127,14 +131,14 @@
                                         <div class="col-md-4 text-right">
                                             <span class="badge rounded-pill text-bg-primary">pdf</span>
                                             <a [href]="dwUrl(e.numc, e.archivo)" target="_top" rel="noopener noreferrer"
-                                                style="color:darkgrey;font-size: 12px;font-weight: normal;">
+                                                class="div-image">
                                                 {{ e.archivo.substring(0,10) }}
                                                 <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
-                                                    style="width: 12px;margin-top: -3px;" />
+                                                    class="image" />
                                             </a>
                                         </div>
 
-                                        <div class="col-md-12" style="margin-top: -4px;">
+                                        <div class="col-md-12 div-contenido">
                                             <ng-template #popContent>
                                                 <div class="row">
                                                     <!-- <div class="col-md-4">{{ e.unidad }}</div> -->
@@ -150,7 +154,7 @@
                                             </button>
                                             <div [innerHTML]="e.resumenl" class="contenido"></div>
 
-                                            <p style="margin-top: -10px;">
+                                            <p class="p.margin">
                                                 <small class=" mr-3"><i class="fa fa-calendar"></i>&nbsp;{{ e.fecha |
                                                     date:"dd-MM-yyyy hh:mm" }}</small>
                                                 <small class=" mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN {{
@@ -215,7 +219,7 @@
         <!-- Fin de Tarjeta Padre -->
     </div>
 
-    <ng-template #busqueda_avanzada style="z-index: 2;" #adjuntar let-c="close" let-d="dismiss">
+    <ng-template #busqueda_avanzada class="ng-template-avanzado" #adjuntar let-c="close" let-d="dismiss">
         <div class="modal-header">
             <h2 class="modal-title">Busqueda Avanzada</h2>
         </div>
@@ -224,11 +228,11 @@
 
                 <div class="form-row col-md-12 d-none">
 
-                    <mat-hint class="col-md-2"><span style="margin-top: 19px; display: block;" class="categoria">Rango
+                    <mat-hint class="col-md-2"><span class="categoria span-class">Rango
                             de Fecha</span></mat-hint>
 
                     <div class="col-md-5">
-                        <div class="input-group" style="width: 100%">
+                        <div class="input-group div-group">
                             <mat-form-field appearance="outline">
                                 <mat-label>Desde</mat-label>
                                 <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="fechaInicio"
@@ -239,7 +243,7 @@
                         </div>
                     </div>
                     <div class="col-md-5">
-                        <div class="input-group" style="width: 100%">
+                        <div class="input-group div-group">
                             <mat-form-field appearance="outline">
                                 <mat-label>Hasta</mat-label>
                                 <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="fechaFin"
@@ -253,7 +257,7 @@
 
                 <div class="form-row col-md-12">
 
-                    <mat-hint class="col-md-2"><span style="margin-top: 19px; display: block;" class="categoria">Tipo de
+                    <mat-hint class="col-md-2"><span class="categoria span-class">Tipo de
                             Documento</span></mat-hint>
 
                     <div class="col-md-3">
@@ -297,7 +301,7 @@
                     </div>
                 </div>
 
-                <mat-hint style="text-align: end;width: 100%; display: block;">
+                <mat-hint class="icon-detail">
                     <span (click)="verMasCampos()" *ngIf="!mostrarCampos" class="ver">Ver mas campos <i
                             class="fa fa-caret-down"></i></span>
                 </mat-hint>
@@ -305,7 +309,7 @@
                 <div *ngIf="mostrarCampos">
                     <div class="form-row col-md-12">
 
-                        <mat-hint class="col-md-2"><span style="margin-top: 19px; display: block;" class="categoria">Por
+                        <mat-hint class="col-md-2"><span class="categoria span-class">Por
                                 Unidades</span></mat-hint>
 
                         <div class="col-md-5">
@@ -333,7 +337,7 @@
 
                     <div class="form-row col-md-12">
 
-                        <mat-hint class="col-md-2"><span style="margin-top: 19px; display: block;" class="categoria">Por
+                        <mat-hint class="col-md-2"><span class="categoria span-class">Por
                                 Descripcion</span></mat-hint>
 
                         <div class="col-md-5">
@@ -355,7 +359,9 @@
                         </div>
                     </div>
 
-                    <mat-hint style="text-align: end;width: 100%; display: block;">
+                    <mat-hint style="text-align: end;
+                    width: 100%; 
+                    display: block;">
                         <span (click)="verMasCampos()" *ngIf="mostrarCampos" class="ver">Ver menos campos <i
                                 class="fa fa-caret-up"></i></span>
                     </mat-hint>
@@ -366,12 +372,12 @@
 
         <div class="modal-footer" align="end">
 
-            <button mat-raised-button color="primary" id="registrar" style="width: 200px;" (click)="buscarDocumento()">
+            <button mat-raised-button color="primary" id="registrar" class="butom-search" (click)="buscarDocumento()">
                 <i class="fa fa-search" aria-hidden="true"></i>
                 Buscar Documento
             </button>
 
-            <button mat-raised-button aria-label="Close" (click)="close()" style="margin-left: 5px;">
+            <button mat-raised-button aria-label="Close" (click)="close()" class="butom-close">
                 Cerrar
             </button>
 
