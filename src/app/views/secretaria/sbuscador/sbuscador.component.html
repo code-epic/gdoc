@@ -28,21 +28,49 @@
 
                 <div class="card-body">
                     <div class="form-row">
-                        <div class="col-md-3">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Nro. Cuenta</mat-label>
-                                <input matInput type="txtOrigen" [ngModelOptions]="{ standalone: true }"
-                                    [(ngModel)]="Doc.ncontrol" id="nori" placeholder="Nro. Cuenta" />
-                            </mat-form-field>
-                        </div>
+                        <div class="col-md-2 div-interno-superior">
+                            <div class="div-interno">
+                              <mat-form-field appearance="outline">
+                                <mat-label>CONTENIDO</mat-label>
+                                <input
+                                  matInput
+                                  placeholder="CONTENIDO"
+                                  [ngModelOptions]="{ standalone: true }"
+                                  [(ngModel)]="buscar"
+                                  value="{{ buscar }}"
+                                  (keypress)="seleccionLista($event)"
+                                />
+                              </mat-form-field>
+                            </div>
+                          </div>
+            
+                          <div class="col-md-2 seleccionar">
+                            <div class="div-interno">
+                              <mat-form-field appearance="outline">
+                                <mat-label> TIPO BUSQUEDA.
+                                
+                                </mat-label>
+                                <mat-select>
+                                  <mat-option value="0" selected>SELECCIONE</mat-option>
+                                  <mat-option value="1"> CEDULA</mat-option>
+                                  <mat-option value="2"> PUNTO CUENTA</mat-option>
+                                  <mat-option value="3"> ASUNTO</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                          </div>
 
+<<<<<<< HEAD
+                        <div class="col-md-2">
+                            <div class="input-group" style="width: 100%">
+=======
                         <div class="col-md-3">
                             <div class="input-group div-group">
+>>>>>>> a5ee18c77d293e0e4010622bd9beab2eac1295d7
                                 <mat-form-field appearance="outline">
                                     <mat-label>Fecha de Recepcion</mat-label>
                                     <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="Doc.forigen"
                                         placeholer="Fecha de Recepcion" [matDatepicker]="picker" />
-                                    <mat-hint>MM/DD/YYYY</mat-hint>
                                     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                     <mat-datepicker #picker></mat-datepicker>
                                 </mat-form-field>
