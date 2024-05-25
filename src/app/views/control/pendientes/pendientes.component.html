@@ -50,7 +50,7 @@
                 <div class="div-interno">
                   <mat-form-field appearance="outline">
                     <mat-label>CONTENIDO GENERAL</mat-label>
-                    <input matInput placeholder="CONTENIDO GENERAL" />
+                    <input matInput placeholder="CONTENIDO GENERAL" [ngModelOptions]="{ standalone: true }" [(ngModel)]="contenidoDocumento"/>
                   </mat-form-field>
                 </div>
               </div>
@@ -96,7 +96,7 @@
                     color="primary"
                     class="boton-buscar"
                   >
-                    Buscar &nbsp;
+                    BuscarR &nbsp;
                     <i class="fa fa-search" aria-hidden="true"></i>
                   </button>
                 </div>

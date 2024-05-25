@@ -62,6 +62,7 @@ export class PendientesComponent implements OnInit {
   public id_alerta = ''
 
   public buscar = ''
+  public contenidoDocumento = ''
   public antes: boolean = false
   public despues: boolean = true
   public paginador: number = 10
@@ -122,8 +123,11 @@ export class PendientesComponent implements OnInit {
 
   async ConsultarSeguimiento() {
     this.xAPI.funcion = 'WKF_CSeguimiento'
-    this.xAPI.parametros = ''
+    this.xAPI.parametros = this.contenidoDocumento
     console.log("llego ConsultarSeguimiento")
+    console.log(this.contenidoDocumento)
+    console.log(this.xAPI)
+    console.log("despues ConsultarSeguimiento")
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data)
@@ -453,7 +457,7 @@ export class PendientesComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.ConsultarSeguimiento()
+    // this.ConsultarSeguimiento()
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
       if (id == 'salida') {
@@ -557,6 +561,8 @@ export class PendientesComponent implements OnInit {
   }
 
   buscarDocumento(): void {
+    console.log('llego buscar')
+    this.ConsultarSeguimiento()
     const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
     this.bzBusqueda = this.bzSeguimientoO.filter((e) => patron.test(e.busqueda));
     this.longitud = this.bzBusqueda.length;
