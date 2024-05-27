@@ -72,6 +72,11 @@ export class PendientesComponent implements OnInit {
   public max_paginador: number = 0;
   public lstPaginas = [];
   public actual: number = 1;
+  public radio: number = 0;
+  public tipoDocumento : number = 0;
+
+  public  desde : any;
+  public  hasta : any;
 
   public lstAcciones = [
     { valor: "0", texto: "EN PROCESO", visible: "1" },
@@ -123,7 +128,13 @@ export class PendientesComponent implements OnInit {
 
   async ConsultarSeguimiento() {
     this.xAPI.funcion = "WKF_CSeguimiento";
-    this.xAPI.parametros = this.contenidoDocumento;
+    if(this.contenidoDocumento != ""){
+      this.xAPI.parametros = this.contenidoDocumento+','+this.desde+','+this.hasta
+    }else{
+      this.xAPI.parametros = ' ,'+this.desde+','+this.hasta
+    }
+    
+    console.log(this.xAPI.parametros)
     this.cargador = false;
     this.ngxService.startLoader("loader-aceptar");
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -192,6 +203,8 @@ export class PendientesComponent implements OnInit {
         this.MostrarPaginador();
         this.cargador = true;
         this.ngxService.stopLoader("loader-aceptar");
+        this.contenidoDocumento=""
+        this.buscar = ""
       },
       (error) => {
         console.log("Error en la carga");
@@ -308,7 +321,7 @@ export class PendientesComponent implements OnInit {
   public salidavisible: boolean = true;
   public resolucion: boolean = false;
   public activarMensaje = false;
-
+  public vistacontenido: boolean = false;
   public detalle: string = "";
 
   public cuenta: string = "";
@@ -594,7 +607,7 @@ export class PendientesComponent implements OnInit {
   }
 
   buscarDocumento(): void {
-
+    this.vistacontenido = true;
     this.ConsultarSeguimiento();
     // const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
     // this.bzBusqueda = this.bzSeguimientoO.filter((e) => patron.test(e.busqueda));
@@ -1382,6 +1395,11 @@ export class PendientesComponent implements OnInit {
     );
   }
   buscarYCerrarModal() {
+
+    this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
+    this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
+    this.vistacontenido = true;
+    this.ConsultarSeguimiento();
     this.modalService.dismissAll();
   }
 

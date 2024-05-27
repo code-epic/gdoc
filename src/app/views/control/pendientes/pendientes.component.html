@@ -21,7 +21,7 @@
             </div>
             <div class="col-md-7">
               <div class="div-radio-avanzado">
-                <mat-radio-group class="mat-radio" color="primary" >
+                <mat-radio-group class="mat-radio" [(ngModel)]="radio" color="primary" >
                   <mat-radio-button value="0"> TODAS </mat-radio-button>
                   <mat-radio-button value="1"> ENTRADA </mat-radio-button>
                   <mat-radio-button value="2"> SALIDA </mat-radio-button>
@@ -69,7 +69,7 @@
                     <mat-label> TIPO DE NÚMERO.
 
                     </mat-label>
-                    <mat-select>
+                    <mat-select [(ngModel)]="tipoDocumento">
                       <mat-option value="0" selected>SELECCIONE</mat-option>
                       <mat-option value="1"> NRO. CEDULA</mat-option>
                       <mat-option value="1"> NRO. CONTROL</mat-option>
@@ -124,6 +124,7 @@
 
 
         </div>
+        <div *ngIf="vistacontenido">
         <div *ngIf="!cargador">
           <h3 class="text-center">Cargando información...</h3>
         </div>
@@ -218,6 +219,7 @@
           </div>
         </div>
       </div>
+      </div>
     </div>
   </div>
 
@@ -246,7 +248,7 @@
         </div>
 
         <div class="col-md-6 div-radio-avanzado">
-          <mat-radio-group class="mat-radio" color="primary">
+          <mat-radio-group class="mat-radio" [(ngModel)]="ppppp" color="primary">
             <mat-radio-button value="0"> CREACION </mat-radio-button>
             <mat-radio-button value="1"> ORIGEN </mat-radio-button>
           </mat-radio-group>
@@ -335,7 +337,7 @@
 
       <div class="modal-footer div-modal-footer">
         <!-- align="end" -->
-        <button mat-raised-button color="primary" id="registrar" class="boton-buscar-avanzado">
+        <button mat-raised-button color="primary" id="registrar"  (click)="buscarYCerrarModal()" class="boton-buscar-avanzado">
           Buscar &nbsp;
           <i class="fa fa-search" aria-hidden="true"></i>
         </button>
