@@ -34,11 +34,13 @@ import {
   MAT_DIALOG_DATA,
   MatDialogConfig,
 } from "@angular/material/dialog";
+import { MatRadioModule } from "@angular/material/radio";
 
 @Component({
   selector: "app-pendientes",
   templateUrl: "./pendientes.component.html",
   styleUrls: ["./pendientes.component.scss"],
+
 })
 export class PendientesComponent implements OnInit {
   mostrarCamposAdicionales: boolean = false;
@@ -73,202 +75,12 @@ export class PendientesComponent implements OnInit {
   public lstPaginas = [];
   public actual: number = 1;
   public radio: number = 0;
-  public tipoDocumento : number = 0;
+  public tipoDocumento: number = 0;
+  public optfecha: number = 0
+  public opttodos: number = 0
 
-  public  desde : any;
-  public  hasta : any;
-
-  public lstAcciones = [
-    { valor: "0", texto: "EN PROCESO", visible: "1" },
-    { valor: "1", texto: "ANALISTA", visible: "1" },
-    { valor: "2", texto: "JEFE DE AREA", visible: "1" },
-    { valor: "3", texto: "BANDEJA DE ESPERA", visible: "1" },
-    { valor: "4", texto: "PRESIDENCIAL", visible: "1" },
-    { valor: "5", texto: "ESPERA DE OPINION", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
-    { valor: "6", texto: "CONSULTORIA JURIDICA", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
-    { valor: "7", texto: "AREA DE RESOLUCIONES", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
-    { valor: "8", texto: "SUB-DIRECCION", visible: "1" },
-    { valor: "9", texto: "DIRECCION GENERAL", visible: "1" },
-    { valor: "10", texto: "DESPACHO DEL MPPD", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
-    { valor: "11", texto: "ARCHIVO", visible: "1" },
-  ];
-
-  public focus = true;
-
-  public xAPI: IAPICore = {
-    funcion: "",
-    parametros: "",
-    valores: "",
-  };
-
-  longitud = 0;
-  pageSize = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 100];
-
-  // MatPaginator Output
-  pageEvent: PageEvent;
-
-  seleccionLista(event) {
-    this.longitud = 0;
-
-    if (event.charCode == 13) {
-      const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
-      this.longitud = this.bzBusqueda.length;
-      this.bzBusqueda = this.bzSeguimientoO.filter((e) => {
-        return patron.test(e.busqueda);
-      });
-
-      this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
-      this.max_paginador = this.bzBusqueda.length / 10;
-      this.cantidad = this.bzBusqueda.length;
-      this.MostrarPaginador();
-      this.buscar = "";
-    }
-  }
-
-  async ConsultarSeguimiento() {
-    this.xAPI.funcion = "WKF_CSeguimiento";
-    if(this.contenidoDocumento != ""){
-      this.xAPI.parametros = this.contenidoDocumento+','+this.desde+','+this.hasta
-    }else{
-      this.xAPI.parametros = ' ,'+this.desde+','+this.hasta
-    }
-    
-    console.log(this.xAPI.parametros)
-    this.cargador = false;
-    this.ngxService.startLoader("loader-aceptar");
-    return await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.bzSeguimientoO = data.Cuerpo.map((e) => {
-          e.busqueda = this.utilService.ConvertirCadena(
-            e.norigen +
-              " " +
-              e.ncontrol +
-              " " +
-              e.contenido +
-              e.estatus_nombre +
-              " " +
-              e.remitente +
-              " " +
-              e.nombre +
-              " " +
-              e.creado +
-              " " +
-              e.salida +
-              " " +
-              e.unidad +
-              " " +
-              e.subdocumento
-          );
-          e.numc = e.ncontrol;
-          e.existe = e.anom == "" ? true : false;
-          e.privado = e.priv == 1 ? true : false;
-          e.color = "green";
-          e.s_texto = "";
-          if (e.s_estatus > 0 || e.s_estatus < 10) {
-            e.s_texto =
-              e.s_estatus != null
-                ? " - " + this.lstAcciones[e.s_estatus].texto
-                : "";
-          }
-
-          switch (e.tdoc.toLowerCase()) {
-            case "punto de cuenta":
-              e.simbolo = "-P";
-              e.color = "green";
-              break;
-            case "tramitacion por organo regular":
-              e.simbolo = "-T";
-              e.color = "brown";
-              break;
-            case "resolucion":
-              e.simbolo = "-R";
-              e.color = "orange";
-              break;
-            default:
-              e.simbolo = "";
-              break;
-          }
-          e.resumenl = e.contenido.substring(0, 200);
-          e.completed = false;
-          return e;
-        });
-
-        this.bzBusqueda = this.bzSeguimientoO;
-        this.longitud = this.bzBusqueda.length;
-        this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
-        this.cantidad = this.longitud;
-        this.max_paginador = this.cantidad / 10;
-        this.blBuscar = true;
-        this.MostrarPaginador();
-        this.cargador = true;
-        this.ngxService.stopLoader("loader-aceptar");
-        this.contenidoDocumento=""
-        this.buscar = ""
-      },
-      (error) => {
-        console.log("Error en la carga");
-      }
-    );
-  }
-
-  pageChangeEvent(e) {
-    this.pageSize = e.pageSize;
-    this.recorrerElementos(e.pageIndex);
-  }
-
-  recorrerElementos(pagina: number) {
-    let pag = this.pageSize * pagina;
-    this.bzSeguimiento = this.bzBusqueda.slice(pag, pag + this.pageSize);
-  }
-
-  //Consultar un enlace
-  constancia(id: string) {
-    const estado = 1;
-    const estatus = 1;
-    return btoa(estado + "," + estatus + "," + id);
-    //this.ruta.navigate(['/constancia', base])
-  }
-
-  MostrarPaginador() {
-    this.blBuscar = true;
-    this.lstPaginas = [];
-    this.antes = false;
-
-    if (this.max_paginador >= 10) {
-      this.max_paginador = 10;
-      this.despues = true;
-    } else {
-      this.despues = false;
-    }
-    for (var i = 0; i < this.max_paginador; i++) {
-      var color = "";
-
-      if (this.de > 0) {
-        color = this.de / 10 == i ? "bg-info text-white" : "";
-        this.antes = true;
-      }
-      if (this.de == 0 && i == 0) color = "bg-info text-white";
-      this.lstPaginas.push({
-        id: i + 1,
-        color: color,
-      });
-    }
-  }
-
-  /**
-   * Establecer la posicion del sistema en el buscador
-   */
-  posicion(pos: number) {
-    if (pos != this.actual) {
-      this.actual = pos;
-      this.de = 10 * (pos - 1);
-      this.para = this.de - 1 + 10;
-      this.bzSeguimiento = this.bzBusqueda.slice(this.de, this.para);
-      this.MostrarPaginador();
-      //this.consultarAPIBuscar()
-    }
-  }
+  public desde: any;
+  public hasta: any;
 
   editorConfig: AngularEditorConfig = {
     editable: true,
@@ -468,6 +280,38 @@ export class PendientesComponent implements OnInit {
   public sGrado: string = "Grado / Jerarquía";
   public sNombre: string = "Nombres y Apellidos";
 
+  public lstAcciones = [
+    { valor: "0", texto: "EN PROCESO", visible: "1" },
+    { valor: "1", texto: "ANALISTA", visible: "1" },
+    { valor: "2", texto: "JEFE DE AREA", visible: "1" },
+    { valor: "3", texto: "BANDEJA DE ESPERA", visible: "1" },
+    { valor: "4", texto: "PRESIDENCIAL", visible: "1" },
+    { valor: "5", texto: "ESPERA DE OPINION", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
+    { valor: "6", texto: "CONSULTORIA JURIDICA", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
+    { valor: "7", texto: "AREA DE RESOLUCIONES", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
+    { valor: "8", texto: "SUB-DIRECCION", visible: "1" },
+    { valor: "9", texto: "DIRECCION GENERAL", visible: "1" },
+    { valor: "10", texto: "DESPACHO DEL MPPD", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
+    { valor: "11", texto: "ARCHIVO", visible: "1" },
+  ];
+
+  public focus = true;
+
+  public xAPI: IAPICore = {
+    funcion: "",
+    parametros: "",
+    valores: "",
+  };
+
+  longitud = 0;
+  pageSize = 10;
+  pageSizeOptions: number[] = [5, 10, 25, 100];
+
+  // MatPaginator Output
+  pageEvent: PageEvent;
+
+
+
   constructor(
     private apiService: ApiService,
     private modalService: NgbModal,
@@ -483,10 +327,10 @@ export class PendientesComponent implements OnInit {
     private resolver: ComponentFactoryResolver,
     private injector: Injector,
     private appRef: ApplicationRef
-  ) {}
+  ) { }
 
   async ngOnInit() {
-    // this.ConsultarSeguimiento()
+    this.opttodos = 0
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id;
       if (id == "salida") {
@@ -547,6 +391,176 @@ export class PendientesComponent implements OnInit {
       end: new FormControl(new Date(year, month, 16)),
     });
   }
+
+  seleccionLista(event) {
+    this.longitud = 0;
+
+    if (event.charCode == 13) {
+      const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
+      this.longitud = this.bzBusqueda.length;
+      this.bzBusqueda = this.bzSeguimientoO.filter((e) => {
+        return patron.test(e.busqueda);
+      });
+
+      this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
+      this.max_paginador = this.bzBusqueda.length / 10;
+      this.cantidad = this.bzBusqueda.length;
+      this.MostrarPaginador();
+      this.buscar = "";
+    }
+  }
+
+  async ConsultarSeguimiento() {
+    let desde = ''
+    let hasta = ''
+
+    this.xAPI.funcion = "WKF_CSeguimiento";
+
+    if (this.contenidoDocumento != "") {
+      desde = this.desde == undefined ? '2022-01-01' : this.desde
+      hasta = this.hasta == undefined ? '2025-12-31' : this.hasta
+      this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta
+    } else {
+      return false
+    }
+
+
+    this.cargador = false;
+    this.ngxService.startLoader("loader-aceptar");
+    return await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.bzSeguimientoO = data.Cuerpo.map((e) => {
+          e.busqueda = this.utilService.ConvertirCadena(
+            e.norigen +
+            " " +
+            e.ncontrol +
+            " " +
+            e.contenido +
+            e.estatus_nombre +
+            " " +
+            e.remitente +
+            " " +
+            e.nombre +
+            " " +
+            e.creado +
+            " " +
+            e.salida +
+            " " +
+            e.unidad +
+            " " +
+            e.subdocumento
+          );
+          e.numc = e.ncontrol;
+          e.existe = e.anom == "" ? true : false;
+          e.privado = e.priv == 1 ? true : false;
+          e.color = "green";
+          e.s_texto = "";
+          if (e.s_estatus > 0 || e.s_estatus < 10) {
+            e.s_texto =
+              e.s_estatus != null
+                ? " - " + this.lstAcciones[e.s_estatus].texto
+                : "";
+          }
+
+          switch (e.tdoc.toLowerCase()) {
+            case "punto de cuenta":
+              e.simbolo = "-P";
+              e.color = "green";
+              break;
+            case "tramitacion por organo regular":
+              e.simbolo = "-T";
+              e.color = "brown";
+              break;
+            case "resolucion":
+              e.simbolo = "-R";
+              e.color = "orange";
+              break;
+            default:
+              e.simbolo = "";
+              break;
+          }
+          e.resumenl = e.contenido.substring(0, 200);
+          e.completed = false;
+          return e;
+        });
+
+        this.bzBusqueda = this.bzSeguimientoO;
+        this.longitud = this.bzBusqueda.length;
+        this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
+        this.cantidad = this.longitud;
+        this.max_paginador = this.cantidad / 10;
+        this.blBuscar = true;
+        this.MostrarPaginador();
+        this.cargador = true;
+        this.ngxService.stopLoader("loader-aceptar");
+        this.contenidoDocumento = ""
+        this.buscar = ""
+      },
+      (error) => {
+        console.log("Error en la carga");
+      }
+    );
+  }
+
+  pageChangeEvent(e) {
+    this.pageSize = e.pageSize;
+    this.recorrerElementos(e.pageIndex);
+  }
+
+  recorrerElementos(pagina: number) {
+    let pag = this.pageSize * pagina;
+    this.bzSeguimiento = this.bzBusqueda.slice(pag, pag + this.pageSize);
+  }
+
+  //Consultar un enlace
+  constancia(id: string) {
+    const estado = 1;
+    const estatus = 1;
+    return btoa(estado + "," + estatus + "," + id);
+    //this.ruta.navigate(['/constancia', base])
+  }
+
+  MostrarPaginador() {
+    this.blBuscar = true;
+    this.lstPaginas = [];
+    this.antes = false;
+
+    if (this.max_paginador >= 10) {
+      this.max_paginador = 10;
+      this.despues = true;
+    } else {
+      this.despues = false;
+    }
+    for (var i = 0; i < this.max_paginador; i++) {
+      var color = "";
+
+      if (this.de > 0) {
+        color = this.de / 10 == i ? "bg-info text-white" : "";
+        this.antes = true;
+      }
+      if (this.de == 0 && i == 0) color = "bg-info text-white";
+      this.lstPaginas.push({
+        id: i + 1,
+        color: color,
+      });
+    }
+  }
+
+  /**
+   * Establecer la posicion del sistema en el buscador
+   */
+  posicion(pos: number) {
+    if (pos != this.actual) {
+      this.actual = pos;
+      this.de = 10 * (pos - 1);
+      this.para = this.de - 1 + 10;
+      this.bzSeguimiento = this.bzBusqueda.slice(this.de, this.para);
+      this.MostrarPaginador();
+      //this.consultarAPIBuscar()
+    }
+  }
+
+
 
   setDescripcionPunto() {
     this.sCedula = "Cédula";
