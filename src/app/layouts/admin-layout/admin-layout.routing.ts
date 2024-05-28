@@ -41,6 +41,8 @@ import { SministerialComponent } from 'src/app/views/secretaria/sministerial/smi
 import { OresolucionesComponent } from 'src/app/views/resoluciones/rsprocesos/oresoluciones/oresoluciones.component';
 import { RsconsultaComponent } from 'src/app/views/resoluciones/rsprocesos/rsconsulta/rsconsulta.component';
 import { SpresidencialComponent } from 'src/app/views/secretaria/spresidencial/spresidencial.component';
+import { ConsultaGeneralComponent } from 'src/app/views/consulta-general/consulta-general.component';
+import { SbuscadorComponent } from 'src/app/views/secretaria/sbuscador/sbuscador.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -100,7 +102,7 @@ export const AdminLayoutRoutes: Routes = [
         canActivate: [AuthGuardGuard]
     },
     {
-        path: 'sministerial',
+        path: 'sministerial/:filtro',
         component: SministerialComponent,
         canActivate: [AuthGuardGuard]
     },
@@ -207,7 +209,12 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'ministerial/:id',
         component: MinisterialComponent,
-        canActivate: [AuthGuardGuard]
+        canActivate: [AuthGuardGuard],
+    },
+    {
+        path: 'ministerial/agregar',
+        component: MinisterialComponent,
+        canActivate: [AuthGuardGuard],
     },
     {
         path: 'fichaproyecto/:id',
@@ -283,6 +290,19 @@ export const AdminLayoutRoutes: Routes = [
         path: 'papelera',
         component: PapeleraComponent,
         canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'sbuscador',
+        component: SbuscadorComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'consulta-general',
+        component: ConsultaGeneralComponent,
+        canActivate: [AuthGuardGuard],
+        children: [{
+            path: 'cargar-archivo',
+            canActivate: [AuthGuardGuard]
+        }]
     }
-
 ];

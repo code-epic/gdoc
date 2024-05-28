@@ -98,6 +98,10 @@ import { RsdatosbasicosmasivosComponent } from './views/resoluciones/rsconfigura
 import { RscondecoracionesComponent } from './views/resoluciones/rsconfiguracion/rscondecoraciones/rscondecoraciones.component';
 import { RsgeneralesComponent } from './views/resoluciones/rsconfiguracion/rsgenerales/rsgenerales.component';
 import { RseliminacionesComponent } from './views/resoluciones/rsconfiguracion/rseliminaciones/rseliminaciones.component';
+import { ConsultaGeneralComponent } from './views/consulta-general/consulta-general.component';
+import { SbuscadorComponent } from './views/secretaria/sbuscador/sbuscador.component';
+import { MatRadioModule } from '@angular/material/radio';
+
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -153,6 +157,7 @@ const ngWizardConfig: NgWizardConfig = {
     MatIconModule,
     MatTreeModule,
     MatCheckboxModule,
+    MatRadioModule,
     MatExpansionModule,
     MatButtonToggleModule,
     AutocompleteLibModule,
@@ -239,7 +244,9 @@ const ngWizardConfig: NgWizardConfig = {
     RsdatosbasicosmasivosComponent,
     RscondecoracionesComponent,
     RsgeneralesComponent,
-    RseliminacionesComponent
+    RseliminacionesComponent,
+    ConsultaGeneralComponent,
+    SbuscadorComponent
   ],
   providers: [
     {

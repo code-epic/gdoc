@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, TemplateRef, ViewChild } from '@angular/core
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbDateParserFormatter, NgbModal, NgbDate, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { IDocumento, IWKFAlerta } from 'src/app/services/control/documentos.service';
@@ -34,10 +34,8 @@ export interface SubDocumento {
   styleUrls: ['./ministerial.component.scss']
 })
 export class MinisterialComponent implements OnInit {
-
-
-
-  public lstEstados = [] //Listar Estados
+  
+  public lstEstados = [] 
   public lstHzAdjuntoSub = []
   public estadoActual = 4
   public estadoOrigen = 2
@@ -91,8 +89,6 @@ export class MinisterialComponent implements OnInit {
 
   public ministerial: any
 
-  // editor: Editor = new Editor
-
   public blUpdate = false
   public bHist = false
 
@@ -122,6 +118,13 @@ export class MinisterialComponent implements OnInit {
     
   }
 
+
+  public DocAdjunto: DocumentoAdjunto = {
+    documento: '',
+    archivo: '',
+    usuario: ''
+  }
+
   public WAlerta: IWKFAlerta = {
     documento: 0,
     estado: 0,
@@ -132,6 +135,8 @@ export class MinisterialComponent implements OnInit {
     observacion: ''
   }
 
+  public hashdoc = ''
+
   public fecha_alerta: any
   public fplazo: any
   public dwValidate = false
@@ -140,18 +145,19 @@ export class MinisterialComponent implements OnInit {
   public lstNotaEntrega = []
   public parametros : string = ''
   public allComplete: boolean = false
-  public estilocheck = 'none'
 
   public estiloclasificar = 'none'
 
+  public edit = 0
+
   @ViewChild('templateBottomSheet') TemplateBottomSheet: TemplateRef<any>;
+  hashcontrol: string;
+  lblFile: any;
 
 
-  constructor(private _bottomSheet: MatBottomSheet,
-    @Inject(DOCUMENT) document: Document,
+  constructor(
     private bottomSheet: MatBottomSheet,
     private apiService: ApiService,
-    config: NgbModalConfig,
     private ruta: Router,
     private toastrService: ToastrService,
     private utilService: UtilService,
@@ -161,40 +167,77 @@ export class MinisterialComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private modalService: NgbModal) { }
 
+    // Contenido de los labels
+
+    public lblDecision = 'Decision del Ministro'
+    public lblBtn = 'Aceptar'
+    public lblComentario = 'Comentario del MPPD'
+    public lblOrigenComando = 'Gran Comando'
+    public fechaElaboracion = ''
+    public fechaOrigen = ''
+
+    /**
+     * Cambia el contenido de los labels
+     */
+    cambiarContenido() {
+      this.edit = 1
+      this.lblDecision = 'Decision Presidencial'
+      this.lblComentario = 'Comentario Presidencial'
+      this.lblBtn = 'Agregar'
+      this.lblOrigenComando = 'Origen de la Cuenta'
+
+      this.lstAcciones = [
+        { 'valor': '1', 'texto': 'PARA LA FIRMA MPPD', 'visible': '1' },
+        { 'valor': '2', 'texto': 'PARA LA FIRMA PRESIDENCIAL', 'visible': '1' },
+        { 'valor': '3', 'texto': 'DIRECTOR', 'visible': '1' },
+        { 'valor': '4', 'texto': 'SUB-DIRECTOR', 'visible': '1' },
+        { 'valor': '5', 'texto': 'JEFE DE SECRETARIA', 'visible': '1' },
+        { 'valor': '6', 'texto': 'TRANSCRIPTOR', 'visible': '1' },
+        { 'valor': '7', 'texto': 'ARCHIVO', 'visible': '1' },
+      ]
+    }
+
+    verArchivos(content) {
+      this.modalService.open(content, { size: 'lg' })
+    }
+
+    public numc = ''
+
   ngOnInit(): void {
-    // this.editor = new Editor()
     this.fplazo = NgbDate.from(this.formatter.parse(this.utilService.FechaActual()))
 
     this.extender_plazo = NgbDate.from(this.formatter.parse(this.utilService.FechaActual()))
 
-    if (this.rutaActiva.snapshot.params.id != undefined) {
+    let ruta = this.rutaActiva.snapshot.params.id
+
+    if(ruta == 'agregar'){
+      this.cambiarContenido()
+    }
+
+    if (ruta != undefined) {
       try {
         this.original = this.rutaActiva.snapshot.params.id
-        this.doc = JSON.parse(atob(this.original))
+        this.doc = JSON.parse(atob(this.original))     
+        console.log(this.doc);
+        
         this.Documento = this.doc
         this.Documento.wfdocumento = this.doc.idd
-        this.numControl = this.doc.numc
+        this.numc = this.doc.numc
 
         this.unidad = this.doc.udep
         this.comando = this.doc.coma
         this.dwValidate = this.doc.anom != "" ? true : false
         this.download = this.apiService.Dws(btoa("D" + this.doc.numc) + '/' + this.doc.anom)
-        
         this.cmbDestino = 'S'
        
-        // this.creador = this.ministerial.usua
-        console.log( 'entrada de datos ', this.parametros );
         this.consultarSubID(this.Documento.wfdocumento.toString())
 
         this.listarEstados()
         this.listarDatos()
-        //Carga de Documentos
         
       } catch (error) {
         //this.ruta.navigate(['/secretaria', ''])
       }
-
-
     }
   }
 
@@ -206,9 +249,7 @@ export class MinisterialComponent implements OnInit {
       (data) => {
         this.lstEstados = data.Cuerpo.filter(e => { return e.esta == 1 });
       },
-      (error) => {
-
-      }
+      (error) => { }
     )
   }
 
@@ -219,6 +260,7 @@ export class MinisterialComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.lstCuenta = data.Cuerpo.map(e => {
+          console.log(data);
           e.completed = false
           return e
         })
@@ -230,48 +272,44 @@ export class MinisterialComponent implements OnInit {
           this.codigohash = btoa(this.doc.id + this.doc.idd + this.cuenta)
           this.lstCuenta[0].completed = false
           this.parametros = this.cuenta + ',' + this.doc.udep + ' ' + this.doc.fori.substring(0,10)
-          console.log( this.lstCuenta, 'la nota pues')
+          // console.log( this.lstCuenta, 'la nota pues')
           this.cargarPuntoCuentas()
         }else{
           this.toastrService.warning('Por favor verifique el punto de cuenta con Control de Gestion', `GDoc Wkf.CSubDocumentoID`);
         }
       },
-      (error) => {
-
-      }
+      (error) => { }
     )
   }
 
   open(content, id) {
-    this.modalService.open(content, { size: 'lg' });
+    this.numControl = id
+    this.hashdoc = btoa("D" + this.numControl)
+    this.modalService.open(content);
   }
+
 
   activarHistorial() {
     this.bHist = !this.bHist
   }
 
   listarDatos() {
-
     this.xAPI.funcion = 'WKF_CSubDocVariante'
     this.xAPI.parametros = this.doc.idd
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-
+      (data) => {        
+        console.log(data.Cuerpo);
+        
         if (data.Cuerpo != undefined && data.Cuerpo.length > 0) {
           this.SubDocumento = data.Cuerpo[0];
           this.original = btoa(JSON.stringify(data.Cuerpo[0]))
           this.blUpdate = true
         }
         this.dwSub = this.SubDocumento.nombre_archivo != "" ? true : false
-
       },
-      (error) => {
-
-      }
+      (error) => { }
     )
-
-
   }
 
   selFecha() {
@@ -297,8 +335,6 @@ export class MinisterialComponent implements OnInit {
 
   aceptar() {
     this.selFecha()
-    // console.log( this.doc)
-    // console.error( this.doc.idd )
     this.SubDocumento.accion = this.SubDocumento.accion.toUpperCase()
     this.SubDocumento.historico = this.SubDocumento.historico.toUpperCase()
     this.SubDocumento.subdocumento = parseInt(this.doc.idd)
@@ -326,9 +362,7 @@ export class MinisterialComponent implements OnInit {
         this.ngxService.stopLoader("loader-aceptar")
         this._aceptar('')
       },
-      (error) => {
-
-      }
+      (error) => { }
     )
   }
 
@@ -340,16 +374,12 @@ export class MinisterialComponent implements OnInit {
         this.ngxService.stopLoader("loader-aceptar")
         this._aceptar('')
       },
-      (error) => {
-
-      }
+      (error) => { }
     )
-
   }
 
-  //Guardar la alerte define el momento y estadus
+  /**Guardar la alerte define el momento y estadus*/
   guardarAlerta(activo: number, fecha: string) {
-
     this.WAlerta.activo = activo
     this.WAlerta.documento = parseInt(this.doc.idd)
     this.WAlerta.estado = 4
@@ -357,7 +387,6 @@ export class MinisterialComponent implements OnInit {
     this.WAlerta.usuario = this.loginService.Usuario.id
     this.WAlerta.observacion = this.cuenta + '|' + this.SubDocumento.estatus.toUpperCase()
     this.WAlerta.fecha = fecha
-
 
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.WAlerta)
@@ -370,7 +399,6 @@ export class MinisterialComponent implements OnInit {
       }) //
   }
 
-
   protected _aceptar(msj: string) {
     Swal.fire({
       title: 'El punto de cuenta ha sido actualizado con exito ',
@@ -379,36 +407,53 @@ export class MinisterialComponent implements OnInit {
       showCancelButton: false,
       confirmButtonColor: '#3085d6',
       confirmButtonText: 'Continuar'
-    }).then((result) => {
+    }).then(() => {
       this.ruta.navigate(['/secretaria']);
     })
   }
 
-
-
   _atras() {
-    // if (this.original != btoa(JSON.stringify(this.SubDocumento))) {
-    //   this.toastrService.warning('Debe guardar los cambios antes de salir de esta pantalla', `GDoc WKF_SubDocumentos`);
-    // } else {
       this.ruta.navigate(['/sministerial']);
-    // }
-    return
   }
 
-
   fileSelected(e) {
+    this.lblFile = e.target.files[0].name
     this.archivos.push(e.target.files[0])
   }
 
   async SubirArchivo(e) {
     this.ngxService.startLoader("loader-aceptar")
     var frm = new FormData(document.forms.namedItem("forma"))
-
     try {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
           console.log(this.archivos[0].name)
           this.SubDocumento.nombre_archivo = this.archivos[0].name
+          this.DocAdjunto.archivo = this.SubDocumento.nombre_archivo
+          this.DocAdjunto.usuario = this.loginService.Usuario.id
+          this.DocAdjunto.documento = this.numControl
+          console.log(this.DocAdjunto);
+          this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
+          this.xAPI.parametros = ''
+          this.xAPI.valores = JSON.stringify(this.DocAdjunto)
+          this.apiService.Ejecutar(this.xAPI).subscribe(
+            (xdata) => {    
+              if (xdata.tipo == 1) {
+                this.toastrService.success(
+                  'Tu archivo ha sido cargado con exito ',
+                  `GDoc Registro`
+                );
+
+              } else {
+                this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+              }
+              this.ngxService.stopLoader("loader-aceptar")
+            },
+            (error) => {
+              this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
+              this.ngxService.stopLoader("loader-aceptar")
+            }
+          )
 
           this.aceptar()
           this.toastrService.success(
@@ -426,42 +471,7 @@ export class MinisterialComponent implements OnInit {
     } catch (error) {
       console.error(error)
     }
-
   }
-
-
-  //Listar los archivos asociados al documento
-  verArchivos(content) {
-    this.modalService.open(content, { size: 'lg' })
-  }
-
-
-
-  insertarObservacion() {
-    var usuario = this.loginService.Usuario.id
-    this.xAPI.funcion = 'WKF_IDocumentoObservacion'
-    this.xAPI.valores = JSON.stringify(
-      {
-        "documento": this.ministerial.idd,
-        "estado": this.estadoActual, //Estado que ocupa
-        "estatus": 1,
-        "observacion": this.Observacion.toUpperCase(),
-        "accion": this.AccionTexto,
-        "usuario": usuario
-      }
-    )
-    this.xAPI.parametros = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-
-        this.redistribuir()
-
-      },
-      (errot) => {
-        this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
-      }) //
-  }
-
 
   async redistribuir(destino: number = 0) {
     var dst = destino != 0 ? destino : this.cmbDestino
@@ -472,8 +482,6 @@ export class MinisterialComponent implements OnInit {
     console.log(this.xAPI);
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        //this.xAPI.funcion = 'WKF_ASubDocumentoAlerta'
-        //await this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
         this.toastrService.success(
           'El documento ha sido redistribuido segun su selección',
           `GDoc Wkf.DocumentoObservacion`
@@ -484,11 +492,6 @@ export class MinisterialComponent implements OnInit {
         console.error(error)
       }
     )
-  }
-
-
-  transferirCaso(){
-
   }
 
   cargarPuntoCuentas() {
@@ -505,13 +508,6 @@ export class MinisterialComponent implements OnInit {
       }
     )
     console.log(event);
-
-   
-    // this._bottomSheetRef.dismiss();
-    
-
-
-    // event.preventDefault();
   }
 
   openTMS() {
@@ -526,13 +522,11 @@ export class MinisterialComponent implements OnInit {
     return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
   }
 
-
-  //Consultar un enlace
+  /**Consultar un enlace*/
   constancia(id: string) {
     const estado = 1
     const estatus = 1
     return btoa(estado + ',' + estatus + ',' + id)
-    //this.ruta.navigate(['/constancia', base])
   }
 
   async transfererirResoluciones(){
@@ -557,27 +551,17 @@ export class MinisterialComponent implements OnInit {
           udep : e.udep, 
           cuenta: e.cuenta,
           cargo: cargo 
-        } )
+        })
+        console.log(this.lstNotaEntrega);
+        
       }
       i++
     })
     await this.notaEntrega()
-    
   }
-
-
 
   updateAllComplete() {
     this.allComplete = this.lstCuenta != null && this.lstCuenta.every(t => t.completed);
-  }
-
-  someComplete(): boolean {
-    if (this.lstCuenta == null) {
-      return false;
-    }
-
-    return this.lstCuenta.filter(t => t.completed).length > 0 && !this.allComplete;
-
   }
 
   setAll(completed: boolean) {
@@ -594,10 +578,9 @@ export class MinisterialComponent implements OnInit {
     }
   }
 
-
-
   async notaEntrega() {
-  
+    console.log('notaEntrega');
+    
     var cantidad = this.lstNotaEntrega.length
 
     if (cantidad > 0) {
@@ -615,21 +598,19 @@ export class MinisterialComponent implements OnInit {
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
+            console.log(data);
+            
             i++
             if (cantidad == i) this.imprimir()
           },
           (errot) => {
             this.toastrService.error(errot, `GDoc Wkf.PromoverSubDocumento`);
           })
-
       })
     }
   }
 
-
   imprimir() {
-
- 
     var ventana = window.open("", "_blank");
     var localtime = new Date().toLocaleString();
     var contenido = document.getElementById('prtNota').innerHTML
@@ -677,6 +658,4 @@ export class MinisterialComponent implements OnInit {
     ventana.print()
     ventana.close()
   }
-
 }
-

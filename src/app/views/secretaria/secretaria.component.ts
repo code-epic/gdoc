@@ -33,7 +33,7 @@ export class SecretariaComponent implements OnInit {
     url: "/sbuzon",
     js: "",
     descripcion: "Documentos en Buzon",
-    icono: "fa fa-inbox",
+    icono: "fa fa-envelope",
     nombre: "Buzon",
     accion: "CargarUrl('control', 'buzon')",
     clase: "f-left",
@@ -41,10 +41,10 @@ export class SecretariaComponent implements OnInit {
     
   },
   {
-    url: "/sministerial",
+    url: "/sministerial/ministeriales",
     js: "",
     descripcion: "Ministerial",
-    icono: "fa fa-share",
+    icono: "fa fa-building",
     nombre: "Ministeriales",
     accion: "CargarUrl('control', 'salidas')",
     clase: "f-left",
@@ -54,7 +54,7 @@ export class SecretariaComponent implements OnInit {
     url: "/spresidencial",
     js: "",
     descripcion: "Presidencial",
-    icono: "fa fa-envelope-open",
+    icono: "fa fa-landmark",
     nombre: "Presidenciales",
     accion: "CargarUrl('control', 'pendientes')",
     clase: "f-left",
@@ -62,16 +62,49 @@ export class SecretariaComponent implements OnInit {
     
   },
   {
-    url: "/pendientes",
+    url: "/sbuscador",
     js: "",
-    descripcion: "Buscador",
-    icono: "fa fa-envelope-open",
+    descripcion: "Buscador de Documentos",
+    icono: "fa fa-compass",
     nombre: "Buscador",
     accion: "CargarUrl('control', 'pendientes')",
     clase: "f-left",
     color: "bg-purple",
     
-  }]
+    },
+    {
+    url: "/consulta-general",
+    js: "",
+    descripcion: "Consulta General",
+    icono: "fa fa-search",
+    nombre: "Consulta",
+    accion: "CargarUrl('control', 'pendientes')",
+    clase: "f-left",
+    color: "bg-orange",
+    
+  },
+  {
+    url: "/sministerial/tramitaciones-por-organo-regular",
+    js: "",
+    descripcion: "Tramitaciones por organo regular",
+    icono: "fa fa-book",
+    nombre: "TOR",
+    accion: "CargarUrl('control', 'pendientes')",
+    clase: "f-left",
+    color: "bg-info",
+    
+  },
+  {
+    url: "/sministerial/otros-documentos",
+    js: "",
+    descripcion: "Otros Documentos",
+    icono: "fa fa-file",
+    nombre: "Otros",
+    accion: "CargarUrl('control', 'pendientes')",
+    clase: "f-left",
+    color: "bg-gray",
+  }
+]
 
   constructor(private apiService: ApiService, 
     public dialog: MatDialog,

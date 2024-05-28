@@ -15,7 +15,6 @@
               <h6 class="text-uppercase text-muted ls-1 mb-1">Ministerial / {{ numControl }}</h6>
               <h2 class="mb-0">Punto de Cuenta</h2>
             </div>
-            
 
             <div class="col-md-1">
               <div class="media align-items-center" *ngIf="dwValidate">
@@ -35,68 +34,117 @@
                 </div>
               </div>
             </div>
-            <!-- <div class="col-md-1">
-              <div class="media align-items-center">
-                <div class="example-button-row">
-                  <button mat-icon-button title="Redistribuir" (click)="open(observacion, cuenta)">
-                    <mat-icon>account_tree</mat-icon>
-                  </button>
-                </div>
-              </div>
-            </div> -->
             <div class="col-md-1">
               <div class="media align-items-center">
                 <div class="example-button-row">
                   <button mat-icon-button title="Volver Atrás" (click)="_atras()">
-                    <mat-icon>reply</mat-icon>
+                    <mat-icon>arrow_back</mat-icon>
                   </button>
                 </div>
               </div>
             </div>
-
           </div>
         </div>
+
         <div class="card-body">
           <form>
-
             <div class="form-group row">
-              <div class="form-group  col-md-4">
-                <label>Unidad Minsiterial</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="unidad"
+
+              <div class="form-group col-md-2" [ngClass]="edit == 0 ? 'd-none' : ''">
+                <label>N. Control</label>
+                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="numControl"
                   value="{{unidad}}" readonly>
               </div>
-              <div class="form-group  col-md-4">
-                <label>Gran Comando</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="comando"
-                  value="{{comando}}" readonly>
+
+              <div class="form-group col-md-2" [ngClass]="edit == 1 ? 'd-none' : 'col-md-4'">
+                <label>Unidad Minisiterial</label>
+                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="unidad"
+                  value="{{unidad}}" [readOnly]="edit == 0 ? true : false">
               </div>
+
+              <div class="form-group col-md-2" [ngClass]="edit == 0 ? 'd-none' : ''">
+                <label for="tmsOrigen">Fecha Elaboracion (*) </label>
+                <form class="form-inline">
+                  <div class="form-group div-general">
+                    <div class="input-group div-general">
+                      <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="fechaElaboracion" ngbDatepicker #fe="ngbDatepicker" readonly
+                        [placement]="placement" [positionTarget]="buttonElaboracion" readonly>
+                      <div class="input-group-append">
+                        <button #buttonElaboracion class="btn calendario" (click)="fe.toggle()" type="button" id="fori">
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <div class="form-group col-md-4">
+                <label>{{lblOrigenComando}}</label>
+                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="comando"
+                  value="{{comando}}" [readOnly]="edit == 0 ? true : false">
+              </div>
+
               <div class="form-group  col-md-2">
                 <label>N. De Cuenta</label>
                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cuenta"
-                  value="{{cuenta}}" readonly>
+                  value="{{cuenta}}" [readOnly]="edit == 0 ? true : false">
               </div>
-              <div class="form-group  col-md-2">
+
+              <div class="form-group  col-md-2" [ngClass]="edit == 1 ? 'd-none' : ''">
                 <label>Fecha</label>
                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
-                  value="{{ fecha}}" readonly>
+                  value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
               </div>
-              <div class="form-group col-md-12">
-                <label>Asunto</label>
-                <div class="NgxEditor__Wrapper">
-                  <!-- <ngx-editor [ngModelOptions]="{standalone: true}" [editor]="editor" [(ngModel)]="asunto"
-                    [placeholder]="'Escibe aqui...'">
-                  </ngx-editor> -->
-                </div>
+
+              <div class="form-group col-md-2" [ngClass]="edit == 0 ? 'd-none' : ''">
+                <label for="tmsOrigen">Fecha Origen (*) </label>
+                <form class="form-inline">
+                  <div class="form-group div-general">
+                    <div class="input-group div-general">
+                      <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="fechaOrigen" ngbDatepicker #fo="ngbDatepicker" readonly [placement]="placement"
+                        [positionTarget]="buttonEl" readonly>
+                      <div class="input-group-append">
+                        <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button" id="fori">
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
 
-            <div class="form-group row">
-              <div class="form-group col-md-12">
+              <div class="form-row row" [ngClass]="edit == 0 ? 'd-none' : ''">
+                <div class="form-group  col-md-6">
+                  <label>Tipo de Cuenta</label>
+                  <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
+                    value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
+                </div>
+                <div class="form-group  col-md-6">
+                  <label>Gestion del Ministro</label>
+                  <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
+                    value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
+                </div>
+              </div>
 
+                <div class="form-row row">
+                  <div class="form-group col-md-12">
+                    <label>Asunto</label> <br>
+                    <div class="NgxEdit == 'true' ? true : falseor__Wrapper">
+                      <textarea class="form-control w-100" [ngModelOptions]="{standalone: true}" [(ngModel)]="asunto"
+                        [readOnly]="edit == 0 ? true : false">
+                  </textarea>
+                    </div>
+                  </div>
+            </div>
+
+            <div class="form-group row" [className]="edit == 1 ? 'd-none' : ''">
+              <div class="form-group col-md-12">
                 <mat-accordion class="example-headers-align">
                   <mat-expansion-panel hideToggle>
                     <mat-expansion-panel-header>
-                      <mat-panel-title style="font-weight:bold">
+                      <mat-panel-title class="mat-panel-title">
                         Detalles de puntos de cuenta
                       </mat-panel-title>
                       <mat-panel-description>
@@ -104,9 +152,9 @@
 
                       </mat-panel-description>
                     </mat-expansion-panel-header>
-                    <table class="table align-items-center table-flush" style="width:100%">
+                    <table class="table align-items-center table-flush table-general">
                       <thead class="thead-light">
-                        <th>#</th>
+                        <th> <mat-checkbox [checked]="allComplete" (change)="setAll($event.checked)" color="warn"></mat-checkbox></th>
                         <th>GRADO / COMPONENTE</th>
                         <th>Nombres y Apellidos</th>
                         <th>CEDULA</th>
@@ -118,40 +166,35 @@
                             <input type="hidden" class="form-control"  id="{{ i }}-nomb" value="{{ el.nombre }}">
                             <input type="hidden" class="form-control"  id="{{ i }}-cedu" value="{{ el.cedula }}">
                             <input type="hidden" class="form-control"  id="{{ i }}-carg" value="{{ el.cargo }}">
-                            <mat-checkbox class="example-margin texto-lista" 
-                              [(ngModel)]="el.completed"  
-                              color="warn" 
-
+                            <input type="hidden" class="form-control" id="{{ i }}-nomb" value="{{ el.nombre }}">
+                            <input type="hidden" class="form-control" id="{{ i }}-cedu" value="{{ el.cedula }}">
+                            <input type="hidden" class="form-control" id="{{ i }}-carg" value="{{ el.cargo }}">
+                            <mat-checkbox class="example-margin texto-lista" [(ngModel)]="el.completed" color="warn"
                               (ngModelChange)="updateAllComplete()">
                             </mat-checkbox>
                           </td>
-                          <td style="width:80px">{{ el.cargo }}</td>
-                          <td style="width:80px">{{ el.nombre }}</td>
-                          <td style="width:60px">{{ el.cedula }}</td>
+                          <td class="td-width">{{ el.cargo }}</td>
+                          <td class="td-width">{{ el.nombre }}</td>
+                          <td class="td-width-menor">{{ el.cedula }}</td>
                           <td>
-                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" id="{{i}}-text"> 
+                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                              id="{{i}}-text">
                           </td>
                         </tr>
-
                       </tbody>
                     </table>
 
                     <div class="form-group col-md-12 text-right">
                       <br>
-                      <button mat-raised-button (click)="transfererirResoluciones()">Transferir a Resoluciones</button>
+                      <button mat-raised-button  (click)="transfererirResoluciones();">Transferir a Resoluciones</button>
                     </div>
-
                   </mat-expansion-panel>
                 </mat-accordion>
-
-
               </div>
-              
             </div>
 
-
-
             <div class="form-group row">
+
               <div class="form-group col-md-4">
                 <label>Accion Tomada</label>
                 <textarea class="form-control" cols="30" rows="6" [ngModelOptions]="{standalone: true}"
@@ -173,14 +216,14 @@
                     <option value="0">SELECCIONE</option>
                     <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
                   </select>
-
                 </div>
+
                 <br>
 
                 <div class="col-md-12">
                   <label for="tmsCreacion">Plazo </label>
-                  <div class="form-group" style="width:100%">
-                    <div class="input-group" style="width:100%">
+                  <div class="form-group div-general">
+                    <div class="input-group div-general">
                       <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="fplazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
                         [positionTarget]="buttonEl" readonly>
@@ -189,17 +232,16 @@
                       </div>
                     </div>
                   </div>
-
                 </div>
-
-
               </div>
             </div>
+
             <hr>
+
             <div class="form-group row">
               <div class="col-md-4">
                 <div class="form-group  col-md-12">
-                  <label>Decision del Ministro</label>
+                  <label>{{lblDecision}}</label>
                   <select class="form-control" [ngModelOptions]="{standalone: true}"
                     [(ngModel)]="SubDocumento.decision">
                     <option value="0">SELECCIONE</option>
@@ -210,15 +252,10 @@
                     <option value="OTRO">OTRO</option>
                   </select>
                 </div>
-
-
               </div>
 
-
-
-
               <div class="form-group col-md-4">
-                <label>Comentario del MPPD</label>
+                <label>{{lblComentario}}</label>
                 <textarea class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
                   [(ngModel)]="SubDocumento.comentario"></textarea>
               </div>
@@ -229,111 +266,44 @@
                   [(ngModel)]="SubDocumento.archivo"></textarea>
               </div>
 
-
             </div>
 
             <hr>
+
             <div class="row">
               <div class="col-md-12">
                 <div class="text-right">
-                  <button class="btn bg-purple text-white" (click)="open(adjuntar, codigohash)">Adjuntar
+                  <button class="btn bg-purple text-white" (click)="open(adjuntar, numc)">Adjuntar
                     Documento</button>
-                  <button class="btn bg-success text-white" *ngIf="dwSub" (click)="verArchivos(archivos)">Ver
+                  <button class="btn bg-success text-white" *ngIf="dwSub" (click)="open(archivos)">Ver
                     Documento</button>
-                  <button class="btn bg-primary text-white" (click)="aceptar()">Aceptar</button>
+                    <button class="btn bg-primary text-white" (click)="aceptar()">{{lblBtn}}</button>
                 </div>
               </div>
             </div>
-
           </form>
         </div>
       </div>
     </div>
   </div>
 
-
-
-
-
-  <ng-template #observacion let-modal>
-    <div class="modal-header header bg-gradient-success">
-      <h4 class="modal-title text-white" id="modal-basic-title">Tranferencia de departamento</h4>
-    </div>
-    <div class="modal-body">
-
-      <div class="container">
-        <div class="row">
-          <div class="form-group col-md-12">
-            <label for="txtobservacion">Observaciones</label>
-            <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
-              [(ngModel)]="Observacion"></textarea>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>Acción</label>
-            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto">
-              <option *ngFor="let e of lstRedistribucion" value="{{e.valor}}">{{e.texto}}</option>
-            </select>
-          </div>
-          <div class="form-group col-md-6">
-            <label>Area</label>
-            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
-              <option value="S">SELECCIONE</option>
-              <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="form-group  col-md-6">
-            <label for="tmsCreacion">Plazo / Alerta</label>
-            <div class="form-group" style="width:100%">
-              <div class="input-group" style="width:100%">
-                <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-                  [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement" readonly
-                  [positionTarget]="buttonEl">
-                <div class="input-group-append">
-                  <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-    <div class="modal-footer">
-      <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')">
-        <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
-      <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
-        <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
-    </div>
-  </ng-template>
-
-
   <ng-template #adjuntar let-c="close" let-d="dismiss">
     <div class="modal-header header bg-gradient-success">
       <h4 class="modal-title" id="modal-basic-title">Cargar Archivo </h4>
-
     </div>
+
     <div class="modal-body">
-
-
       <form method="post" enctype="multipart/form-data" id="forma" name="forma">
-        <input type="hidden" name="txtFileID" id="txtFileID" value="{{codigohash}}" readonly="readonly">
+        <input type="hidden" name="txtFileID" id="txtFileID" value="{{hashdoc}}" readonly="readonly">
         <label for="input-folder-2">Seleccionar Archivo</label>
-        <div class="file-loading">
-          <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2"
-            type="file" multiple accept=".pdf">
-        </div>
+          <div class="custom-file">
+            <input (change)="fileSelected($event)" id="input-folder-2" class="custom-file-input" name="input-folder-2" type="file" accept=".pdf">
+            <label for="input-folder-2" class="custom-file-label">{{lblFile}}</label>
+          </div>
         <div id="errorBlock" class="help-block"></div>
       </form>
-
-
-
     </div>
+
     <div class="modal-footer">
       <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
         <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
@@ -342,32 +312,51 @@
     </div>
   </ng-template>
 
+  <ng-template let-bottomSheetRef="bottomSheetRef" #templateBottomSheet>
+    <div>
+      <table class="table">
+        <thead class="thead-light">
+          <th>Número</th>
+          <th>Fecha</th>
+          <th>Documento</th>
+        </thead>
+        <tbody>
 
+          <tr *ngFor="let el of lstHzAdjunto">
 
+            <td> <a routerLinkActive="active" [routerLink]="['/constancia', constancia( el.ncontrol )]">{{ el.ncontrol
+                }} &nbsp;</a></td>
+            <td>{{ el.fech }}</td>
+            <td>
+              <a [href]="dwUrl(el.ncontrol, el.archivo)" target="_top" rel="noopener noreferrer">
+                {{ el.archivo.substring(22,32) }}
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-template>
 
   <!-- Adjuntar Imagenes al Documento -->
   <ng-template #archivos let-modal>
     <div class="modal-header header bg-gradient-success">
       <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
-
     </div>
+
     <div class="modal-body">
-
-
       <div class="form-group col-md-12">
         <div class="card card-profile">
           <div class="card-header bg-info" style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
             <div class="card-avatar text-center">
               <a href="javascript:;">
-                <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
-                  style="width:100px;z-index: 1; margin-top: -5px;">3
+                <img class="img img-raised rounded-circle image" src="./assets/img/theme/pdf2.jpeg">3
               </a>
             </div>
           </div>
           <br>
 
           <div class="card-body pt-0">
-
             <div class="d-flex justify-content-between">
               <a [href]="download" target="_top" rel="noopener noreferrer" class="btn btn-primary mt-3">Descargar</a>
               <a (click)="activarHistorial()" class="btn btn-default float-right mt-3">Historial</a>
@@ -377,10 +366,10 @@
               <div class="font-weight-50">
                 Publicado<span class="font-weight-light">, {{ fcreacion | date:"dd-MM-yy hh:mm:ss"}}</span>
                 <br>
-                <h5 class="h4" style="font-size: 10px;">{{ creador }}</h5>
+                <h5 class="h4 h5-font">{{ creador }}</h5>
               </div>
             </div>
-            <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
+            <div class="div-table" *ngIf="bHist">
               <table class="table">
                 <thead class="thead-light">
                   <th>Documento</th>
@@ -412,168 +401,50 @@
     </div>
   </ng-template>
 
-
-
-
-
-
-
-
-
-
-
-
-  <!-- Adjuntar Imagenes al Documento -->
-  <ng-template #subarchivos let-modal>
-    <div class="modal-header header bg-gradient-success">
-      <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
-
-    </div>
-    <div class="modal-body">
-
-
-      <div class="form-group col-md-12">
-        <div class="card card-profile">
-          <div class="card-header bg-info" style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
-            <div class="card-avatar text-center">
-              <a href="javascript:;">
-                <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
-                  style="width:100px;z-index: 1; margin-top: -5px;">3
-              </a>
-            </div>
-          </div>
-          <br>
-
-          <div class="card-body pt-0">
-
-            <div class="d-flex justify-content-between">
-              <a [href]="download" target="_top" rel="noopener noreferrer" class="btn btn-primary mt-3">Descargar</a>
-              <a (click)="activarHistorialSub()" class="btn btn-default float-right mt-3">Historial</a>
-            </div>
-            <br><br>
-            <div class="text-center">
-              <div class="font-weight-50">
-                Publicado<span class="font-weight-light">, {{ fcreacionsub | date:"dd-MM-yy hh:mm:ss"}}</span>
-                <br>
-                <h5 class="h4" style="font-size: 10px;">{{ creadorsub }}</h5>
-              </div>
-            </div>
-            <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
-              <table class="table">
-                <thead class="thead-light">
-                  <th>Documento</th>
-                  <th>Usuario</th>
-                  <th>Fecha</th>
-                </thead>
-                <tbody>
-
-                  <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstHzAdjuntoSub;let i=index">
-
-                    <td>
-                      <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top" rel="noopener noreferrer">
-                        {{ el.nombre.substring(20,32) }}
-                      </a>
-                    </td>
-                    <td>{{ el.usuario }}</td>
-                    <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
-        <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
-    </div>
-  </ng-template>
-
-
-  <!-- <button (click)="openTMS()">Open Template Bottom Sheet</button> -->
-
-  <ng-template let-bottomSheetRef="bottomSheetRef" #templateBottomSheet>
-    <div >
-      <table class="table">
-        <thead class="thead-light">
-          <th>Número</th>
-          <th>Fecha</th>
-          <th>Documento</th>
-        </thead>
-        <tbody>
-    
-          <tr  *ngFor="let el of lstHzAdjunto">
-    
-            <td> <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( el.ncontrol )]">{{ el.ncontrol }} &nbsp;</a></td>
-            <td>{{ el.fech }}</td>
-            <td>
-              <a [href]="dwUrl(el.ncontrol, el.archivo)" target="_top" rel="noopener noreferrer"> 
-                {{ el.archivo.substring(22,32) }}
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </ng-template>
-
-
-
-
-
-<div style="display: none">
-  <div id="prtNota">
-    <section class="content">
-      <div class="wrapper">
-        <table border="0" style="width:100%">
-          <tr>
-
-            <td align="center">
-              REPÚBLICA BOLIVARIANA DE VENEZUELA <BR>
-              MINISTERIO DEL PODER POPULAR PARA LA DEFENSA<BR>
-              AREA DE SECRETARIA
-            </td>
-
-          </tr>
-        </table>
-
-        <h3 style="text-align:center">NOTA DE ENTREGA DE DOCUMENTO {{ cuenta }}</h3>
-
-
-
-        <table style="width:100%" border="1">
-          <thead>
-            <th>#</th>
-            <th>CARGO</th>
-            <th>N-CEDULA</th>
-            <th>NOMBRE COMPLETO</th>
-            <th>OBSERVACION</th>
-          </thead>
-          <tbody>
-            <tr *ngFor="let e of lstNotaEntrega; let i=index;">
-              <td>{{i + 1}}</td>
-              <td>{{ e.cargo | uppercase }}</td>
-              <td align="center">{{e.cedula }}</td>
-              <td align="center">{{e.nombre }}</td>
-              <td align="center">{{e.observacion | uppercase }}</td>
+  <div class="div-mayor">
+    <div id="prtNota">
+      <section class="content">
+        <div class="wrapper">
+          <table border="0" class="table-general">
+            <tr>
+              <td align="center">
+                REPÚBLICA BOLIVARIANA DE VENEZUELA <BR>
+                MINISTERIO DEL PODER POPULAR PARA LA DEFENSA<BR>
+                AREA DE SECRETARIA
+              </td>
             </tr>
-          </tbody>
-        </table>
+          </table>
+          <h3 class="h3-text">NOTA DE ENTREGA DE DOCUMENTO {{ cuenta }}</h3>
 
-        <br><br><br>
+          <table class="table-general" border="1">
+            <thead>
+              <th>#</th>
+              <th>CARGO</th>
+              <th>N-CEDULA</th>
+              <th>NOMBRE COMPLETO</th>
+              <th>OBSERVACION</th>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of lstNotaEntrega; let i=index;">
+                <td>{{i + 1}}</td>
+                <td>{{ e.cargo | uppercase }}</td>
+                <td align="center">{{e.cedula }}</td>
+                <td align="center">{{e.nombre }}</td>
+                <td align="center">{{e.observacion | uppercase }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <br><br><br>
 
-        NOTA:
+          NOTA:
 
-        <br>
-
-      </div>
-      <div class="footer">
-        <hr>
-        Ministerio del Poder Popular para la Defensa<br>
-        {{llave}}
-      </div>
-    </section>
+          <br>
+        </div>
+        <div class="footer">
+          <hr>
+          Ministerio del Poder Popular para la Defensa<br>
+          {{llave}}
+        </div>
+      </section>
+    </div>
   </div>
-</div>
-

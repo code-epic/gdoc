@@ -282,11 +282,9 @@ export class SpresidencialComponent implements OnInit {
   editar(e) {
     
     const base = btoa( JSON.stringify(e))
-    this.ruta.navigate(['/ministerial', base])
+    const tipo = "editar"
+    this.ruta.navigate(['/ministerial', tipo, base])
   }
-
-
-
 
   insertarObservacion() {
     var usuario = this.loginService.Usuario.id

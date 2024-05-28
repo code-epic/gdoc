@@ -75,6 +75,19 @@ export class ControlComponent implements OnInit {
   async ngOnInit() {
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
+    this.SubMenu.push(
+       {
+    url: "/consulta-general",
+    js: "",
+    descripcion: "Consulta General",
+    icono: "fa fa-search",
+    nombre: "Consulta",
+    accion: "CargarUrl('control', 'pendientes')",
+    clase: "f-left",
+    color: "bg-orange",
+    
+  }
+    )
     let prv = this.loginService.obtenerPrivilegiosMenu(this.ruta.url)
     if (prv != undefined && prv.Privilegios != undefined) {
       prv.Privilegios.forEach(e => {

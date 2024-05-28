@@ -13,7 +13,7 @@
           <div class="row align-items-center">
             <div class="col-md-10">
               <h6 class="text-uppercase text-muted ls-1 mb-1">Secretaria</h6>
-              <h2 class="mb-0">Ministerial</h2>
+              <h2 class="mb-0">{{titulo}}</h2>
             </div>
             <div class="col-md-1">
               <div class="media align-items-center">
@@ -57,7 +57,7 @@
             <div class="container">
               <mat-selection-list #lstProcesados>
                 <mat-list *ngFor="let e of buzon; let i=index "
-                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  class="mat-list-general">
                   <div class="row">
                     
                     <div class="col-md-1 text-left">
@@ -82,9 +82,9 @@
                         <mat-icon (click)="open(observacion, e.idd)" id="recibir" class="text-gray">account_tree</mat-icon>
                       </button>
                       <a [href]="dwUrl(e.numc, e.anom)" target="_top"
-                      rel="noopener noreferrer" style="color:darkgrey;font-size: 18px;font-weight: normal;">
+                      rel="noopener noreferrer" class="href-style">
                           <!-- {{ e.anom.substring(0,5) }} -->
-                          <img  src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" style="width: 20px;margin-top: 4px;"/>
+                          <img  src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" class="image-style"/>
                       </a>
                     </div>
                   </div>
@@ -107,7 +107,7 @@
             <div class="container">
               <mat-selection-list #lstAlertas>
                 <mat-list *ngFor="let e of bzAlertas; let i=index "
-                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  class="mat-list-general">
                   <div class="row">
                     <div class="col-md-2 texto-lista">
                       {{ e.ncontrol }}
@@ -173,8 +173,8 @@
 
     <div class="form-group  col-md-12"  *ngIf="vplazo">
       <label for="tmsCreacion">Plazo / Alerta</label>
-      <div class="form-group" style="width:100%">
-        <div class="input-group" style="width:100%">
+      <div class="form-group div-style">
+        <div class="input-group div-style">
           <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
             [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
             [positionTarget]="buttonEl" readonly>
