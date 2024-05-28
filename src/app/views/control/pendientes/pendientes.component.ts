@@ -123,7 +123,7 @@ export class PendientesComponent implements OnInit {
 
   async ConsultarSeguimiento() {
     this.xAPI.funcion = 'WKF_CSeguimiento'
-    this.xAPI.parametros = this.contenidoDocumento
+    this.xAPI.parametros = this.contenidoDocumento +  ', AND estado != 9 '
     console.log("llego ConsultarSeguimiento")
     console.log(this.contenidoDocumento)
     console.log(this.xAPI)
