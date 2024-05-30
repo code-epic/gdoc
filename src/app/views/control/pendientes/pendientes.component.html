@@ -48,17 +48,27 @@
                   <mat-form-field appearance="outline">
                     <mat-label>CONTENIDO GENERAL</mat-label>
                     <input matInput placeholder="CONTENIDO GENERAL" [ngModelOptions]="{ standalone: true }"
-                      [(ngModel)]="contenidoDocumento" />
+                      [(ngModel)]="contenidoDocumento" (keypress)="consultarDocument($event);"/>
                   </mat-form-field>
                 </div>
               </div>
+
+              <!-- <div class="col-md-2 div-interno-superior">
+                <div class="div-interno">
+                  <mat-form-field appearance="outline">
+                    <mat-label>NÚMERO</mat-label>
+                    <input matInput placeholder="NÚMERO" [ngModelOptions]="{ standalone: true }" [(ngModel)]="buscar"
+                      value="{{ buscar }}" (keypress)="seleccionLista($event)" />
+                  </mat-form-field>
+                </div>
+              </div> -->
 
               <div class="col-md-2 div-interno-superior">
                 <div class="div-interno">
                   <mat-form-field appearance="outline">
                     <mat-label>NÚMERO</mat-label>
                     <input matInput placeholder="NÚMERO" [ngModelOptions]="{ standalone: true }" [(ngModel)]="buscar"
-                      value="{{ buscar }}" (keypress)="seleccionLista($event)" />
+                      value="{{ buscar }}" (keypress)="consultarDocument($event);" />
                   </mat-form-field>
                 </div>
               </div>
