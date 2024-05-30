@@ -36,6 +36,7 @@ import {
 } from "@angular/material/dialog";
 import { MatRadioModule } from "@angular/material/radio";
 
+
 @Component({
   selector: "app-pendientes",
   templateUrl: "./pendientes.component.html",
@@ -326,7 +327,7 @@ export class PendientesComponent implements OnInit {
     private viewContainerRef: ViewContainerRef,
     private resolver: ComponentFactoryResolver,
     private injector: Injector,
-    private appRef: ApplicationRef
+    private appRef: ApplicationRef,
   ) { }
 
   async ngOnInit() {
@@ -413,13 +414,13 @@ export class PendientesComponent implements OnInit {
   async ConsultarSeguimiento() {
     let desde = ''
     let hasta = ''
-
     this.xAPI.funcion = "WKF_CSeguimiento";
 
     if (this.contenidoDocumento != "") {
       desde = this.desde == undefined ? '2022-01-01' : this.desde
       hasta = this.hasta == undefined ? '2025-12-31' : this.hasta
-      this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta
+      this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar
+      console.log(this.xAPI.parametros)
     } else {
       return false
     }
@@ -622,7 +623,8 @@ export class PendientesComponent implements OnInit {
 
   buscarDocumento(): void {
     this.vistacontenido = true;
-    this.ConsultarSeguimiento();
+    this.consultarDocument(undefined)
+    
     // const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
     // this.bzBusqueda = this.bzSeguimientoO.filter((e) => patron.test(e.busqueda));
     // this.longitud = this.bzBusqueda.length;
@@ -631,6 +633,7 @@ export class PendientesComponent implements OnInit {
     // this.cantidad = this.bzBusqueda.length;
     // this.MostrarPaginador();
     // this.buscar = '';
+    
   }
 
   limpiarDoc() {
@@ -1417,6 +1420,12 @@ export class PendientesComponent implements OnInit {
     this.modalService.dismissAll();
   }
 
+  consultarDocument(event: any) {
+    if (event == undefined || event.charCode == 13) {
+      this.vistacontenido = true;
+      this.ConsultarSeguimiento()
+    }
+  }
   cerrarModal() {
     this.modalService.dismissAll();
   }
