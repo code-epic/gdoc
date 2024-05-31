@@ -34,7 +34,8 @@ import {
   MAT_DIALOG_DATA,
   MatDialogConfig,
 } from "@angular/material/dialog";
-import { MatRadioModule } from "@angular/material/radio";
+import { MatRadioModule, MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+
 
 
 @Component({
@@ -77,8 +78,8 @@ export class PendientesComponent implements OnInit {
   public actual: number = 1;
   public radio: number = 0;
   public tipoDocumento: number = 0;
-  public optfecha: number = 0
-  public opttodos: number = 0
+  public optfecha: string = '0';
+  public opttodos: string = '0';
 
   public desde: any;
   public hasta: any;
@@ -331,7 +332,7 @@ export class PendientesComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.opttodos = 0
+
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id;
       if (id == "salida") {
@@ -623,6 +624,7 @@ export class PendientesComponent implements OnInit {
 
   buscarDocumento(): void {
     this.vistacontenido = true;
+
     this.consultarDocument(undefined)
     
     // const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
