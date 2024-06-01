@@ -63,6 +63,7 @@ export class PendientesComponent implements OnInit {
   public fplazo: any;
   public id_alerta = "";
   public cargador: boolean = true;
+  public sinDatos: boolean = false;
   public buscar = "";
   public contenidoDocumento = "";
   public antes: boolean = false;
@@ -412,25 +413,41 @@ export class PendientesComponent implements OnInit {
     }
   }
 
-  async ConsultarSeguimiento() {
+  async ConsultarSeguimiento(funcion: string) {
     let desde = ''
     let hasta = ''
-    this.xAPI.funcion = "WKF_CSeguimiento";
+    this.xAPI.funcion = funcion;
+    console.log(funcion)
 
-    if (this.contenidoDocumento != "") {
-      desde = this.desde == undefined ? '2022-01-01' : this.desde
-      hasta = this.hasta == undefined ? '2025-12-31' : this.hasta
-      this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' + this.tipoDocumento
-      console.log(this.xAPI.parametros)
-    } else {
-      return false
+    desde = this.desde == undefined ? '2022-01-01' : this.desde
+    hasta = this.hasta == undefined ? '2025-12-31' : this.hasta
+
+    if(this.xAPI.funcion == "WKF_CSeguimiento"){
+      if (this.contenidoDocumento != "") {
+        this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' 
+        + this.tipoDocumento + ',' + this.opttodos
+        console.log(this.xAPI.parametros)
+      } else {
+        return false
+      }
+    }else{
+        this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.Doc.contenido.trim() + ',' 
+        + this.Doc.tipo + ',' + this.Doc.remitente + "," + this.Doc.unidad
+        console.log(this.xAPI.parametros)
+      
     }
+    
 
 
     this.cargador = false;
     this.ngxService.startLoader("loader-aceptar");
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log(data.Cuerpo.length);
+
+        
+
+
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
           e.busqueda = this.utilService.ConvertirCadena(
             e.norigen +
@@ -493,10 +510,27 @@ export class PendientesComponent implements OnInit {
         this.max_paginador = this.cantidad / 10;
         this.blBuscar = true;
         this.MostrarPaginador();
-        this.cargador = true;
+       
         this.ngxService.stopLoader("loader-aceptar");
         this.contenidoDocumento = ""
         this.buscar = ""
+        this.tipoDocumento = 0
+        this.Doc.contenido = '' 
+        this.Doc.tipo = ''
+        this.cargador = true;
+        this.Doc.remitente = ''  
+        this.Doc.unidad = ''
+        this.Doc.comando = ''
+        this.Doc.instrucciones = ''
+        this.mostrarCamposAdicionales= false;
+        this.mostrarBotonOcultar= false; 
+        this.desde == undefined;
+        this.hasta == undefined;
+        if (data.Cuerpo.length === 0) {
+          this.sinDatos = true;
+         } else {
+           this.sinDatos = false;
+         }
       },
       (error) => {
         console.log("Error en la carga");
@@ -1415,18 +1449,29 @@ export class PendientesComponent implements OnInit {
   }
   buscarYCerrarModal() {
 
-    this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
-    this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
+    // this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
+    // this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
     this.vistacontenido = true;
-    this.ConsultarSeguimiento();
+    console.log("llego buscar y cerrar")
+    console.log(this.Doc.tipo)
+    this.ConsultarSeguimiento("WKF_CSeguimiento_Detalle");
     this.modalService.dismissAll();
   }
 
   consultarDocument(event: any) {
     if (event == undefined || event.charCode == 13) {
       this.vistacontenido = true;
-      this.ConsultarSeguimiento()
+      this.ConsultarSeguimiento("WKF_CSeguimiento")
     }
+  }
+
+  consultarDocumentDetalle(event: any) {
+    if (event == undefined || event.charCode == 13) {
+      this.vistacontenido = true;
+      this.ConsultarSeguimiento("WKF_CSeguimiento_Detalle")
+      this.modalService.dismissAll();
+    }
+   
   }
   cerrarModal() {
     this.modalService.dismissAll();
