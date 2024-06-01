@@ -62,7 +62,22 @@
                   </mat-form-field>
                 </div>
               </div> -->
+              <div class="col-md-2 seleccionar">
+                <div class="div-interno">
+                  <mat-form-field appearance="outline">
+                    <mat-label> TIPO DE NÚMERO.
 
+                    </mat-label>
+                    <mat-select [(ngModel)]="tipoDocumento">
+                      <mat-option value="0" selected>SELECCIONE</mat-option>
+                      <mat-option value="1"> NRO. CEDULA</mat-option>
+                      <mat-option value="2"> NRO. CONTROL</mat-option>
+                      <mat-option value="3"> NRO. ORIGEN</mat-option>
+                      <mat-option value="4"> NRO. SALIDA</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
               <div class="col-md-2 div-interno-superior">
                 <div class="div-interno">
                   <mat-form-field appearance="outline">
@@ -73,22 +88,7 @@
                 </div>
               </div>
 
-              <div class="col-md-2 seleccionar">
-                <div class="div-interno">
-                  <mat-form-field appearance="outline">
-                    <mat-label> TIPO DE NÚMERO.
-
-                    </mat-label>
-                    <mat-select [(ngModel)]="tipoDocumento">
-                      <mat-option value="0" selected>SELECCIONE</mat-option>
-                      <mat-option value="1"> NRO. CEDULA</mat-option>
-                      <mat-option value="1"> NRO. CONTROL</mat-option>
-                      <mat-option value="2"> NRO. ORIGEN</mat-option>
-                      <mat-option value="3"> NRO. SALIDA</mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </div>
-              </div>
+              
               <div class="col-md-2">
                 <div class="boton-buscar-principal">
                   <button mat-flat-button (click)="buscarDocumento()" id="registrar" color="primary"

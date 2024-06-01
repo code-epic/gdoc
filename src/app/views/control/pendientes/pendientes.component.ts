@@ -420,7 +420,7 @@ export class PendientesComponent implements OnInit {
     if (this.contenidoDocumento != "") {
       desde = this.desde == undefined ? '2022-01-01' : this.desde
       hasta = this.hasta == undefined ? '2025-12-31' : this.hasta
-      this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar
+      this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' + this.tipoDocumento
       console.log(this.xAPI.parametros)
     } else {
       return false
