@@ -263,9 +263,26 @@
     width: 100%;
   }
 
+  .div-interno{
+    padding-top: 4px;
+  }
+  
+  .div-interno-superior{
+    margin-right: 10px;
+  }
+
   mat-label{
     text-transform: uppercase;
   }
+
+.seleccionar{
+  margin-right: 40px;
+}
+
+.boton-buscar-principal{
+  width: 100%; 
+  padding-top: 9px;
+}
 
   mat-hint{
     span.categoria{
@@ -278,6 +295,10 @@
 
 .div-group{
   width: 100%;
+}
+
+.formulario{
+  margin-left: 5px;
 }
 
 .boton-buscar{
@@ -303,10 +324,23 @@
   margin-top: -4px;
 }
 
+.imagen-pdf{
+  width: 12px; 
+  margin-top: -3px;
+}
+
 .div-image{
   color:darkgrey;
   font-size: 12px;
   font-weight: normal;
+}
+
+.contenedor-documento{
+  margin-top: -4px;
+}
+
+.fecha-documento{
+  margin-top: -10px;
 }
 
 .p.margin {
@@ -320,6 +354,15 @@
 .span-class{
   margin-top: 19px; 
   display: block;
+}
+
+.boton-mostrar-mas-avanzado{
+  text-align: end;
+  width: 100%;
+  display: block;
+  cursor: pointer;
+  padding-right: 0;
+  padding-bottom: 20px;
 }
 
 // .icon-detail{
@@ -336,3 +379,17 @@
   margin-left: 5px;
 }
 
+.div-radio-avanzado{
+  display: inline-block;
+  text-align: center;
+  padding-top: 22px;
+  color: gray;
+  width: 100%;
+}
+
+.mat-radio{
+  display: flex;
+  justify-content: start;
+  gap: 40px;
+  padding-left: 3px;
+}

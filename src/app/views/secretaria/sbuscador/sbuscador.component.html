@@ -8,11 +8,21 @@
     <div class="row">
         <div class="col-xl-12 col-md-12 col-lg-12">
             <div class="card shadow">
+                <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
-                        <div class="col-md-11">
+                        <div class="col-md-4">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Secretaria</h6>
                             <h2 class="mb-0">Buscador de Documentos</h2>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="div-radio-avanzado">
+                                <mat-radio-group class="mat-radio" [(ngModel)]="opttodos" color="primary">
+                                    <mat-radio-button value="0"> TODAS </mat-radio-button>
+                                    <mat-radio-button value="1"> ENTRADA </mat-radio-button>
+                                    <mat-radio-button value="2"> SALIDA </mat-radio-button>
+                                </mat-radio-group>
+                            </div>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
@@ -27,81 +37,68 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="form-row">
-                        <div class="col-md-2 div-interno-superior">
+                    <div class="form-row formulario">
+                        <div class="col-md-3 div-interno-superior">
                             <div class="div-interno">
-                              <mat-form-field appearance="outline">
-                                <mat-label>CONTENIDO</mat-label>
-                                <input
-                                  matInput
-                                  placeholder="CONTENIDO"
-                                  [ngModelOptions]="{ standalone: true }"
-                                  [(ngModel)]="buscar"
-                                  value="{{ buscar }}"
-                                  (keypress)="seleccionLista($event)"
-                                />
-                              </mat-form-field>
-                            </div>
-                          </div>
-            
-                          <div class="col-md-2 seleccionar">
-                            <div class="div-interno">
-                              <mat-form-field appearance="outline">
-                                <mat-label> TIPO BUSQUEDA.
-                                
-                                </mat-label>
-                                <mat-select>
-                                  <mat-option value="0" selected>SELECCIONE</mat-option>
-                                  <mat-option value="1"> CEDULA</mat-option>
-                                  <mat-option value="2"> PUNTO CUENTA</mat-option>
-                                  <mat-option value="3"> ASUNTO</mat-option>
-                                </mat-select>
-                              </mat-form-field>
-                            </div>
-                          </div>
-
-<<<<<<< HEAD
-                        <div class="col-md-2">
-                            <div class="input-group" style="width: 100%">
-=======
-                        <div class="col-md-3">
-                            <div class="input-group div-group">
->>>>>>> a5ee18c77d293e0e4010622bd9beab2eac1295d7
                                 <mat-form-field appearance="outline">
-                                    <mat-label>Fecha de Recepcion</mat-label>
-                                    <input matInput [ngModelOptions]="{ standalone: true }" [(ngModel)]="Doc.forigen"
-                                        placeholer="Fecha de Recepcion" [matDatepicker]="picker" />
-                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-label>CONTENIDO GENERAL</mat-label>
+                                    <input matInput placeholder="CONTENIDO" [ngModelOptions]="{ standalone: true }"
+                                        [(ngModel)]="contenidoDocumento" (keypress)="consultarDocument($event)" />
                                 </mat-form-field>
                             </div>
                         </div>
 
-                        <div class="col-md-3">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Estatus Del Documento</mat-label>
-                                <mat-select [ngModelOptions]="{ standalone: true }" [(ngModel)]="SubDocumento.estatus"
-                                    placeholder="Estatus">
-                                    <mat-option value="0">SELECCIONE</mat-option>
-                                    <mat-option *ngFor="let e of lstAcciones" value="{{ e.valor }}">
-                                        {{ e.texto }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                        <div class="col-md-2 seleccionar">
+                            <div class="div-interno">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>TIPO DE NUMERO</mat-label>
+                                    <mat-select [(ngModel)]="tipoDocumento">
+                                        <mat-option value="0" selected>SELECCIONE</mat-option>
+                                        <mat-option value="1"> NRO. CEDULA</mat-option>
+                                        <mat-option value="2"> NRO. CONTROL</mat-option>
+                                        <mat-option value="3"> NRO. ORIGEN</mat-option>
+                                        <mat-option value="4"> NRO. SALIDA</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div> 
+
+                        <div class="col-md-2 div-interno-superior">
+                            <div class="div-interno">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>NÚMERO</mat-label>
+                                    <input matInput placeholder="NÚMERO" [ngModelOptions]="{ standalone: true }"
+                                        [(ngModel)]="buscar" value="{{ buscar }}"
+                                        (keypress)="consultarDocument($event);" />
+                                </mat-form-field>
+                            </div>
                         </div>
 
-                        <div class="col-11 col-md-2">
+                        <div class="col-md-2 seleccionar">
+                            <div class="div-interno">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Estatus Del Documento</mat-label>
+                                    <mat-select [ngModelOptions]="{ standalone: true }" [(ngModel)]="SubDocumento.estatus"
+                                        placeholder="Estatus">
+                                        <mat-option value="0">SELECCIONE</mat-option>
+                                        <mat-option *ngFor="let e of lstAcciones" value="{{ e.valor }}">
+                                            {{ e.texto }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="col-11 col-md-1">
                             <button mat-raised-button color="primary" id="registrar" class="boton-buscar"
-                                (click)="buscarDocumento()"
-                                >
-                                <i class="fa fa-search" aria-hidden="true"></i>
+                                (click)="buscarDocumento()">
                                 Buscar
+                                <i class="fa fa-search" aria-hidden="true"></i>
                             </button>
                         </div>
 
                         <div class="col-1">
-                            <button mat-icon-button (click)="open(busqueda_avanzada)"
-                             class="busquedas-avanzadas"
+                            <button mat-icon-button (click)="open(busqueda_avanzada)" class="busquedas-avanzadas"
                                 aria-label="Example icon-button with a heart icon">
                                 <!-- <mat-icon>arrow_back</mat-icon> -->
                                 <mat-icon>more_vert</mat-icon>
@@ -109,109 +106,101 @@
                         </div>
                     </div>
 
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-12">
-                                
-                                <div class="container">
-                                    <br>
-                                    <small class="mr-5 small" *ngIf="blBuscar">
-                                        Cerca de {{ cantidad | number }} resultados...
-                                    </small>
-                                    <br>
-                                    <div class="row enlace" *ngFor="let e of bzSeguimiento; let i=index ">
+                    <div *ngIf="vistacontenido">
+                        <div *ngIf="!cargador">
+                            <h3 class="text-center">Cargando información...</h3>
+                        </div>
+                        <div class="row" *ngIf="cargador">
+                            <div class="card-body">
+                                <div class="col-md-12">
+                                    <div class="row enlace" *ngFor="let e of bzSeguimiento; let i = index">
                                         <div class="col-md-8">
                                             <a routerLinkActive="active"
-                                                [routerLink]="['/constancia', constancia( e.numc )]">
+                                                [routerLink]="['/constancia', constancia(e.numc)]">
                                                 {{ e.numc }} - {{ e.tdoc }}
                                             </a>
-                                            | {{ e.origen | date:"dd-MM-yyyy" }}
+                                            | {{ e.origen | date : "dd-MM-yyyy" }}
                                         </div>
-
                                         <div class="col-md-4 text-right">
                                             <span class="badge rounded-pill text-bg-primary">pdf</span>
                                             <a [href]="dwUrl(e.numc, e.archivo)" target="_top" rel="noopener noreferrer"
-                                                class="div-image">
-                                                {{ e.archivo.substring(0,10) }}
+                                                class="texto-detalle-pdf">
+                                                {{ e.archivo.substring(0, 10) }}
                                                 <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
-                                                    class="image" />
+                                                    class="imagen-pdf" />
                                             </a>
                                         </div>
 
-                                        <div class="col-md-12 div-contenido">
+                                        <div class="col-md-12 contenedor-documento">
                                             <ng-template #popContent>
                                                 <div class="row">
-                                                    <!-- <div class="col-md-4">{{ e.unidad }}</div> -->
                                                     <div class="col-md-12">
                                                         <div [innerHTML]="e.contenido" class="contenido"></div>
                                                     </div>
                                                 </div>
                                             </ng-template>
-                                            <!-- <ng-template #popTitle>{{ e.numc }}</ng-template> -->
-                                            {{ e.unidad }} <button mat-button [ngbPopover]="popContent"
+                                            {{ e.unidad }}
+                                            <button mat-button [ngbPopover]="popContent"
                                                 popoverTitle="Detalles generales">
                                                 Mas...
                                             </button>
                                             <div [innerHTML]="e.resumenl" class="contenido"></div>
+                                            <br>
+                                            <p class="fecha-documento">
+                                                <small class="mr-3"><i class="fa fa-calendar"></i>&nbsp;{{
+                                                    e.fecha | date : "dd-MM-yyyy hh:mm"
+                                                    }}</small>
+                                                <small class="mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN
+                                                    {{ e.norigen | uppercase }}</small>
+                                                <small class="mr-3"><i class="fa fa-folder"></i> &nbsp; SALIDA
+                                                    {{ e.salida | uppercase }}</small>
 
-                                            <p class="p.margin">
-                                                <small class=" mr-3"><i class="fa fa-calendar"></i>&nbsp;{{ e.fecha |
-                                                    date:"dd-MM-yyyy hh:mm" }}</small>
-                                                <small class=" mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN {{
-                                                    e.norigen | uppercase }}</small>
-                                                <small class=" mr-3"><i class="fa fa-folder"></i> &nbsp; SALIDA {{
-                                                    e.salida | uppercase }}</small>
-                                                <small class=" mr-4"><i class="fa fa-globe"></i> &nbsp;
-                                                    {{ e.nombre | uppercase }} ( {{ e.estatus_nombre | uppercase }} {{
-                                                    e.s_texto }} )
+                                                <small class="mr-4"><i class="fa fa-globe"></i> &nbsp;
+                                                    {{ e.nombre | uppercase }} (
+                                                    {{ e.estatus_nombre | uppercase }} {{ e.s_texto }} )
                                                 </small>
                                             </p>
                                         </div>
-                                        <!-- <div class="col-md-2"></div> -->
+
+                                        <br /><br />
+
                                     </div>
+                                </div>
+
+                                <br><br>
+                                <div class="col-md-12 text-center">
+                                    <nav aria-label="Page navigation example" *ngIf="blBuscar">
+                                        <div class="row">
+                                            <div class="col-md-1">
+                                                <ul class="pagination justify-content-center">
+                                                    <li class="page-item">
+                                                        <a class="page-link" *ngIf="antes"
+                                                            (click)="posicion(actual - 1)">
+                                                            < </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <ul class="pagination justify-content-center">
+                                                    <li class="page-item" *ngFor="let e of lstPaginas">
+                                                        <a class="page-link {{ e.color }}" (click)="posicion(e.id)">{{
+                                                            e.id }}</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <ul class="pagination justify-content-center">
+                                                    <li class="page-item">
+                                                        <a class="page-link" *ngIf="despues"
+                                                            (click)="posicion(actual + 1)">></a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </nav>
                                 </div>
                             </div>
                         </div>
-
-                        <br><br><br><br><br>
-
-                        <div class="row">
-                            <div class="col-md-3"></div>
-                            <div class="col-md-6 text-center">
-                                <nav aria-label="Page navigation example" *ngIf="blBuscar">
-                                    <div class="row">
-                                        <div class="col-md-1">
-                                            <ul class="pagination justify-content-center">
-                                                <li class="page-item">
-                                                    <a class="page-link" *ngIf="antes" (click)="posicion(actual-1)">
-                                                        < </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-10">
-                                            <ul class="pagination justify-content-center">
-                                                <li class="page-item" *ngFor="let e of lstPaginas">
-                                                    <a class="page-link {{ e.color }}" (click)="posicion(e.id)">{{ e.id
-                                                        }}</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-1">
-                                            <ul class="pagination justify-content-center">
-                                                <li class="page-item">
-                                                    <a class="page-link" *ngIf="despues"
-                                                        (click)="posicion(actual+1)">></a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </nav>
-                            </div>
-
-                            <div class="col-md-3"></div>
-
-                        </div>
-
                     </div>
                 </div>
             </div>
@@ -225,12 +214,8 @@
         </div>
         <div class="modal-body">
             <div class="container">
-
                 <div class="form-row col-md-12 d-none">
-
-                    <mat-hint class="col-md-2"><span class="categoria span-class">Rango
-                            de Fecha</span></mat-hint>
-
+                    <mat-hint class="col-md-2"><span class="categoria span-class">Rango de Fecha</span></mat-hint>
                     <div class="col-md-5">
                         <div class="input-group div-group">
                             <mat-form-field appearance="outline">
@@ -255,10 +240,32 @@
                     </div>
                 </div>
 
-                <div class="form-row col-md-12">
+                <div class="form-row col -md-12">
+                    <mat-hint class="col-md-2"><span class="categoria span-class">Rango de Fecha</span></mat-hint>
+                    <div class="col-md-6">
+                        <mat-form-field class="example-form-field" appearance="outline">
+                            <mat-label>Rango del Documento</mat-label>
+                            <mat-date-range-input [formGroup]="fechaRango" [rangePicker]="fechaRangoPicker"
+                                [comparisonStart]="fechaRango.value.start" [comparisonEnd]="fechaRango.value.end">
+                                <input matStartDate placeholder="Start date" formControlName="start">
+                                <input matEndDate placeholder="End date" formControlName="end">
+                            </mat-date-range-input>
+    
+                            <mat-datepicker-toggle matSuffix [for]="fechaRangoPicker"></mat-datepicker-toggle>
+                            <mat-date-range-picker #fechaRangoPicker></mat-date-range-picker>
+                        </mat-form-field>
+                    </div>
+    
+                    <div class="col-md-4 div-radio-avanzado">
+                        <mat-radio-group class="mat-radio" [(ngModel)]="optfecha" color="primary">
+                            <mat-radio-button value="0"> CREACION </mat-radio-button>
+                            <mat-radio-button value="1"> ORIGEN </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </div>
 
-                    <mat-hint class="col-md-2"><span class="categoria span-class">Tipo de
-                            Documento</span></mat-hint>
+                <div class="form-row col-md-12">
+                    <mat-hint class="col-md-2"><span class="categoria span-class">Tipo de Documento</span></mat-hint>
 
                     <div class="col-md-3">
                         <mat-form-field appearance="outline">
@@ -301,16 +308,9 @@
                     </div>
                 </div>
 
-                <mat-hint class="icon-detail">
-                    <span (click)="verMasCampos()" *ngIf="!mostrarCampos" class="ver">Ver mas campos <i
-                            class="fa fa-caret-down"></i></span>
-                </mat-hint>
-
                 <div *ngIf="mostrarCampos">
                     <div class="form-row col-md-12">
-
-                        <mat-hint class="col-md-2"><span class="categoria span-class">Por
-                                Unidades</span></mat-hint>
+                        <mat-hint class="col-md-2"><span class="categoria span-class">Por Unidades</span></mat-hint>
 
                         <div class="col-md-5">
                             <mat-form-field appearance="outline">
@@ -336,10 +336,7 @@
                     </div>
 
                     <div class="form-row col-md-12">
-
-                        <mat-hint class="col-md-2"><span class="categoria span-class">Por
-                                Descripcion</span></mat-hint>
-
+                        <mat-hint class="col-md-2"><span class="categoria span-class">Por Descripcion</span></mat-hint>
                         <div class="col-md-5">
                             <mat-form-field appearance="outline">
                                 <mat-label>Accion Tomada</mat-label>
@@ -351,19 +348,32 @@
                         <div class="col-md-5">
                             <mat-form-field appearance="outline">
                                 <mat-label>Asunto</mat-label>
-                                <input matInput
-                                    placeholder="Asunto" type="txtOrigen" [ngModelOptions]="{ standalone: true }" id="nori"
-                                    [(ngModel)]="asunto" value="{{buscar`}}"
-                                    (focus)="focus = true" (blur)="focus = false">
+                                <input matInput placeholder="Asunto" type="txtOrigen"
+                                    [ngModelOptions]="{ standalone: true }" id="nori" [(ngModel)]="asunto"
+                                    value="{{buscar`}}" (focus)="focus = true" (blur)="focus = false">
                             </mat-form-field>
                         </div>
                     </div>
-
+                    <!-- 
                     <mat-hint style="text-align: end;
                     width: 100%; 
                     display: block;">
                         <span (click)="verMasCampos()" *ngIf="mostrarCampos" class="ver">Ver menos campos <i
                                 class="fa fa-caret-up"></i></span>
+                    </mat-hint> -->
+
+
+
+                </div>
+
+                <div class="col-md-12">
+                    <mat-hint class="boton-mostrar-mas-avanzado">
+                        <span (click)="verMasCampos()">
+                            {{ mostrarCampos ? "Ocultar" : "Ver más" }}
+                            <i class="fa" [ngClass]="
+                            mostrarCampos ? 'fa-eye-slash' : 'fa-eye'
+                        " aria-hidden="true"></i>
+                        </span>
                     </mat-hint>
                 </div>
 
@@ -372,13 +382,14 @@
 
         <div class="modal-footer" align="end">
 
-            <button mat-raised-button color="primary" id="registrar" class="butom-search" (click)="buscarDocumento()">
+            <button mat-raised-button color="primary" id="registrar" class="butom-search"
+                (click)="buscarYCerrarModal()">
+                Buscar &nbsp;
                 <i class="fa fa-search" aria-hidden="true"></i>
-                Buscar Documento
             </button>
 
-            <button mat-raised-button aria-label="Close" (click)="close()" class="butom-close">
-                Cerrar
+            <button mat-raised-button color="warn" aria-label="Close" (click)="close()" class="butom-close">
+                Cancelar
             </button>
 
         </div>

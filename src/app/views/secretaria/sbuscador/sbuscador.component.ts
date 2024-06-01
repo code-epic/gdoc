@@ -6,10 +6,11 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service'
 import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta, IWKFDependencia } from 'src/app/services/control/documentos.service'
 import { LoginService } from 'src/app/services/seguridad/login.service'
 import { UtilService } from 'src/app/services/util/util.service'
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { SubDocumento } from '../ministerial/ministerial.component';
 import { MatDialog } from '@angular/material/dialog';
+import { NgxUiLoaderService } from "ngx-ui-loader";
 
 export interface Isbusqueda {
   bnrocontrol?: string,
@@ -90,6 +91,8 @@ export class SbuscadorComponent implements OnInit {
   public unidad = ''
   public comando = ''
 
+  public opttodos: string = '0';
+
   estadoInicial = 'inicial'; // Define el estado inicial
 
   // Función para cambiar el estado inicial
@@ -124,6 +127,18 @@ export class SbuscadorComponent implements OnInit {
   public max_paginador: number = 0
   public lstPaginas = []
   public actual: number = 1
+  public tipoDocumento: number = 0;
+  public vistacontenido: boolean = false;
+  public contenidoDocumento = "";
+  public cargador: boolean = true;
+  public optfecha: string = '0';
+
+  public desde: any;
+  public hasta: any;
+
+  fechaRango: FormGroup;
+
+
 
   public lstAcciones = [
     { 'valor': '0', 'texto': 'EN PROCESO', 'visible': '1' },
@@ -174,23 +189,19 @@ export class SbuscadorComponent implements OnInit {
   }
 
   buscarDocumento(): void {
-    let patron
-    if (this.Doc.ncontrol) {
-      patron = new RegExp(this.utilService.ConvertirCadena(this.Doc.ncontrol));
-      this.realizarBusqueda('ncontrol', patron);
-    }else if (this.Doc.forigen){
-      this.realizarBusquedaFecha(new Date(this.Doc.forigen));
+    this.vistacontenido = true;
 
-    } else if (this.SubDocumento.estatus) {
-      patron = new RegExp(this.utilService.ConvertirCadena(this.SubDocumento.estatus));
-      this.realizarBusqueda('estatus', patron);
-    }    
-    this.longitud = this.bzBusqueda.length;
-    this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
-    this.max_paginador = this.bzBusqueda.length / 10;
-    this.cantidad = this.bzBusqueda.length;
-    this.MostrarPaginador();
-    this.close()
+    this.consultarDocument(undefined)
+    
+    // const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
+    // this.bzBusqueda = this.bzSeguimientoO.filter((e) => patron.test(e.busqueda));
+    // this.longitud = this.bzBusqueda.length;
+    // this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
+    // this.max_paginador = this.bzBusqueda.length / 10;
+    // this.cantidad = this.bzBusqueda.length;
+    // this.MostrarPaginador();
+    // this.buscar = '';
+    
   }
 
   realizarBusquedaFecha(fecha: Date): void {
@@ -226,61 +237,103 @@ export class SbuscadorComponent implements OnInit {
     // Limpiar el resto de campos de búsqueda según sea necesario
   }
 
+  consultarDocument(event: any) {
+    if (event == undefined || event.charCode == 13) {
+      this.vistacontenido = true;
+      this.ConsultarSeguimiento()
+    }
+  }
+
   async ConsultarSeguimiento() {
-    this.xAPI.funcion = 'WKF_CSeguimiento'
-    this.xAPI.parametros = ''
+    let desde = ''
+    let hasta = ''
+    this.xAPI.funcion = "WKF_CSeguimiento";
+
+    if (this.contenidoDocumento != "") {
+      desde = this.desde == undefined ? '2022-01-01' : this.desde
+      hasta = this.hasta == undefined ? '2025-12-31' : this.hasta
+      this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' + this.tipoDocumento
+      console.log(this.xAPI.parametros)
+    } else {
+      return false
+    }
+
+
+    this.cargador = false;
+    this.ngxService.startLoader("loader-aceptar");
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
-          e.busqueda = this.utilService.ConvertirCadena(e.norigen + ' ' +
-            e.ncontrol + ' ' + e.contenido + e.estatus_nombre + ' ' + e.remitente + ' ' + e.nombre
-            + ' ' + e.creado + ' ' + e.salida + ' ' + e.unidad + ' ' + e.subdocumento
-          )
-          e.numc = e.ncontrol
-          e.existe = e.anom == '' ? true : false;
+          e.busqueda = this.utilService.ConvertirCadena(
+            e.norigen +
+            " " +
+            e.ncontrol +
+            " " +
+            e.contenido +
+            e.estatus_nombre +
+            " " +
+            e.remitente +
+            " " +
+            e.nombre +
+            " " +
+            e.creado +
+            " " +
+            e.salida +
+            " " +
+            e.unidad +
+            " " +
+            e.subdocumento
+          );
+          e.numc = e.ncontrol;
+          e.existe = e.anom == "" ? true : false;
           e.privado = e.priv == 1 ? true : false;
-          e.color = 'green'
-          e.s_texto = ''
+          e.color = "green";
+          e.s_texto = "";
           if (e.s_estatus > 0 || e.s_estatus < 10) {
-            e.s_texto = e.s_estatus != null ? ' - ' + this.lstAcciones[e.s_estatus].texto : ''
+            e.s_texto =
+              e.s_estatus != null
+                ? " - " + this.lstAcciones[e.s_estatus].texto
+                : "";
           }
 
           switch (e.tdoc.toLowerCase()) {
-            case 'punto de cuenta':
-              e.simbolo = "-P"
-              e.color = 'green'
+            case "punto de cuenta":
+              e.simbolo = "-P";
+              e.color = "green";
               break;
-            case 'tramitacion por organo regular':
-              e.simbolo = "-T"
-              e.color = 'brown'
+            case "tramitacion por organo regular":
+              e.simbolo = "-T";
+              e.color = "brown";
               break;
-            case 'resolucion':
-              e.simbolo = "-R"
-              e.color = 'orange'
+            case "resolucion":
+              e.simbolo = "-R";
+              e.color = "orange";
               break;
             default:
-              e.simbolo = ''
+              e.simbolo = "";
               break;
           }
-          e.resumenl = e.contenido.substring(0, 200)
+          e.resumenl = e.contenido.substring(0, 200);
           e.completed = false;
-          return e
-        })
+          return e;
+        });
 
-        this.bzBusqueda = this.bzSeguimientoO
-        this.longitud = this.bzBusqueda.length
-        this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize)
-        this.cantidad = this.longitud
-        this.max_paginador = this.cantidad / 10
-        this.blBuscar = true
-        this.MostrarPaginador()
-
+        this.bzBusqueda = this.bzSeguimientoO;
+        this.longitud = this.bzBusqueda.length;
+        this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
+        this.cantidad = this.longitud;
+        this.max_paginador = this.cantidad / 10;
+        this.blBuscar = true;
+        this.MostrarPaginador();
+        this.cargador = true;
+        this.ngxService.stopLoader("loader-aceptar");
+        this.contenidoDocumento = ""
+        this.buscar = ""
       },
       (error) => {
-        console.log('Error en la carga')
+        console.log("Error en la carga");
       }
-    )
+    );
   }
 
   pageChangeEvent(e) {
@@ -302,28 +355,28 @@ export class SbuscadorComponent implements OnInit {
   }
 
   MostrarPaginador() {
-    this.blBuscar = true
-    this.lstPaginas = []
-    this.antes = false
+    this.blBuscar = true;
+    this.lstPaginas = [];
+    this.antes = false;
 
-    if (this.max_paginador > 10) {
-      this.max_paginador = 10
-      this.despues = true
+    if (this.max_paginador >= 10) {
+      this.max_paginador = 10;
+      this.despues = true;
     } else {
-      this.despues = false
+      this.despues = false;
     }
     for (var i = 0; i < this.max_paginador; i++) {
-      var color = ''
+      var color = "";
 
       if (this.de > 0) {
-        color = this.de / 10 == i ? 'bg-info text-white' : ''
-        this.antes = true
+        color = this.de / 10 == i ? "bg-info text-white" : "";
+        this.antes = true;
       }
-      if (this.de == 0 && i == 0) color = 'bg-info text-white'
+      if (this.de == 0 && i == 0) color = "bg-info text-white";
       this.lstPaginas.push({
-        "id": i + 1,
-        "color": color
-      })
+        id: i + 1,
+        color: color,
+      });
     }
   }
 
@@ -331,12 +384,12 @@ export class SbuscadorComponent implements OnInit {
  * Establecer la posicion del sistema en el buscador
  */
   posicion(pos: number) {
-    console.log(pos);
     if (pos != this.actual) {
-      this.actual = pos
-      this.de = 10 * (pos - 1)
-      this.para = (this.de - 1) + 10
-      this.bzSeguimiento = this.bzBusqueda.slice(this.de, this.para)
+      this.actual = pos;
+      this.de = 10 * (pos - 1);
+      this.para = this.de - 1 + 10;
+      this.bzSeguimiento = this.bzBusqueda.slice(this.de, this.para);
+      this.MostrarPaginador();
       //this.consultarAPIBuscar()
     }
   }
@@ -523,6 +576,7 @@ export class SbuscadorComponent implements OnInit {
     private utilService: UtilService,
     private toastrService: ToastrService,
     public loginService: LoginService,
+    private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
     private dialog: MatDialog) {
   }
@@ -537,6 +591,23 @@ export class SbuscadorComponent implements OnInit {
     this.Configuracion = sessionStorage.getItem("MD_CConfiguracion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion"))) : []
     this.listarConfiguracion()
 
+    const today = new Date();
+    const month = today.getMonth();
+    const year = today.getFullYear();
+    this.fechaRango = new FormGroup({
+      start: new FormControl(new Date(year, month, 13)),
+      end: new FormControl(new Date(year, month, 16)),
+    });
+
+  }
+
+  buscarYCerrarModal() {
+
+    this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
+    this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
+    this.vistacontenido = true;
+    this.ConsultarSeguimiento();
+    this.modalService.dismissAll();
   }
 
   validarTipoDoc(): boolean {
@@ -634,7 +705,7 @@ export class SbuscadorComponent implements OnInit {
     const modalRef = this.modalService.open(content, {
       centered: true,
       windowClass: 'my-custom-modal-class',
-      size: 'xl',
+      size: 'lg',
       backdrop: false
     });
     modalRef['_windowCmptRef'].location.nativeElement.style.zIndex = '900';
