@@ -428,13 +428,13 @@ export class PendientesComponent implements OnInit {
     console.log(this.desde)
     console.log(this.hasta)
     if(this.xAPI.funcion == "WKF_CSeguimiento"){
-      if (this.contenidoDocumento != "") {
+      // if (this.contenidoDocumento != "") {
         this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' 
-        + this.tipoDocumento + ',' + this.opttodos
+        + this.tipoDocumento + ',' + this.opttodos;
         console.log(this.xAPI.parametros)
-      } else {
-        return false
-      }
+      // } else {
+      //   return false
+      // }
     }else{
         this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.Doc.contenido.trim() + ',' 
         + this.Doc.tipo + ',' + this.Doc.remitente + "," + this.Doc.unidad + "," + this.Doc.comando + "," + this.Doc.instrucciones
@@ -532,6 +532,7 @@ export class PendientesComponent implements OnInit {
         this.mostrarBotonOcultar= false; 
         this.desde == undefined;
         this.hasta == undefined;
+        this.opttodos = "0";
         if (data.Cuerpo.length === 0) {
           this.sinDatos = true;
          } else {
