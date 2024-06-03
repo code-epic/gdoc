@@ -418,10 +418,15 @@ export class PendientesComponent implements OnInit {
     let hasta = ''
     this.xAPI.funcion = funcion;
     console.log(funcion)
+    this.sinDatos = false
 
-    desde = this.desde == undefined ? '2022-01-01' : this.desde
-    hasta = this.hasta == undefined ? '2025-12-31' : this.hasta
+    console.log(new Date().getFullYear() - 5 + '-01-01');
+    console.log(new Date().toISOString().slice(0, 10));
 
+    desde = this.desde == undefined ? new Date().getFullYear() - 5 + '-01-01' : this.desde
+    hasta = this.hasta == undefined ? new Date().toISOString().slice(0, 10) : this.hasta
+    console.log(this.desde)
+    console.log(this.hasta)
     if(this.xAPI.funcion == "WKF_CSeguimiento"){
       if (this.contenidoDocumento != "") {
         this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' 
@@ -432,7 +437,8 @@ export class PendientesComponent implements OnInit {
       }
     }else{
         this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.Doc.contenido.trim() + ',' 
-        + this.Doc.tipo + ',' + this.Doc.remitente + "," + this.Doc.unidad
+        + this.Doc.tipo + ',' + this.Doc.remitente + "," + this.Doc.unidad + "," + this.Doc.comando + "," + this.Doc.instrucciones
+        + ',' + this.optfecha
         console.log(this.xAPI.parametros)
       
     }
@@ -795,6 +801,8 @@ export class PendientesComponent implements OnInit {
 
   close() {
     this.modalService.dismissAll();
+    // this.desde = undefined;
+    // this.hasta = undefined;
   }
 
   //obtenerWorkFlow Permite generar los primeros valores de la red del documento
@@ -1449,16 +1457,18 @@ export class PendientesComponent implements OnInit {
   }
   buscarYCerrarModal() {
 
-    // this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
-    // this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
+     this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
+     this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
     this.vistacontenido = true;
-    console.log("llego buscar y cerrar")
-    console.log(this.Doc.tipo)
+    
     this.ConsultarSeguimiento("WKF_CSeguimiento_Detalle");
     this.modalService.dismissAll();
   }
 
   consultarDocument(event: any) {
+    //  this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
+    //  this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
+
     if (event == undefined || event.charCode == 13) {
       this.vistacontenido = true;
       this.ConsultarSeguimiento("WKF_CSeguimiento")

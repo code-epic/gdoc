@@ -327,14 +327,14 @@
         <div class="col-md-6 div-contenido-oficio">
           <mat-form-field appearance="outline">
             <mat-label [config]="editorConfig" >CONTENIDO DEL OFICIO</mat-label>
-            <textarea matInput [(ngModel)]="Doc.contenido" (keypress)="consultarDocumentDetalle($event)"></textarea>
+            <textarea matInput [(ngModel)]="Doc.contenido"></textarea>
           </mat-form-field>
         </div>
 
         <div class="col-md-6 div-instrucciones-general">
           <mat-form-field appearance="outline">
             <mat-label [config]="editorConfig">INSTRUCCIONES GENERALES</mat-label>
-            <textarea matInput [(ngModel)]="Doc.instrucciones" (keypress)="consultarDocumentDetalle($event)"></textarea>
+            <textarea matInput [(ngModel)]="Doc.instrucciones"></textarea>
           </mat-form-field>
         </div>
       </div>
