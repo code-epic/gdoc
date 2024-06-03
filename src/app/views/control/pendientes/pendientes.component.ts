@@ -430,6 +430,7 @@ export class PendientesComponent implements OnInit {
         this.xAPI.parametros = this.buscar;
         console.log(this.xAPI.parametros)
       }else{
+        
         this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' 
         + this.tipoDocumento + ',' + this.opttodos;
         console.log(this.xAPI.parametros)
