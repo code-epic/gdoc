@@ -417,21 +417,24 @@ export class PendientesComponent implements OnInit {
     let desde = ''
     let hasta = ''
     this.xAPI.funcion = funcion;
-    console.log(funcion)
     this.sinDatos = false
 
-    console.log(new Date().getFullYear() - 5 + '-01-01');
-    console.log(new Date().toISOString().slice(0, 10));
 
     desde = this.desde == undefined ? new Date().getFullYear() - 5 + '-01-01' : this.desde
     hasta = this.hasta == undefined ? new Date().toISOString().slice(0, 10) : this.hasta
-    console.log(this.desde)
-    console.log(this.hasta)
+ 
     if(this.xAPI.funcion == "WKF_CSeguimiento"){
       // if (this.contenidoDocumento != "") {
+      if(this.tipoDocumento  == 1){
+        this.xAPI.funcion = "WKF_CSeguimiento_Cedula"
+        this.xAPI.parametros = this.buscar;
+        console.log(this.xAPI.parametros)
+      }else{
         this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' 
         + this.tipoDocumento + ',' + this.opttodos;
         console.log(this.xAPI.parametros)
+      }
+       
       // } else {
       //   return false
       // }
@@ -450,10 +453,6 @@ export class PendientesComponent implements OnInit {
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data.Cuerpo.length);
-
-        
-
-
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
           e.busqueda = this.utilService.ConvertirCadena(
             e.norigen +
@@ -994,6 +993,7 @@ export class PendientesComponent implements OnInit {
     this.xAPI.funcion = "WKF_AAlertas";
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.WAlerta);
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (alerData) => {
         console.log(alerData);
