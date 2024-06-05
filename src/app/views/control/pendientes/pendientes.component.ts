@@ -1,42 +1,15 @@
-import {
-  Component,
-  OnInit,
-  ViewContainerRef,
-  ComponentFactoryResolver,
-  Injector,
-  ApplicationRef,
-} from "@angular/core";
+import {Component,OnInit,ViewContainerRef,ComponentFactoryResolver,Injector,ApplicationRef,} from "@angular/core";
 import { PageEvent } from "@angular/material/paginator";
 import { ActivatedRoute, Router } from "@angular/router";
-import {
-  NgbModal,
-  NgbDate,
-  NgbDateParserFormatter,
-} from "@ng-bootstrap/ng-bootstrap";
+import {NgbModal,NgbDate,NgbDateParserFormatter,} from "@ng-bootstrap/ng-bootstrap";
 import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
-import Swal from "sweetalert2";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
-import {
-  IWKFAlerta,
-  IDocumento,
-  IWKFDocumento,
-  IWKFCuenta,
-  IWKFDependencia,
-} from "src/app/services/control/documentos.service";
+import {IWKFAlerta,IDocumento} from "src/app/services/control/documentos.service";
 import { LoginService } from "src/app/services/seguridad/login.service";
 import { UtilService } from "src/app/services/util/util.service";
 import { FormControl, FormGroup, FormBuilder } from "@angular/forms";
-import { AngularEditorConfig } from "@kolkov/angular-editor";
-import {
-  MatDialog,
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-  MatDialogConfig,
-} from "@angular/material/dialog";
-import { MatRadioModule, MatRadioGroup, MatRadioButton } from '@angular/material/radio';
-
-
+import {MatDialog,} from "@angular/material/dialog";
 
 @Component({
   selector: "app-pendientes",
@@ -44,6 +17,7 @@ import { MatRadioModule, MatRadioGroup, MatRadioButton } from '@angular/material
   styleUrls: ["./pendientes.component.scss"],
 
 })
+
 export class PendientesComponent implements OnInit {
   mostrarCamposAdicionales: boolean = false;
   mostrarBotonOcultar: boolean = false;
@@ -61,7 +35,6 @@ export class PendientesComponent implements OnInit {
   public bzSeguimiento = [];
 
   public fplazo: any;
-  public id_alerta = "";
   public cargador: boolean = true;
   public sinDatos: boolean = false;
   public buscar = "";
@@ -85,42 +58,9 @@ export class PendientesComponent implements OnInit {
   public desde: any;
   public hasta: any;
 
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
-
   public estadoActual = 1;
   public estadoOrigen = 1;
-
-  public ncontrolv = true; // visibilidad del input numero de control
-  public ncontrolt = "Nro. Control";
-  public remitentet = "Remitente";
-  public origenvisible: boolean = true; // Visibilidad del Input Numero de Origen
-  public fsalida = "Fecha de Creación (*)";
-  public forigenv = true; // Visibilidad de Input Fecha Origen
-
-  public camposalida = 2;
-  public camposfechasalida = 3;
-  public camponumsalida = 2;
-
-  masterSelected: boolean;
-  checklist: any;
-  checkedList: any;
-
   public bPDF = false;
-
-  closeResult = "";
-
-  title = "Documentos";
-  placement = "bottom-start";
-
-  lineCountCache: number = 0;
-  PosicionCuenta: number = -1;
-
   public fcreacion: any;
   public forigen: any;
   public fcuenta: any;
@@ -147,30 +87,6 @@ export class PendientesComponent implements OnInit {
   public nmilitar: string = "";
   public salida: string = "Nro. de Salida";
   public booPuntoCuenta: boolean = false;
-
-  public WkDoc: IWKFDocumento = {
-    nombre: "",
-    estado: 0,
-    estatus: 0,
-    workflow: 0,
-    observacion: "",
-    usuario: "",
-  };
-
-  public WkCuenta: IWKFCuenta = {
-    documento: 0,
-    cuenta: "",
-    estado: 0,
-    estatus: 0,
-    detalle: "",
-    resumen: "",
-    cedula: "",
-    cargo: "",
-    nmilitar: "",
-    fecha: "",
-    usuario: "",
-    activo: 0,
-  };
 
   public Doc: IDocumento = {
     ncontrol: "",
@@ -204,36 +120,6 @@ export class PendientesComponent implements OnInit {
     usuario: "",
     observacion: "",
   };
-
-  public WKDependencia: IWKFDependencia = {
-    documento: 0,
-    nombre: "",
-    observacion: "",
-  };
-
-  public DocSalida: IDocumento = {
-    ncontrol: "",
-    wfdocumento: 0,
-    fcreacion: "",
-    forigen: "",
-    norigen: "",
-    salida: "",
-    tipo: "0",
-    remitente: "0",
-    unidad: "0",
-    comando: "0",
-    contenido: "",
-    instrucciones: "",
-    codigo: "0",
-    nexpediente: "",
-    creador: "",
-    archivo: "",
-    privacidad: 0,
-    subdocumento: "",
-    dependencias: "",
-  };
-
-  public booDependencia = false;
 
   public lstT = []; //Objeto Tipo documento
   public lstR = []; //Objeto Remitente
@@ -320,16 +206,9 @@ export class PendientesComponent implements OnInit {
     private modalService: NgbModal,
     private utilService: UtilService,
     private toastrService: ToastrService,
-    private rutaActiva: ActivatedRoute,
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
-    public formatter: NgbDateParserFormatter,
-    private ruta: Router,
-    private dialog: MatDialog,
-    private viewContainerRef: ViewContainerRef,
-    private resolver: ComponentFactoryResolver,
-    private injector: Injector,
-    private appRef: ApplicationRef,
+    public formatter: NgbDateParserFormatter
   ) { }
 
   async ngOnInit() {
@@ -402,21 +281,20 @@ export class PendientesComponent implements OnInit {
     hasta = this.hasta == undefined ? new Date().toISOString().slice(0, 10) : this.hasta
  
     if(this.xAPI.funcion == "WKF_CSeguimiento"){
-      // if (this.contenidoDocumento != "") {
       if(this.tipoDocumento  == 1){
         this.xAPI.funcion = "WKF_CSeguimiento_Cedula"
         this.xAPI.parametros = this.buscar;
-        console.log(this.xAPI.parametros)
+        // console.log(this.xAPI.parametros)
       }else{
         this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' 
         + this.tipoDocumento + ',' + this.opttodos;
-        console.log(this.xAPI.parametros)
+        // console.log(this.xAPI.parametros)
       }
     }else{
         this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.Doc.contenido.trim() + ',' 
         + this.Doc.tipo + ',' + this.Doc.remitente + "," + this.Doc.unidad + "," + this.Doc.comando + "," + this.Doc.instrucciones
         + ',' + this.optfecha
-        console.log(this.xAPI.parametros)
+        // console.log(this.xAPI.parametros)
       
     }
     
@@ -426,7 +304,7 @@ export class PendientesComponent implements OnInit {
     this.ngxService.startLoader("loader-aceptar");
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data.Cuerpo.length);
+        // console.log(data.Cuerpo.length);
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
           e.busqueda = this.utilService.ConvertirCadena(
             e.norigen +
@@ -533,7 +411,6 @@ export class PendientesComponent implements OnInit {
     const estado = 1;
     const estatus = 1;
     return btoa(estado + "," + estatus + "," + id);
-    //this.ruta.navigate(['/constancia', base])
   }
 
   MostrarPaginador() {
@@ -590,22 +467,6 @@ export class PendientesComponent implements OnInit {
     this.sNombre = "Monto Total";
   }
 
-  SalidaTipo() {
-    this.titulo = "Salida";
-    this.booDependencia = true;
-    this.estadoActual = 9;
-    this.estadoOrigen = 2;
-    this.ncontrolv = false;
-    this.salidavisible = false;
-    this.origenvisible = false;
-    this.forigenv = false;
-    this.ncontrolt = "Nro de Salida";
-    this.remitentet = "Destinatario";
-    this.fsalida = "Fecha de Salida";
-    this.camposalida = 4;
-    this.camposfechasalida = 4;
-  }
-
   validarTipoDoc(): boolean {
     return (
       this.Doc.tipo.toLowerCase() == "resolucion" ||
@@ -650,24 +511,6 @@ export class PendientesComponent implements OnInit {
     // this.MostrarPaginador();
     // this.buscar = '';
     
-  }
-
-  limpiarDoc() {
-    var dia = this.utilService.FechaActual();
-    this.forigen = "";
-    this.fplazo = "";
-    this.Doc.ncontrol = "";
-    this.Doc.norigen = "";
-    this.Doc.nexpediente = "";
-    this.Doc.codigo = "0";
-    this.Doc.salida = "";
-    this.Doc.tipo = "";
-    this.Doc.remitente = "";
-    this.Doc.unidad = "";
-    this.Doc.comando = "";
-    this.Doc.creador = "";
-    this.fcreacionDate = NgbDate.from(this.formatter.parse(dia));
-    this.fcreacion = dia;
   }
 
   /**
