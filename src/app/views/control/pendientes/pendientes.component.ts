@@ -1,4 +1,4 @@
-import {Component,OnInit,ViewContainerRef,ComponentFactoryResolver,Injector,ApplicationRef,} from "@angular/core";
+import {Component,OnInit} from "@angular/core";
 import { PageEvent } from "@angular/material/paginator";
 import { ActivatedRoute, Router } from "@angular/router";
 import {NgbModal,NgbDate,NgbDateParserFormatter,} from "@ng-bootstrap/ng-bootstrap";
@@ -8,8 +8,7 @@ import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import {IWKFAlerta,IDocumento} from "src/app/services/control/documentos.service";
 import { LoginService } from "src/app/services/seguridad/login.service";
 import { UtilService } from "src/app/services/util/util.service";
-import { FormControl, FormGroup, FormBuilder } from "@angular/forms";
-import {MatDialog,} from "@angular/material/dialog";
+import { FormControl, FormGroup } from "@angular/forms";
 
 @Component({
   selector: "app-pendientes",
@@ -131,21 +130,21 @@ export class PendientesComponent implements OnInit {
   public lstHzAdjunto = []; //Historico de documentos adjuntos
   public lstTraza = [];
   public lstHistorial = [];
-  public lstImg = [];
+  // public lstImg = [];
   public lstDependencias = [];
   public titulo = "Documento";
-  public nasociacion = "";
+  // public nasociacion = "";
 
   public download: any;
 
-  public bHist = false;
+  // public bHist = false;
 
   public Componentes: any;
   public Grados: any;
   public Categorias: any;
   public Clasificaciones: any;
   public Configuracion: any;
-  public serializar: string = "";
+  // public serializar: string = "";
   public Configurar: boolean = false;
 
   public activarTipo = false; // activar tipo de documento
@@ -154,12 +153,12 @@ export class PendientesComponent implements OnInit {
     funcion: "",
     parametros: "",
   };
-  routerDoc: { numc: string };
+  // routerDoc: { numc: string };
 
   toppings = new FormControl("");
   toppingsaux = new FormControl("");
 
-  lstPC: string[] = []; // Auxiliar para mappear las cuentas de toppings
+  // lstPC: string[] = []; // Auxiliar para mappear las cuentas de toppings
   lstPuntosCuentas: string[] = [];
   lstPuntosCuentasAux: [];
   public SubMenu = [];
@@ -184,7 +183,7 @@ export class PendientesComponent implements OnInit {
     { valor: "11", texto: "ARCHIVO", visible: "1" },
   ];
 
-  public focus = true;
+  // public focus = true;
 
   public xAPI: IAPICore = {
     funcion: "",
@@ -198,8 +197,6 @@ export class PendientesComponent implements OnInit {
 
   // MatPaginator Output
   pageEvent: PageEvent;
-
-
 
   constructor(
     private apiService: ApiService,
@@ -250,24 +247,6 @@ export class PendientesComponent implements OnInit {
       start: new FormControl(new Date(year, month, 13)),
       end: new FormControl(new Date(year, month, 16)),
     });
-  }
-
-  seleccionLista(event) {
-    this.longitud = 0;
-
-    if (event.charCode == 13) {
-      const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
-      this.longitud = this.bzBusqueda.length;
-      this.bzBusqueda = this.bzSeguimientoO.filter((e) => {
-        return patron.test(e.busqueda);
-      });
-
-      this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
-      this.max_paginador = this.bzBusqueda.length / 10;
-      this.cantidad = this.bzBusqueda.length;
-      this.MostrarPaginador();
-      this.buscar = "";
-    }
   }
 
   async ConsultarSeguimiento(funcion: string) {
@@ -686,145 +665,10 @@ export class PendientesComponent implements OnInit {
     );
   }
 
-  consultarCedula() {
-    if (this.cedula == "") return false;
-    this.isPunto = true;
-    if (
-      this.Doc.tipo.toLowerCase() == "destitucion/punto de cuenta" ||
-      this.Doc.tipo.toLowerCase() == "contratos/punto de cuenta"
-    ) {
-      this.isPunto = false;
-    } else {
-      this.ngxService.startLoader("loader-aceptar");
-      this.xAPI.funcion = "MPPD_CDatosBasicos";
-      this.xAPI.parametros = this.cedula;
-      this.xAPI.valores = "";
-      this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          const militar = data.Cuerpo.map((e) => {
-            e.resoluciones = JSON.parse(e.resoluciones);
-            e.entradas = JSON.parse(e.entradas);
-            e.componente = this.Componentes.filter((el) => {
-              return el.cod_componente == e.componente;
-            })[0].nombre_componente;
-            e.categoria = this.Categorias.filter((el) => {
-              return el.cod_categoria == e.categoria;
-            })[0].nombre_categoria;
-            e.clasificacion = this.Clasificaciones.filter((el) => {
-              return el.cod_clasificacion == e.clasificacion;
-            })[0].des_clasificacion;
-            e.grado = this.Grados.filter((el) => {
-              return el.cod_grado == e.grado;
-            })[0].nombres_grado;
-            return e;
-          })[0];
-
-          if (data.Cuerpo.length > 0) {
-            this.nmilitar = militar.nombres;
-            this.cargo = militar.grado + " " + militar.componente;
-          } else {
-            this.cedula = "";
-            this.nmilitar = "";
-            this.cargo = "";
-            this.toastrService.info(
-              "Debe dirigirse al departamento de resoluciones",
-              `GDoc Resoluciones`
-            );
-          }
-
-          this.ngxService.stopLoader("loader-aceptar");
-        },
-        (error) => {
-          console.error("Error de conexion a los datos ", error);
-        }
-      );
-    }
-  }
-
   /**
    * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
    * @param numBase64  : base64
    */
-  async consultarDocumentoSalida() {
-    if (this.titulo == "Salida") return false;
-    if (this.Doc.salida == "") return false;
-    let dwf = "";
-    if (this.Doc.norigen != "") dwf = this.Doc.norigen;
-    this.xAPI.funcion = "WKF_CDocumentoDetalleSalida";
-    this.xAPI.parametros = "9,1," + this.Doc.salida;
-    this.xAPI.valores = "";
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (data) => {
-        data.Cuerpo.forEach((e) => {
-          this.Doc = e;
-          this.fcreacionDate = NgbDate.from(
-            this.formatter.parse(this.Doc.fcreacion.substring(0, 10))
-          );
-          this.forigenDate = NgbDate.from(
-            this.formatter.parse(this.Doc.forigen.substring(0, 10))
-          );
-          if (e.alerta != null) {
-            this.fplazo = NgbDate.from(
-              this.formatter.parse(e.alerta.substring(0, 10))
-            );
-            this.WAlerta.activo = 1;
-            this.WAlerta.documento = this.Doc.wfdocumento;
-            this.WAlerta.estado = this.estadoActual;
-            this.WAlerta.estatus = this.estadoOrigen;
-            this.WAlerta.usuario = this.loginService.Usuario.id;
-          }
-          this.nasociacion = this.Doc.ncontrol;
-          this.Doc.ncontrol = "";
-        });
-
-        this.Doc.norigen = dwf;
-        this.selTipoDocumento();
-        const punto_cuenta =
-          this.Doc.subdocumento != null
-            ? JSON.parse(this.Doc.subdocumento)
-            : [];
-        this.lstCuenta = punto_cuenta.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : [];
-        this.lstTraza = traza.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        const historial =
-          this.Doc.historial != null ? JSON.parse(this.Doc.historial) : [];
-        this.lstHistorial = historial.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        const hz_adjunto =
-          this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : [];
-        this.lstHzAdjunto = hz_adjunto.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        const dependencias =
-          this.Doc.dependencias != null
-            ? JSON.parse(this.Doc.dependencias)
-            : [];
-        this.lstDependencias = dependencias.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        //Carga de Documentos
-        this.bPDF = this.Doc.archivo != "" ? true : false;
-        this.download = this.apiService.Dws(
-          btoa("D" + this.Doc.ncontrol) + "/" + this.Doc.archivo
-        );
-
-        this.activarTipo = this.validarTipoDoc();
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
-  }
   buscarYCerrarModal() {
 
      this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
@@ -852,8 +696,5 @@ export class PendientesComponent implements OnInit {
       this.modalService.dismissAll();
     }
    
-  }
-  cerrarModal() {
-    this.modalService.dismissAll();
   }
 }
