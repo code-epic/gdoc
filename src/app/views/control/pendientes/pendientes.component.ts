@@ -688,7 +688,7 @@ export class PendientesComponent implements OnInit {
       this.ConsultarSeguimiento("WKF_CSeguimiento")
     }
   }
-
+// 08-06-2024
   consultarDocumentDetalle(event: any) {
     if (event == undefined || event.charCode == 13) {
       this.vistacontenido = true;
