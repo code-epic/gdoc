@@ -543,27 +543,27 @@
                                             </div>
                                             <div class="row">
                                                 <div class="form-group col-md-12">
-                                                    <div class="NgxEditor__Wrapper">
-                                                        <angular-editor [placeholder]="'Introduzca el Asunto...'" [config]="editorConfig"
-                                                            [(ngModel)]="asunto"></angular-editor>
-                                                    </div>
+                                                    <textarea 
+                                                    class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
+                                                [(ngModel)]="asunto" placeholder="Introduzca el Asunto..."  style="width: 100%"></textarea>
+                                                    
                                                 </div>
                                             </div> 
                                             <div class="row">
                                                 <div class="form-group col-md-12">
-                                                    <div class="NgxEditor__Wrapper">
-                                                        <angular-editor [placeholder]="'Instrucciones especiales'" [config]="editorConfig"
-                                                            [(ngModel)]="instrucciones"></angular-editor>
-                                                    </div>
+                                                    <textarea class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
+                                                    [(ngModel)]="instrucciones" placeholder="Instrucciones especiales..."  rows="6" style="width: 100%"></textarea>
+                                                   
                                                 </div>
                                             </div>
                         
                                             <div class="row">
                                                 <div class="form-group col-md-12">
-                                                    <div class="NgxEditor__Wrapper">
-                                                        <angular-editor [placeholder]="'Introduzca la Observacion...'" [config]="editorConfig"
-                                                            [(ngModel)]="observaciones"></angular-editor>
-                                                    </div>
+                                                    <textarea class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
+                                                    [(ngModel)]="observaciones" placeholder="Introduzca la Observacion..."  rows="6" style="width: 100%">
+                                                </textarea>
+                                                    
+                                                   
                                                 </div>
                                             </div>  
 
@@ -847,6 +847,7 @@
                                     </ng-template>
                                     <br>
                                     <br>
+                                    <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
                                     <div class="container">
                                         
                                         <div class="row">
@@ -865,34 +866,78 @@
                                             <div class="col-md-2"></div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-1"></div>
-                                            <div class="col-md-10">
+                                            
+                                            <div class="col-md-12">
+                                                
 
                                                 <!-- Adjuntar Imagenes al Documento -->
-                                                <form method="post" enctype="multipart/form-data" id="forma"
-                                                    name="forma">
-                                                    <input type="hidden" name="identificador" value="{{codigoSession}}"
-                                                        readonly="readonly">
+                                                <form form method="post" enctype="multipart/form-data" id="forma" name="forma">
+                                                    <input type="hidden" name="identificador" value="{{idTransaccion}}">
+                                                    <input type="hidden" name="return" value="true">
                                                     <div class="row">
-                                                        <div class="col-md-9">
+                                                        <div class="col-md-7">
                                                             <div class="input_container">
-                                                                <input id="fileUpload" type="file" name="archivos"
-                                                                    accept=".csv" />
+                                                                <input (change)="fileSelected($event)" id="fileUpload" type="file" name="archivos" accept=".csv" />
                                                             </div>
                                                         </div>
                                                         <div class="col-md-3">
-                                                            <button class="btn bg-success text-white "
-                                                                (click)="SubirArchivo($event);">
-                                                                <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar
-                                                                Archivos </button>
+                                                            <button class="btn bg-success text-white text-left"
+                                                                (click)="SubirArchivo()">
+                                                                <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos</button>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <button class="btn bg-info text-white text-right" *ngIf="!blExpandidaFile"
+                                                                (click)="downloadCSVExFile();">
+                                                                <span class="fa fa-download"></span>&nbsp;&nbsp;Descargar</button>
                                                         </div>
                                                     </div>
                                                 </form>
                                             </div>
-                                            <div class="col-md-1"></div>
+                                           
 
                                         </div>
                                         <hr>
+
+                                        <div class="row" *ngIf="!blExpandidaFile">
+                                            <div class="col-md-12">
+                                                
+                                                <table style="width: 100%;" class="zigzag" border="1">
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="7" class="text-center" style="padding: 15px;">
+                                                                LISTADO GENERAL POR PERSONA </th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th> NUM.</th>
+                                                            <th> GRADO</th>
+                                                            <th> NOMBRE COMPLETO</th>
+                                                            <th style="width: 110px;"> CEDULA</th>
+                                                            <th style="width: 90px;"> FECHA</th>
+                                                            <th>SITUACION</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let e of lstRangoCedulaFile; index as i">
+                                                            <td>{{ i+1 }}</td>
+                                                            <td>{{ e.grado_abreviado }}</td>
+                                                            <td>{{ e.nombres }}</td>
+                                                            <td><a class="enlace" (click)="MoverForm(e.cedula)"
+                                                                    style="font-weight: bold; color: brown;">
+                                                                    {{e.cedula}} </a>
+                                                            </td>
+                                                            <td>
+                                                                {{e.nacimiento}}
+                                                            </td>
+                                                            <td>
+                                                                {{e.situacion}}
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+
+                                                </table>
+                                            </div>
+                                        </div>
 
                                     </div>
                                 </mat-tab>
@@ -922,15 +967,13 @@
 <ng-template #detalles let-c="close" let-d="dismiss">
     
     <div class="modal-body">
-        
-
-
         <div class="form-row">
             <div class="form-group col-md-12">
                 <label for="txtObjeto">Instrucciones especiales</label>
-                <div class="NgxEditor__Wrapper">
-                    <angular-editor [placeholder]="'Instrucciones...'" [config]="editorConfigx"
-                        [(ngModel)]="instrucciones"></angular-editor>
+                <div class="col-md-12">
+                    <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="instrucciones"
+                    placeholder="Instrucciones..." style="width: 100%">{{instrucciones}}</textarea>
                 </div>
             </div>
         </div>
@@ -938,9 +981,9 @@
         <div class="form-row">
             <div class="form-group col-md-12">
                 <label for="txtObjeto">Observaciones</label>
-                <div class="NgxEditor__Wrapper">
-                    <angular-editor [placeholder]="'Observaciones...'" [config]="editorConfigx"
-                        [(ngModel)]="observacion"></angular-editor>
+                <div class="col-md-12">
+                    <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="observacion" placeholder="Observaciones..."  style="width: 100%">{{observacion}}</textarea>
                 </div>
             </div>
         </div>
@@ -968,9 +1011,9 @@
         <div class="form-row">
             <div class="form-group col-md-12">
                 <label for="txtObjeto">Destino</label>
-                <div class="NgxEditor__Wrapper">
-                    <angular-editor [placeholder]="'Destino...'" [config]="editorConfigx"
-                        [(ngModel)]="destino"></angular-editor>
+                <div class="col-md-12">
+                    <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="destino" placeholder="Destino..."  style="width: 100%">{{destino}}</textarea>
                 </div>
             </div>
         </div>
