@@ -409,7 +409,6 @@ export class RsconsultaComponent implements OnInit {
   consultar(e) {
     if (e.keyCode == 13) {
       this.cedula = this.cedula.replace('.', '')
-      console.log(this.cedula)
       this.xAPI.funcion = "MPPD_CUnidad";
       this.xAPI.parametros = this.cedula;
       this.xAPI.valores = "";
@@ -458,11 +457,12 @@ export class RsconsultaComponent implements OnInit {
       this.dbDatosNombre = false;
       this.blResolucionPanel = false;
       this.blDatosBasicos = false;
+      this.lstEntradas = []
+      this.lstResoluciones = []
 
       if (this.cedula == "") return false;
 
       this.cedula = this.cedula.replace(/\./g, '')
-      console.log(this.cedula)
       this.ngxService.startLoader("loader-buscar");
       this.xAPI.funcion = "MPPD_CDatosBasicos";
       this.xAPI.parametros = this.cedula;
@@ -496,13 +496,11 @@ export class RsconsultaComponent implements OnInit {
               ).reverse();
               this.filtrarNombramiento();
             }
-            // console.log(this.lstResoluciones);
             if (
               data.Cuerpo[0].entradas != undefined &&
               data.Cuerpo[0].entradas != ""
             ) {
               this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse();
-              // console.log(this.lstEntradas);
             }
             this.cargarGradosIPSFA(this.Resolucion.n_componente);
             this.IDatosBasicos = data.Cuerpo[0];
@@ -532,7 +530,6 @@ export class RsconsultaComponent implements OnInit {
     this.lstAscenso = this.lstResoluciones.filter((e) => {
       return e.tipo == 13 || e.tipo == 35;
     });
-    console.log(this.lstAscenso);
   }
 
   async cargarGradosIPSFA(componente: number) {
@@ -542,7 +539,6 @@ export class RsconsultaComponent implements OnInit {
   }
 
   obtenerTipo(tipo: any) {
-    // console.log(tipo, this.TipoResoluciones)
     let texto = "";
     this.TipoResoluciones.forEach((e) => {
       if (e.codigo == tipo) {
@@ -554,7 +550,6 @@ export class RsconsultaComponent implements OnInit {
 
   obtenerNombreGrado(grado: any) {
     let texto = "";
-    // console.log(this.Grados)
     this.Grados.forEach((e) => {
       if (e.cod_grado == grado) {
         texto = e.nombre_corto;
@@ -617,7 +612,6 @@ export class RsconsultaComponent implements OnInit {
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data);
           this.resolucion = this.IResolucion.numero;
           this.IResolucion.numero = "";
           this.ngxService.stopLoader("loader-buscar");
@@ -697,10 +691,8 @@ export class RsconsultaComponent implements OnInit {
     }
 
     this.xAPI.valores = "";
-    //console.log(this.xAPI.parametros)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
-        console.log(data);
         this.csvHead = data.Cabecera;
         this.resolucion = desde + " - " + hasta + " : " + data.Cuerpo.length;
         this.ngxService.stopLoader("loader-buscar");
@@ -735,7 +727,6 @@ export class RsconsultaComponent implements OnInit {
     this.desactivarVista();
 
     if (typeof this.tipo != "object") return;
-    //console.log(this.tipo);
     this.IResolucion.tipo = this.tipo.codigo;
     let rs = this.tipo;
     let valor = true;
@@ -895,7 +886,6 @@ export class RsconsultaComponent implements OnInit {
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data);
           this.lstNombres = data.Cuerpo;
           this.cantNombre = data.Cuerpo.length;
           this.ngxService.stopLoader("loader-buscar");
@@ -938,7 +928,6 @@ export class RsconsultaComponent implements OnInit {
     var frm = new FormData(document.forms.namedItem("forma"));
     try {
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
-        //console.log("Control", data);
       });
     } catch (error) {
       console.error(error);
@@ -968,7 +957,6 @@ export class RsconsultaComponent implements OnInit {
       "falta",
     ];
 
-    console.log(this.lstResolucionesX);
     this.utilService.downloadFile(
       head,
       this.lstResolucionesX,
@@ -988,7 +976,6 @@ export class RsconsultaComponent implements OnInit {
   }
 
   dwUrl(e) {
-    // console.log(e);
     if (e.archivo != undefined && e.archivo != "") {
       if (e.formato == "") {
         let cedula = e.cedula != undefined ? e.cedula : this.dwCedula;
@@ -996,7 +983,6 @@ export class RsconsultaComponent implements OnInit {
       } else {
         let valor = e.titulo == undefined ? e.numero : e.titulo;
         let acce = btoa("ASC" + valor + e.formato);
-        // console.log(acce)
         this.apiService.DwsResol(acce + "/" + e.archivo);
       }
     } else {
@@ -1083,10 +1069,8 @@ export class RsconsultaComponent implements OnInit {
     this.xAPI.funcion = "MPPD_CCedulaRango";
     this.xAPI.parametros = "cedula##" + this.rango_cedula;
     this.xAPI.valores = "";
-    //console.log(this.xAPI.parametros)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
-        //console.log(data);
         this.csvHead = data.Cabecera;
         this.ngxService.stopLoader("loader-buscar");
 
@@ -1183,8 +1167,6 @@ export class RsconsultaComponent implements OnInit {
       (data) => {
         if (data != undefined && data.Cuerpo.length > 0) {
           let rs = data.Cuerpo[0];
-          // console.log(rs)
-
           this.autor_creador = rs.registrador + " - " + rs.usuario_registra;
           this.fecha_registro = rs.fecha_registro;
           this.instrucciones = rs.instrucciones;
