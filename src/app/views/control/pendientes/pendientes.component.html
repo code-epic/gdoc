@@ -65,15 +65,14 @@
               <div class="col-md-2 seleccionar">
                 <div class="div-interno">
                   <mat-form-field appearance="outline">
-                    <mat-label> TIPO DE NÚMERO.
-
-                    </mat-label>
-                    <mat-select [(ngModel)]="tipoDocumento">
+                    <mat-label> TIPO</mat-label>
+                    <mat-select [(ngModel)]="tipoDocumento" (selectionChange)="onTipoDocumentoChange($event)">
                       <mat-option value="0" selected>SELECCIONE</mat-option>
                       <mat-option value="1"> NRO. CEDULA</mat-option>
                       <mat-option value="2"> NRO. CONTROL</mat-option>
                       <mat-option value="3"> NRO. ORIGEN</mat-option>
                       <mat-option value="4"> NRO. SALIDA</mat-option>
+                      <mat-option value="5"> NOMBRES APELLIDOS</mat-option>
                     </mat-select>
                   </mat-form-field>
                 </div>
@@ -81,8 +80,8 @@
               <div class="col-md-2 div-interno-superior">
                 <div class="div-interno">
                   <mat-form-field appearance="outline">
-                    <mat-label>NÚMERO</mat-label>
-                    <input matInput placeholder="NÚMERO" [ngModelOptions]="{ standalone: true }" [(ngModel)]="buscar"
+                    <mat-label>{{ numeroPlaceholder }}</mat-label>
+                    <input matInput placeholder="{{ numeroPlaceholder }}" [ngModelOptions]="{ standalone: true }" [(ngModel)]="buscar"
                       value="{{ buscar }}" (keypress)="consultarDocument($event);" />
                   </mat-form-field>
                 </div>

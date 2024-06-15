@@ -1,6 +1,5 @@
 import {Component,OnInit} from "@angular/core";
 import { PageEvent } from "@angular/material/paginator";
-import { ActivatedRoute, Router } from "@angular/router";
 import {NgbModal,NgbDate,NgbDateParserFormatter,} from "@ng-bootstrap/ng-bootstrap";
 import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
@@ -29,7 +28,7 @@ export class PendientesComponent implements OnInit {
   fechaRango: FormGroup;
 
   public bzBusqueda = [];
-
+  public numeroPlaceholder: string = 'NÚMERO';
   public bzSeguimientoO = [];
   public bzSeguimiento = [];
 
@@ -50,7 +49,7 @@ export class PendientesComponent implements OnInit {
   public lstPaginas = [];
   public actual: number = 1;
   public radio: number = 0;
-  public tipoDocumento: number = 0;
+  public tipoDocumento: string = "0";
   public optfecha: string = '0';
   public opttodos: string = '0';
 
@@ -130,21 +129,16 @@ export class PendientesComponent implements OnInit {
   public lstHzAdjunto = []; //Historico de documentos adjuntos
   public lstTraza = [];
   public lstHistorial = [];
-  // public lstImg = [];
   public lstDependencias = [];
   public titulo = "Documento";
-  // public nasociacion = "";
 
   public download: any;
-
-  // public bHist = false;
 
   public Componentes: any;
   public Grados: any;
   public Categorias: any;
   public Clasificaciones: any;
   public Configuracion: any;
-  // public serializar: string = "";
   public Configurar: boolean = false;
 
   public activarTipo = false; // activar tipo de documento
@@ -153,12 +147,11 @@ export class PendientesComponent implements OnInit {
     funcion: "",
     parametros: "",
   };
-  // routerDoc: { numc: string };
+  
 
   toppings = new FormControl("");
   toppingsaux = new FormControl("");
 
-  // lstPC: string[] = []; // Auxiliar para mappear las cuentas de toppings
   lstPuntosCuentas: string[] = [];
   lstPuntosCuentasAux: [];
   public SubMenu = [];
@@ -182,8 +175,6 @@ export class PendientesComponent implements OnInit {
     { valor: "10", texto: "DESPACHO DEL MPPD", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
     { valor: "11", texto: "ARCHIVO", visible: "1" },
   ];
-
-  // public focus = true;
 
   public xAPI: IAPICore = {
     funcion: "",
@@ -260,10 +251,11 @@ export class PendientesComponent implements OnInit {
     hasta = this.hasta == undefined ? new Date().toISOString().slice(0, 10) : this.hasta
  
     if(this.xAPI.funcion == "WKF_CSeguimiento"){
-      if(this.tipoDocumento  == 1){
+
+      if(this.tipoDocumento  == "1" || this.tipoDocumento  == "5"){
         this.xAPI.funcion = "WKF_CSeguimiento_Cedula"
-        this.xAPI.parametros = this.buscar;
-        // console.log(this.xAPI.parametros)
+        this.xAPI.parametros = this.buscar+","+this.tipoDocumento;
+          console.log(this.xAPI.parametros)
       }else{
         this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' 
         + this.tipoDocumento + ',' + this.opttodos;
@@ -350,7 +342,7 @@ export class PendientesComponent implements OnInit {
         this.ngxService.stopLoader("loader-aceptar");
         this.contenidoDocumento = ""
         this.buscar = ""
-        this.tipoDocumento = 0
+        this.tipoDocumento = "0"
         this.Doc.contenido = '' 
         this.Doc.tipo = ''
         this.cargador = true;
@@ -696,5 +688,27 @@ export class PendientesComponent implements OnInit {
       this.modalService.dismissAll();
     }
    
+  }
+
+  onTipoDocumentoChange(event) {
+    switch (event.value) {
+      case '1':
+        this.numeroPlaceholder = 'NRO. CEDULA';
+        break;
+      case '2':
+        this.numeroPlaceholder = 'NRO. CONTROL';
+        break;
+      case '3':
+        this.numeroPlaceholder = 'NRO. ORIGEN';
+        break;
+      case '4':
+        this.numeroPlaceholder = 'NRO. SALIDA';
+        break;
+      case '5':
+        this.numeroPlaceholder = 'NOMBRES APELLIDOS';
+        break;
+      default:
+        this.numeroPlaceholder = 'NÚMERO';
+    }
   }
 }
