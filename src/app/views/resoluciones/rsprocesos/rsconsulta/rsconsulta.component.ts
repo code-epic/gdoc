@@ -965,7 +965,7 @@ export class RsconsultaComponent implements OnInit {
             this.pID.estatus = false
             this.pID.contenido = paquete
             this.pID.mensaje = uuid
-            this.ConsultaPostPID()
+            this.ConsultaPostPID(1)
 
           } else {
             this.ConsultarPidRecursivo(id, paquete, uuid)
@@ -981,8 +981,8 @@ export class RsconsultaComponent implements OnInit {
   /**
    * Consultar una API despues de finalizado el PID Recurrente
    */
-  ConsultaPostPID() {
-    this.xAPI.funcion = "MPPD_CCedulaFileCSV";
+  ConsultaPostPID(tipo : number) {
+    this.xAPI.funcion = tipo==0?"MPPD_CCedulaFileCSV":"MPPD_CCedulaFileCSVSaime";
     this.xAPI.parametros = '';
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -999,6 +999,9 @@ export class RsconsultaComponent implements OnInit {
       }
     );
   }
+
+
+  
 
   downloadCSVExFile() {
     let head = this.csvHeadFile.map((e) => {

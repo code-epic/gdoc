@@ -226,12 +226,12 @@ export class BuzonComponent implements OnInit {
   }
 
   async listarBuzon(): Promise<void> {
-    console.log('Entrando en listado')
+    // console.log('Entrando en listado')
     this.ngxService.startLoader("loader-aceptar")
     try {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data)
+          // console.log(data)
           this.buzon = data.Cuerpo.map((e) => {
             e.existe = e.anom == '' ? true : false;
             e.privado = e.priv == 1 ? true : false;
