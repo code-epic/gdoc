@@ -965,7 +965,7 @@ export class RsconsultaComponent implements OnInit {
             this.pID.estatus = false
             this.pID.contenido = paquete
             this.pID.mensaje = uuid
-            this.ConsultaPostPID(1)
+            this.ConsultaPostPID(0)
 
           } else {
             this.ConsultarPidRecursivo(id, paquete, uuid)
