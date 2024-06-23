@@ -1,34 +1,29 @@
-import {Component,OnInit} from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { PageEvent } from "@angular/material/paginator";
 import {NgbModal,NgbDate,NgbDateParserFormatter,} from "@ng-bootstrap/ng-bootstrap";
 import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
-import {IWKFAlerta,IDocumento} from "src/app/services/control/documentos.service";
+import {IWKFAlerta,IDocumento,} from "src/app/services/control/documentos.service";
 import { LoginService } from "src/app/services/seguridad/login.service";
 import { UtilService } from "src/app/services/util/util.service";
 import { FormControl, FormGroup } from "@angular/forms";
+import { PendientesService } from "src/app/core/service/control/pendientes.service";
 
 @Component({
   selector: "app-pendientes",
   templateUrl: "./pendientes.component.html",
   styleUrls: ["./pendientes.component.scss"],
-
 })
 
 export class PendientesComponent implements OnInit {
+
   mostrarCamposAdicionales: boolean = false;
   mostrarBotonOcultar: boolean = false;
-
-  activarCamposAdicionales() {
-    this.mostrarCamposAdicionales = !this.mostrarCamposAdicionales;
-    this.mostrarBotonOcultar = !this.mostrarBotonOcultar;
-  }
-
   fechaRango: FormGroup;
 
   public bzBusqueda = [];
-  public numeroPlaceholder: string = 'NÚMERO';
+  public numeroPlaceholder: string = "NÚMERO";
   public bzSeguimientoO = [];
   public bzSeguimiento = [];
 
@@ -50,8 +45,8 @@ export class PendientesComponent implements OnInit {
   public actual: number = 1;
   public radio: number = 0;
   public tipoDocumento: string = "0";
-  public optfecha: string = '0';
-  public opttodos: string = '0';
+  public optfecha: string = "0";
+  public opttodos: string = "0";
 
   public desde: any;
   public hasta: any;
@@ -147,7 +142,6 @@ export class PendientesComponent implements OnInit {
     funcion: "",
     parametros: "",
   };
-  
 
   toppings = new FormControl("");
   toppingsaux = new FormControl("");
@@ -161,20 +155,7 @@ export class PendientesComponent implements OnInit {
   public sGrado: string = "Grado / Jerarquía";
   public sNombre: string = "Nombres y Apellidos";
 
-  public lstAcciones = [
-    { valor: "0", texto: "EN PROCESO", visible: "1" },
-    { valor: "1", texto: "ANALISTA", visible: "1" },
-    { valor: "2", texto: "JEFE DE AREA", visible: "1" },
-    { valor: "3", texto: "BANDEJA DE ESPERA", visible: "1" },
-    { valor: "4", texto: "PRESIDENCIAL", visible: "1" },
-    { valor: "5", texto: "ESPERA DE OPINION", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
-    { valor: "6", texto: "CONSULTORIA JURIDICA", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
-    { valor: "7", texto: "AREA DE RESOLUCIONES", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
-    { valor: "8", texto: "SUB-DIRECCION", visible: "1" },
-    { valor: "9", texto: "DIRECCION GENERAL", visible: "1" },
-    { valor: "10", texto: "DESPACHO DEL MPPD", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
-    { valor: "11", texto: "ARCHIVO", visible: "1" },
-  ];
+  public lstAcciones = [];
 
   public xAPI: IAPICore = {
     funcion: "",
@@ -184,9 +165,7 @@ export class PendientesComponent implements OnInit {
 
   longitud = 0;
   pageSize = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 100];
-
-  // MatPaginator Output
+  // pageSizeOptions: number[] = [5, 10, 25, 100];
   pageEvent: PageEvent;
 
   constructor(
@@ -196,8 +175,19 @@ export class PendientesComponent implements OnInit {
     private toastrService: ToastrService,
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
-    public formatter: NgbDateParserFormatter
-  ) { }
+    public formatter: NgbDateParserFormatter, 
+    private pendienteSrv : PendientesService
+  ) {
+
+    this.lstAcciones = this.pendienteSrv.getAction();
+    this.Componentes = this.pendienteSrv.getComponent();
+    this.Grados = this.pendienteSrv.getDegrees();
+    this.Categorias = this.pendienteSrv.getCategories();
+    this.Clasificaciones = this.pendienteSrv.getClassifications();
+    this.Configuracion = this.pendienteSrv.getSetting();
+    this.listarConfiguracion();
+    this.getDate();
+  }
 
   async ngOnInit() {
 
@@ -208,68 +198,36 @@ export class PendientesComponent implements OnInit {
       prv.Privilegios.forEach((e) => {
         if (e.nombre == "configurar") this.Configurar = true;
       });
-    }
-    this.Componentes =
-      sessionStorage.getItem("MPPD_CComponente") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
-        : [];
-    this.Grados =
-      sessionStorage.getItem("MPPD_CGrado") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado")))
-        : [];
-    this.Categorias =
-      sessionStorage.getItem("MPPD_CCategorias") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias")))
-        : [];
-    this.Clasificaciones =
-      sessionStorage.getItem("MPPD_CClasificacion") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion")))
-        : [];
-
-    this.Configuracion =
-      sessionStorage.getItem("MD_CConfiguracion") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion")))
-        : [];
-    this.listarConfiguracion();
-    const today = new Date();
-    const month = today.getMonth();
-    const year = today.getFullYear();
-    this.fechaRango = new FormGroup({
-      start: new FormControl(new Date(year, month, 13)),
-      end: new FormControl(new Date(year, month, 16)),
-    });
+    } 
   }
 
   async ConsultarSeguimiento(funcion: string) {
-    let desde = ''
-    let hasta = ''
+    let desdeLocal = "";
+    let hastaLocal = "";
     this.xAPI.funcion = funcion;
-    this.sinDatos = false
-
-
-    desde = this.desde == undefined ? new Date().getFullYear() - 5 + '-01-01' : this.desde
-    hasta = this.hasta == undefined ? new Date().toISOString().slice(0, 10) : this.hasta
- 
-    if(this.xAPI.funcion == "WKF_CSeguimiento"){
-
-      if(this.tipoDocumento  == "1" || this.tipoDocumento  == "5"){
-        this.xAPI.funcion = "WKF_CSeguimiento_Cedula"
-        this.xAPI.parametros = this.buscar+","+this.tipoDocumento;
-          console.log(this.xAPI.parametros)
-      }else{
-        this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' 
-        + this.tipoDocumento + ',' + this.opttodos;
-        // console.log(this.xAPI.parametros)
-      }
-    }else{
-        this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.Doc.contenido.trim() + ',' 
-        + this.Doc.tipo + ',' + this.Doc.remitente + "," + this.Doc.unidad + "," + this.Doc.comando + "," + this.Doc.instrucciones
-        + ',' + this.optfecha
-        // console.log(this.xAPI.parametros)
-      
-    }
+    this.sinDatos = false;
     
 
+    desdeLocal = this.desde == undefined || this.desde == "1900-01-01" ? new Date().getFullYear() - 5 + "-01-01" : this.desde;
+    hastaLocal = this.hasta == undefined || this.hasta == "1900-01-01" ? new Date().toISOString().slice(0, 10) : this.hasta;
+
+    if (this.xAPI.funcion == "WKF_CSeguimiento") {
+      if (this.tipoDocumento == "1" || this.tipoDocumento == "5") {
+        this.xAPI.funcion = "WKF_CSeguimiento_Cedula";
+        this.xAPI.parametros = this.buscar + "," + this.tipoDocumento;
+        // console.log(this.xAPI.parametros);
+
+      } else {
+        this.xAPI.parametros = this.contenidoDocumento + "," +
+        desdeLocal + "," + hastaLocal + "," + this.buscar +  "," + this.tipoDocumento + "," + this.opttodos;
+        // console.log(this.xAPI.parametros);
+      }
+    } else {
+      this.xAPI.parametros = this.contenidoDocumento + "," + desdeLocal + "," + hastaLocal + "," + this.Doc.contenido.trim() +
+        "," + this.Doc.tipo + "," + this.Doc.remitente + "," + this.Doc.unidad + "," + this.Doc.comando +"," + this.Doc.instrucciones +
+        "," + this.optfecha;
+      // console.log(this.xAPI.parametros)
+    }
 
     this.cargador = false;
     this.ngxService.startLoader("loader-aceptar");
@@ -277,36 +235,17 @@ export class PendientesComponent implements OnInit {
       (data) => {
         // console.log(data.Cuerpo.length);
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
-          e.busqueda = this.utilService.ConvertirCadena(
-            e.norigen +
-            " " +
-            e.ncontrol +
-            " " +
-            e.contenido +
-            e.estatus_nombre +
-            " " +
-            e.remitente +
-            " " +
-            e.nombre +
-            " " +
-            e.creado +
-            " " +
-            e.salida +
-            " " +
-            e.unidad +
-            " " +
-            e.subdocumento
+          e.busqueda = this.utilService.ConvertirCadena( e.norigen + " " + e.ncontrol + " " + e.contenido + e.estatus_nombre + " " +  
+          e.remitente + " " + e.nombre + " " + e.creado + " " + e.salida + " " + e.unidad + " " + e.subdocumento
           );
           e.numc = e.ncontrol;
           e.existe = e.anom == "" ? true : false;
           e.privado = e.priv == 1 ? true : false;
           e.color = "green";
           e.s_texto = "";
+
           if (e.s_estatus > 0 || e.s_estatus < 10) {
-            e.s_texto =
-              e.s_estatus != null
-                ? " - " + this.lstAcciones[e.s_estatus].texto
-                : "";
+            e.s_texto = e.s_estatus != null ? " - " + this.lstAcciones[e.s_estatus].texto : "";
           }
 
           switch (e.tdoc.toLowerCase()) {
@@ -338,28 +277,14 @@ export class PendientesComponent implements OnInit {
         this.max_paginador = this.cantidad / 10;
         this.blBuscar = true;
         this.MostrarPaginador();
-       
+        this.clear();
         this.ngxService.stopLoader("loader-aceptar");
-        this.contenidoDocumento = ""
-        this.buscar = ""
-        this.tipoDocumento = "0"
-        this.Doc.contenido = '' 
-        this.Doc.tipo = ''
-        this.cargador = true;
-        this.Doc.remitente = ''  
-        this.Doc.unidad = ''
-        this.Doc.comando = ''
-        this.Doc.instrucciones = ''
-        this.mostrarCamposAdicionales= false;
-        this.mostrarBotonOcultar= false; 
-        this.desde == undefined;
-        this.hasta == undefined;
-        this.opttodos = "0";
+        
         if (data.Cuerpo.length === 0) {
           this.sinDatos = true;
-         } else {
-           this.sinDatos = false;
-         }
+        } else {
+          this.sinDatos = false;
+        }
       },
       (error) => {
         console.log("Error en la carga");
@@ -424,8 +349,6 @@ export class PendientesComponent implements OnInit {
     }
   }
 
-
-
   setDescripcionPunto() {
     this.sCedula = "Cédula";
     this.sGrado = "Grado / Jerarquía";
@@ -471,8 +394,8 @@ export class PendientesComponent implements OnInit {
   buscarDocumento(): void {
     this.vistacontenido = true;
 
-    this.consultarDocument(undefined)
-    
+    this.consultarDocument(undefined);
+
     // const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
     // this.bzBusqueda = this.bzSeguimientoO.filter((e) => patron.test(e.busqueda));
     // this.longitud = this.bzBusqueda.length;
@@ -481,96 +404,6 @@ export class PendientesComponent implements OnInit {
     // this.cantidad = this.bzBusqueda.length;
     // this.MostrarPaginador();
     // this.buscar = '';
-    
-  }
-
-  /**
-   * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
-   * @param numBase64  : base64
-   */
-  async consultarDocumento(numBase64: string) {
-    const base = atob(numBase64);
-    this.xAPI.funcion = "WKF_CDocumentoDetalle";
-    this.xAPI.parametros = base;
-    this.xAPI.valores = "";
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (data) => {
-        data.Cuerpo.forEach((e) => {
-          this.Doc = e;
-          this.fcreacionDate = NgbDate.from(
-            this.formatter.parse(this.Doc.fcreacion.substring(0, 10))
-          );
-          this.forigenDate = NgbDate.from(
-            this.formatter.parse(this.Doc.forigen.substring(0, 10))
-          );
-          if (e.alerta != null) {
-            this.fplazo = NgbDate.from(
-              this.formatter.parse(e.alerta.substring(0, 10))
-            );
-            this.WAlerta.activo = 1;
-            this.WAlerta.documento = this.Doc.wfdocumento;
-            this.WAlerta.estado = this.estadoActual;
-            this.WAlerta.estatus = this.estadoOrigen;
-            this.WAlerta.usuario = this.loginService.Usuario.id;
-          }
-        });
-
-        this.selTipoDocumento();
-        const punto_cuenta =
-          this.Doc.subdocumento != null
-            ? JSON.parse(this.Doc.subdocumento)
-            : [];
-        this.lstCuenta = punto_cuenta.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : [];
-        this.lstTraza = traza.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        const historial =
-          this.Doc.historial != null ? JSON.parse(this.Doc.historial) : [];
-        this.lstHistorial = historial.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        const hz_adjunto =
-          this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : [];
-        this.lstHzAdjunto = hz_adjunto.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        const dependencia =
-          this.Doc.dependencias != null
-            ? JSON.parse(this.Doc.dependencias)
-            : [];
-        this.lstDependencias = dependencia.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        const cuentasaux =
-          this.Doc.puntodecuenta != null
-            ? JSON.parse(this.Doc.puntodecuenta)
-            : [];
-        this.lstPuntosCuentasAux = cuentasaux.map((e) => {
-          return typeof e == "object" ? e : JSON.parse(e);
-        });
-
-        this.toppingsaux.setValue("1");
-
-        //Carga de Documentos
-        this.bPDF = this.Doc.archivo != "" ? true : false;
-        this.download = this.apiService.Dws(
-          btoa("D" + this.Doc.ncontrol) + "/" + this.Doc.archivo
-        );
-
-        this.activarTipo = this.validarTipoDoc();
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
   }
 
   dwUrl(ncontrol: string, archivo: string): string {
@@ -589,8 +422,6 @@ export class PendientesComponent implements OnInit {
 
   close() {
     this.modalService.dismissAll();
-    // this.desde = undefined;
-    // this.hasta = undefined;
   }
 
   selTipoDocumento() {
@@ -657,58 +488,73 @@ export class PendientesComponent implements OnInit {
     );
   }
 
-  /**
-   * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
-   * @param numBase64  : base64
-   */
-  buscarYCerrarModal() {
+  searchAndCloseModal() {
+    this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
+    this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
 
-     this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
-     this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
     this.vistacontenido = true;
-    
     this.ConsultarSeguimiento("WKF_CSeguimiento_Detalle");
     this.modalService.dismissAll();
+
   }
 
   consultarDocument(event: any) {
-    //  this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
-    //  this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
+    this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
+    this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
 
     if (event == undefined || event.charCode == 13) {
       this.vistacontenido = true;
-      this.ConsultarSeguimiento("WKF_CSeguimiento")
+      this.ConsultarSeguimiento("WKF_CSeguimiento");
     }
   }
-// 08-06-2024
+
   consultarDocumentDetalle(event: any) {
     if (event == undefined || event.charCode == 13) {
       this.vistacontenido = true;
-      this.ConsultarSeguimiento("WKF_CSeguimiento_Detalle")
+      this.ConsultarSeguimiento("WKF_CSeguimiento_Detalle");
       this.modalService.dismissAll();
     }
-   
   }
 
   onTipoDocumentoChange(event) {
-    switch (event.value) {
-      case '1':
-        this.numeroPlaceholder = 'NRO. CEDULA';
-        break;
-      case '2':
-        this.numeroPlaceholder = 'NRO. CONTROL';
-        break;
-      case '3':
-        this.numeroPlaceholder = 'NRO. ORIGEN';
-        break;
-      case '4':
-        this.numeroPlaceholder = 'NRO. SALIDA';
-        break;
-      case '5':
-        this.numeroPlaceholder = 'NOMBRES APELLIDOS';
-        break;
-      default:
-        this.numeroPlaceholder = 'NÚMERO';
-    }
+    this.numeroPlaceholder = this.pendienteSrv.getPlaceholderByTipoDocumento(event.value);
   }
+  
+  getDate() {
+    const today = new Date();
+    const month = today.getMonth();
+    const year = today.getFullYear();
+    const fechaInicial = new Date(year - 5, month, 1);
+    this.fechaRango = new FormGroup({
+      start: new FormControl(fechaInicial),
+      end: new FormControl(today),
+    });
+  }
+
+
+  activarCamposAdicionales() {
+    this.mostrarCamposAdicionales = !this.mostrarCamposAdicionales;
+    this.mostrarBotonOcultar = !this.mostrarBotonOcultar;
+  }
+
+  clear(){
+        this.contenidoDocumento = "";
+        this.buscar = "";
+        this.tipoDocumento = "0";
+        this.Doc.contenido = "";
+        this.Doc.tipo = "";
+        this.cargador = true;
+        this.Doc.remitente = "";
+        this.Doc.unidad = "";
+        this.Doc.comando = "";
+        this.Doc.instrucciones = "";
+        this.mostrarCamposAdicionales = false;
+        this.mostrarBotonOcultar = false;
+        this.desde = undefined;
+        this.hasta = undefined;
+        this.fechaRango.value.start = undefined;
+        this.fechaRango.value.end = undefined;
+        this.opttodos = "0";
+  }
+  
 }

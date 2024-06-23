@@ -188,7 +188,7 @@
 
                     <small class="mr-4"><i class="fa fa-globe"></i> &nbsp;
                       {{ e.nombre | uppercase }} (
-                      {{ e.estatus_nombre | uppercase }} {{ e.s_texto }} )
+                      {{ e.estatus_nombre | uppercase }} !!!{{ e.s_texto }} )
                     </small>
                   </p>
                 </div>
@@ -350,7 +350,7 @@
 
       <div class="modal-footer div-modal-footer">
         <!-- align="end" -->
-        <button mat-raised-button color="primary" id="registrar"  (click)="buscarYCerrarModal()" class="boton-buscar-avanzado">
+        <button mat-raised-button color="primary" id="registrar"  (click)="searchAndCloseModal()" class="boton-buscar-avanzado">
           Buscar &nbsp;
           <i class="fa fa-search" aria-hidden="true"></i>
         </button>

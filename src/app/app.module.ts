@@ -20,17 +20,17 @@ import { MatListModule } from '@angular/material/list'
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CustomPaginator } from './paginator-intl';
-import { ControlComponent } from './views/control/control.component';
+// import { ControlComponent } from './views/control/control.component';
 import { SecretariaComponent } from './views/secretaria/secretaria.component';
 import { ResolucionesComponent } from './views/resoluciones/resoluciones.component';
 import { AyudantiaComponent } from './views/ayudantia/ayudantia.component';
 import { TimonelComponent } from './views/timonel/timonel.component';
 import { AcamiComponent } from './views/acami/acami.component';
 import { PersonalComponent } from './views/personal/personal.component';
-import { RegistrarComponent } from './views/control/registrar/registrar.component';
-import { DocumentoComponent } from './views/control/documento/documento.component';
-import { BuzonComponent } from './views/control/buzon/buzon.component';
-import { SalidasComponent } from './views/control/salidas/salidas.component';
+// import { RegistrarComponent } from './views/control/registrar/registrar.component';
+// import { DocumentoComponent } from './views/control/documento/documento.component';
+// import { BuzonComponent } from './views/control/buzon/buzon.component';
+// import { SalidasComponent } from './views/control/salidas/salidas.component';
 import { ProyectoComponent } from './views/ayudantia/procesos/proyecto/proyecto.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -39,7 +39,7 @@ import { NgxUiLoaderModule, NgxUiLoaderConfig } from "ngx-ui-loader";
 
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatCommonModule, MatNativeDateModule } from '@angular/material/core';
 
-import { ConfiguracionComponent } from './views/control/configuracion/configuracion.component';
+// import { ConfiguracionComponent } from './views/control/configuracion/configuracion.component';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { AuthGuardGuard } from './services/seguridad/auth-guard.guard';
 import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
@@ -51,7 +51,7 @@ import { AyreportesComponent } from './views/ayudantia/ayreportes/ayreportes.com
 import { GeneralesComponent } from './views/generales/generales.component';
 import { ArchivoComponent } from './views/archivo/archivo.component';
 import { AycotizacionesComponent } from './views/ayudantia/procesos/aycotizaciones/aycotizaciones.component';
-import { PendientesComponent } from './views/control/pendientes/pendientes.component';
+// import { PendientesComponent } from './views/control/pendientes/pendientes.component';
 import { ProcesosComponent } from './views/ayudantia/procesos/procesos.component';
 import { RsprocesosComponent } from './views/resoluciones/rsprocesos/rsprocesos.component';
 import { RsbuzonComponent } from './views/resoluciones/rsbuzon/rsbuzon.component';
@@ -193,25 +193,25 @@ const ngWizardConfig: NgWizardConfig = {
     AppComponent,
     AdminLayoutComponent,
     AuthLayoutComponent,
-    ControlComponent,
+    // ControlComponent,
     SecretariaComponent,
     ResolucionesComponent,
     AyudantiaComponent,
     TimonelComponent,
     AcamiComponent,
     PersonalComponent,
-    RegistrarComponent,
-    DocumentoComponent,
-    BuzonComponent,
-    SalidasComponent,
+    // RegistrarComponent,
+    // DocumentoComponent,
+    // BuzonComponent,
+    // SalidasComponent,
     ProyectoComponent,
-    ConfiguracionComponent,
+    // ConfiguracionComponent,
     AybuzonComponent,
     AyreportesComponent,
     GeneralesComponent,
     ArchivoComponent,
     AycotizacionesComponent,
-    PendientesComponent,
+    // PendientesComponent,
     ProcesosComponent,
     RsprocesosComponent,
     RsbuzonComponent,
@@ -221,7 +221,7 @@ const ngWizardConfig: NgWizardConfig = {
     MinisterialComponent,
     FichaproyectoComponent,
     CotizacionComponent,
-    ConfiguracionComponent,
+    // ConfiguracionComponent,
     RstranscripcionComponent,
     RsrevisionComponent,
     RscdatosbasicosComponent,
