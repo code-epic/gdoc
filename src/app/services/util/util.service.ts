@@ -277,7 +277,7 @@ export class UtilService {
       for (let index in headerList) {
         let head = headerList[index];
         let texto = array[i][head] + ""
-        line += "|" + texto.replace(/[\r\n]+/gm, "").toUpperCase();
+        line += "," + texto.replace(/[\r\n]+/gm, "").toUpperCase();
       }
       str += line + "\r\n";
     }
