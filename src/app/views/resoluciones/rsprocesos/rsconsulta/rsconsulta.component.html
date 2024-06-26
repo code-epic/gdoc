@@ -3,10 +3,10 @@
         <p></p>
     </div>
 </div>
-<div class="container-fluid mt--9" >
-    <div class="row" >
+<div class="container-fluid mt--9">
+    <div class="row">
         <div class="col-xl-12 col-md-12 col-lg-12">
-            <div class="card shadow"  style="margin-top: -40px;">
+            <div class="card shadow" style="margin-top: -40px;">
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center" style="margin: -10px;">
                         <div class="col-md-10">
@@ -56,11 +56,11 @@
 
                 <div class="card-body">
                     <div class="row">
-                        
+
                         <div class="col-md-12">
                             <app-eresoluciones *ngIf="valEdit" [resolucion]="input_resoluciones"></app-eresoluciones>
                         </div>
-                        
+
                         <div class="col-md-12" *ngIf="!valEdit">
                             <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
                             <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
@@ -73,11 +73,12 @@
                                     <div *ngIf="blEditor" class="example-large-box " style="margin: 0px;padding: 15px;">
                                         <app-rscdatosbasicos EDITOR="{{EDITOR}}"></app-rscdatosbasicos>
                                     </div>
-                                    <div *ngIf="blEspecifico" class="example-large-box " style="margin: 0px;padding: 15px;">
+                                    <div *ngIf="blEspecifico" class="example-large-box "
+                                        style="margin: 0px;padding: 15px;">
 
-                                     
 
-                                        <div class="row" >
+
+                                        <div class="row">
 
                                             <div class="col-md-4">
                                                 <mat-form-field appearance="outline">
@@ -87,25 +88,30 @@
                                                         (keypress)="consultarNombre($event);">
                                                 </mat-form-field>
                                             </div>
-                                            <div class="col-md-3" >
-                                                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                            <div class="col-md-3">
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    style="width:100%">
                                                     <mat-label>Componente</mat-label>
-                                                    <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}"
+                                                    <mat-select placeholder="Componente"
+                                                        [ngModelOptions]="{standalone: true}"
                                                         [(ngModel)]="dbcomponente">
                                                         <mat-option value="%">TODOS</mat-option>
-                                                        <mat-option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
+                                                        <mat-option *ngFor="let e of Componentes;"
+                                                            [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
                                                     </mat-select>
                                                 </mat-form-field>
                                             </div>
-                    
+
                                             <div class="col-md-3">
-                                                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    style="width:100%">
                                                     <mat-label>Grado</mat-label>
-                                                    <mat-select placeholder="Grado" [ngModelOptions]="{standalone: true}"
-                                                        [(ngModel)]="dbgrado">
+                                                    <mat-select placeholder="Grado"
+                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="dbgrado">
                                                         <mat-option value="%">TODOS</mat-option>
                                                         <mat-option *ngFor="let e of Grados"
-                                                            value="{{e.cod_grado}}">{{e.nombre_corto }} - {{e.nombres_grado }}</mat-option>
+                                                            value="{{e.cod_grado}}">{{e.nombre_corto }} -
+                                                            {{e.nombres_grado }}</mat-option>
                                                     </mat-select>
                                                 </mat-form-field>
                                             </div>
@@ -159,43 +165,46 @@
 
                                         <div class="row" style="padding-top: 5px">
                                             <div class="col-md-9">
-                                                <h2 *ngIf="blDatosBasicos" style="margin-top: 10px; margin-left: -3px"> DATOS BASICOS</h2>
+                                                <h2 *ngIf="blDatosBasicos" style="margin-top: 10px; margin-left: -3px">
+                                                    DATOS BASICOS</h2>
                                             </div>
                                             <div class="col-md-3">
-                                               
-                                                     <div *ngIf="blResolucionPanel"  class="example-button-row text-right text-white"  >
-                                                        <button style="background-color: #2a9a17;" mat-icon-button title="Volver Atrás" 
-                                                        (click)="volverResolucion()">
-                                                            <mat-icon>open_in_browser</mat-icon>
-                                                        </button>
-                                                    </div>
-                                                    <div *ngIf="blDatosBasicos" class="example-button-row text-right text-white"  >
-                                                        <button style="background-color: #2a9a17;" mat-icon-button title="Editar datos Basicos" 
-                                                        (click)="editarDatosBasicos()">
-                                                            <mat-icon>manage_accounts</mat-icon>
-                                                        </button>
-                                                    </div> 
-                                            
+
+                                                <div *ngIf="blResolucionPanel"
+                                                    class="example-button-row text-right text-white">
+                                                    <button style="background-color: #2a9a17;" mat-icon-button
+                                                        title="Volver Atrás" (click)="volverResolucion()">
+                                                        <mat-icon>open_in_browser</mat-icon>
+                                                    </button>
+                                                </div>
+                                                <div *ngIf="blDatosBasicos"
+                                                    class="example-button-row text-right text-white">
+                                                    <button style="background-color: #2a9a17;" mat-icon-button
+                                                        title="Editar datos Basicos" (click)="editarDatosBasicos()">
+                                                        <mat-icon>manage_accounts</mat-icon>
+                                                    </button>
+                                                </div>
+
                                             </div>
                                         </div>
                                         <div class="row" *ngIf="dbDatos">
-                                            
+
                                             <div class="col-md-12">
                                                 <table style="width: 100%;" border="1" class="zigzag">
                                                     <tbody>
                                                         <tr>
                                                             <th>CEDULA</th>
-                                                            <td   [ngStyle]="{'background-color': color_acc}">
+                                                            <td [ngStyle]="{'background-color': color_acc}">
                                                                 <font [ngStyle]="{'color': color_texto}">
                                                                     V-{{IDatosBasicos.cedula}}
                                                                 </font>
                                                             </td>
-                                                            <th style="width: 210px; text-align: center;" >FOTO</th>
-                                                            <th style="text-align: center;" >ASCENSOS</th>
+                                                            <th style="width: 210px; text-align: center;">FOTO</th>
+                                                            <th style="text-align: center;">ASCENSOS</th>
                                                         </tr>
                                                         <tr>
                                                             <th>GRADO</th>
-                                                            <td   [ngStyle]="{'background-color': color_acc}">
+                                                            <td [ngStyle]="{'background-color': color_acc}">
                                                                 <font [ngStyle]="{'color': color_texto}">
                                                                     {{IDatosBasicos.grado}}
                                                                 </font>
@@ -207,25 +216,29 @@
                                                                         style="width: 189px">
                                                                 </div>
                                                             </td>
-                                                            <td rowspan="10" valign="top" style="width: 350px;margin: 0px; padding: 0px">
-                                                               <table style="width: 100%; text-align: center;"  border="1" class="zigzag">
-                                                               
-                                                                <tr *ngFor="let elem of lstAscenso"> 
-                                                                    <td>{{ convertirFecha(elem.fecha_resolucion) }}</td>
-                                                                    <td>{{ obtenerNombreGrado( elem.grado) }}</td>
-                                                                    <td><a *ngIf="!validarSeguridad( elem )" class="enlace"
-                                                                        (click)="dwUrl( elem )" target="_blank"
-                                                                        style="font-weight: bold; color: brown;">
-                                                                        {{elem.titulo}} </a> </td>
-                                                                
-                                                                <td>{{  obtenerOrdenMerito( elem ) }}</td>
-                                                                </tr>
-                                                               </table>
+                                                            <td rowspan="10" valign="top"
+                                                                style="width: 350px;margin: 0px; padding: 0px">
+                                                                <table style="width: 100%; text-align: center;"
+                                                                    border="1" class="zigzag">
+
+                                                                    <tr *ngFor="let elem of lstAscenso">
+                                                                        <td>{{ convertirFecha(elem.fecha_resolucion) }}
+                                                                        </td>
+                                                                        <td>{{ obtenerNombreGrado( elem.grado) }}</td>
+                                                                        <td><a *ngIf="!validarSeguridad( elem )"
+                                                                                class="enlace" (click)="dwUrl( elem )"
+                                                                                target="_blank"
+                                                                                style="font-weight: bold; color: brown;">
+                                                                                {{elem.titulo}} </a> </td>
+
+                                                                        <td>{{ obtenerOrdenMerito( elem ) }}</td>
+                                                                    </tr>
+                                                                </table>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>NOMBRE COMPLETO</th>
-                                                            <td   [ngStyle]="{'background-color': color_acc}">
+                                                            <td [ngStyle]="{'background-color': color_acc}">
                                                                 <font [ngStyle]="{'color': color_texto}">
                                                                     {{IDatosBasicos.nombres}}
                                                                 </font>
@@ -245,11 +258,12 @@
                                                         </tr>
                                                         <tr>
                                                             <th>SEXO</th>
-                                                            <td>{{ getSex(IDatosBasicos.sexo)  | uppercase }}</td>
+                                                            <td>{{ getSex(IDatosBasicos.sexo) | uppercase }}</td>
                                                         </tr>
                                                         <tr>
                                                             <th>SITUACION</th>
-                                                            <td>{{ getSituation(IDatosBasicos.situacion)  | uppercase }}</td>
+                                                            <td>{{ getSituation(IDatosBasicos.situacion) | uppercase }}
+                                                            </td>
                                                         </tr>
                                                         <tr>
                                                             <th>FECHA DE PROMOCION</th>
@@ -257,14 +271,14 @@
                                                         </tr>
                                                         <tr>
                                                             <th>ESPECIALIDAD</th>
-                                                            <td>{{IDatosBasicos.especialidad  | uppercase}}</td>
+                                                            <td>{{IDatosBasicos.especialidad | uppercase}}</td>
                                                         </tr>
                                                         <tr>
                                                             <th>OBSERVACIONES</th>
-                                                            <td>{{IDatosBasicos.observaciones  | uppercase}}</td>
+                                                            <td>{{IDatosBasicos.observaciones | uppercase}}</td>
                                                         </tr>
                                                         <tr *ngIf="IDatosBasicos.condicion != 0">
-                                                            <th >MOTIVO</th>
+                                                            <th>MOTIVO</th>
                                                             <td [ngStyle]="{'background-color': color_acc}" colspan="3">
                                                                 <font [ngStyle]="{'color': color_texto}">
                                                                     {{ IDatosBasicos.motivo | uppercase }}
@@ -279,7 +293,7 @@
 
                                         <div class="row" *ngIf="dbDatosNombre">
                                             <div class="col-md-12">
-                                                
+
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
                                                         <tr>
@@ -301,7 +315,8 @@
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ e.grado_abreviado }}</td>
                                                             <td>{{ e.nombres }}</td>
-                                                            <td><a class="enlace" (click)="MoverForm(e.cedula);volverDatos(0)"
+                                                            <td><a class="enlace"
+                                                                    (click)="MoverForm(e.cedula);volverDatos(0)"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.cedula}} </a>
                                                             </td>
@@ -309,7 +324,7 @@
                                                                 {{ convertirFecha(e.promocion) }}
                                                             </td>
                                                             <td>
-                                                                {{ e.sexo | uppercase  }}
+                                                                {{ e.sexo | uppercase }}
                                                             </td>
                                                             <td>
                                                                 {{ getSituation(e.situacion) | uppercase }}
@@ -322,15 +337,15 @@
                                             </div>
                                         </div>
 
-                                        
+
                                         <div class="row" *ngIf="dbDatos">
-                                            
+
                                             <div class="col-md-12">
-                                                <br ><br>
+                                                <br><br>
                                                 <h2> ENTRADAS</h2>
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
-                                                       
+
                                                         <tr>
                                                             <th style="width: 90px;"> FECHA</th>
                                                             <th tyle="width: 150px;"> CUENTA</th>
@@ -341,11 +356,12 @@
                                                         <tr *ngFor="let e of lstEntradas">
                                                             <td>{{e.fecha_entrada}}</td>
                                                             <td>
-                                                                <a  class="enlace"
-                                                                    (click)="dwUrlEntrada(e)" target="_blank"
+                                                                <a class="enlace" (click)="dwUrlEntrada(e)"
+                                                                    target="_blank"
                                                                     style="font-weight: bold; color: brown;">
-                                                                    {{ e.cuenta_oficio }} </a></td>
-                                                            <td >{{ e.asunto | uppercase}}
+                                                                    {{ e.cuenta_oficio }} </a>
+                                                            </td>
+                                                            <td>{{ e.asunto | uppercase}}
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -355,10 +371,10 @@
 
                                         </div>
 
-                                        
+
                                         <div class="row" *ngIf="dbDatos">
                                             <div class="col-md-12">
-                                                <br ><br>
+                                                <br><br>
                                                 <h2> RESOLUCIONES</h2>
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
@@ -386,14 +402,18 @@
                                                                 <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
                                                                     RESOLUCIONES</b>
                                                             </td>
-                                                            <td *ngIf="!validarSeguridad(e)">{{ e.asunto | uppercase}}</td>
-                                                            <td >
-                                                                <button mat-icon-button aria-label="Detalle" (click)="detalle( detalles, e)">
-                                                                    <mat-icon class="text-{{getIconColor(e)}}">{{ getIcon( e ) }}</mat-icon>
+                                                            <td *ngIf="!validarSeguridad(e)">{{ e.asunto | uppercase}}
+                                                            </td>
+                                                            <td>
+                                                                <button mat-icon-button aria-label="Detalle"
+                                                                    (click)="detalle( detalles, e)">
+                                                                    <mat-icon class="text-{{getIconColor(e)}}">{{
+                                                                        getIcon( e ) }}</mat-icon>
                                                                 </button>
                                                             </td>
-                                                            <td  style="text-align: center;">
-                                                                <button mat-icon-button aria-label="Editar" (click)="editar( e )">
+                                                            <td style="text-align: center;">
+                                                                <button mat-icon-button aria-label="Editar"
+                                                                    (click)="editar( e )">
                                                                     <mat-icon class="text-blue">edit_note</mat-icon>
                                                                 </button>
                                                             </td>
@@ -430,7 +450,8 @@
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ e.grado_abreviado }}</td>
                                                             <td>{{ e.nombres_apellidos }}</td>
-                                                            <td><a class="enlace" (click)="obtenerCedula(e.cedula);volverDatos(1)"
+                                                            <td><a class="enlace"
+                                                                    (click)="obtenerCedula(e.cedula);volverDatos(1)"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.cedula}} </a></td>
 
@@ -464,11 +485,10 @@
 
                                         </div>
 
-                                        
-                                    </div>
 
+                                    </div>
                                 </mat-tab>
-                                <mat-tab  >
+                                <mat-tab>
                                     <ng-template mat-tab-label>
                                         &nbsp;FILTRADA
                                     </ng-template>
@@ -481,9 +501,10 @@
                                                     <mat-form-field class="example-full-width" appearance="outline"
                                                         style="width:100%">
                                                         <mat-label style="width:100%">Tipo de Resolución</mat-label>
-                                                        <input type="text" matInput [formControl]="myControl" (blur)="seleccionTipo()"
-                                                            [matAutocomplete]="auto" [(ngModel)]="tipo">
-                                                        <mat-autocomplete #auto="matAutocomplete"  
+                                                        <input type="text" matInput [formControl]="myControl"
+                                                            (blur)="seleccionTipo()" [matAutocomplete]="auto"
+                                                            [(ngModel)]="tipo">
+                                                        <mat-autocomplete #auto="matAutocomplete"
                                                             [displayWith]="displayFn" style="width:100%">
                                                             <mat-option *ngFor="let option of filteredOptions | async"
                                                                 [value]="option">
@@ -495,10 +516,12 @@
                                                 </div>
 
                                                 <div class="col-md-6">
-                                                    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        style="width:100%">
                                                         <mat-label>Causa</mat-label>
-                                                        <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
-                                                            [(ngModel)]="causa" (selectionChange)="getMotivo()">
+                                                        <mat-select placeholder="Tipo de Comision"
+                                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="causa"
+                                                            (selectionChange)="getMotivo()">
                                                             <mat-option value="%">TODOS</mat-option>
                                                             <mat-option *ngFor="let e of lstCausa"
                                                                 value="{{e.codigo}}">{{e.nombre}}</mat-option>
@@ -508,68 +531,83 @@
                                             </div>
 
                                             <div class="row">
-                                                <div class="col-md-4"  >
-                                                    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                <div class="col-md-4">
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        style="width:100%">
                                                         <mat-label>Categoria</mat-label>
-                                                        <mat-select placeholder="Categoria" [ngModelOptions]="{standalone: true}"
+                                                        <mat-select placeholder="Categoria"
+                                                            [ngModelOptions]="{standalone: true}"
                                                             [(ngModel)]="categoria">
                                                             <mat-option value="%">TODOS</mat-option>
-                                                            <mat-option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}</mat-option>
+                                                            <mat-option *ngFor="let e of Categorias;"
+                                                                [value]="e.cod_categoria">{{e.nombre_categoria}}</mat-option>
                                                         </mat-select>
                                                     </mat-form-field>
                                                 </div>
-                                                <div class="col-md-4" >
-                                                    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                <div class="col-md-4">
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        style="width:100%">
                                                         <mat-label>Componente</mat-label>
-                                                        <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}"
+                                                        <mat-select placeholder="Componente"
+                                                            [ngModelOptions]="{standalone: true}"
                                                             [(ngModel)]="componente">
                                                             <mat-option value="%">TODOS</mat-option>
-                                                            <mat-option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
+                                                            <mat-option *ngFor="let e of Componentes;"
+                                                                [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
                                                         </mat-select>
                                                     </mat-form-field>
                                                 </div>
-                        
+
                                                 <div class="col-md-4">
-                                                    <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        style="width:100%">
                                                         <mat-label>Grado</mat-label>
-                                                        <mat-select placeholder="Grado" [ngModelOptions]="{standalone: true}"
-                                                            [(ngModel)]="grado">
+                                                        <mat-select placeholder="Grado"
+                                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="grado">
                                                             <mat-option value="%">TODOS</mat-option>
                                                             <mat-option *ngFor="let e of Grados"
-                                                                value="{{e.cod_grado}}">{{e.nombre_corto }} - {{e.nombres_grado }}</mat-option>
+                                                                value="{{e.cod_grado}}">{{e.nombre_corto }} -
+                                                                {{e.nombres_grado }}</mat-option>
                                                         </mat-select>
                                                     </mat-form-field>
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="form-group col-md-12">
-                                                    <textarea 
-                                                    class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
-                                                [(ngModel)]="asunto" placeholder="Introduzca el Asunto..."  style="width: 100%"></textarea>
-                                                    
-                                                </div>
-                                            </div> 
-                                            <div class="row">
-                                                <div class="form-group col-md-12">
-                                                    <textarea class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
-                                                    [(ngModel)]="instrucciones" placeholder="Instrucciones especiales..."  rows="6" style="width: 100%"></textarea>
-                                                   
+                                                    <textarea class="form-control" cols="30" rows="5"
+                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="asunto"
+                                                        placeholder="Introduzca el Asunto..."
+                                                        style="width: 100%"></textarea>
+
                                                 </div>
                                             </div>
-                        
                                             <div class="row">
                                                 <div class="form-group col-md-12">
-                                                    <textarea class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
-                                                    [(ngModel)]="observaciones" placeholder="Introduzca la Observacion..."  rows="6" style="width: 100%">
-                                                </textarea>
-                                                    
-                                                   
+                                                    <textarea class="form-control" cols="30" rows="5"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [(ngModel)]="instrucciones"
+                                                        placeholder="Instrucciones especiales..." rows="6"
+                                                        style="width: 100%"></textarea>
+
                                                 </div>
-                                            </div>  
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="form-group col-md-12">
+                                                    <textarea class="form-control" cols="30" rows="5"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [(ngModel)]="observaciones"
+                                                        placeholder="Introduzca la Observacion..." rows="6"
+                                                        style="width: 100%">
+                                                </textarea>
+
+
+                                                </div>
+                                            </div>
 
                                             <div class="row">
 
-                                                
+
                                                 <div class="col-md-3">
                                                     <mat-form-field class="example-form-field" appearance="outline">
                                                         <mat-label>Rango del resuelto</mat-label>
@@ -579,12 +617,14 @@
                                                             [comparisonEnd]="fechaRango.value.end">
                                                             <input matStartDate placeholder="Start date"
                                                                 formControlName="start">
-                                                            <input matEndDate placeholder="End date" formControlName="end">
+                                                            <input matEndDate placeholder="End date"
+                                                                formControlName="end">
                                                         </mat-date-range-input>
 
                                                         <mat-datepicker-toggle matSuffix
                                                             [for]="fechaRangoPicker"></mat-datepicker-toggle>
-                                                        <mat-date-range-picker #fechaRangoPicker></mat-date-range-picker>
+                                                        <mat-date-range-picker
+                                                            #fechaRangoPicker></mat-date-range-picker>
                                                     </mat-form-field>
                                                 </div>
                                                 <div class="col-md-3">
@@ -592,7 +632,8 @@
                                                         style="width:100%">
                                                         <mat-label>Tipo de Buscada</mat-label>
                                                         <mat-select placeholder="Documento"
-                                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="busqueda">
+                                                            [ngModelOptions]="{standalone: true}"
+                                                            [(ngModel)]="busqueda">
                                                             <mat-option value="0">DETALLADA</mat-option>
                                                             <mat-option value="1">AGRUPADA</mat-option>
                                                         </mat-select>
@@ -601,8 +642,8 @@
                                                 <div class="col-md-3">
                                                     <div class="text-left" style="padding-top: 5px; margin: 0px">
                                                         <div class="example-button-container" style="width:150px">
-                                                            <button class="btn bg-primary text-white" style="height: 50px;"
-                                                                (click)="FilConsultar(0)">
+                                                            <button class="btn bg-primary text-white"
+                                                                style="height: 50px;" (click)="FilConsultar(0)">
                                                                 Consultar datos
 
                                                             </button>
@@ -612,8 +653,8 @@
                                                 <div class="col-md-3">
                                                     <div class="text-left" style="padding-top: 5px; margin: 0px;">
                                                         <div class="example-button-container" style="width:150px">
-                                                            <button class="btn bg-warning text-white" style="height: 50px;"
-                                                                (click)="FilConsultar(1)">
+                                                            <button class="btn bg-warning text-white"
+                                                                style="height: 50px;" (click)="FilConsultar(1)">
                                                                 Listar sin fecha
 
                                                             </button>
@@ -626,23 +667,24 @@
                                         <hr *ngIf="blFiltro">
                                         <div *ngIf="!blFiltro">
                                             <div class="row">
-                                               
+
                                                 <div class="col-md-12 text-right">
-                                                    
+
                                                     <button class="btn bg-success text-white "
                                                         (click)="MostrarFiltro();">
-                                                        <span class="fa fa-upload"></span>&nbsp;&nbsp;Mostrar formulario </button>
+                                                        <span class="fa fa-upload"></span>&nbsp;&nbsp;Mostrar formulario
+                                                    </button>
 
-                                                    <button class="btn bg-info text-white "
-                                                        (click)="downloadCSV();">
-                                                        <span class="fa fa-download"></span>&nbsp;&nbsp;Descargar consulta </button>
+                                                    <button class="btn bg-info text-white " (click)="downloadCSV();">
+                                                        <span class="fa fa-download"></span>&nbsp;&nbsp;Descargar
+                                                        consulta </button>
                                                     <br><br>
-                                                    
+
                                                 </div>
-                                                
+
                                             </div>
                                         </div>
-                                        
+
                                         <div class="row" *ngIf="dbResolucionFil">
 
                                             <div class="col-md-12">
@@ -675,7 +717,7 @@
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{e.cedula}} </a></td>
 
-                                                                    <!-- href="{{ obtenerUbicacion(e) }}"  -->
+                                                            <!-- href="{{ obtenerUbicacion(e) }}"  -->
                                                             <td><a *ngIf="!validarSeguridad(e)" class="enlace"
                                                                     (click)="dwUrl(e)" target="_blank"
                                                                     style="font-weight: bold; color: brown;">
@@ -758,48 +800,50 @@
                                     </div>
 
                                 </mat-tab>
-                                <mat-tab >
+                                <mat-tab>
                                     <ng-template mat-tab-label>
                                         &nbsp;EXPANDIDA
                                     </ng-template>
                                     <br>
                                     <div class="container">
-                                        <div class="row"  *ngIf="blExpandida">
+                                        <div class="row" *ngIf="blExpandida">
                                             <div class="form-group col-md-12">
-                                                
-                                                <textarea  [placeholder]="'Consultar rango de cedula'" 
-                                                class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
-                                                [(ngModel)]="rango_cedula"></textarea>
+
+                                                <textarea [placeholder]="'Consultar rango de cedula'"
+                                                    class="form-control" cols="30" rows="5"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    [(ngModel)]="rango_cedula"></textarea>
                                             </div>
                                             <div class="form-group col-md-12 text-right">
                                                 <button class="btn bg-success text-white "
                                                     (click)="ConsultaExpandida();">
-                                                    <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar listado </button>
+                                                    <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar listado
+                                                </button>
                                             </div>
 
 
                                         </div>
-                                        <div class="row" *ngIf="!blExpandida" >
-                                               
-                                            <div class="col-md-12 text-right">
-                                                
-                                                <button class="btn bg-success text-white "
-                                                    (click)="MostrarFiltroEx();">
-                                                    <span class="fa fa-upload"></span>&nbsp;&nbsp;Mostrar formulario </button>
+                                        <div class="row" *ngIf="!blExpandida">
 
-                                                <button class="btn bg-info text-white "
-                                                    (click)="downloadCSVEx();">
-                                                    <span class="fa fa-download"></span>&nbsp;&nbsp;Descargar consulta </button>
+                                            <div class="col-md-12 text-right">
+
+                                                <button class="btn bg-success text-white " (click)="MostrarFiltroEx();">
+                                                    <span class="fa fa-upload"></span>&nbsp;&nbsp;Mostrar formulario
+                                                </button>
+
+                                                <button class="btn bg-info text-white " (click)="downloadCSVEx();">
+                                                    <span class="fa fa-download"></span>&nbsp;&nbsp;Descargar consulta
+                                                </button>
                                                 <br><br>
-                                                
+
                                             </div>
-                                            
+
                                         </div>
                                         <hr>
 
                                         <div class="row" *ngIf="!blExpandida">
                                             <div class="col-md-12">
-                                                
+
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
                                                         <tr>
@@ -837,7 +881,7 @@
                                                 </table>
                                             </div>
                                         </div>
-                                        
+
                                     </div>
                                 </mat-tab>
 
@@ -849,58 +893,79 @@
                                     <br>
                                     <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
                                     <div class="container">
-                                        
+
                                         <div class="row">
-                                            <div class="col-md-2"></div>
-                                            <div class="col-md-8">
+                                            <div class="col-md-1"></div>
+                                            <div class="col-md-10">
                                                 <p>
-                                                    Los archivo que intente subir por esta via deben  ser de extension *.csv preferiblemente separado por coma (,) 
+                                                    Los archivo que intente subir por esta via deben ser de extension
+                                                    *.csv preferiblemente separado por coma (,)
                                                     y cumplir con el siguiente formato:
                                                 </p>
                                                 <ul>
                                                     <li>1.- La codificacion del fichero preferiblemente en UTF-8</li>
                                                     <li>2.- Deben iniciar sin cabecera o algun titulo de columna.</li>
-                                                    <li>3.- La primera columna del archivo debe contener un campo cedula.</li>
+                                                    <li>3.- La primera columna del archivo debe contener un campo
+                                                        cedula.</li>
                                                 </ul>
                                             </div>
-                                            <div class="col-md-2"></div>
+                                            <div class="col-md-1"></div>
                                         </div>
+                                        <br>
+
                                         <div class="row">
-                                            
-                                            <div class="col-md-12">
-                                                
+                                            <div class="col-md-3">
+
+                                                <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                                    [(ngModel)]="tiponomina" value="{{tiponomina}}">
+                                                    <option value="0">NOMINA INTERNA</option>
+                                                    <option value="1">NOMINA SAIME</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-9">
+
 
                                                 <!-- Adjuntar Imagenes al Documento -->
-                                                <form form method="post" enctype="multipart/form-data" id="forma" name="forma">
+                                                <form form method="post" enctype="multipart/form-data" id="forma"
+                                                    name="forma">
                                                     <input type="hidden" name="identificador" value="{{idTransaccion}}">
                                                     <input type="hidden" name="return" value="true">
                                                     <div class="row">
-                                                        <div class="col-md-7">
+                                                        <div class="col-md-8">
                                                             <div class="input_container">
-                                                                <input (change)="fileSelected($event)" id="fileUpload" type="file" name="archivos" accept=".csv" />
+                                                                <input (change)="fileSelected($event)" id="fileUpload"
+                                                                    type="file" name="archivos" accept=".csv" />
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-3">
+                                                        <div class="col-md-4 text-right">
+
                                                             <button class="btn bg-success text-white text-left"
-                                                                (click)="SubirArchivo()">
-                                                                <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos</button>
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <button class="btn bg-info text-white text-right" *ngIf="!blExpandidaFile"
-                                                                (click)="downloadCSVExFile();">
-                                                                <span class="fa fa-download"></span>&nbsp;&nbsp;Descargar</button>
+                                                                *ngIf="blExpandidaFile" (click)="SubirArchivo()">
+                                                                <span style="font-size: 18px;"
+                                                                    class="fa fa-upload"></span>&nbsp;&nbsp;Subir
+                                                            </button>
+
+                                                            <button class="btn bg-info text-white text-right"
+                                                                *ngIf="!blExpandidaFile" (click)="downloadCSVExFile();">
+                                                                <span style="font-size: 18px;"
+                                                                    class="fa fa-download"></span>&nbsp;&nbsp;Descargar</button>
+                                                            <button class="btn bg-warning text-white text-left"
+                                                                (click)="ReveserConsutla()">
+                                                                <span style="font-size: 18px;"
+                                                                    class="fa fa-times-circle"></span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </form>
                                             </div>
-                                           
+
 
                                         </div>
                                         <hr>
 
                                         <div class="row" *ngIf="!blExpandidaFile">
                                             <div class="col-md-12">
-                                                
+
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
                                                         <tr>
@@ -965,43 +1030,44 @@
 
 <!-- Adjuntar Imagenes al Documento -->
 <ng-template #detalles let-c="close" let-d="dismiss">
-    
+
     <div class="modal-body">
         <div class="form-row">
             <div class="form-group col-md-12">
                 <label for="txtObjeto">Instrucciones especiales</label>
                 <div class="col-md-12">
                     <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
-                    [(ngModel)]="instrucciones"
-                    placeholder="Instrucciones..." style="width: 100%">{{instrucciones}}</textarea>
-                </div>
-            </div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group col-md-12">
-                <label for="txtObjeto">Observaciones</label>
-                <div class="col-md-12">
-                    <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
-                    [(ngModel)]="observacion" placeholder="Observaciones..."  style="width: 100%">{{observacion}}</textarea>
+                        [(ngModel)]="instrucciones" placeholder="Instrucciones..."
+                        style="width: 100%">{{instrucciones}}</textarea>
                 </div>
             </div>
         </div>
 
         <div class="form-row">
-            <div class="col-md-12" >
+            <div class="form-group col-md-12">
+                <label for="txtObjeto">Observaciones</label>
+                <div class="col-md-12">
+                    <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="observacion" placeholder="Observaciones..."
+                        style="width: 100%">{{observacion}}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="col-md-12">
                 <table class="table table-bordered table-hover">
-        
+
                     <thead>
-                        <tr  style="background-color: #CCC">
+                        <tr style="background-color: #CCC">
                             <th style="text-align: center;">CREADOR POR</th>
                             <th style="text-align: center;">FECHA CREACION</th>
-                            
+
                         </tr>
                         <tr>
                             <td style="text-align: center;">{{autor_creador}}</td>
                             <td style="text-align: center;">{{fecha_registro}}</td>
-                            
+
                         </tr>
                     </thead>
                 </table>
@@ -1013,7 +1079,7 @@
                 <label for="txtObjeto">Destino</label>
                 <div class="col-md-12">
                     <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
-                    [(ngModel)]="destino" placeholder="Destino..."  style="width: 100%">{{destino}}</textarea>
+                        [(ngModel)]="destino" placeholder="Destino..." style="width: 100%">{{destino}}</textarea>
                 </div>
             </div>
         </div>
@@ -1021,8 +1087,8 @@
 
     </div>
     <div class="modal-footer">
-      <button class="btn bg-gradient-info text-white " (click)="c('Save')">
-        <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
-     
+        <button class="btn bg-gradient-info text-white " (click)="c('Save')">
+            <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+
     </div>
-  </ng-template>
+</ng-template>

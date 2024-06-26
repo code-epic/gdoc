@@ -262,11 +262,11 @@ export class UtilService {
   ConvertToCSV(objArray, headerList) {
     let array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
     let str = "";
-    let row = "#num|";
+    let row = "#num,";
 
     for (let index in headerList) {
       // console.log(index, headerList);
-      row += headerList[index] + "|";
+      row += headerList[index] + ",";
     }
     // console.log(row);
     row = row.slice(0, -1);
