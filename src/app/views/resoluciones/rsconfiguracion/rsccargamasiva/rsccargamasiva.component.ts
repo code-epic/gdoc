@@ -374,6 +374,8 @@ export class RsccargamasivaComponent implements OnInit {
 
   public foto_cedula: string = "";
 
+  
+
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
   public TipoResoluciones: any;
@@ -414,6 +416,8 @@ export class RsccargamasivaComponent implements OnInit {
   llave: string
   archivo_otro: string
   otra_llave: string 
+
+  public cargando : boolean = true
 
   constructor(
     private apiService: ApiService,
@@ -858,10 +862,14 @@ export class RsccargamasivaComponent implements OnInit {
   }
 
   async SubirArchivo() {
+    
     if (this.IResolucion.numero == "") {
       this._snackBar.open("Debe indicar un numero de resuelto y fecha", "OK");
       return;
     }
+
+    this.cargando = false
+
     this.ngxService.startLoader("loader-aceptar");
     this.evaluarDatos();
     this.files.hash = this.hashcontrol;
@@ -935,8 +943,10 @@ export class RsccargamasivaComponent implements OnInit {
     this.apiService.EjecutarProceso(ascender).subscribe(
       (data) => {
         this.ngxService.stopLoader("loader-aceptar");
+        this.cargando = true
         this.resetearFechas(true);
         this.aceptar("");
+        
       },
       (errot) => {
         this.toastrService.warning(

@@ -376,6 +376,8 @@ export class RscondecoracionesComponent implements OnInit {
 
   public foto_cedula: string = "";
 
+  public cargando : boolean = true
+
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
   public TipoResoluciones: any;
@@ -921,7 +923,10 @@ export class RscondecoracionesComponent implements OnInit {
       this._snackBar.open("Debe indicar un numero de resuelto y fecha", "OK");
       return;
     }
+    
     this.ngxService.startLoader("loader-aceptar");
+    this.cargando = false
+
     this.evaluarDatos();
     this.files.hash = this.hashcontrol;
     // this.Ejecutar()
@@ -989,9 +994,12 @@ export class RscondecoracionesComponent implements OnInit {
     this.apiService.EjecutarLotes(otraresol).subscribe(
       (data) => {
         this.ngxService.stopLoader("loader-aceptar");
+        this.cargando = true
         this.resetearFechas(true);
         this.btnAccion = false
+        
         this.aceptar("");
+        
       },
       (errot) => {
         this.toastrService.warning(

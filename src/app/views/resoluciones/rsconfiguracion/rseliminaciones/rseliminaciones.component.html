@@ -35,7 +35,7 @@
       <div class="col-md-2">
         <div class="text-right" style="padding-top: 5px;">
           <button class="btn bg-primary text-white" style="height: 50px;" (click)="consultarResolucion(undefined)">
-            Consultar 
+            Consultar
           </button>
         </div>
       </div>
@@ -43,34 +43,37 @@
       <div class="col-md-4"></div>
 
     </div>
-    <div class="row" *ngIf="detalle">
-      <div class="col-md-1"></div>
-      <div class="col-md-10">
-        RESUMEN <b>{{ resolucion }}</b>: <BR><BR>
-        ACTUALMENTE ESTA RESOLUCION POSEE ( {{ total }}) REGISTROS EN EL SISTEMA
-        PARA BORRAR ESTOS REGISTROS DEBE SOLICITAR LA AUTORIZACION.<br><br>
 
-        <B>
-        <font style="color:brown">
-          NOTA: RECUERDE TENER PRESENTE QUE ESTA ACCION ELIMINA DEL SISTEMA COMPLETAMENTE LA RESOLUCION
-        </font>
-        </B>
-        <hr>
-      </div>
-      <div class="col-md-1"></div>
-    </div>
-    <div class="row" *ngIf="detalle">
-      <div class="col-md-9"></div>
-      <div class="col-md-2">
-        <div class="text-right" style="padding-top: 5px;">
-          <button class="btn bg-warning text-white" style="height: 50px;" (click)="eliminar(undefined)">
-            Eliminar 
-          </button>
+    <div class="container" *ngFor="let e of lstResoluciones">
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+          RESUMEN <b>{{ e.numero_resol }}</b>: <BR><BR>
+          ACTUALMENTE ESTA RESOLUCION POSEE ( {{ e.cantidad }}) REGISTROS EN EL SISTEMA
+          PARA BORRAR ESTOS REGISTROS DEBE SOLICITAR LA AUTORIZACION.<br><br>
+
+          <B>
+            <font style="color:brown">
+              NOTA: RECUERDE TENER PRESENTE QUE ESTA ACCION ELIMINA DEL SISTEMA COMPLETAMENTE LA RESOLUCION
+            </font>
+          </B>
+          <hr>
         </div>
+        <div class="col-md-1"></div>
       </div>
-      <div class="col-md-1"></div>
-    </div>
+      <div class="row">
 
+        <div class="col-md-12 text-right">
+          <div class="text-right" style="padding-top: 5px;">
+            <button *ngIf="cargando" class="btn bg-warning text-white" style="height: 50px;" (click)="eliminar(e.fecha_resol)">
+              Eliminar {{e.fecha_resol}} 
+              <br>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </mat-tab>
 
   <mat-tab>

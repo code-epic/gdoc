@@ -329,7 +329,7 @@
 <div class="row" *ngIf="btnAccion">
     <div class="col-md-12">
         <div class="text-right">
-            <button class="btn bg-success text-white" (click)="SubirArchivo()">Procesar solicitud</button>
+            <button  *ngIf="cargando" class="btn bg-success text-white" (click)="SubirArchivo()">Procesar solicitud</button>
         </div>
     </div>
 </div>
