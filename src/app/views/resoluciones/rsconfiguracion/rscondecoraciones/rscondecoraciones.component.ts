@@ -370,7 +370,7 @@ export class RscondecoracionesComponent implements OnInit {
 
   public foto_cedula: string = "";
 
-  public btncargango : boolean = true
+  public btncargando : boolean = true
 
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
@@ -919,7 +919,7 @@ export class RscondecoracionesComponent implements OnInit {
     }
     
     this.ngxService.startLoader("loader-aceptar");
-    this.btncargango = false
+    this.btncargando = false
 
     this.evaluarDatos();
     this.files.hash = this.hashcontrol;
@@ -991,7 +991,7 @@ export class RscondecoracionesComponent implements OnInit {
         
         this.resetearFechas(true)
         this.btnAccion = false
-        this.btncargango = true
+        this.btncargando = true
         this.aceptar("");
         
       },

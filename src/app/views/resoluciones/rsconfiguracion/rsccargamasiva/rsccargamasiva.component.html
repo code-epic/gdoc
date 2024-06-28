@@ -286,7 +286,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="text-right">
-            <button class="btn bg-primary text-white" (click)="SubirArchivo()">Procesar solicitud</button>
+            <button *ngIf="btncargando" class="btn bg-primary text-white" (click)="SubirArchivo()">Procesar solicitud</button>
         </div>
     </div>
 </div>

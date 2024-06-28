@@ -411,7 +411,7 @@ export class RsccargamasivaComponent implements OnInit {
   archivo_otro: string
   otra_llave: string 
 
-  public cargando : boolean = true
+  public btncargando : boolean = true
 
   constructor(
     private apiService: ApiService,
@@ -862,7 +862,7 @@ export class RsccargamasivaComponent implements OnInit {
       return;
     }
 
-    this.cargando = false
+    this.btncargando = false
 
     this.ngxService.startLoader("loader-aceptar");
     this.evaluarDatos();
@@ -937,8 +937,9 @@ export class RsccargamasivaComponent implements OnInit {
     this.apiService.EjecutarProceso(ascender).subscribe(
       (data) => {
         this.ngxService.stopLoader("loader-aceptar");
-        this.cargando = true
+        
         this.resetearFechas(true);
+        this.btncargando = true
         this.aceptar("");
         
       },
