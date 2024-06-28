@@ -992,6 +992,7 @@ export class RscondecoracionesComponent implements OnInit {
         this.resetearFechas(true)
         this.btnAccion = false
         this.btncargando = true
+        this.limpiarFrm()
         this.aceptar("");
         
       },

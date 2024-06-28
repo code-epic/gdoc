@@ -940,6 +940,7 @@ export class RsccargamasivaComponent implements OnInit {
         
         this.resetearFechas(true);
         this.btncargando = true
+        this.limpiarFrm()
         this.aceptar("");
         
       },
