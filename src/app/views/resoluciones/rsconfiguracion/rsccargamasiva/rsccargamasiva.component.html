@@ -231,34 +231,26 @@
 
 <div class="form-row">
     <div class="form-group col-md-12">
-        <div class="NgxEditor__Wrapper">
-            <label>
-                Asunto
-            </label>
-            <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
-                [(ngModel)]="IResolucion.asunto"></angular-editor>
-
-        </div>
+        <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="IResolucion.asunto" placeholder="Introduzca el asunto..."
+            style="width: 100%">{{IResolucion.asunto}}</textarea>
     </div>
 </div>
 
 <div class="form-row">
     <div class="form-group col-md-12">
-        <label for="txtObjeto">Instrucciones especiales</label>
-        <div class="NgxEditor__Wrapper">
-            <angular-editor [placeholder]="'Introduzca el texto con las instrucciones...'" [config]="editorConfig"
-                [(ngModel)]="IResolucion.instrucciones"></angular-editor>
-        </div>
+        <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="IResolucion.instrucciones" placeholder="Instrucciones..."
+            style="width: 100%">{{IResolucion.instrucciones}}</textarea>
     </div>
 </div>
 
 <div class="form-row">
     <div class="form-group col-md-12">
-        <label for="txtObjeto">Observaciones</label>
-        <div class="NgxEditor__Wrapper">
-            <angular-editor [placeholder]="'Introduzca el texto  para las observaciones...'" [config]="editorConfig"
-                [(ngModel)]="IResolucion.observacion"></angular-editor>
-        </div>
+        <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="IResolucion.observacion" placeholder="Introduzca el texto para observacion..."
+            style="width: 100%">{{IResolucion.observacion}}</textarea>
+
     </div>
 </div>
 

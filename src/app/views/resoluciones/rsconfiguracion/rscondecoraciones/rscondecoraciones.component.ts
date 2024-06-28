@@ -139,13 +139,7 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
 })
 
 export class RscondecoracionesComponent implements OnInit {
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
+ 
 
   public id: string = "";
 
@@ -376,7 +370,7 @@ export class RscondecoracionesComponent implements OnInit {
 
   public foto_cedula: string = "";
 
-  public cargando : boolean = true
+  public btncargango : boolean = true
 
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
@@ -925,7 +919,7 @@ export class RscondecoracionesComponent implements OnInit {
     }
     
     this.ngxService.startLoader("loader-aceptar");
-    this.cargando = false
+    this.btncargango = false
 
     this.evaluarDatos();
     this.files.hash = this.hashcontrol;
@@ -994,10 +988,10 @@ export class RscondecoracionesComponent implements OnInit {
     this.apiService.EjecutarLotes(otraresol).subscribe(
       (data) => {
         this.ngxService.stopLoader("loader-aceptar");
-        this.cargando = true
-        this.resetearFechas(true);
-        this.btnAccion = false
         
+        this.resetearFechas(true)
+        this.btnAccion = false
+        this.btncargango = true
         this.aceptar("");
         
       },

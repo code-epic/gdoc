@@ -138,13 +138,7 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
   ],
 })
 export class RsccargamasivaComponent implements OnInit {
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
+ 
 
   public id: string = "";
 
