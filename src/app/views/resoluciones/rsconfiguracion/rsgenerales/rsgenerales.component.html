@@ -1,1 +1,40 @@
-<p>rsgenerales works!</p>
+<div class="row">
+  <div class="form-group col-md-4">
+    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente" value="{{componente}}">
+      <option value="0">SELECCIONAR COMPONENTE</option>
+      <option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}
+      </option>
+    </select>
+  </div>
+  <div class="form-group col-md-2">
+    <button class="btn bg-primary text-white " (click)="ConsultarListado()">
+      <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar listado </button>
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <table style="width: 100%;" class="zigzag" border="1">
+      <thead>
+        <tr style="height: 40px;">
+          <th style="width: 30px;"> Nº </th>
+          <th> FOTO</th>
+          <th> GDO </th>
+          <th> NOMBRE Y APELLIDOS </th>
+          <th> ASCENSO </th>
+          <th> CARGO </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of lstGenerales">
+          <td>{{ e.cedula }}</td>
+          <td>{{ e.numero }}</td>
+          <td>{{ e.registro }}</td>
+          <td>{{ e.asunto.substring(0,20) }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>

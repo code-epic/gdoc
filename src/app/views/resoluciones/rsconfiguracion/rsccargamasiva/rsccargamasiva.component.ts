@@ -410,6 +410,7 @@ export class RsccargamasivaComponent implements OnInit {
   llave: string
   archivo_otro: string
   otra_llave: string 
+  public lstHistorico = []
 
   public btncargando : boolean = true
 
@@ -429,6 +430,10 @@ export class RsccargamasivaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
+
+    this.lstHistorico = sessionStorage.getItem("historico") != undefined ? JSON.parse(sessionStorage.getItem("historico")) : []
+
 
     this.llave = this.utilService.GenerarUnicId();
     this.Componentes =
@@ -936,6 +941,10 @@ export class RsccargamasivaComponent implements OnInit {
     };
     this.apiService.EjecutarProceso(ascender).subscribe(
       (data) => {
+
+        this.lstHistorico.push(this.IResolucion)
+
+        sessionStorage.setItem('historico', JSON.stringify(this.lstHistorico))
         this.ngxService.stopLoader("loader-aceptar");
         
         this.resetearFechas(true);

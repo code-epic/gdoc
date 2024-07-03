@@ -504,21 +504,27 @@
 
         <div class="form-row">
             <div class="form-group col-md-12">
-                <label for="txtObjeto">Instrucciones especiales</label>
+                <!-- <label for="txtObjeto">Instrucciones especiales</label>
                 <div class="NgxEditor__Wrapper">
                     <angular-editor [placeholder]="'Instrucciones...'" [config]="editorConfigx"
                         [(ngModel)]="instrucciones"></angular-editor>
-                </div>
+                </div> -->
+                <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="instrucciones" placeholder="Instrucciones..."
+                style="width: 100%">{{instrucciones}}</textarea>
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group col-md-12">
-                <label for="txtObjeto">Observaciones</label>
+                <!-- <label for="txtObjeto">Observaciones</label>
                 <div class="NgxEditor__Wrapper">
                     <angular-editor [placeholder]="'Observaciones...'" [config]="editorConfigx"
                         [(ngModel)]="observacion"></angular-editor>
-                </div>
+                </div> -->
+                <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="observacion" placeholder="Introduzca el texto para observacion..."
+                        style="width: 100%">{{observacion}}</textarea>
             </div>
         </div>
 
@@ -544,11 +550,14 @@
 
         <div class="form-row">
             <div class="form-group col-md-12">
-                <label for="txtObjeto">Destino</label>
+                <!-- <label for="txtObjeto">Destino</label>
                 <div class="NgxEditor__Wrapper">
                     <angular-editor [placeholder]="'Destino...'" [config]="editorConfigx"
                         [(ngModel)]="destino"></angular-editor>
-                </div>
+                </div> -->
+                <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="destino" placeholder="Introduzca el texto para el destino..."
+                        style="width: 100%">{{destino}}</textarea>
             </div>
         </div>
 

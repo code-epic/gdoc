@@ -251,21 +251,6 @@ export class ConsultaGeneralComponent implements OnInit {
   selected = new FormControl(0);
   public csvHead: any;
 
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
-
-  editorConfigx: AngularEditorConfig = {
-    editable: false,
-    spellcheck: false,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
 
   public blResolucionPanel: boolean = false;
   public orden_pagina: number = 0;
