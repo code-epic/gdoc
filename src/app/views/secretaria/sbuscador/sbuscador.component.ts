@@ -61,7 +61,7 @@ export class SbuscadorComponent implements OnInit {
   public SubDocumento: SubDocumento = {
       subdocumento: 0,
       cuenta: '',
-      estatus: '',
+      estatus: '0',
       decision: '',
       accion: '',
       comentario: '',
@@ -140,19 +140,19 @@ export class SbuscadorComponent implements OnInit {
 
 
 
-  public lstAcciones = [
-    { 'valor': '0', 'texto': 'EN PROCESO', 'visible': '1' },
-    { 'valor': '1', 'texto': 'ANALISTA', 'visible': '1' },
-    { 'valor': '2', 'texto': 'JEFE DE AREA', 'visible': '1' },
-    { 'valor': '3', 'texto': 'BANDEJA DE ESPERA', 'visible': '1' },
-    { 'valor': '4', 'texto': 'PRESIDENCIAL', 'visible': '1' },
+  public xlstAcciones = [
     { 'valor': '5', 'texto': 'ESPERA DE OPINION', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
     { 'valor': '6', 'texto': 'CONSULTORIA JURIDICA', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
     { 'valor': '7', 'texto': 'AREA DE RESOLUCIONES', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
     { 'valor': '8', 'texto': 'SUB-DIRECCION', 'visible': '1' },
     { 'valor': '9', 'texto': 'DIRECCION GENERAL', 'visible': '1' },
     { 'valor': '10', 'texto': 'DESPACHO DEL MPPD', 'visible': '1' },  //7/5/3 Asociado a los plazos en las alertas
-    { 'valor': '11', 'texto': 'ARCHIVO', 'visible': '1' }
+    { 'valor': '11', 'texto': 'ARCHIVO', 'visible': '1' },
+    { 'valor': '0', 'texto': 'EN PROCESO', 'visible': '1' },
+    { 'valor': '1', 'texto': 'ANALISTA', 'visible': '1' },
+    { 'valor': '2', 'texto': 'JEFE DE AREA', 'visible': '1' },
+    { 'valor': '3', 'texto': 'BANDEJA DE ESPERA', 'visible': '1' },
+    { 'valor': '4', 'texto': 'PRESIDENCIAL', 'visible': '1' },
   ]
 
   public focus = true
@@ -263,72 +263,72 @@ export class SbuscadorComponent implements OnInit {
     this.ngxService.startLoader("loader-aceptar");
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.bzSeguimientoO = data.Cuerpo.map((e) => {
-          e.busqueda = this.utilService.ConvertirCadena(
-            e.norigen +
-            " " +
-            e.ncontrol +
-            " " +
-            e.contenido +
-            e.estatus_nombre +
-            " " +
-            e.remitente +
-            " " +
-            e.nombre +
-            " " +
-            e.creado +
-            " " +
-            e.salida +
-            " " +
-            e.unidad +
-            " " +
-            e.subdocumento
-          );
-          e.numc = e.ncontrol;
-          e.existe = e.anom == "" ? true : false;
-          e.privado = e.priv == 1 ? true : false;
-          e.color = "green";
-          e.s_texto = "";
-          if (e.s_estatus > 0 || e.s_estatus < 10) {
-            e.s_texto =
-              e.s_estatus != null
-                ? " - " + this.lstAcciones[e.s_estatus].texto
-                : "";
-          }
+        // this.bzSeguimientoO = data.Cuerpo.map((e) => {
+        //   e.busqueda = this.utilService.ConvertirCadena(
+        //     e.norigen +
+        //     " " +
+        //     e.ncontrol +
+        //     " " +
+        //     e.contenido +
+        //     e.estatus_nombre +
+        //     " " +
+        //     e.remitente +
+        //     " " +
+        //     e.nombre +
+        //     " " +
+        //     e.creado +
+        //     " " +
+        //     e.salida +
+        //     " " +
+        //     e.unidad +
+        //     " " +
+        //     e.subdocumento
+        //   );
+        //   e.numc = e.ncontrol;
+        //   e.existe = e.anom == "" ? true : false;
+        //   e.privado = e.priv == 1 ? true : false;
+        //   e.color = "green";
+        //   e.s_texto = "";
+        //   if (e.s_estatus > 0 || e.s_estatus < 10) {
+        //     e.s_texto =
+        //       e.s_estatus != null
+        //         ? " - " + this.x[e.s_estatus].texto
+        //         : "";
+        //   }
 
-          switch (e.tdoc.toLowerCase()) {
-            case "punto de cuenta":
-              e.simbolo = "-P";
-              e.color = "green";
-              break;
-            case "tramitacion por organo regular":
-              e.simbolo = "-T";
-              e.color = "brown";
-              break;
-            case "resolucion":
-              e.simbolo = "-R";
-              e.color = "orange";
-              break;
-            default:
-              e.simbolo = "";
-              break;
-          }
-          e.resumenl = e.contenido.substring(0, 200);
-          e.completed = false;
-          return e;
-        });
+        //   switch (e.tdoc.toLowerCase()) {
+        //     case "punto de cuenta":
+        //       e.simbolo = "-P";
+        //       e.color = "green";
+        //       break;
+        //     case "tramitacion por organo regular":
+        //       e.simbolo = "-T";
+        //       e.color = "brown";
+        //       break;
+        //     case "resolucion":
+        //       e.simbolo = "-R";
+        //       e.color = "orange";
+        //       break;
+        //     default:
+        //       e.simbolo = "";
+        //       break;
+        //   }
+        //   e.resumenl = e.contenido.substring(0, 200);
+        //   e.completed = false;
+        //   return e;
+        // });
 
-        this.bzBusqueda = this.bzSeguimientoO;
-        this.longitud = this.bzBusqueda.length;
-        this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
-        this.cantidad = this.longitud;
-        this.max_paginador = this.cantidad / 10;
-        this.blBuscar = true;
-        this.MostrarPaginador();
-        this.cargador = true;
-        this.ngxService.stopLoader("loader-aceptar");
-        this.contenidoDocumento = ""
-        this.buscar = ""
+        // this.bzBusqueda = this.bzSeguimientoO;
+        // this.longitud = this.bzBusqueda.length;
+        // this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
+        // this.cantidad = this.longitud;
+        // this.max_paginador = this.cantidad / 10;
+        // this.blBuscar = true;
+        // this.MostrarPaginador();
+        // this.cargador = true;
+        // this.ngxService.stopLoader("loader-aceptar");
+        // this.contenidoDocumento = ""
+        // this.buscar = ""
       },
       (error) => {
         console.log("Error en la carga");

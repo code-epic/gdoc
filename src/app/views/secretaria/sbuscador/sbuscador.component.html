@@ -16,13 +16,13 @@
                             <h2 class="mb-0">Buscador de Documentos</h2>
                         </div>
                         <div class="col-md-7">
-                            <div class="div-radio-avanzado">
+                            <!-- <div class="div-radio-avanzado">
                                 <mat-radio-group class="mat-radio" [(ngModel)]="opttodos" color="primary">
                                     <mat-radio-button value="0"> TODAS </mat-radio-button>
                                     <mat-radio-button value="1"> ENTRADA </mat-radio-button>
                                     <mat-radio-button value="2"> SALIDA </mat-radio-button>
                                 </mat-radio-group>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
@@ -54,10 +54,8 @@
                                     <mat-label>TIPO DE NUMERO</mat-label>
                                     <mat-select [(ngModel)]="tipoDocumento">
                                         <mat-option value="0" selected>SELECCIONE</mat-option>
-                                        <mat-option value="1"> NRO. CEDULA</mat-option>
-                                        <mat-option value="2"> NRO. CONTROL</mat-option>
-                                        <mat-option value="3"> NRO. ORIGEN</mat-option>
-                                        <mat-option value="4"> NRO. SALIDA</mat-option>
+                                        <mat-option value="1">PUNTO DE CUENTA</mat-option>
+                                        <mat-option value="2">NRO. CONTROL</mat-option>
                                     </mat-select>
                                 </mat-form-field>
                             </div>
@@ -75,18 +73,11 @@
                         </div>
 
                         <div class="col-md-2 seleccionar">
-                            <div class="div-interno">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Estatus Del Documento</mat-label>
-                                    <mat-select [ngModelOptions]="{ standalone: true }" [(ngModel)]="SubDocumento.estatus"
-                                        placeholder="Estatus">
-                                        <mat-option value="0">SELECCIONE</mat-option>
-                                        <mat-option *ngFor="let e of lstAcciones" value="{{ e.valor }}">
-                                            {{ e.texto }}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>
+                            <select style ="height: 50px; margin-top:10px" class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="SubDocumento.estatus">
+                                <option value="0">SELECCIONE</option>
+                                <option *ngFor="let e of xlstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+                            </select>
                         </div>
 
                         <div class="col-11 col-md-1">

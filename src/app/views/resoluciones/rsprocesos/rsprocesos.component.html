@@ -9,11 +9,11 @@
             <div class="card shadow">
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
-                        <div class="col-md-10">
+                        <div class="col-md-9">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
                             <h2 class="mb-0">{{titulo}}</h2>
                         </div>
-                        <div class="col-md-1">
+                        <div class="col-md-1 text-right">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
                                     <button mat-icon-button title="Volver Atrás" (click)="irAnterior()">
@@ -22,7 +22,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-1">
+                        <div class="col-md-1 text-right">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Ver historico de operaciones" (click)="open(historico)" *ngIf="blHistorico">
+                                        <mat-icon style="font-size: 36px;">history</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1 text-right">
+
                             <ul class="navbar-nav align-items-right d-none d-md-flex">
                                 <li class="nav-item" ngbDropdown placement="bottom-right">
                                     <a class="nav-link pr-0" role="button" ngbDropdownToggle>
@@ -172,3 +182,47 @@
     </div>
     <!-- Fin de Tarjeta Padre -->
 </div>
+
+
+
+
+<!-- Adjuntar Imagenes al Documento -->
+<ng-template #historico let-c="close" let-d="dismiss">
+
+    <div class="modal-body">
+        
+        <div class="col-md-12">
+            <h2>Historico de operaciones </h2>
+        </div>
+        <hr>
+        <div class="col-md-12">
+            <table style="width: 100%;" class="zigzag" border="1">
+                <thead>
+                    
+                    <tr>
+                        <th style="width: 110px;"> CEDULA</th>
+                        <th> RESUELTO</th>
+                        <th> FECHA OPERACION</th>
+                        <th> ASUNTO </th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                        <tr *ngFor="let e of lstHistorico">
+                            <td>{{ e.cedula }}</td>
+                            <td>{{ e.numero }}</td>
+                            <td>{{ e.registro }}</td>
+                            <td>{{ e.asunto.substring(0,20) }}</td>
+                        </tr>
+                </tbody>
+
+
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn bg-primary text-white " (click)="c('Save')">
+            <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+
+    </div>
+</ng-template>

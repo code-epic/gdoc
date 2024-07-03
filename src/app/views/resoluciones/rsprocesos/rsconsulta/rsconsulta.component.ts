@@ -252,6 +252,7 @@ export class RsconsultaComponent implements OnInit {
   selected = new FormControl(0)
   public csvHead: any
   public csvHeadFile: any
+  public delimitador : string = '|'
 
 
 
@@ -1011,7 +1012,8 @@ export class RsconsultaComponent implements OnInit {
     this.utilService.downloadFile(
       head,
       this.lstRangoCedulaFile,
-      "Ex-" + this.idTransaccion
+      "Ex-" + this.idTransaccion,
+      this.delimitador
     );
   }
 
@@ -1044,7 +1046,8 @@ export class RsconsultaComponent implements OnInit {
     this.utilService.downloadFile(
       head,
       this.lstResolucionesX,
-      "RS-" + this.utilService.GenerarUnicId()
+      "RS-" + this.utilService.GenerarUnicId(),
+      this.delimitador
     );
   }
 
@@ -1055,7 +1058,8 @@ export class RsconsultaComponent implements OnInit {
     this.utilService.downloadFile(
       head,
       this.lstRangoCedula,
-      "RC-" + this.utilService.GenerarUnicId()
+      "RC-" + this.utilService.GenerarUnicId(),
+      this.delimitador
     );
   }
 

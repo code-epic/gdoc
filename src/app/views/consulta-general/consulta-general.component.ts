@@ -192,6 +192,7 @@ export class ConsultaGeneralComponent implements OnInit {
   public valEdit: boolean = false;
 
   public dbTools: boolean = false;
+  public delimitador : string = ';'
 
   public carpeta: string = "";
   public nombre: string = "";
@@ -973,7 +974,8 @@ export class ConsultaGeneralComponent implements OnInit {
     this.utilService.downloadFile(
       head,
       this.lstResolucionesX,
-      "RS-" + this.utilService.GenerarUnicId()
+      "RS-" + this.utilService.GenerarUnicId(),
+      this.delimitador
     );
   }
 
@@ -984,7 +986,8 @@ export class ConsultaGeneralComponent implements OnInit {
     this.utilService.downloadFile(
       head,
       this.lstRangoCedula,
-      "RC-" + this.utilService.GenerarUnicId()
+      "RC-" + this.utilService.GenerarUnicId(),
+      this.delimitador
     );
   }
 

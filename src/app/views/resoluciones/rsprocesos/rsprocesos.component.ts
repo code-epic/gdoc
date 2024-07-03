@@ -15,7 +15,7 @@ import { NgbModal, NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter }
 export class RsprocesosComponent implements OnInit {
 
   // xobser: Editor = new Editor;
-  public id : string = ''
+  public id: string = ''
 
   public lstProyectos = []
   public lstCotizaciones = []
@@ -34,7 +34,7 @@ export class RsprocesosComponent implements OnInit {
 
   public buscar = ''
 
-  public favance : NgbDate | null
+  public favance: NgbDate | null
 
   public posicionPagina = 0
 
@@ -48,6 +48,8 @@ export class RsprocesosComponent implements OnInit {
   public generales = false
   public entradas = false
   public eliminaciones = false
+  public lstHistorico = []
+  public blHistorico = false
 
   longitud = 0;
   pageSize = 10;
@@ -56,7 +58,7 @@ export class RsprocesosComponent implements OnInit {
   // MatPaginator Output
   pageEvent: PageEvent;
 
-  constructor( private apiService: ApiService,
+  constructor(private apiService: ApiService,
     private modalService: NgbModal,
     private ruta: Router,
     public formatter: NgbDateParserFormatter,
@@ -64,6 +66,16 @@ export class RsprocesosComponent implements OnInit {
     private utilService: UtilService) { }
 
   ngOnInit(): void {
+
+    if (window.sessionStorage.getItem("historico") != undefined) {
+      this.lstHistorico = JSON.parse(
+        window.sessionStorage.getItem("historico"))
+      this.blHistorico = true
+    }
+
+  }
+
+  verHistorico() {
 
   }
 
@@ -73,17 +85,16 @@ export class RsprocesosComponent implements OnInit {
 
   }
 
-  
 
 
 
-  open(content, id) {
-    this.id = id
+
+  open(content) {
+    this.lstHistorico = sessionStorage.getItem("historico") != undefined ? JSON.parse(sessionStorage.getItem("historico")) : []
     this.modalService.open(content, { size: 'lg' });
-
   }
 
-  desactivar(titulo : string){
+  desactivar(titulo: string) {
     this.dbasico = false
     this.aresolucion = false
     this.lotes = false
@@ -100,7 +111,7 @@ export class RsprocesosComponent implements OnInit {
     this.recorrerElementos(e.pageIndex)
   }
 
-  recorrerElementos(pagina : number){
+  recorrerElementos(pagina: number) {
     let pag = this.pageSize
     pag = pag * pagina
 
@@ -109,19 +120,19 @@ export class RsprocesosComponent implements OnInit {
     // }else{
     //   this.bzSeguimiento =  this.bzBusqueda.slice(pag, pag + this.pageSize)
     // }
-   
-   
+
+
   }
 
-  editar(ruta: string, id: string){
+  editar(ruta: string, id: string) {
     const base = btoa(id)
     this.ruta.navigate(['/' + ruta, base])
   }
-  
-  irAnterior(){
-    if (this.menu){
+
+  irAnterior() {
+    if (this.menu) {
       history.back()
-    }else{
+    } else {
       this.menu = true
       this.dbasico = false
       this.aresolucion = false

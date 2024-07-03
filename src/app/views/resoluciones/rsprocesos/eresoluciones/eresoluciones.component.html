@@ -497,7 +497,7 @@
         </div>
     </div>
     <div class="modal-footer">
-      <button class="btn bg-gradient-warning text-white " (click)="AsignarCoordenadana();c('Save')">
+      <button class="btn bg-gradient-warning text-white " (click)="AsignarCoordenadana();c('Save')" *ngIf="!blSave">
         <span class="fa fa-key"></span>&nbsp;&nbsp;Aceptar </button>
      
     </div>
