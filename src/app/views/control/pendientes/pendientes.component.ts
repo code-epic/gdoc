@@ -7,7 +7,7 @@ import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import {IWKFAlerta,IDocumento,} from "src/app/services/control/documentos.service";
 import { LoginService } from "src/app/services/seguridad/login.service";
 import { UtilService } from "src/app/services/util/util.service";
-import { FormControl, FormGroup } from "@angular/forms";
+import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from "@angular/forms";
 import { PendientesService } from "src/app/core/service/control/pendientes.service";
 
 @Component({
@@ -27,7 +27,7 @@ export class PendientesComponent implements OnInit {
   public bzSeguimientoO = [];
   public bzSeguimiento = [];
 
-  public fplazo: any;
+  // public fplazo: any;
   public cargador: boolean = true;
   public sinDatos: boolean = false;
   public buscar = "";
@@ -57,52 +57,13 @@ export class PendientesComponent implements OnInit {
   public fcreacion: any;
   public forigen: any;
   public fcuenta: any;
-
-  public fcreacionDate: NgbDate | null;
-  public forigenDate: NgbDate | null;
-  public fcuentaDate: NgbDate | null;
-
-  public subfechaDate: NgbDate | null;
-
-  public editar: boolean = false;
   public puntocuenta: boolean = false;
-  public salidavisible: boolean = true;
   public resolucion: boolean = false;
-  public activarMensaje = false;
   public vistacontenido: boolean = false;
-  public detalle: string = "";
-
-  public cuenta: string = "";
-  public resumen: string = "";
-  public subfecha: string = "";
-  public cedula: string = "";
-  public cargo: string = "";
-  public nmilitar: string = "";
   public salida: string = "Nro. de Salida";
   public booPuntoCuenta: boolean = false;
 
-  public Doc: IDocumento = {
-    ncontrol: "",
-    wfdocumento: 0,
-    fcreacion: "",
-    forigen: "",
-    norigen: "",
-    salida: "",
-    tipo: "0",
-    remitente: "0",
-    unidad: "0",
-    comando: "0",
-    contenido: "",
-    instrucciones: "",
-    codigo: "0",
-    nexpediente: "",
-    creador: "",
-    archivo: "",
-    privacidad: 0,
-    subdocumento: "",
-    dependencias: "",
-    puntodecuenta: "",
-  };
+  public Doc: IDocumento = {};
 
   public WAlerta: IWKFAlerta = {
     documento: 0,
@@ -119,24 +80,16 @@ export class PendientesComponent implements OnInit {
   public lstU = []; //Objeto Unidad
   public lstC = []; //Objeto Comando
   public lstCA = []; //Objeto Comando
-  public lstCuenta = []; //Objeto Unidad
-
-  public lstHzAdjunto = []; //Historico de documentos adjuntos
-  public lstTraza = [];
-  public lstHistorial = [];
-  public lstDependencias = [];
+  
   public titulo = "Documento";
 
   public download: any;
-
   public Componentes: any;
   public Grados: any;
   public Categorias: any;
   public Clasificaciones: any;
   public Configuracion: any;
   public Configurar: boolean = false;
-
-  public activarTipo = false; // activar tipo de documento
 
   public xApi: IAPICore = {
     funcion: "",
@@ -165,9 +118,9 @@ export class PendientesComponent implements OnInit {
 
   longitud = 0;
   pageSize = 10;
-  // pageSizeOptions: number[] = [5, 10, 25, 100];
   pageEvent: PageEvent;
 
+  form:FormGroup;
   constructor(
     private apiService: ApiService,
     private modalService: NgbModal,
@@ -176,7 +129,8 @@ export class PendientesComponent implements OnInit {
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter, 
-    private pendienteSrv : PendientesService
+    public pendienteSrv : PendientesService,
+    private fb:FormBuilder
   ) {
 
     this.lstAcciones = this.pendienteSrv.getAction();
@@ -190,7 +144,6 @@ export class PendientesComponent implements OnInit {
   }
 
   async ngOnInit() {
-
     await this.loginService.Iniciar();
     this.SubMenu = await this.loginService.obtenerSubMenu("/control");
     let prv = this.loginService.obtenerPrivilegiosMenu("/control");
@@ -199,6 +152,22 @@ export class PendientesComponent implements OnInit {
         if (e.nombre == "configurar") this.Configurar = true;
       });
     } 
+
+    // ESTE BETA SIEMPRE DEBE ESTAR EN EL NGONINIT 
+    // NO PUEDE ESTAR EN EL CONSTRUCTOR RECORDEMOS QUE EL CONSTRUCTOR VA SIEMPRE ANTES QUE LAS LIBRERIAS DE ANGULAR 
+    this.form = this.fb.group({
+      tipoDocumento: new FormControl("valor por defecto", [Validators.required]),
+      var3: new FormControl("222", [Validators.required]),
+      var2: new FormControl("333", [Validators.required]),
+    });
+
+    console.log("************************************************");
+    console.log("ESTE ES EL JSON QUE VA PARA EL BACKEND DE EJEMPL");
+    console.log(this.form.getRawValue());
+    console.log("************************************************");
+
+  
+
   }
 
   async ConsultarSeguimiento(funcion: string) {
@@ -233,11 +202,11 @@ export class PendientesComponent implements OnInit {
     this.ngxService.startLoader("loader-aceptar");
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        // console.log(data.Cuerpo.length);
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
           e.busqueda = this.utilService.ConvertirCadena( e.norigen + " " + e.ncontrol + " " + e.contenido + e.estatus_nombre + " " +  
           e.remitente + " " + e.nombre + " " + e.creado + " " + e.salida + " " + e.unidad + " " + e.subdocumento
           );
+         
           e.numc = e.ncontrol;
           e.existe = e.anom == "" ? true : false;
           e.privado = e.priv == 1 ? true : false;
@@ -429,7 +398,7 @@ export class PendientesComponent implements OnInit {
     this.puntocuenta = false;
     this.resolucion = false;
     this.booPuntoCuenta = false;
-    this.lstCuenta = [];
+    // this.lstCuenta = [];
 
     if (tipo.indexOf("punto") >= 0) {
       this.setDescripcionPunto();
@@ -499,10 +468,9 @@ export class PendientesComponent implements OnInit {
   }
 
   consultarDocument(event: any) {
-    this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
-    this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
-
     if (event == undefined || event.charCode == 13) {
+      this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
+      this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
       this.vistacontenido = true;
       this.ConsultarSeguimiento("WKF_CSeguimiento");
     }

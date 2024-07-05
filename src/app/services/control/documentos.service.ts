@@ -5,7 +5,7 @@ import { IDatosBasicos, IResoluciones } from '../resoluciones/resolucion.service
 
 //Exportar documentos Detalles
 export interface IDocumento {
-  id?: string
+  id?: string 
   wfdocumento?: number
   ncontrol?: string
   fcreacion?: string

@@ -5,12 +5,15 @@ import { Injectable } from '@angular/core';
 })
 export class PendientesService {
 
+  // las variables no pueden iniciar con mayuscula deben ser ejemplo listaComponents, en terminos tecnicos se llama camelcase
   private Componentes: any;
   private Grados: any;
   private Categorias: any;
   private Clasificaciones: any;
   private Configuracion: any;
 
+
+  // esto es un modelo, puedes crear un medelo de datos., osea debes crear en la carpeta core una carpeta llamada models y creaas una interfaz.
   private lstAction: any[] = [
     { valor: "0", texto: "EN PROCESO", visible: "1" },
     { valor: "1", texto: "ANALISTA", visible: "1" },
@@ -26,6 +29,9 @@ export class PendientesService {
     { valor: "11", texto: "ARCHIVO", visible: "1" }
   ];
 
+
+  // esto es un modelo de datos de tipo enum,
+  // osea debes crear en la carpeta core/models una carpeta llamada type donde esten los enums, importante que cada enum es un archivo.
   private TYPE_DOCUMENT_PLACEHOLDERS = {
     "1": "NRO. CEDULA",
     "2": "NRO. CONTROL",
@@ -42,7 +48,7 @@ export class PendientesService {
   }
 
   getComponent(): any {
-    this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined
+    sessionStorage.getItem("MPPD_CComponente") != undefined
                        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : [];
     return this.Componentes;
   }
