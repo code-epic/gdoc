@@ -1,3 +1,5 @@
+<ngx-ui-loader [loaderId]="'loader-gennerales'"></ngx-ui-loader>
+
 <div class="row">
   <div class="form-group col-md-4">
     <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente" value="{{componente}}">
@@ -6,14 +8,16 @@
       </option>
     </select>
   </div>
-  <div class="form-group col-md-2">
+  <div class="form-group col-md-3">
     <button class="btn bg-primary text-white " (click)="ConsultarListado()">
       <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar listado </button>
-  </div>
-
 </div>
-
-<div class="row">
+<div class="form-group col-md-3">
+  <button class="btn bg-primary text-white " (click)="generatePDF()">
+    <span class="fa fa-search"></span>&nbsp;&nbsp;Generar PDF </button>
+  </div>
+</div>
+<div class="row" #pdfTable>
   <div class="col-md-12">
     <table style="width: 100%;" class="zigzag" border="1">
       <thead>
@@ -29,9 +33,17 @@
       <tbody>
         <tr *ngFor="let e of lstGenerales">
           <td>{{ e.cedula }}</td>
-          <td>{{ e.numero }}</td>
-          <td>{{ e.registro }}</td>
-          <td>{{ e.asunto.substring(0,20) }}</td>
+          <td>
+            <img  align="left"
+                      src="https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/{{ e.cedula }}/foto.jpg"
+                      onerror="this.src='assets/img/theme/ndisponible.jpeg'" 
+                      style="width: 75px; vertical-align: top; margin-right: 20px;border-radius: 5%;">
+                      
+          </td>
+          <td>{{ e.nombre }}</td>
+          <td>{{ e.nombres }}</td>
+          <td>{{ e.promocion }}</td>
+          <td>{{ e.situacion }}</td>
         </tr>
       </tbody>
     </table>
