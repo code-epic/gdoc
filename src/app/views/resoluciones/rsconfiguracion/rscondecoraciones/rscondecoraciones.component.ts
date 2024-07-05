@@ -139,13 +139,7 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
 })
 
 export class RscondecoracionesComponent implements OnInit {
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
+ 
 
   public id: string = "";
 
@@ -375,6 +369,8 @@ export class RscondecoracionesComponent implements OnInit {
   public btnAccion: boolean = true
 
   public foto_cedula: string = "";
+
+  public btncargando : boolean = true
 
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
@@ -921,7 +917,10 @@ export class RscondecoracionesComponent implements OnInit {
       this._snackBar.open("Debe indicar un numero de resuelto y fecha", "OK");
       return;
     }
+    
     this.ngxService.startLoader("loader-aceptar");
+    this.btncargando = false
+
     this.evaluarDatos();
     this.files.hash = this.hashcontrol;
     // this.Ejecutar()
@@ -989,9 +988,13 @@ export class RscondecoracionesComponent implements OnInit {
     this.apiService.EjecutarLotes(otraresol).subscribe(
       (data) => {
         this.ngxService.stopLoader("loader-aceptar");
-        this.resetearFechas(true);
+        
+        this.resetearFechas(true)
         this.btnAccion = false
+        this.btncargando = true
+        this.limpiarFrm()
         this.aceptar("");
+        
       },
       (errot) => {
         this.toastrService.warning(

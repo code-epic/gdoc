@@ -192,6 +192,7 @@ export class ConsultaGeneralComponent implements OnInit {
   public valEdit: boolean = false;
 
   public dbTools: boolean = false;
+  public delimitador : string = ';'
 
   public carpeta: string = "";
   public nombre: string = "";
@@ -250,21 +251,6 @@ export class ConsultaGeneralComponent implements OnInit {
   selected = new FormControl(0);
   public csvHead: any;
 
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
-
-  editorConfigx: AngularEditorConfig = {
-    editable: false,
-    spellcheck: false,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
 
   public blResolucionPanel: boolean = false;
   public orden_pagina: number = 0;
@@ -973,7 +959,8 @@ export class ConsultaGeneralComponent implements OnInit {
     this.utilService.downloadFile(
       head,
       this.lstResolucionesX,
-      "RS-" + this.utilService.GenerarUnicId()
+      "RS-" + this.utilService.GenerarUnicId(),
+      this.delimitador
     );
   }
 
@@ -984,7 +971,8 @@ export class ConsultaGeneralComponent implements OnInit {
     this.utilService.downloadFile(
       head,
       this.lstRangoCedula,
-      "RC-" + this.utilService.GenerarUnicId()
+      "RC-" + this.utilService.GenerarUnicId(),
+      this.delimitador
     );
   }
 

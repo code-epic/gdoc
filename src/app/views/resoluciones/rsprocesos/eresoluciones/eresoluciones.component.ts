@@ -142,7 +142,7 @@ export class EresolucionesComponent implements OnInit {
 
   public fecha: any;
   public vigencia: any;
-
+  public blSave : boolean = false
   placement = "bottom";
 
   public xAPI: IAPICore = {

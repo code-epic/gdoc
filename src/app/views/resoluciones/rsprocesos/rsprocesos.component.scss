@@ -158,3 +158,24 @@ textarea {
   font-weight: bold;
   color: #3b3232;
 }
+
+
+table {  
+  font-family:sans-serif;
+  th, td {
+    padding:.25em .5em;
+    text-align:left;
+    &:nth-child(2) {
+      text-align:left;
+    }
+  }
+  th {
+    background-color:rgb(102, 102, 222);
+    color:#fff;
+  }
+  tr {
+    border-bottom: #b9aeae;
+  }
+  tr:nth-child(odd)   { background-color:#f1f1f1; }
+  tr:nth-child(even)    { background-color:#fff; }
+}

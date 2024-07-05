@@ -138,13 +138,7 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
   ],
 })
 export class RsccargamasivaComponent implements OnInit {
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
+ 
 
   public id: string = "";
 
@@ -374,6 +368,8 @@ export class RsccargamasivaComponent implements OnInit {
 
   public foto_cedula: string = "";
 
+  
+
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
   public TipoResoluciones: any;
@@ -414,6 +410,9 @@ export class RsccargamasivaComponent implements OnInit {
   llave: string
   archivo_otro: string
   otra_llave: string 
+  public lstHistorico = []
+
+  public btncargando : boolean = true
 
   constructor(
     private apiService: ApiService,
@@ -431,6 +430,10 @@ export class RsccargamasivaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
+
+    this.lstHistorico = sessionStorage.getItem("historico") != undefined ? JSON.parse(sessionStorage.getItem("historico")) : []
+
 
     this.llave = this.utilService.GenerarUnicId();
     this.Componentes =
@@ -858,10 +861,14 @@ export class RsccargamasivaComponent implements OnInit {
   }
 
   async SubirArchivo() {
+    
     if (this.IResolucion.numero == "") {
       this._snackBar.open("Debe indicar un numero de resuelto y fecha", "OK");
       return;
     }
+
+    this.btncargando = false
+
     this.ngxService.startLoader("loader-aceptar");
     this.evaluarDatos();
     this.files.hash = this.hashcontrol;
@@ -934,9 +941,17 @@ export class RsccargamasivaComponent implements OnInit {
     };
     this.apiService.EjecutarProceso(ascender).subscribe(
       (data) => {
+
+        this.lstHistorico.push(this.IResolucion)
+
+        sessionStorage.setItem('historico', JSON.stringify(this.lstHistorico))
         this.ngxService.stopLoader("loader-aceptar");
+        
         this.resetearFechas(true);
+        this.btncargando = true
+        this.limpiarFrm()
         this.aceptar("");
+        
       },
       (errot) => {
         this.toastrService.warning(

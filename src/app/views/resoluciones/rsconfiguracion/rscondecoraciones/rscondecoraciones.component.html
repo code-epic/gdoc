@@ -48,7 +48,7 @@
             <mat-label style="width:100%">Tipo de Resolución</mat-label>
             <mat-select placeholder="Documento" [ngModelOptions]="{standalone: true}" [(ngModel)]="tipo"
                 (selectionChange)="SelTipo($event)">
-                <mat-option value="0">CONDECORARCIONES</mat-option>
+                <mat-option value="0">CONDECORACIONES</mat-option>
                 <mat-option value="2">RESERVA ACTIVA</mat-option>
                 <mat-option value="3">CESE DEL EMPLEO</mat-option>
             </mat-select>
@@ -57,35 +57,32 @@
     </div>
 
 
-      <div class="col-md-6" *ngIf="blReserva">
-          <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-              <mat-label>Causa</mat-label>
-              <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
-                  [(ngModel)]="IResolucion.solicitud" (selectionChange)="getMotivo()">
-                  <mat-option *ngFor="let e of lstCausa"
-                      value="{{e.codigo}}">{{e.nombre}}</mat-option>
-              </mat-select>
-          </mat-form-field>
-      </div>
+    <div class="col-md-6" *ngIf="blReserva">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Causa</mat-label>
+            <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="IResolucion.solicitud" (selectionChange)="getMotivo()">
+                <mat-option *ngFor="let e of lstCausa" value="{{e.codigo}}">{{e.nombre}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
 
-      <div class="col-md-6" *ngIf="blReserva">
-          <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-              <mat-label>Motivo</mat-label>
-              <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
-                  [(ngModel)]="IResolucion.reserva" (selectionChange)="getDetalle()">
-                  <mat-option *ngFor="let e of lstMotivo"
-                      value="{{e.codigo}}">{{e.nombre}}</mat-option>
+    <div class="col-md-6" *ngIf="blReserva">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Motivo</mat-label>
+            <mat-select placeholder="Tipo de Comision" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="IResolucion.reserva" (selectionChange)="getDetalle()">
+                <mat-option *ngFor="let e of lstMotivo" value="{{e.codigo}}">{{e.nombre}}</mat-option>
 
-              </mat-select>
-          </mat-form-field>
-      </div>
+            </mat-select>
+        </mat-form-field>
+    </div>
 
 
 
-    <div class="col-md-12"  *ngIf="blReservaAux">
+    <div class="col-md-12" *ngIf="blReservaAux">
         <textarea rows="5" name="text" placeholder="Descripcion de la falta o delito"
-        [ngModelOptions]="{standalone: true}"
-        [(ngModel)]="IResolucion.falta" 
+            [ngModelOptions]="{standalone: true}" [(ngModel)]="IResolucion.falta"
             style="width: 100%; border: 0px;"></textarea>
     </div>
 
@@ -211,22 +208,23 @@
 
 
     <div class="col-md-{{maxExtender}}" *ngIf="blExtender">
-      <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-          <mat-label>Fecha Inicio(*)</mat-label>
-          <input matInput [matDatepicker]="fipicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_inicio" >
-          <mat-datepicker-toggle matSuffix [for]="fipicker"></mat-datepicker-toggle>
-          <mat-datepicker #fipicker></mat-datepicker>
-      </mat-form-field>
-  </div>
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Fecha Inicio(*)</mat-label>
+            <input matInput [matDatepicker]="fipicker" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="comision_inicio">
+            <mat-datepicker-toggle matSuffix [for]="fipicker"></mat-datepicker-toggle>
+            <mat-datepicker #fipicker></mat-datepicker>
+        </mat-form-field>
+    </div>
 
-  <div class="col-md-{{maxExtender}}" *ngIf="blExtender">
-      <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-          <mat-label>Fecha Fin(*)</mat-label>
-          <input matInput [matDatepicker]="ffpicker"  [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_fin" >
-          <mat-datepicker-toggle matSuffix [for]="ffpicker"></mat-datepicker-toggle>
-          <mat-datepicker #ffpicker></mat-datepicker>
-      </mat-form-field>
-  </div>
+    <div class="col-md-{{maxExtender}}" *ngIf="blExtender">
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Fecha Fin(*)</mat-label>
+            <input matInput [matDatepicker]="ffpicker" [ngModelOptions]="{standalone: true}" [(ngModel)]="comision_fin">
+            <mat-datepicker-toggle matSuffix [for]="ffpicker"></mat-datepicker-toggle>
+            <mat-datepicker #ffpicker></mat-datepicker>
+        </mat-form-field>
+    </div>
 
 
 
@@ -266,34 +264,29 @@
 
 <div class="form-row">
     <div class="form-group col-md-12">
-        <div class="NgxEditor__Wrapper">
-            <label>
-                Asunto
-            </label>
-            <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
-                [(ngModel)]="IResolucion.asunto"></angular-editor>
 
-        </div>
+        <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="IResolucion.asunto" placeholder="Introduzca el asunto..."
+            style="width: 100%">{{IResolucion.asunto}}</textarea>
     </div>
 </div>
 
 <div class="form-row">
     <div class="form-group col-md-12">
-        <label for="txtObjeto">Instrucciones especiales</label>
-        <div class="NgxEditor__Wrapper">
-            <angular-editor [placeholder]="'Introduzca el texto con las instrucciones...'" [config]="editorConfig"
-                [(ngModel)]="IResolucion.instrucciones"></angular-editor>
-        </div>
+
+
+        <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="IResolucion.instrucciones" placeholder="Instrucciones..."
+            style="width: 100%">{{IResolucion.instrucciones}}</textarea>
     </div>
 </div>
 
 <div class="form-row">
     <div class="form-group col-md-12">
-        <label for="txtObjeto">Observaciones</label>
-        <div class="NgxEditor__Wrapper">
-            <angular-editor [placeholder]="'Introduzca el texto  para las observaciones...'" [config]="editorConfig"
-                [(ngModel)]="IResolucion.observacion"></angular-editor>
-        </div>
+
+        <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="IResolucion.observacion" placeholder="Introduzca el texto para observacion..."
+            style="width: 100%">{{IResolucion.observacion}}</textarea>
     </div>
 </div>
 
@@ -329,7 +322,8 @@
 <div class="row" *ngIf="btnAccion">
     <div class="col-md-12">
         <div class="text-right">
-            <button class="btn bg-success text-white" (click)="SubirArchivo()">Procesar solicitud</button>
+            <button *ngIf="btncargando" class="btn bg-success text-white" (click)="SubirArchivo()">Procesar
+                solicitud</button>
         </div>
     </div>
 </div>

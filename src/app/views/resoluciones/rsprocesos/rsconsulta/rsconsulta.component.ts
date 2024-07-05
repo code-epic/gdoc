@@ -221,6 +221,7 @@ export class RsconsultaComponent implements OnInit {
   public blExpandida: boolean = true
   public blEditor: boolean = false
   public blEspecifico: boolean = true
+  public tiponomina : string =  "0"
 
   public busqueda: string = "0"
   public campos: string = "0"
@@ -251,6 +252,7 @@ export class RsconsultaComponent implements OnInit {
   selected = new FormControl(0)
   public csvHead: any
   public csvHeadFile: any
+  public delimitador : string = '|'
 
 
 
@@ -911,17 +913,17 @@ export class RsconsultaComponent implements OnInit {
 
   fileSelected(e) {
     this.archivos.push(e.target.files[0]);
-    console.log(e.target.files[0])
+    // console.log(e.target.files[0])
   }
 
   async SubirArchivo(e) {
     this.ngxService.startLoader("loader-aceptar");
     var frm = new FormData(document.forms.namedItem("forma"));
-    console.log(frm)
+    // console.log(frm)
     try {
 
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
-        console.log(data)
+        //console.log(data)
         this.execFnx(data)
        
       });
@@ -965,7 +967,7 @@ export class RsconsultaComponent implements OnInit {
             this.pID.estatus = false
             this.pID.contenido = paquete
             this.pID.mensaje = uuid
-            this.ConsultaPostPID(0)
+            this.ConsultaPostPID( this.tiponomina )
 
           } else {
             this.ConsultarPidRecursivo(id, paquete, uuid)
@@ -981,8 +983,8 @@ export class RsconsultaComponent implements OnInit {
   /**
    * Consultar una API despues de finalizado el PID Recurrente
    */
-  ConsultaPostPID(tipo : number) {
-    this.xAPI.funcion = tipo==0?"MPPD_CCedulaFileCSV":"MPPD_CCedulaFileCSVSaime";
+  ConsultaPostPID(tipo : string) {
+    this.xAPI.funcion = tipo=="0" ?"MPPD_CCedulaFileCSV":"MPPD_CCedulaFileCSVSaime";
     this.xAPI.parametros = '';
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -1010,7 +1012,8 @@ export class RsconsultaComponent implements OnInit {
     this.utilService.downloadFile(
       head,
       this.lstRangoCedulaFile,
-      "Ex-" + this.idTransaccion
+      "Ex-" + this.idTransaccion,
+      this.delimitador
     );
   }
 
@@ -1043,7 +1046,8 @@ export class RsconsultaComponent implements OnInit {
     this.utilService.downloadFile(
       head,
       this.lstResolucionesX,
-      "RS-" + this.utilService.GenerarUnicId()
+      "RS-" + this.utilService.GenerarUnicId(),
+      this.delimitador
     );
   }
 
@@ -1054,7 +1058,8 @@ export class RsconsultaComponent implements OnInit {
     this.utilService.downloadFile(
       head,
       this.lstRangoCedula,
-      "RC-" + this.utilService.GenerarUnicId()
+      "RC-" + this.utilService.GenerarUnicId(),
+      this.delimitador
     );
   }
 
@@ -1277,5 +1282,15 @@ export class RsconsultaComponent implements OnInit {
     this.blEditor = true;
     this.blEspecifico = false;
     this.EDITOR = this.IDatosBasicos.cedula;
+  }
+
+
+  ReveserConsutla(){
+    this.blExpandidaFile = true
+    this.lstRangoCedulaFile = []
+    this.tiponomina = "0"
+    this.csvHead = []
+    this.archivos = []
+    document.forms.namedItem("forma").reset();
   }
 }

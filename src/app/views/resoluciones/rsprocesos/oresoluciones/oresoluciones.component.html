@@ -420,8 +420,12 @@
                                 <mat-icon class="text-blue" matSuffix type="button" id="fori"
                                     (click)="Autocompletar()">save_alt</mat-icon> [ Autocompletar datos ] Asunto
                             </label>
-                            <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
-                                [(ngModel)]="IResolucion.asunto"></angular-editor>
+                            <!-- <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
+                                [(ngModel)]="IResolucion.asunto"></angular-editor> -->
+
+                                <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="IResolucion.asunto" placeholder="Introduzca el asunto..."
+                                style="width: 100%">{{IResolucion.asunto}}</textarea>
 
                         </div>
                     </div>
@@ -431,21 +435,27 @@
 
                 <div class="form-row">
                     <div class="form-group col-md-12">
-                        <label for="txtObjeto">Instrucciones especiales</label>
+                        <!-- <label for="txtObjeto">Instrucciones especiales</label>
                         <div class="NgxEditor__Wrapper">
                             <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
                                 [(ngModel)]="IResolucion.instrucciones"></angular-editor>
-                        </div>
+                        </div> -->
+                        <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="IResolucion.instrucciones" placeholder="Instrucciones..."
+                            style="width: 100%">{{IResolucion.instrucciones}}</textarea>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group col-md-12">
-                        <label for="txtObjeto">Observaciones</label>
+                        <!-- <label for="txtObjeto">Observaciones</label>
                         <div class="NgxEditor__Wrapper">
                             <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
                                 [(ngModel)]="IResolucion.observacion"></angular-editor>
-                        </div>
+                        </div> -->
+                        <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="IResolucion.observacion" placeholder="Introduzca el texto para observacion..."
+                        style="width: 100%">{{IResolucion.observacion}}</textarea>
                     </div>
                 </div>
 
@@ -487,6 +497,7 @@
                     <div class="col-md-12">
                         <div class="text-right">
                             <button class="btn bg-primary text-white" (click)="SubirArchivo()"
+                            
                                 *ngIf="blAceptar">Aceptar</button>
                         </div>
                     </div>

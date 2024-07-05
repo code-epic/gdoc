@@ -37,12 +37,12 @@ export class RseliminacionesComponent implements OnInit {
     if (event == undefined || event.charCode == 13) {
       if (this.numero == "") return false;
       this.ngxService.startLoader("loader-eliminar");
-      this.xAPI.funcion = "MPPD_CResoluciones";
+      this.xAPI.funcion = "MPPD_CResolucionesGrupo";
       this.xAPI.parametros = this.numero;
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          // console.log(data);
+          console.log(data);
           this.resolucion = this.numero;
           this.numero = "";
           this.detalle = true;
@@ -62,10 +62,11 @@ export class RseliminacionesComponent implements OnInit {
     }
   }
 
-  eliminar() {
+  eliminar(fecha : string) {
     this.ngxService.startLoader("loader-eliminar");
     this.xAPI.funcion = "MPPD_EResoluciones";
-    this.xAPI.parametros = this.resolucion;
+    this.xAPI.parametros = this.resolucion + ',' + fecha;
+    console.log(this.xAPI.parametros)
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {

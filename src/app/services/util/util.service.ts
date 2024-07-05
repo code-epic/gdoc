@@ -236,9 +236,10 @@ export class UtilService {
     return Math.random().toString(36).substr(2, 18);
   }
 
-  downloadFile(head, data, filename = "data") {
-    let csvData = this.ConvertToCSV(data, head);
-    //console.log(csvData);
+
+  downloadFile(head, data, filename = "data", delimitador) {
+
+    let csvData = this.ConvertToCSV(data, head, delimitador);
     let blob = new Blob(["\ufeff" + csvData], {
       type: "text/csv;charset=utf-8;",
     });
@@ -259,14 +260,14 @@ export class UtilService {
     document.body.removeChild(dwldLink);
   }
 
-  ConvertToCSV(objArray, headerList) {
+  ConvertToCSV(objArray, headerList, delimitador) {
     let array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
     let str = "";
-    let row = "#num|";
+    let row = "#num,";
 
     for (let index in headerList) {
       // console.log(index, headerList);
-      row += headerList[index] + "|";
+      row += headerList[index] + delimitador;
     }
     // console.log(row);
     row = row.slice(0, -1);
@@ -277,7 +278,7 @@ export class UtilService {
       for (let index in headerList) {
         let head = headerList[index];
         let texto = array[i][head] + ""
-        line += "|" + texto.replace(/[\r\n]+/gm, "").toUpperCase();
+        line += delimitador + texto.replace(/[\r\n]+/gm, "").toUpperCase();
       }
       str += line + "\r\n";
     }

@@ -111,13 +111,6 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
   ],
 })
 export class OresolucionesComponent implements OnInit {
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  }
 
   public id: string = ""
 
@@ -321,14 +314,14 @@ export class OresolucionesComponent implements OnInit {
   myControl = new FormControl()
   public TipoResoluciones: any
 
-  public lstCausa : any //Objeto Comando
-  public lstMotivo : any //Objeto Comando
-  public lstDetalle : any //Objeto Comando
-  public lstPais : any //Objeto Comando
-  public GradoIPSFA : any //Objeto Comando
-  public lstIPSFA : any //Objeto Comando
-  public lstC : any //Objeto Comando
-  public archivos : any
+  public lstCausa: any //Objeto Comando
+  public lstMotivo: any //Objeto Comando
+  public lstDetalle: any //Objeto Comando
+  public lstPais: any //Objeto Comando
+  public GradoIPSFA: any //Objeto Comando
+  public lstIPSFA: any //Objeto Comando
+  public lstC: any //Objeto Comando
+  public archivos: any
 
   public hashcontrol = ''
   public CuentaGenera: any
@@ -366,7 +359,8 @@ export class OresolucionesComponent implements OnInit {
   public color = "#e3e6e6"
   public cmbGrado = '0'
   public otro_resuelto = ''
-  
+  public lstHistorico: any
+
 
 
   model1: string
@@ -385,14 +379,20 @@ export class OresolucionesComponent implements OnInit {
     private ngbCalendar: NgbCalendar,
     private dateAdapter: NgbDateAdapter<string>,
     private ruta: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // if (this.rutaActiva.snapshot.params.id != undefined) {
     //   const id = this.rutaActiva.snapshot.params.id
     //   const cnt = this.rutaActiva.snapshot.params.cuenta
     // }
-    
+
+
+
+    this.lstHistorico = sessionStorage.getItem("historico") != undefined ? JSON.parse(sessionStorage.getItem("historico")) : []
+
+
+    console.log(this.lstHistorico)
 
     this.Componentes =
       sessionStorage.getItem("MPPD_CComponente") != undefined
@@ -531,7 +531,7 @@ export class OresolucionesComponent implements OnInit {
     this.xAPI.funcion = "MPPD_CDatosBasicos"
     this.xAPI.parametros = this.IResolucion.cedula
     this.xAPI.valores = ''
-    
+
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -572,7 +572,7 @@ export class OresolucionesComponent implements OnInit {
           this.hashcontrol = btoa("R" + this.IResolucion.cedula) //Cifrar documentos
 
         }
-        
+
 
         this.ngxService.stopLoader("loader-buscar")
       },
@@ -589,7 +589,7 @@ export class OresolucionesComponent implements OnInit {
     this.xasunto = nombramiento.asunto.substring(0, 100)
   }
 
-  verHistorialMilitar() {}
+  verHistorialMilitar() { }
 
   async cargarGradosIPSFA(componente: number) {
     this.lstIPSFA = this.GradoIPSFA.filter((e) => {
@@ -665,7 +665,7 @@ export class OresolucionesComponent implements OnInit {
     this.maxAscenso = '4'
     this.maxCorregir = '3'
     this.maxExtender = '6'
-    this.IResolucion.grado =  parseInt( this.Resolucion.grado )
+    this.IResolucion.grado = parseInt(this.Resolucion.grado)
     console.log(this.tipo)
     switch (parseInt(rs.tipo)) {
       case 1:
@@ -686,11 +686,11 @@ export class OresolucionesComponent implements OnInit {
         // console.log(this.tipo, this.IResolucion.tipo)
         this.maxCol = "6"
         this.blCorregir = true
-        if( this.IResolucion.tipo == 35){
-         
-          let vGr : any = parseInt( this.Resolucion.grado ) + 2
+        if (this.IResolucion.tipo == 35) {
+
+          let vGr: any = parseInt(this.Resolucion.grado) + 2
           this.cmbGrado = vGr.toString()
-          this.IResolucion.grado =  parseInt( this.cmbGrado )
+          this.IResolucion.grado = parseInt(this.cmbGrado)
           this.blAscenso = true
           this.maxAscenso = '6'
           this.maxCorregir = '6'
@@ -698,7 +698,7 @@ export class OresolucionesComponent implements OnInit {
         break
 
       case 4:
-        if (this.fecha_resolucion == "" ) {
+        if (this.fecha_resolucion == "") {
           this._snackBar.open("Debe seleccionar una fecha de resolucion", "OK")
           return
         }
@@ -723,9 +723,9 @@ export class OresolucionesComponent implements OnInit {
         break
       case 7:
         this.maxCol = "4"
-        let vGr : any = parseInt( this.Resolucion.grado ) - 2
+        let vGr: any = parseInt(this.Resolucion.grado) - 2
         this.cmbGrado = vGr.toString()
-        this.IResolucion.grado =  parseInt( this.cmbGrado )
+        this.IResolucion.grado = parseInt(this.cmbGrado)
         this.blAscensof = true
         this.blAscenso = true
         break
@@ -741,11 +741,11 @@ export class OresolucionesComponent implements OnInit {
         this.maxCol = "6"
         this.blComponente = true
         break
-        case 11: //reincorporar
-          this.maxCol = "6"
-          this.maxExtender = '3'
-          this.blExtender = true
-          break
+      case 11: //reincorporar
+        this.maxCol = "6"
+        this.maxExtender = '3'
+        this.blExtender = true
+        break
       default:
         break
     }
@@ -844,7 +844,7 @@ export class OresolucionesComponent implements OnInit {
 
 
 
-  getDetalle(){
+  getDetalle() {
 
   }
 
@@ -889,9 +889,9 @@ export class OresolucionesComponent implements OnInit {
       causa: 0,
       archivo: ''
     }
-    
+
   }
-  LimpiarDatos(){
+  LimpiarDatos() {
     this.IResolucion.cedula = ''
     this.Resolucion.gran_comando = ''
     this.Resolucion.nombres = ''
@@ -904,7 +904,7 @@ export class OresolucionesComponent implements OnInit {
 
   vincular() {
     if (this.IResolucion.otro_resuelto != "") {
-      this.ngxService.startLoader("loader-aceptar")
+      this.ngxService.startLoader("loader-buscar")
       this.xAPI.funcion = "MPPD_CResuelto"
       this.xAPI.parametros =
         this.IResolucion.otro_resuelto + "," + this.Resolucion.cedula
@@ -922,7 +922,7 @@ export class OresolucionesComponent implements OnInit {
         },
         (error) => {
           console.error("Error de conexion a los datos ", error)
-          this.ngxService.stopLoader("loader-aceptar")
+          this.ngxService.stopLoader("loader-buscar")
         }
       )
     }
@@ -944,7 +944,7 @@ export class OresolucionesComponent implements OnInit {
       this._snackBar.open("Debe seleccionar una cedula", "OK")
       return
     }
-    this.ngxService.startLoader("loader-aceptar")
+    this.ngxService.startLoader("loader-buscar")
     this.IResolucion.fecha_resolucion = this.utilService.ConvertirFechaDia(
       this.fecha_resolucion
     )
@@ -970,7 +970,7 @@ export class OresolucionesComponent implements OnInit {
     this.IResolucion.observacion = this.IResolucion.observacion.toUpperCase()
     this.IResolucion.autor_registro = this.loginService.Usuario.cedula
 
-    
+
   }
 
   fileSelected(e) {
@@ -981,11 +981,11 @@ export class OresolucionesComponent implements OnInit {
 
   async SubirArchivo() {
 
-
-    this.ngxService.startLoader("loader-aceptar")
+    this.blAceptar = false
+    this.ngxService.startLoader("loader-buscar")
     var frm = new FormData(document.forms.namedItem("forma"))
-    console.log(this.IResolucion)
-    
+    //console.log(this.IResolucion)
+
     try {
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
         this.evaluarDatos()
@@ -995,61 +995,67 @@ export class OresolucionesComponent implements OnInit {
         this.xAPI.parametros = ""
         this.xAPI.valores = JSON.stringify(this.IResolucion)
 
-        
-        
+
+
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
             let tipo = this.IResolucion.tipo.toString()
-            if( tipo == '9' || tipo == '10'){
+
+
+            this.lstHistorico.push(this.IResolucion)
+
+            sessionStorage.setItem('historico', JSON.stringify(this.lstHistorico))
+
+            if (tipo == '9' || tipo == '10') {
               let datosBasicos = {
                 "cedula": this.IResolucion.cedula,
-                "situacion": tipo =='9'? 'CEMP':'RACT'
+                "situacion": tipo == '9' ? 'CEMP' : 'RACT'
               }
               this.xAPI.funcion = "MPPD_UDatosBasicosSituacion"
               this.xAPI.parametros = ""
               this.xAPI.valores = JSON.stringify(datosBasicos)
               this.apiService.Ejecutar(this.xAPI).subscribe(
                 (data) => {
-                  this.ngxService.stopLoader("loader-aceptar")
-                  
+                  this.ngxService.stopLoader("loader-buscar")
+
                   this.aceptar()
                 },
                 (errot) => {
-                      this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`)
-                      this.ngxService.stopLoader("loader-aceptar")
-                     
-                    }
-                )
-            }else if( tipo == '13' || tipo == '35'){
-                let datosBasicos = {
-                  "cedula": this.IResolucion.cedula,
-                  "grado": this.IResolucion.grado
+                  this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`)
+                  this.ngxService.stopLoader("loader-buscar")
+
                 }
-                this.xAPI.funcion = "MPPD_UDatosBasicosGrado"
-                this.xAPI.parametros = ""
-                this.xAPI.valores = JSON.stringify(datosBasicos)
-                this.apiService.Ejecutar(this.xAPI).subscribe(
-                  (data) => {
-                    this.ngxService.stopLoader("loader-aceptar")
-                    
-                    this.aceptar()
-                  },
-                  (errot) => {
-                        this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`)
-                        this.ngxService.stopLoader("loader-aceptar")
-                      }
-                  )
-            }else{
-              this.ngxService.stopLoader("loader-aceptar")
+              )
+            } else if (tipo == '13' || tipo == '35') {
+              let datosBasicos = {
+                "cedula": this.IResolucion.cedula,
+                "grado": this.IResolucion.grado
+              }
+              this.xAPI.funcion = "MPPD_UDatosBasicosGrado"
+              this.xAPI.parametros = ""
+              this.xAPI.valores = JSON.stringify(datosBasicos)
+              this.apiService.Ejecutar(this.xAPI).subscribe(
+                (data) => {
+                  this.ngxService.stopLoader("loader-buscar")
+
+                  this.aceptar()
+                },
+                (errot) => {
+                  this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`)
+                  this.ngxService.stopLoader("loader-buscar")
+                }
+              )
+            } else {
+              this.ngxService.stopLoader("loader-buscar")
               this.aceptar()
             }
-              
-         
-           
+
+
+
           },
           (errot) => {
             this.toastrService.error(errot, `GDoc MPPD Insertar resuelto`)
-            this.ngxService.stopLoader("loader-aceptar")
+            this.ngxService.stopLoader("loader-buscar")
           }
         ),
           (errot) => {
@@ -1057,13 +1063,13 @@ export class OresolucionesComponent implements OnInit {
           }
       })
     } catch (error) {
-      console.error(error)
+      this.toastrService.error(error, `GDoc MPPD Insertar resuelto subir el archivo`)
     }
-    
+
   }
 
 
-  Autocompletar(){
+  Autocompletar() {
 
     if (typeof this.tipo != "object") return
     this.IResolucion.tipo = this.tipo.codigo
@@ -1073,16 +1079,16 @@ export class OresolucionesComponent implements OnInit {
         this.IResolucion.asunto += ', ' + this.IResolucion.unidad_texto
         break
       case 2:
-        let solicitud = this.lstCausa.filter(e => {return e.codigo == this.IResolucion.solicitud})[0].nombre
-        let reserva = this.lstMotivo.filter(e => {return e.codigo == this.IResolucion.reserva})[0].nombre
+        let solicitud = this.lstCausa.filter(e => { return e.codigo == this.IResolucion.solicitud })[0].nombre
+        let reserva = this.lstMotivo.filter(e => { return e.codigo == this.IResolucion.reserva })[0].nombre
         this.IResolucion.asunto += ', ' + solicitud + ' ' + reserva
         break
     }
 
-    
+
   }
 
- 
+
 
 
   aceptar() {
@@ -1121,7 +1127,7 @@ export class OresolucionesComponent implements OnInit {
         this.ruta.navigate(["/rsprocesos"]);
       }
 
-      
+
     })
   }
 
@@ -1131,15 +1137,6 @@ export class OresolucionesComponent implements OnInit {
   }
 
   AceptarCambios() {
-    // this.Resolucion.sexo = this.ipsfa_sexo == 'MASCULINO' ? 'M' : 'F'
-    // console.log(this.ipsfa_fechaultimoascenso)
-    // this.Resolucion.situacion = this.ipsfa_situacion_ab
-    // this.Resolucion.nombres_apellidos = this.ipsfa_nombres_apellidos
-    // this.forigenDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechanacimiento_unix))
-    // //this.Resolucion.fecha = this.ipsfa_fechanacimiento_unix
-    // this.fingresoDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechaingreso_unix))
-    // //this.Resolucion.ingreso = this.ipsfa_fechaingreso_unix
-    // this.fcreacionDate = NgbDate.from(this.formatter.parse(this.ipsfa_fechaascenso_unix))
-    // //this.Resolucion.promocion = this.ipsfa_fechaascenso_unix
+
   }
 }
