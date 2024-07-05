@@ -1,3 +1,6 @@
+<ngx-ui-loader [loaderId]="'loader-gennerales'"></ngx-ui-loader>
+
+
 <div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
   <div class="container-fluid">
     <p></p>
@@ -51,36 +54,57 @@
         </div>
 
         <div class="card-body">
-          <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
-          <div class="container mb-5">
-            <div class="row">
-              <div class="col-md-1"></div>
 
-              <div class="col-md-10 text-center">
-                <div class="row text-center">
-                  <div class="col-md-3 cardround" *ngFor="let item of SubMenu">
-                    <a routerLinkActive="active" [routerLink]="[item.url]">
-                      <div class="text-center botones">
-                        <br>
-                        <h2 class="text-center  {{item.color}}"><i class="{{item.icono}}" style="font-size: 42px;"></i>
-                        </h2>
-                        <p>{{item.nombre}}</p>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-1"></div>
+
+          <div class="row">
+            <div class="form-group col-md-4">
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente"
+                value="{{componente}}">
+                <option value="0">SELECCIONAR COMPONENTE</option>
+                <option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-3">
+              <button class="btn bg-primary text-white " (click)="generatePDF()">
+                <span class="fa fa-search"></span>&nbsp;&nbsp;Generar PDF </button>
+            </div>
+          </div>
+
+          <div class="row" #pdfTable>
+            <div class="col-md-12">
+              <table style="width: 100%;" class="zigzag" border="1">
+                <thead>
+                  <tr style="height: 40px;">
+                    <th style="width: 30px;"> Nº </th>
+                    <th> FOTO</th>
+                    <th> GDO </th>
+                    <th> NOMBRE Y APELLIDOS </th>
+                    <th> ASCENSO </th>
+                    <th> CARGO </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let e of lstGenerales">
+                    <td>{{ e.cedula }}</td>
+                    <td>
+                      <img align="left" src="https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/{{ e.cedula }}/foto.jpg"
+                        onerror="this.src='assets/img/theme/ndisponible.jpeg'"
+                        style="width: 75px; vertical-align: top; margin-right: 20px;border-radius: 5%;">
+
+                    </td>
+                    <td>{{ e.nombre }}</td>
+                    <td>{{ e.nombres }}</td>
+                    <td>{{ e.promocion }}</td>
+                    <td>{{ e.situacion }}</td>
+                  </tr>
+                </tbody>
+              </table>
 
             </div>
-            <br>
-          
-      
-
-
-            <br><br>
-            
           </div>
+
         </div>
 
       </div>

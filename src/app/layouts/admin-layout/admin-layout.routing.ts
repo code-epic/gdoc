@@ -43,6 +43,10 @@ import { RsconsultaComponent } from 'src/app/views/resoluciones/rsprocesos/rscon
 import { SpresidencialComponent } from 'src/app/views/secretaria/spresidencial/spresidencial.component';
 import { ConsultaGeneralComponent } from 'src/app/views/consulta-general/consulta-general.component';
 import { SbuscadorComponent } from 'src/app/views/secretaria/sbuscador/sbuscador.component';
+import { GrallibroComponent } from 'src/app/views/generales/grallibro/grallibro.component';
+import { GralconsultasComponent } from 'src/app/views/generales/gralconsultas/gralconsultas.component';
+import { GralestadisticasComponent } from 'src/app/views/generales/gralestadisticas/gralestadisticas.component';
+import { GraledicionComponent } from 'src/app/views/generales/graledicion/graledicion.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -294,6 +298,26 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'sbuscador',
         component: SbuscadorComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'gralibro',
+        component: GrallibroComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'gralconsulta',
+        component: GralconsultasComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'gralestadisticas',
+        component: GralestadisticasComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'graledicion',
+        component: GraledicionComponent,
         canActivate: [AuthGuardGuard]
     },
     {

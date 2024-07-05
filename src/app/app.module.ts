@@ -101,6 +101,11 @@ import { RseliminacionesComponent } from './views/resoluciones/rsconfiguracion/r
 import { ConsultaGeneralComponent } from './views/consulta-general/consulta-general.component';
 import { SbuscadorComponent } from './views/secretaria/sbuscador/sbuscador.component';
 import { MatRadioModule } from '@angular/material/radio';
+import { ListadosComponent } from './views/notas/listados/listados.component';
+import { GralconsultasComponent } from './views/generales/gralconsultas/gralconsultas.component';
+import { GralestadisticasComponent } from './views/generales/gralestadisticas/gralestadisticas.component';
+import { GraledicionComponent } from './views/generales/graledicion/graledicion.component';
+import { GrallibroComponent } from './views/generales/grallibro/grallibro.component';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -246,7 +251,12 @@ const ngWizardConfig: NgWizardConfig = {
     RsgeneralesComponent,
     RseliminacionesComponent,
     ConsultaGeneralComponent,
-    SbuscadorComponent
+    SbuscadorComponent,
+    ListadosComponent,
+    GralconsultasComponent,
+    GralestadisticasComponent,
+    GraledicionComponent,
+    GrallibroComponent
   ],
   providers: [
     {
