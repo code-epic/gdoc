@@ -19,13 +19,7 @@ import { AngularEditorConfig } from "@kolkov/angular-editor";
   styleUrls: ["./rscdatosbasicos.component.scss"],
 })
 export class RscdatosbasicosComponent implements OnInit {
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
+
 
   public Componentes: any;
   public Grados: any;
@@ -113,6 +107,11 @@ export class RscdatosbasicosComponent implements OnInit {
     motivo: "",
     observacion: "",
     situacion: "",
+    telefono: "",
+    correo: "",
+    ubicacion: "",
+    cargo: "",
+    estadomayor: ""
   };
 
   public ipsfa_cedula: string = "";
@@ -145,6 +144,7 @@ export class RscdatosbasicosComponent implements OnInit {
   };
 
   @Input() EDITOR: string = "";
+  @Input() GENERAL: boolean = false;
 
   constructor(
     private apiService: ApiService,
@@ -198,12 +198,11 @@ export class RscdatosbasicosComponent implements OnInit {
   }
 
   ngOnChanges() {
-    /** */
     this.DBasico.cedula = this.EDITOR;
     this.blPrincipal = false
-
     if (this.DBasico.cedula != "") this.buscarCedula();
   }
+
   /**
    * Consultar datos generales del militar
    */
@@ -217,70 +216,63 @@ export class RscdatosbasicosComponent implements OnInit {
     }
   }
 
+
+  /** 
+   * 
+  */
   buscarCedula() {
-    let cedula = this.DBasico.cedula;
-    this.dbActivar = false;
-    this.ngxService.startLoader("loader-aceptar");
-    this.xAPI.funcion = "MPPD_CDatosBasicos";
-    this.xAPI.parametros = cedula;
-    this.xAPI.valores = "";
-    this.foto = "assets/img/theme/ndisponible.jpeg";
-    this.limpiarDB();
-    this.DBasico.cedula = cedula;
+    let cedula = this.DBasico.cedula
+    this.dbActivar = false
+    this.ngxService.startLoader("loader-aceptar")
+    this.xAPI.funcion = !this.GENERAL?"MPPD_CDatosBasicos":"MPPD_CCedulaGenerales"
+    this.xAPI.parametros = cedula
+    this.xAPI.valores = ""
+    this.foto = "assets/img/theme/ndisponible.jpeg"
+    this.limpiarDB()
+    this.DBasico.cedula = cedula
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        // console.log(data.Cuerpo);
         if (data.Cuerpo.length > 0) {
-          this.DBasico = data.Cuerpo[0];
-          this.foto =
-            "https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/" +
-            this.DBasico.cedula +
-            "/foto.jpg";
-          this.Resolucion = data.Cuerpo[0];
-          this.nacimiento = NgbDate.from(
-            this.formatter.parse(this.DBasico.nacimiento.substring(0, 10))
-          );
-          this.ingreso = NgbDate.from(
-            this.formatter.parse(this.DBasico.promocion.substring(0, 10))
-          );
-          this.ascenso = NgbDate.from(
-            this.formatter.parse(this.DBasico.ultimo_ascenso.substring(0, 10))
-          );
-
+          this.DBasico = data.Cuerpo[0]
+          console.log(data)
+          this.foto = `https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/${cedula}/foto.jpg`
+          this.Resolucion = data.Cuerpo[0]
+          this.nacimiento = NgbDate.from(this.formatter.parse(this.DBasico.nacimiento.substring(0, 10)))
+          this.ingreso = NgbDate.from(this.formatter.parse(this.DBasico.promocion.substring(0, 10)))
+          this.ascenso = NgbDate.from(this.formatter.parse(this.DBasico.ultimo_ascenso.substring(0, 10)))
           if (
             data.Cuerpo[0].resoluciones != undefined &&
             data.Cuerpo[0].resoluciones != ""
           ) {
-            this.lstResoluciones = JSON.parse(
-              data.Cuerpo[0].resoluciones
-            ).reverse();
-            this.filtrarNombramiento();
+            this.lstResoluciones = JSON.parse( data.Cuerpo[0].resoluciones).reverse()
+            this.filtrarNombramiento()
           }
           if (
             data.Cuerpo[0].entradas != undefined &&
             data.Cuerpo[0].entradas != ""
           ) {
-            this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse();
+            this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse()
           }
-          this.dbActivar = true;
-
-          this.seleccionColor();
+          this.dbActivar = true
+          this.seleccionColor()
+        }else{
+          this.toastrService.info("No se encontraron resultados", "GDoc: Buscar cédula")
         }
 
-        this.ngxService.stopLoader("loader-aceptar");
+        this.ngxService.stopLoader("loader-aceptar")
       },
       (error) => {
-        console.error("Error de conexion a los datos ", error);
-        this.ngxService.stopLoader("loader-aceptar");
+        console.error("Error de conexion a los datos ", error)
+        this.ngxService.stopLoader("loader-aceptar")
       }
-    );
+    )
   }
 
   filtrarNombramiento() {
-    const nombramiento = this.lstResoluciones[0];
+    const nombramiento = this.lstResoluciones[0]
     this.nombramiento =
-      nombramiento.titulo + " - " + nombramiento.tipo_descripcion;
-    this.xasunto = nombramiento.asunto.substring(0, 100);
+      nombramiento.titulo + " - " + nombramiento.tipo_descripcion
+    this.xasunto = nombramiento.asunto.substring(0, 100)
   }
 
   limpiarDB() {
@@ -314,70 +306,75 @@ export class RscdatosbasicosComponent implements OnInit {
       motivo: "",
       observacion: "",
       situacion: "",
-    };
-    this.nombramiento = "";
-    this.xasunto = "";
+      telefono: "",
+      correo: "",
+      ubicacion: "",
+      cargo: "",
+      estadomayor: "",
+    }
+    this.nombramiento = ""
+    this.xasunto = ""
   }
   guardar() {}
 
   //Consultar datos del IPSFA
   consultarIPSFA(content) {
     if (this.DBasico.cedula == "") {
-      this._snackBar.open("Debe seleccionar una cedula", "OK");
-      return;
+      this._snackBar.open("Debe seleccionar una cedula", "OK")
+      return
     }
     if (this.ipsfa_cedula == this.DBasico.cedula) {
-      this.modalService.open(content);
-      return;
+      this.modalService.open(content)
+      return
     }
 
-    this.ngxService.startLoader("loader-aceptar");
-    this.xAPI.funcion = "IPSFA_CMilitarMPPD";
-    this.xAPI.parametros = this.DBasico.cedula;
-    this.xAPI.valores = "";
+    this.ngxService.startLoader("loader-aceptar")
+    this.xAPI.funcion = "IPSFA_CMilitarMPPD"
+    this.xAPI.parametros = this.DBasico.cedula
+    this.xAPI.valores = ""
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        //console.info(data);
+        //console.info(data)
 
         if (data.length > 0) {
-          const militar = data[0];
-          const DB = militar.persona.datobasico;
-          this.ipsfa_cedula = DB.cedula;
+          const militar = data[0]
+          const DB = militar.persona.datobasico
+          this.ipsfa_cedula = DB.cedula
           this.ipsfa_nombres_apellidos =
-            DB.nombreprimero + " " + DB.apellidoprimero;
+            DB.nombreprimero + " " + DB.apellidoprimero
           this.ipsfa_fechanacimiento = this.utilService.ConvertirFechaHumana(
             DB.fechanacimiento
-          );
+          )
 
-          let ISODate = new Date(DB.fechanacimiento).toISOString();
-          this.ipsfa_fechanacimiento_unix = ISODate.substr(0, 10);
+          let ISODate = new Date(DB.fechanacimiento).toISOString()
+          this.ipsfa_fechanacimiento_unix = ISODate.substr(0, 10)
 
-          let ISODateIngreso = new Date(militar.fingreso).toISOString();
-          this.ipsfa_fechaingreso_unix = ISODateIngreso.substr(0, 10);
+          let ISODateIngreso = new Date(militar.fingreso).toISOString()
+          this.ipsfa_fechaingreso_unix = ISODateIngreso.substr(0, 10)
 
-          let ISODateAscenso = new Date(militar.fascenso).toISOString();
-          this.ipsfa_fechaascenso_unix = ISODateAscenso.substr(0, 10);
+          let ISODateAscenso = new Date(militar.fascenso).toISOString()
+          this.ipsfa_fechaascenso_unix = ISODateAscenso.substr(0, 10)
 
-          this.ipsfa_sexo = DB.sexo == "M" ? "MASCULINO" : "FEMENINO";
-          this.ipsfa_componente = militar.componente.descripcion; //+ '(' + militar.componente.abreviatura  + ')'
-          this.ipsfa_grado = militar.grado.descripcion; // + '(' +  militar.grado.abreviatura + ')'
+          this.ipsfa_sexo = DB.sexo == "M" ? "MASCULINO" : "FEMENINO"
+          this.ipsfa_componente = militar.componente.descripcion //+ '(' + militar.componente.abreviatura  + ')'
+          this.ipsfa_grado = militar.grado.descripcion // + '(' +  militar.grado.abreviatura + ')'
           this.ipsfa_clasificacion = this.utilService.ConvertirClasificacion(
             militar.clase
-          );
+          )
           this.ipsfa_categoria = this.utilService.ConvertirCategoria(
             militar.categoria
-          );
+          )
           this.ipsfa_situacion = this.utilService.ConvertirSituacion(
             militar.situacion
-          );
-          this.ipsfa_situacion_ab = militar.situacion;
+          )
+          this.ipsfa_situacion_ab = militar.situacion
 
           this.ipsfa_fechaingreso = this.utilService.ConvertirFechaHumana(
             militar.fingreso
-          );
+          )
           this.ipsfa_fechaultimoascenso = this.utilService.ConvertirFechaHumana(
             militar.fascenso
-          );
+          )
         }
 
         // this.ipsfa_otros_estudios = ''

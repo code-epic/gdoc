@@ -96,7 +96,6 @@ import { EresolucionesComponent } from './views/resoluciones/rsprocesos/eresoluc
 import { MatTreeModule } from '@angular/material/tree';
 import { RsdatosbasicosmasivosComponent } from './views/resoluciones/rsconfiguracion/rsdatosbasicosmasivos/rsdatosbasicosmasivos.component';
 import { RscondecoracionesComponent } from './views/resoluciones/rsconfiguracion/rscondecoraciones/rscondecoraciones.component';
-import { RsgeneralesComponent } from './views/resoluciones/rsconfiguracion/rsgenerales/rsgenerales.component';
 import { RseliminacionesComponent } from './views/resoluciones/rsconfiguracion/rseliminaciones/rseliminaciones.component';
 import { ConsultaGeneralComponent } from './views/consulta-general/consulta-general.component';
 import { SbuscadorComponent } from './views/secretaria/sbuscador/sbuscador.component';
@@ -248,7 +247,6 @@ const ngWizardConfig: NgWizardConfig = {
     EresolucionesComponent,
     RsdatosbasicosmasivosComponent,
     RscondecoracionesComponent,
-    RsgeneralesComponent,
     RseliminacionesComponent,
     ConsultaGeneralComponent,
     SbuscadorComponent,

@@ -293,6 +293,11 @@ export class RsccargamasivaComponent implements OnInit {
     motivo: "",
     observacion: "",
     situacion: "",
+    telefono: "",
+    correo: "",
+    ubicacion: "",
+    cargo: "",
+    estadomayor: ""
   };
 
   //Lista de sobrecargas

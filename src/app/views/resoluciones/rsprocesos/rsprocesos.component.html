@@ -16,8 +16,9 @@
                         <div class="col-md-1 text-right">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
-                                    <button mat-icon-button title="Volver Atrás" (click)="irAnterior()">
-                                        <mat-icon>arrow_back</mat-icon>
+                                    <button mat-icon-button title="Ver historico de operaciones"
+                                        (click)="open(historico)" *ngIf="blHistorico">
+                                        <mat-icon style="font-size: 36px;">history</mat-icon>
                                     </button>
                                 </div>
                             </div>
@@ -25,12 +26,13 @@
                         <div class="col-md-1 text-right">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
-                                    <button mat-icon-button title="Ver historico de operaciones" (click)="open(historico)" *ngIf="blHistorico">
-                                        <mat-icon style="font-size: 36px;">history</mat-icon>
+                                    <button mat-icon-button title="Volver Atrás" (click)="irAnterior()">
+                                        <mat-icon>arrow_back</mat-icon>
                                     </button>
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-md-1 text-right">
 
                             <ul class="navbar-nav align-items-right d-none d-md-flex">
@@ -66,109 +68,81 @@
                 <div class="card-body">
 
 
-                    <div class="row">
-                        <div class="col-md-1"></div>
-                        <div class="col-md-10 text-center">
-                            <div class="row text-center" *ngIf="menu">
-<!-- 
-                                <div class="col-md-2 cardround">
-                                    <a routerLinkActive="active" (click)="desactivar('aresolucion')">
-                                        <div class="text-center botones">
-                                            <br>
-                                            <h2 class="text-center text-green"><i class="fa fa-folder"
-                                                    style="font-size: 42px;"></i>
-                                            </h2>
-                                            <p>Agregar resolucion</p>
-                                        </div>
-                                    </a>
-                                </div> -->
+                        
+                        <div class="row text-center" *ngIf="menu">
+                            <div class="col-md-1"></div>
 
-                                <div class="col-md-2">
-                                    <a routerLinkActive="active"
-                                        (click)="desactivar('Agragar Entradas');aentradas=true">
-                                        <div class="text-center rounded botones">
-                                            <br>
-                                            <h2 class="text-center text-green"><i class="fa fa-file"
-                                                    style="font-size: 42px;"></i></h2>
-                                            <p>Agragar Entradas</p>
-                                        </div>
-                                    </a>
-                                </div>
-
-                                <div class="col-md-2">
-                                    <a routerLinkActive="active"
-                                        (click)="desactivar('Agragar Resolucion');aresolucion=true">
-                                        <div class="text-center rounded botones">
-                                            <br>
-                                            <h2 class="text-center text-blue"><i class="fa fa-book"
-                                                    style="font-size: 42px;"></i></h2>
-                                            <p>Agragar Resolucion</p>
-                                        </div>
-                                    </a>
-                                </div>
-
-
-                                <div class="col-md-2">
-                                    <a routerLinkActive="active"
-                                        (click)="desactivar('Ingresos por lote');lotes=true">
-                                        <div class="text-center rounded botones">
-                                            <br>
-                                            <h2 class="text-center text-orange"><i class="fa fa-tasks"
-                                                    style="font-size: 42px;"></i></h2>
-                                            <p>Lotes</p>
-                                        </div>
-                                    </a>
-                                </div>
-
-                                <div class="col-md-2">
-                                <a routerLinkActive="active" (click)="desactivar('Generales');generales=true">
-                                  <div class="text-center rounded botones">
-                                    <br>
-                                      <h2 class="text-center text-red"><i class="fa fa-cog" style="font-size: 42px;"></i></h2>
-                                      <p>Generales</p>
-                                  </div>
+                            <div class="col-md-2">
+                                <a routerLinkActive="active"
+                                    (click)="desactivar('Agragar Entradas');aentradas=true">
+                                    <div class="text-center rounded botones">
+                                        <br>
+                                        <h2 class="text-center text-green"><i class="fa fa-file"
+                                                style="font-size: 42px;"></i></h2>
+                                        <p>Agragar Entradas</p>
+                                    </div>
                                 </a>
-                              </div>
-
-                                <div class="col-md-2">
-                                    <a routerLinkActive="active"
-                                        (click)="desactivar('Publicaciones');dpublicaciones=true">
-                                        <div class="text-center rounded botones">
-                                            <br>
-                                            <h2 class="text-center text-teal"><i class="fa fa-upload"
-                                                    style="font-size: 42px;"></i></h2>
-                                            <p>Publicaciones</p>
-                                        </div>
-                                    </a>
-                                </div>
-
-                                <div class="col-md-2">
-                                    <a routerLinkActive="active"
-                                        (click)="desactivar('Eliminaciones');eliminaciones=true">
-                                        <div class="text-center rounded botones">
-                                            <br>
-                                            <h2 class="text-center text-purple"><i class="fa fa-trash"
-                                                    style="font-size: 42px;"></i></h2>
-                                            <p>Eliminaciones</p>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div class="col-md-1"></div>
-                                <br><br><br><br>
                             </div>
 
+                            <div class="col-md-2">
+                                <a routerLinkActive="active"
+                                    (click)="desactivar('Agragar Resolucion');aresolucion=true">
+                                    <div class="text-center rounded botones">
+                                        <br>
+                                        <h2 class="text-center text-blue"><i class="fa fa-book"
+                                                style="font-size: 42px;"></i></h2>
+                                        <p>Agragar Resolucion</p>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-md-2">
+                                <a routerLinkActive="active" (click)="desactivar('Ingresos por lote');lotes=true">
+                                    <div class="text-center rounded botones">
+                                        <br>
+                                        <h2 class="text-center text-orange"><i class="fa fa-tasks"
+                                                style="font-size: 42px;"></i></h2>
+                                        <p>Lotes</p>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-md-2">
+                                <a routerLinkActive="active"
+                                    (click)="desactivar('Publicaciones');dpublicaciones=true">
+                                    <div class="text-center rounded botones">
+                                        <br>
+                                        <h2 class="text-center text-teal"><i class="fa fa-upload"
+                                                style="font-size: 42px;"></i></h2>
+                                        <p>Publicaciones</p>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-md-2">
+                                <a routerLinkActive="active"
+                                    (click)="desactivar('Eliminaciones');eliminaciones=true">
+                                    <div class="text-center rounded botones">
+                                        <br>
+                                        <h2 class="text-center text-purple"><i class="fa fa-trash"
+                                                style="font-size: 42px;"></i></h2>
+                                        <p>Eliminaciones</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-1"></div>
+
+                            <br><br><br>
                         </div>
+                     
+                  
 
-                    </div>
-
-                    
                     <div class="row">
                         <div class="col-md-12">
                             <app-rsentradas *ngIf="entradas"></app-rsentradas>
                             <app-rscdatosbasicos *ngIf="dbasico"></app-rscdatosbasicos>
                             <app-oresoluciones *ngIf="aresolucion"></app-oresoluciones>
                             <app-rscgeneral *ngIf="lotes"></app-rscgeneral>
-                            <app-rsgenerales *ngIf="generales"></app-rsgenerales>
                             <app-rscpublicaciones *ngIf="dpublicaciones"></app-rscpublicaciones>
                             <app-rseliminaciones *ngIf="eliminaciones"></app-rseliminaciones>
 
@@ -190,7 +164,7 @@
 <ng-template #historico let-c="close" let-d="dismiss">
 
     <div class="modal-body">
-        
+
         <div class="col-md-12">
             <h2>Historico de operaciones </h2>
         </div>
@@ -198,22 +172,22 @@
         <div class="col-md-12">
             <table style="width: 100%;" class="zigzag" border="1">
                 <thead>
-                    
+
                     <tr>
                         <th style="width: 110px;"> CEDULA</th>
                         <th> RESUELTO</th>
                         <th> FECHA OPERACION</th>
                         <th> ASUNTO </th>
-                        
+
                     </tr>
                 </thead>
                 <tbody>
-                        <tr *ngFor="let e of lstHistorico">
-                            <td>{{ e.cedula }}</td>
-                            <td>{{ e.numero }}</td>
-                            <td>{{ e.registro }}</td>
-                            <td>{{ e.asunto.substring(0,20) }}</td>
-                        </tr>
+                    <tr *ngFor="let e of lstHistorico">
+                        <td>{{ e.cedula }}</td>
+                        <td>{{ e.numero }}</td>
+                        <td>{{ e.registro }}</td>
+                        <td>{{ e.asunto.substring(0,20) }}</td>
+                    </tr>
                 </tbody>
 
 

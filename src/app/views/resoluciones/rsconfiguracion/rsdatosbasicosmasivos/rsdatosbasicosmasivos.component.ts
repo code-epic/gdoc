@@ -1,7 +1,7 @@
 import { Component, Injectable, OnInit } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router } from "@angular/router";
-import { AngularEditorConfig } from "@kolkov/angular-editor";
+import { Router } from "@angular/router";
+
 import {
   NgbCalendar,
   NgbDateAdapter,
@@ -80,13 +80,7 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
   ],
 })
 export class RsdatosbasicosmasivosComponent implements OnInit {
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
+
   public Componentes: any;
   public Grados: any;
   public Categorias: any;
@@ -122,6 +116,11 @@ export class RsdatosbasicosmasivosComponent implements OnInit {
     motivo: "",
     observacion: "",
     situacion: "",
+    telefono: "",
+    correo: "",
+    ubicacion: "",
+    cargo: "",
+    estadomayor: ""
   };
 
   public cargaMasiva: CargaMasiva = {
@@ -152,7 +151,6 @@ export class RsdatosbasicosmasivosComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private modalService: NgbModal,
-    private rutaActiva: ActivatedRoute,
     private utilService: UtilService,
     private loginService: LoginService,
     private toastrService: ToastrService,
@@ -327,6 +325,11 @@ export class RsdatosbasicosmasivosComponent implements OnInit {
       motivo: "",
       observacion: "",
       situacion: "",
+      telefono: "",
+      correo: "",
+      ubicacion: "",
+      cargo: "",
+      estadomayor: ""
     };
   }
 }

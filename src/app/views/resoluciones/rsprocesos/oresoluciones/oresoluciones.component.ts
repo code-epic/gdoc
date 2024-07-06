@@ -170,6 +170,11 @@ export class OresolucionesComponent implements OnInit {
     motivo: "",
     observacion: "",
     situacion: "",
+    telefono: "",
+    correo: "",
+    ubicacion: "",
+    cargo: "",
+    estadomayor: ""
   }
 
   public IResolucion: IResoluciones = {

@@ -306,7 +306,7 @@ export const AdminLayoutRoutes: Routes = [
         canActivate: [AuthGuardGuard]
     },
     {
-        path: 'gralconsulta',
+        path: 'gralconsultas',
         component: GralconsultasComponent,
         canActivate: [AuthGuardGuard]
     },
@@ -316,7 +316,7 @@ export const AdminLayoutRoutes: Routes = [
         canActivate: [AuthGuardGuard]
     },
     {
-        path: 'graledicion',
+        path: 'graedicion',
         component: GraledicionComponent,
         canActivate: [AuthGuardGuard]
     },

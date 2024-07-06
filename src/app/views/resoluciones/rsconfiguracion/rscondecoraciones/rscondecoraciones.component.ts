@@ -294,6 +294,11 @@ export class RscondecoracionesComponent implements OnInit {
     motivo: "",
     observacion: "",
     situacion: "",
+    telefono: "",
+    correo: "",
+    ubicacion: "",
+    cargo: "",
+    estadomayor: ""
   };
 
   //Lista de sobrecargas

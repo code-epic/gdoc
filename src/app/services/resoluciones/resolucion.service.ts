@@ -105,6 +105,11 @@ export interface IDatosBasicos {
   dia: number
   ultimo_ascenso: string
   situacion: string
+  telefono: string
+  correo: string
+  ubicacion: string
+  cargo: string
+  estadomayor: string
 }
 
 @Injectable({

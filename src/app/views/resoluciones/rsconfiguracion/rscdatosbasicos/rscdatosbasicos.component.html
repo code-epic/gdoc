@@ -16,7 +16,7 @@
           <div class="input-group mb-3">
             <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
               [(ngModel)]="DBasico.nombres" value="{{DBasico.nombres}}">
-            <div class="input-group-prepend">
+            <div class="input-group-prepend" *ngIf="!GENERAL">
               <button type="button" class="btn btn-info" (click)="consultarIPSFA(detalles)" id="agregar">
                 <i class="fa fa-eye" aria-hidden="true"></i>
               </button>
@@ -228,24 +228,57 @@
 </div>
 <div class="form-row">
   <div class="form-group col-md-12" >
-    <label> Motivo de la condicion </label>
-    <div  [ngStyle]="{'background-color': color}">
-      <angular-editor 
-        [placeholder]="'Introduzca el motivo de la condicion especial...'" 
-        [config]="editorConfig" 
-        [(ngModel)]="DBasico.motivo">
-      </angular-editor>
-    </div>
+    <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="DBasico.motivo" placeholder="Introduzca el motivo de la condicion especial...'..."
+            style="width: 100%">{{DBasico.motivo}}</textarea>
   </div>
 </div>
 <div class="form-row">
   <div class="form-group col-md-12">
-    <label> Observaciones </label>
-    <!-- <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.observacion"
-      value="{{ DBasico.observacion }}" class="form-control"> -->
-      <angular-editor [placeholder]="'Introduzca el texto...'" [config]="editorConfig"
-                                    [(ngModel)]="DBasico.observacion"></angular-editor>
+
+     <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="DBasico.observacion" placeholder="Introduzca el texto para observaciones..."
+            style="width: 100%">{{DBasico.observacion}}</textarea>
   </div>
+</div>
+
+
+
+<div class="form-row" *ngIf="GENERAL">
+
+  <div class="form-group col-md-6">
+    <label> Teléfono </label>
+    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.telefono"
+      value="{{DBasico.telefono}}" class="form-control">
+  </div>
+
+  <div class="form-group col-md-6">
+    <label> Correo Electronico </label>
+    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.correo"
+      value="{{DBasico.correo}}" class="form-control">
+  </div>
+  
+
+</div>
+<div class="form-row" *ngIf="GENERAL">
+  
+  <div class="form-group col-md-4">
+    <label> Ubicación </label>
+    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.ubicacion"
+      value="{{DBasico.ubicacion}}" class="form-control">
+  </div>
+
+  <div class="form-group col-md-4">
+    <label> Otros Cargos </label>
+    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.cargo"
+      value="{{DBasico.cargo}}" class="form-control">
+  </div>
+  <div class="form-group col-md-4">
+    <label> Estado Mayor </label>
+    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.estadomayor"
+      value="{{DBasico.estadomayor}}" class="form-control">
+  </div>
+
 </div>
 
 <div class="row">
