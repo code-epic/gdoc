@@ -1,0 +1,80 @@
+<div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
+  <div class="container-fluid">
+    <p></p>
+  </div>
+</div>
+<div class="container-fluid mt--9">
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <ngx-ui-loader [loaderId]="'loader-estatus'"></ngx-ui-loader>
+      <div class="card shadow">
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-11">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">PRINCIPAL</h6>
+              <h2 class="mb-0">Módulo de Alertas / Generales </h2>
+            </div>
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>arrow_back</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="form-group col-md-4">
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="estatus"
+                value="{{estatus}}">
+                <option value="0">SELECCIONAR ESTATUS</option>
+                <option *ngFor="let e of lstEstatus;" [value]="e.id">{{e.id}}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-3">
+              <button class="btn bg-primary text-white " (click)="Filtrar()">
+                <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar </button>
+            </div>
+          </div>
+
+          <div class="row" #pdfTable>
+            <div class="col-md-12">
+              <table style="width: 100%;" class="zigzag" border="1">
+                <thead>
+                  <tr style="height: 40px;">
+                    <th style="width: 30px;"> Nº </th>
+                    <th> N&Uacute;MERO</th>
+                    <th> CREACI&Oacute;N</th>
+                    <!-- <th> TIPO DOCUMENTO </th> -->
+                    <th> CONTENDIO </th>
+                    <th> UBICACIÓN </th>
+                    <th> PLAZO </th>
+                    <th> DIAS </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let e of lstDocumentosAux;let i=index;">
+                    <td>{{ i+1 }}</td>
+                    <td>{{ e.numero }}</td>
+                    <td>{{ e.creacion | date:"dd/MM/yyyy" }}</td>
+                    <!-- <td>{{ e.tipo | uppercase }}</td> -->
+                    <td [innerHTML]="e.contenido"></td>
+                    <td>{{ e.estado_nombre | uppercase }}</td>
+                    <td>{{ e.alerta | date:"dd/MM/yyyy" }}</td>
+                    <td>{{ e.cant }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fin de Tarjeta Padre -->
+</div>

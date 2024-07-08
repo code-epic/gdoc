@@ -1,10 +1,8 @@
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
-import { MatAccordion } from '@angular/material/expansion';
-import { PageEvent } from '@angular/material/paginator';
+import { Component, OnInit } from '@angular/core';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import Swal from 'sweetalert2';
 
 export interface DialogData {
   name: string;
@@ -18,14 +16,12 @@ export interface DialogData {
 })
 export class ControlComponent implements OnInit {
 
-  @ViewChild(MatAccordion) accordion: MatAccordion;
+
 
   public rdocumento : string = "none"
   public rtarjetas  : string = ""
   public rlistado : string = "none"
 
-  public paginador = 10
-  public focus;
   public xAPI : IAPICore = {
     funcion: '',
     parametros: '',
@@ -52,42 +48,23 @@ export class ControlComponent implements OnInit {
     estatus: false
   };
 
-  selNav = 0
-  oficinas = []
-  lst = []
 
-  lengthOfi = 0;
-  pageSizeOfi = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 100];
-
-  // MatPaginator Output
-  pageEvent: PageEvent;
 
   public SubMenu = []
 
   public Configurar : boolean = false
 
+  pendiente : number = 0
+  vencidos: number = 0
+
+
   constructor(private apiService: ApiService, 
-    public dialog: MatDialog,
     public loginService : LoginService,
     public ruta : Router) { }
 
   async ngOnInit() {
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
-    this.SubMenu.push(
-       {
-    url: "/consulta-general",
-    js: "",
-    descripcion: "Consulta General",
-    icono: "fa fa-search",
-    nombre: "Consulta",
-    accion: "CargarUrl('control', 'pendientes')",
-    clase: "f-left",
-    color: "bg-orange",
-    
-  }
-    )
     let prv = this.loginService.obtenerPrivilegiosMenu(this.ruta.url)
     if (prv != undefined && prv.Privilegios != undefined) {
       prv.Privilegios.forEach(e => {
@@ -95,22 +72,77 @@ export class ControlComponent implements OnInit {
       });
     }
 
-    await this.ConsultarCantidades()
+    this.consultarAlertas()
   }
 
-  ConsultarCantidades(){
 
-    
-    this.xAPI.funcion = 'WKF_CCantidadEstado'
- 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-       
+
+
+  consultarAlertas(){
+  
+    this.xAPI.funcion = 'WKF_CEstatusAlertasCantidad'
+    this.xAPI.parametros = '5'
+    this.apiService.Ejecutar(this.xAPI).subscribe( 
+     async data => {
+        console.log(data)
+      
+
+        await data.Cuerpo.map(e => {
+          console.log(e)
+          switch (e.estatus) {
+            case "PENDIENTE":
+              this.pendiente = e.cantidad
+              break;
+            case "VENCIDO":
+              this.vencidos = e.cantidad
+              break
+            default:
+              break;
+          }
+        })
+        console.log("Alertando")
+        if ( this.pendiente >0 || this.vencidos > 0 ) this.alert()
       },
-      (error) => { console.log(error) }
+      err => {
+
+      }
     )
   }
- 
+
+
+  alert(){
+    Swal.fire({
+      background: "#F08080",
+      position: "bottom-end",
+      backdrop: false,
+      //icon: "warning",
+      title: "Alertas pendientes",
+      html: `<p align="left" style="color:#fff; font-weight: bold;">
+        <table widht="100%" cellpadding="10px">
+          <tr>
+            <td>
+              <i class="fa fa-exclamation-circle" aria-hidden="true" style="font-size:64px"></i>
+            </td>
+            <td> 
+              Documentación con plazo: ( ${this.pendiente} ) <br>
+              Documentación vencida: ( ${this.vencidos} ) 
+            </td>
+          </tr>
+        </table>
+       
+        </p>
+      `,
+      confirmButtonColor: "#F09090",
+      showConfirmButton: true,
+      showCancelButton: false,
+      confirmButtonText: "Ver detalles",
+      timer: 9000
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ruta.navigate(['ctrlalertas'])
+      }
+    })
+  }
 
 
 

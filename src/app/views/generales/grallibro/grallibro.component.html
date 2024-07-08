@@ -67,14 +67,14 @@
             </div>
 
             <div class="form-group col-md-3">
-              <button class="btn bg-primary text-white " (click)="generatePDF()">
+              <button class="btn bg-primary text-white " (click)="ConsultarListado()">
                 <span class="fa fa-search"></span>&nbsp;&nbsp;Generar PDF </button>
             </div>
           </div>
 
-          <div class="row" #pdfTable>
+          <div class="row" #pdfTable  >
             <div class="col-md-12">
-              <table style="width: 100%;" class="zigzag" border="1">
+              <table style="width: 100%;" class="zigzag" border="1" id="pdfTable" name="pdfTable">
                 <thead>
                   <tr style="height: 40px;">
                     <th style="width: 30px;"> Nº </th>

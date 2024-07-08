@@ -47,6 +47,10 @@ import { GrallibroComponent } from 'src/app/views/generales/grallibro/grallibro.
 import { GralconsultasComponent } from 'src/app/views/generales/gralconsultas/gralconsultas.component';
 import { GralestadisticasComponent } from 'src/app/views/generales/gralestadisticas/gralestadisticas.component';
 import { GraledicionComponent } from 'src/app/views/generales/graledicion/graledicion.component';
+import { ListadosComponent } from 'src/app/views/notas/listados/listados.component';
+import { CtrlestadisticasComponent } from 'src/app/views/control/ctrlestadisticas/ctrlestadisticas.component';
+import { CtrlreporteComponent } from 'src/app/views/control/ctrlreporte/ctrlreporte.component';
+import { CtrlalertasComponent } from 'src/app/views/control/ctrlalertas/ctrlalertas.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -58,6 +62,26 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'control',
         component: ControlComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'notaentrega',
+        component: ListadosComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'ctrlestadistica',
+        component: CtrlestadisticasComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'ctrlreporte',
+        component: CtrlreporteComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'ctrlalertas',
+        component: CtrlalertasComponent,
         canActivate: [AuthGuardGuard]
     },
     {

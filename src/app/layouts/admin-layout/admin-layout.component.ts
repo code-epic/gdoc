@@ -7,9 +7,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AdminLayoutComponent implements OnInit {
 
+
+
   constructor() { }
 
   ngOnInit() {
+    // setInterval(
+    //   this.consultarAlertas, 3000
+    // )
+   
   }
+
 
 }

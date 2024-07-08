@@ -1126,6 +1126,7 @@ export class OresolucionesComponent implements OnInit {
         this.limpiarFrm()
         this.IResolucion.cedula = cedula
         this.consultarCedula()
+        this.blAceptar = true
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         this.LimpiarDatos()
       } else {

@@ -234,7 +234,6 @@ export class RscdatosbasicosComponent implements OnInit {
       (data) => {
         if (data.Cuerpo.length > 0) {
           this.DBasico = data.Cuerpo[0]
-          console.log(data)
           this.foto = `https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/${cedula}/foto.jpg`
           this.Resolucion = data.Cuerpo[0]
           this.nacimiento = NgbDate.from(this.formatter.parse(this.DBasico.nacimiento.substring(0, 10)))

@@ -9,6 +9,9 @@ import { PendientesComponent } from './pendientes/pendientes.component';
 import { RegistrarComponent } from './registrar/registrar.component';
 import { SalidasComponent } from './salidas/salidas.component';
 import { ControlRoutingModule } from './control-routing.module';
+import { CtrlestadisticasComponent } from './ctrlestadisticas/ctrlestadisticas.component';
+import { CtrlreporteComponent } from './ctrlreporte/ctrlreporte.component';
+import { CtrlalertasComponent } from './ctrlalertas/ctrlalertas.component';
 
 
 
@@ -20,7 +23,10 @@ import { ControlRoutingModule } from './control-routing.module';
     DocumentoComponent,
     PendientesComponent,
     RegistrarComponent,
-    SalidasComponent
+    SalidasComponent,
+    CtrlestadisticasComponent,
+    CtrlreporteComponent,
+    CtrlalertasComponent
   ],
   imports: [
     CommonModule,
