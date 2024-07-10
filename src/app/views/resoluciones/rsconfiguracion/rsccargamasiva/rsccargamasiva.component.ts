@@ -729,7 +729,8 @@ export class RsccargamasivaComponent implements OnInit {
       documento: 0,
       causa: 0,
       archivo: "",
-    };
+    }
+
     this.Resolucion = {
       id: "",
       cuenta: "",
@@ -758,7 +759,9 @@ export class RsccargamasivaComponent implements OnInit {
       instrucciones: "",
       n_componente: 0,
       n_grado: 0,
-    };
+    }
+
+    this.llave = this.utilService.GenerarUnicId()
   }
 
   vincular() {

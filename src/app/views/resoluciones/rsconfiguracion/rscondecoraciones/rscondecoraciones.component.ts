@@ -811,6 +811,7 @@ export class RscondecoracionesComponent implements OnInit {
       n_componente: 0,
       n_grado: 0,
     };
+    this.llave = this.utilService.GenerarUnicId();
   }
 
   vincular() {
@@ -998,6 +999,7 @@ export class RscondecoracionesComponent implements OnInit {
         this.btnAccion = false
         this.btncargando = true
         this.limpiarFrm()
+        this.llave = this.utilService.GenerarUnicId();
         this.aceptar("");
         
       },

@@ -7,7 +7,6 @@ import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { UtilService } from "src/app/services/util/util.service";
 
 import pdfMake from "pdfmake/build/pdfmake";
-
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 pdfMake.fonts = {
@@ -156,13 +155,23 @@ export class GrallibroComponent implements OnInit {
     });
 
 
-    console.log(...tableBodyA)
+    // console.log(...tableBodyA)
 
 
     // 4. Definición del PDF
     const docDefinition = {
       pageOrientation: 'landscape', // Orientación del PDF (horizontal)
-      header: 'RELACION DE OFICIALES GENERALES',
+      header: { text: 'RELACION DE OFICIALES GENERALES', style: 'header' },
+      styles: {
+        header: {
+          fontSize: 22,
+          bold: true
+        },
+        anotherStyle: {
+          italics: true,
+          alignment: 'right'
+        }
+      },
       content: [
         {
           columns: [

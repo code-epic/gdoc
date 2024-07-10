@@ -279,6 +279,7 @@ export class RsdatosbasicosmasivosComponent implements OnInit {
       (data) => {
         this.ngxService.stopLoader("loader-aceptar");
         this.resetearFechas(true);
+        this.llave = this.utilService.GenerarUnicId();
         this.aceptar("");
       },
       (errot) => {

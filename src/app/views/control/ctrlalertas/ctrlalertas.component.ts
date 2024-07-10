@@ -48,6 +48,7 @@ export class CtrlalertasComponent implements OnInit {
       }
     )
   }
+  
   async Filtrar(){
     this.ngxService.startLoader("loader-estatus");
     this.lstDocumentosAux = []
