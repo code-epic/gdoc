@@ -7,6 +7,7 @@ import { DocumentoComponent } from './documento/documento.component';
 import { PendientesComponent } from './pendientes/pendientes.component';
 import { RegistrarComponent } from './registrar/registrar.component';
 import { SalidasComponent } from './salidas/salidas.component';
+import { CtrlestadisticasComponent } from './ctrlestadisticas/ctrlestadisticas.component';
 
 const routes: Routes = [
   {
