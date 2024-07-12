@@ -70,7 +70,7 @@ export const AdminLayoutRoutes: Routes = [
         canActivate: [AuthGuardGuard]
     },
     {
-        path: 'ctrlestadistica',
+        path: 'ctrlestadisticas',
         component: CtrlestadisticasComponent,
         canActivate: [AuthGuardGuard]
     },
