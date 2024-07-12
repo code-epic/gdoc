@@ -361,7 +361,7 @@
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{ e.cuenta_oficio }} </a>
                                                             </td>
-                                                            <td>{{ e.asunto | uppercase}}
+                                                            <td [innerHTML]="e.asunto | uppercase">
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -402,7 +402,7 @@
                                                                 <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
                                                                     RESOLUCIONES</b>
                                                             </td>
-                                                            <td *ngIf="!validarSeguridad(e)">{{ e.asunto | uppercase}}
+                                                            <td *ngIf="!validarSeguridad(e)"  [innerHTML]="e.asunto | uppercase">
                                                             </td>
                                                             <td>
                                                                 <button mat-icon-button aria-label="Detalle"
@@ -466,10 +466,8 @@
                                                                 <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
                                                                     RESOLUCIONES</b>
                                                             </td>
-                                                            <td *ngIf="!validarSeguridad(e)">
-                                                                {{e.administracion}}
-                                                                <br>
-                                                                {{e.asunto}}
+                                                            <td *ngIf="!validarSeguridad(e)" [innerHTML]="asuntohtml(e)">
+                                                               
                                                             </td>
                                                             <td>
                                                                 <a *ngIf="!validarSeguridad(e)" class="enlace"
@@ -730,10 +728,7 @@
                                                                 <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
                                                                     RESOLUCIONES</b>
                                                             </td>
-                                                            <td *ngIf="!validarSeguridad(e)">
-                                                                {{e.administracion}}
-                                                                <br>
-                                                                {{e.asunto}}
+                                                            <td *ngIf="!validarSeguridad(e)" [innerHTML]="asuntohtml(e)">
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -899,37 +894,40 @@
                                             <div class="col-md-10">
                                                 <p>
                                                     Los archivo que intente subir por esta via deben ser de extension
-                                                    *.csv preferiblemente separado por coma (,)
-                                                    y cumplir con el siguiente formato:
+                                                    *.csv preferiblemente separado por punto y coma (;) y cumplir con el siguiente formato:
                                                 </p>
                                                 <ul>
                                                     <li>1.- La codificacion del fichero preferiblemente en UTF-8</li>
                                                     <li>2.- Deben iniciar sin cabecera o algun titulo de columna.</li>
-                                                    <li>3.- La primera columna del archivo debe contener un campo
-                                                        cedula.</li>
+                                                    <li>3.- La primera columna del archivo debe contener la cedula.</li>
+                                                    <li>4.- La segunda columna es posicion que corresponde al orden en el que se imprimira la consulta.</li>
+                                                    <li>5.- Podra establecer un delimitador a la hora de descargar el archivo valor por defecto (|).</li>
                                                 </ul>
                                             </div>
                                             <div class="col-md-1"></div>
                                         </div>
                                         <br>
 
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <input type="text" name="delimitador" value="true"  [ngModelOptions]="{standalone: true}"
-                                                [(ngModel)]="delimitador" value="{{delimitador}}">
-                                            </div>
-                                        </div>
+                                      
 
                                         <div class="row">
+                                            <div class="col-md-1">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Delimitador</mat-label>
+                                                    <input matInput placeholder="Delimitador" [ngModelOptions]="{standalone: true}"
+                                                    [(ngModel)]="delimitador" value="{{delimitador}}">
+                                                </mat-form-field>
+                                                
+                                            </div>
                                             <div class="col-md-3">
 
                                                 <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                                    [(ngModel)]="tiponomina" value="{{tiponomina}}">
+                                                    [(ngModel)]="tiponomina" value="{{tiponomina}}" style="height: 50px;margin-top: 5px;">
                                                     <option value="0">NOMINA INTERNA</option>
                                                     <option value="1">NOMINA SAIME</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-9">
+                                            <div class="col-md-8">
 
 
                                                 <!-- Adjuntar Imagenes al Documento -->
@@ -941,22 +939,22 @@
                                                         <div class="col-md-8">
                                                             <div class="input_container">
                                                                 <input (change)="fileSelected($event)" id="fileUpload"
-                                                                    type="file" name="archivos" accept=".csv" />
+                                                                    type="file" name="archivos" accept=".csv" style="height: 50px;margin-top: 5px;" />
                                                             </div>
                                                         </div>
                                                         <div class="col-md-4 text-right">
 
                                                             <button class="btn bg-success text-white text-left"
-                                                                *ngIf="blExpandidaFile" (click)="SubirArchivo()">
+                                                                *ngIf="blExpandidaFile" (click)="SubirArchivo()" style="height: 50px;margin-top: 5px;">
                                                                 <span style="font-size: 18px;"
                                                                     class="fa fa-upload"></span>&nbsp;&nbsp;Subir
                                                             </button>
 
                                                             <button class="btn bg-info text-white text-right"
-                                                                *ngIf="!blExpandidaFile" (click)="downloadCSVExFile();">
+                                                                *ngIf="!blExpandidaFile" (click)="downloadCSVExFile();" style="height: 50px;margin-top: 5px;">
                                                                 <span style="font-size: 18px;"
                                                                     class="fa fa-download"></span>&nbsp;&nbsp;Descargar</button>
-                                                            <button class="btn bg-warning text-white text-left"
+                                                            <button class="btn bg-warning text-white text-left"  style="height: 50px;margin-top: 5px;"
                                                                 (click)="ReveserConsutla()">
                                                                 <span style="font-size: 18px;"
                                                                     class="fa fa-times-circle"></span>

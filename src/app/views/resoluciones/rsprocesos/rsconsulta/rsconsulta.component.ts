@@ -588,6 +588,11 @@ export class RsconsultaComponent implements OnInit {
     return validar;
   }
 
+  asuntohtml(e) : string {
+    let ad =  e.administracion==null?'':  e.administracion.toUpperCase()  + '<br>'
+    return  ad + e.asunto.toUpperCase()
+  }
+
   obtenerResuelto() {
     this.IResolucion.numero = this.resolucion;
     this.consultarResolucion(undefined);
