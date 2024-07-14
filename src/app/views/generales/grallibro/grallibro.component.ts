@@ -5,9 +5,9 @@ import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { UtilService } from "src/app/services/util/util.service";
-
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { style } from "@angular/animations";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 pdfMake.fonts = {
   Roboto: {
@@ -63,6 +63,7 @@ export class GrallibroComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    
     this.Componentes =
       sessionStorage.getItem("MPPD_CComponente") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
@@ -99,6 +100,37 @@ export class GrallibroComponent implements OnInit {
 
 
   async generatePDF() {
+    // const logoBase64 = await this.getBase64ImageFromURL('assets/img/logo.png'); // Convertir logo a base64
+    // const imagePromises = this.lstGenerales.map(async (e) => {
+    //   const imageBase64 = await this.getImageBase64(`assets/img/acami.jpg`);
+    //   return imageBase64;
+    // });
+  
+    // const images = await this.getImageBase64(`assets/img/brand/acami.jpg`);
+
+    // const encabezadoPersonalizadoa = {
+      // columns:[{ text: 'EJÉRCITO BOLIVARIANO', alignment: 'center', fontSize: 12 , style: 'header'},
+      //   { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 12 , style: 'subheader'},   
+      //   { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 12 , style: 'subheader'}],
+      // text: [
+      //     'REPÚBLICA BOLIVARIANA DE VENEZUELA \n',
+      //     'MINISTERIO DEL PODER POPULAR PARA LA DEFENSA \n',
+      //     'EJERCITO BOLIVARIANO \n',
+      //     'RELACION DE OFICIALES GENERALES'
+      //   ],
+      // style: {
+      //   fontSize: 12,
+      //   alignment: 'center',
+      //   // margin: [25, 0, 0, 0],
+      //   //  height: 50  // Margen superior
+      // }
+    // };
+    const encabezadoPersonalizado = [
+      { text: 'REPÚBLICA BOLIVARIANA DE VENEZUELA', alignment: 'left', fontSize: 17 , style: 'header'},
+      { text: 'MINISTERIO DEL PODER POPULAR PARA LA DEFENSA', alignment: 'left', fontSize: 17 , style: 'subheader'}, 
+      { text: 'EJERCITO BOLIVARIANO', alignment: 'left', fontSize: 20 , style: 'subheader'}, 
+      { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 17 , style: 'subheader', color : 'red'}, 
+        ];
 
     // 1. Obtención de imágenes en formato base64
     // const imagePromises = this.lstGenerales.map(async (e) => {
@@ -161,11 +193,13 @@ export class GrallibroComponent implements OnInit {
     // 4. Definición del PDF
     const docDefinition = {
       pageOrientation: 'landscape', // Orientación del PDF (horizontal)
-      header: { text: 'RELACION DE OFICIALES GENERALES', style: 'header' },
+     
+      //  header: images,
+      // content: encabezadoPersonalizado,
       styles: {
         header: {
-          fontSize: 22,
-          bold: true
+          fontSize: 15,
+          bold: false
         },
         anotherStyle: {
           italics: true,
@@ -173,13 +207,17 @@ export class GrallibroComponent implements OnInit {
         }
       },
       content: [
+        encabezadoPersonalizado,
         {
           columns: [
             {
               width: '50%',
+              height: 'auto',
               stack: [
                 {
+                  // encabezadoPersonalizado,
                   table: {
+                    headerRows: 1,
                     widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
                     body: [
                       this.segmentoA,
@@ -191,9 +229,12 @@ export class GrallibroComponent implements OnInit {
             },
             {
               width: '50%',
+              height: 'auto',
               stack: [
                 {
+                  // encabezadoPersonalizado,
                   table: {
+                    headerRows: 1,
                     widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
                     body: [
                       this.segmentoB,
@@ -215,10 +256,6 @@ export class GrallibroComponent implements OnInit {
 
 
   }
-
-
-
-
 
 
   async getImageBase64(url: string): Promise<string> {
