@@ -100,48 +100,46 @@ export class GrallibroComponent implements OnInit {
 
 
   async generatePDF() {
-    // const logoBase64 = await this.getBase64ImageFromURL('assets/img/logo.png'); // Convertir logo a base64
-    // const imagePromises = this.lstGenerales.map(async (e) => {
-    //   const imageBase64 = await this.getImageBase64(`assets/img/acami.jpg`);
-    //   return imageBase64;
-    // });
-  
-    // const images = await this.getImageBase64(`assets/img/brand/acami.jpg`);
+   
+    // const encabezadoPersonalizado = [
+    //   { text: 'REPÚBLICA BOLIVARIANA DE VENEZUELA', alignment: 'left', fontSize: 17 , style: 'header'},
+    //   { text: 'MINISTERIO DEL PODER POPULAR PARA LA DEFENSA', alignment: 'left', fontSize: 17 , style: 'subheader'}, 
+    //   { text: 'EJERCITO BOLIVARIANO', alignment: 'left', fontSize: 20 , style: 'subheader'}, 
+    //   { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 17 , style: 'subheader', color : 'red'}, 
+    //     ];
 
-    // const encabezadoPersonalizadoa = {
-      // columns:[{ text: 'EJÉRCITO BOLIVARIANO', alignment: 'center', fontSize: 12 , style: 'header'},
-      //   { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 12 , style: 'subheader'},   
-      //   { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 12 , style: 'subheader'}],
-      // text: [
-      //     'REPÚBLICA BOLIVARIANA DE VENEZUELA \n',
-      //     'MINISTERIO DEL PODER POPULAR PARA LA DEFENSA \n',
-      //     'EJERCITO BOLIVARIANO \n',
-      //     'RELACION DE OFICIALES GENERALES'
-      //   ],
-      // style: {
-      //   fontSize: 12,
-      //   alignment: 'center',
-      //   // margin: [25, 0, 0, 0],
-      //   //  height: 50  // Margen superior
-      // }
-    // };
-    const encabezadoPersonalizado = [
-      { text: 'REPÚBLICA BOLIVARIANA DE VENEZUELA', alignment: 'left', fontSize: 17 , style: 'header'},
-      { text: 'MINISTERIO DEL PODER POPULAR PARA LA DEFENSA', alignment: 'left', fontSize: 17 , style: 'subheader'}, 
-      { text: 'EJERCITO BOLIVARIANO', alignment: 'left', fontSize: 20 , style: 'subheader'}, 
-      { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 17 , style: 'subheader', color : 'red'}, 
+    // var pruebaimagen = { image: await this.getBase64ImageFromURL( 'assets/img/brand/android-icon-192x192.png'),  width: 150, margin: [30, 5, 0, 10],}
+      const  encabezadoPersonalizadoq = [
+          { image: await this.getBase64ImageFromURL( 'assets/img/brand/android-icon-192x192.png'),  width: 15, margin: [30, 20, 20, 10],},
+          { text: 'REPÚBLICA BOLIVARIANA DE VENEZUELA', alignment: 'left', fontSize: 17 , style: 'header', height: 25 }, // Aumentar la altura
+          { text: 'MINISTERIO DEL PODER POPULAR PARA LA DEFENSA', alignment: 'left', fontSize: 17 , style: 'subheader', height: 25 }, // Aumentar la altura
+          { text: 'EJERCITO BOLIVARIANO', alignment: 'left', fontSize: 20 , style: 'subheader', height: 25 }, // Aumentar la altura
+          { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 17 , style: 'subheader', color : 'red', height: 25 }, // Aumentar la altura
         ];
-
-    // 1. Obtención de imágenes en formato base64
-    // const imagePromises = this.lstGenerales.map(async (e) => {
-    //   const imageBase64 = await this.getBase64ImageFromURL(`assets/img/${e.cedula}.jpg`);
-    //   return imageBase64;
-    // });
-
-    // const images = await Promise.all(imagePromises);
-
-    // const itemPorPagina = 8; // Tamaño de página (4 registros por lado 8)
-    // const totalPages = this.lstGenerales.length / itemPorPagina // Número total de páginas
+        const encabezadoPersonalizado = {
+          columns : [ 
+            { image: await this.getBase64ImageFromURL( 'assets/img/brand/android-icon-192x192.png'),  width: 15, height : 20},
+            {
+              stack : [
+                {
+                  columns :[
+                  { text: 'REPÚBLICA BOLIVARIANA DE VENEZUELA', alignment: 'left', fontSize: 17 , style: 'header', height: 25 }, // Aumentar la altura
+                  { text: 'MINISTERIO DEL PODER POPULAR PARA LA DEFENSA', alignment: 'left', fontSize: 17 , style: 'subheader', height: 25 }, // Aumentar la altura
+                  { text: 'EJERCITO BOLIVARIANO', alignment: 'left', fontSize: 20 , style: 'subheader', height: 25 }, // Aumentar la altura
+                  { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 17 , style: 'subheader', color : 'red', height: 25 }
+                ]
+              },
+              {
+              columns :[
+                { text: 'MINISTERIO DEL PODER POPULAR PARA LA DEFENSApppppp', alignment: 'left', fontSize: 17 , style: 'subheader', height: 25 }
+              ]
+            }
+              ],
+              
+            }
+          ],
+        }
+        
 
     let tableBodyA = []; // Array to store the table rows
     let tableBodyB = []; // Array to store the table rows
@@ -187,35 +185,31 @@ export class GrallibroComponent implements OnInit {
     });
 
 
-    // console.log(...tableBodyA)
-
-
     // 4. Definición del PDF
     const docDefinition = {
+      pageMargins: [30, 140, 30, 0],
       pageOrientation: 'landscape', // Orientación del PDF (horizontal)
-     
-      //  header: images,
-      // content: encabezadoPersonalizado,
+       header: encabezadoPersonalizado,
       styles: {
-        header: {
-          fontSize: 15,
-          bold: false
-        },
+        // header: {
+        //   fontSize: 15,
+        //   bold: false
+        // },
         anotherStyle: {
           italics: true,
           alignment: 'right'
         }
       },
       content: [
-        encabezadoPersonalizado,
+          // encabezadoPersonalizado,
         {
           columns: [
             {
-              width: '50%',
+              width: '30%',
               height: 'auto',
               stack: [
                 {
-                  // encabezadoPersonalizado,
+                  //  encabezadoPersonalizado,
                   table: {
                     headerRows: 1,
                     widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
@@ -257,6 +251,35 @@ export class GrallibroComponent implements OnInit {
 
   }
 
+//   async generatePDF() {
+//     const docDefinition = {
+//         content: [
+//             // Contenido del documento
+//             'Aquí va el contenido del PDF...',
+//         ],
+//         header: function(currentPage, pageCount, pageSize) {
+//   return {
+//     table: {
+//       widths: ['*'],
+//       body: [
+//         ['Imagen de la empresa'], // Primera línea
+//         ['Nombre de la empresa'], // Segunda línea
+//         ['Contacto de la empresa'], // Tercera línea
+//         ['Correo electrónico de la empresa'] // Cuarta línea
+//       ]
+//     },
+//     layout: 'noBorders'
+//   };
+// },
+
+//     };
+
+//     // Genera el PDF
+//     const pdfDoc = pdfMake.createPdf(docDefinition);
+//     pdfDoc.download('mi_reporte.pdf');
+// }
+
+
 
   async getImageBase64(url: string): Promise<string> {
     const response = await fetch(url);
@@ -272,6 +295,34 @@ export class GrallibroComponent implements OnInit {
       reader.readAsDataURL(blob);
     });
   }
+  getBase64ImageFromURL(url) {
+    return new Promise((resolve, reject) => {
+      var img = new Image();
+      img.setAttribute("crossOrigin", "anonymous");
+
+      img.onload = () => {
+        var canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        var dataURL = canvas.toDataURL("image/png");
+
+        resolve(dataURL);
+      };
+
+      img.onerror = error => {
+        reject(error);
+      };
+
+      img.src = url;
+    });
+
+   
+  }
+
 
   getSafeNombre(persona: string) {
 

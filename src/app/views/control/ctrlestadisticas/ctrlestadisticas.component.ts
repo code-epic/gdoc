@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { ApiService, IAPICore } from '../../../services/apicore/api.service';
-import { Chart } from "chart.js";
 import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { IDataStatic } from 'src/app/core/type/common';
+import { ChartType } from 'src/app/core/type/chart-types.enum';
+import { CtrlEstadisticasService } from './service/ctrlestadisticas.service';
 
 @Component({
   selector: 'app-ctrlestadisticas',
@@ -10,9 +11,6 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
   styleUrls: ['./ctrlestadisticas.component.scss', '../control.component.scss']
 })
 export class CtrlestadisticasComponent implements OnInit {
-  public chartMonth: Chart;
-  public chartWeek: Chart;
-  public chartDay: Chart;
   public form!: FormGroup;
   public listMonthWeek: any[] = [];
   public staticsPanel = [
@@ -21,10 +19,7 @@ export class CtrlestadisticasComponent implements OnInit {
     { label: 'Documentos Total:', status: 'TOTAL', color: 'bg-purple', icon: 'fa fa-search', class: 'f-left' }
   ];
   public body: any[] = [];
-  public xAPI: IAPICore = {
-    funcion: '',
-    parametros: '',
-  };
+  
   lstAreas = [];
   lstAreasFilter = [];
   lstEstatus = [
@@ -33,32 +28,58 @@ export class CtrlestadisticasComponent implements OnInit {
     { 'id': 'EN PROCESO' },
   ];
   public rtarjetas = '';
+  response1: IDataStatic[] = [];
+  response2: IDataStatic[] = [];
+  data1: any[] = [];
+  data2: any[] = [];
+  chartType = ChartType;
+  labels1 = [];
+  labels2 = [];
+  dataSets1 = [];
+  dataSets2 = [];
+  background:string[];
+  border:string[];
+
+  options = {
+    legend: {
+      display: false
+    },
+    scales: {
+      xAxes: [{
+        stacked: true,
+      }],
+      yAxes: [
+        {
+          stacked: true,
+          ticks: {
+            beginAtZero: true
+          }
+        }
+      ]
+    },
+  }
+
   constructor(private fb: FormBuilder,
+    private ctrlStaticService: CtrlEstadisticasService,
     private ngxService: NgxUiLoaderService,
-    private apiService: ApiService) { }
+
+    ) { }
 
   ngOnInit(): void {
     this.initForm();
-    this.getAllStaticsPanelDashboard();
-    this.getAllAreasList();
-    this.chartMonth = this.buildChartBase(
-      'canvas',
-      ['ENERO', 'FEBRERO', 'MARZO'],
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0]);
-    this.chartWeek = this.buildChartBase(
-      'canvasWeek',
-      ['SEMANA 1', 'SEMANA 2', 'SEMANA 3', 'SEMANA 4'],
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0]);
-    this.chartDay = this.buildChartBase(
-      'canvasDay',
-      ['SEMANA 1', 'SEMANA 2', 'SEMANA 3', 'SEMANA 4'],
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0]);
+    
+    this.ctrlStaticService.getStaticsPanel('5').subscribe({
+      next: (value) => {
+        this.body = value.Cuerpo;
+      }
+    });
+
+    this.ctrlStaticService.getAllAreasList().subscribe({
+      next: (value) => {
+        this.lstAreas = value.Cuerpo;
+        this.lstAreasFilter = this.filterAreaList();
+      }
+    });
   }
 
   initForm() {
@@ -70,26 +91,7 @@ export class CtrlestadisticasComponent implements OnInit {
       end: new FormControl(new Date(year, month, 16)),
       status: new FormControl('0'),
       options: new FormControl('0'),
-    });
-  }
-
-  getAllStaticsPanelDashboard() {
-    this.getStaticsPanel('5').subscribe({
-      next: (value) => {
-        this.body = value.Cuerpo;
-      }
-    });
-  }
-
-  getAllAreasList() {
-    this.xAPI.funcion = 'WKF_CEstados';
-    this.xAPI.parametros = '%';
-    this.xAPI.valores = '';
-    return this.apiService.Ejecutar(this.xAPI).subscribe({
-      next: (value) => {
-        this.lstAreas = value.Cuerpo;
-        this.lstAreasFilter = this.filterAreaList();
-      }
+      monthWeek: new FormControl(null),
     });
   }
 
@@ -103,12 +105,6 @@ export class CtrlestadisticasComponent implements OnInit {
     return filter.length > 0 ? filter[0].cantidad : 0;
   }
 
-  getStaticsPanel(parameter: any) {
-    this.xAPI.funcion = 'WKF_CEstatusAlertasCantidad';
-    this.xAPI.parametros = parameter;
-    return this.apiService.Ejecutar(this.xAPI);
-  }
-
   private sumTotalDocs() {
     return this.body.reduce((a, b) => +a + +b.cantidad, 0);
   }
@@ -119,87 +115,17 @@ export class CtrlestadisticasComponent implements OnInit {
     let options = this.form.getRawValue().options;
     let start = this.form.getRawValue().start;
     let status = this.form.getRawValue().status;
+
     let datesDays = [];
     if (end != null && start != null) {
       this.listMonthWeek = this.getYearAndMonthByStartAndEnd();
-      this.chartMonth.data.labels = this.listMonthWeek;
-      datesDays = this.getDaysByStartAndEnd();
-      this.chartDay.data.labels = datesDays;
+      // datesDays = this.getDaysByStartAndEnd();
     } else {
-      //alertar 
+      //alertar si falta una fecha
     }
 
-    /**
-    * TODO
-    * recordar que debe cambiarse el paramentro '5' por el orden del filtrado.
-    */
-    this.getStaticsPanel('5').subscribe({
-      next: (value) => {
-        this.body = value.Cuerpo;
-        this.chartMonth.data.datasets[0].data = [];
-        this.chartMonth.data.datasets[1].data = [];
-        this.chartMonth.data.datasets[2].data = [];
-        this.body.forEach(e => {
-          this.chartMonth.data.datasets[0].data.push(e.cantidad as number);
-          this.chartMonth.data.datasets[1].data.push(e.cantidad as number);
-          this.chartMonth.data.datasets[2].data.push(e.cantidad as number);
-
-        });
-        this.chartMonth.update();
-        this.chartDay.update();
-        this.ngxService.stopLoader("loader-progress")
-      }
-    });
-  }
-
-  buildChartBase(id: any, label: any[], data: any[], data1: any[], data2: any[]) {
-    return new Chart(id, {
-      type: "bar",
-      data: {
-        labels: label,
-        datasets: [
-          {
-            label: 'plazo',
-            data: data,
-            borderColor: '#40DBBC',
-            backgroundColor: 'rgb(66,220,189, 0.4)',
-            borderWidth: 1
-          },
-          {
-            label: 'vencida',
-            data: data1,
-            borderColor: '#F5365C',
-            backgroundColor: 'rgb(245,54,92, 0.4)',
-            borderWidth: 1
-          },
-          {
-            label: 'total',
-            data: data2,
-            borderColor: '#8965E0',
-            backgroundColor: 'rgb(137,101,224, 0.4)',
-            borderWidth: 1
-          }
-        ]
-      },
-      options: {
-        legend: {
-          display: false
-        },
-        scales: {
-          xAxes: [{
-            stacked: true,
-          }],
-          yAxes: [
-            {
-              stacked: true,
-              ticks: {
-                beginAtZero: true
-              }
-            }
-          ]
-        }
-      }
-    });
+    this.getDataByMonth();
+    this.getDataByWeek();
   }
 
   private getYearAndMonthByStartAndEnd() {
@@ -232,4 +158,86 @@ export class CtrlestadisticasComponent implements OnInit {
     return dateArray;
   }
 
+  getDataByMonth() {
+    this.ctrlStaticService.getDataByMonth(this.listMonthWeek).subscribe({
+      next: (value) => {
+        console.log("MONTH RESPONSE =>", value);
+        
+        if(this.dataSets1.length != 0) this.dataSets1.length = 0;
+
+        this.response1 = value.Cuerpo;
+        this.labels1 = this.listMonthWeek;
+
+        let procesados = this.response1.filter(x => x.id == "PROCESADOS");
+        this.data1 = procesados.map((item, i) => item.cantidad);
+        let backgroundColorProcesados= procesados.map((item, i) => item.backgroundColor);
+        let borderColorProcesados = procesados.map((item, i) => item.borderColor);
+        this.dataSets1.push({ data: this.data1, backgroundColor:backgroundColorProcesados, borderColor:borderColorProcesados });
+
+        let pendientes = this.response1.filter(x => x.id == "PENDIENTES");
+        this.data1 = pendientes.map((item, i) => item.cantidad);
+        let backgroundPendientes = pendientes.map((item, i) => item.backgroundColor);
+        let borderPendientes = pendientes.map((item, i) => item.borderColor);
+        this.dataSets1.push({ data: this.data1, backgroundColor:backgroundPendientes, borderColor:borderPendientes });
+
+        let vencidos = this.response1.filter(x => x.id == "VENCIDOS");
+        this.data1 = vencidos.map((item, i) => item.cantidad);
+        let backgroundVencidos = vencidos.map((item, i) => item.backgroundColor);
+        let borderVencidos = vencidos.map((item, i) => item.borderColor);
+        this.dataSets1.push({ data: this.data1, backgroundColor: backgroundVencidos, borderColor: borderVencidos });
+
+        this.ngxService.stopLoader("loader-progress");
+      }
+    });
+  }
+
+  getDataByWeek() {
+    this.ctrlStaticService.getDataByWeek(this.listMonthWeek).subscribe({
+      next: (value) => {
+        console.log("WEEK RESPONSE =>", value);
+        this.response2 = value.Cuerpo;
+      }
+    });
+    
+    this.form.get('monthWeek').valueChanges.subscribe(
+      (valueSelected:string) =>{
+        if(valueSelected != null) {
+          this.ngxService.startLoader("loader-progress");
+          
+          if(this.dataSets2.length != 0) this.dataSets2.length = 0;
+          
+          let filterByMonth = this.response2.filter( x => x.yearsMonth == valueSelected);
+          
+          // para calcular los labels de la la estadistica
+          let labelsRepeated = filterByMonth.map((item, i) => `SEMANA ${item.week}`);
+          this.labels2 = labelsRepeated.filter((element, index) => {
+            return labelsRepeated.indexOf(element) === index;
+          });
+
+          // para la data
+          let procesados = filterByMonth.filter(x => x.id == "PROCESADOS");
+          this.data2 = procesados.map((item, i) => item.cantidad);
+          this.background = procesados.map((item, i) => item.backgroundColor);
+          this.border = procesados.map((item, i) => item.borderColor);
+          this.dataSets2.push({ data: this.data2, backgroundColor:this.background, borderColor:this.border });
+
+
+          let pendientes = filterByMonth.filter(x => x.id == "PENDIENTES");
+          this.data2 = pendientes.map((item, i) => item.cantidad);
+          this.background = pendientes.map((item, i) => item.backgroundColor);
+          this.border = pendientes.map((item, i) => item.borderColor);
+          this.dataSets2.push({ data: this.data2, backgroundColor:this.background, borderColor:this.border });
+
+
+          let vencidos = filterByMonth.filter(x => x.id == "VENCIDOS");
+          this.data2 = vencidos.map((item, i) => item.cantidad);
+          this.background = vencidos.map((item, i) => item.backgroundColor);
+          this.border = vencidos.map((item, i) => item.borderColor);
+          this.dataSets2.push({ data: this.data2, backgroundColor:this.background, borderColor:this.border });
+          
+          this.ngxService.stopLoader("loader-progress");
+        }
+      });
+  }
+  
 }

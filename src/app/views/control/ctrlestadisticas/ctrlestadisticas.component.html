@@ -126,48 +126,51 @@
                 </button>
               </div>
             </div>
-          </form>
 
+            <div class="row">
+              <div class="form-group col-md-5"></div>
 
-          <div class="row">
-            <div class="form-group col-md-5"></div>
-
-            <div class="form-group col-md-3" *ngIf="listMonthWeek.length != 0">
-              <select
-                class="form-control"
-                formControlName="status"
-                style="height: 50px; margin-top: 5px"
+              <div
+                class="form-group col-md-3"
+                *ngIf="listMonthWeek.length != 0"
               >
-                <option *ngFor="let e of listMonthWeek" [value]="e">
-                  {{ e }}
-                </option>
-              </select>
+                <select
+                  class="form-control"
+                  formControlName="monthWeek"
+                  style="height: 50px; margin-top: 5px"
+                >
+                  <option *ngFor="let e of listMonthWeek" [value]="e">
+                    {{ e }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="col-md-4"></div>
+            </div>
+          </form>
+          <!-- <div class="row"> -->
+            <div class="row">
+              
+                  <app-chart-bar
+                    idChart="month"
+                    [type]="chartType.Bar"
+                    [dataSets]="dataSets1"
+                    [labels]="labels1"
+                    [options]="options"
+                  ></app-chart-bar>
+      
+                  <app-chart-bar
+                    idChart="week"
+                    [type]="chartType.Bar"
+                    [dataSets]="dataSets2"
+                    [labels]="labels2"
+                    [options]="options"
+                  ></app-chart-bar>
+
+                  <!-- aqui debe ir la tercera grafica -->
             </div>
 
-            <div class="col-md-4"></div>
-          </div>
-
-          <div class="row">
-            <!-- <div class="col-md-12"> -->
-              <div class="col-md-4">
-                <div style="display: block; width: 400px">
-                  <canvas id="canvas" height="320">{{ chartMonth }}</canvas>
-                </div>
-              </div>
-
-              <div class="col-md-4">
-                <div style="display: block; width: 400px">
-                  <canvas id="canvasWeek" height="320">{{ chartWeek }}</canvas>
-                </div>
-              </div>
-
-              <div class="col-md-4">
-                <div style="display: block; width: 400px">
-                  <canvas id="canvasDay" height="320">{{ chartDay }}</canvas>
-                </div>
-              </div>
-
-              <!-- <table style="width: 100%;" class="zigzag" border="1">
+            <!-- <table style="width: 100%;" class="zigzag" border="1">
                               <thead>
                                 <tr style="height: 40px;"  >
                                   <th *ngFor="let e of lstHead"> {{e.id}}</th>
@@ -189,7 +192,7 @@
                                   <td>{{ e.numero }}</td>
                                   <td>{{ e.creacion | date:"dd/MM/yyyy" }}</td>
                                    <td>{{ e.tipo | uppercase }}</td> -->
-              <!-- <td [innerHTML]="e.contenido"></td>
+            <!-- <td [innerHTML]="e.contenido"></td>
                             <td>{{ e.estado_nombre | uppercase }}</td>
                             <td>{{ e.alerta | date:"dd/MM/yyyy" }}</td>
                             <td>{{ e.cant }}</td>
@@ -197,11 +200,11 @@
                         </tbody>
                         <tbody *ngIf="resolucion"></tbody>
                       </table> -->
-            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- Fin de Tarjeta Padre -->
+<!-- </div> -->
+<!-- Fin de Tarjeta Padre -->
 <!-- </div> -->
