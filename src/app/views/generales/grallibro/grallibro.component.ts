@@ -109,31 +109,32 @@ export class GrallibroComponent implements OnInit {
     //     ];
 
     // var pruebaimagen = { image: await this.getBase64ImageFromURL( 'assets/img/brand/android-icon-192x192.png'),  width: 150, margin: [30, 5, 0, 10],}
-      const  encabezadoPersonalizadoq = [
-          { image: await this.getBase64ImageFromURL( 'assets/img/brand/android-icon-192x192.png'),  width: 15, margin: [30, 20, 20, 10],},
-          { text: 'REPÚBLICA BOLIVARIANA DE VENEZUELA', alignment: 'left', fontSize: 17 , style: 'header', height: 25 }, // Aumentar la altura
-          { text: 'MINISTERIO DEL PODER POPULAR PARA LA DEFENSA', alignment: 'left', fontSize: 17 , style: 'subheader', height: 25 }, // Aumentar la altura
-          { text: 'EJERCITO BOLIVARIANO', alignment: 'left', fontSize: 20 , style: 'subheader', height: 25 }, // Aumentar la altura
-          { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 17 , style: 'subheader', color : 'red', height: 25 }, // Aumentar la altura
-        ];
+      
         const encabezadoPersonalizado = {
           columns : [ 
-            { image: await this.getBase64ImageFromURL( 'assets/img/brand/android-icon-192x192.png'),  width: 15, height : 20},
+            { image: await this.getBase64ImageFromURL( 'assets/img/brand/android-icon-192x192.png'),  width: 60, height : 60},
             {
               stack : [
                 {
                   columns :[
                   { text: 'REPÚBLICA BOLIVARIANA DE VENEZUELA', alignment: 'left', fontSize: 17 , style: 'header', height: 25 }, // Aumentar la altura
-                  { text: 'MINISTERIO DEL PODER POPULAR PARA LA DEFENSA', alignment: 'left', fontSize: 17 , style: 'subheader', height: 25 }, // Aumentar la altura
-                  { text: 'EJERCITO BOLIVARIANO', alignment: 'left', fontSize: 20 , style: 'subheader', height: 25 }, // Aumentar la altura
-                  { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 17 , style: 'subheader', color : 'red', height: 25 }
-                ]
+                    ]
               },
               {
               columns :[
-                { text: 'MINISTERIO DEL PODER POPULAR PARA LA DEFENSApppppp', alignment: 'left', fontSize: 17 , style: 'subheader', height: 25 }
+                { text: 'MINISTERIO DEL PODER POPULAR PARA LA DEFENSA', alignment: 'left', fontSize: 17 , style: 'subheader', height: 25 }, // Aumentar la altura
               ]
-            }
+              },
+              {
+              columns :[
+                { text: 'EJERCITO BOLIVARIANO', alignment: 'left', fontSize: 20 , style: 'subheader', height: 25 }, // Aumentar la altura
+              ]
+              },
+              {
+              columns :[
+                { text: 'RELACION DE OFICIALES GENERALES', alignment: 'center', fontSize: 17 , style: 'subheader', color : 'red', height: 25 }
+              ]
+              },
               ],
               
             }
@@ -187,7 +188,7 @@ export class GrallibroComponent implements OnInit {
 
     // 4. Definición del PDF
     const docDefinition = {
-      pageMargins: [30, 140, 30, 0],
+      pageMargins: [1, 115, 1, 1],
       pageOrientation: 'landscape', // Orientación del PDF (horizontal)
        header: encabezadoPersonalizado,
       styles: {
@@ -205,7 +206,7 @@ export class GrallibroComponent implements OnInit {
         {
           columns: [
             {
-              width: '30%',
+              width: '50%',
               height: 'auto',
               stack: [
                 {
