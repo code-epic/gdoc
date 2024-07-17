@@ -188,9 +188,9 @@ export class GrallibroComponent implements OnInit {
 
     // 4. Definición del PDF
     const docDefinition = {
-      pageMargins: [1, 115, 1, 1],
+      pageMargins: [1, 40, 1, 1],
       pageOrientation: 'landscape', // Orientación del PDF (horizontal)
-       header: encabezadoPersonalizado,
+      //  header: encabezadoPersonalizado,
       styles: {
         // header: {
         //   fontSize: 15,
@@ -202,7 +202,7 @@ export class GrallibroComponent implements OnInit {
         }
       },
       content: [
-          // encabezadoPersonalizado,
+           encabezadoPersonalizado,
         {
           columns: [
             {
