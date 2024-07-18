@@ -1,0 +1,75 @@
+@media print {
+  /* Aquí irían tus reglas CSS específicas para imprimir */
+  section {
+    page-break-before: always;
+  }
+
+  .mat-drawer-content {
+    height: auto !important;
+  }
+  .mat-drawer-container {
+    overflow: inherit !important;
+  }
+
+  .logo {
+    margin-right: 10px;
+  }
+
+  .logo img {
+    max-height: 50px;
+  }
+
+  .cabecera {
+    font-weight: bold;
+  }
+
+  /* Estilos para la tabla */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #f0f0f0;
+  }
+}
+
+
+
+.logo {
+  margin-right: 10px;
+}
+
+.logo img {
+  max-height: 50px;
+}
+
+.cabecera {
+  font-weight: bold;
+}
+
+/* Estilos para la tabla */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 8px 16px;
+  text-align: center;
+}
+
+th {
+  background-color: #f0f0f0;
+}
+
+
+

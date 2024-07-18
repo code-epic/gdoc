@@ -105,6 +105,7 @@ import { GralconsultasComponent } from './views/generales/gralconsultas/gralcons
 import { GralestadisticasComponent } from './views/generales/gralestadisticas/gralestadisticas.component';
 import { GraledicionComponent } from './views/generales/graledicion/graledicion.component';
 import { GrallibroComponent } from './views/generales/grallibro/grallibro.component';
+import { TableGrallibroModalComponent } from './views/generales/grallibro/modal/table-grallibro-modal/table-grallibro-modal.component';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -254,7 +255,8 @@ const ngWizardConfig: NgWizardConfig = {
     GralconsultasComponent,
     GralestadisticasComponent,
     GraledicionComponent,
-    GrallibroComponent
+    GrallibroComponent,
+    TableGrallibroModalComponent
   ],
   providers: [
     {

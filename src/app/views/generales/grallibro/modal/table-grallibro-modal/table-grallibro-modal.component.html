@@ -1,0 +1,111 @@
+
+
+<h1 mat-dialog-title>Vista Previa</h1>
+<div mat-dialog-content id="print" align="center">
+    <section>
+        <table>
+
+            <tr>
+                <td style="width: 10%;" rowspan="3">
+                    <img src="ruta_del_logo.png" alt="Logo de prueba">
+                </td>
+                <td style="width: 90%;"> República Bolivariana de Venezuela</td>
+            </tr>
+            <tr>
+                <td style="width: 90%;"> Ministerio del Poder Popular para la Defensa</td>
+            </tr>
+            <tr>
+                <td style="width: 90%;"> {{ nameLabelDoc }}</td>
+            </tr>
+
+        </table>
+        <table>
+            <thead>
+            <tr>
+                <!--Column1-->
+                <th>FOTO</th>
+                <th>GDO</th>
+                <th>NOMBRE Y APELLIDOS</th>
+                <th>ASCENSO</th>
+                <th>CARGO</th>
+
+                <!--Column1-->
+                <th>FOTO</th>
+                <th>GDO</th>
+                <th>NOMBRE Y APELLIDOS</th>
+                <th>ASCENSO</th>
+                <th>CARGO</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr *ngFor="let item of firstElements[0].column1; let i = index">
+                <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
+                <td>{{ item.grado }}</td>
+                <td>{{ item.nombres }}</td>
+                <td>A</td>
+                <td>B</td>
+
+                <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
+                <td>{{ firstElements[0].column2[i].grado }}</td>
+                <td>{{ firstElements[0].column2[i].nombres }}</td>
+                <td>A</td>
+                <td>B</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+
+    <section *ngFor="let element of secondElements">
+
+        <table>
+            <thead>
+            <tr>
+                <!--column1-->
+                <th>FOTO</th>
+                <th>GDO</th>
+                <th>NOMBRE Y APELLIDOS</th>
+                <th>ASCENSO</th>
+                <th>CARGO</th>
+
+                <!--column2-->
+
+                <th>FOTO</th>
+                <th>GDO</th>
+                <th>NOMBRE Y APELLIDOS</th>
+                <th>ASCENSO</th>
+                <th>CARGO</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr *ngFor="let item of element.column1; let i = index">
+                <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
+                <td>{{ item.grado }}</td>
+                <td>{{ item.nombres }}</td>
+                <td>A</td>
+                <td>B</td>
+
+                <ng-container *ngIf="element.column2 != null">
+                    <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
+                    <td>{{ element.column2[i].grado }}</td>
+                    <td>{{ element.column2[i].nombres }}</td>
+                    <td>A</td>
+                    <td>B</td>
+                </ng-container>
+            </tr>
+            <!-- ... Repite para las otras 7 posiciones ... -->
+            </tbody>
+
+        </table>
+    </section>
+</div>
+<div mat-dialog-actions align="center">
+    <button class="btn bg-primary text-white" (click)="printPage()">
+        <span class="fa fa-print"></span>&nbsp;&nbsp;Imprimir
+    </button>
+    <button class="btn bg-primary text-white" [mat-dialog-close]="true">
+        <span class="fa fa-window-close"></span>&nbsp;&nbsp;Cerrar
+    </button>
+</div>

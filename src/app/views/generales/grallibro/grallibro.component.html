@@ -1,114 +1,115 @@
-
-
-
 <div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
-  <div class="container-fluid">
-    <p></p>
-  </div>
-</div>
-<div class="container-fluid mt--9">
-  <div class="row">
-    <div class="col-xl-12 col-md-12 col-lg-12">
-      <ngx-ui-loader [loaderId]="'loader-gennerales'"></ngx-ui-loader>
-
-      <div class="card shadow">
-
-        <div class="card-header bg-transparent">
-          <div class="row align-items-center">
-            <div class="col-md-10">
-              <h6 class="text-uppercase text-muted ls-1 mb-1">PRINCIPAL</h6>
-              <h2 class="mb-0">Módulo de Generales / Libro</h2>
-            </div>
-            <div class="col-md-1">
-              <div class="media align-items-center">
-                <div class="example-button-row">
-                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                    <mat-icon>arrow_back</mat-icon>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-1">
-              <ul class="navbar-nav align-items-right d-none d-md-flex">
-                <li class="nav-item" ngbDropdown placement="bottom-right">
-                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                    <div class="media align-items-center">
-                      <div class="example-button-row">
-                        <button mat-icon-button aria-label="">
-                          <mat-icon>more_vert</mat-icon>
-                        </button>
-                      </div>
-                    </div>
-                  </a>
-                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                    <a routerLinkActive="active" [routerLink]="['/rsentradas']" class="dropdown-item">
-                      <i class="fa fa-plus"></i>
-                      <span>Nueva Entrada</span>
-                    </a>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="card-body">
-
-
-          <div class="row">
-            <div class="form-group col-md-4">
-              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente"
-                value="{{componente}}">
-                <option value="0">SELECCIONAR COMPONENTE</option>
-                <option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group col-md-3">
-              <button class="btn bg-primary text-white " (click)="ConsultarListado()">
-                <span class="fa fa-search"></span>&nbsp;&nbsp;Generar PDF </button>
-            </div>
-          </div>
-
-          <div class="row" #pdfTable  >
-            <div class="col-md-12">
-              <table style="width: 100%;" class="zigzag" border="1" id="pdfTable" name="pdfTable">
-                <thead>
-                  <tr style="height: 40px;">
-                    <th style="width: 30px;"> Nº </th>
-                    <th> FOTO</th>
-                    <th> GDO </th>
-                    <th> NOMBRE Y APELLIDOS </th>
-                    <th> ASCENSO </th>
-                    <th> CARGO </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let e of lstGenerales">
-                    <td>{{ e.cedula }}</td>
-                    <td>
-                      <img align="left" src="https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/{{ e.cedula }}/foto.jpg"
-                        onerror="this.src='assets/img/theme/ndisponible.jpeg'"
-                        style="width: 75px; vertical-align: top; margin-right: 20px;border-radius: 5%;">
-
-                    </td>
-                    <td>{{ e.nombre }}</td>
-                    <td>{{ e.nombres }}</td>
-                    <td>{{ e.promocion }}</td>
-                    <td>{{ e.situacion }}</td>
-                  </tr>
-                </tbody>
-              </table>
-
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+    <div class="container-fluid">
+        <p></p>
     </div>
-  </div>
-  <!-- Fin de Tarjeta Padre -->
 </div>
+
+<div class="container-fluid mt--9">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <ngx-ui-loader [loaderId]="'loader-gennerales'"></ngx-ui-loader>
+
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col-md-10">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">PRINCIPAL</h6>
+                            <h2 class="mb-0">Módulo de Generales / Libro</h2>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>arrow_back</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <ul class="navbar-nav align-items-right d-none d-md-flex">
+                                <li class="nav-item" ngbDropdown placement="bottom-right">
+                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                        <div class="media align-items-center">
+                                            <div class="example-button-row">
+                                                <button mat-icon-button aria-label="">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                        <a routerLinkActive="active" [routerLink]="['/rsentradas']"
+                                           class="dropdown-item">
+                                            <i class="fa fa-plus"></i>
+                                            <span>Nueva Entrada</span>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente"
+                                    value="{{componente}}">
+                                <option value="0">SELECCIONAR COMPONENTE</option>
+                                <option *ngFor="let e of Componentes;"
+                                        [value]="e.cod_componente">{{ e.nombre_componente }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-5">
+                            <button class="btn bg-primary text-white " (click)="ConsultarListado()">
+                                <span class="fa fa-search"></span>&nbsp;&nbsp;Generar PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!--          <div class="row" #pdfTable  >-->
+                    <!--            <div class="col-md-12">-->
+                    <!--              <table style="width: 100%;" class="zigzag" border="1" id="pdfTable" name="pdfTable">-->
+                    <!--                <thead>-->
+                    <!--                  <tr style="height: 40px;">-->
+                    <!--                    <th style="width: 30px;"> Nº </th>-->
+                    <!--                    <th> FOTO</th>-->
+                    <!--                    <th> GDO </th>-->
+                    <!--                    <th> NOMBRE Y APELLIDOS </th>-->
+                    <!--                    <th> ASCENSO </th>-->
+                    <!--                    <th> CARGO </th>-->
+                    <!--                  </tr>-->
+                    <!--                </thead>-->
+                    <!--                <tbody>-->
+                    <!--                  <tr *ngFor="let e of lstGenerales">-->
+                    <!--                    <td>{{ e.cedula }}</td>-->
+                    <!--                    <td>-->
+                    <!--                      <img align="left" src="https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/{{ e.cedula }}/foto.jpg"-->
+                    <!--                        onerror="this.src='assets/img/theme/ndisponible.jpeg'"-->
+                    <!--                        style="width: 75px; vertical-align: top; margin-right: 20px;border-radius: 5%;">-->
+
+                    <!--                    </td>-->
+                    <!--                    <td>{{ e.nombre }}</td>-->
+                    <!--                    <td>{{ e.nombres }}</td>-->
+                    <!--                    <td>{{ e.promocion }}</td>-->
+                    <!--                    <td>{{ e.situacion }}</td>-->
+                    <!--                  </tr>-->
+                    <!--                </tbody>-->
+                    <!--              </table>-->
+
+                    <!--            </div>-->
+                    <!--          </div>-->
+
+                    <!--        </div>-->
+
+                </div>
+            </div>
+        </div>
+        <!-- Fin de Tarjeta Padre -->
+    </div>
+
+
+
+

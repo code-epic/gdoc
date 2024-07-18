@@ -1,38 +1,39 @@
-import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { ActivatedRoute, Router } from "@angular/router";
-import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { NgxUiLoaderService } from "ngx-ui-loader";
-import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
-import { UtilService } from "src/app/services/util/util.service";
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-import { style } from "@angular/animations";
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { NgbDateParserFormatter, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { UtilService } from 'src/app/services/util/util.service';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+import { style } from '@angular/animations';
+import {MatDialog} from '@angular/material/dialog';
+import {TableGrallibroModalComponent} from './modal/table-grallibro-modal/table-grallibro-modal.component';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 pdfMake.fonts = {
   Roboto: {
-    normal: "Roboto-Regular.ttf",
-    bold: "Roboto-Bold.ttf",
-    italics: "Roboto-Italic.ttf",
-    bolditalics: "Roboto-BoldItalic.ttf",
+    normal: 'Roboto-Regular.ttf',
+    bold: 'Roboto-Bold.ttf',
+    italics: 'Roboto-Italic.ttf',
+    bolditalics: 'Roboto-BoldItalic.ttf',
   },
 };
 
 @Component({
-  selector: "app-grallibro",
-  templateUrl: "./grallibro.component.html",
-  styleUrls: ["./grallibro.component.scss"],
+  selector: 'app-grallibro',
+  templateUrl: './grallibro.component.html',
+  styleUrls: ['./grallibro.component.scss'],
 })
 export class GrallibroComponent implements OnInit {
   selected = new FormControl(0);
-  componente = "0";
+  componente = '0';
   Componentes = [];
   lstGenerales = [];
 
   public xAPI: IAPICore = {
-    funcion: "",
-    parametros: "",
-    valores: "",
+    funcion: '',
+    parametros: '',
+    valores: '',
   };
 
 
@@ -52,51 +53,68 @@ export class GrallibroComponent implements OnInit {
     { text: 'CARGO', fillColor: '#941b0b', color: '#ffffff' }, // Cargo
     ];
 
-
-  @ViewChild("pdfTable", { static: false }) pdfTable!: ElementRef;
+  @ViewChild('pdfTable', { static: false }) pdfTable!: ElementRef;
 
   constructor(
     private apiService: ApiService,
+    public dialog: MatDialog,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
     private utilService: UtilService,
   ) { }
 
   ngOnInit(): void {
-    
+
     this.Componentes =
-      sessionStorage.getItem("MPPD_CComponente") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
+      sessionStorage.getItem('MPPD_CComponente') != undefined
+        ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
         : [];
 
-    let ss = sessionStorage.getItem('MPPD_CLibroGenerales');
+    const ss = sessionStorage.getItem('MPPD_CLibroGenerales');
 
-    this.lstGenerales = ss != undefined ? JSON.parse(ss) : []
+    this.lstGenerales = ss != undefined ? JSON.parse(ss) : [];
   }
 
   ConsultarListado() {
-    this.xAPI.funcion = "MPPD_CLibroGenerales";
-    this.xAPI.parametros = "";
-    this.xAPI.valores = "";
-    this.ngxService.startLoader("loader-gennerales");
+    this.xAPI.funcion = 'MPPD_CLibroGenerales';
+    this.xAPI.parametros = '';
+    this.xAPI.valores = '';
+
     if (this.lstGenerales.length > 0) {
-      this.generatePDF()
-      return
+      this.ngxService.stopLoader('loader-gennerales');
+      this.openDialog();
+      return;
     }
+    this.ngxService.startLoader('loader-gennerales');
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        sessionStorage.setItem('MPPD_CLibroGenerales', JSON.stringify(data.Cuerpo))
+        sessionStorage.setItem('MPPD_CLibroGenerales', JSON.stringify(data.Cuerpo));
         this.lstGenerales = await data.Cuerpo.length > 0 ? data.Cuerpo : [];
-        this.generatePDF()
+        this.ngxService.stopLoader('loader-gennerales');
+        this.openDialog();
 
       },
       (error) => {
-        console.error("Error de conexion a los datos ", error);
+        console.error('Error de conexion a los datos ', error);
       }
     );
   }
 
+  openDialog() {
+    const dialogRef = this.dialog.open(TableGrallibroModalComponent, {
+      width: '100%',
+      height: 'auto',
+      data: {
+        componente: this.componente,
+        lstGenerales: this.lstGenerales,
+        lstQa: this.Componentes
+        }
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
 
 
   async generatePDF() {
@@ -142,46 +160,46 @@ export class GrallibroComponent implements OnInit {
         }
         
 
-    let tableBodyA = []; // Array to store the table rows
-    let tableBodyB = []; // Array to store the table rows
-    let i = 1
-    let pos = 1
+    const tableBodyA = []; // Array to store the table rows
+    const tableBodyB = []; // Array to store the table rows
+    let i = 1;
+    let pos = 1;
     // 3. Organización de registros en páginas y filas
     await this.lstGenerales.map(e => {
 
       // console.log(e.cedula)
       // console.log(images[i-1])
-      let img = "" //images[i]==undefined? this.utilService.imgNoDisponible:
-      img = this.utilService.imgNoDisponible
+      let img = ''; // images[i]==undefined? this.utilService.imgNoDisponible:
+      img = this.utilService.imgNoDisponible;
       // if (images[i]!=undefined ) {
       //   console.log("texto encontrado")
       //   img = images[i]
       // }
       if ( i < 5 ) {
-        let valor =[ 
+        const valor = [
           `${pos}`,
-         { image : img, width: 82}, 
-          this.getSafeNombre(e.nombre), 
-          this.getSafeNombre(e.nombres) + '\n V-' + e.cedula, 
-          'B', 
-          'A', 
-        ]
-        tableBodyA.push(valor)
-      }else if ( i < 11 ){
-        
-        let valor =[
+         { image : img, width: 82},
+          this.getSafeNombre(e.nombre),
+          this.getSafeNombre(e.nombres) + '\n V-' + e.cedula,
+          'B',
+          'A',
+        ];
+        tableBodyA.push(valor);
+      } else if ( i < 11 ) {
+
+        const valor = [
           `${pos}`,
-          { image : img, width: 82},  
-          this.getSafeNombre(e.nombre), 
-          this.getSafeNombre(e.nombres) + '\n V-' + e.cedula, 
-          'B', 
-          'A', 
-        ]
-        tableBodyB.push(valor)
-      } 
-      i++
-      if (i == 10 ) i=1
-      pos++
+          { image : img, width: 82},
+          this.getSafeNombre(e.nombre),
+          this.getSafeNombre(e.nombres) + '\n V-' + e.cedula,
+          'B',
+          'A',
+        ];
+        tableBodyB.push(valor);
+      }
+      i++;
+      if (i == 10 ) { i = 1; }
+      pos++;
 
     });
 
@@ -243,7 +261,7 @@ export class GrallibroComponent implements OnInit {
         }
       ]
     };
-    this.ngxService.stopLoader("loader-gennerales");
+    this.ngxService.stopLoader('loader-gennerales');
 
     // 5. Generación y descarga del PDF
     pdfMake.createPdf(docDefinition).download('registro.pdf');
@@ -289,10 +307,10 @@ export class GrallibroComponent implements OnInit {
       const reader = new FileReader();
       reader.onloadend = () => {
         resolve(reader.result as string);
-      }
+      };
       reader.onerror = () => {
-        reject(this.utilService.imgNoDisponible)
-      }
+        reject(this.utilService.imgNoDisponible);
+      };
       reader.readAsDataURL(blob);
     });
   }
