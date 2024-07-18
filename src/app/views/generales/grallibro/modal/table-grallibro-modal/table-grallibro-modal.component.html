@@ -23,6 +23,7 @@
             <thead>
             <tr>
                 <!--Column1-->
+                <th>Nº</th>
                 <th>FOTO</th>
                 <th>GDO</th>
                 <th>NOMBRE Y APELLIDOS</th>
@@ -30,6 +31,7 @@
                 <th>CARGO</th>
 
                 <!--Column1-->
+                <th>Nº</th>
                 <th>FOTO</th>
                 <th>GDO</th>
                 <th>NOMBRE Y APELLIDOS</th>
@@ -40,12 +42,14 @@
             <tbody>
 
             <tr *ngFor="let item of firstElements[0].column1; let i = index">
+                <td>{{ item.index }}</td>
                 <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
                 <td>{{ item.grado }}</td>
                 <td>{{ item.nombres }}</td>
                 <td>A</td>
                 <td>B</td>
 
+                <td>{{ firstElements[0].column2[i].index }}</td>
                 <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
                 <td>{{ firstElements[0].column2[i].grado }}</td>
                 <td>{{ firstElements[0].column2[i].nombres }}</td>
@@ -63,6 +67,7 @@
             <thead>
             <tr>
                 <!--column1-->
+                <th>Nº</th>
                 <th>FOTO</th>
                 <th>GDO</th>
                 <th>NOMBRE Y APELLIDOS</th>
@@ -70,7 +75,7 @@
                 <th>CARGO</th>
 
                 <!--column2-->
-
+                <th>Nº</th>
                 <th>FOTO</th>
                 <th>GDO</th>
                 <th>NOMBRE Y APELLIDOS</th>
@@ -81,6 +86,7 @@
             <tbody>
 
             <tr *ngFor="let item of element.column1; let i = index">
+                <td>{{ item.index }}</td>
                 <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
                 <td>{{ item.grado }}</td>
                 <td>{{ item.nombres }}</td>
@@ -88,6 +94,7 @@
                 <td>B</td>
 
                 <ng-container *ngIf="element.column2 != null">
+                    <td>{{ element.column2[i].index }}</td>
                     <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
                     <td>{{ element.column2[i].grado }}</td>
                     <td>{{ element.column2[i].nombres }}</td>
@@ -104,8 +111,5 @@
 <div mat-dialog-actions align="center">
     <button class="btn bg-primary text-white" (click)="printPage()">
         <span class="fa fa-print"></span>&nbsp;&nbsp;Imprimir
-    </button>
-    <button class="btn bg-primary text-white" [mat-dialog-close]="true">
-        <span class="fa fa-window-close"></span>&nbsp;&nbsp;Cerrar
     </button>
 </div>

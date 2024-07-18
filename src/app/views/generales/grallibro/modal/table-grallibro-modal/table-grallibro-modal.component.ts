@@ -1,5 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {TemplatePrintService} from './service/template-print.service';
+import {element} from 'protractor';
 
 @Component({
     selector: 'app-table-grallibro-modal',
@@ -7,6 +9,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
     styleUrls: ['./table-grallibro-modal.component.scss']
 })
 export class TableGrallibroModalComponent implements OnInit {
+    e;
 
     componente = '0';
     Componentes = [];
@@ -18,7 +21,9 @@ export class TableGrallibroModalComponent implements OnInit {
 
     firstElements: any[] = [];
     secondElements: any[] = [];
+
     constructor(
+        private service: TemplatePrintService,
         public dialogRef: MatDialogRef<TableGrallibroModalComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
@@ -28,9 +33,6 @@ export class TableGrallibroModalComponent implements OnInit {
         this.componente = this.data.componente;
         this.lstGenerales = this.data.lstGenerales;
         this.lstQa = this.data.lstQa;
-        // console.log('this.componente', this.componente);
-        // console.log('this.lstGenerales', this.lstGenerales);
-        // console.log('this.lstQa', this.componente);
 
         this.convertObject();
     }
@@ -43,8 +45,9 @@ export class TableGrallibroModalComponent implements OnInit {
         const listFourGenerales: any[] = [];
         const listSixGenerales: any[] = [];
         const items = [];
+        // tslint:disable-next-line:no-shadowed-variable
         this.lstGenerales.forEach((element, index) => {
-            items.push(element);
+            items.push({...element, index: (index + 1)});
 
             if (items.length === 8) {
                 listFourGenerales.push(...items);
@@ -59,15 +62,15 @@ export class TableGrallibroModalComponent implements OnInit {
                 }
             }
         });
-
         const first = listFourGenerales.slice(0, 4);
-        const second = listFourGenerales.slice(4, listFourGenerales.length);;
+        const second = listFourGenerales.slice(4, listFourGenerales.length);
+
         this.firstElements = [];
         this.firstElements.push({column1: first, column2: second});
-        console.log('firstElements', this.firstElements);
 
         const element = [];
         for (let i = 0; i < listSixGenerales.length; i += 6) {
+
             const iterator = listSixGenerales.slice(i, i + 6);
             element.push([...iterator]);
             if (element.length === 2) {
@@ -81,18 +84,14 @@ export class TableGrallibroModalComponent implements OnInit {
                 });
             }
         }
-
-        console.log('this.secondElements',  this.secondElements);
-
-
     }
 
     printPage() {
-        var printContents = document.getElementById('print').innerHTML;
-        var originalContents = document.body.innerHTML;
-        document.body.innerHTML = printContents;
-        window.print();
-        document.body.innerHTML = originalContents;
-        // window.close();
+        const printContents = document.getElementById('print')?.innerHTML;
+        if (printContents) {
+            this.service.createHtmlSectionForPrint(printContents);
+        }
     }
+
+
 }
