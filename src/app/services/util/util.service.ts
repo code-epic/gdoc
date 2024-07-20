@@ -264,7 +264,7 @@ export class UtilService {
   ConvertToCSV(objArray, headerList, delimitador) {
     let array = typeof objArray != "object" ? JSON.parse(objArray) : objArray;
     let str = "";
-    let row = "#num,";
+    let row = "#num" + delimitador;
 
     for (let index in headerList) {
       // console.log(index, headerList);

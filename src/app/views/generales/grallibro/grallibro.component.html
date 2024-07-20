@@ -57,7 +57,7 @@
                                     value="{{componente}}">
                                 <option value="0">SELECCIONAR COMPONENTE</option>
                                 <option *ngFor="let e of Componentes;"
-                                        [value]="e.cod_componente">{{ e.nombre_componente }}
+                                        [value]="e.cod_componente + '|' + e.nombre_componente">{{ e.nombre_componente }}
                                 </option>
                             </select>
                         </div>

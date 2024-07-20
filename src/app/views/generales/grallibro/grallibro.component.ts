@@ -70,25 +70,23 @@ export class GrallibroComponent implements OnInit {
         ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
         : [];
 
-    const ss = sessionStorage.getItem('MPPD_CLibroGenerales');
+    //const ss = sessionStorage.getItem('MPPD_CLibroGenerales');
 
-    this.lstGenerales = ss != undefined ? JSON.parse(ss) : [];
+    //this.lstGenerales = ss != undefined ? JSON.parse(ss) : [];
   }
 
   ConsultarListado() {
     this.xAPI.funcion = 'MPPD_CLibroGenerales';
-    this.xAPI.parametros = '';
+    this.xAPI.parametros = this.componente.split('|')[0];
     this.xAPI.valores = '';
 
-    if (this.lstGenerales.length > 0) {
-      this.ngxService.stopLoader('loader-gennerales');
-      this.openDialog();
-      return;
-    }
+    this.lstGenerales = []
     this.ngxService.startLoader('loader-gennerales');
+
+    console.log(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        sessionStorage.setItem('MPPD_CLibroGenerales', JSON.stringify(data.Cuerpo));
+        //sessionStorage.setItem('MPPD_CLibroGenerales', JSON.stringify(data.Cuerpo));
         this.lstGenerales = await data.Cuerpo.length > 0 ? data.Cuerpo : [];
         this.ngxService.stopLoader('loader-gennerales');
         this.openDialog();
@@ -101,11 +99,13 @@ export class GrallibroComponent implements OnInit {
   }
 
   openDialog() {
+
     const dialogRef = this.dialog.open(TableGrallibroModalComponent, {
       width: '100%',
       height: 'auto',
       data: {
-        componente: this.componente,
+        componente_id : this.componente.split('|')[0],
+        componente: this.componente.split('|')[1],
         lstGenerales: this.lstGenerales,
         lstQa: this.Componentes
         }

@@ -126,6 +126,8 @@ export class SbuscadorComponent implements OnInit {
   public blBuscar = false
   public max_paginador: number = 0
   public lstPaginas = []
+  public lstDatos = []
+
   public actual: number = 1
   public tipoDocumento: number = 0;
   public vistacontenido: boolean = false;
@@ -190,18 +192,42 @@ export class SbuscadorComponent implements OnInit {
 
   buscarDocumento(): void {
     this.vistacontenido = true;
+    console.log(this.SubDocumento.estatus)
+    this.cargador = false
 
     this.consultarDocument(undefined)
     
-    // const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
-    // this.bzBusqueda = this.bzSeguimientoO.filter((e) => patron.test(e.busqueda));
-    // this.longitud = this.bzBusqueda.length;
-    // this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
-    // this.max_paginador = this.bzBusqueda.length / 10;
-    // this.cantidad = this.bzBusqueda.length;
-    // this.MostrarPaginador();
-    // this.buscar = '';
+    this.ngxService.startLoader("loader-aceptar")
+    this.xAPI.funcion = 'WKF_CSeguimientoSecretaria'
+    this.xAPI.parametros = 'PUNTO DE CUENTA,' + this.SubDocumento.estatus
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstDatos = data.Cuerpo
+        //onsole.log( JSON.parse( this.lstDatos[0].subdocumento ) )
+        console.log(this.lstDatos)
+        this.ngxService.stopLoader("loader-aceptar")
+        
+        this.cargador = true
+      },
+      (error) => {
+        console.error("No existe la funcion ", error)
+        this.ngxService.stopLoader("loader-aceptar")
+      }
+
+    )
     
+
+  }
+
+  getFecha(e) : string {
+    let d =  JSON.parse( e ) 
+    return d[0].fecha
+  }
+
+  getDecisiones(e) : string {
+    let d =  JSON.parse( e ) 
+    return d[0].fecha 
   }
 
   realizarBusquedaFecha(fecha: Date): void {

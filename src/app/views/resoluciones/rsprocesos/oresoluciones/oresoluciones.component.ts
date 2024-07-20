@@ -916,7 +916,7 @@ export class OresolucionesComponent implements OnInit {
       this.xAPI.valores = ""
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data)
+          // console.log(data)
           if (data.Cuerpo != undefined) {
             let otro = data.Cuerpo[0]
             this.fresolucion = otro.fecha_resol
@@ -924,6 +924,7 @@ export class OresolucionesComponent implements OnInit {
 
             this.otro_resuelto = this.IResolucion.otro_resuelto + '|' + otro.fecha_resol + '|' + otro.archivo + '|' + otro.formato
           }
+          this.ngxService.stopLoader("loader-buscar");
         },
         (error) => {
           console.error("Error de conexion a los datos ", error)

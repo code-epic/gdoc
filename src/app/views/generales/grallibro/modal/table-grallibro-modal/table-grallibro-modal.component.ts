@@ -11,10 +11,12 @@ import {element} from 'protractor';
 export class TableGrallibroModalComponent implements OnInit {
     e;
 
-    componente = '0';
-    Componentes = [];
-    lstGenerales = [];
-    lstQa: any[] = [];
+    componente = '0'
+    componente_id = ''
+    Componentes = []
+    lstGenerales = []
+    lstQa: any[] = []
+
 
     nameLabelDoc = 'RELACION DE OFICIALES GENERALES';
 
@@ -30,8 +32,9 @@ export class TableGrallibroModalComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.componente = this.data.componente;
-        this.lstGenerales = this.data.lstGenerales;
+        this.componente = this.data.componente
+        this.lstGenerales = this.data.lstGenerales
+        this.componente_id = this.data.componente_id
         this.lstQa = this.data.lstQa;
 
         this.convertObject();

@@ -828,6 +828,7 @@ export class EresolucionesComponent implements OnInit {
             this.fresolucion = otro.fecha_resol;
             this.aresolucion = otro.asunto;
           }
+          this.ngxService.stopLoader("loader-aceptar");
         },
         (error) => {
           console.error("Error de conexion a los datos ", error);

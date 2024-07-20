@@ -104,92 +104,40 @@
                         <div class="row" *ngIf="cargador">
                             <div class="card-body">
                                 <div class="col-md-12">
-                                    <div class="row enlace" *ngFor="let e of bzSeguimiento; let i = index">
-                                        <div class="col-md-8">
-                                            <a routerLinkActive="active"
-                                                [routerLink]="['/constancia', constancia(e.numc)]">
-                                                {{ e.numc }} - {{ e.tdoc }}
-                                            </a>
-                                            | {{ e.origen | date : "dd-MM-yyyy" }}
-                                        </div>
-                                        <div class="col-md-4 text-right">
-                                            <span class="badge rounded-pill text-bg-primary">pdf</span>
-                                            <a [href]="dwUrl(e.numc, e.archivo)" target="_top" rel="noopener noreferrer"
-                                                class="texto-detalle-pdf">
-                                                {{ e.archivo.substring(0, 10) }}
-                                                <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
-                                                    class="imagen-pdf" />
-                                            </a>
-                                        </div>
+                                    <table style="width: 100%;" class="zigzag" border="1">
+                                        <thead>
 
-                                        <div class="col-md-12 contenedor-documento">
-                                            <ng-template #popContent>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div [innerHTML]="e.contenido" class="contenido"></div>
-                                                    </div>
-                                                </div>
-                                            </ng-template>
-                                            {{ e.unidad }}
-                                            <button mat-button [ngbPopover]="popContent"
-                                                popoverTitle="Detalles generales">
-                                                Mas...
-                                            </button>
-                                            <div [innerHTML]="e.resumenl" class="contenido"></div>
-                                            <br>
-                                            <p class="fecha-documento">
-                                                <small class="mr-3"><i class="fa fa-calendar"></i>&nbsp;{{
-                                                    e.fecha | date : "dd-MM-yyyy hh:mm"
-                                                    }}</small>
-                                                <small class="mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN
-                                                    {{ e.norigen | uppercase }}</small>
-                                                <small class="mr-3"><i class="fa fa-folder"></i> &nbsp; SALIDA
-                                                    {{ e.salida | uppercase }}</small>
+                                            <tr>
+                                                <th >#</th>
+                                                <th >UNIDAD O DEPENDENCIA </th>
+                                                <th>N. DE CUENTA</th>
+                                                <th>AÑO</th>
+                                                <th>ASUNTO</th>
+                                                <!-- <th>ESTATUS</th> -->
+                                                <th>DECISIÓN DEL MPPD</th>
+                                                <th>HISTORIAL</th>
+                                                <th>OBSERVACIONES</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let e of lstDatos; let i=index">
+                                                <td>{{ i + 1 }}</td>
+                                                <td> {{ e.coma }} </td>
+                                                <td> {{ e.cuen }} </td>
+                                                <td> {{  getFecha(e.subdocumento)  | date : "dd/MM/yyyy" }} </td>
+                                                <td [innerHTML]="e.cont | uppercase"></td>
+                                                <td> {{ e.deci }} </td>
+                                                <td> {{ e.hist }} </td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
 
-                                                <small class="mr-4"><i class="fa fa-globe"></i> &nbsp;
-                                                    {{ e.nombre | uppercase }} (
-                                                    {{ e.estatus_nombre | uppercase }} {{ e.s_texto }} )
-                                                </small>
-                                            </p>
-                                        </div>
+                                    </table>
 
-                                        <br /><br />
 
-                                    </div>
                                 </div>
 
-                                <br><br>
-                                <div class="col-md-12 text-center">
-                                    <nav aria-label="Page navigation example" *ngIf="blBuscar">
-                                        <div class="row">
-                                            <div class="col-md-1">
-                                                <ul class="pagination justify-content-center">
-                                                    <li class="page-item">
-                                                        <a class="page-link" *ngIf="antes"
-                                                            (click)="posicion(actual - 1)">
-                                                            < </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-10">
-                                                <ul class="pagination justify-content-center">
-                                                    <li class="page-item" *ngFor="let e of lstPaginas">
-                                                        <a class="page-link {{ e.color }}" (click)="posicion(e.id)">{{
-                                                            e.id }}</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-1">
-                                                <ul class="pagination justify-content-center">
-                                                    <li class="page-item">
-                                                        <a class="page-link" *ngIf="despues"
-                                                            (click)="posicion(actual + 1)">></a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </nav>
-                                </div>
+                              
                             </div>
                         </div>
                     </div>
@@ -385,3 +333,4 @@
 
         </div>
     </ng-template>
+    

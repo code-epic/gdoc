@@ -344,8 +344,8 @@
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{ e.cuenta_oficio }} </a>
                                                             </td>
-                                                            <td>{{ e.asunto | uppercase}}
-                                                            </td>
+                                                            <td [innerHTML]="e.asunto | uppercase"></td>
+                                                            
                                                         </tr>
                                                     </tbody>
 
@@ -368,7 +368,6 @@
                                                             <th>TIPO</th>
                                                             <th>ASUNTO</th>
                                                             <th>DISTRI.</th>
-                                                            <th>ACCION</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -385,21 +384,16 @@
                                                                 <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
                                                                     RESOLUCIONES</b>
                                                             </td>
-                                                            <td *ngIf="!validarSeguridad(e)">{{ e.asunto | uppercase}}
-                                                            </td>
-                                                            <td>
+                                                            <td *ngIf="!validarSeguridad(e)"  [innerHTML]="e.asunto | uppercase"></td>
+                                                            
+                                                            <td >
                                                                 <button mat-icon-button aria-label="Detalle"
                                                                     (click)="detalle( detalles, e)">
                                                                     <mat-icon class="text-{{getIconColor(e)}}">{{
                                                                         getIcon( e ) }}</mat-icon>
                                                                 </button>
                                                             </td>
-                                                            <td style="text-align: center;">
-                                                                <button mat-icon-button aria-label="Editar"
-                                                                    (click)="editar( e )">
-                                                                    <mat-icon class="text-blue">edit_note</mat-icon>
-                                                                </button>
-                                                            </td>
+                                                            
                                                         </tr>
                                                     </tbody>
 
