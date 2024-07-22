@@ -42,3 +42,25 @@ $argon-dashboard-angular-theme: mat.define-light-theme((
 @import '~ng-wizard/themes/ng_wizard_theme_dots.min.css';
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('~src/assets/fonts/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.woff2');
+}
+
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url('~src/assets/iconfont/MaterialIcons-Regular.eot'); /* For IE6-8 */
+  src: local('Material Icons'),
+  local('MaterialIcons-Regular'),
+  url('~src/assets/iconfont/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2') format('woff2'),
+  url('~src/assets/iconfont/MaterialIcons-Regular.ttf') format('truetype');
+}
+
+.material-icons{
+  font-family: 'Material Icons' !important;
+}

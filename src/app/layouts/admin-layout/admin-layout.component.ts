@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {InactiveUserService} from '../../core/service/inactivity/InactiveUserService';
+import {InactiveUserService} from '../../core/service/inactivity/inactive-user.service';
 
 @Component({
   selector: 'app-admin-layout',
