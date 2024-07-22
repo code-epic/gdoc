@@ -116,4 +116,8 @@ export class LoginService {
     return SubMenu
   }
 
+  isLogged() {
+    return sessionStorage.getItem("token") ? true : false;
+  }
+
 }
