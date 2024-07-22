@@ -260,13 +260,8 @@
                                                             <th>OBSERVACIONES</th>
                                                             <td>{{IDatosBasicos.observaciones | uppercase}}</td>
                                                         </tr>
-                                                        <tr *ngIf="IDatosBasicos.condicion != 0">
-                                                            <th>MOTIVO</th>
-                                                            <td [ngStyle]="{'background-color': color_acc}" colspan="3">
-                                                                <font [ngStyle]="{'color': color_texto}">
-                                                                    {{ IDatosBasicos.motivo | uppercase }}
-                                                                </font>
-                                                            </td>
+                                                        <tr >
+                                                          
                                                         </tr>
                                                     </tbody>
 

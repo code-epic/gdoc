@@ -81,7 +81,13 @@ export class SministerialComponent implements OnInit {
   public lstAcciones = []
 
   public cmbAcciones = [
-    { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '0' },]
+     
+      { 'valor': '0', 'texto': 'MINISTERIAL', 'visible': '1' },
+      { 'valor': '2', 'texto': 'PRESIDENCIAL', 'visible': '1' },
+      { 'valor': '3', 'texto': 'TRAMITACION POR ORDEN REGULAR', 'visible': '1' },
+      { 'valor': '4', 'texto': 'OTROS DOCUMENTOS', 'visible': '1' },
+      { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '0' },
+    ]
 
 
 
@@ -114,19 +120,25 @@ export class SministerialComponent implements OnInit {
 
   ngOnInit(): void {
     this.listarEstados()
-    this.seleccionNavegacion(0)
     let ruta = this.rutaActiva.snapshot.params.filtro
     console.log(ruta);
     if (ruta == 'tramitaciones-por-organo-regular')  {
       this.filtro = 1
       this.titulo = 'Tramitaciones por Organo Regular'
+      this.estadoOrigen = 4
     } else if( ruta == 'otros-documentos') {
       this.filtro = 2
       this.titulo = 'Otros Documentos'
+      this.estadoOrigen = 5
+      
     } else if( ruta == 'ministeriales') {
       this.filtro = 3
+      this.estadoOrigen = 2
       this.titulo = 'Ministeriales'
     }
+
+    
+    this.seleccionNavegacion(0)
     
   }
 

@@ -25,6 +25,7 @@ export class SbuzonComponent implements OnInit {
 
   public estadoActual = 4
   public estadoOrigen = 1
+  estatusOrigen = 1
 
   public paginador = 10
   public focus;
@@ -49,7 +50,7 @@ export class SbuzonComponent implements OnInit {
 
   longitud = 0;
   pageSize = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 50,  100];
+  pageSizeOptions: number[] = [5, 10, 25, 50, 100];
 
   // MatPaginator Output
   pageEvent: PageEvent;
@@ -83,8 +84,12 @@ export class SbuzonComponent implements OnInit {
 
   public cmbAcciones = [
     { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
-    { 'valor': '0', 'texto': 'ACEPTAR MINISTERIAL', 'visible': '0' },
-    { 'valor': '2', 'texto': 'ACEPTAR PRESIDENCIAL', 'visible': '0' },]
+    { 'valor': '0', 'texto': 'MINISTERIAL', 'visible': '0' },
+    { 'valor': '2', 'texto': 'PRESIDENCIAL', 'visible': '0' },
+    { 'valor': '3', 'texto': 'TRAMITACION POR ORDEN REGULAR', 'visible': '0' },
+    { 'valor': '4', 'texto': 'OTROS DOCUMENTOS', 'visible': '0' },
+
+  ]
 
 
 
@@ -194,15 +199,25 @@ export class SbuzonComponent implements OnInit {
         this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
         this.listarBuzon()
         break
-      case 1:
+      case 1: // ministerial
         this.clasificacion = false
         //this.xAPI.funcion = 'WKF_CSubDocumento'
         this.xAPI.parametros = this.estadoActual + ',' + 2 + ',1'
         this.listarBuzon()
         break
-      case 2:
+      case 2: //presidencial
         this.clasificacion = false
         this.xAPI.parametros = this.estadoActual + ',' + 3
+        this.listarBuzon()
+        break
+      case 2: //tramitacion
+        this.clasificacion = false
+        this.xAPI.parametros = this.estadoActual + ',' + 4
+        this.listarBuzon()
+        break
+      case 2: //otros documentos
+        this.clasificacion = false
+        this.xAPI.parametros = this.estadoActual + ',' + 5
         this.listarBuzon()
         break
       case 3:
@@ -234,7 +249,7 @@ export class SbuzonComponent implements OnInit {
       (data) => {
         console.log(data)
         data.Cuerpo.forEach(e => {
-          
+
           e.existe = e.anom != '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.completed = false
@@ -273,8 +288,8 @@ export class SbuzonComponent implements OnInit {
 
   //editar
   editar(e) {
-    
-    const base = btoa( JSON.stringify(e))
+
+    const base = btoa(JSON.stringify(e))
     this.ruta.navigate(['/ministerial', base])
   }
 
@@ -299,13 +314,23 @@ export class SbuzonComponent implements OnInit {
       async data => {
         switch (this.AccionTexto) {
           case "0"://Aceptar y promover el documento
+            this.estatusOrigen = 1
             this.promoverBuzon(0, this.utilService.FechaActual())
             break;
           case "1"://Rechazar en el estado inicial
             this.rechazarBuzon()
             break;
-          case "2"://Oficio por opinión
-            //this.promoverBuzon()
+          case "2"://Aceptar y promover el documento
+            this.estatusOrigen = 2
+            this.promoverBuzon(0, this.utilService.FechaActual())
+            break;
+          case "3"://Aceptar y promover el documento
+            this.estatusOrigen = 3
+            this.promoverBuzon(0, this.utilService.FechaActual())
+            break;
+          case "4"://Aceptar y promover el documento
+            this.estatusOrigen = 4
+            this.promoverBuzon(0, this.utilService.FechaActual())
             break;
         }
       },
@@ -341,7 +366,7 @@ export class SbuzonComponent implements OnInit {
 
     var usuario = this.loginService.Usuario.id
     var i = 0
-    var estatus = 1 //NOTA DE ENTREGA
+    var estatus = this.estatusOrigen //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
     this.xAPI.funcion = 'WKF_APromoverEstatus'
     this.xAPI.valores = ''

@@ -1,0 +1,234 @@
+{
+  "cedula": "17374623",
+  "nombre": "Lily Fuentes",
+  "login": "lfuentes",
+  "correo": "",
+  "clave": "888617078fc067dcb2c82177ab23f2957c90518e22908d11ab70d455666e10ff",
+  "sucursal": "Todas",
+  "direccion": "Principal",
+  "cargo": "Analista",
+  "telefono": "",
+  "sistema": "Control de Gestion",
+  "token": "Analista",
+  "Perfil": {
+    "descripcion": "Analista Control"
+  },
+  "Aplicacion": [
+    {
+      "id": "ID-001",
+      "nombre": "Gestion de Documentos",
+      "url": "http://localhost/app/gdoc/index.html?tk=$0",
+      "comentario": "Usuario GDoc",
+      "version": "V1.0.0.0",
+      "autor": "Code Epic Technologies",
+      "Rol": {
+        "descripcion": "Usuario Sistema",
+        "Menu": [
+          {
+            "url": "/principal",
+            "js": "",
+            "icono": "ni-tv-2",
+            "descripcion": "Principal",
+            "nombre": "Principal",
+            "accion": "",
+            "clase": "text-primary",
+            "color": "",
+            "Privilegio": [],
+            "SubMenu": [
+              {
+                "url": "",
+                "js": "",
+                "descripcion": "Entradas Generales",
+                "icono": "fa fa-plus-circle",
+                "nombre": "Entradas Generales",
+                "accion": "CargarUrl('control', 'registrar')",
+                "clase": "f-left",
+                "color": "bg-c-green",
+                "Privilegios": []
+              },
+              {
+                "url": "",
+                "js": "",
+                "descripcion": "Entradas Generales",
+                "icono": "fa fa-inbox",
+                "nombre": "Entradas Generales",
+                "accion": "CargarUrl('control', 'buzon')",
+                "clase": "f-left",
+                "color": "bg-c-blue",
+                "Privilegios": []
+              },
+              {
+                "url": "",
+                "js": "",
+                "descripcion": "Salidas Realizadas",
+                "icono": "fa fa-share",
+                "nombre": "Salidas",
+                "accion": "CargarUrl('control', 'salidas')",
+                "clase": "f-left",
+                "color": "bg-c-pink",
+                "Privilegios": [
+                  {
+                    "metodo": "registrados",
+                    "descripcion": "Registrados",
+                    "accion": "Registrados()",
+                    "directivas": ""
+                  },
+                  {
+                    "metodo": "clasificacion",
+                    "descripcion": "Clasificacion",
+                    "accion": "Clasificacion()",
+                    "directivas": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "url": "/control",
+            "js": "",
+            "icono": "ni-planet",
+            "descripcion": "Control y Gestion",
+            "nombre": "Control y Gestion",
+            "accion": "",
+            "clase": "text-blue",
+            "color": "",
+            "Privilegio": [],
+            "SubMenu": [
+              {
+                "url": "/registrar",
+                "js": "",
+                "descripcion": "Entradas General",
+                "icono": "fa fa-plus-circle",
+                "nombre": "Entradas General",
+                "accion": "CargarUrl('control', 'registrar')",
+                "clase": "f-left",
+                "color": "bg-c-green",
+                "Privilegios": [
+                  {
+                    "metodo": "registrados",
+                    "descripcion": "Registrados",
+                    "accion": "Registrados()",
+                    "directivas": ""
+                  }
+                ]
+              },
+              {
+                "url": "/buzon",
+                "js": "",
+                "descripcion": "Control de Gestion",
+                "icono": "fa fa-inbox",
+                "nombre": "Control de Gestion",
+                "accion": "CargarUrl('control', 'buzon')",
+                "clase": "f-left",
+                "color": "bg-c-blue",
+                "Privilegios": []
+              },
+              {
+                "url": "/salidas",
+                "js": "",
+                "descripcion": "Salidas General",
+                "icono": "fa fa-share",
+                "nombre": "Salidas General",
+                "accion": "CargarUrl('control', 'salidas')",
+                "clase": "f-left",
+                "color": "bg-c-pink",
+                "Privilegios": []
+              },
+              {
+                "url": "/pendientes",
+                "js": "",
+                "descripcion": "Buscador",
+                "icono": "fa fa-search",
+                "nombre": "Buscador",
+                "accion": "CargarUrl('control', 'pendientes')",
+                "clase": "f-left",
+                "color": "bg-purple",
+                "Privilegios": []
+              },
+              {
+                "url": "/consulta-general",
+                "js": "",
+                "descripcion": "Consulta individual",
+                "icono": "fa fa-list",
+                "nombre": "Consulta individual",
+                "accion": "CargarUrl('control', 'pendientes')",
+                "clase": "f-left",
+                "color": "bg-red",
+                "Privilegios": []
+              },
+              {
+                "url": "/ctrlestadisticas",
+                "js": "",
+                "descripcion": "Estadistica General",
+                "icono": "fa fa-table",
+                "nombre": "Estadistica General",
+                "accion": "CargarUrl('control', 'pendientes')",
+                "clase": "f-left",
+                "color": "bg-teal",
+                "Privilegios": []
+              },
+              {
+                "url": "/ctrlreporte",
+                "js": "",
+                "descripcion": "Reportes General",
+                "icono": "fa fa-print",
+                "nombre": "Reportes General",
+                "accion": "CargarUrl('control', 'pendientes')",
+                "clase": "f-left",
+                "color": "bg-gray",
+                "Privilegios": []
+              }
+            ]
+          },
+          {
+            "url": "/archivo",
+            "js": "",
+            "icono": "ni-archive-2",
+            "descripcion": "Archivo",
+            "nombre": "Archivo",
+            "accion": "",
+            "clase": "text-red",
+            "color": "",
+            "Privilegio": [],
+            "SubMenu": [
+              {
+                "url": "",
+                "js": "",
+                "icono": "fas fa-shipping-fast",
+                "nombre": "Oficina Postal",
+                "accion": "CargarUrl('cuerpo', 'inc/cnc/registro')",
+                "clase": "opt",
+                "color": "bg-success",
+                "Privilegios": [
+                  {
+                    "metodo": "actualizar",
+                    "descripcion": "Actualizar",
+                    "accion": "ActualizarOPT()",
+                    "directivas": ""
+                  },
+                  {
+                    "metodo": "reporte",
+                    "descripcion": "Reportes",
+                    "accion": "Reportes()",
+                    "directivas": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "firmadigital": {
+    "direccionmac": "*",
+    "direccionip": "*",
+    "tiempo": "2022-04-03T19:07:05.851Z"
+  }
+}
+
+
+
+
+
+

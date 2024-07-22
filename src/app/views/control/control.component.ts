@@ -134,9 +134,10 @@ export class ControlComponent implements OnInit {
       `,
       confirmButtonColor: "#F09090",
       showConfirmButton: true,
+      showCloseButton: true,
       showCancelButton: false,
       confirmButtonText: "Ver detalles",
-      timer: 9000
+      timer: 5000
     }).then((result) => {
       if (result.isConfirmed) {
         this.ruta.navigate(['ctrlalertas'])

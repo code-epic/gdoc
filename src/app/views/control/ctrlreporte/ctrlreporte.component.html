@@ -76,31 +76,38 @@
           <div class="row">
             <div class="col-md-12">
               <table style="width: 100%;" class="zigzag" border="1">
-                <thead>
+                <thead *ngIf="control">
+                  <tr style="height: 40px;"  >
+                    <th *ngFor="let e of lstHeadControl"> {{e.id}}</th>
+                  </tr>
+                </thead>
+                <thead *ngIf="timonel">
                   <tr style="height: 40px;"  >
                     <th *ngFor="let e of lstHead"> {{e.id}}</th>
                   
                   </tr>
                 </thead>
+               
+              
+                <tbody *ngIf="control">
+                  <tr *ngFor="let e of lstDocumentosAux;let i=index;">
+                    <td>{{ i+1 }}</td>
+                    
+                    <td>{{ e.numero }}/{{ e.creacion | date:"dd/MM/yyyy" }}</td>
+                    <td>{{ e.comando | uppercase }}</td>
+                    <td>{{ "" | uppercase }}</td> 
+                    <td [innerHTML]="e.contenido" style="width: 30%;"></td>
+                    <td>{{ "" | uppercase }}</td>
+                   
+                  </tr>
+                </tbody>
                 <tbody *ngIf="timonel">
                   <tr *ngFor="let e of lstDocumentosAux;let i=index;">
                     <td>{{ i+1 }}</td>
                     <td>{{ e.creacion | date:"dd/MM/yyyy" }}</td>
-                    <td>{{ e.asunto | uppercase }}</td>
+                    <td [innerHTML]="e.contenido | uppercase"></td>
                     <td [innerHTML]="e.dependecia"></td>
-                    <td>{{ e.cant }}</td>
-                  </tr>
-                </tbody>
-                <tbody *ngIf="control">
-                  <tr *ngFor="let e of lstDocumentosAux;let i=index;">
-                    <td>{{ i+1 }}</td>
-                    <td>{{ e.numero }}</td>
-                    <td>{{ e.creacion | date:"dd/MM/yyyy" }}</td>
-                    <!-- <td>{{ e.tipo | uppercase }}</td> -->
-                    <td [innerHTML]="e.contenido"></td>
-                    <td>{{ e.estado_nombre | uppercase }}</td>
-                    <td>{{ e.alerta | date:"dd/MM/yyyy" }}</td>
-                    <td>{{ e.cant }}</td>
+                    <td>{{ e.contar }}</td>
                   </tr>
                 </tbody>
                 <tbody *ngIf="resolucion"></tbody>

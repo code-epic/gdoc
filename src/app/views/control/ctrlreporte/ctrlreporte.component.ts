@@ -19,13 +19,33 @@ export class CtrlreporteComponent implements OnInit {
   ]
 
   lstHead = []
+  lstHeadControl = []
+  lstHeadResoluciones = []
 
   timonel = false
   control = false
   resolucion = false
+  secretaria = false
+
+  lstControl = [
+    {'id': "NRO." },
+    {'id': "FECHA DE OFICIO" },
+    {'id': "ENTE SOLICITANTE" },
+    {'id': "OPINION ENVIADA A" },
+    {'id': "ASUNTO" },
+    {'id': "ESTATUS" },
+  ]
 
   lstTimonel = [
-    {'id': "Nro." },
+    {'id': "NRO." },
+    {'id': "FECHA DE ENVIO" },
+    {'id': "ASUNTO" },
+    {'id': "DEPENDENCIA" },
+    {'id': "CONTEO DE DIAS" },
+  ]
+
+  lstResoluciones = [
+    {'id': "NRO." },
     {'id': "FECHA DE ENVIO" },
     {'id': "ASUNTO" },
     {'id': "DEPENDENCIA" },
@@ -83,6 +103,7 @@ export class CtrlreporteComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe( 
      async data => {
         this.lstDocumentos = data.Cuerpo
+        console.log(data)
         this.lstDocumentosAux = this.lstDocumentos
         this.ngxService.stopLoader("loader-estatus");
       },
@@ -95,15 +116,38 @@ export class CtrlreporteComponent implements OnInit {
 
   selArea(){
     console.log(this.areas)
+    this.lstHead = []
     this.ocultar()
     switch (this.areas) {
+      case "2":
+        this.Consultar()
+        this.lstDocumentos = []
+        this.lstDocumentosAux = []
+        this.lstHeadControl = this.lstControl
+        this.control = true
+        break;
+      case "3":
+        // this.Consultar()
+        this.lstDocumentos = []
+        this.lstDocumentosAux = []
+        this.lstHeadResoluciones = this.lstResoluciones
+        this.resolucion = true
+        break;
       case "6":
         this.Consultar()
+        this.lstDocumentos = []
+        this.lstDocumentosAux = []
         this.lstHead = this.lstTimonel
         this.timonel = true
         break;
+     
     
       default:
+        // this.Consultar()
+        // this.lstDocumentos = []
+        // this.lstDocumentosAux = []
+        // this.lstHead = this.lstControl
+        // this.timonel = true
         break;
     }
   }
@@ -111,6 +155,7 @@ export class CtrlreporteComponent implements OnInit {
     this.timonel = false
     this.control = false
     this.resolucion = false
+    this.secretaria = false
   }
   Reporte(){}
 
