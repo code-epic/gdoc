@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output } from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { MatSnackBar } from "@angular/material/snack-bar";
 import {
   NgbDate,
@@ -11,7 +11,6 @@ import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { Resolucion } from "src/app/services/control/documentos.service";
 import { IDatosBasicos } from "src/app/services/resoluciones/resolucion.service";
 import { UtilService } from "src/app/services/util/util.service";
-import { AngularEditorConfig } from "@kolkov/angular-editor";
 
 @Component({
   selector: "app-rscdatosbasicos",
@@ -145,6 +144,8 @@ export class RscdatosbasicosComponent implements OnInit {
 
   @Input() EDITOR: string = "";
   @Input() GENERAL: boolean = false;
+  @Input() SHOWPRINT: boolean = false;
+  @Output() datosBasic?: EventEmitter<any> = new EventEmitter();
 
   constructor(
     private apiService: ApiService,
@@ -410,36 +411,51 @@ export class RscdatosbasicosComponent implements OnInit {
     this.DBasico.ultimo_ascenso = this.utilService.ConvertirFecha(this.ascenso);
   }
 
+  print() {
+    this.obtenerDatos();
+    let cedula = this.DBasico.cedula;
+
+    //de debo comentar esta parte porque esta dummy, es solo para pruebas
+    if (this.GENERAL) { this.datosBasic.emit({data: this.DBasico}); }
+
+    //descomentar aqui, si quieren que este integrado al boton de aceptar
+    // if (this.DBasico.condicion != 0 && this.DBasico.motivo === '') {
+    //   this.toastrService.warning(
+    //       'Debe introducir el motivo obligatoriamente',
+    //       `MPPD_DatosBasicos Alerta`
+    //   );
+    //   return;
+    // }
+    // if (this.GENERAL) { this.datosBasic.emit({event: this.DBasico}); }
+  }
+
   Aceptar() {
     this.obtenerDatos();
-    let cedula = this.DBasico.cedula
-
-    if (this.DBasico.condicion != 0 && this.DBasico.motivo == "") {
+    let cedula = this.DBasico.cedula;
+    if (this.DBasico.condicion != 0 && this.DBasico.motivo === '') {
       this.toastrService.warning(
-        "Debe introducir el motivo obligatoriamente",
+        'Debe introducir el motivo obligatoriamente',
         `MPPD_DatosBasicos Alerta`
       );
       return;
     }
-    this.ngxService.startLoader("loader-aceptar");
+    this.ngxService.startLoader('loader-aceptar');
 
-    this.DBasico.fecha =
-      this.DBasico.fecha != "" ? this.DBasico.fecha : "1900-01-01";
-    this.xAPI.funcion = this.dbActivar
-      ? "MPPD_UDatosBasicos"
-      : "MPPD_IDatosBasicos";
-    this.xAPI.parametros = "";
+    this.DBasico.fecha = this.DBasico.fecha != "" ? this.DBasico.fecha : "1900-01-01";
+    this.xAPI.funcion = this.dbActivar ? "MPPD_UDatosBasicos" : "MPPD_IDatosBasicos";
+    this.xAPI.parametros = '';
     this.SituacionMilitar();
     this.xAPI.valores = JSON.stringify(this.DBasico);
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+
         this.toastrService.success(
           "Los datos han sido actualizados exitosamente ",
           `MPPD.DatosBasicos`
         );
-        this.ngxService.stopLoader("loader-aceptar");
+        this.ngxService.stopLoader('loader-aceptar');
         this.dbActivar = false;
-        if (this.EDITOR != "") this.controlActivo(cedula);
+        if (this.EDITOR != '') { this.controlActivo(cedula); }
       },
       (error) => {
         this.toastrService.error(error, `MPPD_DatosBasicos -> Aceptar`);
