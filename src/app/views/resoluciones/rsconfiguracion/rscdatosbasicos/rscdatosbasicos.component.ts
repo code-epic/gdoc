@@ -144,6 +144,7 @@ export class RscdatosbasicosComponent implements OnInit {
 
   @Input() EDITOR: string = "";
   @Input() GENERAL: boolean = false;
+  @Input() SHOWPRINT: boolean = false;
   @Output() datosBasic?: EventEmitter<any> = new EventEmitter();
 
   constructor(
@@ -410,10 +411,27 @@ export class RscdatosbasicosComponent implements OnInit {
     this.DBasico.ultimo_ascenso = this.utilService.ConvertirFecha(this.ascenso);
   }
 
+  print() {
+    this.obtenerDatos();
+    let cedula = this.DBasico.cedula;
+
+    //de debo comentar esta parte porque esta dummy, es solo para pruebas
+    if (this.GENERAL) { this.datosBasic.emit({data: this.DBasico}); }
+
+    //descomentar aqui, si quieren que este integrado al boton de aceptar
+    // if (this.DBasico.condicion != 0 && this.DBasico.motivo === '') {
+    //   this.toastrService.warning(
+    //       'Debe introducir el motivo obligatoriamente',
+    //       `MPPD_DatosBasicos Alerta`
+    //   );
+    //   return;
+    // }
+    // if (this.GENERAL) { this.datosBasic.emit({event: this.DBasico}); }
+  }
+
   Aceptar() {
     this.obtenerDatos();
     let cedula = this.DBasico.cedula;
-    // if (this.GENERAL) { this.datosBasic.emit({event: this.DBasico}); }
     if (this.DBasico.condicion != 0 && this.DBasico.motivo === '') {
       this.toastrService.warning(
         'Debe introducir el motivo obligatoriamente',
@@ -436,7 +454,6 @@ export class RscdatosbasicosComponent implements OnInit {
           `MPPD.DatosBasicos`
         );
         this.ngxService.stopLoader('loader-aceptar');
-        if (this.GENERAL) { this.datosBasic.emit({event: this.DBasico}); }
         this.dbActivar = false;
         if (this.EDITOR != '') { this.controlActivo(cedula); }
       },

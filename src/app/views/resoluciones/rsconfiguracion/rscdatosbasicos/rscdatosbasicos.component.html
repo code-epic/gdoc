@@ -282,11 +282,18 @@
 </div>
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-6">
     <div class="text-right">
       <button class="btn bg-primary text-white" (click)="Aceptar()">Aceptar</button>
     </div>
   </div>
+    <div class="col-md-6" *ngIf="SHOWPRINT">
+        <div class="text-left">
+            <button class="btn bg-primary text-white " (click)="print()">
+                <span class="fa fa-print"></span>&nbsp;&nbsp;IMPRIMIR
+            </button>
+        </div>
+    </div>
 </div>
 
 <br><br>
