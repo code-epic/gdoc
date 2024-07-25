@@ -16,10 +16,9 @@ export class TemplateCVService {
 <title>CV-${datosBasicos.nombres}</title>
 <style type="text/css">
 @media print {
-@page { size: landscape; }
 table { max-height: 100%; overflow: hidden; page-break-after: always; }
 }
-body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Times New Roman"; font-size:x-small }
+body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Roboto"; font-size:x-small }
 a.comment-indicator:hover + comment { background:#ffd; position:absolute; display:block; border:1px solid black; padding:0.5em;  }
 a.comment-indicator { background:red; display:inline-block; border:1px solid black; width:0.5em; height:0.5em;  }
 comment { display:none;  }
@@ -54,8 +53,8 @@ comment { display:none;  }
 <colgroup span="2" width="30"></colgroup>
 <colgroup width="55"></colgroup>
 <tr>
-<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=2 rowspan=7 height="182" align="left" valign=top><font color="#000000"><br><img [src]="/assets/photo/${datosBasicos.cedula}.jpg" width=210 height=210 hspace=1 vspace=3>
-</font></td>
+<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=2 rowspan=7 height="182" align="left" valign=top><img src="./../../../../../assets/photo/${datosBasicos.cedula}.png" width=170 height=210 hspace=1 vspace=3 />
+</td>
 <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=2 align="left" valign=middle><b><font face="Calibri">NOMBRES Y  APELLIDOS</font></b></td>
 <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=8 align="left" valign=middle><font face="Calibri">${datosBasicos.nombres}</font></td>
 <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=9 align="center" valign=middle><b><font face="Calibri">ORDEN DE MÉRITO ASCENSOS</font></b></td>
@@ -245,8 +244,10 @@ ${datosBasicos.unidad_descripcion}</font></td>
 
 
         `);
-        printWindow?.document.close();
-        printWindow?.print();
-        printWindow?.close();
+        setTimeout(function() {
+            printWindow?.document.close();
+            printWindow.print();
+            // printWindow.close();
+        }, 200);
     }
 }
