@@ -49,7 +49,10 @@ export class TableGrallibroModalComponent implements OnInit {
     convertObject() {
         const listFourGenerales: any[] = [];
         const listSixGenerales: any[] = [];
+        
         const items = [];
+        this.firstElements = [];
+        this.secondElements = []
         // tslint:disable-next-line:no-shadowed-variable
         this.lstGenerales.forEach((element, index) => {
             items.push({...element, index: (index + 1)});
@@ -107,9 +110,6 @@ export class TableGrallibroModalComponent implements OnInit {
             else 
                 return 0;
         })
-        
-        // let nombramiento = this.lstResoluciones[0]
-        // let nb = nombramiento.titulo + " - " + nombramiento.tipo_descripcion
         let texto = ''
         if (nmb[0].asunto == undefined ){
             texto = ''

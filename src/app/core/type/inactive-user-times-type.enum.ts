@@ -1,5 +1,5 @@
 export enum InactiveUserTimesTypeEnum {
-    IdleTime = 3000,
-    CloseSessionCountdownTime = 300000,
-    AlertCountdownTimeMillisecons = 180000
+    IdleTime = 10000,
+    CloseSessionCountdownTime = 1000000,
+    AlertCountdownTimeMillisecons = 360000
 }
