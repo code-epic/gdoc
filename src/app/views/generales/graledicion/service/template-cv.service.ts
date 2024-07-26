@@ -9,8 +9,6 @@ export class TemplateCVService {
     crearHTML(DB: any) {
         const printWindow = window.open('', '_blank');
         printWindow?.document.write(`
-        
-  
         <!DOCTYPE html>
 
 <html>
@@ -230,9 +228,9 @@ ${DB.unidad_descripcion}</font></td>
 
 </html>
 
-        
-        
-        
+
+
+
         `);
         printWindow.document.head.innerHTML = `
             <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
@@ -248,10 +246,11 @@ ${DB.unidad_descripcion}</font></td>
                 .bordes-todos {
                     border: 1px solid #000000;
                 }
-                body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Times New Roman"; font-size:x-small }
-                a.comment-indicator:hover + comment { background:#ffd; position:absolute; display:block; border:1px solid black; padding:0.5em;  } 
-                a.comment-indicator { background:red; display:inline-block; border:1px solid black; width:0.5em; height:0.5em;  } 
-                comment { display:none;  } 
+              
+                body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Roboto"; font-size:x-small }
+                a.comment-indicator:hover + comment { background:#ffd; position:absolute; display:block; border:1px solid black; padding:0.5em;  }
+                a.comment-indicator { background:red; display:inline-block; border:1px solid black; width:0.5em; height:0.5em;  }
+                comment { display:none;  }
             </style>
 
             </head>`
