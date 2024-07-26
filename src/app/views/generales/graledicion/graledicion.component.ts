@@ -103,10 +103,10 @@ export class GraledicionComponent implements OnInit {
     ngOnInit(): void {
     }
 
-    generatePdf(event: any) {
+    generarPdf(event: any) {
         console.log("json de test", this.event);
 
-        this.templateCv.createHtmlSectionForPrint(this.event); //eliminar esta linea luego de probar
+        this.templateCv.crearHTML(this.event); //eliminar esta linea luego de probar
         // this.templateCv.createHtmlSectionForPrint(event.data); //descomentar para integrar
     }
 

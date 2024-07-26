@@ -42,7 +42,7 @@ export class GralconsultasComponent implements OnInit {
 
   ConsultarListado(){
     this.xAPI.funcion = 'MPPD_CLibroGenerales'
-    this.xAPI.parametros = ''
+    this.xAPI.parametros = this.componente.split('|')[0];
     this.xAPI.valores = ''
     this.ngxService.startLoader("loader-gennerales");
     this.apiService.Ejecutar(this.xAPI).subscribe(

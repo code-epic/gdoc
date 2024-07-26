@@ -414,19 +414,7 @@ export class RscdatosbasicosComponent implements OnInit {
   print() {
     this.obtenerDatos();
     let cedula = this.DBasico.cedula;
-
-    //de debo comentar esta parte porque esta dummy, es solo para pruebas
     if (this.GENERAL) { this.datosBasic.emit({data: this.DBasico}); }
-
-    //descomentar aqui, si quieren que este integrado al boton de aceptar
-    // if (this.DBasico.condicion != 0 && this.DBasico.motivo === '') {
-    //   this.toastrService.warning(
-    //       'Debe introducir el motivo obligatoriamente',
-    //       `MPPD_DatosBasicos Alerta`
-    //   );
-    //   return;
-    // }
-    // if (this.GENERAL) { this.datosBasic.emit({event: this.DBasico}); }
   }
 
   Aceptar() {

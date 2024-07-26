@@ -22,7 +22,7 @@ export class TableGrallibroModalComponent implements OnInit {
 
 
     firstElements: any[] = [];
-    secondElements: any[] = [];
+    secondElements: any[] = ['100','200','300', '400'];
 
     constructor(
         private service: TemplatePrintService,
@@ -37,6 +37,7 @@ export class TableGrallibroModalComponent implements OnInit {
         this.componente_id = this.data.componente_id
         this.lstQa = this.data.lstQa;
 
+        console.log(this.lstGenerales)
         this.convertObject();
     }
 
