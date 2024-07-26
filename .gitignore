@@ -33,6 +33,9 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+src/assets/img/mppd
+dist/assets/img/mppd
+
 
 # System Files
 .DS_Store

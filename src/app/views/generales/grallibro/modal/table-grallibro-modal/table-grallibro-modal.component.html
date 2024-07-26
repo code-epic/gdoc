@@ -2,22 +2,23 @@
 
 <h1 mat-dialog-title>Vista Previa</h1>
 <div mat-dialog-content id="print" align="center">
-    <div *ngFor="let e of Componentes">
+    <!-- <div *ngFor="let e of Componentes"> -->
         <section>
-            <table>
+            <table >
 
                 <tr>
-                    <td style="width: 10%;" rowspan="3">
-                        <img src="assets/img/mppd/escudos/{{componente_id}}.jpeg"  style="width: 120px;" alt="Logo de prueba">
+                    <td style="width: 10%;">
+                        <img src="assets/img/mppd/escudos/{{componente_id}}.jpeg"  style="width: 110px; height: 140px;" alt="Logo de prueba">
                     </td>
-                    <td style="width: 90%; text-align: left;">REPÚBLICA BOLIVARIANA DE VENEZUELA</td>
+                    <td style="width: 90%; text-align: left;font-weight: bold;">
+                        <p style="font-size: 16px;font-weight: bold;"> 
+                            REPÚBLICA BOLIVARIANA DE VENEZUELA <br> 
+                            MINISTERIO DEL PODER POPULAR PARA LA DEFENSA </p>
+                        <p style="font-size: 28px; font-weight: bold;"> {{ componente }} </p>
+                        <p style="text-align: center; font-size: 28px;color: rgb(135, 81, 81); font-weight: bold;">{{ nameLabelDoc }} </p>
+                    </td>
                 </tr>
-                <tr>
-                    <td style="width: 90%; text-align: left">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</td>
-                </tr>
-                <tr>
-                    <td style="width: 90%; text-align: left"> {{ nameLabelDoc }} <br> {{ componente }}</td>
-                </tr>
+
 
             </table>
             <table>
@@ -42,20 +43,51 @@
                 </thead>
                 <tbody>
 
-                <tr *ngFor="let item of firstElements[0].column1; let i = index">
-                    <td>{{ item.index }}</td>
-                    <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
-                    <td>{{ item.grado }}</td>
-                    <td>{{ item.nombres }}</td>
-                    <td>A</td>
-                    <td>B</td>
+                <tr *ngFor="let e of firstElements[0].column1; let i = index">
+                    <td>{{ e.index }}</td>
+                    <td style="width: 110px; height: 140px;"><img src="assets/img/mppd/fotos/{{e.cedula}}.jpg" style="width: 110px; height: 140px;"></td>
+                    <td  align="center">
+                        <p style="font-size: 11px; font-weight: bold;">
+                            {{ e.nombre }}
+                        </p>
+                        <p style="font-size: 9px;">
+                            {{e.promocion}}
+                        </p>
+                    </td>
+                    <td class="nombre">
+                        {{ e.nombres }}<br>
+                        C.I {{e.cedula}}<br>
+                        Correo: 
+                    </td>
+                    <td style="font-size: 9px;" [innerHTML]="filtrarAscenso(e.resoluciones)">
+                    </td>
+                    <td style="width: 110px;font-size: 9px;" [innerHTML]="filtrarNombramiento(e.resoluciones)">
+                    </td>
+                    
 
                     <td>{{ firstElements[0].column2[i].index }}</td>
-                    <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
-                    <td>{{ firstElements[0].column2[i].grado }}</td>
-                    <td>{{ firstElements[0].column2[i].nombres }}</td>
-                    <td>A</td>
-                    <td>B</td>
+                    <td style="width: 110px; height: 140px;">
+                        <img src="assets/img/mppd/fotos/{{firstElements[0].column2[i].cedula}}.jpg" style="width: 110px;height: 140px;">
+                    </td>
+                    <td  align="center">
+                        <p style="font-size: 11px; font-weight: bold;">
+                            {{ firstElements[0].column2[i].nombre }}
+                        </p>
+                        <p style="font-size: 9px;">
+                            {{firstElements[0].column2[i].promocion }}
+                        </p>
+                    </td>
+                    <td class="nombre">
+                        {{ firstElements[0].column2[i].nombres }}<br>
+                        C.I {{e.cedula}}<br>
+                        Correo: </td>
+                    <td style="font-size: 9px;"
+                     [innerHTML]="filtrarAscenso(firstElements[0].column2[i].resoluciones)">
+                    </td>
+                    <td style="width: 110px; font-size: 9px;" 
+                        [innerHTML]="filtrarNombramiento(firstElements[0].column2[i].resoluciones)">
+                    </td>
+                    
                 </tr>
                 </tbody>
             </table>
@@ -86,21 +118,58 @@
                 </thead>
                 <tbody>
 
-                <tr *ngFor="let item of element.column1; let i = index">
-                    <td>{{ item.index }}</td>
-                    <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
-                    <td>{{ item.grado }}</td>
-                    <td>{{ item.nombres }}</td>
-                    <td>A</td>
-                    <td>B</td>
+                <tr *ngFor="let e of element.column1; let i = index">
+                    <td>{{ e.index }}</td>
+                    <td style="width: 110px; height: 140px;">
+                        <img src="assets/img/mppd/fotos/{{e.cedula}}.jpg" style="width: 110px;height: 140px;">
+                    </td>
+                    <td align="center">
+                        <p style="font-size: 11px; font-weight: bold;">
+                            {{ e.nombre }}
+                        </p>
+                        <p style="font-size: 9px;">
+                            {{e.promocion }}
+                        </p>
+                    </td>
+                    <td  class="nombre">
+                        {{ e.nombres }}<br>
+                        C.I {{e.cedula}}<br>
+                        Correo: 
+                    </td>
+                    <td style="font-size: 9px;"
+                         [innerHTML]="filtrarAscenso(e.resoluciones)">
+                    </td>
+                    <td style="width: 110px; font-size: 9px;" [innerHTML]="filtrarNombramiento(e.resoluciones) ">
+
+                    </td>
+                    
+                    
 
                     <ng-container *ngIf="element.column2 != null">
                         <td>{{ element.column2[i].index }}</td>
-                        <td style="width: 10%;"><img src="ruta_del_logo.png" alt="Logo de prueba"></td>
-                        <td>{{ element.column2[i].grado }}</td>
-                        <td>{{ element.column2[i].nombres }}</td>
-                        <td>A</td>
-                        <td>B</td>
+                        <td style="width: 110px; height: 140px;">
+                            <img src="assets/img/mppd/fotos/{{element.column2[i].cedula}}.jpg" style="width: 110px;height: 140px;">
+                        </td>
+                        <td  align="center">
+                            <p style="font-size: 11px; font-weight: bold;">
+                                {{ element.column2[i].nombre }}
+                            </p>
+                            <p style="font-size: 9px;">
+                                {{element.column2[i].promocion }}
+                            </p>
+                        </td>
+                        <td class="nombre">
+                            {{ element.column2[i].nombres }}<br>
+                            C.I {{element.column2[i].cedula}}<br>
+                            Correo: 
+                        </td>
+                        <td  style="font-size: 9px;"
+                             [innerHTML]="filtrarAscenso(element.column2[i].resoluciones)">
+                        </td>
+                        <td style="width: 110px; font-size: 9px;"
+                            [innerHTML]="filtrarNombramiento(element.column2[i].resoluciones)">
+                        </td>
+                        
                     </ng-container>
                 </tr>
                 <!-- ... Repite para las otras 7 posiciones ... -->
@@ -108,7 +177,7 @@
 
             </table>
         </section>
-    </div>
+    <!-- </div> -->
 
 </div>
 <div mat-dialog-actions align="center">

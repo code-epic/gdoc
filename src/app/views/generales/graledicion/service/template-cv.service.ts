@@ -41,7 +41,7 @@ export class TemplateCVService {
 <colgroup span="2" width="30"></colgroup>
 <colgroup width="55"></colgroup>
 <tr>
-<td class="bordes-todos" colspan=2 rowspan=7 height="182" align="left" valign=top><font color="#000000"><br><img [src]="ttps://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/${DB.cedula}/foto.jpg" width=210 height=210 hspace=1 vspace=3>
+<td class="bordes-todos" colspan=2 rowspan=7 height="182" align="left" valign=top><font color="#000000"><br><img [src]="https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/${DB.cedula}/foto.jpg" width=210 height=210 hspace=1 vspace=3>
 </font></td>
 <td class="bordes-todos" colspan=2 align="left" valign=middle><b><font face="Calibri">NOMBRES Y  APELLIDOS</font></b></td>
 <td class="bordes-todos" colspan=8 align="left" valign=middle><font face="Calibri">${DB.nombres}</font></td>
@@ -234,7 +234,7 @@ ${DB.unidad_descripcion}</font></td>
         `);
         printWindow.document.head.innerHTML = `
             <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-            <title>CV-${DB.nombres}</title>
+           
             <style type="text/css">
                 @media print { 
                     @page { size: landscape; }

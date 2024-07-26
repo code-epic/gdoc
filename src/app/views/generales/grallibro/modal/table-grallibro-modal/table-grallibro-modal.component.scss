@@ -1,44 +1,3 @@
-//@media print {
-//  /* Aquí irían tus reglas CSS específicas para imprimir */
-//  section {
-//    page-break-before: always;
-//  }
-//
-//  .mat-drawer-content {
-//    height: auto !important;
-//  }
-//  .mat-drawer-container {
-//    overflow: inherit !important;
-//  }
-//
-//  .logo {
-//    margin-right: 10px;
-//  }
-//
-//  .logo img {
-//    max-height: 50px;
-//  }
-//
-//  .cabecera {
-//    font-weight: bold;
-//  }
-//
-//  /* Estilos para la tabla */
-//  table {
-//    border-collapse: collapse;
-//    width: 100%;
-//  }
-//
-//  th, td {
-//    border: 1px solid #ddd;
-//    padding: 8px;
-//    text-align: center;
-//  }
-//
-//  th {
-//    background-color: #f0f0f0;
-//  }
-//}
 
 
 
@@ -58,6 +17,34 @@
 table {
   border-collapse: collapse;
   width: 100%;
+  font-family: sans-serif;
+
+    th,
+    td {
+        padding: .25em .5em;
+        text-align: left;
+
+        &:nth-child(2) {
+            text-align: left;
+        }
+    }
+
+    th {
+        background-color: rgb(153, 49, 49);
+        color: #fff;
+    }
+
+    tr {
+        border-bottom: #b9aeae;
+    }
+
+    tr:nth-child(odd) {
+        background-color: #f1f1f1;
+    }
+
+    tr:nth-child(even) {
+        background-color: #fff;
+    }
 }
 
 th, td {
@@ -70,6 +57,14 @@ th, td {
 th {
   background-color: #f0f0f0;
 }
+
+
+.mat-drawer-content {height: auto !important; }
+.mat-drawer-container {overflow: inherit !important; }
+.logo { margin-right: 10px; }
+.logo img { max-height: 50px;}
+.cabecera {font-weight: bold;}
+.nombre { font-size:9px; width: 120px; text-align: center;}
 
 
 

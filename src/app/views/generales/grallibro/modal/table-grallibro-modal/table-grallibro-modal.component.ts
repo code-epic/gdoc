@@ -22,7 +22,8 @@ export class TableGrallibroModalComponent implements OnInit {
 
 
     firstElements: any[] = [];
-    secondElements: any[] = ['100','200','300', '400'];
+    secondElements: any[] = [];
+    lstResoluciones = []
 
     constructor(
         private service: TemplatePrintService,
@@ -37,7 +38,7 @@ export class TableGrallibroModalComponent implements OnInit {
         this.componente_id = this.data.componente_id
         this.lstQa = this.data.lstQa;
 
-        console.log(this.lstGenerales)
+        // console.log(this.lstGenerales)
         this.convertObject();
     }
 
@@ -95,6 +96,44 @@ export class TableGrallibroModalComponent implements OnInit {
         if (printContents) {
             this.service.createHtmlSectionForPrint(printContents);
         }
+    }
+
+    filtrarNombramiento(e) : string {
+        let nmb = JSON.parse(e).filter( e => { return e.tipo != 13 }).sort( (a, b) => {
+            if (a.fecha > b.fecha)
+                return -1;
+            else if (a.fecha < b.fecha)
+                return 1;
+            else 
+                return 0;
+        })
+        
+        // let nombramiento = this.lstResoluciones[0]
+        // let nb = nombramiento.titulo + " - " + nombramiento.tipo_descripcion
+        let texto = ''
+        if (nmb[0].asunto == undefined ){
+            texto = ''
+        }else{
+            texto = nmb[0].asunto.substring(0, 100)
+        }
+
+        return texto
+    }
+
+    filtrarAscenso(e){
+        let asc = JSON.parse(e).filter( e => { return e.tipo == 13 }).sort( (a, b) => {
+            if (a.fecha > b.fecha)
+                return -1;
+            else if (a.fecha < b.fecha)
+                return 1;
+            else 
+                return 0;
+        })
+        //console.log(asc)
+        // console.log('ordenando... ', asc)
+        //asc[0].asunto.substring(0,100)
+        let pos = asc[0].orden == 0? '1 DE 1': asc[0].orden + ' DE ' + asc[0].cantidad
+        return `RESOL. <br> ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${pos}`
     }
 
 

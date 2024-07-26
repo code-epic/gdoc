@@ -71,7 +71,6 @@
 
   <div class="row" style="padding: 18px; margin-top:-12px">
     <table summary="" class="table table-bordered table-hover mb-3">
-
         <thead>
             <tr>
                 <th> Resolucion: {{ nombramiento }}</th>
@@ -79,7 +78,7 @@
         </thead>
         <tbody>
             <tr>
-                <td>{{ xasunto.substring(0,220) | uppercase}}</td>
+                <td [innerHTML]="xasunto.substring(0,220) | uppercase"></td>
             </tr>
         </tbody>
     </table>
