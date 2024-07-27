@@ -45,7 +45,7 @@ export class TemplatePrintService {
                 }
 
                 th {
-                    background-color: rgb(102, 102, 222);
+                    background-color: rgb(148, 27, 11);
                     color: #fff;
                 }
 
@@ -62,9 +62,7 @@ export class TemplatePrintService {
                 }
             }
             th, td { 
-                border: 1px solid #ddd; background: #fff; padding: 8px 16px; text-align: center; 
-            }
-            th { background-color: #f0f0f0;  
+                border: 1px solid #ddd;  padding: 8px 16px; text-align: center; 
             }
           }
          
@@ -92,7 +90,7 @@ export class TemplatePrintService {
             }
 
             th {
-                background-color: rgb(102, 102, 222);
+                background-color: rgb(148, 27, 11);
                 color: #fff;
             }
 
@@ -109,11 +107,9 @@ export class TemplatePrintService {
             }
           }
           th, td { 
-            border: 1px solid #ddd; background: #fff; padding: 8px 16px; text-align: center; 
+            border: 1px solid #ddd; padding: 8px 16px; text-align: center; 
           }
-          th { 
-            background-color: #f0f0f0; 
-          }
+         
           body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Roboto"; font-size:11px }
         </style>`
         // printWindow?.document.close();

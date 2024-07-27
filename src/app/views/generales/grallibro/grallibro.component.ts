@@ -52,7 +52,7 @@ export class GrallibroComponent implements OnInit {
     this.lstGenerales = []
     this.ngxService.startLoader('loader-gennerales');
 
-    console.log(this.xAPI)
+    //console.log(this.xAPI)
     this.apiService.Ejecutar(this.xAPI).subscribe(
        data => {
         console.log(data)

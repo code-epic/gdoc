@@ -124,11 +124,7 @@ export class TableGrallibroModalComponent implements OnInit {
                 texto = nmb[0].asunto + `<br> RESOL. <br> ${nmb[0].numero} <br> ${nmb[0].fecha}<br>`
             }
         } else {
-            // estos console.log deben borrarse es solo para la explicacion tecnica
-            console.log('e =>', e); //dato que viene del metodo
-            console.log('nmb', nmb); //dato que retorno el filter
-            console.log('nmb[0]', nmb[0]); // se esta buscando un elemento en especifico, pero como no hay nada, esto es undefine
-            texto = '';
+            texto = 'SIN NOMBRAMIENTO';
         }
         return texto;
     }
@@ -145,11 +141,14 @@ export class TableGrallibroModalComponent implements OnInit {
                 return 0;
             }
         });
-        //console.log(asc)
-        // console.log('ordenando... ', asc)
-        //asc[0].asunto.substring(0,100)
-        let pos = asc[0].orden == 0 ? '1 DE 1' : asc[0].orden + ' DE ' + asc[0].cantidad
-        return `RESOL. <br> ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${pos}`
+        let texto = ''
+        if (asc.length !== 0) {
+            let pos = asc[0].orden == 0 ? '1 DE 1' : asc[0].orden + ' DE ' + asc[0].cantidad
+            texto =  `RESOL. <br> ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${pos}`
+        } else {
+            texto = 'SIN RESUELTO'
+        }
+        return texto
     }
 
     setDefaultPic(event: any) {

@@ -48,7 +48,7 @@ export class GralconsultasComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
        
-        console.log(data)
+        // console.log(data)
         
         this.lstGenerales = data.Cuerpo.length > 0? data.Cuerpo: []
         this.ngxService.stopLoader("loader-gennerales");
@@ -59,6 +59,55 @@ export class GralconsultasComponent implements OnInit {
       }
     )
   }
+
+  filtrarNombramiento(e): string {
+    let nmb = JSON.parse(e).filter(e => {
+        return e.tipo != 13;
+    }).sort( (a, b) => {
+        if (a.fecha > b.fecha) {
+            return -1;
+        } else if (a.fecha < b.fecha) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
+
+    let texto = '';
+    if (nmb.length !== 0) {
+        if (nmb[0].asunto === undefined ) {
+            texto = '';
+        } else {
+            texto = nmb[0].asunto + `<br> RESOL. <br> ${nmb[0].numero} <br> ${nmb[0].fecha}<br>`  +
+            nmb[1].asunto + `<br> RESOL. <br> ${nmb[1].numero} <br> ${nmb[1].fecha}<br>`
+        }
+    } else {
+        texto = 'SIN NOMBRAMIENTO';
+    }
+    return texto;
+}
+
+filtrarAscenso(e) {
+    let asc = JSON.parse(e).filter(e => {
+        return e.tipo == 13;
+    }).sort((a, b) => {
+        if (a.fecha > b.fecha) {
+            return -1;
+        } else if (a.fecha < b.fecha) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
+    let texto = ''
+    if (asc.length !== 0) {
+        let pos = asc[0].orden == 0 ? '1 DE 1' : asc[0].orden + ' DE ' + asc[0].cantidad
+        texto =  `RESOL. <br> ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${pos}`
+    } else {
+        texto = 'SIN RESUELTO'
+    }
+    return texto
+}
 
   
   
