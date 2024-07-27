@@ -1,3 +1,4 @@
+import { BreakpointObserver } from "@angular/cdk/layout";
 import {
   ClassGetter,
   THIS_EXPR,
@@ -5,7 +6,6 @@ import {
 import { Component, OnInit } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { PageEvent } from "@angular/material/paginator";
-
 import { Router } from "@angular/router";
 import { NgbModalConfig, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ToastrService } from "ngx-toastr";
@@ -110,7 +110,8 @@ export class RsbuzonComponent implements OnInit {
     private toastrService: ToastrService,
     private loginService: LoginService,
     private utilService: UtilService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private breakpointObserver: BreakpointObserver
   ) {}
 
   ngOnInit(): void {
@@ -118,7 +119,21 @@ export class RsbuzonComponent implements OnInit {
     this.seleccionNavegacion(0);
     //this.listarSubDocumentos(1);
   }
-
+  cut(): void {
+    console.log('Acción de cortar');
+  }
+  /**
+   * Do whatever you want
+   */
+  copy(): void {
+    console.log('Acción de copiar');
+  }
+  /**
+   * Do whatever you want
+   */
+  link(): void {
+    console.log('Acción de ir a un enlace');
+  }
   entrada_open(id, cuenta) {
     if (cuenta != undefined) {
       const xid = btoa("4,2," + id);
@@ -175,6 +190,47 @@ export class RsbuzonComponent implements OnInit {
         break;
     }
   }
+
+  onRightClick1(event: MouseEvent) {
+    event.preventDefault(); // Evita el menú contextual por defecto
+    console.log('Clic derecho detectado');
+    // Aquí puedes agregar tu lógica para ejecutar una acción específica
+    // Por ejemplo, mostrar un menú contextual personalizado
+  }
+
+  onRightClick2(event: MouseEvent) {
+    event.preventDefault(); // Evita la acción predeterminada del menú contextual del navegador
+    
+  }
+  
+  showContextMenu = false;
+  contextMenuPosition: { x: number; y: number } = { x: 0, y: 0 };
+
+  onRightClick(event: MouseEvent) {
+    event.preventDefault();
+    this.showContextMenu = true;
+    this.contextMenuPosition.x = event.clientX;
+    this.contextMenuPosition.y = event.clientY;
+  }
+
+  eliminar() {
+    // Lógica para eliminar
+    console.log('Eliminar');
+    this.showContextMenu = false;
+  }
+
+  copiar() {
+    // Lógica para copiar
+    console.log('Copiar');
+    this.showContextMenu = false;
+  }
+
+  pegar() {
+    // Lógica para pegar
+    console.log('Pegar');
+    this.showContextMenu = false;
+  }
+  
 
   listarEstados() {
     this.xAPI.funcion = "WKF_CEstados";
