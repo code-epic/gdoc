@@ -145,7 +145,7 @@
                     
                     
 
-                    <ng-container *ngIf="element.column2[i] != null">
+                    <ng-container *ngIf="element.column2 != undefined && element.column2[i] != null">
                         <td>{{ element.column2[i].index }}</td>
                         <td style="width: 110px; height: 140px;">
                             <img src="assets/img/mppd/fotos/{{element.column2[i].cedula}}.jpg" (error)="setDefaultPic($event)"  style="width: 110px;height: 140px;">
