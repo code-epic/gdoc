@@ -130,3 +130,53 @@ textarea {
     color: aliceblue;
     background-color: #3b3232;
   }
+
+
+  .context-menu {
+    position: absolute;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .context-menu div {
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .dropdown-menu {
+    /* Estilos personalizados para el menú contextual */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  }
+
+  .context-menu {
+    display: inline-flex;
+    flex-direction: column;
+    min-width: 180px;
+    max-width: 280px;
+    background-color: rgb(255, 255, 255);
+    padding: 6px 0;
+    border-radius: 4px;
+  }
+  .context-menu-item {
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    user-select: none;
+    min-width: 64px;
+    line-height: 36px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex: 1;
+  }
+  .context-menu-item:hover {
+    background-color: rgb(208, 208, 208);
+  }
+  .context-menu-item:active {
+    background-color: rgb(170, 170, 170);
+  }

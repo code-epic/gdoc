@@ -70,8 +70,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-
-
 import { RstranscripcionComponent } from './views/resoluciones/rstranscripcion/rstranscripcion.component';
 import { RsrevisionComponent } from './views/resoluciones/rsrevision/rsrevision.component';
 import { RsconfiguracionComponent } from './views/resoluciones/rsconfiguracion/rsconfiguracion.component';
@@ -106,7 +104,7 @@ import { GralestadisticasComponent } from './views/generales/gralestadisticas/gr
 import { GraledicionComponent } from './views/generales/graledicion/graledicion.component';
 import { GrallibroComponent } from './views/generales/grallibro/grallibro.component';
 import { TableGrallibroModalComponent } from './views/generales/grallibro/modal/table-grallibro-modal/table-grallibro-modal.component';
-
+import { MatTableModule } from '@angular/material/table';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -182,6 +180,7 @@ const ngWizardConfig: NgWizardConfig = {
     NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
     MatToolbarModule,
     MatDatepickerModule,
+    MatTableModule,
     MatSnackBarModule,
     MatNativeDateModule,
     ToastrModule.forRoot({
