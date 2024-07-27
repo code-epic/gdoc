@@ -106,7 +106,7 @@ export class TableGrallibroModalComponent implements OnInit {
     filtrarNombramiento(e): string {
         let nmb = JSON.parse(e).filter(e => {
             return e.tipo != 13;
-        }).sort((a, b) => {
+        }).sort( (a, b) => {
             if (a.fecha > b.fecha) {
                 return -1;
             } else if (a.fecha < b.fecha) {
@@ -115,13 +115,21 @@ export class TableGrallibroModalComponent implements OnInit {
                 return 0;
             }
         });
-        let texto = '';
-        if (nmb[0].asunto == undefined) {
-            texto = '';
-        } else {
-            texto = nmb[0].asunto.substring(0, 100);
-        }
 
+        let texto = '';
+        if (nmb.length !== 0) {
+            if (nmb[0].asunto === undefined ) {
+                texto = '';
+            } else {
+                texto = nmb[0].asunto + `<br> RESOL. <br> ${nmb[0].numero} <br> ${nmb[0].fecha}<br>`
+            }
+        } else {
+            // estos console.log deben borrarse es solo para la explicacion tecnica
+            console.log('e =>', e); //dato que viene del metodo
+            console.log('nmb', nmb); //dato que retorno el filter
+            console.log('nmb[0]', nmb[0]); // se esta buscando un elemento en especifico, pero como no hay nada, esto es undefine
+            texto = '';
+        }
         return texto;
     }
 
