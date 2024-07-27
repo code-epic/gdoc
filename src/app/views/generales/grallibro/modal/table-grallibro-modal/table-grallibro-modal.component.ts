@@ -2,6 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {TemplatePrintService} from './service/template-print.service';
 import {element} from 'protractor';
+import {UtilService} from '../../../../../services/util/util.service';
 
 @Component({
     selector: 'app-table-grallibro-modal',
@@ -11,11 +12,11 @@ import {element} from 'protractor';
 export class TableGrallibroModalComponent implements OnInit {
     e;
 
-    componente = '0'
-    componente_id = ''
-    Componentes = []
-    lstGenerales = []
-    lstQa: any[] = []
+    componente = '0';
+    componente_id = '';
+    Componentes = [];
+    lstGenerales = [];
+    lstQa: any[] = [];
 
 
     nameLabelDoc = 'RELACION DE OFICIALES GENERALES';
@@ -23,19 +24,20 @@ export class TableGrallibroModalComponent implements OnInit {
 
     firstElements: any[] = [];
     secondElements: any[] = [];
-    lstResoluciones = []
+    lstResoluciones = [];
 
     constructor(
         private service: TemplatePrintService,
+        public utils: UtilService,
         public dialogRef: MatDialogRef<TableGrallibroModalComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
     }
 
     ngOnInit(): void {
-        this.componente = this.data.componente
-        this.lstGenerales = this.data.lstGenerales
-        this.componente_id = this.data.componente_id
+        this.componente = this.data.componente;
+        this.lstGenerales = this.data.lstGenerales;
+        this.componente_id = this.data.componente_id;
         this.lstQa = this.data.lstQa;
 
         // console.log(this.lstGenerales)
@@ -49,10 +51,10 @@ export class TableGrallibroModalComponent implements OnInit {
     convertObject() {
         const listFourGenerales: any[] = [];
         const listSixGenerales: any[] = [];
-        
+
         const items = [];
         this.firstElements = [];
-        this.secondElements = []
+        this.secondElements = [];
         // tslint:disable-next-line:no-shadowed-variable
         this.lstGenerales.forEach((element, index) => {
             items.push({...element, index: (index + 1)});
@@ -101,15 +103,19 @@ export class TableGrallibroModalComponent implements OnInit {
         }
     }
 
-    filtrarNombramiento(e) : string {
-        let nmb = JSON.parse(e).filter( e => { return e.tipo != 13 }).sort( (a, b) => {
-            if (a.fecha > b.fecha)
+    filtrarNombramiento(e): string {
+        let nmb = JSON.parse(e).filter(e => {
+            return e.tipo != 13;
+        }).sort( (a, b) => {
+            if (a.fecha > b.fecha) {
                 return -1;
-            else if (a.fecha < b.fecha)
+            } else if (a.fecha < b.fecha) {
                 return 1;
-            else 
+            } else {
                 return 0;
-        })
+            }
+        });
+
         let texto = ''
         if (nmb[0].asunto == undefined ){
             texto = ''
@@ -117,24 +123,29 @@ export class TableGrallibroModalComponent implements OnInit {
             texto = nmb[0].asunto + `<br> RESOL. <br> ${nmb[0].numero} <br> ${nmb[0].fecha}<br>`
         }
 
-        return texto
+        return texto;
     }
 
-    filtrarAscenso(e){
-        let asc = JSON.parse(e).filter( e => { return e.tipo == 13 }).sort( (a, b) => {
-            if (a.fecha > b.fecha)
+    filtrarAscenso(e) {
+        let asc = JSON.parse(e).filter(e => {
+            return e.tipo == 13;
+        }).sort((a, b) => {
+            if (a.fecha > b.fecha) {
                 return -1;
-            else if (a.fecha < b.fecha)
+            } else if (a.fecha < b.fecha) {
                 return 1;
-            else 
+            } else {
                 return 0;
-        })
+            }
+        });
         //console.log(asc)
         // console.log('ordenando... ', asc)
         //asc[0].asunto.substring(0,100)
-        let pos = asc[0].orden == 0? '1 DE 1': asc[0].orden + ' DE ' + asc[0].cantidad
+        let pos = asc[0].orden == 0 ? '1 DE 1' : asc[0].orden + ' DE ' + asc[0].cantidad
         return `RESOL. <br> ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${pos}`
     }
 
-
+    setDefaultPic(event: any) {
+        event.target.src = this.utils.imgNoDisponible;
+    }
 }
