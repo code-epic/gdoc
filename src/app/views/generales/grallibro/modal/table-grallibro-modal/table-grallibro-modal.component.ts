@@ -114,7 +114,7 @@ export class TableGrallibroModalComponent implements OnInit {
         if (nmb[0].asunto == undefined ){
             texto = ''
         }else{
-            texto = nmb[0].asunto.substring(0, 100)
+            texto = nmb[0].asunto + `<br> RESOL. <br> ${nmb[0].numero} <br> ${nmb[0].fecha}<br>`
         }
 
         return texto
