@@ -116,13 +116,20 @@ export class TableGrallibroModalComponent implements OnInit {
             }
         });
 
-        let texto = ''
-        if (nmb[0].asunto == undefined ){
-            texto = ''
-        }else{
-            texto = nmb[0].asunto + `<br> RESOL. <br> ${nmb[0].numero} <br> ${nmb[0].fecha}<br>`
+        let texto = '';
+        if (nmb.length !== 0) {
+            if (nmb[0].asunto === undefined ) {
+                texto = '';
+            } else {
+                texto = nmb[0].asunto + `<br> RESOL. <br> ${nmb[0].numero} <br> ${nmb[0].fecha}<br>`
+            }
+        } else {
+            // estos console.log deben borrarse es solo para la explicacion tecnica
+            console.log('e =>', e); //dato que viene del metodo
+            console.log('nmb', nmb); //dato que retorno el filter
+            console.log('nmb[0]', nmb[0]); // se esta buscando un elemento en especifico, pero como no hay nada, esto es undefine
+            texto = '';
         }
-
         return texto;
     }
 
