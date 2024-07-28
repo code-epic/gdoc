@@ -335,7 +335,7 @@ export const AdminLayoutRoutes: Routes = [
         canActivate: [AuthGuardGuard]
     },
     {
-        path: 'gralestadisticas',
+        path: 'gralestadistica',
         component: GralestadisticasComponent,
         canActivate: [AuthGuardGuard]
     },

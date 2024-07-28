@@ -80,7 +80,7 @@
                 </mat-list>
               </mat-selection-list>
 
-              <mat-selection-list #lstDocumentos>
+              <mat-selection-list #lstDocumentos style="margin-top:-7px;">
                 <mat-list *ngFor="let e of buzon; let i=index "
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
@@ -100,7 +100,7 @@
                       {{ e.udep | uppercase }}
                     </div>
                     
-                    <div class="col-md-2 text-right">
+                    <div class="col-md-2 text-right " style="margin-top:-20px;">
                       <button mat-icon-button aria-label="Privado">
                         <mat-icon *ngIf="e.privado" class="text-warning">no_encryption</mat-icon>
                       </button>

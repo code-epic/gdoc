@@ -105,6 +105,8 @@ import { GraledicionComponent } from './views/generales/graledicion/graledicion.
 import { GrallibroComponent } from './views/generales/grallibro/grallibro.component';
 import { TableGrallibroModalComponent } from './views/generales/grallibro/modal/table-grallibro-modal/table-grallibro-modal.component';
 import { MatTableModule } from '@angular/material/table';
+import { MatBadgeModule } from '@angular/material/badge';
+
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -163,6 +165,7 @@ const ngWizardConfig: NgWizardConfig = {
     MatRadioModule,
     MatExpansionModule,
     MatButtonToggleModule,
+    MatBadgeModule,
     AutocompleteLibModule,
     MatSelectModule,
     MatListModule,

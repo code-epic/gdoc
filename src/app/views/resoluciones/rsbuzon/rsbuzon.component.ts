@@ -1,8 +1,3 @@
-import { BreakpointObserver } from "@angular/cdk/layout";
-import {
-  ClassGetter,
-  THIS_EXPR,
-} from "@angular/compiler/src/output/output_ast";
 import { Component, OnInit } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { PageEvent } from "@angular/material/paginator";
@@ -102,6 +97,10 @@ export class RsbuzonComponent implements OnInit {
   public lstCarpetas = [];
   public lstCarpetasAux = [];
   public codCarpeta = ''
+  public blNavegacion : boolean = false
+  public details : boolean = false
+  
+  btnTexto = 'Control de Gestion'
 
   constructor(
     private apiService: ApiService,
@@ -110,8 +109,7 @@ export class RsbuzonComponent implements OnInit {
     private toastrService: ToastrService,
     private loginService: LoginService,
     private utilService: UtilService,
-    private modalService: NgbModal,
-    private breakpointObserver: BreakpointObserver
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -119,21 +117,22 @@ export class RsbuzonComponent implements OnInit {
     this.seleccionNavegacion(0);
     //this.listarSubDocumentos(1);
   }
-  cut(): void {
-    console.log('Acción de cortar');
+  
+  listarEstados() {
+    this.xAPI.funcion = "WKF_CEstados";
+    this.xAPI.parametros = "%";
+    this.xAPI.valores = "";
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstEstados = data.Cuerpo.filter((e) => {
+          return (e.esta == 1 && e.id != 3) || e.id == 1;
+        });
+      },
+      (error) => {}
+    );
   }
-  /**
-   * Do whatever you want
-   */
-  copy(): void {
-    console.log('Acción de copiar');
-  }
-  /**
-   * Do whatever you want
-   */
-  link(): void {
-    console.log('Acción de ir a un enlace');
-  }
+
+
   entrada_open(id, cuenta) {
     if (cuenta != undefined) {
       const xid = btoa("4,2," + id);
@@ -144,16 +143,7 @@ export class RsbuzonComponent implements OnInit {
     const xid = btoa(id);
     this.ruta.navigate(["/rsentradas", xid]);
   }
-  // open(content, id, cuenta) {
-  //   this.numControl = id;
-  //   this.idd = "";
-  //   this.cuenta = "";
-  //   if (cuenta != undefined) {
-  //     this.idd = id;
-  //     this.cuenta = cuenta;
-  //   }
-  //   this.modalService.open(content);
-  // }
+ 
 
   open(content, id, pos) {
     this.numControl = id;
@@ -161,7 +151,18 @@ export class RsbuzonComponent implements OnInit {
     console.log(this.posicion, ' ', this.numControl)
     //this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
     this.modalService.open(content, { centered: true });
+  
   }
+
+  principal(){
+
+  }
+
+  listarDocumentos(e){
+    console.log(e)
+  }
+
+
   seleccionNavegacion(e) {
     
     this.xAPI.funcion = "WKF_CDocumentos";
@@ -170,9 +171,9 @@ export class RsbuzonComponent implements OnInit {
 
     switch (e) {
       case 0:
-        this.cargarAcciones(0);
-        this.xAPI.parametros = this.estadoActual + "," + this.estatusActual;
-        this.listarBuzon(e);
+        // this.cargarAcciones(0);
+        // this.xAPI.parametros = this.estadoActual + "," + this.estatusActual;
+        // this.listarBuzon(e);
         break;
       case 1:
         this.cargarAcciones(1);
@@ -191,60 +192,14 @@ export class RsbuzonComponent implements OnInit {
     }
   }
 
-  onRightClick1(event: MouseEvent) {
+  clickDerecho(event: MouseEvent) {
     event.preventDefault(); // Evita el menú contextual por defecto
     console.log('Clic derecho detectado');
-    // Aquí puedes agregar tu lógica para ejecutar una acción específica
-    // Por ejemplo, mostrar un menú contextual personalizado
   }
 
-  onRightClick2(event: MouseEvent) {
-    event.preventDefault(); // Evita la acción predeterminada del menú contextual del navegador
-    
-  }
   
-  showContextMenu = false;
-  contextMenuPosition: { x: number; y: number } = { x: 0, y: 0 };
-
-  onRightClick(event: MouseEvent) {
-    event.preventDefault();
-    this.showContextMenu = true;
-    this.contextMenuPosition.x = event.clientX;
-    this.contextMenuPosition.y = event.clientY;
-  }
-
-  eliminar() {
-    // Lógica para eliminar
-    console.log('Eliminar');
-    this.showContextMenu = false;
-  }
-
-  copiar() {
-    // Lógica para copiar
-    console.log('Copiar');
-    this.showContextMenu = false;
-  }
-
-  pegar() {
-    // Lógica para pegar
-    console.log('Pegar');
-    this.showContextMenu = false;
-  }
   
 
-  listarEstados() {
-    this.xAPI.funcion = "WKF_CEstados";
-    this.xAPI.parametros = "%";
-    this.xAPI.valores = "";
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.lstEstados = data.Cuerpo.filter((e) => {
-          return (e.esta == 1 && e.id != 3) || e.id == 1;
-        });
-      },
-      (error) => {}
-    );
-  }
 
   async listarBuzon(tipo : number) {
     

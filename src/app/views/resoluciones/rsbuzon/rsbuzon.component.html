@@ -64,8 +64,8 @@
             <div class="example-large-box mat-elevation-z4">
               <mat-selection-list style="padding: 15px; width: 100%;">
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                  <div class="row">
-                    <div class="col-md-1 texto-lista">
+                  <div class="row"  *ngIf="blNavegacion">
+                    <div class="col-md-1 texto-lista text-center">
                      #
                     </div>
                     <div class="col-md-2 texto-lista">
@@ -84,13 +84,30 @@
                     </div>
 
                   </div>
+                  <div class="row" *ngIf="!blNavegacion">
+                    <div class="col-md-6">
+                      <section>
+                        <button mat-flat-button (click)="principal()">
+                          <font class="auto-title"><i class="fa fa-home" style="font-size: 18px;">
+                          </i>&nbsp;&nbsp;PRINCIPAL
+                          </font>
+                        </button>
+                        <font class="auto-marca" *ngIf="details">&nbsp;&nbsp;>&nbsp;&nbsp;</font>
+                        <button mat-flat-button *ngIf="details">
+                          <font class="auto-title" style="font-size:14px;">{{ btnTexto }}</font>
+                        </button>
+                      </section>
+                    </div>
+                    <div class="col-md-6"></div>
+                  </div>
                 </mat-list>
               </mat-selection-list>
 
-              <mat-selection-list style="margin-top: -10px;padding: 15px; width: 100%;">
+
+              <mat-selection-list *ngIf="blNavegacion" style="margin-top: -10px;padding: 15px; width: 100%;">
                 <mat-list *ngFor="let e of bzRecibido; let i=index "
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                  <div class="row">
+                  <div class="row" >
                     <div class="col-md-1">
                       <button mat-icon-button aria-label="Visibilidad" class="text-grey"
                         (click)="open(observacion, e.idd, i)" id="procesados">
@@ -120,18 +137,37 @@
                         <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
                           style="width: 20px;margin-top: 4px;" />
                       </a>
-                      <button mat-icon-button aria-label="Privado">
+                      <!-- <button mat-icon-button aria-label="Privado">
                         <mat-icon class="text-grey" style="font-size: 27px;margin-top: 2px;"
                           (click)="MoverForm(e)">preview</mat-icon>
-                      </button>
+                      </button> -->
                     </div>
 
                   </div>
+                  
+                  
                 </mat-list>
               </mat-selection-list>
+
+              <div class="row" *ngIf="!blNavegacion" style="padding: 20px;">
+                <div class="col-md-2 cardround" *ngFor="let e of lstEstados">
+                  <a routerLinkActive="active" (dblclick)="listarDocumentos(e)">
+                    <div class="text-center botones" >
+                      <br>
+                      <h2 class="text-center" style="color: rgb(160, 184, 230);" >
+                        <i class="fa fa-folder" style="font-size: 54px;"  mat-raised-button matBadge="7" [matBadgeHidden]="hidden"></i>
+                      </h2>
+                      <p style="font-weight: bold;font-family: Roboto;">{{e.nomb | uppercase}}</p>
+                
+                      
+                    </div>
+                  </a>
+                </div>
+              </div>
+
               <br>
 
-              <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+              <mat-paginator  *ngIf="blNavegacion"  [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
                 [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
               </mat-paginator>
 
@@ -281,7 +317,7 @@
                 <div class="col-md-9">
 
                   <div class="row">
-                    <!-- <div class="col-md-2 cardround" *ngFor="let e of lstCarpetas">
+                    <div class="col-md-2 cardround" *ngFor="let e of lstCarpetas">
                       <a routerLinkActive="active">
                         <div class="text-center botones">
                           <br>
@@ -293,7 +329,7 @@
                           
                         </div>
                       </a>
-                    </div> -->
+                    </div>
                     <!-- <div *ngIf="showContextMenu" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                       <a class="dropdown-item" (click)="eliminar()">Eliminar</a>
                       <a class="dropdown-item" (click)="copiar()">Copiar</a>
