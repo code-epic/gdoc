@@ -1,6 +1,6 @@
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
@@ -11,13 +11,6 @@ import { NgWizardModule, NgWizardConfig, THEME } from 'ng-wizard';
 import { AppRoutingModule } from './app.routing';
 import { ComponentsModule } from './components/components.module';
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatCheckboxModule } from '@angular/material/checkbox'
-import { MatListModule } from '@angular/material/list'
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CustomPaginator } from './paginator-intl';
 // import { ControlComponent } from './views/control/control.component';
@@ -32,9 +25,6 @@ import { PersonalComponent } from './views/personal/personal.component';
 // import { BuzonComponent } from './views/control/buzon/buzon.component';
 // import { SalidasComponent } from './views/control/salidas/salidas.component';
 import { ProyectoComponent } from './views/ayudantia/procesos/proyecto/proyecto.component';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { NgxUiLoaderModule, NgxUiLoaderConfig } from "ngx-ui-loader";
 
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatCommonModule, MatNativeDateModule } from '@angular/material/core';
@@ -106,7 +96,8 @@ import { GrallibroComponent } from './views/generales/grallibro/grallibro.compon
 import { TableGrallibroModalComponent } from './views/generales/grallibro/modal/table-grallibro-modal/table-grallibro-modal.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatBadgeModule } from '@angular/material/badge';
-
+import {SharedModule} from './shared/shared.module';
+import { RecibidosFieldsNavComponent } from './views/resoluciones/rsbuzon/recibidos-fields-nav/recibidos-fields-nav.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -151,50 +142,26 @@ const ngWizardConfig: NgWizardConfig = {
     FormsModule,
     HttpClientModule,
     ComponentsModule,
-    MatFormFieldModule,
-    MatAutocompleteModule,
+
     NgbModule,
     RouterModule,
     AppRoutingModule,
     TabsModule.forRoot(),
-    MatTabsModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTreeModule,
-    MatCheckboxModule,
-    MatRadioModule,
-    MatExpansionModule,
-    MatButtonToggleModule,
-    MatBadgeModule,
-    AutocompleteLibModule,
-    MatSelectModule,
-    MatListModule,
-    ReactiveFormsModule,
-    MatInputModule,
-    MatPaginatorModule,
     NgWizardModule.forRoot(ngWizardConfig),
-    MatDialogModule,
-    MatCommonModule,
-    MatTooltipModule,
-    MatChipsModule,
-    MatBottomSheetModule,
+
     ToastContainerModule,
     AngularEditorModule,
     NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
-    MatToolbarModule,
-    MatDatepickerModule,
-    MatTableModule,
-    MatSnackBarModule,
     MatNativeDateModule,
     ToastrModule.forRoot({
       closeButton: false,
       newestOnTop: false,
       progressBar: true,
-      positionClass: "toast-top-right",
+      positionClass: 'toast-top-right',
       preventDuplicates: false
     }),
-    AngularFileUploaderModule
-
+    AngularFileUploaderModule,
+    SharedModule
   ],
   declarations: [
     AppComponent,
@@ -258,7 +225,8 @@ const ngWizardConfig: NgWizardConfig = {
     GralestadisticasComponent,
     GraledicionComponent,
     GrallibroComponent,
-    TableGrallibroModalComponent
+    TableGrallibroModalComponent,
+    RecibidosFieldsNavComponent
   ],
   providers: [
     {

@@ -23,14 +23,15 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatRadioModule } from '@angular/material/radio';
-
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-import { NgxUiLoaderModule, NgxUiLoaderConfig } from "ngx-ui-loader";
-
+import { NgxUiLoaderModule } from "ngx-ui-loader";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { AngularEditorModule } from '@kolkov/angular-editor';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatBadgeModule} from '@angular/material/badge';
+import {AutocompleteLibModule} from 'angular-ng-autocomplete';
+import {MatTableModule} from '@angular/material/table';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 
 @NgModule({
@@ -60,15 +61,17 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
     MatSnackBarModule,
     MatTreeModule,
     MatRadioModule,
-
+    MatSidenavModule,
     FormsModule,
     ReactiveFormsModule,
-
+    MatGridListModule,
     NgxUiLoaderModule,
 
     NgbModule,
-    
-    AngularEditorModule
+    AngularEditorModule,
+    MatBadgeModule,
+    AutocompleteLibModule,
+    MatTableModule
   ]
 })
 export class MaterialModule { }
