@@ -20,11 +20,34 @@ export class RecibidosFieldsNavComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.formSidenav.disable();
+    this.reactiveForm();
   }
 
   close() {
     this.closeEvent.emit(false);
   }
 
+  reactiveForm(){
+    //SI QUIERES INHABILITAR TODO EL FORMULARIO:
+    /*
+    this.formSidenav.disable();
+    */
+
+    //SI QUIERES INHABILITAR SOLO UN INPUT O SELECT
+    /*
+    this.formSidenav.get('formControlNameAQUI').disable();
+    */
+
+    //QUIERES AGREGAR ALGUNA VALIDACION A SOLO UN CAMPO LUEGO DE SLECCIONAR OTRO CAMPO
+    /*
+    his.formSidenav.get('formControlNameAQUI').setValidators([AQUI VA LA VALIDACION, ANGULAR TE TRAE UNAS CUANTAS POR DEFECTO Validators.required, Validators.regex('a-z')]);
+     */
+
+    // QUIERES SABER CUANDO UN USER ESCRIBA EN UN CAMPO ESPECIFICO:
+    /*
+    this.formSidenav.get('formControlNameAQUI').valueChanges.subscribe((value) => {
+      console.log("VALUE", value);
+    });
+    */
+  }
 }
