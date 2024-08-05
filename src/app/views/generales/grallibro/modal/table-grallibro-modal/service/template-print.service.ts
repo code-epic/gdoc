@@ -113,8 +113,12 @@ export class TemplatePrintService {
         
         body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:Calibri; font-size:11px }
         </style>`
-        // printWindow?.document.close();
-        // printWindow?.print();
-        // printWindow?.close();
+
+        setTimeout( () => {
+            printWindow?.document.close();
+            printWindow?.print();
+            printWindow?.close();
+        }, 3000); //3 seconds
+
     }
 }
