@@ -23,7 +23,8 @@ export class TemplatePrintService {
                 size: landscape; 
             
             }
-            body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Roboto"; font-size:x-small }
+            body{ width: 1200px }
+            div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Roboto"; font-size:x-small }
             section { 
                 page-break-before: always; 
             }
@@ -118,7 +119,9 @@ export class TemplatePrintService {
             printWindow?.document.close();
             printWindow?.print();
             printWindow?.close();
-        }, 3000); //3 seconds
+        }, 2000); //2 seconds
+        // pero hay un bug, es necesario cambiar el query para que retorna una paginacion 10 of 10 u 100 of 100.
+        // TODO cambiar request a paginado.
 
     }
 }
