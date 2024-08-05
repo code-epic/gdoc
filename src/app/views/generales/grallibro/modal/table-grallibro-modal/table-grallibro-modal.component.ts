@@ -59,11 +59,11 @@ export class TableGrallibroModalComponent implements OnInit {
         this.lstGenerales.forEach((element, index) => {
             items.push({...element, index: (index + 1)});
 
-            if (items.length === 8) {
+            if (items.length === 6) {
                 listFourGenerales.push(...items);
                 items.length = 0;
             } else if (listFourGenerales.length > 1) {
-                if (items.length === 6) {
+                if (items.length === 4) {
                     listSixGenerales.push(...items);
                     items.length = 0;
                 } else if ((this.lstGenerales.length - 1) === index) {
@@ -72,23 +72,23 @@ export class TableGrallibroModalComponent implements OnInit {
                 }
             }
         });
-        const first = listFourGenerales.slice(0, 4);
-        const second = listFourGenerales.slice(4, listFourGenerales.length);
+        const first = listFourGenerales.slice(0, 3);
+        const second = listFourGenerales.slice(3, listFourGenerales.length);
 
         this.firstElements = [];
         this.firstElements.push({column1: first, column2: second});
 
         const element = [];
-        for (let i = 0; i < listSixGenerales.length; i += 6) {
+        for (let i = 0; i < listSixGenerales.length; i += 4) {
 
-            const iterator = listSixGenerales.slice(i, i + 6);
+            const iterator = listSixGenerales.slice(i, i + 4);
             element.push([...iterator]);
             if (element.length === 2) {
                 this.secondElements.push({
                     column1: element[0], column2: element[1]
                 });
                 element.length = 0;
-            } else if (iterator.length < 6) {
+            } else if (iterator.length < 4) {
                 this.secondElements.push({
                     column1: element[0]
                 });
