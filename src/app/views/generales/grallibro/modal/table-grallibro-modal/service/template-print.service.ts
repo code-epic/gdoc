@@ -76,7 +76,7 @@ export class TemplatePrintService {
         .logo { margin-right: 10px; }
         .logo img { max-height: 50px; }
         .cabecera {font-weight: bold; }
-        .nombre { font-size:9px; }
+        .nombre { font-size:8px; }
         table {
             border-collapse: collapse; width: 100%;
             font-family: sans-serif;

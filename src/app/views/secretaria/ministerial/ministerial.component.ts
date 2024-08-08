@@ -153,6 +153,7 @@ export class MinisterialComponent implements OnInit {
   @ViewChild('templateBottomSheet') TemplateBottomSheet: TemplateRef<any>;
   hashcontrol: string;
   lblFile: any;
+  blOficio : boolean = false
 
 
   constructor(
@@ -260,26 +261,32 @@ export class MinisterialComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.lstCuenta = data.Cuerpo.map(e => {
-          console.log(data);
+          // console.log(data);
           e.completed = false
           return e
         })
-        
+        // console.info('impresion : ', this.lstCuenta)
+        this.cargarDatosBase(this.lstCuenta)
+
         if (this.lstCuenta[0].cuenta != '' && this.lstCuenta[0].cuenta != null) {
-          this.asunto = this.lstCuenta[0].resumen
-          this.cuenta = this.lstCuenta[0].cuenta
-          this.fecha = this.lstCuenta[0].fecha.substring(0,10) 
-          this.codigohash = btoa(this.doc.id + this.doc.idd + this.cuenta)
-          this.lstCuenta[0].completed = false
-          this.parametros = this.cuenta + ',' + this.doc.udep + ' ' + this.doc.fori.substring(0,10)
-          // console.log( this.lstCuenta, 'la nota pues')
           this.cargarPuntoCuentas()
+          this.blOficio = true
         }else{
-          this.toastrService.warning('Por favor verifique el punto de cuenta con Control de Gestion', `GDoc Wkf.CSubDocumentoID`);
+          this.blOficio = false
+          //this.toastrService.warning('Por favor verifique el punto de cuenta con Control de Gestion', `GDoc Wkf.CSubDocumentoID`);
         }
       },
       (error) => { }
     )
+  }
+
+  cargarDatosBase(e) {
+    this.asunto = e[0].resumen==null?e[0].cont:e[0].resumen
+    this.cuenta = e[0].cuenta
+    this.fecha = e[0].fecha == null? e[0].fech.substring(0,10): e[0].fecha.substring(0,10)
+    this.codigohash = btoa(this.doc.id + this.doc.idd + this.cuenta)
+    e[0].completed = false
+    this.parametros = this.cuenta + ',' + this.doc.udep + ' ' + this.doc.fori.substring(0,10)
   }
 
   open(content, id) {

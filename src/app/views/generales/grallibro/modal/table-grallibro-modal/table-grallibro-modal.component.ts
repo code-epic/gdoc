@@ -155,7 +155,9 @@ export class TableGrallibroModalComponent implements OnInit {
     }
 
     filtrarNombramiento(e): string {
-        let nmb = JSON.parse(e).filter(e => {
+        let otro_cargo = e.cargo;
+
+        let nmb = JSON.parse(e.resoluciones).filter(e => {
             return e.tipo != 13;
         }).sort( (a, b) => {
             if (a.fecha > b.fecha) {
@@ -172,7 +174,7 @@ export class TableGrallibroModalComponent implements OnInit {
             if (nmb[0].asunto === undefined ) {
                 texto = '';
             } else {
-                texto = nmb[0].asunto + `<br> RESOL. <br> ${nmb[0].numero} <br> ${nmb[0].fecha}<br>`
+                texto = nmb[0].asunto + `<br> RESOL. ${nmb[0].numero} <br> ${nmb[0].fecha}<br> ${otro_cargo}` 
             }
         } else {
             texto = 'SIN NOMBRAMIENTO';
@@ -181,7 +183,8 @@ export class TableGrallibroModalComponent implements OnInit {
     }
 
     filtrarAscenso(e) {
-        let asc = JSON.parse(e).filter(e => {
+        let estudios = e.estudios == ''?'1 DE 1': e.estudios
+        let asc = JSON.parse(e.resoluciones).filter(e => {
             return e.tipo == 13;
         }).sort((a, b) => {
             if (a.fecha > b.fecha) {
@@ -194,8 +197,8 @@ export class TableGrallibroModalComponent implements OnInit {
         });
         let texto = ''
         if (asc.length !== 0) {
-            let pos = asc[0].orden == 0 ? '1 DE 1' : asc[0].orden + ' DE ' + asc[0].cantidad
-            texto =  `RESOL. <br> ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${pos}`
+            let pos = asc[0].orden == 0 ? estudios : asc[0].orden + ' DE ' + asc[0].cantidad
+            texto =  `RESOL. ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${pos}`
         } else {
             texto = 'SIN RESUELTO'
         }
