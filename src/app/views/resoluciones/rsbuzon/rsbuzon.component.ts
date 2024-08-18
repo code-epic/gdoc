@@ -160,9 +160,7 @@ export class RsbuzonComponent implements OnInit {
 
     }
 
-    principal() {
 
-    }
 
     listarDocumentos(e) {
         console.log(e);
@@ -175,6 +173,7 @@ export class RsbuzonComponent implements OnInit {
         this.xAPI.valores = '';
         this.selNav = e;
 
+        console.log('entrando...', e)
         switch (e) {
             case 0:
                 // this.cargarAcciones(0);
@@ -205,8 +204,6 @@ export class RsbuzonComponent implements OnInit {
 
 
     async listarBuzon(tipo: number) {
-
-
         if (tipo == 0) {
             if (this.bzRecibido.length > 0) {
                 return;
@@ -219,8 +216,6 @@ export class RsbuzonComponent implements OnInit {
         }
         console.log('iniciando');
         this.cargarInformacion(tipo);
-
-
     }
 
     async cargarInformacion(tipo) {

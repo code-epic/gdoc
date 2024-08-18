@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { Avance } from 'src/app/services/ayudantia/proyecto.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { NgbModal, NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
 
@@ -47,6 +46,7 @@ export class RsprocesosComponent implements OnInit {
   public menu = true
   public generales = false
   public entradas = false
+  public aentradas = false
   public eliminaciones = false
   public lstHistorico = []
   public blHistorico = false
@@ -136,7 +136,7 @@ export class RsprocesosComponent implements OnInit {
       this.menu = true
       this.dbasico = false
       this.aresolucion = false
-      this.entradas = false
+      this.aentradas = false
       this.masivo = false
       this.lotes = false
       this.generales = false

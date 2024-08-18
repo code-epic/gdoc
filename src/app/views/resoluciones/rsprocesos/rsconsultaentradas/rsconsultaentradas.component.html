@@ -1,0 +1,161 @@
+<ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
+<mat-tab-group mat-stretch-tabs class="example-stretched-tabs" [selectedIndex]="selected.value"
+  (selectedIndexChange)="selected.setValue($event)">
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      &nbsp;GENERAL
+    </ng-template>
+    <br><br>
+
+    <div *ngIf="!bEntradas">
+      <div class="form-row">
+        <div class="col-md-3">
+          <mat-form-field class="example-form-field" appearance="outline">
+            <mat-label>Rango del resuelto</mat-label>
+            <mat-date-range-input [formGroup]="fechaRango" [rangePicker]="fechaRangoPicker"
+              [comparisonStart]="fechaRango.value.start" [comparisonEnd]="fechaRango.value.end">
+              <input matStartDate placeholder="Start date" formControlName="start">
+              <input matEndDate placeholder="End date" formControlName="end">
+            </mat-date-range-input>
+
+            <mat-datepicker-toggle matSuffix [for]="fechaRangoPicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #fechaRangoPicker></mat-date-range-picker>
+          </mat-form-field>
+        </div>
+        <div class="col-md-3">
+          <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Formato del Documento</mat-label>
+            <mat-select placeholder="Documento" [ngModelOptions]="{standalone: true}" [(ngModel)]="tipo">
+              <mat-option value="%">TODOS</mat-option>
+              <mat-option value="0">RESOLUCION</mat-option>
+              <mat-option value="1">ORDEN GENERAL</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label>Estatus</mat-label>
+            <mat-select placeholder="Documento" [ngModelOptions]="{standalone: true}" [(ngModel)]="estatus">
+              <mat-option value="%">TODOS</mat-option>
+              <mat-option *ngFor="let e of Estados;" [value]="e.cod_estado_resol">{{e.des_estado_resol}}</mat-option>
+
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-2">
+          <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+            <mat-label style="width:100%">Número</mat-label>
+
+            <input matInput placeholder="Numero" [ngModelOptions]="{standalone: true}" [(ngModel)]="numero"
+              value="{{numero}}">
+            <mat-icon matSuffix>folder</mat-icon>
+
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-12">
+          <textarea class="form-control" cols="30" rows="2" [ngModelOptions]="{standalone: true}" [(ngModel)]="asunto"
+            placeholder="Introduzca el asunto..." style="width: 100%">{{asunto}}</textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-12">
+
+          <textarea class="form-control" cols="30" rows="2" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="observacion" placeholder="Introduzca la observacion..."
+            style="width: 100%">{{observacion}}</textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-12 text-right">
+          <button class="btn bg-success text-white " (click)="Consultar();">
+            <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar listado
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row" style="padding-top: 5px" *ngIf="bEntradas">
+      <div class="col-md-9">
+          <h2 style="margin-top: 10px; margin-left: -3px">
+              LISTADO GENERAL DE ENTRADAS</h2>
+      </div>
+      <div class="col-md-3">
+
+          <div
+              class="example-button-row text-right text-white">
+              <button style="background-color: #2a9a17;" mat-icon-button
+                  title="Volver Atrás" (click)="volverFrm()">
+                  <mat-icon>open_in_browser</mat-icon>
+              </button>
+          </div>
+          <!-- <div *ngIf="blDatosBasicos"
+              class="example-button-row text-right text-white">
+              <button style="background-color: #2a9a17;" mat-icon-button
+                  title="Editar datos Basicos" (click)="editarDatosBasicos()">
+                  <mat-icon>manage_accounts</mat-icon>
+              </button>
+          </div> -->
+
+      </div>
+  </div>
+
+    <div class="row" *ngIf="bEntradas">
+      <div class="col-md-12">
+
+        <table style="width: 100%;" class="zigzag" border="1">
+          <thead>
+
+            <tr>
+              <th>NUM.</th>
+              <th>FECHA</th>
+              <th>CEDULA</th>
+              <th>GRADO</th>
+              <th>NOMBRES Y APELLIDOS</th>
+              <th>CUENTA U OFICIO</th>
+              <th>ESTATUS</th>
+              <th>ASUNTO</th>
+              <th>ACC</th>
+
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of lstEntradas;let i = index">
+              <td>{{ i+1 }}</td>
+              <td>{{ convertirFecha(e.fecha_entrada)}}</td>
+              <td>
+                <a class="enlace" (click)="dwUrlEntrada(e)" target="_blank" style="font-weight: bold; color: brown;">
+                  {{ e.cedula_entrada }} </a>
+              </td>
+              <td>{{ e.grado }}</td>
+              <td>{{ e.nombre }}</td>
+              <td>{{ e.cuenta_oficio }}</td>
+              <td>{{ e.estatus_descripcion }}</td>
+              <td [innerHTML]="e.asunto | uppercase"></td>
+              <td style="text-align: center;">
+                <button mat-icon-button aria-label="Editar" (click)="detalleEntrada( frmEntrada, e )">
+                  <mat-icon class="text-blue">notes</mat-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+
+      </div>
+    </div>
+
+
+
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      &nbsp;AVANZADAS
+    </ng-template>
+
+  </mat-tab>
+</mat-tab-group>

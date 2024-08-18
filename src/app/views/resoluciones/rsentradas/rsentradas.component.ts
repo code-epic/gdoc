@@ -15,11 +15,9 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 
 
 export interface ITipoResolucion {
-  cod_tipo_resol: string
-  des_resol: string
-
+  codigo: string
+  nombre: string
 }
-
 
 
 @Component({
@@ -90,7 +88,6 @@ export class RsentradasComponent implements OnInit {
   public Categorias: any
   public Clasificaciones: any
   public TipoEntradas: any
-  public TipoResoluciones: any
   public Estados: any
   public Carpetas: any
   public OrdenNumero: any
@@ -145,37 +142,48 @@ export class RsentradasComponent implements OnInit {
     observacion: ''
   }
 
-  public lstResoluciones: any
-  public lstEntradas: any
-  public lstT = [] //Objeto Tipo documento
-  public lstR = [] //Objeto Remitente
-  public lstU = [] //Objeto Unidad
-  public lstCuenta = [] //Objeto Unidad
+  lstResoluciones: any
+  lstEntradas: any
+  lstT = [] //Objeto Tipo documento
+  lstR = [] //Objeto Remitente
+  lstU = [] //Objeto Unidad
+  lstCuenta = [] //Objeto Unidad
 
-  public lstHzAdjunto = [] //Historico de documentos adjuntos
-  public lstTraza = []
-  public lstHistorial = []
-  public lstImg = []
-  public titulo = 'Documento'
+  lstHzAdjunto = [] //Historico de documentos adjuntos
+  lstTraza = []
+  lstHistorial = []
+  lstImg = []
+  titulo = 'Documento'
 
-  public bHistorial = false
-  public bPDF = false
+  bHistorial = false
+  bPDF = false
 
-  public nControl = ''
+  nControl = ''
 
-  public value = ''
+  value = ''
 
-  public download: any
+  download: any
 
-  public bHist = false
-  public unidad: string = ''
-  public asunto: string = ''
-  public nombramiento : string = ''
-  public xasunto : string = ''
+  bHist = false
+  bSecretaria = false
+  editar_datos = false
+  unidad: string = ''
+  asunto: string = ''
+  nombramiento: string = ''
+  xasunto: string = ''
 
-  filteredOptions: Observable<ITipoResolucion[]>;
-  myControl = new FormControl();
-  public CuentaGenera: any
+  filteredOptions: Observable<ITipoResolucion[]>
+  myControl = new FormControl()
+  TipoResoluciones: any
+  
+  
+  CuentaGenera: any
+
+  color = "#e3e6e6"
+  hashcontrol = ''
+  tipo: any
+  public archivos: any
+
 
 
   constructor(private apiService: ApiService,
@@ -209,13 +217,14 @@ export class RsentradasComponent implements OnInit {
     this.OrdenNumero = sessionStorage.getItem("MPPD_COrdenEntrada") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_COrdenEntrada"))) : []
 
 
-    
+
 
     this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map(value => (typeof value === 'string' ? value : value?.name)),
-      map(name => (name ? this._filter(name) : this.TipoResoluciones.slice())),
-    );
+      startWith(""),
+      map((value) => (typeof value === "string" ? value : value?.name)),
+      map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
+    )
+
 
 
   }
@@ -250,7 +259,7 @@ export class RsentradasComponent implements OnInit {
 
         });
 
-        
+
 
         //this.selTipoDocumento()
         const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
@@ -294,63 +303,88 @@ export class RsentradasComponent implements OnInit {
    * Consultar datos generales del militar 
    */
   consultarCedula() {
-    if(this.Resolucion.cedula == '') return false
+    if (this.Resolucion.cedula == "") return false
+
     this.ngxService.startLoader("loader-buscar")
-    this.xAPI.funcion = 'MPPD_CDatosBasicos'
+    this.xAPI.funcion = "MPPD_CDatosBasicos"
     this.xAPI.parametros = this.Resolucion.cedula
     this.xAPI.valores = ''
+
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data.Cuerpo[0])
-        this.Resolucion = data.Cuerpo[0]
+        console.log(data)
+        if (data != undefined && data.Cuerpo.length > 0) {
+          this.Resolucion = data.Cuerpo[0]
 
-        this.Resolucion.componente = this.Componentes.filter(e => {return e.cod_componente ==  this.Resolucion.componente })[0].nombre_componente
-        this.Resolucion.categoria = this.Categorias.filter(e => {return e.cod_categoria ==  this.Resolucion.categoria })[0].nombre_categoria
-        this.Resolucion.clasificacion = this.Clasificaciones.filter(e => {return e.cod_clasificacion ==  this.Resolucion.clasificacion })[0].des_clasificacion
-        this.Resolucion.grado = this.Grados.filter(e => {return e.cod_grado ==  this.Resolucion.grado })[0].nombres_grado
-        
-        if (data.Cuerpo[0].resoluciones != undefined && data.Cuerpo[0].resoluciones != ''){
-          this.lstResoluciones =  JSON.parse(data.Cuerpo[0].resoluciones).reverse()
-          this.filtrarNombramiento()
+          this.Resolucion.componente = this.Componentes.filter((e) => {
+            return e.cod_componente == this.Resolucion.componente
+          })[0].nombre_componente
+          this.Resolucion.categoria = this.Categorias.filter((e) => {
+            return e.cod_categoria == this.Resolucion.categoria
+          })[0].nombre_categoria
+          this.Resolucion.clasificacion = this.Clasificaciones.filter((e) => {
+            return e.cod_clasificacion == this.Resolucion.clasificacion
+          })[0].des_clasificacion
+          this.Resolucion.gran_comando = this.Grados.filter((e) => {
+            return e.cod_grado == this.Resolucion.grado
+          })[0].nombres_grado
+
+          if (
+            data.Cuerpo[0].resoluciones != undefined &&
+            data.Cuerpo[0].resoluciones != ""
+          ) {
+            this.lstResoluciones = JSON.parse(
+              data.Cuerpo[0].resoluciones
+            ).reverse()
+            this.filtrarNombramiento()
+          }
+          if (
+            data.Cuerpo[0].entradas != undefined &&
+            data.Cuerpo[0].entradas != ""
+          ) {
+            this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse()
+          }
+          this.editar_datos = true
+          //this.cargarGradosIPSFA(this.Resolucion.n_componente)
+          this.hashcontrol = btoa("RE" + this.Resolucion.cedula) //Cifrar documentos
+
         }
-        if (data.Cuerpo[0].entradas != undefined && data.Cuerpo[0].entradas != ''){
-          this.lstEntradas = JSON.parse(data.Cuerpo[0].entradas).reverse()
-        }
-       
+
 
         this.ngxService.stopLoader("loader-buscar")
       },
       (error) => {
         console.error("Error de conexion a los datos ", error)
       }
-
     )
 
   }
 
-  filtrarNombramiento () {
+  filtrarNombramiento() {
 
     console.log(this.lstResoluciones)
-    const nombramiento =  this.lstResoluciones[0]
+    const nombramiento = this.lstResoluciones[0]
 
     this.nombramiento = nombramiento.titulo + ' - ' + nombramiento.tipo_descripcion
-    this.xasunto = nombramiento.asunto.substring(0,100)
-    
+    this.xasunto = nombramiento.asunto.substring(0, 120)
+
   }
-  verHistorialMilitar(){
+  verHistorialMilitar() {
 
   }
 
   displayFn(tr: ITipoResolucion): string {
-    return tr && tr.des_resol ? tr.des_resol : '';
+    return tr && tr.nombre ? tr.nombre : ""
   }
 
   private _filter(name: string): ITipoResolucion[] {
-    const filterValue = name.toLowerCase();
+    const filterValue = name.toLowerCase()
 
-    return this.TipoResoluciones.filter(option => option.des_resol.toLowerCase().includes(filterValue));
+    return this.TipoResoluciones.filter((option) =>
+      option.nombre.toLowerCase().includes(filterValue)
+    )
   }
-
 
   verHistorial() {
     const estado = 1
@@ -377,6 +411,21 @@ export class RsentradasComponent implements OnInit {
   verArchivos(content) {
     this.modalService.open(content, { size: 'lg' })
 
+  }
+
+  seleccionTipo() {
+    // this.desactivarVista()
+    if (this.Resolucion.cedula == "") {
+      // this._snackBar.open("Debe seleccionar una cedula", "OK")
+      return
+    }
+
+    
+  }
+
+
+  fileSelected(e) {
+    this.archivos.push(e.target.files[0])
   }
 
 }

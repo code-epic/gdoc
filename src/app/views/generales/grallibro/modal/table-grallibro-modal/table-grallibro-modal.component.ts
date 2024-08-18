@@ -70,13 +70,13 @@ export class TableGrallibroModalComponent implements OnInit {
 
             const first = listFourGenerales.slice(0, 4);
             const second = listFourGenerales.slice(4, listFourGenerales.length);
-            console.log("second", second);
-            console.log("first", first);
+            // console.log("second", second);
+            // console.log("first", first);
             
             this.firstElements = [];
             this.firstElements.push({column1: first, column2: second});
             this.secondElements = [];
-            console.log("firstElements", this.firstElements);
+            //console.log("firstElements", this.firstElements);
         }else {
 
        
@@ -130,7 +130,8 @@ export class TableGrallibroModalComponent implements OnInit {
     }
 
     filtrarNombramiento(e): string {
-        let otro_cargo = e.cargo;
+        console.log(e)
+        let otro_cargo = e.cargo
 
         let nmb = JSON.parse(e.resoluciones).filter(e => {
             return e.tipo != 13;
@@ -158,7 +159,7 @@ export class TableGrallibroModalComponent implements OnInit {
     }
 
     filtrarAscenso(e) {
-        let estudios = e.estudios == ''?'1 DE 1': e.estudios
+        let area = e.area == ''?'1 DE 1': e.area
         let asc = JSON.parse(e.resoluciones).filter(e => {
             return e.tipo == 13;
         }).sort((a, b) => {
@@ -172,7 +173,7 @@ export class TableGrallibroModalComponent implements OnInit {
         });
         let texto = ''
         if (asc.length !== 0) {
-            let pos = asc[0].orden == 0 ? estudios : asc[0].orden + ' DE ' + asc[0].cantidad
+            let pos = asc[0].orden == 0 ? area : asc[0].orden + ' DE ' + asc[0].cantidad
             texto =  `RESOL. ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${pos}`
         } else {
             texto = 'SIN RESUELTO'
@@ -182,5 +183,9 @@ export class TableGrallibroModalComponent implements OnInit {
 
     setDefaultPic(event: any) {
         event.target.src = this.utils.imgNoDisponible;
+    }
+
+    getEscudo(comp) : string {
+        return comp=='%'?'mppd.png': comp +'.jpeg'
     }
 }

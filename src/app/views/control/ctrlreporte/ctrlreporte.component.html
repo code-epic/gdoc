@@ -94,9 +94,9 @@
                     <td>{{ i+1 }}</td>
                     
                     <td>{{ e.numero }}/{{ e.creacion | date:"dd/MM/yyyy" }}</td>
-                    <td>{{ e.comando | uppercase }}</td>
+                    <td [innerHTML]="e.dependencia | uppercase" style="width: 300px;"></td>
                     <td>{{ "" | uppercase }}</td> 
-                    <td [innerHTML]="e.contenido" style="width: 30%;"></td>
+                    <td [innerHTML]="e.contenido | uppercase" style="width: 300px;"></td>
                     <td>{{ "" | uppercase }}</td>
                    
                   </tr>

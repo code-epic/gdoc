@@ -98,6 +98,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatBadgeModule } from '@angular/material/badge';
 import {SharedModule} from './shared/shared.module';
 import { RecibidosFieldsNavComponent } from './views/resoluciones/rsbuzon/recibidos-fields-nav/recibidos-fields-nav.component';
+import { RsconsultaentradasComponent } from './views/resoluciones/rsprocesos/rsconsultaentradas/rsconsultaentradas.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -226,7 +227,8 @@ const ngWizardConfig: NgWizardConfig = {
     GraledicionComponent,
     GrallibroComponent,
     TableGrallibroModalComponent,
-    RecibidosFieldsNavComponent
+    RecibidosFieldsNavComponent,
+    RsconsultaentradasComponent
   ],
   providers: [
     {

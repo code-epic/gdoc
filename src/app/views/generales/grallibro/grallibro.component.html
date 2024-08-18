@@ -52,21 +52,22 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label for="">Componente</label>
                             <select class="form-control" 
                                 [ngModelOptions]="{standalone: true}" 
                                 [(ngModel)]="componente"
-                                (change)="consultarEspecialidades()"
+                                (change)="consultarEspecialidades(); consultarEstudios()"
                                     value="{{componente}}">
                                 <option value="0">SELECCIONAR COMPONENTE</option>
+                                <option value="%">TODOS LOS COMPONENTES</option>
                                 <option *ngFor="let e of Componentes;"
                                         [value]="e.cod_componente + '|' + e.nombre_componente">{{ e.nombre_componente }}
                                 </option>
                             </select>
                         </div>
 
-                        <div class="form-group col-md-2">
+                        <div class="form-group col-md-3">
                             <label for="">Situación</label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="situacion"
                                     value="{{situacion}}">
@@ -74,7 +75,8 @@
                                     <option value="RINC">REINCORPORADO</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-2">
+
+                        <div class="form-group col-md-3">
                             <label for="">Promoción</label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="promocion"
                                     value="{{promocion}}">
@@ -84,14 +86,55 @@
                                 </option>
                             </select>
                         </div>
+                       
 
-                        <div class="form-group col-md-2">
+                        <div class="form-group col-md-4">
+                            <label for="">Categoria</label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="categoria"
+                                    value="{{categoria}}">
+                            <option value="%">TODAS</option>    
+                            <option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}
+                            </option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="">Clasificación</label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="clasificacion"
+                                    value="{{clasificacion}}">
+                            <option value="%">TODAS</option>    
+                            <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
+                                {{e.des_clasificacion}}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="">Grado</label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="grado"
+                                    value="{{grado}}">
+                            <option value="%">TODOS</option>    
+                            <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
+                            </select>
+                        </div>
+
+                       
+
+                        <div class="form-group col-md-4">
                             <label for="">Especialidad</label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="especialidad"
                                     value="{{especialidad}}">
                                 <option value="%">TODAS</option>
                                 <option *ngFor="let e of lstEspecialidad;"
                                         [value]="e.especialidad">{{ e.especialidad | uppercase }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="">Estudios</label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="estudios"
+                                    value="{{estudios}}">
+                                <option value="%">TODAS</option>
+                                <option *ngFor="let e of lstEstudios;"
+                                        [value]="e.estudios">{{ e.estudios | uppercase }}
                                 </option>
                             </select>
                         </div>

@@ -194,6 +194,7 @@ export class RsconsultaComponent implements OnInit {
   public blConfidencial: boolean = false
   public blDatosBasicos: boolean = false
   public valEdit: boolean = false
+  public valEditEntrada: boolean = false
 
   public dbTools: boolean = false
 
@@ -273,6 +274,23 @@ export class RsconsultaComponent implements OnInit {
     segundos: '',
     contenido: ''
   }
+
+  cuenta = ''
+  digital = ''
+  documento = ''
+  numero = ''
+  responsable_entrada = ''
+  registrado_entrada = ''
+  
+  modificado_entrada = ''
+  carpeta_entrada = ''
+  acto = 'RESOLUCION'
+  estatus_entrada = ''
+  tipo_entrada = ''
+  asunto_entrada = ''
+  observacion_entrada = ''
+  opttodos = "0"
+
 
   constructor(
     private apiService: ApiService,
@@ -369,6 +387,8 @@ export class RsconsultaComponent implements OnInit {
     const today = new Date()
     const month = today.getMonth()
     const year = today.getFullYear()
+
+    this.opttodos = "0"
 
     this.fechaRango = new FormGroup({
       start: new FormControl(new Date(year, month, 13)),
@@ -1163,6 +1183,9 @@ export class RsconsultaComponent implements OnInit {
     this.valEdit = true;
   }
 
+
+
+
   ConsultaExpandida() {
     this.xAPI.funcion = "MPPD_CCedulaRango";
     this.xAPI.parametros = "cedula##" + this.rango_cedula;
@@ -1286,6 +1309,26 @@ export class RsconsultaComponent implements OnInit {
     //Listar los archivos asociados al documento
     this.getResueltoID(e.id);
     this.modalService.open(content, { size: "lg" });
+  }
+
+
+  detalleEntrada(content, e) {
+    this.modalService.open(content, { size: "lg" });
+    console.log(e)
+    this.valEditEntrada = true;
+    this.documento = e.cod_acto==1?'RESOLUCIÓN':'ORDEN GENERAL'
+    this.responsable_entrada = e.des_responsable
+    this.registrado_entrada = e.des_registrado
+    this.numero = e.numero_carpeta
+    this.cuenta = e.cuenta_oficio
+    this.digital = e.digital
+    this.modificado_entrada = e.f_modificado
+    this.estatus_entrada = e.estatus_descripcion
+    this.tipo_entrada = e.des_tipo_entrada
+    this.asunto_entrada = e.asunto
+    this.observacion_entrada = e.observacion
+    this.carpeta_entrada = e.des_carpeta
+    
   }
 
   editarDatosBasicos() {

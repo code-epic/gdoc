@@ -5,6 +5,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import {MatDialog} from '@angular/material/dialog';
 import {TableGrallibroModalComponent} from './modal/table-grallibro-modal/table-grallibro-modal.component';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -19,11 +20,19 @@ export class GrallibroComponent implements OnInit {
   promocion = '%'
   especialidad = '%'
   estudios = '%'
+  grado = '%'
+  clasificacion = '%'
+  categoria = '%'
 
   Componentes = []
+  Grados = []
+  Categorias = []
+  Clasificaciones = []
+
   lstGenerales = []
   lstPromocion = []
   lstEspecialidad = []
+  lstEstudios = []
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -38,6 +47,7 @@ export class GrallibroComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     public dialog: MatDialog,
+    private toastrService: ToastrService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
   ) {
@@ -51,6 +61,19 @@ export class GrallibroComponent implements OnInit {
       sessionStorage.getItem('MPPD_CComponente') != undefined
         ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
         : []
+
+    this.Grados =
+    sessionStorage.getItem("MPPD_CGrado") != undefined
+      ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado"))).slice(0,8)
+      : [];
+    this.Categorias =
+      sessionStorage.getItem("MPPD_CCategorias") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias")))
+        : [];
+    this.Clasificaciones =
+      sessionStorage.getItem("MPPD_CClasificacion") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion")))
+        : [];
 
     await this.consultarPromociones()
   }
@@ -83,20 +106,44 @@ export class GrallibroComponent implements OnInit {
     )
   }
   
+  consultarEstudios(){
+    let cmp = this.componente.split('|')[0]
+    this.lstEspecialidad = []
+    this.xAPI.funcion = 'MPPD_CEstudios'
+    this.xAPI.parametros = cmp
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        console.log(data)
+        this.lstEstudios = data.Cuerpo
+      },
+      error => {}
+
+    )
+  }
 
 
   /**
    * 
    */
   consultarListado() {
+    
     let cmp = this.componente.split('|')[0]
     let sit = this.situacion
     let pro = this.promocion
     let esp = this.especialidad
     let est = this.estudios
+    if ( cmp == '0'){
+      this.toastrService.warning(
+        'Debe seleccionar un componente',
+        `GDoc Generales`
+      )
+      return
+    } 
 
+    let valorsql = this.grado=='%'?`DB.cod_grado <=8`: ` DB.cod_grado =${this.grado}`
     this.xAPI.funcion = 'MPPD_CLibroGenerales'
-    this.xAPI.parametros = cmp + ',' + sit + ',' + pro + ',' + esp + ',' + est
+    this.xAPI.parametros = cmp + ',' + sit + ',' + pro + ',' + esp + ',' + est + ',' + valorsql
     this.xAPI.valores = ''
 
     this.lstGenerales = []
