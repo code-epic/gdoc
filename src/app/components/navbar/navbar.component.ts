@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, Output, EventEmitter } from '@angular/core';
 import { ROUTES } from '../sidebar/sidebar.component';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { Router } from '@angular/router';
@@ -15,7 +15,7 @@ export class NavbarComponent implements OnInit {
   public focus;
   public listTitles: any[];
   public location: Location;
-
+  @Output() onChange = new EventEmitter<any>();
   public nombre : string = 'Analista'
 
   constructor(location: Location,  
@@ -49,6 +49,12 @@ export class NavbarComponent implements OnInit {
         }
     }
     return 'Principal';
+  }
+
+  booleanIsSidenav = false;
+  onChangeSidenav() {
+    this.booleanIsSidenav = !this.booleanIsSidenav;
+    this.onChange.emit(true);
   }
 
   cerrar(){

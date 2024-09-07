@@ -1,17 +1,36 @@
 <!-- Sidenav -->
-<mat-drawer-container class="example-container" autosize>
-  <mat-drawer #drawer class="example-sidenav" mode="side" opened>
+<mat-sidenav-container class="example-container" autosize>
+  <mat-sidenav #sidenav class="example-sidenav" mode="side" [opened]="opened">
     <app-sidebar></app-sidebar>
-  </mat-drawer>
-  <mat-drawer-content>
-    <div class="main-content">
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main-content" autosize [style]="opened == true ? 'margin-left: 250px;' : 'margin-left: 0'">
+    <!-- <div class="main-content"> -->
       <!-- Top navbar -->
-      <app-navbar></app-navbar>
+      <app-navbar (onChange)="onChangeSidenav($event)"></app-navbar>
       <!-- Pages -->
+
       <router-outlet></router-outlet>
-      <div class="container-fluid">
-        <!-- <app-footer></app-footer> -->
-      </div>
+      <!-- <div class="container-fluid"> -->
+      <!-- <app-footer></app-footer> -->
+      <!-- </div> -->
+    <!-- </div> -->
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<!-- <mat-drawer-container class="example-container" autosize> -->
+<!-- <mat-drawer #drawer class="example-sidenav" mode="side" opened> -->
+<!-- <app-sidebar></app-sidebar> -->
+<!-- </mat-drawer> -->
+<!-- <mat-drawer-content> -->
+<!-- <div class="main-content"> -->
+<!-- Top navbar -->
+<!-- <app-navbar></app-navbar> -->
+<!-- Pages -->
+<!-- <router-outlet></router-outlet> -->
+<!-- <div class="container-fluid"> -->
+<!-- <app-footer></app-footer> -->
+<!-- </div>
     </div>
   </mat-drawer-content>
-</mat-drawer-container>
+</mat-drawer-container> -->
