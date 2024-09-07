@@ -214,7 +214,8 @@ export class PendientesComponent implements OnInit {
           e.s_texto = "";
 
           if (e.s_estatus > 0 || e.s_estatus < 10) {
-            e.s_texto = e.s_estatus != null ? " - " + this.lstAcciones[e.s_estatus].texto : "";
+            if( this.lstAcciones[e.s_estatus] != undefined )
+              e.s_texto = e.s_estatus != null ? " - " + this.lstAcciones[e.s_estatus].texto : "";
           }
 
           switch (e.tdoc.toLowerCase()) {

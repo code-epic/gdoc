@@ -22,6 +22,12 @@ export class SministerialComponent implements OnInit {
 
   public estadoActual = 4
   public estadoOrigen = 2
+  fecha_desde = '-09-01'
+  fecha_hasta = '-09-30'
+  xyear = '2024'
+  public lstMeses = []
+  public lstYear = []
+  public xmeses = ''
 
   public paginador = 10
   public focus;
@@ -48,7 +54,7 @@ export class SministerialComponent implements OnInit {
 
   longitud = 0;
   pageSize = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 50,  100];
+  pageSizeOptions: number[] = [5, 10, 25, 50, 100];
 
   // MatPaginator Output
   pageEvent: PageEvent;
@@ -56,6 +62,7 @@ export class SministerialComponent implements OnInit {
   selNav = 0
 
   public buzon = []
+  public buzonResoluciones = []
   public bzOriginal = []
 
   public estilocheck = 'none'
@@ -81,13 +88,13 @@ export class SministerialComponent implements OnInit {
   public lstAcciones = []
 
   public cmbAcciones = [
-     
-      { 'valor': '0', 'texto': 'MINISTERIAL', 'visible': '1' },
-      { 'valor': '2', 'texto': 'PRESIDENCIAL', 'visible': '1' },
-      { 'valor': '3', 'texto': 'TRAMITACION POR ORDEN REGULAR', 'visible': '1' },
-      { 'valor': '4', 'texto': 'OTROS DOCUMENTOS', 'visible': '1' },
-      { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '0' },
-    ]
+
+    { 'valor': '0', 'texto': 'MINISTERIAL', 'visible': '1' },
+    { 'valor': '2', 'texto': 'PRESIDENCIAL', 'visible': '1' },
+    { 'valor': '3', 'texto': 'TRAMITACION POR ORDEN REGULAR', 'visible': '1' },
+    { 'valor': '4', 'texto': 'OTROS DOCUMENTOS', 'visible': '1' },
+    { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '0' },
+  ]
 
 
 
@@ -100,6 +107,7 @@ export class SministerialComponent implements OnInit {
 
   public posicionPagina = 0
   public placement = 'bottom'
+  public xTipo = ''
 
 
   constructor(
@@ -113,33 +121,38 @@ export class SministerialComponent implements OnInit {
     private rutaActiva: ActivatedRoute,
     private modalService: NgbModal) {
     config.backdrop = 'static';
-    
+
     config.keyboard = false;
+    this.lstMeses = this.apiService.Xmeses
+    this.lstYear = this.apiService.Xyear
   }
 
 
   ngOnInit(): void {
+    this.xmeses = new Date().getMonth().toString()
+    this.xyear = new Date().getFullYear().toString()
+
     this.listarEstados()
     let ruta = this.rutaActiva.snapshot.params.filtro
-    console.log(ruta);
-    if (ruta == 'tramitaciones-por-organo-regular')  {
+    // console.log(ruta);
+    if (ruta == 'tramitaciones-por-organo-regular') {
       this.filtro = 1
       this.titulo = 'Tramitaciones por Organo Regular'
       this.estadoOrigen = 4
-    } else if( ruta == 'otros-documentos') {
+    } else if (ruta == 'otros-documentos') {
       this.filtro = 2
       this.titulo = 'Otros Documentos'
       this.estadoOrigen = 5
-      
-    } else if( ruta == 'ministeriales') {
+
+    } else if (ruta == 'ministeriales') {
       this.filtro = 3
       this.estadoOrigen = 2
       this.titulo = 'Ministeriales'
     }
 
-    
+
     this.seleccionNavegacion(0)
-    
+
   }
 
 
@@ -200,20 +213,36 @@ export class SministerialComponent implements OnInit {
 
   seleccionNavegacion(e) {
     this.buzon = []
-    this.xAPI.funcion = 'WKF_CDocumentos'
+    
+    this.xAPI.funcion = 'WKF_CDocumentosSecretaria'
     this.xAPI.valores = ''
     this.selNav = e
     this.vministerial = true
     this.tministerial = '4'
+    this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
+    this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
     this.cargarAcciones(e)
     switch (e) {
       case 0:
+        this.xTipo = ''
         this.clasificacion = false
         this.vministerial = false
         this.tministerial = '12'
-        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
+        this.filtro = 1
+        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen+ "," + this.fecha_desde + "," + this.fecha_hasta;
         this.listarBuzon()
         break
+      case 1:
+        this.xAPI.funcion = 'WKF_CDocSecretariaResoluciones'
+        this.filtro = 3
+        this.xTipo = 'PUNTO'
+        this.clasificacion = false
+        this.vministerial = false
+        this.tministerial = '12'
+        this.xAPI.parametros = '3,1' + "," + this.fecha_desde + "," + this.fecha_hasta;
+        this.listarBuzon()
+        break
+
       case 3:
         this.ConsultarAlertas()
         break
@@ -248,15 +277,28 @@ export class SministerialComponent implements OnInit {
           e.existe = e.anom != '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.completed = false
-          e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
+
           e.color = 'warn'
-          if (this.filtro == 1 && e.tdoc == 'TRAMITACION POR ORGANO REGULAR') {
+
+
+          if (this.filtro == 3 && e.tdoc == 'PUNTO DE CUENTA') {
+            console.log(e)
             bz.push(e)
-          } else if(this.filtro == 2 && e.tdoc !='PUNTO DE CUENTA' && e.tdoc != 'TRAMITACIONES POR ORGANO REGULAR'){
-            bz.push(e)
-          } else if (this.filtro == 3 && e.tdoc == 'PUNTO DE CUENTA') {
+          } else if (this.filtro == 1) {
+            console.log(e.accion, e.tdoc, this.filtro)
+            let text = this.cmbAcciones[e.accion].texto == undefined ? '' : this.cmbAcciones[e.accion].texto
+            e.nombre_accion = e.accion != null ? text : ''
             bz.push(e)
           }
+          // if (this.filtro == 1 && e.tdoc == 'TRAMITACION POR ORGANO REGULAR') {
+          //   bz.push(e)
+          // } else if(this.filtro == 2 && e.tdoc !='PUNTO DE CUENTA' && e.tdoc != 'TRAMITACIONES POR ORGANO REGULAR'){
+          //   bz.push(e)
+          // } else if (this.filtro == 3 && e.tdoc == 'PUNTO DE CUENTA') {
+          //   bz.push(e)
+          // }
+
+
         })//Registros recorridos como elementos
 
         this.longitud = bz.length
@@ -287,8 +329,8 @@ export class SministerialComponent implements OnInit {
 
   //editar
   editar(e) {
-    
-    const base = btoa( JSON.stringify(e))
+
+    const base = btoa(JSON.stringify(e))
     this.ruta.navigate(['/ministerial', base])
   }
 
@@ -454,5 +496,14 @@ export class SministerialComponent implements OnInit {
 
   dwUrl(ncontrol: string, archivo: string): string {
     return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
+  }
+
+  getDetalle(e): string {
+   
+    if (e.s_cuenta == '' ){
+      return e.numc
+    }
+    return e.tdoc == "PUNTO DE CUENTA" ? e.s_cuenta : e.numc
+    
   }
 }

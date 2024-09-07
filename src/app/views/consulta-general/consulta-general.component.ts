@@ -251,6 +251,24 @@ export class ConsultaGeneralComponent implements OnInit {
   public fecha_registro: string = "";
   public destino: string = "";
 
+  cuenta = ''
+  digital = ''
+  documento = ''
+  numero = ''
+  responsable_entrada = ''
+  registrado_entrada = ''
+
+  modificado_entrada = ''
+  carpeta_entrada = ''
+  acto = 'RESOLUCION'
+  estatus_entrada: any
+  tipo_entrada = ''
+  asunto_entrada = ''
+  observacion_entrada = ''
+  opttodos = "0"
+
+  
+
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
   selected = new FormControl(0);
@@ -1200,6 +1218,38 @@ export class ConsultaGeneralComponent implements OnInit {
     //Listar los archivos asociados al documento
     this.getResueltoID(e.id);
     this.modalService.open(content, { size: "lg" });
+  }
+
+  detalleEntrada(content, e) {
+
+    this.modalService.open(content, { size: "lg" })
+
+
+    this.documento = e.cod_acto == 0 ? 'RESOLUCIÓN' : 'ORDEN GENERAL'
+    this.responsable_entrada = e.des_responsable
+    this.registrado_entrada = e.des_registrado
+    this.numero = e.numero_carpeta
+    this.cuenta = e.cuenta_oficio
+    this.digital = e.digital
+    this.modificado_entrada = e.f_modificado
+    this.estatus_entrada = e.estatus_descripcion
+
+    // console.log(new Date(e.f_modificado))
+    // console.log(new Date('2024-09-01 00:00:00'))
+
+    if ( new Date(e.f_modificado) < new Date('2024-09-01 00:00:00')){
+      this.tipo_entrada = e.des_tipo_entrada
+      // console.log('ENTRADA')
+    } else {
+      this.tipo_entrada = e.des_tipo_resol
+      // console.log('RESOLUCION')
+
+    }
+
+    this.asunto_entrada = e.asunto
+    this.observacion_entrada = e.observacion
+    this.carpeta_entrada = e.des_carpeta
+
   }
 
   editarDatosBasicos() {

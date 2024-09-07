@@ -105,7 +105,8 @@ export interface Resolucion {
   instrucciones: string
   n_componente: number
   n_grado: number
-
+  codigo_componente?: number
+  codigo_grado?: number
 }
 
 

@@ -41,39 +41,19 @@ export class ArchivoComponent implements OnInit {
 
   ]
 
-  public paginador = 10
+  public paginador = 50
   public focus;
   public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
-    relacional: false,
-    concurrencia: false,
-    protocolo: '',
-    ruta: '',
-    version: '',
-    retorna: false,
-    migrar: false,
-    http: 0,
-    https: 0,
-    consumidores: '',
-    puertohttp: 0,
-    puertohttps: 0,
-    driver: '',
-    query: '',
-    metodo: '',
-    tipo: '',
-    prioridad: '',
-    entorno: '',
-    logs: false,
-    cache: 0,
-    estatus: false
+    valores: ''
   }
   lst = []
   public lstEstados = [] //Listar Estados
 
   lengthOfi = 0;
-  pageSizeOfi = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 100];
+  pageSizeOfi = 50;
+  pageSizeOptions: number[] = [1, 50, 100, 150, 200, 250 ];
 
   // MatPaginator Output
   pageEvent: PageEvent;
@@ -81,6 +61,7 @@ export class ArchivoComponent implements OnInit {
   selNav = 0
 
   public bzRecibido = []
+  public bzRecibidoOpinion = []
   public bzProcesados = []
   public bzPendientes = []
   public bzCerrados = []
@@ -107,6 +88,22 @@ export class ArchivoComponent implements OnInit {
     usuario: '',
     observacion: ''
   }
+
+  public lstFecha = [
+    {id : '2023-12-01,2023-12-31,2023-11-30', value: 'DICIEMBRE'},
+    {id : '2024-01-01,2024-01-31,2023-12-31', value: 'ENERO'},
+    {id : '2024-02-01,2024-02-28,2024-01-31', value: 'FEBRERO'},
+    {id : '2024-03-01,2024-03-31,2024-02-28', value: 'MARZO'},
+    {id : '2024-04-01,2024-04-30,2024-03-31', value: 'ABRIL'},
+    {id : '2024-05-01,2024-05-31,2024-04-30', value: 'MAYO'},
+    {id : '2024-06-01,2024-06-30,2024-05-31', value: 'JUNIO'},
+    {id : '2024-07-01,2024-07-31,2024-06-30', value: 'JULIO'},
+    {id : '2024-08-01,2024-08-31,2024-07-31', value: 'AGOSTO'},
+    {id : '2024-09-01,2024-09-30,2024-08-31', value: 'SEPTIEMBRE'},
+    {id : '2024-10-01,2024-10-31,2024-09-30', value: '0CTUBRE'},
+    {id : '2024-11-01,2024-11-30,2024-10-31', value: 'NOVIEMBRE'},
+    {id : '2024-12-01,2024-12-31,2024-11-30', value: 'DICIEMBRE'},
+  ]
 
   constructor(
     private apiService: ApiService,
@@ -136,45 +133,6 @@ export class ArchivoComponent implements OnInit {
   }
 
 
-  seleccionNavegacion(e) {
-    console.log(e);
-    this.bzRecibido = []
-    this.bzProcesados = []
-    this.bzPendientes = []
-    this.bzCerrados = []
-    this.xAPI.funcion = 'WKF_CDocumentos'
-    this.xAPI.valores = ''
-    this.selNav = e
-
-    switch (e) {
-      case 0:
-        this.cargarAcciones(0)
-        this.clasificacion = false
-
-        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
-        this.listarBuzon(this.bzRecibido)
-        break
-      case 1:
-        this.cargarAcciones(1)
-        this.clasificacion = false
-        this.xAPI.parametros = this.estadoActual + ',' + 2
-        this.listarBuzon(this.bzProcesados)
-        break
-      case 2:
-        this.cargarAcciones(2)
-        this.clasificacion = false
-        this.xAPI.parametros = this.estadoActual + ',' + 3
-        this.listarBuzon(this.bzPendientes)
-        break
-      case 4:
-        this.xAPI.parametros = this.estadoActual + ',' + 4
-        this.listarBuzon(this.bzCerrados)
-        break
-      default:
-        break
-    }
-
-  }
 
   listarEstados() {
     this.xAPI.funcion = 'WKF_CEstados'
@@ -192,6 +150,38 @@ export class ArchivoComponent implements OnInit {
     )
   }
 
+
+
+  seleccionNavegacion(e) {
+    this.bzRecibido = []
+    this.bzProcesados = []
+    this.bzPendientes = []
+    this.bzCerrados = []
+    this.xAPI.funcion = 'WKF_CDocumentoFecha'
+    this.xAPI.valores = ''
+    this.selNav = e
+
+    switch (e) {
+      case 0:
+        this.cargarAcciones(0)
+        this.clasificacion = false
+
+        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen + ',' + this.lstFecha[6] 
+        this.listarBuzon(this.bzRecibido)
+        break
+      case 1:
+        this.cargarAcciones(1)
+        this.clasificacion = false
+        this.xAPI.parametros = this.estadoActual + ',' + 2
+        this.listarBuzon(this.bzProcesados)
+        break
+    
+      default:
+        break
+    }
+
+  }
+
   async listarBuzon(bz: any) {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -205,6 +195,7 @@ export class ArchivoComponent implements OnInit {
           bz.push(e)
         })//Registros recorridos como elementos
 
+        console.log(bz)
         this.lengthOfi = data.Cuerpo.length
         if (this.lengthOfi > 0) {
           this.estilocheck = ''
@@ -249,7 +240,7 @@ export class ArchivoComponent implements OnInit {
 
   //recorrerElementos para paginar listados
   recorrerElementos(posicion: number, lista: any) {
-    if (posicion > 1) posicion = posicion * 10
+    if (posicion > 1) posicion = posicion * 50
     this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
 
   }

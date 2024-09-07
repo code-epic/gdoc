@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="form-row formulario">
+                    <div class="row">
                         <div class="col-md-3 div-interno-superior">
                             <div class="div-interno">
                                 <mat-form-field appearance="outline">
@@ -80,17 +80,16 @@
                             </select>
                         </div>
 
-                        <div class="col-11 col-md-1">
+                        <div class="col-md-1">
                             <button mat-raised-button color="primary" id="registrar" class="boton-buscar"
                                 (click)="buscarDocumento()">
                                 Buscar
-                                <i class="fa fa-search" aria-hidden="true"></i>
                             </button>
                         </div>
 
-                        <div class="col-1">
+                        <div class="col-md-1">
                             <button mat-icon-button (click)="open(busqueda_avanzada)" class="busquedas-avanzadas"
-                                aria-label="Example icon-button with a heart icon">
+                                aria-label="">
                                 <!-- <mat-icon>arrow_back</mat-icon> -->
                                 <mat-icon>more_vert</mat-icon>
                             </button>

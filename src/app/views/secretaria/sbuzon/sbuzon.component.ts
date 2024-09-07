@@ -26,6 +26,12 @@ export class SbuzonComponent implements OnInit {
   public estadoActual = 4
   public estadoOrigen = 1
   estatusOrigen = 1
+  fecha_desde = '-09-01'
+  fecha_hasta = '-09-30'
+  xyear = '2024'
+  public lstMeses = []
+  public lstYear = []
+  public xmeses = ''
 
   public paginador = 10
   public focus;
@@ -118,10 +124,14 @@ export class SbuzonComponent implements OnInit {
     config.backdrop = 'static';
     config.keyboard = false;
 
+    this.lstMeses = this.apiService.Xmeses
+    this.lstYear = this.apiService.Xyear
   }
 
 
   ngOnInit(): void {
+    this.xmeses = new Date().getMonth().toString()
+    this.xyear = new Date().getFullYear().toString()
     this.listarEstados()
     this.seleccionNavegacion(0)
 
@@ -185,42 +195,24 @@ export class SbuzonComponent implements OnInit {
 
   seleccionNavegacion(e) {
     this.buzon = []
-    this.xAPI.funcion = 'WKF_CDocumentos'
+    this.xAPI.funcion = 'WKF_CDocumentosSecretaria'
     this.xAPI.valores = ''
     this.selNav = e
     this.vministerial = true
     this.tministerial = '4'
+    this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
+    this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
+
     this.cargarAcciones(e)
     switch (e) {
       case 0:
         this.clasificacion = false
         this.vministerial = false
         this.tministerial = '12'
-        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
+        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen + "," + this.fecha_desde + "," + this.fecha_hasta;
         this.listarBuzon()
         break
-      case 1: // ministerial
-        this.clasificacion = false
-        //this.xAPI.funcion = 'WKF_CSubDocumento'
-        this.xAPI.parametros = this.estadoActual + ',' + 2 + ',1'
-        this.listarBuzon()
-        break
-      case 2: //presidencial
-        this.clasificacion = false
-        this.xAPI.parametros = this.estadoActual + ',' + 3
-        this.listarBuzon()
-        break
-      case 2: //tramitacion
-        this.clasificacion = false
-        this.xAPI.parametros = this.estadoActual + ',' + 4
-        this.listarBuzon()
-        break
-      case 2: //otros documentos
-        this.clasificacion = false
-        this.xAPI.parametros = this.estadoActual + ',' + 5
-        this.listarBuzon()
-        break
-      case 3:
+      case 1:
         this.ConsultarAlertas()
         break
     }

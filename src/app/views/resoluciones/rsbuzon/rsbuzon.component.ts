@@ -1,14 +1,23 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
-import {PageEvent} from '@angular/material/paginator';
-import {Router} from '@angular/router';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ToastrService} from 'ngx-toastr';
-import {NgxUiLoaderService} from 'ngx-ui-loader';
-import {ApiService, IAPICore} from 'src/app/services/apicore/api.service';
-import {IWKFAlerta} from 'src/app/services/control/documentos.service';
-import {LoginService} from 'src/app/services/seguridad/login.service';
-import {UtilService} from 'src/app/services/util/util.service';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { PageEvent } from '@angular/material/paginator';
+import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { map, Observable, startWith } from 'rxjs';
+import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { IWKFAlerta } from 'src/app/services/control/documentos.service';
+import { LoginService } from 'src/app/services/seguridad/login.service';
+import { UtilService } from 'src/app/services/util/util.service';
+
+
+
+export interface ITipoResolucion {
+    codigo: string
+    nombre: string
+}
+
 
 @Component({
     selector: 'app-rsbuzon',
@@ -19,16 +28,22 @@ export class RsbuzonComponent implements OnInit {
     public estadoActual = 3;
     public estatusActual = 1;
     public destino = 14;
+    public fecha_desde = '2024-09-01'
+    public fecha_hasta = '2024-09-30'
 
     public extender_plazo: any;
-    public clasificacion = false;
+    public x = false;
     public vrecibido = true;
     public vprocesados = false;
     public vpendientes = false;
+    public blistado = false
+
     public cmbDestino = '';
 
     public paginador = 10;
     public focus;
+
+    Componentes = []
 
     public xAPI: IAPICore = {
         funcion: '',
@@ -45,18 +60,18 @@ export class RsbuzonComponent implements OnInit {
     public idd: string = '';
     public cuenta: string = '';
     public cmbAcciones = [
-        {valor: '0', texto: 'ACEPTAR', visible: '0'},
-        {valor: '1', texto: 'RECHAZAR', visible: '0'},
-        {valor: '2', texto: 'ELABORAR OFICIO DE OPINION', visible: '1'},
-        {valor: '3', texto: 'EN MANOS DEL DIRECTOR DEL DESPACHO', visible: '1'},
+        { valor: '0', texto: 'ACEPTAR', visible: '0' },
+        { valor: '1', texto: 'RECHAZAR', visible: '0' },
+        { valor: '2', texto: 'ELABORAR OFICIO DE OPINION', visible: '1' },
+        { valor: '3', texto: 'EN MANOS DEL DIRECTOR DEL DESPACHO', visible: '1' },
         {
             valor: '4',
             texto: 'EN MANOS DEL SUB DIRECTOR DEL DESPACHO',
             visible: '1',
         },
-        {valor: '5', texto: 'ARCHIVAR', visible: '1'},
-        {valor: '6', texto: 'REDISTRIBUCION', visible: '1'},
-        {valor: '7', texto: 'SALIDA', visible: '2'},
+        { valor: '5', texto: 'ARCHIVAR', visible: '1' },
+        { valor: '6', texto: 'REDISTRIBUCION', visible: '1' },
+        { valor: '7', texto: 'SALIDA', visible: '2' },
     ];
 
     public lstAcciones = [];
@@ -64,19 +79,35 @@ export class RsbuzonComponent implements OnInit {
     public bzSubDocumentos = [];
     public bzRecibido = [];
     public lstRecibidos = [];
+    public bzRecibidoResumen = []
     public bzClasificar = [];
     public bzProcesados = [];
     public bzPendientes = [];
     public lst = [];
     public lstEstados = []; //Listar Estados
+    public lstResponsable = []
+    public lstCedula = []
 
     public estilocheck = 'none';
     public estiloclasificar = 'none';
 
+    public xcomponente = '0'
+    public xclasificacion = '0'
+    public xprioridad = '0'
+    public xresponsable = '0'
+    public xtipo = '0'
+    public xobservacion = ''
+
+
     public allComplete: boolean = false;
+    public allCompletex: boolean = false;
+    public lstAll: any = [];
+    public lstAllx: any = [];
+
     public numControl = '';
     public Observacion = '';
     public AccionTexto: string = '0';
+    maxRecibido = 0
 
     public WAlerta: IWKFAlerta = {
         documento: 0,
@@ -88,7 +119,7 @@ export class RsbuzonComponent implements OnInit {
         observacion: '',
     };
 
-    public lstAll: any = [];
+
     longitud = 0;
     posicion = 0;
     pageSize = 10;
@@ -96,13 +127,40 @@ export class RsbuzonComponent implements OnInit {
     public numCarpeta: string = '';
 
     selected = new FormControl(0);
+    public lstCarpetasRecibido = [
+        { 'id': 1, 'nomb': 'CONTROL DE GESTIÓN', 'cant': 0, 'cod': 'CG' },
+        { 'id': 2, 'nomb': 'SECRRETARIA', 'cant': 0, 'cod': 'SC' }
+    ]
     public lstCarpetas = [];
     public lstCarpetasAux = [];
     public codCarpeta = '';
     public blNavegacion: boolean = false;
     public details: boolean = false;
 
+    public sNavegacion = ''
     btnTexto = 'Control de Gestion';
+
+
+    public lstAccionesMininisterial = [
+        { 'valor': '1', 'texto': 'ANALISTA', 'visible': '1' },
+        { 'valor': '2', 'texto': 'JEFE DE AREA', 'visible': '1' },
+        { 'valor': '3', 'texto': 'BANDEJA DE ESPERA', 'visible': '1' },
+        { 'valor': '4', 'texto': 'PRESIDENCIAL', 'visible': '1' },
+        { 'valor': '5', 'texto': 'ESPERA DE OPINION', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+        { 'valor': '6', 'texto': 'CONSULTORIA JURIDICA', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+        { 'valor': '7', 'texto': 'RESOLUCIONES', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+        { 'valor': '8', 'texto': 'SUB-DIRECCION', 'visible': '1' },
+        { 'valor': '9', 'texto': 'DIRECCION GENERAL', 'visible': '1' },
+        { 'valor': '10', 'texto': 'DESPACHO DEL MPPD', 'visible': '1' },  //7/5/3 Asociado a los plazos en las alertas
+        { 'valor': '11', 'texto': 'ARCHIVO', 'visible': '1' },
+        { 'valor': '12', 'texto': 'RESOLUCIONES / URGENTE', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+        { 'valor': '13', 'texto': 'RESOLUCIONES / JEFE DEL AREA SECRETARIA', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+
+    ]
+
+    filteredOptions: Observable<ITipoResolucion[]>
+    myControl = new FormControl()
+    TipoResoluciones: any
 
     constructor(
         private apiService: ApiService,
@@ -116,11 +174,30 @@ export class RsbuzonComponent implements OnInit {
     ) {
     }
 
-    ngOnInit(): void {
+    async ngOnInit() {
+
+        this.Componentes =
+            sessionStorage.getItem('MPPD_CComponente') != undefined
+                ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
+                : []
+
+        this.TipoResoluciones = sessionStorage.getItem("MPPD_CTipoResolucion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion"))) : []
+
+        this.listarResponsables()
         this.initFormSidenav();
+
+        await this.seleccionNavegacion(0);
         this.listarEstados();
-        this.seleccionNavegacion(0);
+
+
+        this.filteredOptions = this.myControl.valueChanges.pipe(
+            startWith(""),
+            map((value) => (typeof value === "string" ? value : value?.name)),
+            map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
+        )
+
         //this.listarSubDocumentos(1);
+        // this.blNavegacion = true
     }
 
     listarEstados() {
@@ -139,6 +216,18 @@ export class RsbuzonComponent implements OnInit {
     }
 
 
+    displayFn(tr: ITipoResolucion): string {
+        return tr && tr.nombre ? tr.nombre : ""
+    }
+
+    private _filter(name: string): ITipoResolucion[] {
+        const filterValue = name.toLowerCase()
+
+        return this.TipoResoluciones.filter((option) =>
+            option.nombre.toLowerCase().includes(filterValue)
+        )
+    }
+
     entrada_open(id, cuenta) {
         if (cuenta != undefined) {
             const xid = btoa('4,2,' + id);
@@ -154,42 +243,65 @@ export class RsbuzonComponent implements OnInit {
     open(content, id, pos) {
         this.numControl = id;
         this.posicion = pos;
-        console.log(this.posicion, ' ', this.numControl);
         //this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
-        this.modalService.open(content, {centered: true});
+        let modalRef = this.modalService.open(content, {
+            centered: true,
+            windowClass: "my-custom-modal-class",
+            size: "md",
+            backdrop: false,
+        });
 
+        modalRef["_windowCmptRef"].location.nativeElement.style.zIndex = "900";
     }
 
 
 
     listarDocumentos(e) {
-        console.log(e);
+        this.sNavegacion = `${e.nomb}`
+        this.bzRecibidoResumen = []
+        this.details = true
+
+        if (e.id == 2) {
+            this.bzRecibido.forEach((el) => {
+                if (el.tdoc == 'PUNTO DE CUENTA') this.bzRecibidoResumen.push(el)
+            })
+
+
+        } else {
+            this.bzRecibido.forEach((el) => {
+                if (el.tdoc != 'PUNTO DE CUENTA') this.bzRecibidoResumen.push(el)
+            })
+        }
+        this.blNavegacion = true
+
+
     }
 
 
     seleccionNavegacion(e) {
 
-        this.xAPI.funcion = 'WKF_CDocumentos';
+        this.xAPI.funcion = 'WKF_CDocumentosResoluciones';
         this.xAPI.valores = '';
         this.selNav = e;
 
-        console.log('entrando...', e)
+        // console.log('entrando...', e)
         switch (e) {
             case 0:
-                // this.cargarAcciones(0);
-                // this.xAPI.parametros = this.estadoActual + "," + this.estatusActual;
-                // this.listarBuzon(e);
+                this.cargarAcciones(0);
+                this.xAPI.parametros = this.estadoActual + "," + this.estatusActual + "," + this.fecha_desde + "," + this.fecha_hasta;
+                this.listarBuzon(e);
                 break;
             case 1:
                 this.cargarAcciones(1);
-                this.xAPI.parametros = this.estadoActual + ',' + 2;
+                this.xAPI.parametros = this.estadoActual + ',' + 2 + "," + this.fecha_desde + "," + this.fecha_hasta;
                 this.listarBuzon(e);
                 break;
             case 2:
                 // this.cargarAcciones(1);
                 this.xAPI.funcion = 'WKF_CGrupoCarpetas';
                 this.xAPI.parametros = '';
-                this.listarCarpetas();
+                // this.listarCarpetas();
+                this.subEntrada()
                 break;
 
             default:
@@ -197,10 +309,6 @@ export class RsbuzonComponent implements OnInit {
         }
     }
 
-    clickDerecho(event: MouseEvent) {
-        event.preventDefault(); // Evita el menú contextual por defecto
-        console.log('Clic derecho detectado');
-    }
 
 
     async listarBuzon(tipo: number) {
@@ -214,7 +322,7 @@ export class RsbuzonComponent implements OnInit {
                 return;
             }
         }
-        console.log('iniciando');
+        // console.log('iniciando');
         this.cargarInformacion(tipo);
     }
 
@@ -224,6 +332,8 @@ export class RsbuzonComponent implements OnInit {
             (data) => {
 
                 this.lstAll = data.Cuerpo;
+                this.maxRecibido = this.lstAll.length
+                let i = 0
                 let arr = this.lstAll.map((e) => {
                     e.completed = false;
                     e.color = 'warn';
@@ -231,61 +341,92 @@ export class RsbuzonComponent implements OnInit {
                     e.priv = e.priv == 1 ? true : false;
                     e.existe = e.anom == '' ? true : false;
                     e.xaccion = e.accion;
+                    if (e.tdoc == 'PUNTO DE CUENTA') {
+                        i = i + 1
+                    }
                     return e;
                 }); //Registros recorridos como elementos
                 if (tipo == 0) {
-                    this.bzRecibido = arr;
+                    this.bzRecibido = arr
                 } else {
-                    this.bzClasificar = arr;
+                    this.bzClasificar = arr
+                }
+                this.lstCarpetasRecibido[0].cant = this.maxRecibido - i
+                this.lstCarpetasRecibido[1].cant = i
+
+                this.lengthOfi = data.Cuerpo.length
+                this.ngxService.stopLoader('ldbuzon')
+            },
+            (error) => {
+                console.error(error)
+                this.ngxService.stopLoader('ldbuzon');
+            }
+        );
+    }
+
+    // async listarCarpetas() {
+    //     this.xAPI.parametros = ''
+    //     this.xAPI.valores = ''
+    //     this.ngxService.startLoader('ldcarpetas');
+    //     await this.apiService.Ejecutar(this.xAPI).subscribe(
+    //         (data) => {
+    //             console.log('listarCarpetas: ', data);
+    //             if (data.Cuerpo.length > 0) {
+    //                 this.lstCarpetas = data.Cuerpo;
+    //                 // this.lstCarpetasAux = data.Cuerpo;
+    //                 this.subEntrada()
+
+    //             } else {
+    //                 this.ngxService.stopLoader('ldcarpetas')
+    //             }
+
+
+
+
+    //         },
+    //         (error) => {
+    //         }
+    //     );
+    // }
+
+
+    async subEntrada() {
+
+        this.lstCarpetas = []
+        this.xAPI.funcion = 'MPPD_CGrupoCarpertaEntrada';
+        this.xAPI.parametros = '36'
+        this.xAPI.valores = ''
+
+        await this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data) => {
+                console.log('subEntrada: ', data);
+                try {
+                    if (data.Cuerpo.length > 0) {
+                        data.Cuerpo.forEach(e => {
+                            let dt = {
+                                'cantidad': e.cantidad,
+                                'llav': e.numero_carpeta,
+                                'usuario': '',
+                                'componente': parseInt(e.cod_componente)
+                            }
+                            this.lstCarpetas.push(dt)
+                        });
+                        this.lstCarpetasAux = this.lstCarpetas
+                    }
+                    this.ngxService.stopLoader('ldcarpetas')
+                } catch (error) {
+                    console.log(error)
+                    this.ngxService.stopLoader('ldcarpetas')
                 }
 
 
-                this.lengthOfi = data.Cuerpo.length;
-                // if (this.selNav == 1) {
-                //   this.listarSubDocumentos(2);
-                //   this.longitud = this.lstAll.length;
-                //   if (this.longitud > 0) {
-                //     this.estilocheck = "";
-                //     this.bzOriginal = this.lstAll;
-                //     this.pageSize = 10;
-                //     this.recorrerElementos(0);
-                //   }
-                // }
-                this.ngxService.stopLoader('ldbuzon');
+
+
             },
             (error) => {
             }
         );
     }
-
-    async listarCarpetas() {
-        this.ngxService.startLoader('ldcarpetas');
-        await this.apiService.Ejecutar(this.xAPI).subscribe(
-            (data) => {
-                console.log(data.Cuerpo[0]);
-                this.lstCarpetas = data.Cuerpo;
-                this.lstCarpetasAux = data.Cuerpo;
-                // this.bzOriginal = data.Cuerpo.map((e) => {
-                //   e.completed = false;
-                //   e.color = "warn";
-                //   e.cuentas = e.cuenta != "" ? "" : e.nori;
-                //   e.priv = e.priv == 1 ? true : false;
-                //   e.existe = e.anom == "" ? true : false;
-                //   e.xaccion = e.accion;
-                //   return e;
-                // }); //Registros recorridos como elementos
-                // this.lengthOfi = data.Cuerpo.length;
-                // if (this.selNav == 1) {
-                //   this.listarSubDocumentos(2);
-
-                // }
-                this.ngxService.stopLoader('ldcarpetas');
-            },
-            (error) => {
-            }
-        );
-    }
-
     consultarCarpeta(e) {
         if (e.keyCode == 13) {
             this.filtrarCarpetas(e.target.value);
@@ -376,7 +517,6 @@ export class RsbuzonComponent implements OnInit {
         if (this.lstAll == null) {
             return false;
         }
-
         return (
             this.lstAll.filter((t) => t.completed).length > 0 && !this.allComplete
         );
@@ -432,12 +572,8 @@ export class RsbuzonComponent implements OnInit {
             (data) => {
                 switch (this.AccionTexto) {
                     case '0': //Oficio por opinión
-                        // console.log(this.idd, this.posicion, ' control ')
-                        // if (this.idd != "" && this.cuenta != "") {
-                        //   this.promoverPuntoCuenta(3, 2);
-                        // } else {
+
                         this.promoverBuzon(0, this.utilService.FechaActual());
-                        // }
 
                         break;
                     case '1': //Rechazar en el estado inicial
@@ -518,7 +654,7 @@ export class RsbuzonComponent implements OnInit {
 
 
     reducirVector() {
-        this.bzRecibido.splice(this.posicion, 1);
+        this.bzRecibidoResumen.splice(this.posicion, 1);
         console.log('Control de datos ');
 
     }
@@ -598,10 +734,10 @@ export class RsbuzonComponent implements OnInit {
     }
 
     selAccion() {
-        this.clasificacion = false;
+        this.x = false;
         switch (this.AccionTexto) {
             case '6':
-                this.clasificacion = true;
+                this.x = true;
                 break;
 
             default:
@@ -681,15 +817,39 @@ export class RsbuzonComponent implements OnInit {
         return this.apiService.Dws(btoa('D' + ncontrol) + '/' + archivo);
     }
 
-    crearCarpeta() {
-        var lstBz = this.lstAll;
-        var usuario = this.loginService.Usuario.id;
+    async crearCarpeta() {
+        //'240827-20150','240815-19764','240815-19763'
+        var elementos = ``
+        let i = 0
+        let coma = ''
+        await this.lstAll.forEach(e => {
+
+            if (e.completed) {
+                if (i > 0) coma = ','
+                elementos += coma + `'${e.numc}'`
+                i++
+            }
+
+        })
+        console.log(elementos)
+        var componente = parseInt(this.xcomponente)
         var numero = this.numCarpeta;
-        var i = 0;
-        var estatus = 3; //NOTA DE ENTREGA
+        var tipo = this.xtipo
+        var clasificacion = parseInt(this.xclasificacion)
+        var prioridad = this.xprioridad
+        var observacion = this.xobservacion
+        let idtrans = this.utilService.GenerarUnicId()
+        var estatus = '36'
+
+        var usuario = this.loginService.Usuario.cedula;
+
+
+        // var estatus = 3; //NOTA DE ENTREGA
         //Buscar en Wk de acuerdo al usuario y la app activa
-        this.xAPI.funcion = 'WKF_IUClasificacion';
-        this.xAPI.valores = '';
+        this.xAPI.funcion = 'MPPD_GEntradasResoluciones';
+        this.xAPI.parametros =
+            `'0',${elementos}##${componente}##${numero}##${tipo}##${estatus}##${clasificacion}##${prioridad}##${observacion}##${usuario}##${idtrans}`;
+        console.log(this.xAPI.parametros)
         if (this.numCarpeta == '') {
             this.toastrService.error(
                 'Debe Introducir un numero de carpeta',
@@ -698,20 +858,30 @@ export class RsbuzonComponent implements OnInit {
             return;
         }
 
-        lstBz.forEach((e) => {
-            i++;
-            if (e.completed == true) {
-                this.xAPI.parametros = `${e.idd},${this.estadoActual},${this.destino},${estatus},${numero},${usuario}`;
-                this.apiService.Ejecutar(this.xAPI).subscribe(
-                    (data) => {
-                        this.actualizarBzRegistrados(e.numc, 0);
-                    },
-                    (errot) => {
-                        this.toastrService.error(errot, `GDoc Wkf.Estatus`);
-                    }
-                ); //
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data) => {
+                console.log(data)
+                this.clasificarBuzon()
+            },
+            (errot) => {
+                this.toastrService.error(errot, `GDoc Wkf.Estatus`);
             }
-        });
+        );
+
+        // lstBz.forEach((e) => {
+        //     i++;
+        //     if (e.completed == true) {
+        //         this.xAPI.parametros = `${e.idd},${this.estadoActual},${this.destino},${estatus},${numero},${usuario}`;
+        //         this.apiService.Ejecutar(this.xAPI).subscribe(
+        //             (data) => {
+        //                 this.actualizarBzRegistrados(e.numc, 0);
+        //             },
+        //             (errot) => {
+        //                 this.toastrService.error(errot, `GDoc Wkf.Estatus`);
+        //             }
+        //         ); //
+        //     }
+        // });
         //this.seleccionNavegacion(0)
     }
 
@@ -742,11 +912,34 @@ export class RsbuzonComponent implements OnInit {
         this.isShowing = !this.isShowing;
         this.formSidenav.reset();
         this.formSidenav.patchValue(e);
+        this.blistado = true
         console.log('ELEMENTO DE LA CARPETA', e);
+        this.lstCedula = []
+        this.listarCedulasEnCarpeta(e)
+
     }
 
-    closeEvent(e:boolean){
+    closeEvent(e: boolean) {
         this.isShowing = e;
+        this.blistado = false
+    }
+    listarCedulasEnCarpeta(e) {
+        this.xAPI.funcion = 'MPPD_CEntradasProceso'
+        this.xAPI.parametros = `${e.llav},${e.componente},36`
+        this.xAPI.valores = null
+
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data) => {
+                this.lstAllx = data.Cuerpo
+                let arr = this.lstAllx.map((e) => {
+                    e.completed = false;
+                  
+                    return e;
+                }); 
+                this.lstCedula = arr
+            },
+            err => { }
+        )
     }
 
     initFormSidenav() {
@@ -759,4 +952,163 @@ export class RsbuzonComponent implements OnInit {
             obse: new FormControl(''),
         })
     }
+
+    getDetalle(e): string {
+        return e.tdoc == "PUNTO DE CUENTA" ? e.s_cuenta : e.numc
+
+    }
+
+    principal() {
+        this.sNavegacion = ''
+        this.blNavegacion = false
+        this.details = false
+        this.bzRecibidoResumen = []
+    }
+
+    principalp() {
+        this.sNavegacion = ''
+        this.blNavegacion = false
+        this.details = false
+        this.bzRecibidoResumen = []
+    }
+
+
+    async listarResponsables() {
+        this.xAPI.funcion = 'MPPD_ListarResponsables'
+        this.xAPI.parametros = 'Resoluciones'
+        this.xAPI.valores = null
+
+        await this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data) => {
+                if (data.msj == undefined) {
+                    data.forEach(e => {
+                        this.lstResponsable.push({
+                            'cedula': e.cedula,
+                            'nombre': e.nombre
+                        })
+                    });
+                }
+            },
+            err => { }
+        )
+    }
+
+    getEstatusMinisterial(e): string {
+        // console.log(e)
+        if (e.s_estatus == null) e.s_estatus = 1
+        let pos = parseInt(e.s_estatus) - 1;
+
+        return this.lstAccionesMininisterial[pos].texto
+
+
+    }
+
+    getColor(e): string {
+        let color = '#000011'
+        // console.log(e)
+        switch (e) {
+            case 100:
+                color = '#998877'
+                break
+            case 200:
+                color = '#abe2fa;'
+                break
+            case 300:
+                color = '#5582b5'
+                break
+            case 400:
+                color = '#A32A24'
+                break
+            case 602:
+                color = '#6ddf93'
+                break
+            default:
+                break;
+        }
+        return color
+    }
+
+
+    clasificarBuzon() {
+        var lstBz = this.bzClasificar
+        var usuario = this.loginService.Usuario.cedula
+        var llave = ``
+        var i = 0
+        var estatus = 3 //NOTA DE ENTREGA
+        //Buscar en Wk de acuerdo al usuario y la app activa
+        this.xAPI.funcion = 'WKF_AUbicacion'
+        this.xAPI.valores = ''
+
+
+
+        lstBz.forEach(e => {
+            i++
+            if (e.completed == true) {
+                this.xAPI.parametros = `3,${estatus},${llave},${usuario},${e.idd}`
+                this.apiService.Ejecutar(this.xAPI).subscribe(
+                    (data) => {
+                        this.actualizarBzClasificar(e.numc, 0)
+                    },
+                    (errot) => {
+                        this.toastrService.error(errot, `GDoc Wkf.Estatus`);
+                    }) //
+
+            }
+        });
+        this.seleccionNavegacion(0)
+
+    }
+
+    actualizarBzClasificar(codigo, tipo) {
+        var posicion = 0
+        var i = 0
+        this.bzClasificar.forEach(e => {
+            if (e.numc == codigo) {
+                posicion = i
+                return
+            }
+            i++
+        })
+        if (tipo == 0) {
+            this.bzClasificar.splice(posicion, 1)
+        } else {
+            this.bzClasificar[posicion].existe = false
+        }
+    }
+
+
+
+
+
+
+    updateAllCompletex() {
+        this.allCompletex =
+            this.lstAllx != null && this.lstAllx.every((t) => t.completed);
+    }
+
+    someCompletex(): boolean {
+        if (this.lstAllx == null) {
+            return false;
+        }
+        return (
+            this.lstAllx.filter((t) => t.completed).length > 0 && !this.allCompletex
+        );
+    }
+
+    setAllx(completed: boolean) {
+        this.allCompletex = completed;
+        if (this.lstAllx == null) {
+            return;
+        }
+
+        this.lstAllx.forEach((t) => (t.completed = completed));
+        if (completed == false) {
+            this.estiloclasificar = 'none';
+        } else {
+            this.estiloclasificar = '';
+        }
+    }
+
+
+
 }

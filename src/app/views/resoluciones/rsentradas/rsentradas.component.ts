@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, Input, OnInit } from '@angular/core';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 
 import { ActivatedRoute, Router } from '@angular/router'
@@ -12,6 +12,15 @@ import { map, startWith } from 'rxjs/operators';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { IEntradas } from 'src/app/services/resoluciones/resolucion.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastrService } from 'ngx-toastr';
+
+import {
+  NgbDateAdapter,
+  NgbDatepickerModule,
+  NgbDateStruct,
+} from "@ng-bootstrap/ng-bootstrap"
 
 
 export interface ITipoResolucion {
@@ -20,26 +29,75 @@ export interface ITipoResolucion {
 }
 
 
+/**
+ * This Service handles how the date is represented in scripts i.e. ngModel.
+ */
+@Injectable()
+export class CustomAdapter extends NgbDateAdapter<string> {
+  readonly DELIMITER = "-"
+
+  fromModel(value: string | null): NgbDateStruct | null {
+    if (value) {
+      const date = value.split(this.DELIMITER)
+      return {
+        day: parseInt(date[0], 10),
+        month: parseInt(date[1], 10),
+        year: parseInt(date[2], 10),
+      }
+    }
+    return null
+  }
+
+  toModel(date: NgbDateStruct | null): string | null {
+    return date
+      ? date.day + this.DELIMITER + date.month + this.DELIMITER + date.year
+      : null
+  }
+}
+
+/**
+ * This Service handles how the date is rendered and parsed from keyboard i.e. in the bound input field.
+ */
+@Injectable()
+export class CustomDateParserFormatter extends NgbDateParserFormatter {
+  readonly DELIMITER = "/"
+
+  parse(value: string): NgbDateStruct | null {
+    if (value) {
+      const date = value.split(this.DELIMITER)
+      return {
+        day: parseInt(date[0], 10),
+        month: parseInt(date[1], 10),
+        year: parseInt(date[2], 10),
+      }
+    }
+    return null
+  }
+
+  format(date: NgbDateStruct | null): string {
+    return date
+      ? date.day + this.DELIMITER + date.month + this.DELIMITER + date.year
+      : ""
+  }
+}
+
+
+
 @Component({
   selector: 'app-rsentradas',
   templateUrl: './rsentradas.component.html',
-  styleUrls: ['./rsentradas.component.scss']
+  styleUrls: ['./rsentradas.component.scss'],
+  providers: [
+    { provide: NgbDateAdapter, useClass: CustomAdapter },
+    { provide: NgbDateParserFormatter, useClass: CustomDateParserFormatter },
+  ],
 })
 
 export class RsentradasComponent implements OnInit {
 
   public id: string = ''
-
-  // editor: Editor = new Editor
-
-  // xeditor: Editor = new Editor
-
-  // xobser: Editor = new Editor
-
   public estadoActual = 1
   public estadoOrigen = 1
-
-
   public fecha: any
   public vigencia: any
 
@@ -51,6 +109,31 @@ export class RsentradasComponent implements OnInit {
     valores: ''
   }
 
+  Entradas: IEntradas = {
+    id: '',
+    cedula: '',
+    asunto: '',
+    acto: 0,
+    carpeta: 0,
+    componente: 0,
+    tipo_entrada: 0,
+    cuenta: '',
+    digital: '',
+    ecomponente: 0,
+    egrado: 0,
+    estatus: 0,
+    archivo: '',
+    formato: '',
+    llave: '',
+    numero_carpeta: '',
+    numero_resol: '',
+    observacion: '',
+    registrado: '',
+    modificado: '',
+    responsable: '',
+    fecha_entrada: '',
+    fecha_resolucion: ''
+  }
 
   public Resolucion: Resolucion = {
     id: '',
@@ -79,7 +162,9 @@ export class RsentradasComponent implements OnInit {
     unidad_comando: '',
     instrucciones: '',
     n_componente: 0,
-    n_grado: 0
+    n_grado: 0,
+    codigo_componente: 0,
+    codigo_grado: 0
   }
 
   //Lista de sobrecargas
@@ -94,6 +179,8 @@ export class RsentradasComponent implements OnInit {
   public fcreacion: any
   public forigen: any
   public fplazo: any
+
+  public fecha_resolucion: any
 
   public fcreacionDate: NgbDate | null
   public forigenDate: NgbDate | null
@@ -156,6 +243,7 @@ export class RsentradasComponent implements OnInit {
   titulo = 'Documento'
 
   bHistorial = false
+  blAceptar: boolean = true
   bPDF = false
 
   nControl = ''
@@ -175,15 +263,27 @@ export class RsentradasComponent implements OnInit {
   filteredOptions: Observable<ITipoResolucion[]>
   myControl = new FormControl()
   TipoResoluciones: any
-  
-  
+
+
   CuentaGenera: any
 
   color = "#e3e6e6"
   hashcontrol = ''
-  tipo: any
-  public archivos: any
+  tipo = '0'
+  clasificacion: any
+  archivos: any
+  responsable = '0'
+  componente = '100'
+  estatus = ''
+  codigo = ''
+  xclasificacion = ''
+  xcomponente = ''
+  bclasificacion = true
 
+  @Input() entradas: any;
+  editar: boolean = false
+
+  
 
 
   constructor(private apiService: ApiService,
@@ -191,8 +291,10 @@ export class RsentradasComponent implements OnInit {
     private rutaActiva: ActivatedRoute,
     private utilService: UtilService,
     private loginService: LoginService,
+    private toastrService: ToastrService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
+    private _snackBar: MatSnackBar,
     private ruta: Router) { }
 
   ngOnInit(): void {
@@ -201,6 +303,52 @@ export class RsentradasComponent implements OnInit {
     // this.editor = new Editor()
     // this.xeditor = new Editor()
     // this.xobser = new Editor()
+
+    if (this.entradas != undefined) {
+      let e = this.entradas.rs;
+      console.log(this.entradas)
+      this.Entradas.cedula = this.entradas.id
+      this.Entradas.acto = parseInt(e.cod_acto.toString())
+      this.Entradas.responsable = e.des_responsable
+      this.Entradas.registrado = e.des_registrado
+      this.Entradas.numero_carpeta = e.numero_carpeta
+      this.Entradas.cuenta = e.cuenta_oficio
+      this.Entradas.digital = e.digital
+      this.Entradas.modificado = e.f_modificado
+      this.Entradas.estatus = e.estatus_descripcion
+      this.Entradas.tipo_entrada = e.cod_tipo_entrada
+      this.Entradas.asunto = e.asunto
+      this.Entradas.observacion = e.observacion
+      this.Entradas.responsable = e.responsable
+      this.Entradas.componente = e.componente
+      this.clasificacion = e.cod_tipo_entrada
+      this.xclasificacion = e.des_tipo_resol!=''?e.des_tipo_resol:e.des_tipo_entrada.toString()
+      this.fecha_resolucion = this.utilService.ConvertirFechaDia(
+        e.fecha_entrada
+
+      )
+
+      
+      // this.codigo = 
+
+      this.editar = true
+     
+      this.Resolucion.cedula = this.Entradas.cedula
+      // this.clasificacion = this.Entradas.tipo_entrada
+
+      console.log(this.entradas)
+
+
+      // this.myControl.value( this.Entradas.tipo_entrada )
+
+      this.consultarCedula()
+      this.estatus = this.entradas.rs.estatus.toString()
+      this.codigo = this.entradas.rs.cod_acto.toString()
+
+    }
+    this.archivos = []
+
+
     if (this.rutaActiva.snapshot.params.id != undefined) {
       const id = this.rutaActiva.snapshot.params.id
       const cnt = this.rutaActiva.snapshot.params.cuenta
@@ -220,13 +368,20 @@ export class RsentradasComponent implements OnInit {
 
 
     this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(""),
+      startWith(''),
       map((value) => (typeof value === "string" ? value : value?.name)),
       map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
     )
 
+    
+    this.xcomponente = this.Entradas.componente.toString()
+    
 
 
+  }
+
+  activar(){
+    this.bclasificacion = false
   }
 
   /**
@@ -305,7 +460,14 @@ export class RsentradasComponent implements OnInit {
   consultarCedula() {
     if (this.Resolucion.cedula == "") return false
 
-    this.ngxService.startLoader("loader-buscar")
+    if (this.fecha_resolucion == "") {
+      this._snackBar.open("Debe seleccionar una fecha para continuar", "OK")
+      return
+    }
+
+
+    // this.limpiarFrm()
+    this.ngxService.startLoader("loader-entrada")
     this.xAPI.funcion = "MPPD_CDatosBasicos"
     this.xAPI.parametros = this.Resolucion.cedula
     this.xAPI.valores = ''
@@ -313,9 +475,10 @@ export class RsentradasComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
+        // console.log(data)
         if (data != undefined && data.Cuerpo.length > 0) {
           this.Resolucion = data.Cuerpo[0]
+          console.log(data)
 
           this.Resolucion.componente = this.Componentes.filter((e) => {
             return e.cod_componente == this.Resolucion.componente
@@ -348,11 +511,12 @@ export class RsentradasComponent implements OnInit {
           this.editar_datos = true
           //this.cargarGradosIPSFA(this.Resolucion.n_componente)
           this.hashcontrol = btoa("RE" + this.Resolucion.cedula) //Cifrar documentos
+          this.myControl.setValue(this.Entradas.tipo_entrada)
 
         }
 
 
-        this.ngxService.stopLoader("loader-buscar")
+        this.ngxService.stopLoader("loader-entrada")
       },
       (error) => {
         console.error("Error de conexion a los datos ", error)
@@ -363,7 +527,7 @@ export class RsentradasComponent implements OnInit {
 
   filtrarNombramiento() {
 
-    console.log(this.lstResoluciones)
+    // console.log(this.lstResoluciones)
     const nombramiento = this.lstResoluciones[0]
 
     this.nombramiento = nombramiento.titulo + ' - ' + nombramiento.tipo_descripcion
@@ -386,6 +550,14 @@ export class RsentradasComponent implements OnInit {
     )
   }
 
+
+
+
+  cargarEntrada() {
+
+  }
+
+
   verHistorial() {
     const estado = 1
     const estatus = 1
@@ -395,6 +567,64 @@ export class RsentradasComponent implements OnInit {
 
   limpiarFrm() {
 
+    this.Resolucion = {
+      id: '',
+      cuenta: '',
+      unidad: '',
+      fecha_doc: '',
+      tipo: '0',
+      cedula: '',
+      nombres: '',
+      fecha_nacimiento: '',
+      componente: '',
+      categoria: '',
+      clasificacion: '',
+      grado: '',
+      carpeta: '0',
+      estatus: '0',
+      entrada: '0',
+      asunto: '',
+      observacion: '',
+      responsable: '',
+      cargo_responsable: '',
+      situacion: '',
+      sexo: '',
+      numero: '0',
+      gran_comando: '',
+      unidad_comando: '',
+      instrucciones: '',
+      n_componente: 0,
+      n_grado: 0,
+      codigo_componente: 0,
+      codigo_grado: 0
+    }
+
+    this.Entradas = {
+      id: '',
+      cedula: '',
+      asunto: '',
+      acto: 0,
+      carpeta: 0,
+      componente: 0,
+      tipo_entrada: 0,
+      cuenta: '',
+      digital: '',
+      ecomponente: 0,
+      egrado: 0,
+      estatus: 0,
+      archivo: '',
+      formato: '',
+      llave: '',
+      numero_carpeta: '',
+      numero_resol: '',
+      observacion: '',
+      registrado: '',
+      modificado: '',
+      responsable: '',
+      fecha_entrada: '',
+      fecha_resolucion: ''
+    }
+
   }
 
   open(content) {
@@ -402,14 +632,127 @@ export class RsentradasComponent implements OnInit {
   }
 
 
+  validarCampos(){
+   
+    if( parseInt(this.codigo) != this.Entradas.acto){
+      this.Entradas.acto = parseInt(this.codigo)
+    }
 
-  guardar() {
+    if( parseInt(this.xcomponente) != this.Entradas.componente){
+      this.Entradas.componente = parseInt(this.xcomponente)
+    }
+    
+    // console.log(this.xcomponente)
+
+    if (this.clasificacion.codigo != undefined ) {
+      if( this.Entradas.tipo_entrada != parseInt( this.clasificacion.codigo)) {
+        this.Entradas.tipo_entrada = parseInt( this.clasificacion.codigo)
+      }
+    }
+
+   
 
   }
 
-  //Listar los archivos asociados al documento
-  verArchivos(content) {
-    this.modalService.open(content, { size: 'lg' })
+  async SubirArchivo() {
+    this.validarCampos()
+    this.blAceptar = false
+    
+    this.ngxService.startLoader("loader-entrada")
+    var frm = new FormData(document.forms.namedItem("forma"))
+    try {
+      await this.apiService.EnviarArchivos(frm).subscribe((data) => {
+        this.Entradas.archivo = this.archivos[0]==undefined?'':this.archivos[0].name
+        if (!this.editar) {
+
+          this.guardar()
+        } else {
+          this.actualizar()
+        }
+      })
+
+    } catch (error) {
+      this.toastrService.error(error, `GDoc MPPD Insertar resuelto subir el archivo`)
+    }
+ 
+  }
+
+
+  guardar() {
+    if (this.Resolucion.cedula == '') {
+      this._snackBar.open("Debe seleccionar una cedula", "OK")
+      return
+    }
+    this.Entradas.cedula = this.Resolucion.cedula
+    this.Entradas.egrado = parseInt(this.Resolucion.codigo_grado.toString())
+    this.Entradas.ecomponente = parseInt(this.Resolucion.codigo_componente.toString())
+    this.Entradas.estatus = parseInt(this.estatus)
+    this.Entradas.asunto = this.Entradas.asunto.toUpperCase()
+    this.Entradas.observacion = this.Entradas.observacion.toUpperCase()
+    this.Entradas.tipo_entrada = parseInt(this.clasificacion.codigo)
+    this.Entradas.fecha_entrada = this.utilService.ConvertirFechaDia(
+      this.fecha_resolucion
+    )
+    this.Entradas.modificado = ''
+    this.xAPI.funcion = "MPPD_IEntradaResoluciones"
+    this.xAPI.parametros = ''
+    this.xAPI.valores = JSON.stringify(this.Entradas)
+
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+
+        this.toastrService.info('Proceso exitoso', `GDoc MPPD Insertar resuelto`);
+        this.ngxService.stopLoader("loader-entrada");
+        this.blAceptar = false
+        this.limpiarFrm()
+        //this.utilService.contenido$.emit( this.Entradas.cedula );
+      },
+      error => {
+        console.error(error, 'GDoc Resoluciones entradas')
+      }
+    );
+
+  }
+
+  actualizar() {
+    this.validarCampos()
+    console.log(this.Entradas)
+
+    let update = {
+      'identificador': this.entradas.rs.id,
+      'asunto': this.Entradas.asunto,
+      'observacion': this.Entradas.observacion,
+      'codigo': this.Entradas.acto,
+      'archivo': this.Entradas.archivo,
+      'estatus': this.estatus,
+      'tipo': this.Entradas.tipo_entrada,
+      'modificado': this.loginService.Usuario.cedula,
+      'cuenta': this.Entradas.cuenta,
+      'componente': this.Entradas.componente
+    }
+
+    // console.log(update, this.loginService.Usuario)
+    this.xAPI.funcion = "MPPD_AEntradasResolucion"
+    this.xAPI.parametros = ''
+    this.xAPI.valores = JSON.stringify(update)
+    console.log(this.xAPI.valores)
+    
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.toastrService.info('Proceso exitoso', `GDoc MPPD Insertar resuelto`);
+        this.ngxService.stopLoader("loader-entrada");
+        this.utilService.contenido$.emit(this.Entradas.cedula);
+        this.blAceptar = false
+      },
+      error => {
+        console.error(error, 'GDoc Resoluciones entradas')
+      }
+    );
+
+
 
   }
 
@@ -420,12 +763,30 @@ export class RsentradasComponent implements OnInit {
       return
     }
 
-    
+
   }
 
 
   fileSelected(e) {
     this.archivos.push(e.target.files[0])
+  }
+
+
+  getSituation(valor: String): String {
+    switch (valor) {
+      case "ACT":
+        return "ACTIVO";
+      case "RACT":
+        return "RESERVA ACTIVA";
+      case "CEMP":
+        return "CESE DE EMPLEO";
+      case "RINC":
+        return "REINCORPORADO";
+      case "FALL":
+        return "FALLECIDO";
+      default:
+        return ''
+    }
   }
 
 }

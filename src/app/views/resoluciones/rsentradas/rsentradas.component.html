@@ -1,4 +1,4 @@
-<ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
+<ngx-ui-loader [loaderId]="'loader-entrada'"></ngx-ui-loader>
 
 
 <div class="card-body">
@@ -19,18 +19,17 @@
                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
                     value="{{fecha}}" readonly>
             </div>
-            
+
         </div>
         <div class="row" *ngIf="bSecretaria">
             <div class="form-group col-md-12">
                 <label>Cuenta o oficio</label>
                 <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="asunto" placeholder="Introduzca el asunto..."
-                        style="width: 100%">{{asunto}}</textarea>
+                    [(ngModel)]="asunto" placeholder="Introduzca el asunto..." style="width: 100%">{{asunto}}</textarea>
             </div>
 
         </div>
-        
+
 
 
         <div class="row">
@@ -49,8 +48,7 @@
                     <mat-label>Grado</mat-label>
 
                     <input matInput placeholder="Nombre completo" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Resolucion.gran_comando" value="{{Resolucion.gran_comando}}"
-                        disabled="disabled">
+                        [(ngModel)]="Resolucion.gran_comando" value="{{Resolucion.gran_comando}}" disabled="disabled">
 
                 </mat-form-field>
             </div>
@@ -73,7 +71,8 @@
         <div class="row">
 
             <div class="col-md-12" style="padding: 15px; margin-top:-40px">
-                <table summary="" class="table table-bordered table-hover" style="width: 100%; word-break : break-word;">
+                <table summary="" class="table table-bordered table-hover"
+                    style="width: 100%; word-break : break-word;">
 
                     <thead>
                         <tr [ngStyle]="{'background-color': color}">
@@ -86,13 +85,14 @@
                             <th style="text-align: center;">{{Resolucion.componente}}</th>
                             <th style="text-align: center;">{{Resolucion.categoria}}</th>
                             <th style="text-align: center;">{{Resolucion.clasificacion}}</th>
-                            <th style="text-align: center;"></th>
+                            <th style="text-align: center;">{{ getSituation(Resolucion.situacion) }}</th>
                         </tr>
                         <tr>
                             <th colspan="4">&Uacute;ltima resoluci&oacute;n: {{ nombramiento }}</th>
                         </tr>
                         <tr>
-                            <td colspan="4" style="width: 100%; word-break : break-word;" [innerHTML]="xasunto | uppercase">
+                            <td colspan="4" style="width: 100%; word-break : break-word;"
+                                [innerHTML]="xasunto | uppercase">
 
                             </td>
                         </tr>
@@ -106,160 +106,164 @@
 
 
 
-       
-    </form>
-</div>
+        <br>
 
 
 
-<br>
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-body">
 
-                <div class="form-row">
-                    <div class="col-md-3">
-                        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                            <mat-label>Formato del Documento</mat-label>
-                            <mat-select placeholder="Documento" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.tipo">
-                                <mat-option value="0">RESOLUCION</mat-option>
-                                <mat-option value="1">ORDEN GENERAL</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
+        <div class="form-row">
+            <div class="col-md-3">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label>Formato del Documento</mat-label>
+                    <mat-select placeholder="Documento"  [(value)]="codigo"
+                        required="required">
+                        <mat-option value="1">RESOLUCION</mat-option>
+                        <mat-option value="0">ORDEN GENERAL</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
 
-                    
 
-                    <div class="form-group col-md-6">
-                        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                            <mat-label style="width:100%">Tipo de Resolución</mat-label>
-                            <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto"
-                            (blur)="seleccionTipo()" [(ngModel)]="tipo">
-                            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%">
-                                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                                    {{option.nombre}}
-                                </mat-option>
-                            </mat-autocomplete>
-                            <mat-icon matSuffix>search</mat-icon>
-                        </mat-form-field>
-                    </div>
+            <div class="col-md-3">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label>Fecha (*)</mat-label>
+                    <input matInput placeholder="Fecha " [ngModelOptions]="{standalone: true}"
+                        ngbDatepicker #fo="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
+                        [(ngModel)]="fecha_resolucion">
+                    <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button"
+                        id="fori">edit_calendar</mat-icon>
 
-                    <div class="col-md-3">
-                        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                            <mat-label style="width:100%">Número</mat-label>
 
-                            <input matInput placeholder="Seleccionar unidad" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.numero" value="{{Resolucion.numero}}">
-                            <mat-icon matSuffix >folder</mat-icon>
+                </mat-form-field>
+            </div>
+            
 
-                        </mat-form-field>
-                    </div>
-                    
-                </div>
-                <div class="form-row">
+            <div class="col-md-3">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label style="width:100%">Carpeta Número</mat-label>
 
-                    
+                    <input matInput placeholder="Carpeta Número" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="Entradas.numero_carpeta" value="{{Entradas.numero_carpeta}}" required="required">
 
-                    <!-- <div class="form-group col-md-4">
-                        <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
-                            <mat-label>Número de Resolución </mat-label>
-                            <input matInput placeholder="" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.numero" value="{{Resolucion.numero}}">
-                        </mat-form-field>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
-                            <mat-label style="width:100%">Tipo de Resolución</mat-label>
-                            <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
-                            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%">
-                                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                                    {{option.des_resol}}
-                                </mat-option>
-                            </mat-autocomplete>
-                        </mat-form-field>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <mat-form-field class="example-full-width" appearance="fill" style="width:100%">
-                            <mat-label>Número Carpeta </mat-label>
-                            <input matInput placeholder="" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.carpeta" value="{{Resolucion.carpeta}}">
-                        </mat-form-field>
-                    </div> -->
-                </div>
+                </mat-form-field>
+            </div>
+
+            <div class="form-group col-md-3">
+                
+                <mat-form-field  class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label style="width:100%">Cuenta</mat-label>
+                    <input  type="text" matInput  
+                    [ngModelOptions]="{standalone: true}" [(ngModel)]="Entradas.cuenta" value="{{Entradas.cuenta}}" >
+                </mat-form-field>
+            </div>
+
+
+            <div class="col-md-4">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label>Componente</mat-label>
+                    <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}" 
+                    [(ngModel)]="xcomponente" value="{{xcomponente}}"
+                        required="required">
+                        <mat-option *ngFor="let e of Componentes;"
+                            [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
 
 
 
-                <div class="form-row">
-                    <div class="form-group col-md-12">
-                        <label for="txtObjeto">Asunto</label>
-                        <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.asunto" placeholder="Introduzca el asunto..."
-                                style="width: 100%">{{Resolucion.asunto}}</textarea>
-                    </div>
-                </div>
+            <div class="form-group col-md-5">
+                <mat-form-field *ngIf="bclasificacion" class="example-full-width" appearance="outline" style="width:100%">
+                    <input readonly="readonly" type="text" matInput (click)="activar()" [(ngModel)]="xclasificacion">
+                </mat-form-field>
+                <mat-form-field *ngIf="!bclasificacion" class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label style="width:100%">Clasificacion de documento</mat-label>
+                    <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto"
+                        (blur)="seleccionTipo()" [(ngModel)]="clasificacion">
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%">
+                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option" required="required">
+                            {{option.nombre}}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+            </div>
 
-                <div class="form-row">
-                    <div class="form-group col-md-12">
-                        <label for="txtObjeto">Observaciones</label>
-                        <!-- <div class="NgxEditor__Wrapper">
-                            <angular-editor [placeholder]="'Enter text here...'"
-                                [(ngModel)]="Resolucion.observacion"></angular-editor>
-                        </div> -->
-                        <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.observacion" placeholder="Introduzca el asunto..."
-                                style="width: 100%">{{Resolucion.observacion}}</textarea>
-                    </div>
-                </div>
+            <div class="col-md-3">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label>Estatus</mat-label>
+                    <mat-select placeholder="Estatus"  required="required" [(value)]="estatus">
+                        <mat-option *ngFor="let e of Estados;"
+                            [value]="e.cod_estado_resol">{{e.des_estado_resol}}</mat-option>
+
+                    </mat-select>
+                </mat-form-field>
+            </div>
 
 
-                <div class="form-row">
-                    <div class="col-md-4">
-                        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                            <mat-label>Estatus</mat-label>
-                            <mat-select placeholder="Documento" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Resolucion.estatus">
-                                <mat-option *ngFor="let e of Estados;" [value]="e.cod_estado_resol">{{e.des_estado_resol}}</mat-option>
-                                
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                    <div class="form-group col-md-8" style="padding-top:5px ;">
-                        <form method="post" enctype="multipart/form-data" id="forma" name="forma">
-                            <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly" >
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="input_container">
-                                        <input style="height: 48px;" (change)="fileSelected($event)" id="fileUpload" type="file"
-                                            name="archivos" accept=".pdf" />
+        </div>
 
-                                    </div>
-                                </div>
-                                <!-- <div class="col-md-3">
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <textarea class="form-control" cols="30" rows="2" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="Entradas.asunto" placeholder="Introduzca el asunto..." style="width: 100%"
+                    required="required">{{Entradas.asunto}}</textarea>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <textarea class="form-control" cols="30" rows="2" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="Entradas.observacion" placeholder="Introduzca las observaciones..."
+                    style="width: 100%">{{Entradas.observacion}}</textarea>
+            </div>
+        </div>
+
+
+        <div class="form-row">
+            
+            <div class="col-md-5">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label>Responsable</mat-label>
+                    <mat-select placeholder="Responsable" [(ngModel)]="responsable">
+                        <mat-option value="0">TRANSCRIPCION</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="form-group col-md-7" style="padding-top:5px ;">
+                <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+                    <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input_container">
+                                <input style="height: 48px;" (change)="fileSelected($event)" id="fileUpload" type="file"
+                                    name="archivos" accept=".pdf" />
+
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-3">
                                         <button class="btn bg-success text-white ">
                                             <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar
                                             Archivos </button>
                                     </div> -->
-                            </div>
-                        </form>
                     </div>
-                </div>
+                </form>
+            </div>
+        </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="text-right">
-                            <button class="btn bg-primary text-white" (click)="guardar()">Aceptar</button>
-                        </div>
-                    </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="text-right">
+                    <button *ngIf="!editar && blAceptar" class="btn bg-primary text-white" (click)="SubirArchivo()">Aceptar</button>
+                    <button *ngIf="editar && blAceptar" class="btn bg-warning text-white" (click)="SubirArchivo()">Actualizar</button>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Fin de Tarjeta Padre -->
+    </form>
 </div>
-<!-- Fin de Tarjeta Padre -->
-
-
 
 
 

@@ -274,7 +274,8 @@
                         <div class="form-group col-md-12" *ngIf="resolucion">
                             <table class="table align-items-center table-flush" style="table-layout: fixed; border-collapse: collapse; width:100%;">
                                 <thead class="thead-light">
-                                    <th>N°</th>
+                                    <th style="text-align:center;width:10px">N°</th>
+                                    <th style="text-align:center;width:120px">ACCIÓN</th>
                                     <th [style.display]="puntocuenta?'':'none'">Cuenta</th>
                                     <th [style.display]="puntocuenta?'':'none'">Resumen</th>
                                     <th [style.display]="puntocuenta?'':'none'">Fecha</th>
@@ -284,7 +285,10 @@
                                 </thead>
                                 <tbody>
                                     <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
-                                        <td style="text-align:center;width:20px">
+                                        <td style="text-align:center;width:10px">
+                                           <font style="font-weight: bold;"> {{i+1}}</font>
+                                        </td>
+                                        <td style="text-align:center;width:120px">
 
                                             <div class="btn-group" role="group" aria-label="Basic"
                                                 *ngIf="el.activo == 0">

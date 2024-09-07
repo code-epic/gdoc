@@ -1,3 +1,152 @@
+<!-- Adjuntar Imagenes al Documento -->
+<ng-template #frmEntrada let-c="close" let-d="dismiss">
+    <div class="modal-body">
+
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs">
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    &nbsp;VISTA GENERAL
+                </ng-template>
+                <div class="example-large-box " style="margin: 0px;padding: 15px;">
+                    <div class="form-row">
+                        <div class=" col-md-6">
+                            <mat-form-field appearance="outline">
+                                <mat-label>Cuenta u Oficio</mat-label>
+                                <input matInput placeholder="Cuenta u Oficio" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="cuenta" readonly="readonly">
+                            </mat-form-field>
+                        </div>
+                        <div class=" col-md-6">
+                            <mat-form-field appearance="outline">
+                                <mat-label>Digital</mat-label>
+                                <input matInput placeholder="Digital" [ngModelOptions]="{standalone: true}" [(ngModel)]="digital"
+                                readonly="readonly">
+                            </mat-form-field>
+                        </div>
+                        <div class=" col-md-6">
+            
+                            <mat-form-field appearance="outline">
+                                <mat-label>Documento</mat-label>
+                                <input matInput placeholder="Documento" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="documento" readonly="readonly">
+                            </mat-form-field>
+            
+                        </div>
+            
+                        <div class=" col-md-6">
+            
+                            <mat-form-field appearance="outline">
+                                <mat-label>Tipo</mat-label>
+                                <input matInput placeholder="Tipo" [ngModelOptions]="{standalone: true}" 
+                                [(ngModel)]="tipo_entrada" readonly="readonly">
+                            </mat-form-field>
+            
+                        </div>
+                        
+                        <div class=" col-md-5">
+            
+                             <mat-form-field appearance="outline">
+                                <mat-label>Estatus</mat-label>
+                                <input matInput placeholder="Estatus" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="estatus_entrada" readonly="readonly">
+                            </mat-form-field> 
+            
+                        </div>
+                        
+                        <div class=" col-md-5">
+            
+                            <mat-form-field appearance="outline">
+                                <mat-label>Carpeta</mat-label>
+                                <input matInput placeholder="Carpeta" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="carpeta_entrada" readonly="readonly">
+                            </mat-form-field>
+            
+                        </div>
+
+                        <div class=" col-md-2">
+            
+                            <mat-form-field appearance="outline">
+                                <mat-label>Número Carpeta</mat-label>
+                                <input matInput placeholder="Número Carpeta" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="numero" readonly="readonly">
+                            </mat-form-field>
+            
+                        </div>
+            
+                        <div class=" col-md-12">
+            
+                            <mat-form-field appearance="outline">
+                                <mat-label>Asunto</mat-label>
+                                <input matInput placeholder="Asunto" 
+                                readonly="readonly"
+                                [ngModelOptions]="{standalone: true}" [(ngModel)]="asunto_entrada">
+                            </mat-form-field>
+            
+                        </div>
+            
+                        <div class=" col-md-12">
+            
+                            <mat-form-field appearance="outline">
+                                <mat-label>Observacion</mat-label>
+                                <input matInput placeholder="Observacion" 
+                                [ngModelOptions]="{standalone: true}" [(ngModel)]="observacion_entrada" readonly="readonly">
+                            </mat-form-field>
+            
+                        </div>
+            
+                    </div>
+            
+            
+            
+                    <div class="form-row">
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-hover">
+            
+                                <thead>
+                                    <tr style="background-color: #CCC">
+                                        <th style="text-align: center;">RESPONSABLE</th>
+                                        <th style="text-align: center;">FECHA CREACION</th>
+            
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: center;">{{responsable_entrada}}</td>
+                                        <td style="text-align: center;">{{modificado_entrada}}</td>
+            
+                                    </tr>
+                                    <tr style="background-color: #CCC">
+                                        <th style="text-align: center;">REGISTRADO POR</th>
+                                        <th style="text-align: center;">FECHA REGISTRO</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: center;">{{registrado_entrada}}</td>
+                                        <td style="text-align: center;">{{modificado_entrada}}</td>
+            
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    &nbsp;HISTORICO DE VERSIONES
+                </ng-template>
+                <div class="example-large-box " style="margin: 0px;padding: 15px;">
+                </div>
+         </mat-tab>
+        </mat-tab-group>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn bg-gradient-info text-white " (click)="c('Save')">
+            <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+
+    </div>
+</ng-template>
+
+
+
 <div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
     <div class="container-fluid">
         <p></p>
@@ -316,9 +465,9 @@
                                         </div>
 
 
-                                        <div class="row" *ngIf="dbDatos">
+                                        <div class="row"  *ngIf="dbDatos">
 
-                                            <div class="col-md-12 d-none">
+                                            <div class="col-md-12">
                                                 <br><br>
                                                 <h2> ENTRADAS</h2>
                                                 <table style="width: 100%;" class="zigzag" border="1">
@@ -326,20 +475,37 @@
 
                                                         <tr>
                                                             <th style="width: 90px;"> FECHA</th>
-                                                            <th tyle="width: 150px;"> CUENTA</th>
+                                                            <th>CUENTA</th>
+                                                            <th>ESTATUS</th>
                                                             <th>ASUNTO</th>
+                                                            <th>VER</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr *ngFor="let e of lstEntradas">
-                                                            <td>{{e.fecha_entrada}}</td>
-                                                            <td>
-                                                                <a class="enlace" (click)="dwUrlEntrada(e)"
+                                                            <td>{{ convertirFecha(e.fecha_entrada)}}</td>
+                                                            <td>   
+                                                                <a *ngIf="e.cuenta_oficio!=''"  
+                                                                class="enlace" (click)="dwUrlEntrada(e)"
                                                                     target="_blank"
                                                                     style="font-weight: bold; color: brown;">
                                                                     {{ e.cuenta_oficio }} </a>
+                                                                <a *ngIf="e.cuenta_oficio==''"  
+                                                                class="enlace" (click)="dwUrlEntrada(e)"
+                                                                    target="_blank"
+                                                                    style="font-weight: bold; color: brown;">
+                                                                     VER DOC. </a>
+                                                                
+
                                                             </td>
+                                                            <td>{{ e.estatus_descripcion }}</td>
                                                             <td [innerHTML]="e.asunto | uppercase"></td>
+                                                            <td style="text-align: center;">
+                                                                <button mat-icon-button aria-label="Editar"
+                                                                    (click)="detalleEntrada( frmEntrada, e )">
+                                                                    <mat-icon class="text-blue">notes</mat-icon>
+                                                                </button>
+                                                            </td>
                                                             
                                                         </tr>
                                                     </tbody>

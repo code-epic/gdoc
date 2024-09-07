@@ -36,6 +36,10 @@ export class RegistrarComponent implements OnInit {
   public estatusAcutal = 1
 
   public paginador = 10
+  fecha_desde = '-09-01'
+  fecha_hasta = '-09-30'
+  xyear = '2024'
+
   public focus;
   public hashcontrol = ''
 
@@ -98,6 +102,9 @@ export class RegistrarComponent implements OnInit {
   public bzBusqueda = []
   public bzAlertasO = []
   public bzAlertas = []
+  public lstMeses = []
+  public lstYear = []
+  public xmeses = ''
   public buscar = ''
   public extender_plazo = ''
   public detalles = ''
@@ -128,11 +135,17 @@ export class RegistrarComponent implements OnInit {
     config.backdrop = 'static';
     config.keyboard = false;
     this.strRuta = environment.Url + environment.API
+    this.lstMeses = this.apiService.Xmeses
+    this.lstYear = this.apiService.Xyear
+  
   }
 
 
   ngOnInit(): void {
     // this.editor = new Editor();
+    // console.log( new Date().getMonth(), new Date().getFullYear() )
+    this.xmeses = new Date().getMonth().toString()
+    this.xyear = new Date().getFullYear().toString()
     this.listarEstados()
     this.seleccionNavegacion(0)
 
@@ -291,18 +304,21 @@ export class RegistrarComponent implements OnInit {
 
   seleccionNavegacion(e) {
     this.selNav = e
-    this.xAPI.funcion = 'WKF_CDocumentos'
+    this.xAPI.funcion = 'WKF_CDocumentosGestion'
     this.xAPI.valores = ''
     this.buzon = []
     this.bzOriginal = []
+    this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
+    this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
 
     switch (e) {
       case 0:
-        this.xAPI.parametros = '1,1'
+        this.xAPI.parametros = `1,1,${this.fecha_desde},${this.fecha_hasta}`
+        
         this.listarBuzon()
         break;
       case 1:
-        this.xAPI.parametros = '1,2'
+        this.xAPI.parametros = `1,2,${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon()
         break;
       case 2:

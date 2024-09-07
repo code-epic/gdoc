@@ -20,6 +20,9 @@ export class BuzonComponent implements OnInit {
 
   public estadoActual = 2
   public estatusAcutal = 1
+  fecha_desde = '-09-01'
+  fecha_hasta = '-09-30'
+  xyear = '2024'
 
   public extender_plazo: any
 
@@ -108,6 +111,10 @@ export class BuzonComponent implements OnInit {
     usuario : ''
   }
 
+  public lstMeses = []
+  public lstYear = []
+  public xmeses = ''
+
   constructor(
     private apiService: ApiService,
     private ruta: Router,
@@ -116,10 +123,15 @@ export class BuzonComponent implements OnInit {
     private utilService: UtilService,
     private loginService: LoginService,
     private modalService: NgbModal) {
+
+      this.lstMeses = this.apiService.Xmeses
+      this.lstYear = this.apiService.Xyear
       
   }
 
   ngOnInit(): void {
+    this.xmeses = new Date().getMonth().toString()
+    this.xyear = new Date().getFullYear().toString()
     this.listarEstados()
     this.seleccionNavegacion(0)
   }
@@ -181,24 +193,26 @@ export class BuzonComponent implements OnInit {
 
   seleccionNavegacion(e) {
     this.buzon = []
-    this.xAPI.funcion = 'WKF_CDocumentos'
+    this.xAPI.funcion = 'WKF_CDocumentosGestion'
     this.xAPI.valores = ''
     this.selNav = e
 
     this.clasificacion = false
     this.cargarAcciones(e)
+    this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
+    this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
 
     switch (e) {
       case 0:
-        this.xAPI.parametros = this.estadoActual + ',' + this.estatusAcutal
+        this.xAPI.parametros = `${this.estadoActual},${this.estatusAcutal},${this.fecha_desde},${this.fecha_hasta}` 
         this.listarBuzon()
         break
       case 1:
-        this.xAPI.parametros = this.estadoActual + ',' + 2
+        this.xAPI.parametros = `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}` 
         this.listarBuzon()
         break
       case 2:
-        this.xAPI.parametros = this.estadoActual + ',' + 3
+        this.xAPI.parametros = `${this.estadoActual},3,${this.fecha_desde},${this.fecha_hasta}` 
         this.listarBuzon()
         break
       case 3:

@@ -1,35 +1,37 @@
-<nav class="navbar navbar-vertical navbar-expand-md navbar-light bg-white" id="sidenav-main">
-  <div class="container-fluid">
-    <!-- Brand -->
-    <a class="navbar-brand pt-0" routerLinkActive="active" [routerLink]="['/dashboard']">
-      <div class="div" style="margin-left: 0%;">
-        <img src="./assets/img/brand/mppd.png" style="height: 70px; height: 70px;" alt="...">
-      </div>
-    </a>
-    <!-- Collapse -->
-    <div class="collapse navbar-collapse"  [ngbCollapse]="isCollapsed" id="sidenav-collapse-main">
-      <!-- Navigation -->
-      <ul class="navbar-nav">
-        <!-- <li *ngFor="let menuItem of menuItems" class="{{menuItem.class}} nav-item"></li> -->
-          <li *ngFor="let menuItem of menuItems" class=" nav-item">
+
+
+    <nav class="navbar navbar-vertical navbar-expand-md navbar-light bg-white" id="sidenav-main">
+      <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand pt-0" routerLinkActive="active" [routerLink]="['/dashboard']">
+          <div class="div" style="margin-left: 0%;">
+            <img src="./assets/img/brand/mppd.png" style="height: 70px; height: 70px;" alt="...">
+          </div>
+        </a>
+        <!-- Collapse -->
+        <div class="collapse navbar-collapse" [ngbCollapse]="isCollapsed" id="sidenav-collapse-main">
+          <!-- Navigation -->
+          <ul class="navbar-nav">
+            <!-- <li *ngFor="let menuItem of menuItems" class="{{menuItem.class}} nav-item"></li> -->
+            <li *ngFor="let menuItem of menuItems" class=" nav-item">
               <a routerLinkActive="active" [routerLink]="[menuItem.path]" class="nav-link">
-                  <i class="ni {{ menuItem.icon + ' ' +  menuItem.class}}"></i>
-                  {{menuItem.title}}
+                <i class="ni {{ menuItem.icon + ' ' +  menuItem.class}}"></i>
+                {{menuItem.title}}
               </a>
-          </li>
-          <li class=" nav-item">
-            <a routerLinkActive="active" [routerLink]="['/buscador']" class="nav-link">
+            </li>
+            <li class=" nav-item">
+              <a routerLinkActive="active" [routerLink]="['/buscador']" class="nav-link">
                 <i class="ni ni-books text-blue"></i>
                 Buscador
-            </a>
-          </li>
-          <li class=" nav-item">
-            <a routerLinkActive="active" [routerLink]="['/papelera']" class="nav-link">
+              </a>
+            </li>
+            <li class=" nav-item">
+              <a routerLinkActive="active" [routerLink]="['/papelera']" class="nav-link">
                 <i class="ni ni-basket text-red"></i>
                 Papelera
-            </a>
-          </li>
-      </ul>
-    </div>
-  </div>
-</nav>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>

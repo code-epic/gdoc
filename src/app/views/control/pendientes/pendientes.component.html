@@ -151,7 +151,7 @@
                   <a routerLinkActive="active" [routerLink]="['/constancia', constancia(e.numc)]">
                     {{ e.numc }} - {{ e.tdoc }}
                   </a>
-                  | {{ e.origen | date : "dd-MM-yyyy" }}
+                  | CREADO {{ e.fecha | date : "dd/MM/yyyy hh:mm:ss" }}
                 </div>
                 <div class="col-md-4 text-right">
                   <span class="badge rounded-pill text-bg-primary">pdf</span>
@@ -178,18 +178,20 @@
                   <div [innerHTML]="e.resumenl" class="contenido"></div>
                   <br>
                   <p class="fecha-documento">
-                    <small class="mr-3"><i class="fa fa-calendar"></i>&nbsp;{{
-                      e.fecha | date : "dd-MM-yyyy hh:mm"
+                    <small class="mr-3"><i class="fa fa-calendar"></i>&nbsp;FECHA ORIGEN {{
+                      e.origen | date : "dd/MM/yyyy"
                       }}</small>
-                    <small class="mr-3"><i class="fa fa-map-pin"></i> &nbsp; ORIGEN
+                    <small class="mr-3"><i class="fa fa-map-pin"></i> &nbsp;NÚM. ORIGEN
                       {{ e.norigen | uppercase }}</small>
-                    <small class="mr-3"><i class="fa fa-folder"></i> &nbsp; SALIDA
-                      {{ e.salida | uppercase }}</small>
+                   
 
                     <small class="mr-4"><i class="fa fa-globe"></i> &nbsp;
                       {{ e.nombre | uppercase }} (
                       {{ e.estatus_nombre | uppercase }} {{ e.s_texto }} )
                     </small>
+
+                    <small class="mr-3" *ngIf="e.salida!=''"><i class="fa fa-folder"></i> &nbsp; SALIDA
+                      {{ e.salida | uppercase }}</small>
                   </p>
                 </div>
 

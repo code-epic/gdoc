@@ -56,8 +56,43 @@
               &nbsp;RECIBIDOS
             </ng-template>
 
-            <div class="container">
-              <mat-selection-list #lstDocumentos>
+            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list >
+                <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1">
+                     
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                     NUMERO CONTROL
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      FECHA / ORIGEN
+                    </div>
+                    <div class="col-md-3 texto-lista">
+                      UNIDAD DEPENDENCIA
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                        value="{{xyear}}" style="margin-top: -20px;">
+                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                      </select>
+                     
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
+                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                    </select>
+                  </div>
+
+                  </div>
+
+                </mat-list>
+              </mat-selection-list>
+
+              <mat-selection-list style="margin-top:-7px; ">
                 <mat-list *ngFor="let e of buzon; let i=index "
                   class="mat-list-general">
                   <div class="row">
@@ -72,17 +107,20 @@
                         &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-2 texto-lista">
-                      {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
+                      {{ e.fcre | date:"dd/MM/yyyy" }} | {{ e.nori | uppercase }}
                     </div>
-                    <div class="col-md-2 texto-detalle">
+                    
+                    <div class="col-md-4 texto-detalle" #tooltip="matTooltip"
+                    matTooltip="{{ e.fech | date : 'hh:mm:ss' }}">
+                      {{ e.udep | uppercase }} / {{ e.coma | uppercase }}
+                    </div>
+                    <div class="col-md-2 texto-detalle text-right">
                       <!-- Llama al tipo de documento que se recibe AC 18/03/24 11:00am -->
                       {{ e.tdoc | uppercase }}
                     </div>
-                    <div class="col-md-4 texto-detalle">
-                      {{ e.udep | uppercase }} / {{ e.coma | uppercase }}
-                    </div>
                     <div class="col-md-1 text-right">
-                      <a [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer"
+                      <a *ngIf="e.anom!=''"
+                       [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer"
                         class="href-style">
                         <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
                           class="image-style" />
@@ -97,7 +135,7 @@
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
           </mat-tab>
-          <mat-tab>
+          <!-- <mat-tab>
             <ng-template mat-tab-label>
               &nbsp;ALERTAS
             </ng-template>
@@ -121,7 +159,7 @@
                     </div>
                     <div class="col-md-1 text-right ">
                       <button mat-icon-button aria-label="Privado">
-                        <!--  -->
+                       
                         <mat-icon class="text-warning" (click)="open(observacion, e.id_alerta)">today</mat-icon>
                       </button>
                     </div>
@@ -133,7 +171,7 @@
             <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
-          </mat-tab>
+          </mat-tab> -->
         </mat-tab-group>
       </div>
     </div>

@@ -37,9 +37,10 @@
             <div class="col-md-1">
               <div class="media align-items-center">
                 <div class="example-button-row">
-                  <button mat-icon-button title="Volver Atrás" (click)="_atras()">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+
                     <mat-icon>arrow_back</mat-icon>
-                  </button>
+                  </button> 
                 </div>
               </div>
             </div>
@@ -148,13 +149,14 @@
                         Detalles de puntos de cuenta
                       </mat-panel-title>
                       <mat-panel-description>
-                        Listado general
+                        Listado general ( {{ lstCuenta.length }} )
 
                       </mat-panel-description>
                     </mat-expansion-panel-header>
                     <table class="table align-items-center table-flush table-general">
                       <thead class="thead-light">
-                        <th> <mat-checkbox [checked]="allComplete" (change)="setAll($event.checked)" color="warn"></mat-checkbox></th>
+                        <th style="width: 20px;">#</th>
+                        <!-- <th style="width: 20px;"> <mat-checkbox [checked]="allComplete" (change)="setAll($event.checked)" color="warn"></mat-checkbox></th> -->
                         <th>GRADO / COMPONENTE</th>
                         <th>Nombres y Apellidos</th>
                         <th>CEDULA</th>
@@ -162,23 +164,32 @@
                       </thead>
                       <tbody>
                         <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
-                          <td>
+                          <td style="width: 20px;">{{i+1}}</td>
+                          <td style="display: none;">
                             <input type="hidden" class="form-control"  id="{{ i }}-nomb" value="{{ el.nombre }}">
                             <input type="hidden" class="form-control"  id="{{ i }}-cedu" value="{{ el.cedula }}">
                             <input type="hidden" class="form-control"  id="{{ i }}-carg" value="{{ el.cargo }}">
                             <input type="hidden" class="form-control" id="{{ i }}-nomb" value="{{ el.nombre }}">
                             <input type="hidden" class="form-control" id="{{ i }}-cedu" value="{{ el.cedula }}">
                             <input type="hidden" class="form-control" id="{{ i }}-carg" value="{{ el.cargo }}">
-                            <mat-checkbox class="example-margin texto-lista" [(ngModel)]="el.completed" color="warn"
+                            <!-- <mat-checkbox class="example-margin texto-lista" [(ngModel)]="el.completed" color="warn"
                               (ngModelChange)="updateAllComplete()">
-                            </mat-checkbox>
+                            </mat-checkbox> -->
                           </td>
                           <td class="td-width">{{ el.cargo }}</td>
                           <td class="td-width">{{ el.nombre }}</td>
                           <td class="td-width-menor">{{ el.cedula }}</td>
                           <td>
-                            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                              id="{{i}}-text">
+                              <select class="form-control" id="{{i}}-text" [value]="el.detalle==''?'PR':getDetalle(el.detalle) ">
+                                <option value="PR">PROCESAR</option>
+                                <option value="NP">NO PROCESAR</option>
+                                <option value="NPPIDD">NP POR INT. DEL DIRECTOR</option>
+                                <option value="NPPIDJ">NP POR INT. DEL JEFE DE AREA</option>
+                                <option value="CR">CODIGO ROJO</option>
+                                <option value="BD">NO PROCESAR POR ASCENSO</option>
+                              </select>
+                            <!-- <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                              id="{{i}}-text"> -->
                           </td>
                         </tr>
                       </tbody>
@@ -186,7 +197,7 @@
 
                     <div class="form-group col-md-12 text-right">
                       <br>
-                      <button mat-raised-button  (click)="transfererirResoluciones();">Transferir a Resoluciones</button>
+                      <button mat-raised-button  color="warn" (click)="transfererirResoluciones()">Aceptar cambios</button>
                     </div>
                   </mat-expansion-panel>
                 </mat-accordion>

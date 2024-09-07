@@ -205,7 +205,7 @@ export class SbuscadorComponent implements OnInit {
       (data) => {
         this.lstDatos = data.Cuerpo
         //onsole.log( JSON.parse( this.lstDatos[0].subdocumento ) )
-        console.log(this.lstDatos)
+        // console.log(this.lstDatos)
         this.ngxService.stopLoader("loader-aceptar")
         
         this.cargador = true
@@ -221,14 +221,17 @@ export class SbuscadorComponent implements OnInit {
   }
 
   getFecha(e) : string {
+    let fecha = ''
     let d =  JSON.parse( e ) 
-    return d[0].fecha
+    
+    if (d!=null){
+      fecha = d[0].fecha 
+    }else{
+      fecha = '2000-01-01'
+    }
+    return fecha
   }
 
-  getDecisiones(e) : string {
-    let d =  JSON.parse( e ) 
-    return d[0].fecha 
-  }
 
   realizarBusquedaFecha(fecha: Date): void {
     this.bzBusqueda = this.bzSeguimientoO.filter((e) => {
@@ -276,8 +279,8 @@ export class SbuscadorComponent implements OnInit {
     this.xAPI.funcion = "WKF_CSeguimiento";
 
     if (this.contenidoDocumento != "") {
-      desde = this.desde == undefined ? '2022-01-01' : this.desde
-      hasta = this.hasta == undefined ? '2025-12-31' : this.hasta
+      desde = this.desde == undefined ? '2024-01-01' : this.desde
+      hasta = this.hasta == undefined ? '2024-12-31' : this.hasta
       this.xAPI.parametros = this.contenidoDocumento + ',' + desde + ',' + hasta + ',' + this.buscar + ',' + this.tipoDocumento
       console.log(this.xAPI.parametros)
     } else {

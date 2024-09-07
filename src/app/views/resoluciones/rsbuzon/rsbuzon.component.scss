@@ -8,6 +8,13 @@ ul {
     font-weight: bold;
 }
 
+.texto-sub-lista{
+  margin-top: 12.5px;
+  font-weight: normal;
+  color: #434141;
+}
+
+
 .texto-detalle {
     margin-top: 13px;
     font-weight: none;
@@ -185,3 +192,7 @@ textarea {
   .context-menu-item:active {
     background-color: rgb(170, 170, 170);
   }
+
+  ::ng-deep .mat-autocomplete-panel {
+    z-index: 1000; /* Ajusta este valor según tus necesidades */
+}

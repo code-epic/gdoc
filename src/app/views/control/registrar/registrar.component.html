@@ -37,7 +37,8 @@
                     </div>
                   </a>
                   <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                    <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item"  id="nuevodocumento">
+                    <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item"
+                      id="nuevodocumento">
                       <i class="fa fa-plus"></i>
                       <span>Nuevo Documento</span>
                     </a>
@@ -45,7 +46,7 @@
                       <i class="fa fa-search"></i>
                       <span>Notas de Entrega</span>
                     </a>
-               
+
                   </div>
                 </li>
               </ul>
@@ -53,15 +54,15 @@
           </div>
         </div>
 
-        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" 
-        (selectedIndexChange)="seleccionNavegacion($event)">
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
+          (selectedIndexChange)="seleccionNavegacion($event)">
           <mat-tab>
             <ng-template mat-tab-label>
               &nbsp;REGISTRADOS
             </ng-template>
 
-            <div class="container">
-              <mat-selection-list #documento>
+            <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1" [ngStyle]="{'display':estilocheck}">
@@ -71,8 +72,28 @@
                     </div>
                     <div class="col-md-2">
                       <button mat-icon-button aria-label="Example " (click)="open(content, 0)" id="clasificar">
-                        <mat-icon>assignment_turned_in</mat-icon>
+                        <mat-icon>folder_copy</mat-icon>
                       </button>
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      FECHA / ORIGEN
+                    </div>
+                    <div class="col-md-3 texto-lista">
+                      UNIDAD DEPENDENCIA
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                        value="{{xyear}}" style="margin-top: -20px;">
+                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                      </select>
+
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                        value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
+                        <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                      </select>
                     </div>
 
                   </div>
@@ -80,7 +101,7 @@
                 </mat-list>
               </mat-selection-list>
 
-              <mat-selection-list #lstDocumentos style="margin-top:-7px;">
+              <mat-selection-list style="margin-top:-7px; ">
                 <mat-list *ngFor="let e of buzon; let i=index "
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
@@ -90,16 +111,18 @@
                       </mat-checkbox>
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="{{e.color}}">{{ e.simbolo }}</font></a>
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
+                        &nbsp;<font color="{{e.color}}">{{ e.simbolo }}</font></a>
 
                     </div>
                     <div class="col-md-2 texto-lista">
-                      {{ e.fcre | date:"dd-MM-yyyy" }} |  {{ e.nori | uppercase }} 
+                      {{ e.fcre | date:"dd/MM/yyyy" }} | {{ e.nori | uppercase }}
                     </div>
-                    <div class="col-md-5 texto-detalle" #tooltip="matTooltip" matTooltip="  {{ e.udep | uppercase }}">
+                    <div class="col-md-5 texto-detalle" #tooltip="matTooltip"
+                      matTooltip="{{ e.fech | date : 'hh:mm:ss' }}">
                       {{ e.udep | uppercase }}
                     </div>
-                    
+
                     <div class="col-md-2 text-right " style="margin-top:-20px;">
                       <button mat-icon-button aria-label="Privado">
                         <mat-icon *ngIf="e.privado" class="text-warning">no_encryption</mat-icon>
@@ -107,9 +130,13 @@
                       <button mat-icon-button aria-label="Editar" (click)="editar( e.numc )">
                         <mat-icon class="text-gray">edit_note</mat-icon>
                       </button>
-                      <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                      <button *ngIf="e.anom==''"  mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
                         <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
+                      <button *ngIf="e.anom!=''" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                        <mat-icon class="text-blue">attach_file</mat-icon>
+                      </button>
+                      
                       <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.numc, e.idd)">
                         <mat-icon class="text-gray">delete_outline</mat-icon>
                       </button>
@@ -178,7 +205,8 @@
                 </div>
 
                 <mat-action-row>
-                  <button *ngIf="btnNota" class="btn bg-gradient-primary text-white " (click)="notaEntrega(x.id)" id="btnota">
+                  <button *ngIf="btnNota" class="btn bg-gradient-primary text-white " (click)="notaEntrega(x.id)"
+                    id="btnota">
                     <span class="fa fa-print"></span>&nbsp;&nbsp; Nota de entrega
                   </button>
 
@@ -187,7 +215,7 @@
             </mat-accordion>
             <br>
 
- 
+
 
           </mat-tab>
 
@@ -202,7 +230,8 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.ncontrol )]">{{ e.ncontrol }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.ncontrol )]">{{
+                        e.ncontrol }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-4 texto-lista">
                       {{ e.unidad | uppercase }}
@@ -272,7 +301,8 @@
       <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
       <label for="input-folder-2">Seleccionar Archivo</label>
       <div class="custom-file">
-        <input (change)="fileSelected($event)" id="formFile" class="custom-file-input" name="archivos" type="file" accept=".pdf">
+        <input (change)="fileSelected($event)" id="formFile" class="custom-file-input" name="archivos" type="file"
+          accept=".pdf">
         <label for="formFile" class="custom-file-label">{{lblFile}}</label>
       </div>
       <div id="errorBlock" class="help-block"></div>

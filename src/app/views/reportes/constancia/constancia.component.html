@@ -5,8 +5,11 @@
 </div>
 
 <div class="container-fluid mt--9">
+    
     <div class="row">
+
         <div class="col-xl-12 col-md-12 col-lg-12">
+            <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
             <div class="card shadow">
                 <div class="card-header bg-transparent">
                     <div class="row ">
@@ -84,7 +87,7 @@
                         <div class="form-group  col-md-12 text-justify" [innerHTML]="Doc.contenido"
                             style="font-size: small; padding: 15px; border: 1px solid #ccc">
                         </div>
-                        
+
                         <table summary="" class="table table-bordered table-hover" *ngIf="Doc.instrucciones!=''">
                             <thead>
                                 <tr>
@@ -92,8 +95,8 @@
                                 </tr>
                             </thead>
                         </table>
-                        <div *ngIf="Doc.instrucciones!=''" class="form-group  col-md-12 text-justify" [innerHTML]="Doc.instrucciones"
-                            style="padding: 15px; border: 1px solid #ccc">
+                        <div *ngIf="Doc.instrucciones!=''" class="form-group  col-md-12 text-justify"
+                            [innerHTML]="Doc.instrucciones" style="padding: 15px; border: 1px solid #ccc">
                         </div>
 
                         <table summary="" class="table table-bordered table-hover" *ngIf="rcuenta">
@@ -104,36 +107,40 @@
                             </thead>
                         </table>
                         <div *ngIf="rcuenta" class="form-group  col-md-12 text-justify" [innerHTML]="resumencuenta"
-                                style="padding: 15px; border: 1px solid #ccc">
-                            </div>
+                            style="padding: 15px; border: 1px solid #ccc">
+                        </div>
 
                         <br>
-                        
 
-                        <div  class="form-group  col-md-12 text-justify" *ngIf="rcuenta">
-                            <table  style="width: 100%;" class="table table-bordered table-hover">
+
+                        <div class="form-group  col-md-12 text-justify" *ngIf="rcuenta">
+                            <table style="width: 100%;" class="table table-bordered table-hover">
                                 <thead>
                                     <tr>
+                                        <th>NUM.</th>
+                                        <th>{{sCedula}}</th>
                                         <th>{{sNombre}}</th>
                                         <th>{{sGrado}}</th>
-                                        <th>{{sCedula}}</th>
+                                        <th>{{ sAccion }}</th>
                                     </tr>
-    
+
                                 </thead>
-                                <tbody >
-                                    <tr  *ngFor="let e of lstSubDoc" >
+                                <tbody>
+                                    <tr *ngFor="let e of lstSubDoc; let i=index">
+                                        <th>{{i+1}}</th>
+                                        <th>{{e.cedula | uppercase }}</th>
                                         <th>{{e.nmilitar | uppercase }}</th>
                                         <th>{{e.cargo | uppercase }}</th>
-                                        <th>{{e.cedula | uppercase }}</th>
+                                        <th>{{ getDetalle(e.detalle) }}</th>
                                     </tr>
-    
+
                                 </tbody>
-                                
+
                             </table>
 
-                            
+
                         </div>
-                                
+
 
                         <table summary="" class="table table-bordered table-hover">
                             <thead>
@@ -151,8 +158,8 @@
                             <tbody>
 
                                 <tr *ngFor="let e of lstTraza">
-                                    <td>{{e.fecha | date:"dd-MM-yyyy" }}</td>
-                                    <td>{{e.nombre_estado | uppercase }}</td>
+                                    <td>{{e.fecha | date : "dd/MM/yyyy hh:mm:ss" }}</td>
+                                    <td>{{ getDepartamento(e.nombre_estado) }}</td>
                                     <td>{{e.nombre_estatus | uppercase }}</td>
                                     <td>{{e.observacion | uppercase }}</td>
                                     <td>{{e.descripcion | uppercase }}</td>
@@ -160,7 +167,7 @@
                             </tbody>
                         </table>
 
-                        <div class="form-group  col-md-12 text-justify" 
+                        <div class="form-group  col-md-12 text-justify"
                             style="font-size: small; padding: 15px; border: 0px solid #ccc">
                         </div>
 
@@ -185,10 +192,15 @@
                                     <th>FECHA DE CREACIÓN</th>
                                     <td>{{Doc.fcreacion}}</td>
                                 </tr>
-                            </tbody> 
+                            </tbody>
                         </table>
 
                     </div>
+
+                    <br>
+                    <br>
+                    <br>
+                    <br>
 
                     <div class="form-row">
                         <div class="form-group col-md-12" style="display: none;">
@@ -197,7 +209,7 @@
                                 class="table table-bordered table-hover">
 
                                 <thead>
-                                    <tr> 
+                                    <tr>
                                         <th>Country</th>
                                         <th data-priority="1">Número de Control</th>
                                         <th data-priority="2">Número de Origen</th>
@@ -234,3 +246,8 @@
         </div>
     </div>
 </div>
+
+<br>
+<br>
+<br>
+<br>

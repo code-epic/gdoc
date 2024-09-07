@@ -16,10 +16,13 @@ import {
 } from "src/app/services/resoluciones/resolucion.service"
 import { LoginService } from "src/app/services/seguridad/login.service"
 import { UtilService } from "src/app/services/util/util.service"
-import { FormGroup, FormControl } from "@angular/forms"
+import { FormGroup, FormControl, FormBuilder, FormControlName, Validators } from "@angular/forms"
 import { Observable } from "rxjs"
 import { map, startWith } from "rxjs/operators"
 import { MatDialog } from "@angular/material/dialog"
+import Swal from "sweetalert2"
+
+
 
 interface ITipoResolucion {
   codigo: string
@@ -164,6 +167,7 @@ export class RsconsultaComponent implements OnInit {
   public UbicacionCarpetas: any
   public UbicacionCarpetasEntrada: any
   public input_resoluciones: any
+  public input_entrada: any
 
   public GradoIPSFA = [] //Objeto Comando
   public lstResoluciones: any
@@ -195,6 +199,8 @@ export class RsconsultaComponent implements OnInit {
   public blDatosBasicos: boolean = false
   public valEdit: boolean = false
   public valEditEntrada: boolean = false
+  public valEditResolucion: boolean = false
+
 
   public dbTools: boolean = false
 
@@ -227,7 +233,7 @@ export class RsconsultaComponent implements OnInit {
   public blExpandida: boolean = true
   public blEditor: boolean = false
   public blEspecifico: boolean = true
-  public tiponomina : string =  "0"
+  public tiponomina: string = "0"
 
   public busqueda: string = "0"
   public campos: string = "0"
@@ -258,7 +264,7 @@ export class RsconsultaComponent implements OnInit {
   selected = new FormControl(0)
   public csvHead: any
   public csvHeadFile: any
-  public delimitador : string = '|'
+  public delimitador: string = '|'
 
 
 
@@ -281,15 +287,17 @@ export class RsconsultaComponent implements OnInit {
   numero = ''
   responsable_entrada = ''
   registrado_entrada = ''
-  
+
   modificado_entrada = ''
   carpeta_entrada = ''
   acto = 'RESOLUCION'
-  estatus_entrada = ''
+  estatus_entrada: any
   tipo_entrada = ''
   asunto_entrada = ''
   observacion_entrada = ''
   opttodos = "0"
+
+  public bEliminarEntrada: boolean = false
 
 
   constructor(
@@ -302,7 +310,13 @@ export class RsconsultaComponent implements OnInit {
     public dialog: MatDialog,
     public formatter: NgbDateParserFormatter,
     private _snackBar: MatSnackBar
-  ) { }
+  ) {
+
+    this.Estados =
+      sessionStorage.getItem("MPPD_CEstadoResolucion") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CEstadoResolucion")))
+        : []
+  }
 
   convertirFecha(fecha: string): string {
     return fecha != '' ? this.utilService.ConvertirFechaHumana(fecha) : ''
@@ -359,10 +373,7 @@ export class RsconsultaComponent implements OnInit {
       sessionStorage.getItem("MPPD_CTipoResolucion") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion")))
         : []
-    this.Estados =
-      sessionStorage.getItem("MPPD_CEstadoResolucion") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CEstadoResolucion")))
-        : []
+
     this.Carpetas =
       sessionStorage.getItem("MPPD_CCarpetaEntrada") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetaEntrada")))
@@ -384,6 +395,10 @@ export class RsconsultaComponent implements OnInit {
       sessionStorage.getItem("MPPD_CCarpetaEntrada") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetaEntrada")))
         : []
+
+
+    // console.log(this.Estados)
+
     const today = new Date()
     const month = today.getMonth()
     const year = today.getFullYear()
@@ -407,8 +422,17 @@ export class RsconsultaComponent implements OnInit {
       this.blEspecifico = true
       this.cedula = e
       this.dbTools = true;
+      this.opttodos = "0"
+
+      this.valEdit = false
+      this.valEditEntrada = false
+      this.valEditResolucion = false
       this.consultarCedula(undefined);
-    });
+    })
+
+    console.log(this.loginService.Usuario)
+    this.bEliminarEntrada = this.loginService.Usuario.cargo=="Transcriptor Premium"?true:false
+
   }
 
   displayFn(tr: ITipoResolucion): string {
@@ -608,9 +632,9 @@ export class RsconsultaComponent implements OnInit {
     return validar;
   }
 
-  asuntohtml(e) : string {
-    let ad =  e.administracion==null?'':  e.administracion.toUpperCase()  + '<br>'
-    return  ad + e.asunto.toUpperCase()
+  asuntohtml(e): string {
+    let ad = e.administracion == null ? '' : e.administracion.toUpperCase() + '<br>'
+    return ad + e.asunto.toUpperCase()
   }
 
   obtenerResuelto() {
@@ -955,7 +979,7 @@ export class RsconsultaComponent implements OnInit {
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
         //console.log(data)
         this.execFnx(data)
-       
+
       });
     } catch (error) {
       console.error(error);
@@ -997,7 +1021,7 @@ export class RsconsultaComponent implements OnInit {
             this.pID.estatus = false
             this.pID.contenido = paquete
             this.pID.mensaje = uuid
-            this.ConsultaPostPID( this.tiponomina )
+            this.ConsultaPostPID(this.tiponomina)
 
           } else {
             this.ConsultarPidRecursivo(id, paquete, uuid)
@@ -1013,8 +1037,8 @@ export class RsconsultaComponent implements OnInit {
   /**
    * Consultar una API despues de finalizado el PID Recurrente
    */
-  ConsultaPostPID(tipo : string) {
-    this.xAPI.funcion = tipo=="0" ?"MPPD_CCedulaFileCSV":"MPPD_CCedulaFileCSVSaime";
+  ConsultaPostPID(tipo: string) {
+    this.xAPI.funcion = tipo == "0" ? "MPPD_CCedulaFileCSV" : "MPPD_CCedulaFileCSVSaime";
     this.xAPI.parametros = '';
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -1033,7 +1057,7 @@ export class RsconsultaComponent implements OnInit {
   }
 
 
-  
+
 
   downloadCSVExFile() {
     let head = this.csvHeadFile.map((e) => {
@@ -1146,32 +1170,38 @@ export class RsconsultaComponent implements OnInit {
   }
 
   dwUrlEntrada(e) {
-    if (e.cod_carpeta != undefined && e.cod_carpeta != "") {
-      this.UbicacionCarpetasEntrada.forEach((el) => {
-        if (el.cod_carpeta == e.cod_carpeta) {
-          this.tpf.ruta =
-            "entradas/" + e.fecha_entrada.substring(0, 4) + "/" + el.url;
-          this.tpf.archivo = e.digital + ".pdf";
-          this.ngxService.startLoader("loader-buscar");
-          this.apiService.getDwsCdn(this.tpf).subscribe(
-            (response: any) => {
-              const blob = new Blob([response], { type: "application/pdf" });
-              const url = window.URL.createObjectURL(blob);
-              window.open(url);
-              this.ngxService.stopLoader("loader-buscar");
-            },
-            (error) => {
-              this.toastrService.error(
-                "El documento no se encuentra disponible",
-                `GDoc Resoluciones`
-              );
-              this.ngxService.stopLoader("loader-buscar");
-            }
-          );
+    console.log(e)
+    if (e.archivo != undefined && e.archivo != '' && e.cuenta_oficio == '') {
+      let cedula = e.cedula_entrada != undefined ? e.cedula_entrada : this.dwCedula;
+      this.apiService.DwsResol(btoa("RE" + cedula) + "/" + e.archivo);
+    }else{
+      if (e.cod_carpeta != undefined && e.cod_carpeta != "") {
+        this.UbicacionCarpetasEntrada.forEach((el) => {
+          if (el.cod_carpeta == e.cod_carpeta) {
+            this.tpf.ruta =
+              "entradas/" + e.fecha_entrada.substring(0, 4) + "/" + el.url;
+            this.tpf.archivo = e.digital + ".pdf";
+            this.ngxService.startLoader("loader-buscar");
+            this.apiService.getDwsCdn(this.tpf).subscribe(
+              (response: any) => {
+                const blob = new Blob([response], { type: "application/pdf" });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url);
+                this.ngxService.stopLoader("loader-buscar");
+              },
+              (error) => {
+                this.toastrService.error(
+                  "El documento no se encuentra disponible",
+                  `GDoc Resoluciones`
+                );
+                this.ngxService.stopLoader("loader-buscar");
+              }
+            );
 
-          return;
-        }
-      });
+            return;
+          }
+        });
+      }
     }
   }
 
@@ -1181,6 +1211,8 @@ export class RsconsultaComponent implements OnInit {
       rs: e,
     };
     this.valEdit = true;
+    this.valEditEntrada = false
+    this.valEditResolucion = true
   }
 
 
@@ -1313,10 +1345,11 @@ export class RsconsultaComponent implements OnInit {
 
 
   detalleEntrada(content, e) {
-    this.modalService.open(content, { size: "lg" });
-    console.log(e)
-    this.valEditEntrada = true;
-    this.documento = e.cod_acto==1?'RESOLUCIÓN':'ORDEN GENERAL'
+
+    this.modalService.open(content, { size: "lg" })
+
+
+    this.documento = e.cod_acto == 0 ? 'RESOLUCIÓN' : 'ORDEN GENERAL'
     this.responsable_entrada = e.des_responsable
     this.registrado_entrada = e.des_registrado
     this.numero = e.numero_carpeta
@@ -1324,21 +1357,48 @@ export class RsconsultaComponent implements OnInit {
     this.digital = e.digital
     this.modificado_entrada = e.f_modificado
     this.estatus_entrada = e.estatus_descripcion
-    this.tipo_entrada = e.des_tipo_entrada
+
+    // console.log(new Date(e.f_modificado))
+    // console.log(new Date('2024-09-01 00:00:00'))
+
+    if ( new Date(e.f_modificado) < new Date('2024-09-01 00:00:00')){
+      this.tipo_entrada = e.des_tipo_entrada
+      // console.log('ENTRADA')
+    } else {
+      this.tipo_entrada = e.des_tipo_resol
+      // console.log('RESOLUCION')
+
+    }
+
     this.asunto_entrada = e.asunto
     this.observacion_entrada = e.observacion
     this.carpeta_entrada = e.des_carpeta
-    
+
+  }
+
+  detalleEntradaEditar(e) {
+    this.input_entrada = {
+      'rs': e,
+      'id': this.IDatosBasicos.cedula
+    }
+    this.valEditEntrada = true
+    this.valEditResolucion = false
+    this.valEdit = true
+    this.blEditor = false;
+    this.blEspecifico = false;
+
+
   }
 
   editarDatosBasicos() {
     this.blEditor = true;
     this.blEspecifico = false;
     this.EDITOR = this.IDatosBasicos.cedula;
+
   }
 
 
-  ReveserConsutla(){
+  ReveserConsutla() {
     this.blExpandidaFile = true
     this.lstRangoCedulaFile = []
     this.tiponomina = "0"
@@ -1346,4 +1406,37 @@ export class RsconsultaComponent implements OnInit {
     this.archivos = []
     document.forms.namedItem("forma").reset();
   }
+
+  eliminarEntrada(e){
+
+    Swal.fire({
+      title: 'GDoc Resoluciones',
+      text: "¿Está seguro que desea eliminar la entrada?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.xAPI.funcion = "MPPD_EEntradas";
+        this.xAPI.parametros = e.id.toString();
+        this.xAPI.valores = ''
+        // console.log(this.xAPI)
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          async (data) => {
+            this.cedula = this.dwCedula
+            this.consultarCedula(undefined)
+          },
+          (error) => {
+            console.error("Error de conexion a los datos ", error);
+            this.ngxService.stopLoader("loader-buscar");
+          }
+        );
+      }
+    })    
+    
+   
+  }
 }
+

@@ -392,7 +392,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     // console.log(this.estadoActual)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        console.log(data)
+        // console.log(data)
         data.Cuerpo.forEach(e => {
 
           this.Doc = e
@@ -677,8 +677,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
-        this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
-        this.ngxService.stopLoader("loader-aceptar")
+       
 
         if (this.titulo == 'Salida') {
           this.insertarObservacion()
@@ -686,13 +685,47 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.lstPC = this.toppings.value
 
           this.salvarPuntoCuenta(wfd)
+         
           this.ruta.navigate(['/salidas']);
 
         } else {
+          console.log(this.Doc)
+          
+          const cant = this.lstCuenta.length
 
-          this.ruta.navigate(['/registrar']);
+            if (cant > 0) {
+              
+              let fnx = {
+                'funcion': 'WKF_ESubDocumentoPuntoCuenta',
+                'parametros' : this.Doc.wfdocumento.toString(),
+                'valores': ''
+              }
+              // console.log(fnx)
+
+              this.apiService.Ejecutar(fnx).subscribe(
+                async data => {
+                  // console.log(data)
+                  await this.salvarCuentas(this.Doc.wfdocumento)
+                  
+                },
+                err => {
+                  this.ruta.navigate(['/registrar']);
+                }
+              )
+
+            }else{
+              this.ruta.navigate(['/registrar']);
+            }
+
+
+         
+
+          
+          
         }
 
+        this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
+        this.ngxService.stopLoader("loader-aceptar")
 
 
       },
@@ -846,7 +879,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.xAPI.funcion = 'WKF_IDocumentoDependencia'
       this.xAPI.valores = ''
       this.xAPI.parametros = numc + ',' + this.lstDependencias[0].nombre
-      console.log('insertando dependicia ', this.xAPI)
+      // console.log('insertando dependicia ', this.xAPI)
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           this.lstDependencias.splice(0, 1)
@@ -975,8 +1008,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   async salvarCuentas(numc: number) {
     const cant = this.lstCuenta.length
-    console.log('entrando en confianza... ', cant)
-    console.log('entrando en confianza... ', this.lstCuenta)
+    // console.log('entrando en confianza... ', cant)
+    // console.log('entrando en confianza... ', this.lstCuenta)
     if (cant == 0) {
       this.ngxService.stopLoader("loader-aceptar")
       return
@@ -1029,7 +1062,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.puntocuenta = false
         this.resolucion = false
         if (this.titulo == 'Salida') {
-          console.log('entrando')
+          // console.log('entrando')
           this.cargarPuntosdeCuenta()
           return true
         }
@@ -1168,7 +1201,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.selTipoDocumento()
         const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
         this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        console.log(this.lstCuenta)
+        // console.log(this.lstCuenta)
 
         const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
         this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })

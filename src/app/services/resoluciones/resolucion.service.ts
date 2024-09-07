@@ -50,6 +50,32 @@ export interface IResoluciones {
   archivo: string
 }
 
+export interface IEntradas {
+  id : string
+  cedula : string
+  asunto : string
+  acto : number
+  carpeta : number
+  componente : number
+  tipo_entrada : number 
+  cuenta : string
+  digital : string
+  ecomponente: number
+  egrado : number
+  estatus : number
+  archivo : string
+  formato : string
+  llave: string
+  numero_carpeta : string
+  numero_resol : string
+  observacion : string
+  registrado : string
+  modificado: string
+  responsable : string
+  fecha_entrada : string
+  fecha_resolucion : string
+}
+
 
 // export interface IDatosBasicos {
 //   area: string

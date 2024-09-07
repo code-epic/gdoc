@@ -481,4 +481,35 @@ export class RscdatosbasicosComponent implements OnInit {
   controlActivo(cedula : string) {
     this.utilService.contenido$.emit( cedula );
   }
+
+  consultarSAIME(){
+    this.xAPI.funcion = "MPPD_CCedulaSaime"
+    this.xAPI.parametros = this.DBasico.cedula;
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        let DB = data.Cuerpo[0]
+        let nombre =  DB.nombre1 + ' ' + DB.nombre2 + ' ' +  DB.apellido1 + ' ' + DB.apellido2
+        this.DBasico.nombres = nombre.toUpperCase()
+        this.nacimiento = NgbDate.from(
+          this.formatter.parse(DB.fecha_nacimiento)
+        )
+        this.DBasico.sexo = DB.sexo
+        this.toastrService.success(
+          "Los datos han sido actualizados exitosamente ",
+          `MPPD.DatosBasicos`
+        );
+        this.ngxService.stopLoader('loader-aceptar');
+      
+        
+      },
+      (error) => {
+        this.toastrService.error(error, `MPPD_DatosBasicos -> Aceptar`);
+        this.ngxService.stopLoader("loader-aceptar");
+      }
+    );
+  }
+
 }
+

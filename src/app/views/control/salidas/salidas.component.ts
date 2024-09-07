@@ -51,6 +51,7 @@ export class SalidasComponent implements OnInit {
     { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
     { 'valor': '2', 'texto': 'PROCESAR SALIDA', 'visible': '1' },
     { 'valor': '3', 'texto': 'ARCHIVAR', 'visible': '2' },
+    { 'valor': '4', 'texto': 'ARCHIVAR / EN ESPERA DE OPINION', 'visible': '2' },
     { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '2' }]
 
   public paginador = 10
@@ -495,10 +496,7 @@ export class SalidasComponent implements OnInit {
       (data) => {
 
         if (this.AccionTexto == '3') {
-          console.log(
-            'El documento ha sido redistribuido segun su selección',
-            `GDoc Wkf.DocumentoObservacion`
-          )
+         
           this.xAPI.funcion = "WKF_ADocumentoArchivo"
           this.xAPI.valores = JSON.stringify({
             codigo: this.codigo,
@@ -555,6 +553,9 @@ export class SalidasComponent implements OnInit {
         this.clasificacion = true
         break;
       case '3':
+        this.archivar = true
+        break;
+      case '4':
         this.archivar = true
         break;
     }

@@ -7,7 +7,7 @@ import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { IDocumento, IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
-import {MatBottomSheet, MatBottomSheetRef} from '@angular/material/bottom-sheet';
+import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { Md5 } from "md5-typescript";
 
 import Swal from 'sweetalert2'
@@ -34,8 +34,8 @@ export interface SubDocumento {
   styleUrls: ['./ministerial.component.scss']
 })
 export class MinisterialComponent implements OnInit {
-  
-  public lstEstados = [] 
+
+  public lstEstados = []
   public lstHzAdjuntoSub = []
   public estadoActual = 4
   public estadoOrigen = 2
@@ -56,7 +56,9 @@ export class MinisterialComponent implements OnInit {
     { 'valor': '4', 'texto': 'PRESIDENCIAL', 'visible': '1' },
     { 'valor': '5', 'texto': 'ESPERA DE OPINION', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
     { 'valor': '6', 'texto': 'CONSULTORIA JURIDICA', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
-    { 'valor': '7', 'texto': 'AREA DE RESOLUCIONES', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '7', 'texto': 'RESOLUCIONES', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '12', 'texto': 'RESOLUCIONES / URGENTE', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '13', 'texto': 'RESOLUCIONES / JEFE DEL AREA SECRETARIA', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
     { 'valor': '8', 'texto': 'SUB-DIRECCION', 'visible': '1' },
     { 'valor': '9', 'texto': 'DIRECCION GENERAL', 'visible': '1' },
     { 'valor': '10', 'texto': 'DESPACHO DEL MPPD', 'visible': '1' },  //7/5/3 Asociado a los plazos en las alertas
@@ -80,7 +82,7 @@ export class MinisterialComponent implements OnInit {
   public archivos = []
   public lstMinisterial = []
   public lstCuenta = []
-  
+
   public download: any
   public fcreacion: any
   public creador: any
@@ -114,8 +116,8 @@ export class MinisterialComponent implements OnInit {
     usuario: ''
   }
 
-  public Documento : IDocumento = {
-    
+  public Documento: IDocumento = {
+
   }
 
 
@@ -141,9 +143,9 @@ export class MinisterialComponent implements OnInit {
   public fplazo: any
   public dwValidate = false
   public dwSub = false
-  public doc : any
+  public doc: any
   public lstNotaEntrega = []
-  public parametros : string = ''
+  public parametros: string = ''
   public allComplete: boolean = false
 
   public estiloclasificar = 'none'
@@ -153,7 +155,7 @@ export class MinisterialComponent implements OnInit {
   @ViewChild('templateBottomSheet') TemplateBottomSheet: TemplateRef<any>;
   hashcontrol: string;
   lblFile: any;
-  blOficio : boolean = false
+  blOficio: boolean = false
 
 
   constructor(
@@ -168,41 +170,41 @@ export class MinisterialComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private modalService: NgbModal) { }
 
-    // Contenido de los labels
+  // Contenido de los labels
 
-    public lblDecision = 'Decision del Ministro'
-    public lblBtn = 'Aceptar'
-    public lblComentario = 'Comentario del MPPD'
-    public lblOrigenComando = 'Gran Comando'
-    public fechaElaboracion = ''
-    public fechaOrigen = ''
+  public lblDecision = 'Decision del Ministro'
+  public lblBtn = 'Aceptar'
+  public lblComentario = 'Comentario del MPPD'
+  public lblOrigenComando = 'Gran Comando'
+  public fechaElaboracion = ''
+  public fechaOrigen = ''
 
-    /**
-     * Cambia el contenido de los labels
-     */
-    cambiarContenido() {
-      this.edit = 1
-      this.lblDecision = 'Decision Presidencial'
-      this.lblComentario = 'Comentario Presidencial'
-      this.lblBtn = 'Agregar'
-      this.lblOrigenComando = 'Origen de la Cuenta'
+  /**
+   * Cambia el contenido de los labels
+   */
+  cambiarContenido() {
+    this.edit = 1
+    this.lblDecision = 'Decision Presidencial'
+    this.lblComentario = 'Comentario Presidencial'
+    this.lblBtn = 'Agregar'
+    this.lblOrigenComando = 'Origen de la Cuenta'
 
-      this.lstAcciones = [
-        { 'valor': '1', 'texto': 'PARA LA FIRMA MPPD', 'visible': '1' },
-        { 'valor': '2', 'texto': 'PARA LA FIRMA PRESIDENCIAL', 'visible': '1' },
-        { 'valor': '3', 'texto': 'DIRECTOR', 'visible': '1' },
-        { 'valor': '4', 'texto': 'SUB-DIRECTOR', 'visible': '1' },
-        { 'valor': '5', 'texto': 'JEFE DE SECRETARIA', 'visible': '1' },
-        { 'valor': '6', 'texto': 'TRANSCRIPTOR', 'visible': '1' },
-        { 'valor': '7', 'texto': 'ARCHIVO', 'visible': '1' },
-      ]
-    }
+    this.lstAcciones = [
+      { 'valor': '1', 'texto': 'PARA LA FIRMA MPPD', 'visible': '1' },
+      { 'valor': '2', 'texto': 'PARA LA FIRMA PRESIDENCIAL', 'visible': '1' },
+      { 'valor': '3', 'texto': 'DIRECTOR', 'visible': '1' },
+      { 'valor': '4', 'texto': 'SUB-DIRECTOR', 'visible': '1' },
+      { 'valor': '5', 'texto': 'JEFE DE SECRETARIA', 'visible': '1' },
+      { 'valor': '6', 'texto': 'TRANSCRIPTOR', 'visible': '1' },
+      { 'valor': '7', 'texto': 'ARCHIVO', 'visible': '1' },
+    ]
+  }
 
-    verArchivos(content) {
-      this.modalService.open(content, { size: 'lg' })
-    }
+  verArchivos(content) {
+    this.modalService.open(content, { size: 'lg' })
+  }
 
-    public numc = ''
+  public numc = ''
 
   ngOnInit(): void {
     this.fplazo = NgbDate.from(this.formatter.parse(this.utilService.FechaActual()))
@@ -211,16 +213,16 @@ export class MinisterialComponent implements OnInit {
 
     let ruta = this.rutaActiva.snapshot.params.id
 
-    if(ruta == 'agregar'){
+    if (ruta == 'agregar') {
       this.cambiarContenido()
     }
 
     if (ruta != undefined) {
       try {
         this.original = this.rutaActiva.snapshot.params.id
-        this.doc = JSON.parse(atob(this.original))     
+        this.doc = JSON.parse(atob(this.original))
         console.log(this.doc);
-        
+
         this.Documento = this.doc
         this.Documento.wfdocumento = this.doc.idd
         this.numc = this.doc.numc
@@ -230,12 +232,12 @@ export class MinisterialComponent implements OnInit {
         this.dwValidate = this.doc.anom != "" ? true : false
         this.download = this.apiService.Dws(btoa("D" + this.doc.numc) + '/' + this.doc.anom)
         this.cmbDestino = 'S'
-       
+
         this.consultarSubID(this.Documento.wfdocumento.toString())
 
         this.listarEstados()
         this.listarDatos()
-        
+
       } catch (error) {
         //this.ruta.navigate(['/secretaria', ''])
       }
@@ -254,26 +256,21 @@ export class MinisterialComponent implements OnInit {
     )
   }
 
-  consultarSubID(id : string) {
+  consultarSubID(id: string) {
     this.xAPI.funcion = 'WKF_CSubDocumentoID'
     this.xAPI.parametros = '' + id
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstCuenta = data.Cuerpo.map(e => {
-          // console.log(data);
-          e.completed = false
-          return e
-        })
-        // console.info('impresion : ', this.lstCuenta)
-        this.cargarDatosBase(this.lstCuenta)
 
+        this.lstCuenta = data.Cuerpo
+        this.cargarDatosBase(this.lstCuenta)
+        console.log(this.lstCuenta)
         if (this.lstCuenta[0].cuenta != '' && this.lstCuenta[0].cuenta != null) {
           this.cargarPuntoCuentas()
           this.blOficio = true
-        }else{
+        } else {
           this.blOficio = false
-          //this.toastrService.warning('Por favor verifique el punto de cuenta con Control de Gestion', `GDoc Wkf.CSubDocumentoID`);
         }
       },
       (error) => { }
@@ -281,12 +278,12 @@ export class MinisterialComponent implements OnInit {
   }
 
   cargarDatosBase(e) {
-    this.asunto = e[0].resumen==null?e[0].cont:e[0].resumen
+    this.asunto = e[0].resumen == null ? e[0].cont : e[0].resumen
     this.cuenta = e[0].cuenta
-    this.fecha = e[0].fecha == null? e[0].fech.substring(0,10): e[0].fecha.substring(0,10)
+    this.fecha = e[0].fecha == null ? e[0].fech.substring(0, 10) : e[0].fecha.substring(0, 10)
     this.codigohash = btoa(this.doc.id + this.doc.idd + this.cuenta)
     e[0].completed = false
-    this.parametros = this.cuenta + ',' + this.doc.udep + ' ' + this.doc.fori.substring(0,10)
+    this.parametros = this.cuenta + ',' + this.doc.udep + ' ' + this.doc.fori.substring(0, 10)
   }
 
   open(content, id) {
@@ -305,9 +302,9 @@ export class MinisterialComponent implements OnInit {
     this.xAPI.parametros = this.doc.idd
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {        
+      (data) => {
         console.log(data.Cuerpo);
-        
+
         if (data.Cuerpo != undefined && data.Cuerpo.length > 0) {
           this.SubDocumento = data.Cuerpo[0];
           this.original = btoa(JSON.stringify(data.Cuerpo[0]))
@@ -329,6 +326,13 @@ export class MinisterialComponent implements OnInit {
         this.fecha_alerta = this.utilService.FechaActual(7)
         break;
       case "7":
+        this.fecha_alerta = this.utilService.FechaActual(7)
+        break;
+
+      case "12":
+        this.fecha_alerta = this.utilService.FechaActual(7)
+        break;
+      case "13":
         this.fecha_alerta = this.utilService.FechaActual(7)
         break;
       case "10":
@@ -420,7 +424,7 @@ export class MinisterialComponent implements OnInit {
   }
 
   _atras() {
-      this.ruta.navigate(['/sministerial']);
+    this.ruta.navigate(['/sministerial/ministeriales']);
   }
 
   fileSelected(e) {
@@ -444,7 +448,7 @@ export class MinisterialComponent implements OnInit {
           this.xAPI.parametros = ''
           this.xAPI.valores = JSON.stringify(this.DocAdjunto)
           this.apiService.Ejecutar(this.xAPI).subscribe(
-            (xdata) => {    
+            (xdata) => {
               if (xdata.tipo == 1) {
                 this.toastrService.success(
                   'Tu archivo ha sido cargado con exito ',
@@ -536,35 +540,40 @@ export class MinisterialComponent implements OnInit {
     return btoa(estado + ',' + estatus + ',' + id)
   }
 
-  async transfererirResoluciones(){
+  async transfererirResoluciones() {
     console.log('transfererirResoluciones')
+    this.ngxService.startLoader("loader-aceptar")
     this.lstNotaEntrega = []
     let i = 0
     var fecha = new Date().toISOString()
     let llave = Md5.init(this.cuenta + fecha)
-    await this.lstCuenta.map(e => {
-      if ( e.completed) {
-        const text = (<HTMLInputElement>document.getElementById(i + "-text")).value
-        const nombre = (<HTMLInputElement>document.getElementById(i + "-nomb")).value
-        const cedula = (<HTMLInputElement>document.getElementById(i + "-cedu")).value
-        const cargo = (<HTMLInputElement>document.getElementById(i + "-carg")).value
-        this.lstNotaEntrega.push ( { 
-          id: e.id, 
-          nombre: nombre, 
-          cedula: cedula, 
-          numc: e.numc, 
-          observacion: text, 
-          llave:  llave, 
-          udep : e.udep, 
+    await this.lstCuenta.forEach(e => {
+
+      const text = (<HTMLInputElement>document.getElementById(i + "-text")).value
+      const nombre = (<HTMLInputElement>document.getElementById(i + "-nomb")).value
+      const cedula = (<HTMLInputElement>document.getElementById(i + "-cedu")).value
+      const cargo = (<HTMLInputElement>document.getElementById(i + "-carg")).value
+      if (text != "PR") {
+        this.lstNotaEntrega.push({
+          id: e.ids,
+          nombre: nombre,
+          cedula: cedula,
+          numc: e.numc,
+          observacion: text,
+          llave: llave,
+          udep: e.udep,
           cuenta: e.cuenta,
-          cargo: cargo 
+          cargo: cargo
         })
-        console.log(this.lstNotaEntrega);
-        
+        // console.log(this.lstNotaEntrega);
+
       }
       i++
+
+
     })
-    await this.notaEntrega()
+
+    await this.notaEntrega(0)
   }
 
   updateAllComplete() {
@@ -585,36 +594,40 @@ export class MinisterialComponent implements OnInit {
     }
   }
 
-  async notaEntrega() {
-    console.log('notaEntrega');
-    
-    var cantidad = this.lstNotaEntrega.length
+  async notaEntrega(pos) {
+    console.log('notaEntrega', this.lstNotaEntrega);
 
-    if (cantidad > 0) {
-      var i = 0
-      this.lstNotaEntrega.forEach(e => {
-        var destino = 3
-        var estatus = 1
-        var usuario = this.loginService.Usuario.id
-      
-        this.xAPI.funcion = 'WKF_APromoverSubDocumento'
-        this.xAPI.valores = ''
-        this.xAPI.parametros = destino + ',' + estatus + ',' + e.llave + '|' + e.observacion  + ',' + usuario + ',1,' + e.id
+    let e = this.lstNotaEntrega[pos]
+    var destino = 3
+    var estatus = 1
+    var usuario = this.loginService.Usuario.cedula
 
-        console.log(this.xAPI , 'reportes')
+    this.xAPI.funcion = 'WKF_APromoverSubDocumento'
+    this.xAPI.valores = ''
+    this.xAPI.parametros = destino + ',' + estatus + ',' + e.llave + '|' + e.observacion + ',' + usuario + ',1,' + e.id
+    console.log(this.xAPI.parametros)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
 
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          (data) => {
-            console.log(data);
-            
-            i++
-            if (cantidad == i) this.imprimir()
-          },
-          (errot) => {
-            this.toastrService.error(errot, `GDoc Wkf.PromoverSubDocumento`);
-          })
+        if (pos == this.lstNotaEntrega.length - 1) {
+          this.toastrService.info('Proceso finalizado con exito', `GDoc Secretaria`);
+          this.ngxService.stopLoader("loader-aceptar")
+        } else {
+          this.notaEntrega(pos + 1)
+        }
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.PromoverSubDocumento`);
       })
-    }
+
+  }
+
+  getDetalle(e): string {
+    let text = "PR"
+    let cont = e.split("|")
+    if (cont.length > 0) text = cont[1]
+
+    return text
   }
 
   imprimir() {

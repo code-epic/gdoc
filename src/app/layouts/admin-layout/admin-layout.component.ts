@@ -8,6 +8,8 @@ import {InactiveUserService} from '../../core/service/inactivity/inactive-user.s
 })
 export class AdminLayoutComponent implements OnInit {
   isInactive = false;
+  public activar = false
+
 
   constructor(private inactiveUserService: InactiveUserService) { }
 

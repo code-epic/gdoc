@@ -308,7 +308,7 @@ export class OresolucionesComponent implements OnInit {
   public blReconocer: boolean = false
   public blCategoria: boolean = false
   public blComponente: boolean = false
-  public blAceptar: boolean = false
+  public blAceptar: boolean = true
   public blAlert: boolean = false
   public blCalendar: boolean = false
   public blDbEspecialidad: boolean = false
@@ -365,6 +365,7 @@ export class OresolucionesComponent implements OnInit {
   public cmbGrado = '0'
   public otro_resuelto = ''
   public lstHistorico: any
+  
 
 
 
