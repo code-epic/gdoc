@@ -12,6 +12,7 @@ import { ControlRoutingModule } from './control-routing.module';
 import { CtrlestadisticasComponent } from './ctrlestadisticas/ctrlestadisticas.component';
 import { CtrlreporteComponent } from './ctrlreporte/ctrlreporte.component';
 import { CtrlalertasComponent } from './ctrlalertas/ctrlalertas.component';
+import { DatosbasicosComponent } from './datosbasicos/datosbasicos.component';
 
 
 
@@ -26,7 +27,9 @@ import { CtrlalertasComponent } from './ctrlalertas/ctrlalertas.component';
     SalidasComponent,
     CtrlestadisticasComponent,
     CtrlreporteComponent,
-    CtrlalertasComponent
+    CtrlalertasComponent,
+    DatosbasicosComponent,
+    
   ],
   imports: [
     CommonModule,

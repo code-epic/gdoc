@@ -132,7 +132,10 @@ export class RsentradasComponent implements OnInit {
     modificado: '',
     responsable: '',
     fecha_entrada: '',
-    fecha_resolucion: ''
+    fecha_resolucion: '',
+    detalle: '',
+    accion: 0
+
   }
 
   public Resolucion: Resolucion = {
@@ -622,7 +625,9 @@ export class RsentradasComponent implements OnInit {
       modificado: '',
       responsable: '',
       fecha_entrada: '',
-      fecha_resolucion: ''
+      fecha_resolucion: '',
+      detalle: '',
+      accion: 0
     }
 
   }

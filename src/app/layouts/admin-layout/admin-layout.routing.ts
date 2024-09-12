@@ -51,6 +51,7 @@ import { ListadosComponent } from 'src/app/views/notas/listados/listados.compone
 import { CtrlestadisticasComponent } from 'src/app/views/control/ctrlestadisticas/ctrlestadisticas.component';
 import { CtrlreporteComponent } from 'src/app/views/control/ctrlreporte/ctrlreporte.component';
 import { CtrlalertasComponent } from 'src/app/views/control/ctrlalertas/ctrlalertas.component';
+import { DatosbasicosComponent } from 'src/app/views/control/datosbasicos/datosbasicos.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -62,6 +63,11 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'control',
         component: ControlComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'datosbasicos',
+        component: DatosbasicosComponent,
         canActivate: [AuthGuardGuard]
     },
     {

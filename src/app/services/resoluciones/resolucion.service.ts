@@ -74,6 +74,8 @@ export interface IEntradas {
   responsable : string
   fecha_entrada : string
   fecha_resolucion : string
+  detalle : string
+  accion : number
 }
 
 

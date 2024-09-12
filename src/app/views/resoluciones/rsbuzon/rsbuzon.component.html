@@ -55,379 +55,418 @@
                 <div class="card-body" style="margin: 0; padding: 0px;">
 
 
-                        <mat-sidenav-container class="example-container">
-                            <mat-sidenav #sidenav mode="side" [opened]="isShowing" position="end">
-                                <div class="row">
-                                    <div class="col-xl-12 col-md-12 col-lg-12">
-                                        <app-recibidos-fields-nav [formSidenav]="formSidenav"
-                                            (closeEvent)="closeEvent($event)" [title]="formSidenav.get('obse')?.value">
+                    <mat-sidenav-container class="example-container">
+                        <mat-sidenav #sidenav mode="side" [opened]="isShowing" position="end">
+                            <div class="row">
+                                <div class="col-xl-12 col-md-12 col-lg-12">
+                                    <app-recibidos-fields-nav [formSidenav]="formSidenav"
+                                        (closeEvent)="closeEvent($event)" [title]="formSidenav.get('obse')?.value">
 
-                                        </app-recibidos-fields-nav>
-                                    </div>
+                                    </app-recibidos-fields-nav>
                                 </div>
-                            </mat-sidenav>
+                            </div>
+                        </mat-sidenav>
 
-                            <mat-sidenav-content>
-                                <div class="row">
-                                    <div class="col-xl-12 col-md-12 col-lg-12">
-                                        <div class="card shadow">
-
-
-                                            <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
-                                                [selectedIndex]="selected.value"
-                                                (selectedIndexChange)="selected.setValue($event);seleccionNavegacion($event)"
-                                                dynamicHeight>
-
-                                                <mat-tab>
-                                                    <ng-template mat-tab-label>
-                                                        &nbsp;RECIBIDOS
-                                                    </ng-template>
-                                                    <ngx-ui-loader [loaderId]="'ldbuzon'"></ngx-ui-loader>
-
-                                                    <div class="example-large-box mat-elevation-z4">
-                                                        <mat-selection-list style="padding: 15px; width: 100%;">
-                                                            <mat-list
-                                                                style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                                                                <div class="row">
-                                                                    <div class="col-md-6">
-                                                                        <section>
-                                                                            <button mat-flat-button
-                                                                                (click)="principal()">
-                                                                                <font class="auto-title"><i
-                                                                                        class="fa fa-home"
-                                                                                        style="font-size: 18px;">
-                                                                                    </i>&nbsp;&nbsp;PRINCIPAL
-                                                                                </font>
-                                                                            </button>
-                                                                            <font class="auto-marca" *ngIf="details">
-                                                                                &nbsp;&nbsp;>&nbsp;&nbsp;</font>
-                                                                            <button mat-flat-button *ngIf="details">
-                                                                                <font class="auto-title"
-                                                                                    style="font-size:14px;">{{
-                                                                                    sNavegacion }}</font>
-                                                                            </button>
+                        <mat-sidenav-content>
+                            <div class="row">
+                                <div class="col-xl-12 col-md-12 col-lg-12">
+                                    <div class="card shadow">
 
 
-                                                                        </section>
-                                                                    </div>
-                                                                    <div class="col-md-6"></div>
-                                                                </div>
-                                                            </mat-list>
-                                                            <mat-list
-                                                                style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: 55px;"
-                                                                *ngIf="blNavegacion">
-                                                                <div class="row" style="margin-top:10px">
-                                                                    <div class="col-md-1 texto-lista text-center">
-                                                                        
-                                                                    </div>
-                                                                    <div class="col-md-2 texto-lista">
-                                                                        CODIGO
+                                        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
+                                            [selectedIndex]="selected.value"
+                                            (selectedIndexChange)="selected.setValue($event);seleccionNavegacion($event)"
+                                            dynamicHeight>
 
-                                                                    </div>
-                                                                    <div class="col-md-3 texto-lista">
-                                                                        FECHA
-                                                                    </div>
+                                            <mat-tab>
+                                                <ng-template mat-tab-label>
+                                                    &nbsp;RECIBIDOS
+                                                </ng-template>
+                                                <ngx-ui-loader [loaderId]="'ldbuzon'"></ngx-ui-loader>
 
-                                                                    <div class="col-md-4 texto-lista">
-                                                                        DEPENDENCIA
-                                                                    </div>
-                                                                    <div class="col-md-2 text-right texto-lista">
-                                                                        ACCIONES
-                                                                    </div>
-
-                                                                </div>
-
-                                                            </mat-list>
-                                                        </mat-selection-list>
-
-
-                                                        <mat-selection-list *ngIf="blNavegacion"
-                                                            style="margin-top: -10px;padding: 15px; width: 100%;">
-                                                            <mat-list *ngFor="let e of bzRecibidoResumen; let i=index "
-                                                                style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                                                                <div class="row">
-                                                                    <div class="col-md-1">
-                                                                        <button mat-icon-button aria-label="Visibilidad"
-                                                                            class="text-grey"
-                                                                            (click)="open(observacion, e.idd, i);"
-                                                                            id="procesados">
-                                                                            <mat-icon>task_alt</mat-icon>
+                                                <div class="example-large-box mat-elevation-z4">
+                                                    <mat-selection-list style="padding: 15px; width: 100%;">
+                                                        <mat-list
+                                                            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <section>
+                                                                        <button mat-flat-button (click)="principal()">
+                                                                            <font class="auto-title"><i
+                                                                                    class="fa fa-home"
+                                                                                    style="font-size: 18px;">
+                                                                                </i>&nbsp;&nbsp;PRINCIPAL
+                                                                            </font>
                                                                         </button>
-                                                                    </div>
-                                                                    <div class="col-md-2 texto-lista">
-                                                                        <a routerLinkActive="active"
-                                                                            [routerLink]="['/constancia', constancia( e.numc )]">{{getDetalle(e)}}
-                                                                            &nbsp;<font color="{{e.color}}">{{ e.simbolo
-                                                                                }}
-                                                                            </font></a>
+                                                                        <font class="auto-marca" *ngIf="details">
+                                                                            &nbsp;&nbsp;>&nbsp;&nbsp;</font>
+                                                                        <button mat-flat-button *ngIf="details">
+                                                                            <font class="auto-title"
+                                                                                style="font-size:14px;">{{
+                                                                                sNavegacion }}</font>
+                                                                        </button>
 
-                                                                    </div>
-                                                                    <div class="col-md-3 texto-lista">
-                                                                        {{ e.fcre | date:"dd/MM/yyyy" }} | {{ e.nori }}
-                                                                    </div>
 
-                                                                    <div class="col-md-4 texto-detalle"
-                                                                        #tooltip="matTooltip"
-                                                                        matTooltip="{{ e.cont | uppercase}}">
-
-                                                                        {{ e.udep | uppercase }}
-                                                                    </div>
-                                                                    <div class="col-md-2 text-right">
-                                                                       
-                                                                        <a [href]="dwUrl(e.numc, e.anom)" target="_top"
-                                                                            rel="noopener noreferrer"
-                                                                            style="color:darkgrey;font-size: 18px;font-weight: normal;">
-                                                                            <img src="./assets/img/theme/pdf2.jpeg"
-                                                                                alt="Descargar archivo"
-                                                                                style="width: 20px;margin-top: 4px;" />
-                                                                        </a>
-                                                                    </div>
-
+                                                                    </section>
                                                                 </div>
-
-
-                                                            </mat-list>
-                                                        </mat-selection-list>
-                                                        <!-- (click)="toggleSidenav(e)" -->
-                                                        <div class="row" *ngIf="!blNavegacion" style="padding: 20px;">
-                                                            <div class="col-md-2 cardround"
-                                                                *ngFor="let e of lstCarpetasRecibido">
-                                                                <a routerLinkActive="active"
-                                                                    (dblclick)="listarDocumentos(e)">
-                                                                    <div class="text-center botones">
-                                                                        <br>
-                                                                        <h2 class="text-center"
-                                                                            style="color: rgb(160, 184, 230);">
-                                                                            <i class="fa fa-folder"
-                                                                                style="font-size: 54px;"
-                                                                                mat-raised-button matBadge="{{e.cant}}"
-                                                                                [matBadgeHidden]="hidden"></i>
-                                                                        </h2>
-                                                                        <p
-                                                                            style="font-weight: bold;font-family: Roboto;">
-                                                                            {{
-                                                                            e.nomb }}</p>
-
-
-                                                                    </div>
-                                                                </a>
+                                                                <div class="col-md-6"></div>
                                                             </div>
-                                                        </div>
+                                                        </mat-list>
+                                                        <mat-list
+                                                            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: 55px;"
+                                                            *ngIf="blNavegacion">
+                                                            <div class="row" style="margin-top:10px">
+                                                                <div class="col-md-1 texto-lista text-center">
+                                                                    &nbsp;&nbsp;
+                                                                </div>
+                                                                <div class="col-md-1"></div>
+                                                                <div class="col-md-2 texto-lista">
+                                                                    CODIGO
 
-                                                        <br>
-
-                                                        <mat-paginator *ngIf="blNavegacion" [length]="longitud"
-                                                            (page)="pageChangeEvent($event)" [pageSize]="pageSize"
-                                                            [pageSizeOptions]="pageSizeOptions"
-                                                            (page)="pageEvent = $event" aria-label="Seleccionar">
-                                                        </mat-paginator>
-
-
-                                                    </div>
-                                                </mat-tab>
-                                                <mat-tab>
-                                                    <ng-template mat-tab-label>
-                                                        &nbsp;CLASIFICAR
-                                                    </ng-template>
-                                                    <ngx-ui-loader [loaderId]="'ldclasificar'"></ngx-ui-loader>
-                                                    <div class="example-large-box mat-elevation-z4">
-
-                                                        <mat-selection-list
-                                                            style="padding: 20px; width: 100%; margin-bottom: -30px;"
-                                                            #documento>
-                                                            <mat-list style="border-bottom: 1px #e0dfdff1 solid;">
-                                                                <div class="row">
-                                                                    <div class="col-md-1">
-                                                                        <mat-checkbox [checked]="allComplete"
-                                                                            color="primary"
-                                                                            [indeterminate]="someComplete()"
-                                                                            (change)="setAll($event.checked)"
-                                                                            class="example-margin texto-lista"
-                                                                            id="check">
-                                                                        </mat-checkbox>
-                                                                    </div>
-                                                                    <div class="col-md-2">
-                                                                        <button mat-icon-button aria-label="Example "
-                                                                            (click)="open(content, 0, 0)"
-                                                                            id="clasificar">
-                                                                            <mat-icon>folder_copy</mat-icon>
-                                                                        </button>
-                                                                    </div>
-
-                                                                    <div class="col-md-3 texto-lista">
-                                                                        FECHA / NUMERO
-                                                                    </div>
-                                                                    <div class="col-md-5 texto-lista">
-                                                                        ACCION TOMADA EN SECRETARIA
-                                                                    </div>
-
-                                                                    <div class="col-md-1 text-right texto-lista">
-                                                                        ACC
-                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-2 texto-lista">
+                                                                    FECHA
                                                                 </div>
 
-                                                            </mat-list>
-                                                        </mat-selection-list>
+                                                                <div class="col-md-5 texto-lista">
+                                                                    DEPENDENCIA
+                                                                </div>
+                                                                <div class="col-md-1 text-right texto-lista">
+                                                                    ACC.
+                                                                </div>
 
-                                                        <mat-selection-list
-                                                            style="padding: 20px; margin-top: -10px; width: 100%;"
-                                                            #lstDocumentos>
-                                                            <mat-list *ngFor="let e of bzClasificar; let i=index "
-                                                                style="border-bottom: 1px #e0dfdff1 solid;">
-                                                                <div class="row">
-                                                                    <div class="col-md-1">
-                                                                        <mat-checkbox class="example-margin texto-lista"
-                                                                            [(ngModel)]="e.completed" color="warn"
-                                                                            (ngModelChange)="updateAllComplete()">
-                                                                        </mat-checkbox>
-                                                                    </div>
-                                                                    <div class="col-md-2 texto-lista">
-                                                                        <a routerLinkActive="active"
-                                                                            [routerLink]="['/constancia', constancia( e.numc )]">{{
-                                                                            getDetalle(e) }}
-                                                                            &nbsp;<font color="{{e.color}}">{{ e.simbolo
-                                                                                }}
-                                                                            </font></a>
+                                                            </div>
 
-                                                                    </div>
-                                                                    <div class="col-md-3 texto-lista">
-                                                                        {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori |
-                                                                        uppercase
-                                                                        }}
-                                                                    </div>
+                                                        </mat-list>
+                                                    </mat-selection-list>
 
-                                                                    <div class="col-md-5 texto-detalle">
 
-                                                                        {{ getEstatusMinisterial(e) }}
-                                                                    </div>
-                                                                    <div class="col-md-1 text-right">
+                                                    <mat-selection-list *ngIf="blNavegacion"
+                                                        style="margin-top: -10px;padding: 15px; width: 100%;">
+                                                        <mat-list *ngFor="let e of bzRecibidoResumen; let i=index "
+                                                            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                                                            <div class="row">
+                                                                <div class="col-md-1">
+                                                                    &nbsp;&nbsp;<font style="font-weight: bold;"> {{ i +
+                                                                        1}} </font>
+                                                                </div>
+                                                                <div class="col-md-1">
+                                                                    <button mat-icon-button aria-label="Visibilidad"
+                                                                        class="text-grey"
+                                                                        (click)="open(observacion, e.idd, i);"
+                                                                        id="procesados">
+                                                                        <mat-icon>task_alt</mat-icon>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="col-md-2 texto-lista">
+                                                                    <a routerLinkActive="active"
+                                                                        [routerLink]="['/constancia', constancia( e.numc )]">{{getDetalle(e)}}
+                                                                        &nbsp;<font color="{{e.color}}">{{ e.simbolo
+                                                                            }}
+                                                                        </font></a>
 
-                                                                        <a [href]="dwUrl(e.numc, e.anom)" target="_top"
-                                                                            rel="noopener noreferrer"
-                                                                            style="color:darkgrey;font-size: 18px;font-weight: normal;">
-                                                                            <img src="./assets/img/theme/pdf2.jpeg"
-                                                                                alt="Descargar archivo"
-                                                                                style="width: 20px;margin-top: 4px;" />
-                                                                        </a>
-                                                                        <!-- <button mat-icon-button aria-label="Privado">
+                                                                </div>
+                                                                <div class="col-md-2 texto-lista">
+                                                                    {{ e.fcre | date:"dd/MM/yyyy" }} | {{ e.nori }}
+                                                                </div>
+
+                                                                <div class="col-md-5 texto-detalle"
+                                                                    #tooltip="matTooltip"
+                                                                    matTooltip="{{ e.cont | uppercase}}">
+
+                                                                    {{ e.udep | uppercase }}
+                                                                </div>
+                                                                <div class="col-md-1 text-right">
+
+                                                                    <a [href]="dwUrl(e.numc, e.anom)" target="_top"
+                                                                        rel="noopener noreferrer"
+                                                                        style="color:darkgrey;font-size: 18px;font-weight: normal;">
+                                                                        <img src="./assets/img/theme/pdf2.jpeg"
+                                                                            alt="Descargar archivo"
+                                                                            style="width: 20px;margin-top: 4px;" />
+                                                                    </a>
+                                                                </div>
+
+                                                            </div>
+
+
+                                                        </mat-list>
+                                                    </mat-selection-list>
+                                                    <!-- (click)="toggleSidenav(e)" -->
+                                                    <div class="row" *ngIf="!blNavegacion" style="padding: 20px;">
+                                                        <div class="col-md-2 cardround"
+                                                            *ngFor="let e of lstCarpetasRecibido">
+                                                            <a routerLinkActive="active"
+                                                                (dblclick)="listarDocumentos(e)">
+                                                                <div class="text-center botones">
+                                                                    <br>
+                                                                    <h2 class="text-center"
+                                                                        style="color: rgb(160, 184, 230);">
+                                                                        <i class="fa fa-folder" style="font-size: 54px;"
+                                                                            mat-raised-button matBadge="{{e.cant}}"
+                                                                            [matBadgeHidden]="hidden"></i>
+                                                                    </h2>
+                                                                    <p style="font-weight: bold;font-family: Roboto;">
+                                                                        {{
+                                                                        e.nomb }}</p>
+
+
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+
+                                                    <br>
+
+                                                </div>
+                                            </mat-tab>
+                                            <mat-tab>
+                                                <ng-template mat-tab-label>
+                                                    &nbsp;CLASIFICAR
+                                                </ng-template>
+                                                <ngx-ui-loader [loaderId]="'ldclasificar'"></ngx-ui-loader>
+                                                <div class="example-large-box mat-elevation-z4">
+
+                                                    <mat-selection-list
+                                                        style="padding: 20px; width: 100%; margin-bottom: -30px;"
+                                                        #documento>
+                                                        <mat-list style="border-bottom: 1px #e0dfdff1 solid;">
+                                                            <div class="row">
+                                                                <div class="col-md-1">
+                                                                    <mat-checkbox [checked]="allComplete"
+                                                                        color="primary" [indeterminate]="someComplete()"
+                                                                        (change)="setAll($event.checked)"
+                                                                        class="example-margin texto-lista" id="check">
+                                                                    </mat-checkbox>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <button mat-icon-button aria-label="Example "
+                                                                        (click)="open(content, 0, 0)" id="clasificar">
+                                                                        <mat-icon>folder_copy</mat-icon>
+                                                                    </button>
+                                                                </div>
+
+                                                                <div class="col-md-3 texto-lista">
+                                                                    FECHA / NUMERO
+                                                                </div>
+                                                                <div class="col-md-5 texto-lista">
+                                                                    ACCION TOMADA EN SECRETARIA
+                                                                </div>
+
+                                                                <div class="col-md-1 text-right texto-lista">
+                                                                    ACC
+                                                                </div>
+                                                            </div>
+
+                                                        </mat-list>
+                                                    </mat-selection-list>
+
+                                                    <mat-selection-list
+                                                        style="padding: 20px; margin-top: -10px; width: 100%;"
+                                                        #lstDocumentos>
+                                                        <mat-list *ngFor="let e of bzClasificar; let i=index "
+                                                            style="border-bottom: 1px #e0dfdff1 solid;">
+                                                            <div class="row">
+                                                                <div class="col-md-1">
+                                                                    <mat-checkbox class="example-margin texto-lista"
+                                                                        [(ngModel)]="e.completed" color="warn"
+                                                                        (ngModelChange)="updateAllComplete()">
+                                                                    </mat-checkbox>
+                                                                </div>
+                                                                <div class="col-md-2 texto-lista">
+                                                                    <a routerLinkActive="active"
+                                                                        [routerLink]="['/constancia', constancia( e.numc )]">{{
+                                                                        getDetalle(e) }}
+                                                                        &nbsp;<font color="{{e.color}}">{{ e.simbolo
+                                                                            }}
+                                                                        </font></a>
+
+                                                                </div>
+                                                                <div class="col-md-3 texto-lista">
+                                                                    {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori |
+                                                                    uppercase
+                                                                    }}
+                                                                </div>
+
+                                                                <div class="col-md-5 texto-detalle">
+
+                                                                    {{ getEstatusMinisterial(e) }}
+                                                                </div>
+                                                                <div class="col-md-1 text-right">
+
+                                                                    <a [href]="dwUrl(e.numc, e.anom)" target="_top"
+                                                                        rel="noopener noreferrer"
+                                                                        style="color:darkgrey;font-size: 18px;font-weight: normal;">
+                                                                        <img src="./assets/img/theme/pdf2.jpeg"
+                                                                            alt="Descargar archivo"
+                                                                            style="width: 20px;margin-top: 4px;" />
+                                                                    </a>
+                                                                    <!-- <button mat-icon-button aria-label="Privado">
                                                 <mat-icon class="text-green"
                                                     style="font-size: 27px;margin-top: 2px;"
                                                     (click)="MoverForm(e)">preview
                                                 </mat-icon>
                                             </button> -->
-                                                                    </div>
-
                                                                 </div>
-                                                            </mat-list>
-                                                        </mat-selection-list>
 
-                                                        <br>
+                                                            </div>
+                                                        </mat-list>
+                                                    </mat-selection-list>
 
-                                                        <mat-paginator [length]="longitud"
-                                                            (page)="pageChangeEvent($event)" [pageSize]="pageSize"
-                                                            [pageSizeOptions]="pageSizeOptions"
-                                                            (page)="pageEvent = $event" aria-label="Seleccionar">
-                                                        </mat-paginator>
-                                                    </div>
-                                                </mat-tab>
+                                                    <br>
+
+                                                    <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)"
+                                                        [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+                                                        (page)="pageEvent = $event" aria-label="Seleccionar">
+                                                    </mat-paginator>
+                                                </div>
+                                            </mat-tab>
 
 
-                                                <mat-tab>
-                                                    <ng-template mat-tab-label>
-                                                        &nbsp;EN PROCESO
-                                                    </ng-template>
-                                                    <ngx-ui-loader [loaderId]="'ldcarpetas'"></ngx-ui-loader>
-                                                   
-                                                    <div class="example-large-box " style="margin-top: -22px;">
+                                            <mat-tab>
+                                                <ng-template mat-tab-label>
+                                                    &nbsp;EN PROCESO
+                                                </ng-template>
+                                                <ngx-ui-loader [loaderId]="'ldcarpetas'"></ngx-ui-loader>
 
-                                                        <div class="row" *ngIf="blistado" style="padding-right: 10px;">
-                                                            <div class="col-md-12">
-                                                                <mat-selection-list style="width: 100%;" >
-                                                            
-                                                                    <mat-list 
-                                                                        style="margin-top: 5px; border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: 50px;"
-                                                                        >
-                                                                        <div class="row" style="padding-left: 5px;padding-right: 5px;">
-                                                                            <div class="col-md-1 texto-lista text-center">
-                                                                                <mat-checkbox 
-                                                                                style="margin-top:-15px"
-                                                                                [checked]="allCompletex"
-                                                                                color="primary"
+                                                <div class="example-large-box " style="margin-top: -22px;">
+
+                                                    <div class="row" *ngIf="blistado" style="padding-right: 10px;">
+                                                        <div class="col-md-12">
+                                                            <mat-selection-list style="width: 100%;">
+
+                                                                <mat-list
+                                                                    style="margin-top: 5px; border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: 50px;">
+                                                                    <div class="row"
+                                                                        style="padding-left: 5px;padding-right: 5px;">
+                                                                        <div class="col-md-1 texto-lista text-center">
+                                                                            NÚM</div>
+                                                                        <div class="col-md-1 texto-lista text-center">
+                                                                            <mat-checkbox style="margin-top:-15px"
+                                                                                [checked]="allCompletex" color="primary"
                                                                                 [indeterminate]="someCompletex()"
                                                                                 (change)="setAllx($event.checked)"
                                                                                 class="example-margin texto-lista"
                                                                                 id="checkx">
                                                                             </mat-checkbox>
-                                                                            </div>
-                                                                            <div class="col-md-2 texto-lista">
-                                                                                CEDULA
-        
-                                                                            </div>
-                                                                            
-        
-                                                                            <div class="col-md-5 texto-lista">
-                                                                                NOMBRES Y APELLIDOS
-                                                                            </div>
-                                                                            <div class="col-md-4 text-right texto-lista">
-                                                                                ACCION
-                                                                            </div>
-        
                                                                         </div>
-        
-                                                                    </mat-list>
-                                                                    <mat-list *ngFor="let e of lstCedula; let i=index "
-                                                                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: 50px;"
-                                                                        >
-                                                                        <div class="row" style="padding-left: 5px;padding-right: 5px;">
-                                                                            <div class="col-md-1 texto-lista text-center">
-                                                                                <mat-checkbox 
-                                                                                    style="margin-top:-15px"
-                                                                                    class="example-margin texto-lista"
-                                                                                    [(ngModel)]="e.completed" color="warn"
-                                                                                    (ngModelChange)="updateAllCompletex()">
-                                                                                </mat-checkbox>
-                                                                            </div>
-                                                                            <div class="col-md-2 texto-sub-lista">
-                                                                                {{e.cedula}}
-        
-        
-                                                                            </div>
-                                                                           
-        
-                                                                            <div class="col-md-5 texto-sub-lista">
-                                                                                {{ e.nombres_apellidos }}
-                                                                            </div>
-                                                                            <div class="col-md-4 text-right texto-sub-lista">
-                                                                                {{ e.estatus }}
-                                                                            </div>
-        
-                                                                        </div>
-        
-                                                                    </mat-list>
-                                                                </mat-selection-list>
-                                                                <br>
-                                                                <br>
+                                                                        <div class="col-md-2">
+                                                                            <button mat-icon-button
+                                                                                aria-label="Example "
+                                                                                (click)="open(content, 0, 0)"
+                                                                                id="clasificar">
+                                                                                <mat-icon>folder_copy</mat-icon>
+                                                                            </button>
 
-                                                                <br>
-                                                                <br>
-                                                                <br>
-                                                                <br>
-                                                                <br>
-                                                                <br>
-                                                                <br>
-                                                                <br>
-                                                            </div>
-                                                            <div class="col-md-12 text-right">
-                                                                <button class="btn bg-warning text-white " (click)="closeEvent(false)"
-                                                                    >
-                                                                    &nbsp;&nbsp;Ocultar
-                                                                </button>
+                                                                        </div>
+
+
+                                                                        <div class="col-md-5 texto-lista">
+                                                                            NOMBRES Y APELLIDOS
+                                                                        </div>
+                                                                        <div class="col-md-3 text-right texto-lista">
+                                                                            ACCION
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </mat-list>
+                                                                <mat-list *ngFor="let e of lstCedula; let i=index "
+                                                                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: 50px;">
+                                                                    <div class="row"
+                                                                        style="padding-left: 5px;padding-right: 5px;">
+                                                                        <div class="col-md-1 texto-lista text-center">
+                                                                            &nbsp;&nbsp;<font
+                                                                                style="font-weight: bold;"> {{ i + 1}}
+                                                                            </font>
+                                                                        </div>
+                                                                        <div class="col-md-1 texto-lista text-center">
+                                                                            <mat-checkbox style="margin-top:-15px"
+                                                                                class="example-margin texto-lista"
+                                                                                [class.mat-checkbox-disabled]="!getDetalleEnabled(e.obse)"
+                                                                                [(ngModel)]="e.completed" color="warn"
+                                                                                (ngModelChange)="updateAllCompletex()">
+                                                                            </mat-checkbox>
+                                                                        </div>
+                                                                        <div class="col-md-2 texto-sub-lista">
+                                                                            {{e.cedula}}
+
+
+                                                                        </div>
+
+
+                                                                        <div class="col-md-5 texto-sub-lista">
+                                                                            {{ e.nombres_apellidos }}
+                                                                        </div>
+                                                                        <div
+                                                                            class="col-md-3 text-right texto-sub-lista">
+                                                                            {{ e.obse==''?'PROCESAR':getDetalleX(e.obse)
+                                                                            }}
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </mat-list>
+                                                            </mat-selection-list>
+
+
+                                                            <br>
+                                                            <br>
+
+
+                                                        </div>
+
+
+                                                        <div class="col-md-12">
+                                                            <div style="padding-right: 5px;padding-left: 10px; padding-top: 15px;">
+                                                                <textarea class="form-control" cols="30" rows="2"
+                                                                    [ngModelOptions]="{standalone: true}"
+                                                                    [(ngModel)]="xasunto"
+                                                                    placeholder="Introduzca el asunto..."
+                                                                    style="width: 100%"
+                                                                    required="required">{{xasunto}}</textarea>
                                                             </div>
                                                         </div>
 
-                                                        <div class="row" *ngIf="!blistado"
-                                                            style="border-bottom:solid 1px;border-color:#f1f0f0;color:#CCC;margin-bottom: 2px;">
-                                                            <!-- <div class="col-md-9"
+                                                        <br><br>
+
+                                                        <div class="col-md-12">
+                                                            <div style="padding-right: 5x;padding-left: 10px;padding-top: 15px;">
+
+
+                                                                <textarea class="form-control" cols="30" rows="2"
+                                                                    [ngModelOptions]="{standalone: true}"
+                                                                    [(ngModel)]="observaciones"
+                                                                    placeholder="Introduzca las observaciones..."
+                                                                    style="width: 100%">{{observaciones}}</textarea>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6" style="padding-top: 20px;padding-left:30px; ">
+                                                            <button class="btn bg-success text-white "
+                                                                (click)="closeEvent(false)">
+                                                                &nbsp;&nbsp;Aceptar cambios
+                                                            </button>
+                                                            &nbsp;&nbsp;
+                                                            <button class="btn bg-gradient-warning text-white "
+                                                                (click)="closeEvent(false)">
+                                                                &nbsp;&nbsp;Anular cuenta
+                                                            </button>
+                                                            
+                                                        </div>
+
+                                                        <div class="col-md-6 text-right"  style="padding-top: 20px;">
+                                                            <button class="btn bg-warning text-white "
+                                                                (click)="closeEvent(false)">
+                                                                &nbsp;&nbsp;Ocultar
+                                                            </button>
+                                                            
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row" *ngIf="!blistado"
+                                                        style="border-bottom:solid 1px;border-color:#f1f0f0;color:#CCC;margin-bottom: 2px;height: 90px;">
+                                                        <!-- <div class="col-md-9"
                                                                 style="margin-top: 10px; margin-bottom: -10px; padding-left:40px ;">
 
                                                                 <mat-chip-list aria-label=""
@@ -474,84 +513,83 @@
                                                                     </mat-chip>
                                                                 </mat-chip-list>
                                                             </div> -->
-                                                            <div class="col-md-6"></div>
-                                                            <div class="col-md-6 text-right">
-                                                                <mat-form-field appearance="outline"
-                                                                    style="border:0px; margin:0px;padding-right:5px;margin-bottom: -19px;">
+                                                        <div class="col-md-6"></div>
+                                                        <div class="col-md-6 text-right"  style="margin-top: 27px; margin-bottom: -10px; padding-left:40px ;">
+                                                            <mat-form-field appearance="outline"
+                                                                style="border:0px; margin:0px;padding-right:5px;margin-bottom: -19px;">
 
-                                                                    <input style="color: #5582b5;" matInput
-                                                                        placeholder="Buscar n&uacute;mero de carpeta"
-                                                                        (keypress)="consultarCarpeta($event)"
-                                                                        [(ngModel)]="codCarpeta" value="{{codCarpeta}}">
-                                                                    <mat-icon matSuffix type="button">search</mat-icon>
-                                                                </mat-form-field>
-
-                                                            </div>
+                                                                <input style="color: #5582b5;" matInput
+                                                                    placeholder="Buscar n&uacute;mero de carpeta"
+                                                                    (keypress)="consultarCarpeta($event)"
+                                                                    [(ngModel)]="codCarpeta" value="{{codCarpeta}}">
+                                                                <mat-icon matSuffix type="button">search</mat-icon>
+                                                            </mat-form-field>
 
                                                         </div>
 
+                                                    </div>
 
-                                                        <div class="row" *ngIf="!blistado" style="margin:0px;padding:5px">
 
-                                                            <div class="col-md-12">
+                                                    <div class="row" *ngIf="!blistado" style="margin:0px;padding:5px">
 
-                                                                <div class="row">
-                                                                    <div class="col-md-2 cardround"
-                                                                        *ngFor="let e of lstCarpetas">
-                                                                        <a routerLinkActive="active">
-                                                                            <div class="text-center botones">
-                                                                                <br>
-                                                                                <!-- (contextmenu)="onRightClick($event)" -->
-                                                                                <h2 class="text-center  "
+                                                        <div class="col-md-12">
+
+                                                            <div class="row">
+                                                                <div class="col-md-2 cardround"
+                                                                    *ngFor="let e of lstCarpetas">
+                                                                    <a routerLinkActive="active">
+                                                                        <div class="text-center botones">
+                                                                            <br>
+                                                                            <!-- (contextmenu)="onRightClick($event)" -->
+                                                                            <h2 class="text-center  "
                                                                                 [style.color]="getColor(e.componente)"
-                                                                                    
-                                                                                    (click)="toggleSidenav(e)">
-                                                                                    <i class="fa fa-folder"
-                                                                                        style="font-size: 62px;"></i>
-                                                                                </h2>
-                                                                                <p
-                                                                                    style="font-weight: bold;font-family: Roboto;">
-                                                                                    {{ e.llav }}</p>
+                                                                                (click)="toggleSidenav(e)">
+                                                                                <i class="fa fa-folder"
+                                                                                    style="font-size: 62px;"></i>
+                                                                            </h2>
+                                                                            <p
+                                                                                style="font-weight: bold;font-family: Roboto;">
+                                                                                {{ e.llav }}</p>
 
 
-                                                                            </div>
-                                                                        </a>
-                                                                    </div>
-                                                                   
-
-
+                                                                        </div>
+                                                                    </a>
                                                                 </div>
 
 
+
                                                             </div>
 
 
                                                         </div>
 
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
-                                                        <br>
+
                                                     </div>
 
-                                                </mat-tab>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                </div>
+
+                                            </mat-tab>
 
 
-                                                <!-- <mat-tab>
+                                            <!-- <mat-tab>
                                                     <ng-template mat-tab-label>
                                                         &nbsp;VISTA
                                                     </ng-template>
@@ -562,17 +600,17 @@
 
 
                                                 </mat-tab> -->
-                                            </mat-tab-group>
+                                        </mat-tab-group>
 
-                                            <br><br><br><br><br>
-                                        </div>
+                                        <br><br><br><br><br>
                                     </div>
                                 </div>
-                            </mat-sidenav-content>
-                        </mat-sidenav-container>
+                            </div>
+                        </mat-sidenav-content>
+                    </mat-sidenav-container>
 
 
-                        <br><br>
+                    <br><br>
 
                 </div>
 

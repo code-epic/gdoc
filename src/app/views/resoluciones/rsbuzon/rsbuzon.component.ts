@@ -97,6 +97,8 @@ export class RsbuzonComponent implements OnInit {
     public xresponsable = '0'
     public xtipo = '0'
     public xobservacion = ''
+    public observaciones = ''
+    public xasunto = ''
 
 
     public allComplete: boolean = false;
@@ -136,6 +138,7 @@ export class RsbuzonComponent implements OnInit {
     public codCarpeta = '';
     public blNavegacion: boolean = false;
     public details: boolean = false;
+
 
     public sNavegacion = ''
     btnTexto = 'Control de Gestion';
@@ -351,10 +354,11 @@ export class RsbuzonComponent implements OnInit {
                 } else {
                     this.bzClasificar = arr
                 }
+
                 this.lstCarpetasRecibido[0].cant = this.maxRecibido - i
                 this.lstCarpetasRecibido[1].cant = i
 
-                this.lengthOfi = data.Cuerpo.length
+
                 this.ngxService.stopLoader('ldbuzon')
             },
             (error) => {
@@ -363,32 +367,6 @@ export class RsbuzonComponent implements OnInit {
             }
         );
     }
-
-    // async listarCarpetas() {
-    //     this.xAPI.parametros = ''
-    //     this.xAPI.valores = ''
-    //     this.ngxService.startLoader('ldcarpetas');
-    //     await this.apiService.Ejecutar(this.xAPI).subscribe(
-    //         (data) => {
-    //             console.log('listarCarpetas: ', data);
-    //             if (data.Cuerpo.length > 0) {
-    //                 this.lstCarpetas = data.Cuerpo;
-    //                 // this.lstCarpetasAux = data.Cuerpo;
-    //                 this.subEntrada()
-
-    //             } else {
-    //                 this.ngxService.stopLoader('ldcarpetas')
-    //             }
-
-
-
-
-    //         },
-    //         (error) => {
-    //         }
-    //     );
-    // }
-
 
     async subEntrada() {
 
@@ -546,6 +524,10 @@ export class RsbuzonComponent implements OnInit {
         let pag = this.pageSize * pagina;
         this.lstAll = this.bzOriginal.slice(pag, pag + this.pageSize);
     }
+
+
+
+
 
     //editar
     editar(id: string) {
@@ -933,10 +915,11 @@ export class RsbuzonComponent implements OnInit {
                 this.lstAllx = data.Cuerpo
                 let arr = this.lstAllx.map((e) => {
                     e.completed = false;
-                  
+
                     return e;
-                }); 
+                });
                 this.lstCedula = arr
+                console.log(arr)
             },
             err => { }
         )
@@ -1108,6 +1091,85 @@ export class RsbuzonComponent implements OnInit {
             this.estiloclasificar = '';
         }
     }
+
+    openResolucion() {
+
+    }
+
+
+    // option value="PR">PROCESAR</option>
+    //                             <option value="NP">NO PROCESAR</option>
+    //                             <option value="NPPIDD">NP POR INT. DEL DIRECTOR</option>
+    //                             <option value="NPPIDJ">NP POR INT. DEL JEFE DE AREA</option>
+    //                             <option value="CR">CODIGO ROJO</option>
+    //                             <option value="BD">NO PROCESAR POR ASCENSO</option>
+
+    getDetalleX(e): string {
+        let text = "PROCESAR"
+        let cont = e.split("|")
+        if (cont.length > 0) {
+
+            switch (cont[1]) {
+                case "PR":
+                    text = "PROCESAR"
+                    break;
+                case "NP":
+                    text = "NO PROCESAR"
+                    break;
+                case "NPPIDD":
+                    text = "NP POR INT. DEL DIRECTOR"
+                    break;
+                case "NPPIDJ":
+                    text = "NP POR INT. DEL JEFE DE AREA"
+                    break;
+                case "CR":
+                    text = "CODIGO ROJO"
+                    break;
+            }
+        }
+
+
+
+        // let cont = e.split("|")
+        // if (cont.length > 0) text = cont[1]
+
+        return text
+    }
+
+    getDetalleEnabled(e): boolean {
+        let text = true
+        let cont = e.split("|")
+        if (cont.length > 0) {
+
+            switch (cont[1]) {
+                case "PR":
+                    text = true
+                    break;
+                case "NP":
+                    text = false
+                    break;
+                case "NPPIDD":
+                    text = false
+                    break;
+                case "NPPIDJ":
+                    text = false
+                    break;
+                case "CR":
+                    text = false
+                    break;
+            }
+        }
+
+
+
+        // let cont = e.split("|")
+        // if (cont.length > 0) text = cont[1]
+
+        return text
+    }
+
+
+
 
 
 
