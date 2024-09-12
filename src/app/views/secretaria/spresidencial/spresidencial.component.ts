@@ -21,7 +21,14 @@ export class SpresidencialComponent implements OnInit {
 
 
   public estadoActual = 4
-  public estadoOrigen = 2
+  public estadoOrigen = 5
+  public estatusAcutal = 6
+  fecha_desde = '-09-01'
+  fecha_hasta = '-09-30'
+  xyear = '2024'
+  public lstMeses = []
+  public lstYear = []
+  public xmeses = ''
 
   public paginador = 10
   public focus;
@@ -119,11 +126,14 @@ export class SpresidencialComponent implements OnInit {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
     config.keyboard = false;
+    this.lstMeses = this.apiService.Xmeses
+    this.lstYear = this.apiService.Xyear
 
   }
 
-
   ngOnInit(): void {
+    this.xmeses = new Date().getMonth().toString()
+    this.xyear = new Date().getFullYear().toString()
     this.listarEstados()
     this.seleccionNavegacion(0)
 
@@ -187,29 +197,31 @@ export class SpresidencialComponent implements OnInit {
 
   seleccionNavegacion(e) {
     this.buzon = []
-    this.xAPI.funcion = 'WKF_CDocumentos'
+    this.xAPI.funcion = 'WKF_CDocumentosGestion'
     this.xAPI.valores = ''
     this.selNav = e
     this.vministerial = true
     this.tministerial = '4'
     this.cargarAcciones(e)
+    this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
+    this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
     switch (e) {
       case 0:
         this.clasificacion = false
         this.vministerial = false
         this.tministerial = '12'
-        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
+        this.xAPI.parametros = `${this.estadoActual},${this.estatusAcutal},${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon()
         break
       case 1:
         this.clasificacion = false
         //this.xAPI.funcion = 'WKF_CSubDocumento'
-        this.xAPI.parametros = this.estadoActual + ',' + 2 + ',1'
+        this.xAPI.parametros = `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon()
         break
       case 2:
         this.clasificacion = false
-        this.xAPI.parametros = this.estadoActual + ',' + 3
+        this.xAPI.parametros = `${this.estadoActual},3,${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon()
         break
       case 3:
@@ -237,6 +249,7 @@ export class SpresidencialComponent implements OnInit {
   async listarBuzon() {
     var bz = []
     this.ngxService.startLoader("loader-aceptar")
+    console.log(this.xAPI)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data)

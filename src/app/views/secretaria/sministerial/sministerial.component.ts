@@ -242,7 +242,15 @@ export class SministerialComponent implements OnInit {
         this.xAPI.parametros = '3,1' + "," + this.fecha_desde + "," + this.fecha_hasta;
         this.listarBuzon()
         break
-
+      case 2:
+        this.xTipo = ''
+        this.clasificacion = false
+        this.vministerial = false
+        this.tministerial = '12'
+        this.filtro = 1
+        this.xAPI.parametros = this.estadoActual + ',7,' + this.fecha_desde + "," + this.fecha_hasta;
+        this.listarBuzon()
+        break
       case 3:
         this.ConsultarAlertas()
         break

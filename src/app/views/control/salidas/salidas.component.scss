@@ -28,7 +28,11 @@ ul {
 .texto-lista{
     margin-top: 13px; 
     font-weight: bold;
-    align-items: center;
+}
+
+.texto-detalle{
+    margin-top: 13px; 
+    font-size: 12.5px;
 }
 
 
@@ -55,53 +59,6 @@ ul {
     border-color: #bbbfc5 !important;
 }
 
-#codeEditor, #lineCounter {
-    font-family: lucida console, courier new, courier, monospace;
-    margin: 0;
-    padding: 10px 0;
-    height: 75vh;
-    border-radius: 0;
-    resize: none;
-    font-size: 16px;
-    line-height: 1.2;
-    outline: none;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
-#lineCounter:focus-visible,
-#codeEditor:focus-visible {
-    outline:none;
-} 
-#lineCounter {
-    display: flex;
-    border-color: transparent;
-    overflow-y: hidden;
-    text-align: right;
-    box-shadow: none;
-    color: #707070;
-    background-color: #d8d8d8;
-    position: absolute;
-    width: 3.5rem;
-    background-color: #ffffdd;
-    /* border-color: #3E3D32; */
-    color: #928869;
-    border: 0.0625rem solid #c0c2c3;
-    border-right: none;
-    border-radius: 4px 0px 0px 5px;
-}
-
-#codeEditor {
-    padding-left: calc(3.5rem + 5px);
-    width: 100%;
-    background-color: #ffffdd;
-    border-color: #272822;
-    color: #080808;
-    border-left: none !important;
-    border: 0.0625rem solid #c0c2c3;
-    border-radius: 0px 8px 9px 0px;
-
-}
 
 input{
     text-transform: uppercase;

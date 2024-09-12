@@ -4,6 +4,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
@@ -21,6 +22,13 @@ export class ArchivoComponent implements OnInit {
 
   public estadoActual = 11
   public estadoOrigen = 1
+  public estatusAcutal = 1
+  fecha_desde = '-09-01'
+  fecha_hasta = '-09-30'
+  xyear = '2024'
+  public lstMeses = []
+  public lstYear = []
+  public xmeses = ''
 
   public clasificacion = false
 
@@ -53,7 +61,7 @@ export class ArchivoComponent implements OnInit {
 
   lengthOfi = 0;
   pageSizeOfi = 50;
-  pageSizeOptions: number[] = [1, 50, 100, 150, 200, 250 ];
+  pageSizeOptions: number[] = [1, 50, 100, 150, 200, 250];
 
   // MatPaginator Output
   pageEvent: PageEvent;
@@ -90,25 +98,26 @@ export class ArchivoComponent implements OnInit {
   }
 
   public lstFecha = [
-    {id : '2023-12-01,2023-12-31,2023-11-30', value: 'DICIEMBRE'},
-    {id : '2024-01-01,2024-01-31,2023-12-31', value: 'ENERO'},
-    {id : '2024-02-01,2024-02-28,2024-01-31', value: 'FEBRERO'},
-    {id : '2024-03-01,2024-03-31,2024-02-28', value: 'MARZO'},
-    {id : '2024-04-01,2024-04-30,2024-03-31', value: 'ABRIL'},
-    {id : '2024-05-01,2024-05-31,2024-04-30', value: 'MAYO'},
-    {id : '2024-06-01,2024-06-30,2024-05-31', value: 'JUNIO'},
-    {id : '2024-07-01,2024-07-31,2024-06-30', value: 'JULIO'},
-    {id : '2024-08-01,2024-08-31,2024-07-31', value: 'AGOSTO'},
-    {id : '2024-09-01,2024-09-30,2024-08-31', value: 'SEPTIEMBRE'},
-    {id : '2024-10-01,2024-10-31,2024-09-30', value: '0CTUBRE'},
-    {id : '2024-11-01,2024-11-30,2024-10-31', value: 'NOVIEMBRE'},
-    {id : '2024-12-01,2024-12-31,2024-11-30', value: 'DICIEMBRE'},
+    { id: '2023-12-01,2023-12-31,2023-11-30', value: 'DICIEMBRE' },
+    { id: '2024-01-01,2024-01-31,2023-12-31', value: 'ENERO' },
+    { id: '2024-02-01,2024-02-28,2024-01-31', value: 'FEBRERO' },
+    { id: '2024-03-01,2024-03-31,2024-02-28', value: 'MARZO' },
+    { id: '2024-04-01,2024-04-30,2024-03-31', value: 'ABRIL' },
+    { id: '2024-05-01,2024-05-31,2024-04-30', value: 'MAYO' },
+    { id: '2024-06-01,2024-06-30,2024-05-31', value: 'JUNIO' },
+    { id: '2024-07-01,2024-07-31,2024-06-30', value: 'JULIO' },
+    { id: '2024-08-01,2024-08-31,2024-07-31', value: 'AGOSTO' },
+    { id: '2024-09-01,2024-09-30,2024-08-31', value: 'SEPTIEMBRE' },
+    { id: '2024-10-01,2024-10-31,2024-09-30', value: '0CTUBRE' },
+    { id: '2024-11-01,2024-11-30,2024-10-31', value: 'NOVIEMBRE' },
+    { id: '2024-12-01,2024-12-31,2024-11-30', value: 'DICIEMBRE' },
   ]
 
   constructor(
     private apiService: ApiService,
     config: NgbModalConfig,
     private ruta: Router,
+    private ngxService: NgxUiLoaderService,
     private toastrService: ToastrService,
     private loginService: LoginService,
     private utilService: UtilService,
@@ -116,10 +125,14 @@ export class ArchivoComponent implements OnInit {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
     config.keyboard = false;
+    this.lstMeses = this.apiService.Xmeses
+    this.lstYear = this.apiService.Xyear
 
   }
 
   ngOnInit(): void {
+    this.xmeses = new Date().getMonth().toString()
+    this.xyear = new Date().getFullYear().toString()
     this.listarEstados()
     this.seleccionNavegacion(0)
 
@@ -157,25 +170,28 @@ export class ArchivoComponent implements OnInit {
     this.bzProcesados = []
     this.bzPendientes = []
     this.bzCerrados = []
-    this.xAPI.funcion = 'WKF_CDocumentoFecha'
+    this.xAPI.funcion = 'WKF_CDocumentosGestion'
     this.xAPI.valores = ''
     this.selNav = e
+    this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
+    this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
+   
 
     switch (e) {
       case 0:
         this.cargarAcciones(0)
         this.clasificacion = false
 
-        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen + ',' + this.lstFecha[6] 
+        this.xAPI.parametros =  `${this.estadoActual},${this.estatusAcutal},${this.fecha_desde},${this.fecha_hasta}` 
         this.listarBuzon(this.bzRecibido)
         break
       case 1:
         this.cargarAcciones(1)
         this.clasificacion = false
-        this.xAPI.parametros = this.estadoActual + ',' + 2
+        this.xAPI.parametros = `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon(this.bzProcesados)
         break
-    
+
       default:
         break
     }
@@ -183,9 +199,10 @@ export class ArchivoComponent implements OnInit {
   }
 
   async listarBuzon(bz: any) {
+    this.ngxService.startLoader("loader-aceptar")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
+        // console.log(data)
         data.Cuerpo.forEach(e => {
           e.existe = e.anom == '' ? true : false
           e.privado = false
@@ -201,6 +218,7 @@ export class ArchivoComponent implements OnInit {
           this.estilocheck = ''
           this.recorrerElementos(1, this.bzRecibido)
         }
+        this.ngxService.stopLoader("loader-aceptar")
 
       },
       (error) => {

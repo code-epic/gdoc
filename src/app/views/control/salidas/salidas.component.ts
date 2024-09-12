@@ -26,6 +26,13 @@ export class SalidasComponent implements OnInit {
 
   public estadoActual = 9
   public estadoOrigen = 1
+  public estatusAcutal = 1
+  fecha_desde = '-09-01'
+  fecha_hasta = '-09-30'
+  xyear = '2024'
+  public lstMeses = []
+  public lstYear = []
+  public xmeses = ''
 
   public clasificacion = false
 
@@ -135,6 +142,10 @@ export class SalidasComponent implements OnInit {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
     config.keyboard = false;
+    this.lstMeses = this.apiService.Xmeses
+    this.lstYear = this.apiService.Xyear
+    this.xmeses = new Date().getMonth().toString()
+    this.xyear = new Date().getFullYear().toString()
 
   }
 
@@ -225,14 +236,16 @@ export class SalidasComponent implements OnInit {
     this.bzProcesados = []
     this.bzPendientes = []
     this.bzCerrados = []
-    this.xAPI.funcion = 'WKF_CDocumentos'
+    this.xAPI.funcion = 'WKF_CDocumentosGestion'
     this.xAPI.valores = ''
     this.selNav = e
     this.pageSize = 10;
+    this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
+    this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
 
     switch (e) {
       case 0:
-        this.xAPI.parametros = this.estadoActual + ',' + this.estadoOrigen
+        this.xAPI.parametros =  `${this.estadoActual},${this.estatusAcutal},${this.fecha_desde},${this.fecha_hasta}` 
         this.listarBuzon(this.selNav)
         this.clasificacion = false
         this.cargarAcciones(0)
@@ -240,20 +253,20 @@ export class SalidasComponent implements OnInit {
         break
       case 1:
 
-        this.xAPI.parametros = this.estadoActual + ',' + 2
+        this.xAPI.parametros =  `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}` 
         this.listarBuzon(this.selNav)
         this.clasificacion = false
         this.cargarAcciones(1)
 
         break
       case 2:
-        this.xAPI.parametros = this.estadoActual + ',' + 3
+        this.xAPI.parametros =  `${this.estadoActual},3,${this.fecha_desde},${this.fecha_hasta}` 
         this.listarBuzon(this.selNav)
         this.clasificacion = false
         this.cargarAcciones(2)
         break
       case 4:
-        this.xAPI.parametros = this.estadoActual + ',' + 4
+        this.xAPI.parametros =  `${this.estadoActual},4,${this.fecha_desde},${this.fecha_hasta}` 
         this.listarBuzon(this.selNav)
         break
       default:
