@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { TableRsreportesModalComponent } from '../../rsreportes/modal/table-rsreportes-modal/table-rsreportes-modal.component';
 
 @Component({
   selector: 'app-rscpublicaciones',
@@ -15,6 +16,27 @@ import { UtilService } from 'src/app/services/util/util.service';
   styleUrls: ['./rscpublicaciones.component.scss']
 })
 export class RscpublicacionesComponent implements OnInit {
+
+  openDialog() {
+    this.consultarListado()
+    const dialogRef = this.dialog.open(TableRsreportesModalComponent, {
+      width: '100%',
+      height: 'auto',
+      data: {
+        componente_id : this.componente.split('|')[0],
+        componente: this.componente.split('|')[1],
+        lstNombres: this.lstNombres,
+        lstGenerales: this.lstGenerales,
+        lstQa: this.Componentes
+        }
+    })
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`)
+    })
+  }
+
+  @Input() generacion: boolean = false;
 
   selected = new FormControl(0);
   componente = '0'
@@ -137,6 +159,13 @@ export class RscpublicacionesComponent implements OnInit {
    * 
    */
   consultarListado() {
+    if ( this.componente == '0'){
+      this.toastrService.warning(
+        'Debe seleccionar un componente',
+        `GDoc Generales`
+      )
+      return
+    } 
 
     if(this.codigos == "0") {
       this._snackBar.open("Debe seleccionar un codigo", "OK");
@@ -162,12 +191,12 @@ export class RscpublicacionesComponent implements OnInit {
       }
 
     )
-
-
   }
 
   downloadCSVEx() {
+    this.consultarListado()
     let head = this.csvHead.map((e) => {
+      console.log(e.nombre);
       return e.nombre;
     });
     this.utilService.downloadFile(

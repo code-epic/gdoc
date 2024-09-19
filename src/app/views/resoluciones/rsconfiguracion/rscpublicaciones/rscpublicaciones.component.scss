@@ -17,3 +17,9 @@ table {
   tr:nth-child(odd)   { background-color:#f1f1f1; }
   tr:nth-child(even)    { background-color:#fff; }
 }
+
+.botones{
+  display: flex;
+  align-items: self-end;
+  padding-bottom: 3px;
+}

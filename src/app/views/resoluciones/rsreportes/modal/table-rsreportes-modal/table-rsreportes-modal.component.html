@@ -1,0 +1,56 @@
+<h1 mat-dialog-title>Vista Previa</h1>
+<div mat-dialog-content align="center">
+
+    <table>
+
+        <tr style="background-color: #FFF;">
+            <td style="width: 10%;">
+                <img src="assets/img/mppd/escudos/{{getEscudo(componente_id)}}" (error)="setDefaultPic($event)"
+                    style="width: 110px; height: 140px;" alt="Logo de prueba">
+            </td>
+            <td style="width: 90%; text-align: left;font-weight: bold;margin-top: 5px;">
+                <p style="font-size: 16px;font-weight: bold;">
+                    REPÚBLICA BOLIVARIANA DE VENEZUELA <br>
+                    MINISTERIO DEL PODER POPULAR PARA LA DEFENSA </p>
+                <p style=" margin-top: -5px; font-size: 28px; font-weight: bold;"> COMPONENTE</p>
+            </td>
+        </tr>
+
+
+    </table>
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <table style="width: 100%;" class="zigzag" border="1">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;"> NUM.</th>
+                        <th> COMPONENTE</th>
+                        <th> GRADO</th>
+                        <th> NOMBRE COMPLETO</th>
+                        <th style="width: 110px;"> CEDULA</th>
+                        <th> MOTIVO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let e of lstNombres; index as i">
+                        <td>{{ i+1 }}</td>
+                        <td>{{e.cnombre}} </td>
+                        <td>{{e.gnombre}} </td>
+                        <td>{{ e.nombres_apellidos }}</td>
+                        <td>{{e.cedula}} </td>
+                        <td [innerHTML]="e.motivo"></td>
+
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+<div mat-dialog-actions align="center">
+    <button class="btn bg-primary text-white">
+        <span class="fa fa-print"></span>&nbsp;&nbsp;Imprimir
+    </button>
+</div>
