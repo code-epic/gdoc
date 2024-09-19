@@ -18,7 +18,7 @@ export class RecibidosFieldsNavComponent implements OnInit {
   @Output()
   closeEvent: EventEmitter<any> = new EventEmitter<any>();
 
-  public xcomponente = '0'
+  public componente = '0'
   public xclasificacion = '0'
   public xprioridad = '0'
   public xresponsable = '0'
@@ -27,6 +27,10 @@ export class RecibidosFieldsNavComponent implements OnInit {
   public xasunto = ''
   public xestatus = ''
   public numCarpeta = '0'
+
+  public xnumCarpeta = '0'
+  public xcomponente = '0'
+
 
   public Componentes = []
   public lstResponsable = []
@@ -58,10 +62,58 @@ export class RecibidosFieldsNavComponent implements OnInit {
     this.listarResponsables()
   }
 
+  ngOnChanges(){
+    let e = this.formSidenav.value
+    // console.log('Control de SideBar 2... ', this.formSidenav.value)
+    this.xcomponente = e.nomb.toString()
+    this.xnumCarpeta = e.obse.toString()
+
+    this.componente = e.nomb.toString()
+    this.numCarpeta = e.obse.toString()
+    this.OpcionesCarpetas()
+
+
+  }
+  async OpcionesCarpetas() {
+    this.xAPI.funcion = 'MPPD_CCarpetasGroup'
+    this.xAPI.parametros = `${this.xnumCarpeta},${this.xcomponente}`
+    this.xAPI.valores = null
+
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+                data.Cuerpo.forEach(e => {
+                  let rp = e.responsable.toString()
+                    this.xtipo = e.cod_acto.toString()
+                    this.xestatus = e.estatus.toString()
+                    this.xprioridad = e.accion.toString()
+                    this.xclasificacion = e.cod_tipo_entrada.toString()
+                    this.xresponsable = rp!=''?rp:'0'
+                })
+        },
+        err => { }
+    )
+}
+
   close() {
     this.closeEvent.emit(false);
   }
 
+  ActualizarCarpeta(){
+    let carpet = {
+      'xnumero_carpeta': this.xnumCarpeta.toString(), 
+      'numero_carpeta': this.numCarpeta.toString(), 
+      'xcod_componente': this.xcomponente,
+      'cod_componente': this.componente,
+      'fecha_entrada': '', 
+      'cod_tipo_entrada': this.xclasificacion.toString(), 
+      'estatus': this.xestatus, 
+      'responsable': this.xresponsable.toString(), 
+      'accion': this.xprioridad.toString(), 
+      'cod_acto': this.xtipo,
+      
+
+    }
+  }
 
   async listarResponsables() {
     this.xAPI.funcion = 'MPPD_ListarResponsables'
@@ -84,7 +136,7 @@ export class RecibidosFieldsNavComponent implements OnInit {
   }
 
   reactiveForm() {
-    console.log('Control de SideBar... ', this.formSidenav)
+    // console.log('Control de SideBar... ', this.formSidenav)
     //SI QUIERES INHABILITAR TODO EL FORMULARIO:
     /*
     this.formSidenav.disable();
@@ -101,11 +153,11 @@ export class RecibidosFieldsNavComponent implements OnInit {
      */
 
     // QUIERES SABER CUANDO UN USER ESCRIBA EN UN CAMPO ESPECIFICO:
-    /*
-    this.formSidenav.get('formControlNameAQUI').valueChanges.subscribe((value) => {
-      console.log("VALUE", value);
-    });
-    */
+
+    // this.formSidenav.get('formSidenav').valueChanges.subscribe((value) => {
+    //   console.log("VALUE", value);
+    // });
+  
   }
 
   AplicarCambios(){}

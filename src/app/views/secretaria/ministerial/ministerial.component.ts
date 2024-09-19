@@ -56,9 +56,9 @@ export class MinisterialComponent implements OnInit {
     { 'valor': '4', 'texto': 'PRESIDENCIAL', 'visible': '1' },
     { 'valor': '5', 'texto': 'ESPERA DE OPINION', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
     { 'valor': '6', 'texto': 'CONSULTORIA JURIDICA', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
-    { 'valor': '7', 'texto': 'RESOLUCIONES', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
-    { 'valor': '12', 'texto': 'RESOLUCIONES / URGENTE', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
-    { 'valor': '13', 'texto': 'RESOLUCIONES / JEFE DEL AREA SECRETARIA', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '7', 'texto': 'DIV. RESOLUCIONES', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '12', 'texto': 'DIV. RESOLUCIONES / URGENTE', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '13', 'texto': 'DIV. RESOLUCIONES / JEFE DEL AR EA SECRETARIA', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
     { 'valor': '8', 'texto': 'SUB-DIRECCION', 'visible': '1' },
     { 'valor': '9', 'texto': 'DIRECCION GENERAL', 'visible': '1' },
     { 'valor': '10', 'texto': 'DESPACHO DEL MPPD', 'visible': '1' },  //7/5/3 Asociado a los plazos en las alertas

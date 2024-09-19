@@ -893,9 +893,14 @@ export class RsbuzonComponent implements OnInit {
     toggleSidenav(e: any) {
         this.isShowing = !this.isShowing;
         this.formSidenav.reset();
-        this.formSidenav.patchValue(e);
-        this.blistado = true
         console.log('ELEMENTO DE LA CARPETA', e);
+        this.formSidenav.patchValue({
+            'esta' :1,'fech': 2, 'id':3, 'idw':4, 
+            'nomb': e.componente,
+            'obse': e.llav
+        });
+        this.blistado = true
+       
         this.lstCedula = []
         this.listarCedulasEnCarpeta(e)
 

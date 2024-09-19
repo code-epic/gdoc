@@ -52,6 +52,8 @@ import { CtrlestadisticasComponent } from 'src/app/views/control/ctrlestadistica
 import { CtrlreporteComponent } from 'src/app/views/control/ctrlreporte/ctrlreporte.component';
 import { CtrlalertasComponent } from 'src/app/views/control/ctrlalertas/ctrlalertas.component';
 import { DatosbasicosComponent } from 'src/app/views/control/datosbasicos/datosbasicos.component';
+import { RsreportesComponent } from 'src/app/views/resoluciones/rsreportes/rsreportes.component';
+import { RsalertasComponent } from 'src/app/views/resoluciones/rsalertas/rsalertas.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -113,6 +115,16 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'resoluciones',
         component: ResolucionesComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsreportes',
+        component: RsreportesComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsalertas',
+        component: RsalertasComponent,
         canActivate: [AuthGuardGuard]
     },
     {

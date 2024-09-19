@@ -99,6 +99,8 @@ import { MatBadgeModule } from '@angular/material/badge';
 import {SharedModule} from './shared/shared.module';
 import { RecibidosFieldsNavComponent } from './views/resoluciones/rsbuzon/recibidos-fields-nav/recibidos-fields-nav.component';
 import { RsconsultaentradasComponent } from './views/resoluciones/rsprocesos/rsconsultaentradas/rsconsultaentradas.component';
+import { RsreportesComponent } from './views/resoluciones/rsreportes/rsreportes.component';
+import { RsalertasComponent } from './views/resoluciones/rsalertas/rsalertas.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -228,7 +230,9 @@ const ngWizardConfig: NgWizardConfig = {
     GrallibroComponent,
     TableGrallibroModalComponent,
     RecibidosFieldsNavComponent,
-    RsconsultaentradasComponent
+    RsconsultaentradasComponent,
+    RsreportesComponent,
+    RsalertasComponent
   ],
   providers: [
     {
