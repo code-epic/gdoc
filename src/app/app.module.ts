@@ -101,6 +101,7 @@ import { RecibidosFieldsNavComponent } from './views/resoluciones/rsbuzon/recibi
 import { RsconsultaentradasComponent } from './views/resoluciones/rsprocesos/rsconsultaentradas/rsconsultaentradas.component';
 import { RsreportesComponent } from './views/resoluciones/rsreportes/rsreportes.component';
 import { RsalertasComponent } from './views/resoluciones/rsalertas/rsalertas.component';
+import { TableRsreportesModalComponent } from './views/resoluciones/rsreportes/modal/table-rsreportes-modal/table-rsreportes-modal.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -232,7 +233,8 @@ const ngWizardConfig: NgWizardConfig = {
     RecibidosFieldsNavComponent,
     RsconsultaentradasComponent,
     RsreportesComponent,
-    RsalertasComponent
+    RsalertasComponent,
+    TableRsreportesModalComponent
   ],
   providers: [
     {
