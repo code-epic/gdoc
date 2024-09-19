@@ -34,7 +34,7 @@
                 <mat-form-field appearance="outline">
                     <mat-label>N&uacute;mero de la carpeta</mat-label>
                     <input matInput placeholder="N&uacute;mero de la carpeta" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="numCarpeta" id="numCarpeta">
+                        [(ngModel)]="xnumCarpeta" id="xnumCarpeta">
                     <mat-icon matSuffix>folder</mat-icon>
                 </mat-form-field>
             </div>
@@ -99,7 +99,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="text-right" style="padding-right: 15px;">
-                        <button class="btn bg-primary text-white" (click)="AplicarCambios();close()">Aplicar
+                        <button class="btn bg-primary text-white" (click)="ActualizarCarpeta()">Aplicar
                             Cambios</button>
                     </div>
                 </div>

@@ -971,9 +971,7 @@ export class EresolucionesComponent implements OnInit {
   }
 
   Autocompletar(){
-    
-   
-    
+
     switch (parseInt(this.cod_resol_tipo)) {
       case 1:
         this.IResolucion.asunto += ', ' + this.IResolucion.unidad_texto

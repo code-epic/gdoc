@@ -79,26 +79,3 @@ align-items: center;
 }
 
 
-
-.input_container {
-  border: 1px solid #e5e5e5;
-  text-transform: capitalize;
-}
-
-input[type=file]::file-selector-button {
-  background-color: #85c889;
-  color: #000;
-  border: 0px;
-  border-right: 1px solid #e5e5e5;
-  padding: 10px 15px;
-  margin-right: 20px;
-  transition: .5s;
-  text-transform: capitalize;
-}
-
-input[type=file]::file-selector-button:hover {
-  background-color: #eee;
-  border: 0px;
-  border-right: 1px solid #e5e5e5;
-  text-transform: capitalize;
-}

@@ -1,15 +1,30 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
-import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+
+import { ActivatedRoute, Router } from "@angular/router"
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap"
+
+import { Resolucion } from "src/app/services/control/documentos.service"
+import {
+    NgbCalendar,
+    NgbDateAdapter,
+    NgbDateParserFormatter,
+    NgbDatepickerModule,
+    NgbDateStruct,
+} from "@ng-bootstrap/ng-bootstrap"
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
-import { map, Observable, startWith } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map, startWith } from "rxjs/operators"
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
+import { IResoluciones } from 'src/app/services/resoluciones/resolucion.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import Swal from 'sweetalert2';
 
 
 
@@ -19,10 +34,66 @@ export interface ITipoResolucion {
 }
 
 
+/**
+ * This Service handles how the date is represented in scripts i.e. ngModel.
+ */
+@Injectable()
+export class CustomAdapter extends NgbDateAdapter<string> {
+    readonly DELIMITER = "-";
+
+    fromModel(value: string | null): NgbDateStruct | null {
+        if (value) {
+            const date = value.split(this.DELIMITER);
+            return {
+                day: parseInt(date[0], 10),
+                month: parseInt(date[1], 10),
+                year: parseInt(date[2], 10),
+            };
+        }
+        return null;
+    }
+
+    toModel(date: NgbDateStruct | null): string | null {
+        return date
+            ? date.day + this.DELIMITER + date.month + this.DELIMITER + date.year
+            : null;
+    }
+}
+
+/**
+ * This Service handles how the date is rendered and parsed from keyboard i.e. in the bound input field.
+ */
+@Injectable()
+export class CustomDateParserFormatter extends NgbDateParserFormatter {
+    readonly DELIMITER = "/";
+
+    parse(value: string): NgbDateStruct | null {
+        if (value) {
+            const date = value.split(this.DELIMITER);
+            return {
+                day: parseInt(date[0], 10),
+                month: parseInt(date[1], 10),
+                year: parseInt(date[2], 10),
+            };
+        }
+        return null;
+    }
+
+    format(date: NgbDateStruct | null): string {
+        return date
+            ? date.day + this.DELIMITER + date.month + this.DELIMITER + date.year
+            : "";
+    }
+}
+
 @Component({
     selector: 'app-rsbuzon',
     templateUrl: './rsbuzon.component.html',
     styleUrls: ['./rsbuzon.component.scss'],
+    providers: [
+        { provide: NgbDateAdapter, useClass: CustomAdapter },
+        { provide: NgbDateParserFormatter, useClass: CustomDateParserFormatter },
+    ],
 })
 export class RsbuzonComponent implements OnInit {
     public estadoActual = 3;
@@ -87,6 +158,12 @@ export class RsbuzonComponent implements OnInit {
     public lstEstados = []; //Listar Estados
     public lstResponsable = []
     public lstCedula = []
+    public TipoResoluciones: any
+
+    public lstCausa: any //Objeto Comando
+    public lstMotivo: any //Objeto Comando
+    public lstDetalle: any //Objeto Comando
+    public lstPais: any //Objeto Comando
 
     public estilocheck = 'none';
     public estiloclasificar = 'none';
@@ -110,6 +187,78 @@ export class RsbuzonComponent implements OnInit {
     public Observacion = '';
     public AccionTexto: string = '0';
     maxRecibido = 0
+    public maxCol = "12"
+    public maxAscenso = "4"
+    public maxColComision = "6"
+    public maxCorregir = '3'
+    public maxExtender = '6'
+    public color = "#e3e6e6"
+    public cmbGrado = '0'
+    public otro_resuelto = ''
+    public lstHistorico: any
+    public blNombramiento: boolean = false
+    public blCorregir: boolean = false
+    public blReserva: boolean = false
+    public blReservaAux: boolean = false
+    public blComision: boolean = false
+    public blComisionAux: boolean = false
+    public blExtender: boolean = false
+    public blAscenso: boolean = false
+    public blAscensof: boolean = false
+    public blReconocer: boolean = false
+    public blCategoria: boolean = false
+    public blComponente: boolean = false
+    public blAceptar: boolean = true
+    public blAlert: boolean = false
+    public blCalendar: boolean = false
+    public blDbEspecialidad: boolean = false
+
+    public ultimo_ascenso: any
+    public comision_inicio: any
+    public comision_fin: any
+
+    public searchView = "none"
+    public contentView = ""
+  
+
+
+    public Resolucion: Resolucion = {
+        id: "",
+        cuenta: "",
+        unidad: "",
+        fecha_doc: "",
+        tipo: {},
+        cedula: "",
+        nombres: "",
+        fecha_nacimiento: "",
+        componente: "",
+        categoria: "",
+        clasificacion: "",
+        grado: "",
+        carpeta: "",
+        estatus: "",
+        entrada: "",
+        asunto: "",
+        observacion: "",
+        responsable: "",
+        cargo_responsable: "",
+        situacion: "",
+        sexo: "",
+        numero: "",
+        gran_comando: "",
+        unidad_comando: "",
+        instrucciones: "",
+        n_componente: 0,
+        n_grado: 0,
+    }
+
+
+
+
+
+    model1: string
+    model2: string
+
 
     public WAlerta: IWKFAlerta = {
         documento: 0,
@@ -163,16 +312,67 @@ export class RsbuzonComponent implements OnInit {
 
     filteredOptions: Observable<ITipoResolucion[]>
     myControl = new FormControl()
-    TipoResoluciones: any
+
+
+    public IResolucion: IResoluciones = {
+        grado: 0,
+        anio: 0,
+        asunto: "",
+        cedula: "",
+        pais: 0,
+        reserva: 0,
+        solicitud: 0,
+        tipo: 0,
+        unidad: 0,
+        comando: "",
+        comision_fin: "",
+        comision_inicio: "",
+        creador: "",
+        destino: "",
+        dia: 0,
+        distribucion: "0",
+        estatus: 0,
+        modificado: "",
+        fecha_termino: "",
+        falta: "",
+        registro: "",
+        fecha_resolucion: "",
+        formato: "",
+        ultimo_ascenso: "",
+        instrucciones: "",
+        mes: 0,
+        autor_modificar: "",
+        motivo: "",
+        numero: "",
+        observacion: "",
+        orden_merito: 0,
+        otro_resuelto: "",
+        autor_registro: "",
+        termino: 0,
+        unidad_texto: "",
+        documento: 0,
+        causa: 0,
+        archivo: "",
+    };
+
+    public fecha_resolucion: any;
+    public hashcontrol = "";
+    public CuentaGenera: any
+    public tipo: any
+    public archivos: any;
 
     constructor(
         private apiService: ApiService,
         private ruta: Router,
-        private ngxService: NgxUiLoaderService,
         private toastrService: ToastrService,
         private loginService: LoginService,
         private utilService: UtilService,
         private modalService: NgbModal,
+        private ngxService: NgxUiLoaderService,
+        public formatter: NgbDateParserFormatter,
+        private _snackBar: MatSnackBar,
+        private ngbCalendar: NgbCalendar,
+        private dateAdapter: NgbDateAdapter<string>,
         private fb: FormBuilder
     ) {
     }
@@ -202,6 +402,11 @@ export class RsbuzonComponent implements OnInit {
         //this.listarSubDocumentos(1);
         // this.blNavegacion = true
     }
+
+    get today() {
+        return this.dateAdapter.toModel(this.ngbCalendar.getToday())!
+    }
+
 
     listarEstados() {
         this.xAPI.funcion = 'WKF_CEstados';
@@ -251,6 +456,21 @@ export class RsbuzonComponent implements OnInit {
             centered: true,
             windowClass: "my-custom-modal-class",
             size: "md",
+            backdrop: false,
+        });
+
+        modalRef["_windowCmptRef"].location.nativeElement.style.zIndex = "900";
+    }
+
+
+    openResolucion(content, id, pos) {
+        this.numControl = id;
+        this.posicion = pos;
+        //this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
+        let modalRef = this.modalService.open(content, {
+            centered: true,
+            windowClass: "my-custom-modal-class",
+            size: "xl",
             backdrop: false,
         });
 
@@ -758,9 +978,6 @@ export class RsbuzonComponent implements OnInit {
         ); //
     }
 
-    fileSelected(e) {
-        //this.archivos.push(e.target.files[0])
-    }
 
     async SubirArchivo(e) {
         var frm = new FormData(document.forms.namedItem('forma'));
@@ -895,12 +1112,12 @@ export class RsbuzonComponent implements OnInit {
         this.formSidenav.reset();
         console.log('ELEMENTO DE LA CARPETA', e);
         this.formSidenav.patchValue({
-            'esta' :1,'fech': 2, 'id':3, 'idw':4, 
+            'esta': 1, 'fech': 2, 'id': 3, 'idw': 4,
             'nomb': e.componente,
             'obse': e.llav
         });
         this.blistado = true
-       
+
         this.lstCedula = []
         this.listarCedulasEnCarpeta(e)
 
@@ -1097,18 +1314,6 @@ export class RsbuzonComponent implements OnInit {
         }
     }
 
-    openResolucion() {
-
-    }
-
-
-    // option value="PR">PROCESAR</option>
-    //                             <option value="NP">NO PROCESAR</option>
-    //                             <option value="NPPIDD">NP POR INT. DEL DIRECTOR</option>
-    //                             <option value="NPPIDJ">NP POR INT. DEL JEFE DE AREA</option>
-    //                             <option value="CR">CODIGO ROJO</option>
-    //                             <option value="BD">NO PROCESAR POR ASCENSO</option>
-
     getDetalleX(e): string {
         let text = "PROCESAR"
         let cont = e.split("|")
@@ -1173,6 +1378,286 @@ export class RsbuzonComponent implements OnInit {
         return text
     }
 
+
+    AnularCuenta() {
+        Swal.fire({
+            title: 'GDoc Resoluciones',
+            text: "¿Está seguro que desea anular la carpeta?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let where = `${this.numCarpeta}`
+                this.xAPI.funcion = 'MPPD_UCarpetasGroup'
+                this.xAPI.parametros = where
+                this.xAPI.valores = null
+
+                this.apiService.Ejecutar(this.xAPI).subscribe(
+                    (data) => {
+                        this.toastrService.info(
+                            "La carpeta ha sido actualizada",
+                            `GDoc Resoluciones`
+                        )
+                        this.closeEvent(false)
+                    },
+                    err => {
+                        console.log(err)
+                    }
+                )
+            }
+        })
+    }
+
+    AceptarResoluciones() {
+        this.modalService.dismissAll()
+    }
+
+
+
+    fileSelected(e) {
+        this.archivos.push(e.target.files[0]);
+    }
+
+    async SubirArchivoResoluciones() {
+
+
+        console.log("R" + this.IResolucion.cedula)
+
+        this.ngxService.startLoader("loader-aceptar");
+        if (this.archivos.length > 0) {
+            console.log('Existen mas archivos')
+
+            var frm = new FormData(document.forms.namedItem("forma"));
+            try {
+                await this.apiService.EnviarArchivos(frm).subscribe((data) => {
+
+
+
+                    //this.evaluarDatos();
+
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            //this.evaluarDatos();
+        }
+    }
+
+
+
+    seleccionTipo() {
+        this.desactivarVista()
+      
+
+        if (this.fecha_resolucion == "") {
+            this._snackBar.open("Debe seleccionar una fecha para continuar", "OK")
+            return
+        }
+
+        if (typeof this.tipo != "object") return
+        this.IResolucion.tipo = this.tipo.codigo
+        let rs = this.tipo
+        let valor = true
+        this.resetearFechas(false)
+        this.maxAscenso = '4'
+        this.maxCorregir = '3'
+        this.maxExtender = '6'
+        this.IResolucion.grado = parseInt(this.Resolucion.grado)
+        console.log(this.tipo)
+        switch (parseInt(rs.tipo)) {
+            case 1:
+                this.blNombramiento = true
+                this.maxCol = "6"
+                this.viewUnidad()
+                break
+            case 2:
+                if (this.validarCategoriaCeseReserva(parseInt(rs.codigo))) {
+                    this.maxCol = "12"
+                    this.getCausa(rs.codigo)
+                } else {
+                    valor = false
+                }
+
+                break
+            case 3:
+                // console.log(this.tipo, this.IResolucion.tipo)
+                this.maxCol = "6"
+                this.blCorregir = true
+                if (this.IResolucion.tipo == 35) {
+
+                    let vGr: any = parseInt(this.Resolucion.grado) + 2
+                    this.cmbGrado = vGr.toString()
+                    this.IResolucion.grado = parseInt(this.cmbGrado)
+                    this.blAscenso = true
+                    this.maxAscenso = '6'
+                    this.maxCorregir = '6'
+                }
+                break
+
+            case 4:
+                if (this.fecha_resolucion == "") {
+                    this._snackBar.open("Debe seleccionar una fecha de resolucion", "OK")
+                    return
+                }
+                let fin = this.utilService.SumarAnios(this.fecha_resolucion, 1)
+                this.comision_inicio = this.fecha_resolucion
+                this.comision_fin = fin
+                this.maxCol = "6"
+                this.blComision = true
+                this.maxColComision = "6"
+                this.getAdministracion(rs.codigo)
+                break
+            case 5:
+                this.maxCol = "6"
+                this.blCorregir = true
+                this.blExtender = true
+                break
+            case 6:
+                this.maxCol = "12"
+                this.maxColComision = "4"
+                this.blComision = true
+                this.blComisionAux = true
+                break
+            case 7:
+                this.maxCol = "4"
+                let vGr: any = parseInt(this.Resolucion.grado) - 2
+                this.cmbGrado = vGr.toString()
+                this.IResolucion.grado = parseInt(this.cmbGrado)
+                this.blAscensof = true
+                this.blAscenso = true
+                break
+            case 8:
+                this.maxCol = "5"
+                this.blReconocer = true
+                break
+            case 9:
+                this.maxCol = "6"
+                this.blCategoria = true
+                break
+            case 10:
+                this.maxCol = "6"
+                this.blComponente = true
+                break
+            case 11: //reincorporar
+                this.maxCol = "6"
+                this.maxExtender = '3'
+                this.blExtender = true
+                break
+            default:
+                break
+        }
+
+        this.blAceptar = valor
+    }
+
+
+  viewUnidad() {
+    this.searchView = ""
+    this.contentView = "none"
+  }
+
+
+    resetearFechas(active: boolean) {
+        this.fecha_resolucion = active ? "" : this.fecha_resolucion
+        this.ultimo_ascenso = ""
+        this.comision_inicio = ""
+        this.comision_fin = ""
+      }
+    
+
+
+    validarCategoriaCeseReserva(codigo: number) {
+        if (codigo == 9 && this.Resolucion.clasificacion == "ASIMILADOS")
+            return true
+        if (codigo == 10 && this.Resolucion.clasificacion == "EFECTIVO")
+            return true
+        this.toastrService.error(
+            "Error: No coincide el tipo de resolución con la categoría",
+            `GDoc Resoluciones`
+        )
+        return false
+    }
+
+    desactivarVista() {
+        this.blCorregir = false
+        this.blNombramiento = false
+        this.blReserva = false
+        this.blReservaAux = false
+        this.blComision = false
+        this.blComisionAux = false
+        this.blExtender = false
+        this.blAscenso = false
+        this.blAscensof = false
+        this.blReconocer = false
+        this.blCategoria = false
+        this.blComponente = false
+    }
+
+    getAdministracion(id: string) {
+        this.lstCausa = []
+        this.xAPI.funcion = "MPPD_CCausaResolucion"
+        this.ngxService.startLoader("loader-buscar")
+        this.xAPI.parametros = id
+        this.xAPI.valores = ""
+
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data) => {
+                this.lstCausa = data.Cuerpo
+                this.ngxService.stopLoader("loader-buscar")
+            },
+            (err) => {
+                console.error(err)
+            }
+        )
+    }
+
+    getCausa(id: string) {
+        this.lstCausa = []
+        this.lstMotivo = []
+        this.xAPI.funcion = "MPPD_CCausaResolucion"
+        this.ngxService.startLoader("loader-buscar")
+        this.xAPI.parametros = id
+        this.xAPI.valores = ""
+
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data) => {
+                console.log(data)
+                this.lstCausa = data.Cuerpo
+
+                this.blReserva = true
+                this.ngxService.stopLoader("loader-buscar")
+                //
+            },
+            (err) => {
+                console.error(err)
+            }
+        )
+    }
+
+    getMotivo() {
+        this.lstMotivo = []
+        this.xAPI.funcion = "MPPD_CMotivoResolucion"
+        this.ngxService.startLoader("loader-buscar")
+        this.xAPI.parametros = this.IResolucion.solicitud.toString()
+        this.xAPI.valores = ""
+
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data) => {
+                this.lstMotivo = data.Cuerpo
+
+                this.blReserva = true
+                this.ngxService.stopLoader("loader-buscar")
+                if (this.IResolucion.solicitud.toString() == "7") this.blReservaAux = true
+            },
+            (err) => {
+                console.error(err)
+            }
+        )
+    }
 
 
 

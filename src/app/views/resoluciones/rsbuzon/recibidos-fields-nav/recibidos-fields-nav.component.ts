@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-recibidos-fields-nav',
@@ -47,6 +49,7 @@ export class RecibidosFieldsNavComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private toastrService: ToastrService,
   ) { }
 
   ngOnInit(): void {
@@ -99,21 +102,44 @@ export class RecibidosFieldsNavComponent implements OnInit {
   }
 
   ActualizarCarpeta(){
-    let carpet = {
-      'xnumero_carpeta': this.xnumCarpeta.toString(), 
-      'numero_carpeta': this.numCarpeta.toString(), 
-      'xcod_componente': this.xcomponente,
-      'cod_componente': this.componente,
-      'fecha_entrada': '', 
-      'cod_tipo_entrada': this.xclasificacion.toString(), 
-      'estatus': this.xestatus, 
-      'responsable': this.xresponsable.toString(), 
-      'accion': this.xprioridad.toString(), 
-      'cod_acto': this.xtipo,
-      
 
-    }
+    Swal.fire({
+      title: 'GDoc Resoluciones',
+      text: "¿Está seguro que desea acualizar la carpeta?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let cadena = `${this.xtipo},${this.xclasificacion},${this.xestatus},${this.xresponsable},${this.xprioridad},${this.xnumCarpeta},${this.xcomponente},`
+        let where = `${this.numCarpeta},${this.componente}`
+        this.xAPI.funcion = 'MPPD_UCarpetasGroup'
+        this.xAPI.parametros = cadena + where
+        this.xAPI.valores = null
+    
+         this.apiService.Ejecutar(this.xAPI).subscribe(
+            (data) => {
+              this.toastrService.info(
+                "La carpeta ha sido actualizada",
+                `GDoc Resoluciones`
+              )
+              this.close()
+            },
+            err => { 
+              console.log(err)
+            }
+        )
+    
+       
+      
+      }
+    })    
+    
+   
   }
+    
 
   async listarResponsables() {
     this.xAPI.funcion = 'MPPD_ListarResponsables'
