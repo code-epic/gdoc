@@ -18,7 +18,6 @@ import { TableRsreportesModalComponent } from '../../rsreportes/modal/table-rsre
 export class RscpublicacionesComponent implements OnInit {
 
   openDialog() {
-    this.consultarListado()
     const dialogRef = this.dialog.open(TableRsreportesModalComponent, {
       width: '100%',
       height: 'auto',

@@ -1,5 +1,5 @@
 <h1 mat-dialog-title>Vista Previa</h1>
-<div mat-dialog-content align="center">
+<div mat-dialog-content align="center"  id="imprimir">
 
     <table>
 
@@ -11,8 +11,9 @@
             <td style="width: 90%; text-align: left;font-weight: bold;margin-top: 5px;">
                 <p style="font-size: 16px;font-weight: bold;">
                     REPÚBLICA BOLIVARIANA DE VENEZUELA <br>
-                    MINISTERIO DEL PODER POPULAR PARA LA DEFENSA </p>
-                <p style=" margin-top: -5px; font-size: 28px; font-weight: bold;"> COMPONENTE</p>
+                    MINISTERIO DEL PODER POPULAR PARA LA DEFENSA 
+                </p>
+                <p style=" margin-top: -5px; font-size: 28px; font-weight: bold;"> {{componente}}</p>
             </td>
         </tr>
 
@@ -50,7 +51,7 @@
     </div>
 </div>
 <div mat-dialog-actions align="center">
-    <button class="btn bg-primary text-white">
+    <button class="btn bg-primary text-white" (click)="imprimirTabla()">
         <span class="fa fa-print"></span>&nbsp;&nbsp;Imprimir
     </button>
 </div>
