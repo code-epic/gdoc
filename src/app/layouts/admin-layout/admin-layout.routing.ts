@@ -54,6 +54,7 @@ import { CtrlalertasComponent } from 'src/app/views/control/ctrlalertas/ctrlaler
 import { DatosbasicosComponent } from 'src/app/views/control/datosbasicos/datosbasicos.component';
 import { RsreportesComponent } from 'src/app/views/resoluciones/rsreportes/rsreportes.component';
 import { RsalertasComponent } from 'src/app/views/resoluciones/rsalertas/rsalertas.component';
+import { RsestadisticasComponent } from 'src/app/views/resoluciones/rsestadisticas/rsestadisticas.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -315,6 +316,16 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'rsconfiguracion',
         component: RsconfiguracionComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsalertas',
+        component: RsalertasComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'rsestadisticas',
+        component: RsestadisticasComponent,
         canActivate: [AuthGuardGuard]
     },
     {

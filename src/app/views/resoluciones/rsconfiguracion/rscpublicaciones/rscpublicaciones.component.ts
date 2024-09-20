@@ -36,7 +36,8 @@ export class RscpublicacionesComponent implements OnInit {
     })
   }
 
-  @Input() generacion: boolean = false;
+  @Input() formularioAGenerar = 0;
+  txtBoton: string = 'Reporte'
 
   selected = new FormControl(0);
   componente = '0'
@@ -105,6 +106,24 @@ export class RscpublicacionesComponent implements OnInit {
         : [];
 
     await this.consultarPromociones()
+
+    switch(this.formularioAGenerar){
+      case 1: 
+          this.txtBoton = 'Codigos Rojos'
+          break
+        case 2:
+          this.txtBoton = 'Bajas'
+          break
+        case 3:
+          this.txtBoton = 'Nombramientos'
+          break
+        case 4:
+          this.txtBoton = 'Ascensos'
+          break
+        default:
+          this.txtBoton = 'Reporte'
+    }
+    
   }
 
 

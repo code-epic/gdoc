@@ -16,7 +16,7 @@
 
                         <div class="col-md-11">
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
-                            <h2 class="mb-0">Reportes</h2>
+                            <h2 class="mb-0">{{titulo}}</h2>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
@@ -35,7 +35,7 @@
 
                     <div class="col-md-12 row justify-content-center text-center">
                         <div class="col-md-2"></div>
-                        <div class="col-md-2 cardround" (click)="generacion = true">
+                        <div class="col-md-2 cardround" (click)="cambiarFormulario(1)">
                             <div class="text-center botones">
                                 <br>
                                 <h2 class="text-center text-red"><i class="fa fa-exclamation"
@@ -45,7 +45,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2 cardround" (click)="generacion = true">
+                        <div class="col-md-2 cardround" (click)="cambiarFormulario(2)">
                             <div class="text-center botones">
                                 <br>
                                 <h2 class="text-center text-orange"><i class="fa fa-arrow-down"
@@ -55,7 +55,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2 cardround" (click)="generacion = true">
+                        <div class="col-md-2 cardround" (click)="cambiarFormulario(3)">
                             <div class="text-center botones">
                                 <br>
                                 <h2 class="text-center text-blue"><i class="fa fa-clipboard-check"
@@ -65,7 +65,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2 cardround" (click)="generacion = true">
+                        <div class="col-md-2 cardround" (click)="cambiarFormulario(4)">
                             <div class="text-center botones">
                                 <br>
                                 <h2 class="text-center text-green"><i class="fa fa-arrow-up"
@@ -80,7 +80,7 @@
                     <br><br>
                     <div class="row p-4">
                         <div class="col-md-12">
-                            <app-rscpublicaciones *ngIf="generacion" [generacion]="true" ></app-rscpublicaciones>
+                            <app-rscpublicaciones *ngIf="formularioAGenerar != 0" [formularioAGenerar]="formularioAGenerar" ></app-rscpublicaciones>
                         </div>
                     </div>
                 </div>
