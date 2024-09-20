@@ -102,6 +102,7 @@ import { RsconsultaentradasComponent } from './views/resoluciones/rsprocesos/rsc
 import { RsreportesComponent } from './views/resoluciones/rsreportes/rsreportes.component';
 import { RsalertasComponent } from './views/resoluciones/rsalertas/rsalertas.component';
 import { TableRsreportesModalComponent } from './views/resoluciones/rsreportes/modal/table-rsreportes-modal/table-rsreportes-modal.component';
+import { RsestadisticasComponent } from './views/resoluciones/rsestadisticas/rsestadisticas.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -234,7 +235,8 @@ const ngWizardConfig: NgWizardConfig = {
     RsconsultaentradasComponent,
     RsreportesComponent,
     RsalertasComponent,
-    TableRsreportesModalComponent
+    TableRsreportesModalComponent,
+    RsestadisticasComponent
   ],
   providers: [
     {
