@@ -79,6 +79,8 @@ export class ArchivoComponent implements OnInit {
   public estiloclasificar = 'none'
 
   public allComplete: boolean = false
+  public bzOriginal = [] //Listado Original
+  public buzon = []
 
   public numControl = ''
 
@@ -112,6 +114,10 @@ export class ArchivoComponent implements OnInit {
     { id: '2024-11-01,2024-11-30,2024-10-31', value: 'NOVIEMBRE' },
     { id: '2024-12-01,2024-12-31,2024-11-30', value: 'DICIEMBRE' },
   ]
+
+  longitud = 0;
+  pageSize = 10;
+  
 
   constructor(
     private apiService: ApiService,
@@ -166,30 +172,28 @@ export class ArchivoComponent implements OnInit {
 
 
   seleccionNavegacion(e) {
-    this.bzRecibido = []
-    this.bzProcesados = []
-    this.bzPendientes = []
-    this.bzCerrados = []
+    this.buzon = []
     this.xAPI.funcion = 'WKF_CDocumentosGestion'
     this.xAPI.valores = ''
     this.selNav = e
     this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
     this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
    
-
+    console.log(e)
+    this.cargarAcciones(e)
     switch (e) {
       case 0:
-        this.cargarAcciones(0)
+        
         this.clasificacion = false
 
         this.xAPI.parametros =  `${this.estadoActual},${this.estatusAcutal},${this.fecha_desde},${this.fecha_hasta}` 
-        this.listarBuzon(this.bzRecibido)
+        this.listarBuzon()
         break
       case 1:
-        this.cargarAcciones(1)
+        
         this.clasificacion = false
         this.xAPI.parametros = `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}`
-        this.listarBuzon(this.bzProcesados)
+        this.listarBuzon()
         break
 
       default:
@@ -198,39 +202,108 @@ export class ArchivoComponent implements OnInit {
 
   }
 
-  async listarBuzon(bz: any) {
+
+
+
+  // async listarBuzon(bz: any) {
+  //   this.ngxService.startLoader("loader-aceptar")
+  //   await this.apiService.Ejecutar(this.xAPI).subscribe(
+  //     (data) => {
+  //       // console.log(data)
+  //       data.Cuerpo.forEach(e => {
+  //         e.existe = e.anom == '' ? true : false
+  //         e.privado = false
+  //         e.completed = false
+  //         //e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
+  //         e.color = 'warn'
+  //         bz.push(e)
+  //       })//Registros recorridos como elementos
+
+  //       // console.log(bz)
+  //       this.lengthOfi = data.Cuerpo.length
+  //       if (this.lengthOfi > 0) {
+  //         this.estilocheck = ''
+  //         this.recorrerElementos(1, this.bzRecibido)
+  //       }
+  //       this.ngxService.stopLoader("loader-aceptar")
+
+  //     },
+  //     (error) => {
+
+  //     }
+  //   )
+  // }
+
+
+  async listarBuzon(): Promise<void> {
+    // console.log('Entrando en listado')
     this.ngxService.startLoader("loader-aceptar")
-    await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        // console.log(data)
-        data.Cuerpo.forEach(e => {
-          e.existe = e.anom == '' ? true : false
-          e.privado = false
-          e.completed = false
-          //e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
-          e.color = 'warn'
-          bz.push(e)
-        })//Registros recorridos como elementos
+    try {
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        (data) => {
+          console.log(data)
+          this.buzon = data.Cuerpo.map((e) => {
+            e.existe = e.anom == '' ? true : false;
+            e.privado = e.priv == 1 ? true : false;
+            //  e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
+            e.color = 'green'
+            switch (e.tdoc.toLowerCase()) {
+              case 'punto de cuenta':
+                e.simbolo = "-P"
+                e.color = 'green'
+                break;
+              case 'tramitacion por organo regular':
+                e.simbolo = "-T"
+                e.color = 'brown'
+                break;
+              case 'resolucion':
+                e.simbolo = "-R"
+                e.color = 'orange'
+                break;
+              default:
+                e.simbolo = ''
+                break;
+            }
 
-        console.log(bz)
-        this.lengthOfi = data.Cuerpo.length
-        if (this.lengthOfi > 0) {
-          this.estilocheck = ''
-          this.recorrerElementos(1, this.bzRecibido)
+            e.completed = false;
+
+            return e;
+          });
+          this.longitud = this.buzon.length;
+          if (this.longitud > 0) {
+            this.estilocheck = '';
+            this.bzOriginal = this.buzon;
+            this.pageSize = 10;
+            this.recorrerElementos(0);
+          }
+          this.ngxService.stopLoader("loader-aceptar")
+        },
+        (error) => {
+          this.ngxService.stopLoader("loader-aceptar")
         }
-        this.ngxService.stopLoader("loader-aceptar")
-
-      },
-      (error) => {
-
-      }
-    )
+      )
+    } catch (error) {
+      console.error(error)
+      this.ngxService.stopLoader("loader-aceptar")
+    }
   }
 
 
   pageChangeEvent(e) {
-    this.recorrerElementos(e.pageIndex + 1, this.lst)
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex)
   }
+
+
+  //recorrerElementos para paginar listados
+  recorrerElementos(pagina: number) {
+    let pag = this.pageSize * pagina
+    this.buzon = this.bzOriginal.slice(pag, pag + this.pageSize)
+  }
+  
+  // pageChangeEvent(e) {
+  //   this.recorrerElementos(e.pageIndex + 1, this.lst)
+  // }
 
   updateAllComplete() {
     this.allComplete = this.bzRecibido != null && this.bzRecibido.every(t => t.completed);
@@ -257,11 +330,11 @@ export class ArchivoComponent implements OnInit {
 
 
   //recorrerElementos para paginar listados
-  recorrerElementos(posicion: number, lista: any) {
-    if (posicion > 1) posicion = posicion * 50
-    this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
+  // recorrerElementos(posicion: number, lista: any) {
+  //   if (posicion > 1) posicion = posicion * 50
+  //   this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
 
-  }
+  // }
 
 
   //editar

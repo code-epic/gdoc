@@ -103,6 +103,7 @@ import { RsreportesComponent } from './views/resoluciones/rsreportes/rsreportes.
 import { RsalertasComponent } from './views/resoluciones/rsalertas/rsalertas.component';
 import { TableRsreportesModalComponent } from './views/resoluciones/rsreportes/modal/table-rsreportes-modal/table-rsreportes-modal.component';
 import { RsestadisticasComponent } from './views/resoluciones/rsestadisticas/rsestadisticas.component';
+import { MreportesComponent } from './views/secretaria/mreportes/mreportes.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -236,7 +237,8 @@ const ngWizardConfig: NgWizardConfig = {
     RsreportesComponent,
     RsalertasComponent,
     TableRsreportesModalComponent,
-    RsestadisticasComponent
+    RsestadisticasComponent,
+    MreportesComponent
   ],
   providers: [
     {

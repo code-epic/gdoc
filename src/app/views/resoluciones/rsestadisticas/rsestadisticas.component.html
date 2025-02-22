@@ -31,17 +31,94 @@
                     <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
                     <div class="container mb-5">
                         <div class="row">
-                            <div class="col-md-1"></div>
-
-                            <div class="col-md-10 text-center">
+                            
 
                                 <div class="row text-center">
 
+
+
+                                    <table style="width: 100%;">
+                                        <thead style="width: 100%;">
+                                            <tr>
+                                                <td rowspan="2" >
+                                                    GRADOS
+                                                </td>
+                                                <td colspan="9">
+                                                    EJERCITO BOLIVARIANO
+                                                </td>
+                                                <td colspan="9">
+                                                   ARMADA BOLIVARIANA
+                                                </td >
+                                                <td colspan="9">
+                                                    AVIACION MILITAR BOLIVARIANA
+                                                </td>
+                                                <td colspan="9">
+                                                    GUARDIA NACIONAL BOLIVARIANA
+                                                </td>
+                                                <td rowspan="2"> TOTAL </td>
+                                            </tr>
+                                            <tr class="font-small">
+                                               
+                                                <td *ngFor="let e of lstTitulos;">
+                                                    {{e.valor}}
+                                                </td>
+
+                                                <td *ngFor="let e of lstTitulos;">
+                                                    {{e.valor}}
+                                                </td>
+                                              
+
+                                                <td *ngFor="let e of lstTitulos;">
+                                                    {{e.valor}}
+                                                </td>
+
+                                                <td *ngFor="let e of lstTitulos;">
+                                                    {{e.valor}}
+                                                </td>
+                                             
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody>
+                                            <tr *ngFor="let e of lstGrados">
+                                                <td >{{e.grado}}</td>
+                                                <td>{{ encontrarPosicionCat(0, 4, e.id, 1) }}</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>{{ encontrarPosicion(0, 7, e.id) }}</td>
+                                                <td>{{ encontrarPosicion(0, 5, e.id) }}</td>
+                                                <td>{{ encontrarPosicion(0, 3, e.id) }}</td>
+                                                <td>{{ encontrarPosicion(0, 1, e.id) }}</td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                 </div>
 
-                            </div>
-
-                            <div class="col-md-1"></div>
+                            
 
                         </div>
                         <br><br><br>

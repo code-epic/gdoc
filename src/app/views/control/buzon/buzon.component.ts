@@ -21,7 +21,7 @@ export class BuzonComponent implements OnInit {
   public estadoActual = 2
   public estatusAcutal = 1
   fecha_desde = '-09-01'
-  fecha_hasta = '-09-30'
+  fecha_hasta = '-10-01'
   xyear = '2024'
 
   public extender_plazo: any

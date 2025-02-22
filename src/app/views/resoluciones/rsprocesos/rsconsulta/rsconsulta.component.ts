@@ -1,32 +1,36 @@
-import { Component, Input, OnInit } from "@angular/core"
-import { MatSnackBar } from "@angular/material/snack-bar"
-import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap"
-import { ToastrService } from "ngx-toastr"
-import { NgxUiLoaderService } from "ngx-ui-loader"
+import { Component, Input, OnInit } from "@angular/core";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { ToastrService } from "ngx-toastr";
+import { NgxUiLoaderService } from "ngx-ui-loader";
 import {
   ApiService,
   IAPICore,
   ProcessID,
   WTipoArchivo,
-} from "src/app/services/apicore/api.service"
-import { Resolucion } from "src/app/services/control/documentos.service"
+} from "src/app/services/apicore/api.service";
+import { Resolucion } from "src/app/services/control/documentos.service";
 import {
   IDatosBasicos,
   IResoluciones,
-} from "src/app/services/resoluciones/resolucion.service"
-import { LoginService } from "src/app/services/seguridad/login.service"
-import { UtilService } from "src/app/services/util/util.service"
-import { FormGroup, FormControl, FormBuilder, FormControlName, Validators } from "@angular/forms"
-import { Observable } from "rxjs"
-import { map, startWith } from "rxjs/operators"
-import { MatDialog } from "@angular/material/dialog"
-import Swal from "sweetalert2"
-
-
+} from "src/app/services/resoluciones/resolucion.service";
+import { LoginService } from "src/app/services/seguridad/login.service";
+import { UtilService } from "src/app/services/util/util.service";
+import {
+  FormGroup,
+  FormControl,
+  FormBuilder,
+  FormControlName,
+  Validators,
+} from "@angular/forms";
+import { Observable } from "rxjs";
+import { map, startWith } from "rxjs/operators";
+import { MatDialog } from "@angular/material/dialog";
+import Swal from "sweetalert2";
 
 interface ITipoResolucion {
-  codigo: string
-  nombre: string
+  codigo: string;
+  nombre: string;
 }
 
 @Component({
@@ -35,270 +39,270 @@ interface ITipoResolucion {
   styleUrls: ["./rsconsulta.component.scss"],
 })
 export class RsconsultaComponent implements OnInit {
-  public cedula: string = ''
-  public resolucion: string = ''
+  public cedula: string = "";
+  public resolucion: string = "";
 
   public xAPI: IAPICore = {
-    funcion: '',
-    parametros: '',
-    valores: '',
-  }
-  fechaRango: FormGroup
+    funcion: "",
+    parametros: "",
+    valores: "",
+  };
+  fechaRango: FormGroup;
 
-  public tpf: WTipoArchivo = {}
+  public tpf: WTipoArchivo = {};
 
   public IDatosBasicos: IDatosBasicos = {
-    area: '',
-    cedula: '',
+    area: "",
+    cedula: "",
     categoria: 0,
     clasificacion: 0,
     componente: 0,
     grado: 0,
-    profesion: '',
-    profesionx: '',
+    profesion: "",
+    profesionx: "",
     reserva: 0,
     solicitud: 0,
     condicion: 0,
-    especialidad: '',
-    estudios: '',
-    nacimiento: '',
-    promocion: '',
-    fecha: '',
+    especialidad: "",
+    estudios: "",
+    nacimiento: "",
+    promocion: "",
+    fecha: "",
     n_componente: 0,
     n_grado: 0,
-    nombres: '',
-    sexo: '',
+    nombres: "",
+    sexo: "",
     resolucion: 0,
     orden: 0,
     anio: 0,
     mes: 0,
     dia: 0,
-    ultimo_ascenso: '',
-    motivo: '',
-    observacion: '',
-    situacion: '',
+    ultimo_ascenso: "",
+    motivo: "",
+    observacion: "",
+    situacion: "",
     telefono: "",
     correo: "",
     ubicacion: "",
     cargo: "",
-    estadomayor: ""
-  }
+    estadomayor: "",
+    merito: "",
+    direccion: "",
+    estatura: "",
+    estado_civil: "",
+  };
 
   public IResolucion: IResoluciones = {
     grado: 0,
     anio: 0,
-    asunto: '',
-    cedula: '',
+    asunto: "",
+    cedula: "",
     pais: 0,
     reserva: 0,
     solicitud: 0,
     tipo: 0,
     unidad: 0,
-    comando: '',
-    comision_fin: '',
-    comision_inicio: '',
-    creador: '',
-    destino: '',
+    comando: "",
+    comision_fin: "",
+    comision_inicio: "",
+    creador: "",
+    destino: "",
     dia: 0,
-    distribucion: '',
+    distribucion: "",
     estatus: 0,
-    modificado: '',
-    fecha_termino: '',
-    falta: '',
-    registro: '',
-    fecha_resolucion: '',
-    formato: '',
-    ultimo_ascenso: '',
-    instrucciones: '',
+    modificado: "",
+    fecha_termino: "",
+    falta: "",
+    registro: "",
+    fecha_resolucion: "",
+    formato: "",
+    ultimo_ascenso: "",
+    instrucciones: "",
     mes: 0,
-    autor_modificar: '',
-    motivo: '',
-    numero: '',
-    observacion: '',
+    autor_modificar: "",
+    motivo: "",
+    numero: "",
+    observacion: "",
     orden_merito: 0,
-    otro_resuelto: '',
-    autor_registro: '',
+    otro_resuelto: "",
+    autor_registro: "",
     termino: 0,
-    unidad_texto: '',
+    unidad_texto: "",
     documento: 0,
     causa: 0,
-    archivo: '',
-  }
+    archivo: "",
+  };
 
   public Resolucion: Resolucion = {
-    id: '',
-    cuenta: '',
-    unidad: '',
-    fecha_doc: '',
+    id: "",
+    cuenta: "",
+    unidad: "",
+    fecha_doc: "",
     tipo: {},
-    cedula: '',
-    nombres: '',
-    fecha_nacimiento: '',
-    componente: '',
-    categoria: '',
-    clasificacion: '',
-    grado: '',
-    carpeta: '',
-    estatus: '',
-    entrada: '',
-    asunto: '',
-    observacion: '',
-    responsable: '',
-    cargo_responsable: '',
-    situacion: '',
-    sexo: '',
-    numero: '',
-    gran_comando: '',
-    unidad_comando: '',
-    instrucciones: '',
+    cedula: "",
+    nombres: "",
+    fecha_nacimiento: "",
+    componente: "",
+    categoria: "",
+    clasificacion: "",
+    grado: "",
+    carpeta: "",
+    estatus: "",
+    entrada: "",
+    asunto: "",
+    observacion: "",
+    responsable: "",
+    cargo_responsable: "",
+    situacion: "",
+    sexo: "",
+    numero: "",
+    gran_comando: "",
+    unidad_comando: "",
+    instrucciones: "",
     n_componente: 0,
     n_grado: 0,
-  }
+  };
 
-  public Componentes: any
-  public Grados: any
-  public Categorias: any
-  public Clasificaciones: any
-  public TipoEntradas: any
-  public Estados: any
-  public Carpetas: any
-  public OrdenNumero: any
-  public TipoResoluciones: any
-  public UbicacionCarpetas: any
-  public UbicacionCarpetasEntrada: any
-  public input_resoluciones: any
-  public input_entrada: any
+  public Componentes: any;
+  public Grados: any;
+  public Categorias: any;
+  public Clasificaciones: any;
+  public TipoEntradas: any;
+  public Estados: any;
+  public Carpetas: any;
+  public OrdenNumero: any;
+  public TipoResoluciones: any;
+  public UbicacionCarpetas: any;
+  public UbicacionCarpetasEntrada: any;
+  public input_resoluciones: any;
+  public input_entrada: any;
 
-  public GradoIPSFA = [] //Objeto Comando
-  public lstResoluciones: any
-  public lstResolucionesS: any //Solo resoluciones
-  public lstResolucionesX: any //Solo resoluciones
-  public lstResolucionesTipo: any //Solo resoluciones
-  public lstNombres: any
+  public GradoIPSFA = []; //Objeto Comando
+  public lstResoluciones: any;
+  public lstResolucionesS: any; //Solo resoluciones
+  public lstResolucionesX: any; //Solo resoluciones
+  public lstResolucionesTipo: any; //Solo resoluciones
+  public lstNombres: any;
 
-  public lstEntradas: any
-  public lstIPSFA = [] //Objeto Comando
-  public archivos = []
-  public lstCausa = [] //Objeto Comando
-  public lstMotivo = [] //Objeto Comando
-  public lstDetalle = [] //Objeto Comando
-  public lstRangoCedula = []
-  public lstRangoCedulaFile = []
-  public lstAscenso = []
+  public lstEntradas: any;
+  public lstIPSFA = []; //Objeto Comando
+  public archivos = [];
+  public lstCausa = []; //Objeto Comando
+  public lstMotivo = []; //Objeto Comando
+  public lstDetalle = []; //Objeto Comando
+  public lstRangoCedula = [];
+  public lstRangoCedulaFile = [];
+  public lstAscenso = [];
 
-  public xasunto: string = ''
-  public tipo: any
-  public nombramiento: string = ''
+  public xasunto: string = "";
+  public tipo: any;
+  public nombramiento: string = "";
 
-  public dbDatos: boolean = false
-  public dbResolucion: boolean = false
-  public dbResolucionFil: boolean = false
-  public dbResolucionTipo: boolean = false
-  public dbDatosNombre: boolean = false
-  public blConfidencial: boolean = false
-  public blDatosBasicos: boolean = false
-  public valEdit: boolean = false
-  public valEditEntrada: boolean = false
-  public valEditResolucion: boolean = false
+  public dbDatos: boolean = false;
+  public dbResolucion: boolean = false;
+  public dbResolucionFil: boolean = false;
+  public dbResolucionTipo: boolean = false;
+  public dbDatosNombre: boolean = false;
+  public blConfidencial: boolean = false;
+  public blDatosBasicos: boolean = false;
+  public valEdit: boolean = false;
+  public valEditEntrada: boolean = false;
+  public valEditResolucion: boolean = false;
 
+  public dbTools: boolean = false;
 
-  public dbTools: boolean = false
+  public carpeta: string = "";
+  public nombre: string = "";
+  public grado: string = "%";
+  public componente: string = "%";
+  public dbgrado: string = "%";
+  public dbcomponente: string = "%";
+  public categoria: string = "%";
+  public asunto: string = "";
+  public causa: string = "%";
+  public instrucciones: string = "";
+  public observaciones: string = "";
 
-  public carpeta: string = ''
-  public nombre: string = ''
-  public grado: string = "%"
-  public componente: string = "%"
-  public dbgrado: string = "%"
-  public dbcomponente: string = "%"
-  public categoria: string = "%"
-  public asunto: string = ''
-  public causa: string = "%"
-  public instrucciones: string = ''
-  public observaciones: string = ''
+  public blNombramiento: boolean = false;
+  public blCorregir: boolean = false;
+  public blReserva: boolean = false;
+  public blReservaAux: boolean = false;
+  public blComision: boolean = false;
+  public blComisionAux: boolean = false;
+  public blExtender: boolean = false;
+  public blAscenso: boolean = false;
+  public blReconocer: boolean = false;
+  public blCategoria: boolean = false;
+  public blComponente: boolean = false;
+  public blAceptar: boolean = false;
+  public blAlert: boolean = false;
+  public blFiltro: boolean = true;
+  public blExpandida: boolean = true;
+  public blEditor: boolean = false;
+  public blEspecifico: boolean = true;
+  public tiponomina: string = "0";
 
-  public blNombramiento: boolean = false
-  public blCorregir: boolean = false
-  public blReserva: boolean = false
-  public blReservaAux: boolean = false
-  public blComision: boolean = false
-  public blComisionAux: boolean = false
-  public blExtender: boolean = false
-  public blAscenso: boolean = false
-  public blReconocer: boolean = false
-  public blCategoria: boolean = false
-  public blComponente: boolean = false
-  public blAceptar: boolean = false
-  public blAlert: boolean = false
-  public blFiltro: boolean = true
-  public blExpandida: boolean = true
-  public blEditor: boolean = false
-  public blEspecifico: boolean = true
-  public tiponomina: string = "0"
+  public busqueda: string = "0";
+  public campos: string = "0";
+  public dwCedula: string = "";
+  public rango_cedula = "";
 
-  public busqueda: string = "0"
-  public campos: string = "0"
-  public dwCedula: string = ''
-  public rango_cedula = ''
+  public total: number = 0;
+  public cantNombre: number = 0;
+  public idTransaccion: string = "";
 
-  public total: number = 0
-  public cantNombre: number = 0
-  public idTransaccion: string = ''
+  public maxCol = "12";
+  public maxColComision = "6";
+  public color = "#e3e6e6";
 
-  public maxCol = "12"
-  public maxColComision = "6"
-  public color = "#e3e6e6"
+  public color_acc: string = "transparent";
+  public color_texto: string = "black";
+  public icono_dist: string = "public";
+  public instruccion: string = "";
+  public observacion: string = "";
+  public autor_creador: string = "";
+  public fecha_registro: string = "";
+  public destino: string = "";
 
-  public color_acc: string = "transparent"
-  public color_texto: string = "black"
-  public icono_dist: string = "public"
-  public instruccion: string = ''
-  public observacion: string = ''
-  public autor_creador: string = ''
-  public fecha_registro: string = ''
-  public destino: string = ''
+  public blExpandidaFile: boolean = true;
 
-  public blExpandidaFile: boolean = true
+  filteredOptions: Observable<ITipoResolucion[]>;
+  myControl = new FormControl();
+  selected = new FormControl(0);
+  public csvHead: any;
+  public csvHeadFile: any;
+  public delimitador: string = "|";
 
-  filteredOptions: Observable<ITipoResolucion[]>
-  myControl = new FormControl()
-  selected = new FormControl(0)
-  public csvHead: any
-  public csvHeadFile: any
-  public delimitador: string = '|'
-
-
-
-  public blResolucionPanel: boolean = false
-  public orden_pagina: number = 0
-  public EDITOR: string = ''
-  @Input() OCULTAR: boolean = false
+  public blResolucionPanel: boolean = false;
+  public orden_pagina: number = 0;
+  public EDITOR: string = "";
+  @Input() OCULTAR: boolean = false;
 
   public pID: ProcessID = {
-    id: '',
+    id: "",
     estatus: false,
-    mensaje: '',
-    segundos: '',
-    contenido: ''
-  }
+    mensaje: "",
+    segundos: "",
+    contenido: "",
+  };
 
-  cuenta = ''
-  digital = ''
-  documento = ''
-  numero = ''
-  responsable_entrada = ''
-  registrado_entrada = ''
+  cuenta = "";
+  digital = "";
+  documento = "";
+  numero = "";
+  responsable_entrada = "";
+  registrado_entrada = "";
 
-  modificado_entrada = ''
-  carpeta_entrada = ''
-  acto = 'RESOLUCION'
-  estatus_entrada: any
-  tipo_entrada = ''
-  asunto_entrada = ''
-  observacion_entrada = ''
-  opttodos = "0"
+  modificado_entrada = "";
+  carpeta_entrada = "";
+  acto = "RESOLUCION";
+  estatus_entrada: any;
+  tipo_entrada = "";
+  asunto_entrada = "";
+  observacion_entrada = "";
+  opttodos = "0";
 
-  public bEliminarEntrada: boolean = false
-
+  public bEliminarEntrada: boolean = false;
 
   constructor(
     private apiService: ApiService,
@@ -311,132 +315,130 @@ export class RsconsultaComponent implements OnInit {
     public formatter: NgbDateParserFormatter,
     private _snackBar: MatSnackBar
   ) {
-
     this.Estados =
       sessionStorage.getItem("MPPD_CEstadoResolucion") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CEstadoResolucion")))
-        : []
+        : [];
   }
 
   convertirFecha(fecha: string): string {
-    return fecha != '' ? this.utilService.ConvertirFechaHumana(fecha) : ''
+    return fecha != "" ? this.utilService.ConvertirFechaHumana(fecha) : "";
   }
   volverResolucion() {
-    this.blResolucionPanel = !this.blResolucionPanel
-    this.dbResolucion = false
-    this.dbDatos = false
-    this.dbDatosNombre = false
-    this.blDatosBasicos = false
+    this.blResolucionPanel = !this.blResolucionPanel;
+    this.dbResolucion = false;
+    this.dbDatos = false;
+    this.dbDatosNombre = false;
+    this.blDatosBasicos = false;
 
     if (this.orden_pagina == 1) {
-      this.dbResolucion = true
+      this.dbResolucion = true;
     } else {
-      this.dbDatosNombre = true
+      this.dbDatosNombre = true;
     }
   }
 
   volverDatos(tipo: number) {
-    this.blResolucionPanel = !this.blResolucionPanel
-    this.dbResolucion = false
-    this.dbDatos = true
-    this.dbDatosNombre = false
-    this.orden_pagina = tipo
+    this.blResolucionPanel = !this.blResolucionPanel;
+    this.dbResolucion = false;
+    this.dbDatos = true;
+    this.dbDatosNombre = false;
+    this.orden_pagina = tipo;
   }
 
   ngOnInit(): void {
     if (this.loginService.Usuario.token != undefined) {
-      let tk = this.loginService.Usuario.token
+      let tk = this.loginService.Usuario.token;
       this.blConfidencial =
-        tk == "Confidencial" || tk == "Administrador" ? true : false
+        tk == "Confidencial" || tk == "Administrador" ? true : false;
     }
     this.Componentes =
       sessionStorage.getItem("MPPD_CComponente") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
-        : []
+        : [];
     this.Grados =
       sessionStorage.getItem("MPPD_CGrado") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado")))
-        : []
+        : [];
     this.Categorias =
       sessionStorage.getItem("MPPD_CCategorias") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias")))
-        : []
+        : [];
     this.Clasificaciones =
       sessionStorage.getItem("MPPD_CClasificacion") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion")))
-        : []
+        : [];
     this.TipoEntradas =
       sessionStorage.getItem("MPPD_CTipoEntrada") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoEntrada")))
-        : []
+        : [];
     this.TipoResoluciones =
       sessionStorage.getItem("MPPD_CTipoResolucion") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion")))
-        : []
+        : [];
 
     this.Carpetas =
       sessionStorage.getItem("MPPD_CCarpetaEntrada") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetaEntrada")))
-        : []
+        : [];
     this.OrdenNumero =
       sessionStorage.getItem("MPPD_COrdenEntrada") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_COrdenEntrada")))
-        : []
+        : [];
     this.GradoIPSFA =
       sessionStorage.getItem("MPPD_CGradoIPSFA") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGradoIPSFA")))
-        : []
+        : [];
     this.UbicacionCarpetas =
       sessionStorage.getItem("MPPD_CCarpetas") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetas")))
-        : []
+        : [];
 
     this.UbicacionCarpetasEntrada =
       sessionStorage.getItem("MPPD_CCarpetaEntrada") != undefined
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetaEntrada")))
-        : []
-
+        : [];
 
     // console.log(this.Estados)
 
-    const today = new Date()
-    const month = today.getMonth()
-    const year = today.getFullYear()
+    const today = new Date();
+    const month = today.getMonth();
+    const year = today.getFullYear();
 
-    this.opttodos = "0"
+    this.opttodos = "0";
 
     this.fechaRango = new FormGroup({
       start: new FormControl(new Date(year, month, 13)),
       end: new FormControl(new Date(year, month, 16)),
-    })
+    });
 
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(""),
       map((value) => (typeof value === "string" ? value : value?.name)),
       map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
-    )
+    );
 
-    this.idTransaccion = this.utilService.GenerarUnicId()
+    this.idTransaccion = this.utilService.GenerarUnicId();
     this.utilService.contenido$.subscribe((e) => {
-      this.blEditor = false
-      this.blEspecifico = true
-      this.cedula = e
+      this.blEditor = false;
+      this.blEspecifico = true;
+      this.cedula = e;
       this.dbTools = true;
-      this.opttodos = "0"
+      this.opttodos = "0";
 
-      this.valEdit = false
-      this.valEditEntrada = false
-      this.valEditResolucion = false
+      this.valEdit = false;
+      this.valEditEntrada = false;
+      this.valEditResolucion = false;
       this.consultarCedula(undefined);
-    })
+    });
 
-    console.log(this.loginService.Usuario)
-    this.bEliminarEntrada = this.loginService.Usuario.cargo=="Transcriptor Premium"?true:false
-
+    console.log(this.loginService.Usuario);
+    this.bEliminarEntrada =
+      this.loginService.Usuario.cargo == "Transcriptor Premium" ? true : false;
   }
 
   displayFn(tr: ITipoResolucion): string {
-    return tr && tr.nombre ? tr.nombre : ''
+    return tr && tr.nombre ? tr.nombre : "";
   }
 
   private _filter(name: string): ITipoResolucion[] {
@@ -449,15 +451,13 @@ export class RsconsultaComponent implements OnInit {
 
   consultar(e) {
     if (e.keyCode == 13) {
-      this.cedula = this.cedula.replace('.', '')
+      this.cedula = this.cedula.replace(".", "");
       this.xAPI.funcion = "MPPD_CUnidad";
       this.xAPI.parametros = this.cedula;
-      this.xAPI.valores = ''
+      this.xAPI.valores = "";
 
       this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-
-        },
+        (data) => {},
         (err) => {
           console.error(err);
         }
@@ -468,7 +468,7 @@ export class RsconsultaComponent implements OnInit {
   verificar() {
     this.dbDatos = false;
     this.dbResolucion = false;
-    this.resolucion = ''
+    this.resolucion = "";
     if (this.cedula != "") {
       this.consultarCedula(undefined);
       return false;
@@ -498,20 +498,20 @@ export class RsconsultaComponent implements OnInit {
       this.dbDatosNombre = false;
       this.blResolucionPanel = false;
       this.blDatosBasicos = false;
-      this.lstEntradas = []
-      this.lstResoluciones = []
+      this.lstEntradas = [];
+      this.lstResoluciones = [];
 
       if (this.cedula == "") return false;
 
-      this.cedula = this.cedula.replace(/\./g, '')
+      this.cedula = this.cedula.replace(/\./g, "");
       this.ngxService.startLoader("loader-buscar");
       this.xAPI.funcion = "MPPD_CDatosBasicos";
       this.xAPI.parametros = this.cedula;
-      this.xAPI.valores = ''
+      this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           this.dwCedula = this.cedula;
-          this.cedula = ''
+          this.cedula = "";
           if (data != undefined && data.Cuerpo.length > 0) {
             this.Resolucion = data.Cuerpo[0];
 
@@ -580,7 +580,7 @@ export class RsconsultaComponent implements OnInit {
   }
 
   obtenerTipo(tipo: any) {
-    let texto = ''
+    let texto = "";
     this.TipoResoluciones.forEach((e) => {
       if (e.codigo == tipo) {
         texto = e.nombre;
@@ -590,7 +590,7 @@ export class RsconsultaComponent implements OnInit {
   }
 
   obtenerNombreGrado(grado: any) {
-    let texto = ''
+    let texto = "";
     this.Grados.forEach((e) => {
       if (e.cod_grado == grado) {
         texto = e.nombre_corto;
@@ -633,8 +633,9 @@ export class RsconsultaComponent implements OnInit {
   }
 
   asuntohtml(e): string {
-    let ad = e.administracion == null ? '' : e.administracion.toUpperCase() + '<br>'
-    return ad + e.asunto.toUpperCase()
+    let ad =
+      e.administracion == null ? "" : e.administracion.toUpperCase() + "<br>";
+    return ad + e.asunto.toUpperCase();
   }
 
   obtenerResuelto() {
@@ -655,11 +656,11 @@ export class RsconsultaComponent implements OnInit {
       this.ngxService.startLoader("loader-buscar");
       this.xAPI.funcion = "MPPD_CResoluciones";
       this.xAPI.parametros = this.IResolucion.numero;
-      this.xAPI.valores = ''
+      this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           this.resolucion = this.IResolucion.numero;
-          this.IResolucion.numero = ''
+          this.IResolucion.numero = "";
           this.ngxService.stopLoader("loader-buscar");
           this.lstResolucionesS = data.Cuerpo;
           this.dbResolucion = true;
@@ -673,7 +674,7 @@ export class RsconsultaComponent implements OnInit {
   }
 
   FilConsultar(estatus) {
-    let codigo = ''
+    let codigo = "";
     let desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
     let hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
     this.lstResolucionesX = [];
@@ -736,7 +737,7 @@ export class RsconsultaComponent implements OnInit {
       this.xAPI.parametros = desde + "," + hasta + "," + codigo;
     }
 
-    this.xAPI.valores = ''
+    this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         this.csvHead = data.Cabecera;
@@ -754,7 +755,7 @@ export class RsconsultaComponent implements OnInit {
           this.dbResolucionFil = true;
           this.blFiltro = false;
         }
-        this.asunto = ''
+        this.asunto = "";
       },
       (error) => {
         console.error("Error de conexion a los datos ", error);
@@ -852,7 +853,7 @@ export class RsconsultaComponent implements OnInit {
     this.xAPI.funcion = "MPPD_CCausaResolucion";
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = id;
-    this.xAPI.valores = ''
+    this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -871,7 +872,7 @@ export class RsconsultaComponent implements OnInit {
     this.xAPI.funcion = "MPPD_CCausaResolucion";
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = id;
-    this.xAPI.valores = ''
+    this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -890,7 +891,7 @@ export class RsconsultaComponent implements OnInit {
     this.xAPI.funcion = "MPPD_CMotivoResolucion";
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = this.IResolucion.causa.toString();
-    this.xAPI.valores = ''
+    this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -929,7 +930,7 @@ export class RsconsultaComponent implements OnInit {
         " AND db.cod_grado " + grado + " AND db.cod_componente " + componente;
 
       this.xAPI.parametros = this.nombre + "," + codigo;
-      this.xAPI.valores = ''
+      this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           this.lstNombres = data.Cuerpo;
@@ -939,7 +940,7 @@ export class RsconsultaComponent implements OnInit {
             this.dbDatosNombre = true;
           }
 
-          this.nombre = ''
+          this.nombre = "";
         },
         (error) => {
           console.error("Error de conexion a los datos ", error);
@@ -975,72 +976,72 @@ export class RsconsultaComponent implements OnInit {
     var frm = new FormData(document.forms.namedItem("forma"));
     // console.log(frm)
     try {
-
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
         //console.log(data)
-        this.execFnx(data)
-
+        this.execFnx(data);
       });
     } catch (error) {
       console.error(error);
-      this.ngxService.stopLoader("loader-aceptar")
+      this.ngxService.stopLoader("loader-aceptar");
     }
   }
-
 
   execFnx(data: any) {
-    let nameFnx = 'Fnx_MYSQLCsvLoad'
+    let nameFnx = "Fnx_MYSQLCsvLoad";
     let fnx = {
-      'funcion': nameFnx,
-      'codigo': '9c9ae59f7e1e5868908b1225fa8a66c0.sse',
-      'basedatos': 'mppd',
-      'dir': data.msj,
-      'file': data.contenido[0].split('|')[1],
-      'uuid': this.idTransaccion,
-    }
+      funcion: nameFnx,
+      codigo: "9c9ae59f7e1e5868908b1225fa8a66c0.sse",
+      basedatos: "mppd",
+      dir: data.msj,
+      file: data.contenido[0].split("|")[1],
+      uuid: this.idTransaccion,
+    };
 
-    this.apiService.ExecFnx(fnx).subscribe(data => {
-      this.ConsultarPidRecursivo(data.contenido.id, 'GDoc/Resoluciones', this.idTransaccion)
-    }, err => {
-      console.error('Fallo ejecutando la funcion fnx_MYSQLCsvLoad')
-    })
+    this.apiService.ExecFnx(fnx).subscribe(
+      (data) => {
+        this.ConsultarPidRecursivo(
+          data.contenido.id,
+          "GDoc/Resoluciones",
+          this.idTransaccion
+        );
+      },
+      (err) => {
+        console.error("Fallo ejecutando la funcion fnx_MYSQLCsvLoad");
+      }
+    );
   }
-
-
 
   // Consulta el Pid recursivamente
   ConsultarPidRecursivo(id: string, paquete: any, uuid: string) {
-
     this.apiService.ExecFnxId(id).subscribe(
       (data) => {
         setTimeout(() => {
-
-          if (data.documento == 'PROCESADO') {
-            console.log(data)
-            this.pID.id = id
-            this.pID.estatus = false
-            this.pID.contenido = paquete
-            this.pID.mensaje = uuid
-            this.ConsultaPostPID(this.tiponomina)
-
+          if (data.documento == "PROCESADO") {
+            console.log(data);
+            this.pID.id = id;
+            this.pID.estatus = false;
+            this.pID.contenido = paquete;
+            this.pID.mensaje = uuid;
+            this.ConsultaPostPID(this.tiponomina);
           } else {
-            this.ConsultarPidRecursivo(id, paquete, uuid)
+            this.ConsultarPidRecursivo(id, paquete, uuid);
           }
-        }, 10000)
+        }, 10000);
       },
       (error) => {
-        console.log(error)
+        console.log(error);
       }
-    )
+    );
   }
 
   /**
    * Consultar una API despues de finalizado el PID Recurrente
    */
   ConsultaPostPID(tipo: string) {
-    this.xAPI.funcion = tipo == "0" ? "MPPD_CCedulaFileCSV" : "MPPD_CCedulaFileCSVSaime";
-    this.xAPI.parametros = '';
-    this.xAPI.valores = ''
+    this.xAPI.funcion =
+      tipo == "0" ? "MPPD_CCedulaFileCSV" : "MPPD_CCedulaFileCSVSaime";
+    this.xAPI.parametros = "";
+    this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         this.csvHeadFile = data.Cabecera;
@@ -1056,9 +1057,6 @@ export class RsconsultaComponent implements OnInit {
     );
   }
 
-
-
-
   downloadCSVExFile() {
     let head = this.csvHeadFile.map((e) => {
       return e.nombre;
@@ -1070,9 +1068,6 @@ export class RsconsultaComponent implements OnInit {
       this.delimitador
     );
   }
-
-
-
 
   downloadCSV() {
     // let head = this.csvHead.map((e) => {
@@ -1118,35 +1113,46 @@ export class RsconsultaComponent implements OnInit {
   }
 
   dwUrl(e) {
-    if (e.archivo != undefined && e.archivo != "") {
-      if (e.formato == "") {
-        let cedula = e.cedula != undefined ? e.cedula : this.dwCedula;
-        this.apiService.DwsResol(btoa("R" + cedula) + "/" + e.archivo);
-      } else {
-        let valor = e.titulo == undefined ? e.numero : e.titulo;
-        let acce = btoa("ASC" + valor + e.formato);
-        this.apiService.DwsResol(acce + "/" + e.archivo);
-      }
-    } else {
-      let anio = e.fecha_resolucion;
-      let codigo = e.numero;
-      if (e.distribucion == 2) {
-        codigo = e.numero + " NO PUBLICAR";
-      } else {
-        codigo = e.numero;
-      }
+    let valorAnio =
+      e.fecha != undefined ? parseInt(e.fecha.substring(0, 4)) : 0;
 
-      anio = anio.substring(0, 4);
-      this.UbicacionCarpetas.forEach((e) => {
-        if (e.anio == anio) {
-          let peticion = e.nombre + "/" + codigo + ".pdf";
-          // https://10.190.1.160
-          // this.carpeta = "/cdn/" + e.nombre + "/" + codigo + ".pdf";
-          this.apiService.DwsCdn(peticion);
-          return;
+    if (valorAnio < 2025) {
+      this.descargarAntes2025(e);
+    } else {
+      if (e.archivo != undefined && e.archivo != "") {
+        if (e.formato == "") {
+          let cedula = e.cedula != undefined ? e.cedula : this.dwCedula;
+          this.apiService.DwsResol(btoa("R" + cedula) + "/" + e.archivo);
+        } else {
+          let valor = e.titulo == undefined ? e.numero : e.titulo;
+          let acce = btoa("ASC" + valor + e.formato);
+          this.apiService.DwsResol(acce + "/" + e.archivo);
         }
-      });
+      } else {
+        this.descargarAntes2025(e);
+      }
     }
+  }
+
+  descargarAntes2025(e) {
+    let anio = e.fecha_resolucion;
+    let codigo = e.numero;
+    if (e.distribucion == 2) {
+      codigo = e.numero + " NO PUBLICAR";
+    } else {
+      codigo = e.numero;
+    }
+
+    anio = anio.substring(0, 4);
+    this.UbicacionCarpetas.forEach((e) => {
+      if (e.anio == anio) {
+        let peticion = e.nombre + "/" + codigo + ".pdf";
+        // https://10.190.1.160
+        // this.carpeta = "/cdn/" + e.nombre + "/" + codigo + ".pdf";
+        this.apiService.DwsCdn(peticion);
+        return;
+      }
+    });
   }
 
   dwUrlCorreccion(e) {
@@ -1166,15 +1172,16 @@ export class RsconsultaComponent implements OnInit {
 
     return valores.length > 0
       ? valores[0] + "  " + this.convertirFecha(valores[1])
-      : ''
+      : "";
   }
 
   dwUrlEntrada(e) {
-    console.log(e)
-    if (e.archivo != undefined && e.archivo != '' && e.cuenta_oficio == '') {
-      let cedula = e.cedula_entrada != undefined ? e.cedula_entrada : this.dwCedula;
+    console.log(e);
+    if (e.archivo != undefined && e.archivo != "" && e.cuenta_oficio == "") {
+      let cedula =
+        e.cedula_entrada != undefined ? e.cedula_entrada : this.dwCedula;
       this.apiService.DwsResol(btoa("RE" + cedula) + "/" + e.archivo);
-    }else{
+    } else {
       if (e.cod_carpeta != undefined && e.cod_carpeta != "") {
         this.UbicacionCarpetasEntrada.forEach((el) => {
           if (el.cod_carpeta == e.cod_carpeta) {
@@ -1211,17 +1218,14 @@ export class RsconsultaComponent implements OnInit {
       rs: e,
     };
     this.valEdit = true;
-    this.valEditEntrada = false
-    this.valEditResolucion = true
+    this.valEditEntrada = false;
+    this.valEditResolucion = true;
   }
-
-
-
 
   ConsultaExpandida() {
     this.xAPI.funcion = "MPPD_CCedulaRango";
     this.xAPI.parametros = "cedula##" + this.rango_cedula;
-    this.xAPI.valores = ''
+    this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         this.csvHead = data.Cabecera;
@@ -1258,7 +1262,7 @@ export class RsconsultaComponent implements OnInit {
       case "FALL":
         return "FALLECIDO";
       default:
-        return ''
+        return "";
     }
   }
 
@@ -1313,8 +1317,8 @@ export class RsconsultaComponent implements OnInit {
     this.xAPI.funcion = "MPPD_CResueltoID";
     this.xAPI.parametros = id.toString();
     this.xAPI.valores = {};
-    this.instruccion = ''
-    this.observacion = ''
+    this.instruccion = "";
+    this.observacion = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -1343,90 +1347,82 @@ export class RsconsultaComponent implements OnInit {
     this.modalService.open(content, { size: "lg" });
   }
 
-
   detalleEntrada(content, e) {
+    this.modalService.open(content, { size: "lg" });
 
-    this.modalService.open(content, { size: "lg" })
+    console.log(e);
 
-
-    this.documento = e.cod_acto == 0 ? 'RESOLUCIÓN' : 'ORDEN GENERAL'
-    this.responsable_entrada = e.des_responsable
-    this.registrado_entrada = e.des_registrado
-    this.numero = e.numero_carpeta
-    this.cuenta = e.cuenta_oficio
-    this.digital = e.digital
-    this.modificado_entrada = e.f_modificado
-    this.estatus_entrada = e.estatus_descripcion
+    this.documento = e.cod_acto == 0 ? "RESOLUCIÓN" : "ORDEN GENERAL";
+    this.responsable_entrada = e.des_responsable;
+    this.registrado_entrada = e.des_registrado;
+    this.numero = e.numero_carpeta;
+    this.cuenta = e.cuenta_oficio;
+    this.digital = e.digital;
+    this.modificado_entrada = e.f_modificado;
+    this.estatus_entrada = e.estatus_descripcion;
 
     // console.log(new Date(e.f_modificado))
     // console.log(new Date('2024-09-01 00:00:00'))
 
-    if ( new Date(e.f_modificado) < new Date('2024-09-01 00:00:00')){
-      this.tipo_entrada = e.des_tipo_entrada
+    if (new Date(e.f_modificado) < new Date("2024-09-01 00:00:00")) {
+      this.tipo_entrada = e.des_tipo_entrada;
       // console.log('ENTRADA')
     } else {
-      this.tipo_entrada = e.des_tipo_resol
+      this.tipo_entrada = e.des_tipo_resol;
       // console.log('RESOLUCION')
-
     }
 
-    this.asunto_entrada = e.asunto
-    this.observacion_entrada = e.observacion
-    this.carpeta_entrada = e.des_carpeta
-
+    this.asunto_entrada = e.asunto;
+    this.observacion_entrada = e.observacion;
+    this.carpeta_entrada = e.des_carpeta;
   }
 
   detalleEntradaEditar(e) {
     this.input_entrada = {
-      'rs': e,
-      'id': this.IDatosBasicos.cedula
-    }
-    this.valEditEntrada = true
-    this.valEditResolucion = false
-    this.valEdit = true
+      rs: e,
+      id: this.IDatosBasicos.cedula,
+    };
+    this.valEditEntrada = true;
+    this.valEditResolucion = false;
+    this.valEdit = true;
     this.blEditor = false;
     this.blEspecifico = false;
-
-
   }
 
   editarDatosBasicos() {
     this.blEditor = true;
     this.blEspecifico = false;
     this.EDITOR = this.IDatosBasicos.cedula;
-
   }
 
-
   ReveserConsutla() {
-    this.blExpandidaFile = true
-    this.lstRangoCedulaFile = []
-    this.tiponomina = "0"
-    this.csvHead = []
-    this.archivos = []
+    this.blExpandidaFile = true;
+    this.lstRangoCedulaFile = [];
+    this.tiponomina = "0";
+    this.csvHead = [];
+    this.archivos = [];
     document.forms.namedItem("forma").reset();
   }
 
-  eliminarEntrada(e){
-
+  eliminarEntrada(e) {
     Swal.fire({
-      title: 'GDoc Resoluciones',
+      title: "GDoc Resoluciones",
       text: "¿Está seguro que desea eliminar la entrada?",
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Si'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si",
     }).then((result) => {
       if (result.isConfirmed) {
         this.xAPI.funcion = "MPPD_EEntradas";
         this.xAPI.parametros = e.id.toString();
-        this.xAPI.valores = ''
+        this.xAPI.valores = "";
         // console.log(this.xAPI)
         this.apiService.Ejecutar(this.xAPI).subscribe(
           async (data) => {
-            this.cedula = this.dwCedula
-            this.consultarCedula(undefined)
+            this.cedula = this.dwCedula;
+            this.consultarCedula(undefined);
           },
           (error) => {
             console.error("Error de conexion a los datos ", error);
@@ -1434,9 +1430,30 @@ export class RsconsultaComponent implements OnInit {
           }
         );
       }
-    })    
-    
-   
+    });
+  }
+
+  dwUrlDigital(ncontrol: string, archivo: string) {
+    console.log(ncontrol, archivo);
+    this.xAPI.funcion = "MPPD_CDigitalWKFResoluciones";
+    this.xAPI.parametros = `${ncontrol}`;
+    this.xAPI.valores = "";
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async (data) => {
+        let doc = data.Cuerpo;
+        console.log(doc);
+        if (doc.length > 0) {
+          this.apiService.DwsResolDigital(
+            btoa("D" + ncontrol) + "/" + doc[0].anom
+          );
+        }
+      },
+      (error) => {
+        console.error("Error de conexion a los datos ", error);
+        this.ngxService.stopLoader("loader-buscar");
+      }
+    );
+    // return this.apiService.Dws(btoa('D' + ncontrol) + '/' + archivo);
   }
 }
-

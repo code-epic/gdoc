@@ -80,7 +80,11 @@ export class ConsultaGeneralComponent implements OnInit {
     correo: "",
     ubicacion: "",
     cargo: "",
-    estadomayor: ""
+    estadomayor: "",
+    merito: "",
+    direccion: "",
+    estatura: "",
+    estado_civil: ""
   };
 
   public IResolucion: IResoluciones = {

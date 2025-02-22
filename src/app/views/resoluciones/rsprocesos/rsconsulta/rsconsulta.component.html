@@ -18,12 +18,23 @@
                                     [(ngModel)]="cuenta" readonly="readonly">
                             </mat-form-field>
                         </div>
-                        <div class=" col-md-6">
+                        <div class=" col-md-5">
                             <mat-form-field appearance="outline">
                                 <mat-label>Digital</mat-label>
                                 <input matInput placeholder="Digital" [ngModelOptions]="{standalone: true}" [(ngModel)]="digital"
                                 readonly="readonly">
+                                <input type="hidden" [ngModelOptions]="{standalone: true}" [(ngModel)]="nombrearchivo"
+                                readonly="readonly">
                             </mat-form-field>
+                        </div>
+                        <div class="col-md-1">
+                            <a (click)="dwUrlDigital(digital, nombrearchivo)" target="_top"
+                                rel="noopener noreferrer"
+                                style="color:darkgrey;font-size: 18px;font-weight: normal;">
+                                <img src="./assets/img/theme/pdf2.jpeg"
+                                    alt="Descargar archivo"
+                                    style="width: 50px;margin-top: 4px;" />
+                            </a>
                         </div>
                         <div class=" col-md-6">
             
@@ -769,7 +780,7 @@
                                             </div>
                                             <div class="row">
                                                 <div class="form-group col-md-12">
-                                                    <textarea class="form-control" cols="30" rows="5"
+                                                    <textarea class="form-control" cols="30" rows="3"
                                                         [ngModelOptions]="{standalone: true}" [(ngModel)]="asunto"
                                                         placeholder="Introduzca el Asunto..."
                                                         style="width: 100%"></textarea>
@@ -778,10 +789,10 @@
                                             </div>
                                             <div class="row">
                                                 <div class="form-group col-md-12">
-                                                    <textarea class="form-control" cols="30" rows="5"
+                                                    <textarea class="form-control" cols="30" rows="3"
                                                         [ngModelOptions]="{standalone: true}"
                                                         [(ngModel)]="instrucciones"
-                                                        placeholder="Instrucciones especiales..." rows="6"
+                                                        placeholder="Instrucciones especiales..."
                                                         style="width: 100%"></textarea>
 
                                                 </div>
@@ -789,10 +800,10 @@
 
                                             <div class="row">
                                                 <div class="form-group col-md-12">
-                                                    <textarea class="form-control" cols="30" rows="5"
+                                                    <textarea class="form-control" cols="30" rows="3"
                                                         [ngModelOptions]="{standalone: true}"
                                                         [(ngModel)]="observaciones"
-                                                        placeholder="Introduzca la Observacion..." rows="6"
+                                                        placeholder="Introduzca la Observacion..."
                                                         style="width: 100%">
                                                 </textarea>
 
@@ -832,7 +843,7 @@
                                                         </mat-select>
                                                     </mat-form-field>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <mat-form-field class="example-full-width" appearance="outline"
                                                         style="width:100%">
                                                         <mat-label>Tipo de Buscada</mat-label>
@@ -844,7 +855,7 @@
                                                         </mat-select>
                                                     </mat-form-field>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="text-left" style="padding-top: 5px; margin: 0px">
                                                         <div class="example-button-container" style="width:150px">
                                                             <button class="btn bg-primary text-white"
@@ -855,7 +866,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="text-left" style="padding-top: 5px; margin: 0px;">
                                                         <div class="example-button-container" style="width:150px">
                                                             <button class="btn bg-warning text-white"

@@ -26,7 +26,7 @@ export class RecibidosFieldsNavComponent implements OnInit {
   public xresponsable = '0'
   public xtipo = '0'
   public xobservacion = ''
-  public xasunto = ''
+  public observacion = ''
   public xestatus = ''
   public numCarpeta = '0'
 
@@ -44,7 +44,7 @@ export class RecibidosFieldsNavComponent implements OnInit {
     valores: '',
   };
 
-
+MPPD_CCarpetasGroup
   public Estados: any
 
   constructor(
@@ -78,12 +78,16 @@ export class RecibidosFieldsNavComponent implements OnInit {
 
   }
   async OpcionesCarpetas() {
+
+    if (this.xnumCarpeta == '' || this.xcomponente == ''){
     this.xAPI.funcion = 'MPPD_CCarpetasGroup'
     this.xAPI.parametros = `${this.xnumCarpeta},${this.xcomponente}`
     this.xAPI.valores = null
 
     await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
+          console.log(data)
+            if (data.Cuerpo != undefined ){
                 data.Cuerpo.forEach(e => {
                   let rp = e.responsable.toString()
                     this.xtipo = e.cod_acto.toString()
@@ -92,9 +96,11 @@ export class RecibidosFieldsNavComponent implements OnInit {
                     this.xclasificacion = e.cod_tipo_entrada.toString()
                     this.xresponsable = rp!=''?rp:'0'
                 })
+              }
         },
         err => { }
     )
+  }
 }
 
   close() {

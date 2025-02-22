@@ -353,7 +353,7 @@
                                                                         <div class="col-md-2">
                                                                             <button mat-icon-button
                                                                                 aria-label="Example "
-                                                                                (click)="openResolucion(contentResolucion, 0, 0)"
+                                                                                (click)="openResolucion(contentResolucion)"
                                                                                 id="clasificar">
                                                                                 <mat-icon>folder_copy</mat-icon>
                                                                             </button>
@@ -361,8 +361,11 @@
                                                                         </div>
 
 
-                                                                        <div class="col-md-5 texto-lista">
+                                                                        <div class="col-md-3 texto-lista">
                                                                             NOMBRES Y APELLIDOS
+                                                                        </div>
+                                                                        <div class="col-md-2 texto-lista">
+                                                                            DIGITAL
                                                                         </div>
                                                                         <div class="col-md-3 text-right texto-lista">
                                                                             ACCION
@@ -395,8 +398,11 @@
                                                                         </div>
 
 
-                                                                        <div class="col-md-5 texto-sub-lista">
+                                                                        <div class="col-md-3 texto-sub-lista">
                                                                             {{ e.nombres_apellidos }}
+                                                                        </div>
+                                                                        <div class="col-md-2 texto-sub-lista">
+                                                                            {{ e.digital }}
                                                                         </div>
                                                                         <div
                                                                             class="col-md-3 text-right texto-sub-lista">
@@ -418,7 +424,8 @@
 
 
                                                         <div class="col-md-12">
-                                                            <div style="padding-right: 5px;padding-left: 10px; padding-top: 15px;">
+                                                            <div
+                                                                style="padding-right: 5px;padding-left: 10px; padding-top: 15px;">
                                                                 <textarea class="form-control" cols="30" rows="2"
                                                                     [ngModelOptions]="{standalone: true}"
                                                                     [(ngModel)]="xasunto"
@@ -431,7 +438,8 @@
                                                         <br><br>
 
                                                         <div class="col-md-12">
-                                                            <div style="padding-right: 5x;padding-left: 10px;padding-top: 15px;">
+                                                            <div
+                                                                style="padding-right: 5x;padding-left: 10px;padding-top: 15px;">
 
 
                                                                 <textarea class="form-control" cols="30" rows="2"
@@ -442,7 +450,8 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-md-6" style="padding-top: 20px;padding-left:30px; ">
+                                                        <div class="col-md-9"
+                                                            style="padding-top: 20px;padding-left:30px; ">
                                                             <button class="btn bg-success text-white "
                                                                 (click)="closeEvent(false)">
                                                                 &nbsp;&nbsp;Aceptar cambios
@@ -452,69 +461,24 @@
                                                                 (click)="closeEvent(false)">
                                                                 &nbsp;&nbsp;Anular cuenta
                                                             </button>
-                                                            
+
                                                         </div>
 
-                                                        <div class="col-md-6 text-right"  style="padding-top: 20px;">
+                                                        <div class="col-md-3 text-right" style="padding-top: 20px;">
                                                             <button class="btn bg-warning text-white "
                                                                 (click)="closeEvent(false)">
                                                                 &nbsp;&nbsp;Ocultar
                                                             </button>
-                                                            
+
                                                         </div>
                                                     </div>
 
                                                     <div class="row" *ngIf="!blistado"
                                                         style="border-bottom:solid 1px;border-color:#f1f0f0;color:#CCC;margin-bottom: 2px;height: 90px;">
-                                                        <!-- <div class="col-md-9"
-                                                                style="margin-top: 10px; margin-bottom: -10px; padding-left:40px ;">
 
-                                                                <mat-chip-list aria-label=""
-                                                                    style="padding-right: 5px;">
-                                                                    <mat-chip class="text-white"
-                                                                        style="background-color: rgb(49, 86, 29);">
-                                                                        <mat-chip-avatar>
-                                                                            <img src="./assets/img/brand/ejercito.png"
-                                                                                style="height: 24px;" />
-                                                                        </mat-chip-avatar>
-                                                                        Ejercito Bolivariano
-                                                                    </mat-chip>
-                                                                    <mat-chip class="text-grey"
-                                                                        style="background-color: #abe2fa;">
-                                                                        <mat-chip-avatar>
-                                                                            <img src="./assets/img/brand/armada.png"
-                                                                                style="height: 24px;" />
-                                                                        </mat-chip-avatar>
-                                                                        Armada Bolivariana
-                                                                    </mat-chip>
-                                                                    <mat-chip class="text-white"
-                                                                        style="background-color: #5582b5;">
-                                                                        <mat-chip-avatar>
-                                                                            <img src="./assets/img/brand/aviacion.png"
-                                                                                style="height: 24px;" />
-                                                                        </mat-chip-avatar>
-                                                                        Aviaci&oacute;n Bolivariana
-                                                                    </mat-chip>
-                                                                    <mat-chip class="text-white"
-                                                                        style="background-color: rgb(163, 42, 36);">
-                                                                        <mat-chip-avatar>
-                                                                            <img src="./assets/img/brand/guardia.png"
-                                                                                style="height: 24px;" />
-                                                                        </mat-chip-avatar>
-                                                                        Guardia Bolivariana
-                                                                    </mat-chip>
-                                                                    <mat-chip class="text-white"
-                                                                        style="background-color: rgb(65, 147, 246);">
-                                                                        <mat-chip-avatar>
-                                                                            <img src="./assets/img/brand/escudo.png"
-                                                                                style="height: 24px;" />
-                                                                        </mat-chip-avatar>
-                                                                        Mixta
-                                                                    </mat-chip>
-                                                                </mat-chip-list>
-                                                            </div> -->
                                                         <div class="col-md-6"></div>
-                                                        <div class="col-md-6 text-right"  style="margin-top: 27px; margin-bottom: -10px; padding-left:40px ;">
+                                                        <div class="col-md-6 text-right"
+                                                            style="margin-top: 27px; margin-bottom: -10px; padding-left:40px ;">
                                                             <mat-form-field appearance="outline"
                                                                 style="border:0px; margin:0px;padding-right:5px;margin-bottom: -19px;">
 
@@ -689,33 +653,6 @@
 
             </mat-form-field>
         </div>
-
-        <!-- <div class="form-group col-md-12">
-            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xresponsable"
-                 value="{{xresponsable}}">
-                <option value="0">SELECCIONAR RESPONSABLE</option>
-                <option *ngFor="let e of lstResponsable;" [value]="e.cedula + '|' + e.nombre">{{
-                    e.nombre }}
-                </option>
-                
-                
-            </select>
-        </div> -->
-
-        <!-- <div class="form-group col-md-12">
-            <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                <mat-label style="width:100%">Clasificacion de documento</mat-label>
-                <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto"
-                [(ngModel)]="clasificacion">
-                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" style="width:100%;z-index: -1;">
-                    <mat-option *ngFor="let option of filteredOptions | async" [value]="option" required="required">
-                        {{option.nombre}}
-                    </mat-option>
-                </mat-autocomplete>
-                <mat-icon matSuffix>search</mat-icon>
-            </mat-form-field>
-        </div> -->
-
         <div class="col-md-12 text-right" style="padding-right: 30px;">
             <button class="btn bg-gradient-success text-white " (click)="crearCarpeta();modal.close('Save')"
                 id="btncls">
@@ -785,7 +722,7 @@
 
 
 
-<ng-template #contentResolucion let-modal>
+<ng-template #z let-modal>
     <div class="modal-header header bg-gradient-info">
         <h1 style="margin-bottom: -5px; padding-top: -5px;" class="modal-title text-white" id="modal-basic-title">
             Asignar resolución a documentos de entrada</h1>
@@ -816,8 +753,7 @@
                     <input matInput placeholder="Fecha de resolucion" [ngModelOptions]="{standalone: true}"
                         ngbDatepicker #fo="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
                         [(ngModel)]="fecha_resolucion">
-                    <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button"
-                        id="fori">edit_calendar</mat-icon>
+                    <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button" id="fori">edit_calendar</mat-icon>
 
 
                 </mat-form-field>
@@ -888,8 +824,8 @@
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Fecha del Ascenso ( * )</mat-label>
 
-                    <input matInput placeholder="Fecha del Ascenso" [ngModelOptions]="{standalone: true}"
-                        ngbDatepicker #fox="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
+                    <input matInput placeholder="Fecha del Ascenso" [ngModelOptions]="{standalone: true}" ngbDatepicker
+                        #fox="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
                         [(ngModel)]="ultimo_ascenso">
                     <mat-icon matSuffix #buttonEl (click)="fox.toggle()" type="button"
                         id="forix">edit_calendar</mat-icon>
@@ -922,8 +858,8 @@
             <div class="col-md-4" *ngIf='blReconocer'>
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Fecha Ultimo Ascenso (*)</mat-label>
-                    <input matInput placeholder="Fecha del Ascenso" [ngModelOptions]="{standalone: true}"
-                        ngbDatepicker #fox="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
+                    <input matInput placeholder="Fecha del Ascenso" [ngModelOptions]="{standalone: true}" ngbDatepicker
+                        #fox="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
                         [(ngModel)]="ultimo_ascenso">
                     <mat-icon matSuffix #buttonEl (click)="fox.toggle()" type="button"
                         id="forix">edit_calendar</mat-icon>
@@ -972,8 +908,7 @@
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Fecha (*)</mat-label>
                     <input matInput [matDatepicker]="xpickerx" [(ngModel)]="fresolucion"
-                        [ngModelOptions]="{standalone: true}" [ngModelOptions]="{standalone: true}"
-                        disabled="disabled">
+                        [ngModelOptions]="{standalone: true}" [ngModelOptions]="{standalone: true}" disabled="disabled">
                     <mat-datepicker-toggle matSuffix [for]="xpickerx"></mat-datepicker-toggle>
                     <mat-datepicker #xpickerx></mat-datepicker>
                 </mat-form-field>
@@ -1049,8 +984,8 @@
             <div class="col-md-{{maxColComision}}">
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Fecha Inicio(*)</mat-label>
-                    <input matInput placeholder="Fecha Inicio" [ngModelOptions]="{standalone: true}"
-                        ngbDatepicker #foxx="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
+                    <input matInput placeholder="Fecha Inicio" [ngModelOptions]="{standalone: true}" ngbDatepicker
+                        #foxx="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
                         [(ngModel)]="comision_inicio">
                     <mat-icon matSuffix #buttonEl (click)="foxx.toggle()" type="button"
                         id="forix">edit_calendar</mat-icon>
@@ -1072,8 +1007,7 @@
             <div class="col-md-{{maxColComision}}" *ngIf="blComisionAux">
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Pais</mat-label>
-                    <mat-select placeholder="Pais" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="IResolucion.pais">
+                    <mat-select placeholder="Pais" [ngModelOptions]="{standalone: true}" [(ngModel)]="IResolucion.pais">
                         <mat-option *ngFor="let e of lstPais" value="{{e.codigo}}">{{e.nombre}}</mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -1088,12 +1022,8 @@
 
         <div class="form-row">
             <div class="form-group col-md-12">
-                <!-- <label for="txtObjeto">Asunto  [ <a> Importar informaci&oacute;n </a> ] </label> -->
                 <div>
-                    <label>
-                       Asunto
-                    </label>
-                        <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                    <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="IResolucion.asunto" placeholder="Introduzca el asunto..."
                         style="width: 100%">{{IResolucion.asunto}}</textarea>
 
@@ -1123,8 +1053,8 @@
         <div class="form-row">
             <div class="form-group col-md-12">
                 <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
-                [(ngModel)]="IResolucion.observacion" placeholder="Introduzca el texto para observacion..."
-                style="width: 100%">{{IResolucion.observacion}}</textarea>
+                    [(ngModel)]="IResolucion.observacion" placeholder="Introduzca el texto para observacion..."
+                    style="width: 100%">{{IResolucion.observacion}}</textarea>
             </div>
         </div>
 
@@ -1146,8 +1076,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="input_container">
-                                <input (change)="fileSelected($event)" id="fileUpload" type="file"
-                                    name="archivos" accept=".pdf" />
+                                <input (change)="fileSelected($event)" id="fileUpload" type="file" name="archivos"
+                                    accept=".pdf" />
 
                             </div>
                         </div>
@@ -1158,9 +1088,8 @@
 
         <div class="row">
             <div class="col-md-12 text-right" style="padding-right: 30px;">
-                <button class="btn bg-gradient-success text-white " (click)="AceptarResoluciones()"
-                    id="btncls">
-                    <span class="fa fa-share"></span>&nbsp;&nbsp;Guardar 
+                <button class="btn bg-gradient-success text-white " (click)="AceptarResoluciones()" id="btncls">
+                    <span class="fa fa-share"></span>&nbsp;&nbsp;Guardar
                 </button>
                 <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
                     <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar
@@ -1169,8 +1098,8 @@
 
         </div>
 
-  
 
-        
+
+
     </div>
 </ng-template>

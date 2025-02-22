@@ -6,12 +6,18 @@
     <div class="form-group col-md-3">
       <label for="">Componente</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente"
-        (change)="consultarEspecialidades(); consultarEstudios()" value="{{componente}}">
-        <option value="0">SELECCIONAR COMPONENTE</option>
+         value="{{componente}}">
         <option value="%">TODOS LOS COMPONENTES</option>
         <option *ngFor="let e of Componentes;" [value]="e.cod_componente + '|' + e.nombre_componente">{{
           e.nombre_componente }}
         </option>
+      </select>
+    </div>
+    <div class="form-group col-md-3">
+      <label for="">Grado</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="grado" value="{{grado}}">
+        <option value="%">TODOS</option>
+        <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
       </select>
     </div>
 
@@ -32,7 +38,7 @@
       </select>
     </div>
 
-    <div class="form-group col-md-3">
+    <div class="form-group col-md-4">
       <label for="">Clasificación</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="clasificacion"
         value="{{clasificacion}}">
@@ -42,15 +48,9 @@
       </select>
     </div>
 
-    <div class="form-group col-md-4">
-      <label for="">Grado</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="grado" value="{{grado}}">
-        <option value="%">TODOS</option>
-        <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
-      </select>
-    </div>
+   
 
-    <div class="form-group col-md-4">
+    <div class="form-group col-md-4" *ngIf="bFrm">
       <label for="">Codigo</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="codigos" value="{{codigos}}">
         <option value="0">SELECCIONE EL CODIGO</option>
@@ -61,8 +61,8 @@
     </div>
 
     <div class="form-group col-md-4 text-left botones">
-      <button class="btn bg-primary text-white " (click)="consultarListado()">
-        <span class="fa fa-search"></span>&nbsp;&nbsp;Generar {{txtBoton}}
+      <button class="btn bg-primary text-white " (click)="relfexion(true)">
+        <span class="fa fa-search"></span>&nbsp;&nbsp;{{txtBoton}}
       </button>
       &nbsp;&nbsp;&nbsp;
 
@@ -104,25 +104,38 @@
         <tr>
           <th style="width: 60px;"> NUM.</th>
           <th> COMPONENTE</th>
+          <th> CATEGORIA</th>
           <th> GRADO</th>
           <th> NOMBRE COMPLETO</th>
           <th style="width: 110px;"> CEDULA</th>
-          <th> MOTIVO</th>
+          <th *ngIf="bmotivo"> MOTIVO</th>
+          <th *ngIf="bnombramiento" style="width: 320px;">NOMBRAMIENTO</th>
+          <th *ngIf="bascenso" style="width: 320px;">ASCENSO</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let e of lstNombres; index as i">
           <td>{{ i+1 }}</td>
           <td>{{e.cnombre}} </td>
+          <td>{{e.clasificacion }} </td>
           <td>{{e.gnombre}} </td>
           <td>{{ e.nombres_apellidos }}</td>
           <td>{{e.cedula}} </td>
-          <td [innerHTML]="e.motivo"></td>
-
+          <td *ngIf="bmotivo" [innerHTML]="e.motivo"></td>
+          <td *ngIf="bnombramiento" style="width: 160px; font-size: 9px;text-align: center" 
+              [innerHTML]="filtrarNombramiento(e)">
+          <td *ngIf="bascenso" style="width: 160px; font-size: 9px;text-align: center" 
+              [innerHTML]="filtrarAscenso(e)">
+          </td>
         </tr>
       </tbody>
 
     </table>
+
+    
+
+
+
     <div class="row justify-content-center mt-4">
       <button class="btn bg-primary text-white " (click)="openDialog()">
         <span class="fa fa-print"></span>&nbsp;&nbsp;Imprimir {{txtBoton}}

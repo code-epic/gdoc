@@ -360,6 +360,8 @@ export class RsbuzonComponent implements OnInit {
     public CuentaGenera: any
     public tipo: any
     public archivos: any;
+    
+    public lstDigitalesDevuelto = []
 
     constructor(
         private apiService: ApiService,
@@ -383,7 +385,7 @@ export class RsbuzonComponent implements OnInit {
             sessionStorage.getItem('MPPD_CComponente') != undefined
                 ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
                 : []
-
+        console.log(this.Componentes)
         this.TipoResoluciones = sessionStorage.getItem("MPPD_CTipoResolucion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion"))) : []
 
         this.listarResponsables()
@@ -463,9 +465,9 @@ export class RsbuzonComponent implements OnInit {
     }
 
 
-    openResolucion(content, id, pos) {
-        this.numControl = id;
-        this.posicion = pos;
+    openResolucion(content) {
+      
+
         //this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
         let modalRef = this.modalService.open(content, {
             centered: true,
@@ -553,7 +555,7 @@ export class RsbuzonComponent implements OnInit {
         this.ngxService.startLoader('ldbuzon');
         await this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
-
+                // console.log(data.Cuerpo)
                 this.lstAll = data.Cuerpo;
                 this.maxRecibido = this.lstAll.length
                 let i = 0
@@ -597,7 +599,7 @@ export class RsbuzonComponent implements OnInit {
 
         await this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
-                console.log('subEntrada: ', data);
+                // console.log('subEntrada: ', data);  
                 try {
                     if (data.Cuerpo.length > 0) {
                         data.Cuerpo.forEach(e => {
@@ -1030,7 +1032,7 @@ export class RsbuzonComponent implements OnInit {
             }
 
         })
-        console.log(elementos)
+        // console.log(elementos)
         var componente = parseInt(this.xcomponente)
         var numero = this.numCarpeta;
         var tipo = this.xtipo
@@ -1134,14 +1136,16 @@ export class RsbuzonComponent implements OnInit {
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
+                
                 this.lstAllx = data.Cuerpo
                 let arr = this.lstAllx.map((e) => {
                     e.completed = false;
-
+                    if(e.digital != '') this.lstDigitalesDevuelto.push(e.digital)
                     return e;
                 });
                 this.lstCedula = arr
                 console.log(arr)
+                console.log(this.lstDigitalesDevuelto)
             },
             err => { }
         )
@@ -1159,7 +1163,7 @@ export class RsbuzonComponent implements OnInit {
     }
 
     getDetalle(e): string {
-        return e.tdoc == "PUNTO DE CUENTA" ? e.s_cuenta : e.numc
+        return e.tdoc == "PUNTO DE CUENTA" || e.tdoc == "MULTIPLE/PUNTO DE CUENTA" ? e.s_cuenta : e.numc
 
     }
 
@@ -1202,8 +1206,8 @@ export class RsbuzonComponent implements OnInit {
         // console.log(e)
         if (e.s_estatus == null) e.s_estatus = 1
         let pos = parseInt(e.s_estatus) - 1;
-
-        return this.lstAccionesMininisterial[pos].texto
+        // console.log('CANT: ', pos,    this.lstAccionesMininisterial)
+        return this.lstAccionesMininisterial[pos]!=undefined?this.lstAccionesMininisterial[pos].texto:''
 
 
     }

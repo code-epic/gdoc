@@ -1,9 +1,8 @@
-import { Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, Router } from '@angular/router';
-import { NgbDateParserFormatter, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
@@ -16,30 +15,11 @@ import { TableRsreportesModalComponent } from '../../rsreportes/modal/table-rsre
   styleUrls: ['./rscpublicaciones.component.scss']
 })
 export class RscpublicacionesComponent implements OnInit {
-
-  openDialog() {
-    const dialogRef = this.dialog.open(TableRsreportesModalComponent, {
-      width: '100%',
-      height: 'auto',
-      data: {
-        componente_id : this.componente.split('|')[0],
-        componente: this.componente.split('|')[1],
-        lstNombres: this.lstNombres,
-        lstGenerales: this.lstGenerales,
-        lstQa: this.Componentes
-        }
-    })
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`)
-    })
-  }
-
   @Input() formularioAGenerar = 0;
   txtBoton: string = 'Reporte'
 
-  selected = new FormControl(0);
-  componente = '0'
+
+  componente = '%'
   situacion = 'ACT'
   promocion = '%'
   especialidad = '%'
@@ -55,24 +35,26 @@ export class RscpublicacionesComponent implements OnInit {
 
   lstGenerales = []
   lstPromocion = []
-  lstEspecialidad = []
-  lstEstudios = []
 
   codigos = '1'
   bxls = false
   dbDatosNombre = false
+  bFrm = false
 
   lstNombres = []
 
-  public xAPI: IAPICore = {
+  xAPI: IAPICore = {
     funcion: '',
     parametros: '',
     valores: '',
   }
 
-  public csvHead: any
-  public csvHeadFile: any
-  public delimitador: string = ','
+  csvHead: any
+  csvHeadFile: any
+  delimitador: string = ','
+  bnombramiento: boolean = false
+  bascenso: boolean = false
+  bmotivo: boolean = false
 
 
   constructor(
@@ -93,7 +75,7 @@ export class RscpublicacionesComponent implements OnInit {
 
     this.Grados =
       sessionStorage.getItem("MPPD_CGrado") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado"))).slice(0, 8)
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado")))
         : [];
     this.Categorias =
       sessionStorage.getItem("MPPD_CCategorias") != undefined
@@ -104,99 +86,83 @@ export class RscpublicacionesComponent implements OnInit {
         ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion")))
         : [];
 
-    await this.consultarPromociones()
 
-    switch(this.formularioAGenerar){
-      case 1: 
-          this.txtBoton = 'Codigos Rojos'
-          break
-        case 2:
-          this.txtBoton = 'Bajas'
-          break
-        case 3:
-          this.txtBoton = 'Nombramientos'
-          break
-        case 4:
-          this.txtBoton = 'Ascensos'
-          break
-        default:
-          this.txtBoton = 'Reporte'
+    this.txtBoton = this.relfexion()
+
+
+  }
+
+  relfexion(accion: boolean = false): string {
+    let boton = ''
+    this.bFrm = false
+    this.bmotivo = false
+    this.bnombramiento = false
+    this.bascenso = false
+    switch (this.formularioAGenerar) {
+      case 1:
+        boton = 'Codigos Rojos'
+        this.bFrm = true
+        this.bmotivo = true
+        if (accion) this.ConsultarCodigosRojos()
+        break
+      case 2:
+        boton = 'Bajas'
+
+        if (accion) this.ConsultarBajas()
+        break
+      case 3:
+        boton = 'Nombramientos'
+        this.bnombramiento = true
+        if (accion) this.ConsultarNombramientos()
+        break
+      case 4:
+        this.bascenso = true
+        boton = 'Ascensos'
+        if (accion) this.ConsultarAscenso()
+        break
+      default:
+        boton = 'Reporte'
     }
-    
+    return boton
   }
 
 
-  consultarPromociones() {
+  openDialog() {
+    const dialogRef = this.dialog.open(TableRsreportesModalComponent, {
+      width: '100%',
+      height: 'auto',
+      data: {
+        componente_id: this.componente.split('|')[0],
+        componente: this.componente.split('|')[1],
+        lstNombres: this.lstNombres,
+        lstGenerales: this.lstGenerales,
+        lstQa: this.Componentes
+      }
+    })
 
-    this.xAPI.funcion = 'MPPD_CPromociones'
-    this.xAPI.parametros = ''
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-        this.lstPromocion = data.Cuerpo
-      },
-      error => { }
-
-    )
-  }
-
-  consultarEspecialidades() {
-    let cmp = this.componente.split('|')[0]
-    this.lstEspecialidad = []
-    this.xAPI.funcion = 'MPPD_CEspecialidad'
-    this.xAPI.parametros = cmp
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-        this.lstEspecialidad = data.Cuerpo
-      },
-      error => { }
-
-    )
-  }
-
-  consultarEstudios() {
-    let cmp = this.componente.split('|')[0]
-    this.lstEspecialidad = []
-    this.xAPI.funcion = 'MPPD_CEstudios'
-    this.xAPI.parametros = cmp
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-        console.log(data)
-        this.lstEstudios = data.Cuerpo
-      },
-      error => { }
-
-    )
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`)
+    })
   }
 
 
 
-  /**
-   * 
-   */
-  consultarListado() {
-    if ( this.componente == '0'){
-      this.toastrService.warning(
-        'Debe seleccionar un componente',
-        `GDoc Generales`
-      )
-      return
-    } 
+  ConsultarCodigosRojos() {
 
-    if(this.codigos == "0") {
+    if (this.codigos == "0") {
       this._snackBar.open("Debe seleccionar un codigo", "OK");
       return;
     }
+    let cmp = this.componente.split('|')[0]
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.funcion = 'MPPD_CCodigosRojos'
-    this.xAPI.parametros = this.codigos
+    this.xAPI.parametros = `${this.codigos},${cmp},${this.grado},${this.situacion},${this.clasificacion},${this.categoria}`
     this.xAPI.valores = ''
+    console.log(this.xAPI.parametros)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
         console.log(data)
-        this.csvHead = data.Cabecera 
+        this.csvHead = data.Cabecera
         this.ngxService.stopLoader("loader-buscar");
         this.lstNombres = data.Cuerpo
         this.dbDatosNombre = true
@@ -204,6 +170,7 @@ export class RscpublicacionesComponent implements OnInit {
       },
       error => {
         console.error(error)
+        this.ngxService.stopLoader("loader-buscar");
         this.dbDatosNombre = false
         this.bxls = false
       }
@@ -211,8 +178,140 @@ export class RscpublicacionesComponent implements OnInit {
     )
   }
 
-  downloadCSVEx() {
-    this.consultarListado()
+  ConsultarBajas() {
+    console.log('bajas')
+  }
+
+  ConsultarNombramientos() {
+    // console.log('bajas')
+    let cmp = this.componente.split('|')[0]
+    let sit = this.situacion
+    let esp = this.especialidad
+    let est = this.estudios
+
+    this.xAPI.funcion = 'MPPD_CNombramientos'
+    this.xAPI.parametros = this.grado + ',' + cmp + ',' + sit + ',' + esp + ',' + est
+    this.xAPI.valores = ''
+    console.log(this.xAPI)
+    this.ngxService.startLoader("loader-buscar");
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        // console.log(data)
+        this.csvHead = data.Cabecera
+        this.ngxService.stopLoader("loader-buscar");
+        this.lstNombres = data.Cuerpo
+        this.dbDatosNombre = true
+        this.bxls = true
+      },
+      error => {
+        console.error(error)
+        this.ngxService.stopLoader("loader-buscar");
+        this.dbDatosNombre = false
+        this.bxls = false
+      }
+
+    )
+
+  }
+
+
+  filtrarNombramiento(e): string {
+    // console.log(e)
+    let otro_cargo = e.cargo
+    if (e.resoluciones == undefined || e.resoluciones == null) {
+      return 'SIN NOMBRAMIENTO';
+    }
+
+    let nmb = JSON.parse(e.resoluciones).filter(e => {
+      return e.tipo != 13;
+    }).sort((a, b) => {
+      if (a.fecha > b.fecha) {
+        return -1;
+      } else if (a.fecha < b.fecha) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+
+    let texto = '';
+    if (nmb.length !== 0) {
+      if (nmb[0].asunto === undefined) {
+        texto = '';
+      } else {
+        texto = nmb[0].asunto + `<br> RESOL. ${nmb[0].numero} <br> ${nmb[0].fecha}`
+      }
+    } else {
+      texto = 'SIN NOMBRAMIENTO';
+    }
+    return texto;
+  }
+
+
+
+  ConsultarAscenso() {
+    // console.log('bajas')
+    let cmp = this.componente.split('|')[0]
+    let sit = this.situacion
+    let esp = this.especialidad
+    let est = this.estudios
+
+    this.xAPI.funcion = 'MPPD_CNombramientos'
+    this.xAPI.parametros = this.grado + ',' + cmp + ',' + sit + ',' + esp + ',' + est
+    this.xAPI.valores = ''
+    // console.log(this.xAPI)
+    this.ngxService.startLoader("loader-buscar");
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        // console.log(data)
+        this.csvHead = data.Cabecera
+        this.ngxService.stopLoader("loader-buscar");
+        this.lstNombres = data.Cuerpo
+        this.dbDatosNombre = true
+        this.bxls = true
+      },
+      error => {
+        console.error(error)
+        this.ngxService.stopLoader("loader-buscar");
+        this.dbDatosNombre = false
+        this.bxls = false
+      }
+
+    )
+
+  }
+
+
+  filtrarAscenso(e) {
+    let area = e.area == '' ? '1 DE 1' : e.area
+    if (e.resoluciones == undefined || e.resoluciones == null) {
+      return 'SIN RESUELTO';
+    }
+    let asc = JSON.parse(e.resoluciones).filter(e => {
+      return e.tipo == 13;
+    }).sort((a, b) => {
+      if (a.fecha > b.fecha) {
+        return -1;
+      } else if (a.fecha < b.fecha) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    let texto = ''
+    if (asc.length !== 0) {
+      let pos = asc[0].orden == 0 ? area : asc[0].orden + ' DE ' + asc[0].cantidad
+      texto = `RESOL. ${asc[0].numero} <br> ${asc[0].fecha}`
+      // <br> ${pos}
+    } else {
+      texto = 'SIN RESUELTO'
+    }
+    return texto
+  }
+
+
+  async downloadCSVEx() {
+    await this.relfexion(true)
     let head = this.csvHead.map((e) => {
       console.log(e.nombre);
       return e.nombre;

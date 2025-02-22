@@ -283,6 +283,24 @@
 
 </div>
 
+<div class="form-row" *ngIf="GENERAL">
+  <div class="form-group col-md-4">
+    <label> Merito </label>
+    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.merito"
+      value="{{DBasico.merito}}" class="form-control">
+  </div>
+  <div class="form-group col-md-4">
+    <label> Orden </label>
+    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.orden"
+      value="{{DBasico.orden}}" class="form-control">
+  </div>
+  <div class="form-group col-md-4">
+    <label> Estatura </label>
+    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.estatura"
+      value="{{DBasico.estatura}}" class="form-control">
+  </div>
+</div>
+
 <div class="row">
   <div class="col-md-6">
     <div class="text-right">

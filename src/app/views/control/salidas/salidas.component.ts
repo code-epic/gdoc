@@ -422,6 +422,9 @@ export class SalidasComponent implements OnInit {
           case "3"://Oficio por opinión
             this.redistribuir(11)
             break;
+          case "4"://Oficio por opinión
+            this.redistribuir(12)
+            break;
           case "6":// Enviar a otras areas
             this.redistribuir(0)
             break;
@@ -499,16 +502,20 @@ export class SalidasComponent implements OnInit {
   }
 
   async redistribuir(destino: number = 0) {
+    let estatus = 1
     var dst = destino != 0 ? destino : this.cmbDestino
-
+    if (destino == 12) {
+      dst = 11
+      estatus = 2
+    }
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
-    this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
+    this.xAPI.parametros = dst + ',' + dst + ',' + estatus + ',' + this.loginService.Usuario.id + ',' + this.numControl
     console.log(this.xAPI.parametros)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
-        if (this.AccionTexto == '3') {
+        if (this.AccionTexto == '3' || this.AccionTexto == '4') {
          
           this.xAPI.funcion = "WKF_ADocumentoArchivo"
           this.xAPI.valores = JSON.stringify({

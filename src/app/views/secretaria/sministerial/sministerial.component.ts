@@ -90,9 +90,11 @@ export class SministerialComponent implements OnInit {
   public cmbAcciones = [
 
     { 'valor': '0', 'texto': 'MINISTERIAL', 'visible': '1' },
+    { 'valor': '1', 'texto': 'OTROS DOCUMENTOS', 'visible': '1' },
     { 'valor': '2', 'texto': 'PRESIDENCIAL', 'visible': '1' },
     { 'valor': '3', 'texto': 'TRAMITACION POR ORDEN REGULAR', 'visible': '1' },
     { 'valor': '4', 'texto': 'OTROS DOCUMENTOS', 'visible': '1' },
+    { 'valor': '5', 'texto': 'OTROS DOCUMENTOS', 'visible': '1' },
     { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '0' },
   ]
 
@@ -181,6 +183,7 @@ export class SministerialComponent implements OnInit {
     this.xAPI.parametros = '4,2'
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        // console.log(data)
         this.bzAlertasO = data.Cuerpo.map((e) => {
           e.color = e.contador >= 0 ? 'text-red' : 'text-yellow'
           e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`
@@ -278,7 +281,8 @@ export class SministerialComponent implements OnInit {
     this.ngxService.startLoader("loader-aceptar")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
+        // console.log('data texto')
+        // console.log(data)
         data.Cuerpo.forEach(e => {
 
           e.edit = e.tdoc.toLowerCase() == 'punto de cuenta' ? true : false
@@ -290,13 +294,18 @@ export class SministerialComponent implements OnInit {
 
 
           if (this.filtro == 3 && e.tdoc == 'PUNTO DE CUENTA') {
-            console.log(e)
+           
             bz.push(e)
           } else if (this.filtro == 1) {
-            console.log(e.accion, e.tdoc, this.filtro)
-            let text = this.cmbAcciones[e.accion].texto == undefined ? '' : this.cmbAcciones[e.accion].texto
-            e.nombre_accion = e.accion != null ? text : ''
+             //console.log(e)
+            let text = ''
+             e.nombre_accion = ''
+            if ( e.accion != null ){
+              text = this.cmbAcciones[e.accion].texto == undefined ? '' : this.cmbAcciones[e.accion].texto
+              e.nombre_accion = text
+            }
             bz.push(e)
+           
           }
           // if (this.filtro == 1 && e.tdoc == 'TRAMITACION POR ORGANO REGULAR') {
           //   bz.push(e)

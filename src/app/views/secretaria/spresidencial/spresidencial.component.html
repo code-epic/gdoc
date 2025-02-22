@@ -126,32 +126,72 @@
 
           <mat-tab>
             <ng-template mat-tab-label>
-              &nbsp;ALERTAS
+              &nbsp;ENVIADOS A LA DIV. DE RESOLUCIONES
             </ng-template>
 
-            <div class="container">
-              <mat-selection-list #lstAlertas>
-                <mat-list *ngFor="let e of bzAlertas; let i=index "
-                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+            <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list>
+                <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
+                    <div class="col-md-1">
+
+                    </div>
                     <div class="col-md-2 texto-lista">
-                      {{ e.ncontrol }}
+                      NUMERO CONTROL
+                    </div>
+
+                    <div class="col-md-1 texto-lista">
+                      ORIGEN
                     </div>
                     <div class="col-md-4 texto-lista">
-                      {{ e.unidad | uppercase }}
+                      UNIDAD DEPENDENCIA
                     </div>
                     <div class="col-md-2 texto-lista">
-                      {{ e.plazo | date:"dd-MM-yyyy" }}
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                        value="{{xyear}}" style="margin-top: -20px;">
+                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                      </select>
+
                     </div>
-                    <div class="col-md-3 texto-lista  {{ e.color }}">
-                      {{ e.texto | uppercase }}
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                        value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(1)">
+                        <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                      </select>
                     </div>
-                    <div class="col-md-1 text-right ">
-                      <button mat-icon-button aria-label="Privado">
-                        <!--  -->
-                        <mat-icon class="text-warning" (click)="open(observacion, e.id_alerta)">today</mat-icon>
+
+                  </div>
+
+                </mat-list>
+              </mat-selection-list>
+
+              <mat-selection-list style="margin-top:-7px;" #lstPendientes>
+                <mat-list *ngFor="let e of buzon; let i=index " class="mat-list-general">
+                  <div class="row">
+
+                    <div class="col-md-1 text-left">
+
+                      <button mat-icon-button aria-label="Editar" (click)="editar(e)">
+                        <mat-icon class="text-gray">edit_note</mat-icon>
                       </button>
 
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]"
+                        [matTooltip]="e.numc">{{ getDetalle(e) }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+
+                    <div class="col-md-2  texto-lista">
+                      {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
+                    </div>
+                    <div class="col-md-6 texto-detalle">
+                      {{ e.udep | uppercase }} / {{ e.coma | uppercase }}
+                    </div>
+                    <div class="col-md-1 text-right ">
+                      <a [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer" class="href-style">
+                        <!-- {{ e.anom.substring(0,5) }} -->
+                        <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" class="image-style" />
+                      </a>
                     </div>
                   </div>
                 </mat-list>
@@ -161,6 +201,7 @@
             <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
+
           </mat-tab>
 
 

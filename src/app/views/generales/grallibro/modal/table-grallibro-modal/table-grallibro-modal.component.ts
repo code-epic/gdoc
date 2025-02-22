@@ -130,7 +130,7 @@ export class TableGrallibroModalComponent implements OnInit {
     }
 
     filtrarNombramiento(e): string {
-        console.log(e)
+        //console.log(e)
         let otro_cargo = e.cargo
 
         let nmb = JSON.parse(e.resoluciones).filter(e => {
@@ -150,7 +150,8 @@ export class TableGrallibroModalComponent implements OnInit {
             if (nmb[0].asunto === undefined ) {
                 texto = '';
             } else {
-                texto = nmb[0].asunto + `<br> RESOL. ${nmb[0].numero} <br> ${nmb[0].fecha}<br> ${otro_cargo}` 
+                let xcargo = otro_cargo==undefined?'':otro_cargo
+                texto = nmb[0].asunto + `<br> RESOL. ${nmb[0].numero} <br> ${nmb[0].fecha}<br> ${xcargo}` 
             }
         } else {
             texto = 'SIN NOMBRAMIENTO';
@@ -159,7 +160,7 @@ export class TableGrallibroModalComponent implements OnInit {
     }
 
     filtrarAscenso(e) {
-        let area = e.area == ''?'1 DE 1': e.area
+        let area = this.getMerito(e.merito)
         let asc = JSON.parse(e.resoluciones).filter(e => {
             return e.tipo == 13;
         }).sort((a, b) => {
@@ -173,8 +174,9 @@ export class TableGrallibroModalComponent implements OnInit {
         });
         let texto = ''
         if (asc.length !== 0) {
-            let pos = asc[0].orden == 0 ? area : asc[0].orden + ' DE ' + asc[0].cantidad
-            texto =  `RESOL. ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${pos}`
+            // let pos = asc[0].orden == 0 ? area : asc[0].orden + ' DE ' + asc[0].cantidad
+            // let pos = area
+            texto =  `RESOL. ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${area}`
         } else {
             texto = 'SIN RESUELTO'
         }
@@ -187,5 +189,9 @@ export class TableGrallibroModalComponent implements OnInit {
 
     getEscudo(comp) : string {
         return comp=='%'?'mppd.png': comp +'.jpeg'
+    }
+
+    getMerito(merito ) : string {
+        return merito.replace('/', ' DE ')
     }
 }

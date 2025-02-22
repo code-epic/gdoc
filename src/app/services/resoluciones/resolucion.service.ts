@@ -138,6 +138,11 @@ export interface IDatosBasicos {
   ubicacion: string
   cargo: string
   estadomayor: string
+  merito : string
+  direccion: string
+  estatura: string
+  estado_civil: string
+
 }
 
 @Injectable({

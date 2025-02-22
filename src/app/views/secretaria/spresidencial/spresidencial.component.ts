@@ -112,6 +112,8 @@ export class SpresidencialComponent implements OnInit {
 
   public posicionPagina = 0
   public placement = 'bottom'
+  public filtro = 0
+   public xTipo = ''
 
 
   constructor(
@@ -214,9 +216,18 @@ export class SpresidencialComponent implements OnInit {
         this.listarBuzon()
         break
       case 1:
+        // this.clasificacion = false
+        // //this.xAPI.funcion = 'WKF_CSubDocumento'
+        // this.xAPI.parametros = `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}`
+        // this.listarBuzon()
+        // break
+        this.xAPI.funcion = 'WKF_CDocSecretariaResoluciones'
+        this.filtro = 3
+        this.xTipo = 'PUNTO'
         this.clasificacion = false
-        //this.xAPI.funcion = 'WKF_CSubDocumento'
-        this.xAPI.parametros = `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}`
+        this.vministerial = false
+        this.tministerial = '12'
+        this.xAPI.parametros = '3,3' + "," + this.fecha_desde + "," + this.fecha_hasta;
         this.listarBuzon()
         break
       case 2:
@@ -476,6 +487,22 @@ export class SpresidencialComponent implements OnInit {
       }) //
   }
 
+  dwUrl(ncontrol: string, archivo: string): string {
+    return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
+  }
+
+  getDetalle(e): string {
+   
+    if (e.s_cuenta == '' ){
+      return e.numc
+    }
+    return e.tdoc == "PUNTO DE CUENTA" ? e.s_cuenta : e.numc
+    
+  }
+
 
 
 }
+
+
+

@@ -33,7 +33,7 @@
                 <div class="card-body">
                     <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
 
-                    <div class="col-md-12 row justify-content-center text-center">
+                    <div *ngIf="bmenu" class="col-md-12 row justify-content-center text-center">
                         <div class="col-md-2"></div>
                         <div class="col-md-2 cardround" (click)="cambiarFormulario(1)">
                             <div class="text-center botones">
@@ -77,12 +77,32 @@
 
                         <div class="col-md-2"></div>
                     </div>
-                    <br><br>
-                    <div class="row p-4">
+                    <br>
+                    <div  *ngIf="!bmenu" class="row" style="padding-top: 5px">
+                        <div class="col-md-9">
+                            <h2 style="margin-top: 10px; margin-left: -3px;padding-left: 20px;">
+                                REPORTE GENERAL</h2>
+                        </div>
+                        <div class="col-md-3">
+
+                            <div 
+                                class="example-button-row text-right text-white">
+                                <button style="background-color: #2a9a17;" mat-icon-button
+                                    title="Volver Atrás" (click)="volver()">
+                                    <mat-icon>open_in_browser</mat-icon>
+                                </button>
+                            </div>
+                            
+
+                        </div>
+                    </div>
+                    <div class="row p-4" *ngIf="!bmenu">
                         <div class="col-md-12">
                             <app-rscpublicaciones *ngIf="formularioAGenerar != 0" [formularioAGenerar]="formularioAGenerar" ></app-rscpublicaciones>
                         </div>
                     </div>
+
+                    
                 </div>
             </div>
         </div>

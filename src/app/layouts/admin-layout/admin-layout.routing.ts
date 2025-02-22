@@ -55,6 +55,7 @@ import { DatosbasicosComponent } from 'src/app/views/control/datosbasicos/datosb
 import { RsreportesComponent } from 'src/app/views/resoluciones/rsreportes/rsreportes.component';
 import { RsalertasComponent } from 'src/app/views/resoluciones/rsalertas/rsalertas.component';
 import { RsestadisticasComponent } from 'src/app/views/resoluciones/rsestadisticas/rsestadisticas.component';
+import { MreportesComponent } from 'src/app/views/secretaria/mreportes/mreportes.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -262,6 +263,11 @@ export const AdminLayoutRoutes: Routes = [
         path: 'ministerial/agregar',
         component: MinisterialComponent,
         canActivate: [AuthGuardGuard],
+    },
+    {
+        path: 'mreportes',
+        component: MreportesComponent,
+        canActivate: [AuthGuardGuard]
     },
     {
         path: 'fichaproyecto/:id',

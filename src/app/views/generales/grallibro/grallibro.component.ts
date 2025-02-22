@@ -133,6 +133,7 @@ export class GrallibroComponent implements OnInit {
     let pro = this.promocion
     let esp = this.especialidad
     let est = this.estudios
+    let cat = this.categoria
     if ( cmp == '0'){
       this.toastrService.warning(
         'Debe seleccionar un componente',
@@ -143,7 +144,7 @@ export class GrallibroComponent implements OnInit {
 
     let valorsql = this.grado=='%'?`DB.cod_grado <=8`: ` DB.cod_grado =${this.grado}`
     this.xAPI.funcion = 'MPPD_CLibroGenerales'
-    this.xAPI.parametros = cmp + ',' + sit + ',' + pro + ',' + esp + ',' + est + ',' + valorsql
+    this.xAPI.parametros = cmp + ',' + sit + ',' + pro + ',' + esp + ',' + est + ',' + valorsql + ',' + cat
     this.xAPI.valores = ''
 
     this.lstGenerales = []

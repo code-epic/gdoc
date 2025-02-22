@@ -294,5 +294,8 @@ export class ResolucionesComponent implements OnInit {
     
   }
 
+  crackName(texto: string ) : string{
+    return texto=='Transcripcion'?'Doc. Proceso':texto
+  }
 
 }

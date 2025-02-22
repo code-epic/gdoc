@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { UtilService } from 'src/app/services/util/util.service';
 
 @Component({
   selector: 'app-rsreportes',
@@ -9,11 +10,19 @@ export class RsreportesComponent implements OnInit {
 
   formularioAGenerar: number = 0
   titulo: string = 'Reportes'
+  bmenu = true
 
-  constructor(
+ 
+
+
+  constructor(private utilService : UtilService
   ) { }
 
   ngOnInit(): void {
+    this.utilService.onChange$.subscribe( e => {
+      console.log(e)
+      this.bmenu = e
+    })
   }
 
   /**
@@ -26,11 +35,12 @@ export class RsreportesComponent implements OnInit {
    */
   cambiarFormulario(n: number){
     this.formularioAGenerar = 0
-    setTimeout(() => {
+  
       this.formularioAGenerar = n;
-
+      this.bmenu = false
       switch(n){
         case 1: 
+        
           this.titulo = 'Codigos Rojos'
           break
         case 2:
@@ -43,6 +53,9 @@ export class RsreportesComponent implements OnInit {
           this.titulo = 'Ascensos'
           break
       }
-    }, 10);
+  }
+
+  volver(){
+    this.bmenu = true
   }
 }

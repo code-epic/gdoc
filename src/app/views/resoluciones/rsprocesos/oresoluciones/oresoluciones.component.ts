@@ -174,7 +174,11 @@ export class OresolucionesComponent implements OnInit {
     correo: "",
     ubicacion: "",
     cargo: "",
-    estadomayor: ""
+    estadomayor: "",
+    merito: "",
+    direccion: "",
+    estatura: "",
+    estado_civil: ""
   }
 
   public IResolucion: IResoluciones = {
@@ -1148,3 +1152,6 @@ export class OresolucionesComponent implements OnInit {
 
   }
 }
+
+
+

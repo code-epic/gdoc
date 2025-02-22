@@ -99,7 +99,7 @@
                 </mat-list>
               </mat-selection-list>
               <mat-selection-list #lstDocumentos>
-                <mat-list *ngFor="let e of bzRecibido; let i=index "
+                <mat-list *ngFor="let e of buzon; let i=index "
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
@@ -125,7 +125,7 @@
               </mat-selection-list>
             </div>
 
-            <mat-paginator [length]="lengthOfi" (page)="pageChangeEvent($event)" [pageSize]="pageSizeOfi"
+            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
 
@@ -135,32 +135,66 @@
            &nbsp;ARCHIVOS EN ESPERA DE OPINION
            </ng-template> 
 
-           <div class="container">
-             <mat-selection-list #lstDocumentos>
-               <mat-list *ngFor="let e of bzRecibidoOpinion; let i=index "
-                 style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                 <div class="row">
-                   <div class="col-md-1">
-                     <button mat-icon-button aria-label="Example " class="text-success"
-                       (click)="open(observacion, e.idd)">
-                       <mat-icon>room_preferences</mat-icon>
-                     </button>
-                   </div>
-                   <div class="col-md-2 texto-lista">
-                     <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
-                       &nbsp;<font color="green">{{ e.simbolo }}</font></a>
-                   </div>
+           <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+            <mat-selection-list >
+              <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                <div class="row">
+                  <div class="col-md-1 texto-lista" >
+                  
+                  </div>
+                  <div class="col-md-2 texto-lista">
+                    NUM. CONTROL
+                  </div>
 
-                   <div class="col-md-3 texto-lista">
-                     {{ e.fcre | date:"dd-MM-yyyy" }} |  {{ e.saso | uppercase }}
-                   </div>
-                   <div class="col-md-6 texto-detalle">
-                     {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
-                   </div>
+                  <div class="col-md-2 texto-lista">
+                    FECHA / ORIGEN
+                  </div>
+                  <div class="col-md-3 texto-lista">
+                    UNIDAD DEPENDENCIA
+                  </div>
+                  <div class="col-md-2 texto-lista">
+                    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                      value="{{xyear}}" style="margin-top: -20px;">
+                      <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                    </select>
                    
-                 </div>
-               </mat-list>
-             </mat-selection-list>
+                  </div>
+                  <div class="col-md-2 texto-lista">
+                    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                    value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
+                    <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                  </select>
+                </div>
+
+                </div>
+
+              </mat-list>
+            </mat-selection-list>
+            <mat-selection-list #lstDocumentos>
+              <mat-list *ngFor="let e of buzon; let i=index "
+                style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                <div class="row">
+                  <div class="col-md-1">
+                    <button mat-icon-button aria-label="Example " class="text-success"
+                      (click)="open(observacion, e.idd)">
+                      <mat-icon>room_preferences</mat-icon>
+                    </button>
+                  </div>
+                  <div class="col-md-2 texto-lista">
+                    <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
+                      &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                  </div>
+
+                  <div class="col-md-2 texto-lista">
+                    {{ e.fcre | date:"dd-MM-yyyy" }} |  {{ e.saso | uppercase }}
+                  </div>
+                  <div class="col-md-7 texto-detalle">
+                    {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
+                  </div>
+                  
+                </div>
+              </mat-list>
+            </mat-selection-list>
            </div>
 
            <mat-paginator [length]="lengthOfi" (page)="pageChangeEvent($event)" [pageSize]="pageSizeOfi"
@@ -175,7 +209,7 @@
 
            <div class="container">
              <mat-selection-list #lstDocumentos>
-               <mat-list *ngFor="let e of bzProcesados; let i=index "
+               <mat-list *ngFor="let e of buzon; let i=index "
                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                  <div class="row">
              

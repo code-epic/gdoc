@@ -102,9 +102,9 @@ export class ApiService {
     {'id': 5, 'mes' : 'JUNIO', 'desde':'06-01', 'hasta': '06-30'},
     {'id': 6, 'mes' : 'JULIO', 'desde':'07-01', 'hasta': '07-31'},
     {'id': 7, 'mes' : 'AGOSTO', 'desde':'08-01', 'hasta': '08-31'},
-    {'id': 8, 'mes' : 'SEPTIEMBRE', 'desde':'09-01', 'hasta': '09-30'},
-    {'id': 9, 'mes' : 'OCTUBRE', 'desde':'10-01', 'hasta': '10-31'},
-    {'id': 10, 'mes' : 'NOMVIEMBRE', 'desde':'11-01', 'hasta': '11-30'},
+    {'id': 8, 'mes' : 'SEPTIEMBRE', 'desde':'09-01', 'hasta': '10-01'},
+    {'id': 9, 'mes' : 'OCTUBRE', 'desde':'10-01', 'hasta': '11-01'},
+    {'id': 10, 'mes' : 'NOMVIEMBRE', 'desde':'11-01', 'hasta': '12-01'},
     {'id': 11, 'mes' : 'DICIEMBRE', 'desde':'12-01', 'hasta': '12-31'},
   ]
 
@@ -212,6 +212,24 @@ export class ApiService {
     });
   }
 
+  DwsResolDigital(peticion: string) {
+    let ruta = this.URL + 'dws/' + peticion
+    console.log(ruta)
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+      }),
+      responseType: 'blob' as 'json'
+    };
+
+    this.http.get(ruta, httpOptions).subscribe((response: any) => {
+      const blob = new Blob([response], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url);
+    });
+  }
+
 
   DwsCdn(peticion: string) {
     let ruta = this.URL + 'dwscdn/' + peticion
@@ -230,6 +248,8 @@ export class ApiService {
       window.open(url);
     });
   }
+
+  
 
 
   getDwsCdn(tpf: WTipoArchivo): Observable<any> {

@@ -120,7 +120,11 @@ export class RsdatosbasicosmasivosComponent implements OnInit {
     correo: "",
     ubicacion: "",
     cargo: "",
-    estadomayor: ""
+    estadomayor: "",
+    merito: "",
+    direccion: "",
+    estatura: "",
+    estado_civil: ""
   };
 
   public cargaMasiva: CargaMasiva = {
@@ -330,7 +334,11 @@ export class RsdatosbasicosmasivosComponent implements OnInit {
       correo: "",
       ubicacion: "",
       cargo: "",
-      estadomayor: ""
+      estadomayor: "",
+      merito: '',
+      direccion: '',
+      estatura: '',
+      estado_civil: ''
     };
   }
 }

@@ -59,6 +59,7 @@ export class MinisterialComponent implements OnInit {
     { 'valor': '7', 'texto': 'DIV. RESOLUCIONES', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
     { 'valor': '12', 'texto': 'DIV. RESOLUCIONES / URGENTE', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
     { 'valor': '13', 'texto': 'DIV. RESOLUCIONES / JEFE DEL AR EA SECRETARIA', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
+    { 'valor': '14', 'texto': 'DEVUELTO SIN DECISION', 'visible': '1' }, //7/5/3 Asociado a los plazos en las alertas
     { 'valor': '8', 'texto': 'SUB-DIRECCION', 'visible': '1' },
     { 'valor': '9', 'texto': 'DIRECCION GENERAL', 'visible': '1' },
     { 'valor': '10', 'texto': 'DESPACHO DEL MPPD', 'visible': '1' },  //7/5/3 Asociado a los plazos en las alertas

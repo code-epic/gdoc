@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatSnackBar } from "@angular/material/snack-bar";
 import {
   NgbDate,
@@ -110,7 +110,11 @@ export class RscdatosbasicosComponent implements OnInit {
     correo: "",
     ubicacion: "",
     cargo: "",
-    estadomayor: ""
+    estadomayor: "",
+    merito: '',
+    direccion: '',
+    estatura: '',
+    estado_civil: ''
   };
 
   public ipsfa_cedula: string = "";
@@ -155,7 +159,7 @@ export class RscdatosbasicosComponent implements OnInit {
     public utilService: UtilService,
     private _snackBar: MatSnackBar,
     private modalService: NgbModal
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.Componentes =
@@ -225,7 +229,7 @@ export class RscdatosbasicosComponent implements OnInit {
     let cedula = this.DBasico.cedula
     this.dbActivar = false
     this.ngxService.startLoader("loader-aceptar")
-    this.xAPI.funcion = !this.GENERAL?"MPPD_CDatosBasicos":"MPPD_CCedulaGenerales"
+    this.xAPI.funcion = !this.GENERAL ? "MPPD_CDatosBasicos" : "MPPD_CCedulaGenerales"
     this.xAPI.parametros = cedula
     this.xAPI.valores = ""
     this.foto = "assets/img/theme/ndisponible.jpeg"
@@ -233,6 +237,7 @@ export class RscdatosbasicosComponent implements OnInit {
     this.DBasico.cedula = cedula
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        //console.log(data)
         if (data.Cuerpo.length > 0) {
           this.DBasico = data.Cuerpo[0]
           this.foto = `https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/${cedula}/foto.jpg`
@@ -244,7 +249,7 @@ export class RscdatosbasicosComponent implements OnInit {
             data.Cuerpo[0].resoluciones != undefined &&
             data.Cuerpo[0].resoluciones != ""
           ) {
-            this.lstResoluciones = JSON.parse( data.Cuerpo[0].resoluciones).reverse()
+            this.lstResoluciones = JSON.parse(data.Cuerpo[0].resoluciones).reverse()
             this.filtrarNombramiento()
           }
           if (
@@ -255,7 +260,7 @@ export class RscdatosbasicosComponent implements OnInit {
           }
           this.dbActivar = true
           this.seleccionColor()
-        }else{
+        } else {
           this.toastrService.info("No se encontraron resultados", "GDoc: Buscar cédula")
         }
 
@@ -311,11 +316,15 @@ export class RscdatosbasicosComponent implements OnInit {
       ubicacion: "",
       cargo: "",
       estadomayor: "",
+      merito: "",
+      direccion: "",
+      estado_civil: "",
+      estatura: ""
     }
     this.nombramiento = ""
     this.xasunto = ""
   }
-  guardar() {}
+  guardar() { }
 
   //Consultar datos del IPSFA
   consultarIPSFA(content) {
@@ -414,7 +423,7 @@ export class RscdatosbasicosComponent implements OnInit {
   print() {
     this.obtenerDatos();
     let cedula = this.DBasico.cedula;
-    if (this.GENERAL) { this.datosBasic.emit({data: this.DBasico}); }
+    if (this.GENERAL) { this.datosBasic.emit({ data: this.DBasico }); }
   }
 
   Aceptar() {
@@ -454,7 +463,13 @@ export class RscdatosbasicosComponent implements OnInit {
 
   SituacionMilitar() {
     switch (this.DBasico.situacion) {
-      case "RSP" && "RCP" && "INV":
+      case "RSP":
+        this.DBasico.situacion = "RACT";
+        break;
+      case "RCP":
+        this.DBasico.situacion = "RACT";
+        break;
+      case "INV":
         this.DBasico.situacion = "RACT";
         break;
       case "ACT":
@@ -478,11 +493,11 @@ export class RscdatosbasicosComponent implements OnInit {
     }
   }
 
-  controlActivo(cedula : string) {
-    this.utilService.contenido$.emit( cedula );
+  controlActivo(cedula: string) {
+    this.utilService.contenido$.emit(cedula);
   }
 
-  consultarSAIME(){
+  consultarSAIME() {
     this.xAPI.funcion = "MPPD_CCedulaSaime"
     this.xAPI.parametros = this.DBasico.cedula;
     this.xAPI.valores = ''
@@ -490,7 +505,7 @@ export class RscdatosbasicosComponent implements OnInit {
       (data) => {
         console.log(data)
         let DB = data.Cuerpo[0]
-        let nombre =  DB.nombre1 + ' ' + DB.nombre2 + ' ' +  DB.apellido1 + ' ' + DB.apellido2
+        let nombre = DB.nombre1 + ' ' + DB.nombre2 + ' ' + DB.apellido1 + ' ' + DB.apellido2
         this.DBasico.nombres = nombre.toUpperCase()
         this.nacimiento = NgbDate.from(
           this.formatter.parse(DB.fecha_nacimiento)
@@ -501,8 +516,8 @@ export class RscdatosbasicosComponent implements OnInit {
           `MPPD.DatosBasicos`
         );
         this.ngxService.stopLoader('loader-aceptar');
-      
-        
+
+
       },
       (error) => {
         this.toastrService.error(error, `MPPD_DatosBasicos -> Aceptar`);

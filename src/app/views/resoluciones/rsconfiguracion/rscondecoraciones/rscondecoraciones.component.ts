@@ -298,7 +298,11 @@ export class RscondecoracionesComponent implements OnInit {
     correo: "",
     ubicacion: "",
     cargo: "",
-    estadomayor: ""
+    estadomayor: "",
+    merito: "",
+    direccion: "",
+    estatura: "",
+    estado_civil: ""
   };
 
   //Lista de sobrecargas

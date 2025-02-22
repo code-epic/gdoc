@@ -17,468 +17,314 @@ import { UtilService } from 'src/app/services/util/util.service';
 })
 export class RstranscripcionComponent implements OnInit {
 
-  
-  
-  
-  
-  
-    public estadoActual = 3
-    public estadoOrigen = 2
-  
-    public extender_plazo: any
-    public clasificacion = false
-    public vrecibido = true
-    public vprocesados = false
-    public vpendientes = false
-    public cmbDestino = ''
-  
-    public paginador = 10
-    public focus;
-  
-    public xAPI: IAPICore = {
-      funcion: '',
-      parametros: '',
-      valores: ''
-    }
-  
-    public selNav = 0
-    public lengthOfi = 0;
-    public pageSizeOfi = 10;
-    public pageEvent: PageEvent;
-    public idd : string = ''
-    public cuenta : string = ''
-  
-  
-    public pageSizeOptions: number[] = [5, 10, 25, 100]
-  
-    public cmbAcciones = [
-      { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
-      { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
-      { 'valor': '2', 'texto': 'ELABORAR OFICIO DE OPINION', 'visible': '1' },
-      { 'valor': '3', 'texto': 'EN MANOS DEL DIRECTOR DEL DESPACHO', 'visible': '1' },
-      { 'valor': '4', 'texto': 'EN MANOS DEL SUB DIRECTOR DEL DESPACHO', 'visible': '1' },
-      { 'valor': '5', 'texto': 'ARCHIVAR', 'visible': '1' },
-      { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '1' },
-      { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' }]
-  
-    public lstAcciones = []
-    public bzOriginal = []
-    public bzSubDocumentos = []
-    public bzRecibido = []
-    public bzProcesados = []
-    public bzPendientes = []
-    public lst = []
-    public lstEstados = [] //Listar Estados
-  
-  
-    public estilocheck = 'none'
-    public estiloclasificar = 'none'
-  
-    public allComplete: boolean = false
-    public numControl = ''
-    public Observacion = ''
-    public AccionTexto: string = '0'
-  
-    public WAlerta: IWKFAlerta = {
-      documento: 0,
-      estado: 0,
-      estatus: 0,
-      activo: 0,
-      fecha: '',
-      usuario: '',
-      observacion: ''
-    }
-  
-  
-    constructor(
-      private apiService: ApiService,
-      private ruta: Router,
-      private toastrService: ToastrService,
-      private loginService: LoginService,
-      private utilService: UtilService,
-      private modalService: NgbModal) {
-  
-    }
-  
-    ngOnInit(): void {
-      this.listarEstados()
-      this.seleccionNavegacion(0)
-      this.listarSubDocumentos(1)
-    }
-  
-    entrada_open(id, cuenta){
-     
-      if (cuenta != undefined){
-        const xid = btoa('4,2,' + id)
-        const xcuenta = btoa(cuenta)
-        this.ruta.navigate(['/rsentradas', xid, xcuenta ])
-        return
-      }
-      const xid = btoa(id)
-      this.ruta.navigate(['/rsentradas', xid ])
-     
-    }
-    open(content, id, cuenta) {
-      this.numControl = id
-      this.idd = ''
-      this.cuenta = ''
-      if( cuenta != undefined ){
-        this.idd =  id
-        this.cuenta = cuenta
-      }
-      this.modalService.open(content)
-    }
-  
-  
-    seleccionNavegacion(e) {
-      this.bzRecibido = []
-      this.bzProcesados = []
-      this.bzPendientes = []
-      this.xAPI.funcion = 'WKF_CDocumentos'
-      this.xAPI.valores = ''
-      this.selNav = e
-  
-      switch (e) {
-        case 0:
-          this.cargarAcciones(1)
-          this.clasificacion = false
-          this.xAPI.parametros = this.estadoActual + ',' + 2
-          this.listarBuzon()
-          break
-        case 1:
-          this.cargarAcciones(2)
-          this.clasificacion = false
-          this.xAPI.parametros = this.estadoActual + ',' + 3
-          this.listarBuzon()
-          break
-        default:
-          break
-      }
-  
-    }
-  
-    listarEstados() {
-      this.xAPI.funcion = 'WKF_CEstados'
-      this.xAPI.parametros = '%'
-      this.xAPI.valores = ''
-      this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.lstEstados = data.Cuerpo.filter((e) => { return e.esta == 1 && e.id != 3 || e.id == 1 })
-  
-        },
-        (error) => { }
-      )
-    }
-  
-    async listarBuzon() {
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.bzOriginal = data.Cuerpo.map(e => {
-            e.completed = false
-            e.color = 'warn'
-            e.cuentas = e.cuenta != ''? '': e.nori
-            e.priv = e.priv == 1 ? true : false
-            e.existe = e.anom == '' ? true : false
-            e.xaccion = e.accion
-            return e
-          }) //Registros recorridos como elementos
-          this.lengthOfi = data.Cuerpo.length
-          if (this.selNav == 0) this.listarSubDocumentos(2)
-        },
-        (error) => {
-  
-        }
-      )
-    }
-  
-    async listarSubDocumentos(estatus : number) {
-  
-      this.xAPI.funcion = 'WKF_CSubDocumentoResoluciones'
-      this.xAPI.parametros = '4,2,3,' + estatus
-      this.bzSubDocumentos = []
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.bzSubDocumentos = data.Cuerpo.map(e => {
-            e.completed = false
-            e.color = 'warn'
-            e.bOk = e.cuenta == ''? true: false
-            e.cuentas = e.cuenta == ''? '': e.cuenta
-            e.priv = e.priv == 1 ? true : false
-            e.existe = e.anom == '' ? true : false
-            e.xaccion = e.accion
-            return e
-          }) //Registros recorridos como elementos
-          this.lengthOfi = data.Cuerpo.length
-        },
-        (error) => {
-  
-        }
-      )
-    }
-  
-    async ConsultarCtrl(id) {
-      if (id == 4) {
-        this.bzRecibido = this.bzSubDocumentos
-      } else {
-        this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
-      }
-    }
-  
-    ConsultarProcesados(id) {
-      console.log(this.bzSubDocumentos)
-      if (id == 4) {
-        this.bzRecibido = this.bzSubDocumentos
-      } else {
-        this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
-      }
-    }
-  
-    ConsultarPendientes(id) {
-      this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
-    }
-  
-  
-    pageChangeEvent(e) {
-      this.recorrerElementos(e.pageIndex + 1, this.lst)
-    }
-  
-  
-    //recorrerElementos para paginar listados
-    recorrerElementos(posicion: number, lista: any) {
-      if (posicion > 1) posicion = posicion * 10
-      this.lst = lista.slice(posicion, posicion + this.pageSizeOfi)
-  
-    }
-  
-  
-    //editar
-    editar(id: string) {
-      const estado = this.estadoActual
-      const estatus = this.selNav + 1
-      const base = btoa(estado + ',' + estatus + ',' + id)
-      this.ruta.navigate(['/documento', base])
-    }
-  
-    insertarObservacion() {
-      var usuario = this.loginService.Usuario.id
-      this.xAPI.funcion = 'WKF_IDocumentoObservacion'
-      this.xAPI.valores = JSON.stringify(
-        {
-          "documento": this.numControl,
-          "estado": this.estadoActual, //Estado que ocupa
-          "estatus": this.selNav + 1,
-          "observacion": this.Observacion.toUpperCase(),
-          "accion": this.AccionTexto,
-          "usuario": usuario
-        }
-      )
-      this.xAPI.parametros = ''
-      this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          switch (this.AccionTexto) {
-            case "0"://Oficio por opinión
-              if (this.idd != '' && this.cuenta != ''){
-                this.promoverPuntoCuenta(3, 2)
-              }else {
-                this.promoverBuzon(0, this.utilService.FechaActual())
-              }
-              
-              break;
-            case "1"://Rechazar en el estado inicial
-              this.rechazarBuzon()
-              break
-            // case "5":// Enviar a Archivo
-            //   this.redistribuir(11)
-            //   break;
-  
-            // case "6":// Enviar a otras areas
-            //   this.redistribuir(0)
-            //   break;
-  
-            // case "7"://Enviar a salida con bifurcacion
-            //   this.redistribuir(9)
-            //   break;
-  
-            // default:
-  
-            //   this.promoverBuzon()
-            //   break;
-          }
-  
-  
-  
-        },
-        (errot) => {
-          this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
-        }) //
-    }
-  
-  
-    async rechazarBuzon() {
-      this.xAPI.funcion = "WKF_AUbicacionRechazo"
-      this.xAPI.valores = ''
-      this.xAPI.parametros = '1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.toastrService.success(
-            'El documento ha sido enviado al origen',
-            `GDoc Wkf.DocumentoObservacion`
-          )
-          this.seleccionNavegacion(this.selNav)
-        },
-        (error) => {
-          console.error(error)
-        }
-  
-      )
-    }
-  
-  
-  
-    async promoverBuzon(activo: number, sfecha: string) {
-      var fecha = ''
-      if (sfecha == '') {
-        if (this.extender_plazo == undefined) {
-          this.toastrService.warning(
-            'Debe seleccionar una fecha ',
-            `GDoc Wkf.DocumentoObservacion`
-          )
-          return false
-        } else {
-          fecha = this.utilService.ConvertirFecha(this.extender_plazo)
-        }
-      } else {
-        fecha = sfecha
-      }
-  
-      sfecha == '' ? this.utilService.ConvertirFecha(this.extender_plazo) : sfecha
-  
-      var usuario = this.loginService.Usuario.id
-      var i = 0
-      var estatus = 1 //NOTA DE ENTREGA
-      //Buscar en Wk de acuerdo al usuario y la app activa
-      this.xAPI.funcion = 'WKF_APromoverEstatus'
-      this.xAPI.valores = ''
-  
-      this.xAPI.parametros = `${estatus},${usuario},${this.numControl}`
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        async data => {
-          await this.guardarAlerta(activo, fecha)
-          this.seleccionNavegacion(this.selNav)
-          this.Observacion = ''
-          this.numControl = '0'
-          this.toastrService.success(
-            'Se ha promovido el documento',
-            `GDoc Wkf.DocumentoObservacion`
-          )
-        },
-        (errot) => {
-          this.toastrService.error(errot, `GDoc Wkf.PromoverDocumento`);
-        }) //
-  
-    }
-  
-    async redistribuir(destino: number = 0) {
-      var dst = destino != 0 ? destino : this.cmbDestino
-  
-      this.xAPI.funcion = "WKF_ARedistribuir"
-      this.xAPI.valores = ''
-      this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
-          this.toastrService.success(
-            'El documento ha sido redistribuido segun su selección',
-            `GDoc Wkf.DocumentoObservacion`
-          )
-          this.seleccionNavegacion(this.selNav)
-        },
-        (error) => {
-          console.error(error)
-        }
-      )
-    }
-  
-  
-    /**
-     * 
-     * @param destino 3 es la posicion del estado actual
-     */
-    async promoverPuntoCuenta(destino: number = 0, estatus : number) {
-      var dst = destino != 0 ? destino : this.cmbDestino
-  
-      this.xAPI.funcion = "WKF_ASubDocumentoRedistribuir"
-      this.xAPI.valores = ''
-      this.xAPI.parametros = dst + ',' + estatus + ','  + this.loginService.Usuario.id + ',' + this.idd + ',' + this.cuenta
-      console.log(this.xAPI);
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        async data => {
-          //this.xAPI.funcion = 'WKF_ASubDocumentoAlerta'
-          //await this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
-          this.toastrService.success(
-            'El documento ha sido redistribuido segun su selección',
-            `GDoc Wkf.DocumentoObservacion`
-          )
-        },
-        (error) => {
-          console.error(error)
-        }
-      )
-    }
-    async cargarAcciones(posicion) {
-      this.lstAcciones = []
-      this.lstAcciones = this.cmbAcciones.filter(e => { return e.visible == posicion });
-    }
-  
-    selAccion() {
-      this.clasificacion = false
-      switch (this.AccionTexto) {
-        case '6':
-          this.clasificacion = true
-          break;
-  
-        default:
-          break;
-      }
-    }
-  
-  
-    //Consultar un enlace
-    constancia(id: string) {
-      const estado = 1
-      const estatus = 1
-      return btoa(estado + ',' + estatus + ',' + id)
-      //this.ruta.navigate(['/constancia', base])
-    }
-  
-  
-  
-  
-    //Guardar la alerte define el momento y estadus
-    guardarAlerta(activo: number, fecha: string) {
-      this.WAlerta.activo = activo
-      this.WAlerta.documento = parseInt(this.numControl)
-      this.WAlerta.estado = this.estadoActual
-      this.WAlerta.estatus = this.selNav + 1
-      this.WAlerta.usuario = this.loginService.Usuario.id
-      this.WAlerta.observacion = this.Observacion.toUpperCase()
-      this.WAlerta.fecha = fecha
-  
-      this.xAPI.funcion = 'WKF_AAlertas'
-      this.xAPI.parametros = ''
-      this.xAPI.valores = JSON.stringify(this.WAlerta)
-      this.apiService.Ejecutar(this.xAPI).subscribe(
-        async alerData => {
-          console.log(alerData)
-        },
-        (errot) => {
-          this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
-        }) //
-    }
-  
-  
-  
+
+
+
+
+
+  public estadoActual = 3
+  public estadoOrigen = 2
+  public estatusAcutal = 1
+  fecha_desde = '-09-01'
+  fecha_hasta = '-09-30'
+  xyear = '2024'
+  public lstMeses = []
+  public lstYear = []
+  public xmeses = ''
+
+  public extender_plazo: any
+  public clasificacion = false
+  public vrecibido = true
+  public vprocesados = false
+  public vpendientes = false
+  public cmbDestino = ''
+
+  public posicion = 10
+  public focus;
+
+  public xAPI: IAPICore = {
+    funcion: '',
+    parametros: '',
+    valores: ''
   }
-  
-  
-  
+
+  public selNav = 0
+  public lengthOfi = 0;
+  public pageSizeOfi = 10;
+  public pageEvent: PageEvent;
+  public idd: string = ''
+  public cuenta: string = ''
+
+
+  public pageSizeOptions: number[] = [5, 10, 25, 100]
+  public lstResponsable = []
+
+
+  public cmbAcciones = [
+    { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
+    { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
+    { 'valor': '2', 'texto': 'ELABORAR OFICIO DE OPINION', 'visible': '1' },
+    { 'valor': '3', 'texto': 'EN MANOS DEL DIRECTOR DEL DESPACHO', 'visible': '1' },
+    { 'valor': '4', 'texto': 'EN MANOS DEL SUB DIRECTOR DEL DESPACHO', 'visible': '1' },
+    { 'valor': '5', 'texto': 'ARCHIVAR', 'visible': '1' },
+    { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '1' },
+    { 'valor': '7', 'texto': 'SALIDA', 'visible': '2' }]
+
+  public lstAcciones = []
+  public bzOriginal = []
+  public bzSubDocumentos = []
+  public bzRecibido = []
+  public bzProcesados = []
+  public bzPendientes = []
+  public lst = []
+  public lstEstados = [] //Listar Estados
+  public buzon = []
+
+
+  public estilocheck = 'none'
+  public estiloclasificar = 'none'
+
+  public allComplete: boolean = false
+  public numControl = ''
+  public Observacion = ''
+  public xresponsable: string = '0'
+
+  public WAlerta: IWKFAlerta = {
+    documento: 0,
+    estado: 0,
+    estatus: 0,
+    activo: 0,
+    fecha: '',
+    usuario: '',
+    observacion: ''
+  }
+
+
+  public lstFecha = [
+    { id: '2023-12-01,2023-12-31,2023-11-30', value: 'DICIEMBRE' },
+    { id: '2024-01-01,2024-01-31,2023-12-31', value: 'ENERO' },
+    { id: '2024-02-01,2024-02-28,2024-01-31', value: 'FEBRERO' },
+    { id: '2024-03-01,2024-03-31,2024-02-28', value: 'MARZO' },
+    { id: '2024-04-01,2024-04-30,2024-03-31', value: 'ABRIL' },
+    { id: '2024-05-01,2024-05-31,2024-04-30', value: 'MAYO' },
+    { id: '2024-06-01,2024-06-30,2024-05-31', value: 'JUNIO' },
+    { id: '2024-07-01,2024-07-31,2024-06-30', value: 'JULIO' },
+    { id: '2024-08-01,2024-08-31,2024-07-31', value: 'AGOSTO' },
+    { id: '2024-09-01,2024-09-30,2024-08-31', value: 'SEPTIEMBRE' },
+    { id: '2024-10-01,2024-10-31,2024-09-30', value: '0CTUBRE' },
+    { id: '2024-11-01,2024-11-30,2024-10-31', value: 'NOVIEMBRE' },
+    { id: '2024-12-01,2024-12-31,2024-11-30', value: 'DICIEMBRE' },
+  ]
+
+  longitud = 0;
+  pageSize = 10;
+
+  public codigo_carpeta = ''
+  public componente = ''
+  public fecha_entrada = ''
+
+
+  constructor(
+    private apiService: ApiService,
+    private ruta: Router,
+    private toastrService: ToastrService,
+    private loginService: LoginService,
+    private utilService: UtilService,
+    private modalService: NgbModal) {
+
+
+    this.lstMeses = this.apiService.Xmeses
+    this.lstYear = this.apiService.Xyear
+
+  }
+
+  ngOnInit(): void {
+    this.xmeses = new Date().getMonth().toString()
+    this.xyear = new Date().getFullYear().toString()
+    this.listarResponsables()
+    this.listarEstados()
+    this.listarBuzon()
+  }
+
+  entrada_open(id, cuenta) {
+
+    if (cuenta != undefined) {
+      const xid = btoa('4,2,' + id)
+      const xcuenta = btoa(cuenta)
+      this.ruta.navigate(['/rsentradas', xid, xcuenta])
+      return
+    }
+    const xid = btoa(id)
+    this.ruta.navigate(['/rsentradas', xid])
+
+  }
+  open(content, carpeta, componente, posicion, fecha) {
+    this.posicion = posicion
+    this.codigo_carpeta = carpeta
+    this.fecha_entrada = fecha
+    this.componente = componente
+    this.modalService.open(content)
+  }
+
+
+
+  listarEstados() {
+    this.xAPI.funcion = 'WKF_CEstados'
+    this.xAPI.parametros = '%'
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.lstEstados = data.Cuerpo.filter((e) => { return e.esta == 1 && e.id != 3 || e.id == 1 })
+
+      },
+      (error) => { }
+    )
+  }
+
+  async listarBuzon() {
+    let user = this.loginService.Usuario.cedula
+
+    this.xAPI.funcion = 'MPPD_CCarpertasResponsable'
+    this.xAPI.parametros = '36,' + user// '30574644/ 12096976' //16473700
+    this.xAPI.valores = ''
+    console.log(this.xAPI)
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        this.buzon = data.Cuerpo
+      },
+      (error) => {
+
+      }
+    )
+  }
+
+
+
+
+
+  //Consultar un enlace
+  constancia(id: string) {
+    const estado = 1
+    const estatus = 1
+    return btoa(estado + ',' + estatus + ',' + id)
+    //this.ruta.navigate(['/constancia', base])
+  }
+
+
+  pageChangeEvent(e) {
+    this.pageSize = e.pageSize
+    this.recorrerElementos(e.pageIndex)
+  }
+
+
+  //recorrerElementos para paginar listados
+  recorrerElementos(pagina: number) {
+    let pag = this.pageSize * pagina
+    this.buzon = this.bzOriginal.slice(pag, pag + this.pageSize)
+  }
+
+  //Guardar la alerte define el momento y estadus
+  guardarAlerta(activo: number, fecha: string) {
+    this.WAlerta.activo = activo
+    this.WAlerta.documento = parseInt(this.numControl)
+    this.WAlerta.estado = this.estadoActual
+    this.WAlerta.estatus = this.selNav + 1
+    this.WAlerta.usuario = this.loginService.Usuario.id
+    this.WAlerta.observacion = this.Observacion.toUpperCase()
+    this.WAlerta.fecha = fecha
+
+    this.xAPI.funcion = 'WKF_AAlertas'
+    this.xAPI.parametros = ''
+    this.xAPI.valores = JSON.stringify(this.WAlerta)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async alerData => {
+        console.log(alerData)
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
+      }) //
+  }
+
+
+
+  getText(e): string {
+    let texto = 'EJERCITO'
+    // console.log(e)
+    switch (parseInt(e)) {
+      case 100:
+        texto = 'EJERCITO'
+        break
+      case 200:
+        texto = 'ARMADA'
+        break
+      case 300:
+        texto = 'AVIACION'
+        break
+      case 400:
+        texto = 'GUARDIA'
+        break
+      case 602:
+        texto = 'MIXTO'
+        break
+      default:
+        break;
+    }
+    return texto
+  }
+
+  async listarResponsables() {
+    this.xAPI.funcion = 'MPPD_ListarResponsables'
+    this.xAPI.parametros = 'Resoluciones'
+    this.xAPI.valores = null
+
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        console.log(data)
+        if (data.msj == undefined) {
+          data.forEach(e => {
+            this.lstResponsable.push({
+              'cedula': e.cedula,
+              'nombre': e.nombre
+            })
+          });
+        }
+      },
+      err => { }
+    )
+  }
+
+  Trasnferir() {
+    let user = this.loginService.Usuario.cedula
+
+    let cadena = `${this.xresponsable},${this.Observacion},${this.codigo_carpeta},${this.componente},${this.fecha_entrada}`
+    this.xAPI.funcion = 'MPPD_UCarpetaResponsable'
+    this.xAPI.parametros = cadena
+    this.xAPI.valores = null
+    
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        this.reducirVector()
+        this.toastrService.info(
+          "La carpeta ha sido actualizada",
+          `GDoc Resoluciones`
+        )
+      },
+      err => {
+        console.log(err)
+      }
+    )
+
+
+  }
+
+  reducirVector() {
+    this.buzon.splice(this.posicion, 1);
+    console.log('Control de datos ');
+
+}
+
+
+}
+
+
