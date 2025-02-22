@@ -1114,7 +1114,7 @@ export class RsconsultaComponent implements OnInit {
 
   dwUrl(e) {
     let valorAnio =
-      e.fecha != undefined ? parseInt(e.fecha.substring(0, 4)) : 0;
+      e.fecha_resolucion != undefined ? parseInt(e.fecha_resolucion.substring(0, 4)) : 0;
 
     if (valorAnio < 2025) {
       console.log(e)
@@ -1145,6 +1145,7 @@ export class RsconsultaComponent implements OnInit {
     }
 
     anio = anio.substring(0, 4);
+    console.log(anio, codigo)
     this.UbicacionCarpetas.forEach((e) => {
       if (e.anio == anio) {
         let peticion = e.nombre + "/" + codigo + ".pdf";
