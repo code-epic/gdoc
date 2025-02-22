@@ -1117,6 +1117,7 @@ export class RsconsultaComponent implements OnInit {
       e.fecha != undefined ? parseInt(e.fecha.substring(0, 4)) : 0;
 
     if (valorAnio < 2025) {
+      console.log(e)
       this.descargarAntes2025(e);
     } else {
       if (e.archivo != undefined && e.archivo != "") {
@@ -1149,6 +1150,7 @@ export class RsconsultaComponent implements OnInit {
         let peticion = e.nombre + "/" + codigo + ".pdf";
         // https://10.190.1.160
         // this.carpeta = "/cdn/" + e.nombre + "/" + codigo + ".pdf";
+        console.log(peticion)
         this.apiService.DwsCdn(peticion);
         return;
       }
