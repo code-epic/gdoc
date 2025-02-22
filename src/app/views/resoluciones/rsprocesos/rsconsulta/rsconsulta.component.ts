@@ -1145,7 +1145,7 @@ export class RsconsultaComponent implements OnInit {
     }
 
     anio = anio.substring(0, 4);
-    console.log(anio, codigo)
+    console.log(anio, codigo, this.UbicacionCarpetas)
     this.UbicacionCarpetas.forEach((e) => {
       if (e.anio == anio) {
         let peticion = e.nombre + "/" + codigo + ".pdf";
