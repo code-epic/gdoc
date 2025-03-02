@@ -1,0 +1,412 @@
+<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <p></p>
+  </div>
+</div>
+
+<div class="container-fluid mt--9">
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
+        <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-10">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
+              <h2 class="mb-0">Documentos</h2>
+            </div>
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>arrow_back</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-1">
+              <ul class="navbar-nav align-items-center d-none d-md-flex">
+                <li class="nav-item" ngbDropdown placement="bottom-right">
+                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                    <div class="media align-items-center">
+                      <div class="example-button-row">
+                        <button mat-icon-button aria-label="Example icon-button with a heart icon">
+                          <mat-icon>more_vert</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </a>
+                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                    <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item">
+                      <i class="fa fa-plus"></i>
+                      <span>Nuevo Documento</span>
+                    </a>
+                    <a routerLinkActive="active" [routerLink]="['/notasentregas']" class="dropdown-item">
+                      <i class="fa fa-search"></i>
+                      <span>Notas de Entrega</span>
+                    </a>
+                    <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
+                      <i class="ni ni-settings-gear-65"></i>
+                      <span>Configuración</span>
+                    </a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
+          (selectedIndexChange)="seleccionNavegacion($event)">
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;RECIBIDOS
+            </ng-template>
+            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list >
+                <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1 texto-lista" >
+                    
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      NUM. CONTROL
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      FECHA / ORIGEN
+                    </div>
+                    <div class="col-md-3 texto-lista">
+                      UNIDAD DEPENDENCIA
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                        value="{{xyear}}" style="margin-top: -20px;">
+                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                      </select>
+                     
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
+                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                    </select>
+                  </div>
+
+                  </div>
+
+                </mat-list>
+              </mat-selection-list>
+              <mat-selection-list #lstDocumentos>
+                <mat-list *ngFor="let e of buzon; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1">
+                      <button mat-icon-button aria-label="Example " class="text-gray"
+                        (click)="open(observacion, e.idd)" id="recibir">
+                        <mat-icon>task_alt</mat-icon>
+                      </button>
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+                    
+                    <div class="col-md-2 texto-lista">
+                      {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
+                    </div>
+                    <div class="col-md-6 texto-detalle">
+                      {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
+                    </div>
+                    <div class="col-md-1 text-right">
+                      <button mat-icon-button aria-label="Privado">
+                        <mat-icon *ngIf="e.privado" class="text-gray">no_encryption</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;PROCESADOS
+            </ng-template>
+            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list >
+                <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1 texto-lista" >
+                    
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      NUM. CONTROL
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      FECHA / ORIGEN
+                    </div>
+                    <div class="col-md-3 texto-lista">
+                      UNIDAD DEPENDENCIA
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                        value="{{xyear}}" style="margin-top: -20px;">
+                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                      </select>
+                     
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(1)">
+                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                    </select>
+                  </div>
+
+                  </div>
+
+                </mat-list>
+              </mat-selection-list>
+              <mat-selection-list #lstProcesados>
+                <mat-list *ngFor="let e of buzon; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1">
+                      <button mat-icon-button aria-label="Visibilidad" class="text-gray" (click)="open(observacion, e.idd)" id="procesados">
+                        <mat-icon>add_circle</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+                    <div class="col-md-7 texto-detalle">
+                      <b>{{ e.fcre | date:"dd-MM-yyyy" }} - {{ e.udep | uppercase }}</b>&nbsp;{{ e.observacion_accion | uppercase }}
+                    </div>
+                    <div class="col-md-2 text-right">
+                      
+                      <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
+                        <mat-icon class="text-gray">edit_note</mat-icon>
+                      </button>
+                      <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                        <mat-icon class="text-gray">attach_file</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;PENDIENTES
+            </ng-template>
+
+            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list >
+                <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1 texto-lista" >
+                    
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      NUM. CONTROL
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      FECHA / ORIGEN
+                    </div>
+                    <div class="col-md-3 texto-lista">
+                      UNIDAD DEPENDENCIA
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                        value="{{xyear}}" style="margin-top: -20px;">
+                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                      </select>
+                     
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(2)">
+                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                    </select>
+                  </div>
+
+                  </div>
+
+                </mat-list>
+              </mat-selection-list>
+              <mat-selection-list #lstPendientes>
+                <mat-list *ngFor="let e of buzon; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1">
+                      <button mat-icon-button aria-label="Visibilidad" class="text-gray" (click)="open(observacion, e.idd)" id="pndt">
+                        <mat-icon>add_circle</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+                    <div class="col-md-7 texto-detalle">
+                      <b>{{ e.fcre | date:"dd-MM-yyyy" }} - {{ e.udep | uppercase }}</b>&nbsp;{{ e.nombre_accion | uppercase }}
+                    </div>
+
+
+                    <div class="col-md-2 text-right">
+                      
+                      <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
+                        <mat-icon class="text-gray">edit_note</mat-icon>
+                      </button>
+                      <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                        <mat-icon class="text-gray">attach_file</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+          </mat-tab>
+
+
+
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;ALERTAS
+            </ng-template>
+
+            <div class="container">
+              <mat-selection-list #lstAlertas>
+                <mat-list *ngFor="let e of buzon; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-2 texto-lista">
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.ncontrol )]">{{ e.ncontrol }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+                    <div class="col-md-4 texto-lista">
+                      {{ e.unidad | uppercase }}
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      {{ e.plazo | date:"dd-MM-yyyy" }}
+                    </div>
+                    <div class="col-md-3 texto-lista  {{ e.color }}">
+                      {{ e.texto | uppercase }}
+                    </div>
+                    <div class="col-md-1 text-right ">
+                      <button mat-icon-button aria-label="Privado">
+                        <!--  -->
+                        <mat-icon class="text-warning" (click)="open(alerta, e.id_alerta)">today</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+          </mat-tab>
+        </mat-tab-group> 
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #observacion let-modal>
+  <div class="modal-header header bg-gradient-info">
+    <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-group col-md-12">
+      <label for="txtobservacion">Observaciones</label>
+      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="Observacion"></textarea>
+    </div>
+    <div class="form-group  col-md-12">
+      <label>Acción</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
+        (change)="selAccion()" id="slcaceptar">
+        <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+      </select>
+
+    </div>
+    <div class="form-group  col-md-12" *ngIf="clasificacion">
+      <label>Area</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
+        <option value="S">SELECCIONE</option>
+        <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
+      </select>
+    </div>
+
+    <div class="form-group  col-md-12"  *ngIf="vplazo">
+      <label for="tmsCreacion">Plazo / Alerta</label>
+      <div class="form-group" style="width:100%">
+        <div class="input-group" style="width:100%">
+          <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+            [positionTarget]="buttonEl" readonly>
+          <div class="input-group-append">
+            <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button" id="btnplazo"></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')" id="btnaceptar">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+    <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
+
+
+
+<ng-template #adjuntar let-c="close" let-d="dismiss">
+  <div class="modal-header header bg-gradient-success">
+    <h4 class="modal-title" id="modal-basic-title">Cargar Archivo en {{ numControl }}</h4>
+
+  </div>
+  <div class="modal-body">
+
+
+    <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+      <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+      <label>Seleccionar Archivo</label>
+      <div class="file-loading">
+        <input (change)="fileSelected($event)" class="file-input" name="archivos" type="file" accept=".pdf">
+      </div>
+      <div id="errorBlock" class="help-block"></div>
+    </form>
+
+
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
+      <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
+    <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>

@@ -1,0 +1,126 @@
+<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>    
+</div>
+
+<div class="container-fluid mt--9">
+    <div class="row">
+      <div class="col-xl-12 col-md-12 col-lg-12">
+        <div class="card shadow">
+            <div class="card-header bg-transparent">
+                <div class="row align-items-center">
+                    <div class="col-md-11">
+                        <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
+                        <h2 class="mb-0">Configuración</h2>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="media align-items-center">
+                          <div class="example-button-row">
+                            <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                              <mat-icon>reply</mat-icon>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                </div>
+            </div>
+            <div class="card-body bg-transparent">
+                <div class="row justify-content-md-center">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="cmbConfiguracion">Seleccionar Configuación</label>
+                            <select class="form-control" [(ngModel)]="tipo" (change)="selTipo()" id="tipoconfig">
+                                <option value="0">Seleccione</option>
+                                <option value="1">Tipo de Documento</option>
+                                <option value="2">Remitente</option>
+                                <option value="3">Unidad o Dependencia</option>
+                                <option value="4">Gran Comando</option>
+                                <option value="5">Codigo de Archivo</option>
+                            </select>
+                            <!-- <button *ngIf="registrar" type="button" class="btn btn-primary" (click)="testing()">
+                                <i class="fa fa-plus" aria-hidden="true"  ></i> &nbsp; Testing
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" >
+                <mat-tab>
+                    <ng-template mat-tab-label name="regs">
+                    &nbsp;REGISTRAR
+                    </ng-template>
+                    <ngx-ui-loader [loaderId]="'loader-registrar'"></ngx-ui-loader>
+                    <div class="row col-md-12 justify-content-md-center mb-4 mt-4">
+                        <div class="row col-md-12">
+                            <div class="form-group col-md-6">
+                                <label for="">Nombre y/o Abreviatura</label>
+                                <input type="text" class="form-control" id="nombreconfig"
+                                [(ngModel)]="nombre"  value ="{{ nombre }}">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Descripcion Completa</label>
+                                <div class="input-group mb-3">
+                                    
+                                    <input style="font-size:14px;" type="text" 
+                                        class="form-control" [ngModelOptions]="{standalone: true}" 
+                                        [(ngModel)]="observacion"  value ="{{observacion}}" id="descripcionconfig">
+                                    <div class="input-group-prepend">
+                                        
+                                        <button *ngIf="registrar" type="button" class="btn btn-primary" (click)="guardar()" id="registrar">
+                                            <i class="fa fa-plus" aria-hidden="true"  ></i> &nbsp; Registar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>      
+                        </div>
+                    </div> 
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                    &nbsp;CONSULTAS
+                    </ng-template>
+                    <mat-selection-list>
+                        <mat-list *ngFor="let config of lista " 
+                          style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                          <div class="row col-md-12">
+    
+                            <div class="col-md-5 texto-lista">
+                                {{ config.nomb | uppercase}}
+                            </div>
+                            <div class="col-md-5 texto-lista">
+                                {{ config.obse | uppercase}}
+                            </div>
+                            <div class="col-md-2 text-right" >
+                              <button mat-icon-button aria-label="Eliminar" (click)="eliminar(config.id)">
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            </div>
+                          </div>
+                        </mat-list>
+                    </mat-selection-list>
+
+                    <!-- <mat-panel-title *ngFor="let config of lista"
+                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                        <div class="row">
+                            <div class="col-md-5 texto-lista">
+                                {{ config.nomb | uppercase}}
+                            </div>
+                            <div class="col-md-5 texto-lista">
+                                {{ config.obse | uppercase}}
+                            </div>
+                            <div class="col-md-2 text-right" >
+                              <button mat-icon-button aria-label="Eliminar" (click)="eliminar(e.id)">
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            </div>
+                        </div>
+                    </mat-panel-title>  -->
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+      </div>
+    </div>    
+</div>

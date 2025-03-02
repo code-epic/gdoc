@@ -1,0 +1,269 @@
+<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--9">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col-md-9">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Control de Visitantes</h6>
+                            <h2 class="mb-0">Registrar Visitantes</h2>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" *ngIf="bPDF"
+                                        (click)="verArchivos(archivos)">
+                                        <mat-icon>wallpaper</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>arrow_back</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <ul class="navbar-nav align-items-right d-none d-md-flex">
+                                <li class="nav-item" ngbDropdown placement="bottom-right">
+                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                        <div class="media align-items-center">
+                                            <div class="example-button-row">
+                                                <button mat-icon-button
+                                                    aria-label="Example icon-button with a heart icon">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                        <a routerLinkActive="active" [routerLink]="['/configuracion']"
+                                            class="dropdown-item">
+                                            <i class="ni ni-settings-gear-65"></i>
+                                            <span>Configuración</span>
+                                        </a>
+
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="txtSalida">Cedula</label>
+                            <input type="txtSalida" class="form-control" value="{{Doc.salida}}" (blur)="consultarDocumentoSalida()"
+                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.salida">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="txtSalida">Nombres</label>
+                            <input type="txtSalida" class="form-control" value="{{Doc.salida}}" (blur)="consultarDocumentoSalida()"
+                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.salida">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="txtSalida">Apellidos</label>
+                            <input type="txtSalida" class="form-control" value="{{Doc.salida}}" (blur)="consultarDocumentoSalida()"
+                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.salida">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="cmbTipoDocumento">Tipo Persona</label>
+                            
+                                <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
+                                    [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" (change)="selTipoDocumento()" id="tdoc">
+                                    <option value="0">Seleccione</option>
+                                    <option value="1">CIVIL</option>
+                                    <option value="2">MILITAR</option>
+                                </select>
+                                
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="cmbUnidad">Unidad o Dependencia</label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}" id="unid">
+                                <option value="0">Seleccione</option>
+                                <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Componente / Gran Comando</label>
+                            <div class="input-group">
+                                <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.comando"
+                                    value="{{Doc.comando}}" id="coma">
+                                    <option value="0">Seleccione</option>
+                                    <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
+                                </select>
+                                <div class="input-group-append"   *ngIf="booDependencia">
+                                    <button *ngIf="!editar" type="button"  (click)="agregarDependencia()" id="btndependencia" class="btn btn-success">
+                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12"  *ngIf="booDependencia" >
+                            <table class="table align-items-center table-flush" style="width:100%">
+                                <thead class="thead-light">
+                                    <th># ACC</th>
+                                    <th>Unidades o Dependencias Seleccionadas</th>
+                                </thead>
+                                <tbody>
+                                    <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstDependencias;let i=index">
+                                        <td style="width:20px">
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                (click)="eliminarDependencia( i, el.id )"><i class="fa fa-trash"
+                                                aria-hidden="true"></i>
+                                            </button>
+                                        </td>
+                                        <td>{{ el.nombre }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label for="txtContenido">Motivo de la Visita</label>
+                            <div class="NgxEditor__Wrapper">
+                                <angular-editor [placeholder]="'Enter text here...'" [config]="editorConfig" [(ngModel)]="Doc.contenido"></angular-editor>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-row col-md-12" *ngIf="puntocuenta">
+                            <div class="form-group col-md-2">
+                                <label>Nro. Cuenta</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="cuenta" value="{{cuenta}}" id="cuenta">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Asunto de la Cuenta</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="resumen" value="{{resumen}}" id="resconte">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="tmsOrigen">Fecha Cuenta</label>
+                                <form class="form-inline">
+                                    <div class="form-group" style="width:100%">
+                                        <div class="input-group" style="width:100%">
+                                            <input class="form-control" placeholder="AAAA-MM-DD"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="subfecha"
+                                                ngbDatepicker #fcu="ngbDatepicker"
+                                                [value]="formatter.format(subfechaDate)" [placement]="placement"
+                                                [positionTarget]="buttonEl" readonly>
+                                            <div class="input-group-append">
+                                                <button #buttonEl class="btn calendario" (click)="fcu.toggle()"
+                                                    type="button" id="fcuenta">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="form-row col-md-12" *ngIf="resolucion">
+                            <div class="form-group col-md-2">
+                                <label>{{sCedula}}</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="cedula" value="{{cedula}}" (blur)="consultarCedula()" id="cedula">
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label>{{sGrado}}</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="cargo" value="{{cargo}}" [disabled]="isPunto" id="grado">
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="cmbUnidad">{{sNombre}}</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="nmilitar" value="{{nmilitar}}" [disabled]="isPunto">
+                                    <div class="input-group-prepend">
+                                        <button *ngIf="!editar" type="button" class="btn btn-success"
+                                            (click)="mensajeAgregarCuenta()" id="agregar">
+                                            <i class="fa fa-plus" aria-hidden="true"></i>
+                                        </button>
+                                        <button *ngIf="editar" type="button" class="btn btn-primary"
+                                            (click)="editarCuenta()">
+                                            <i class="fa fa-edit" aria-hidden="true"></i>
+                                        </button>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12" *ngIf="resolucion">
+                            <table class="table align-items-center table-flush" style="table-layout: fixed; border-collapse: collapse; width:100%;">
+                                <thead class="thead-light">
+                                    <th style="text-align:center;width:10px">N°</th>
+                                    <th style="text-align:center;width:120px">ACCIÓN</th>
+                                    <th [style.display]="puntocuenta?'':'none'">Cuenta</th>
+                                    <th [style.display]="puntocuenta?'':'none'">Resumen</th>
+                                    <th [style.display]="puntocuenta?'':'none'">Fecha</th>
+                                    <th>{{sGrado}}</th>
+                                    <th>{{sNombre}}</th>
+                                    <th>{{sCedula}}</th>
+                                </thead>
+                                <tbody>
+                                    <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
+                                        <td style="text-align:center;width:10px">
+                                           <font style="font-weight: bold;"> {{i+1}}</font>
+                                        </td>
+                                        <td style="text-align:center;width:120px">
+
+                                            <div class="btn-group" role="group" aria-label="Basic"
+                                                *ngIf="el.activo == 0">
+                                                <button type="button" class="btn btn-primary btn-sm"
+                                                    (click)="selEditarCuenta( i )"><i class="fa fa-edit"
+                                                        aria-hidden="true"></i></button>
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                    (click)="eliminarCuenta( i )"><i class="fa fa-trash"
+                                                        aria-hidden="true"></i></button>
+                                            </div>
+                                            <button *ngIf="el.activo != 0" type="button" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                                &nbsp;&nbsp;En Proceso </button>
+                                        </td>
+                                        <td [style.display]="puntocuenta?'':'none'">{{ el.cuenta }}</td>
+                                        <td [style.display]="puntocuenta?'':'none'">{{ el.resumen.substring(0,20) }}...
+                                        </td>
+                                        <td [style.display]="puntocuenta?'':'none'">{{ el.fecha.substring(0,10) }}</td>
+                                        <td>{{ el.cargo.substring(0,20) }}...</td>
+                                        <td>{{ el.nmilitar.substring(0,25) }}...</td>
+                                        <td>{{ el.cedula }}</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-right">
+                                <button class="btn bg-primary text-white" (click)="registrar()"
+                                    id="registrar">Registrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

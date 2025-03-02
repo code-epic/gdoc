@@ -1,0 +1,162 @@
+<div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
+  <div class="container-fluid">
+    <p></p>
+  </div>
+</div>
+<div class="container-fluid mt--9">
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-10">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Control de Visitantes</h6>
+              <h2 class="mb-0">Principales</h2>
+            </div>
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>arrow_back</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-1">
+              <ul class="navbar-nav align-items-right d-none d-md-flex">
+                <li class="nav-item" ngbDropdown placement="bottom-right">
+                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                    <div class="media align-items-center">
+                      <div class="example-button-row">
+                        <button mat-icon-button aria-label="">
+                          <mat-icon>more_vert</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </a>
+                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                    <a routerLinkActive="active" [routerLink]="['/visitantedocumento']" class="dropdown-item">
+                      <i class="fa fa-plus"></i>
+                      <span>Nuevo Visitante</span>
+                    </a>
+                    <!-- <a *ngIf="Configurar" routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item">
+                      <i class="ni ni-settings-gear-65"></i>
+                      <span>Configuración</span>
+                    </a>
+                    <a  routerLinkActive="active" [routerLink]="['/datosbasicos']" class="dropdown-item">
+                      <i class="ni ni-settings-gear-65"></i>
+                      <span>Datos Básicos</span>
+                    </a>
+                    
+                    <a routerLinkActive="active" [routerLink]="['/ctrlalertas']" class="dropdown-item">
+                      <i class="fa fa-exclamation-circle"></i>
+                      <span>Alertas</span>
+                    </a> -->
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
+          (selectedIndexChange)="seleccionNavegacion($event)">
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;REGISTRADOS
+            </ng-template>
+            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list >
+                <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+
+                </mat-list>
+              </mat-selection-list>
+              <mat-selection-list #lstDocumentos>
+                <mat-list *ngFor="let e of buzon; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1">
+                      <button mat-icon-button aria-label="Example " class="text-gray"
+                        (click)="open(observacion, e.idd)" id="recibir">
+                        <mat-icon>task_alt</mat-icon>
+                      </button>
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+                    
+                    <div class="col-md-2 texto-lista">
+                      {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
+                    </div>
+                    <div class="col-md-6 texto-detalle">
+                      {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
+                    </div>
+                    <div class="col-md-1 text-right">
+                      <button mat-icon-button aria-label="Privado">
+                        <mat-icon *ngIf="e.privado" class="text-gray">no_encryption</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              &nbsp;HISTÓRICO DE VISITANTES
+            </ng-template>
+            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list >
+                <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+
+                </mat-list>
+              </mat-selection-list>
+              <mat-selection-list #lstProcesados>
+                <mat-list *ngFor="let e of buzon; let i=index "
+                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1">
+                      <button mat-icon-button aria-label="Visibilidad" class="text-gray" (click)="open(observacion, e.idd)" id="procesados">
+                        <mat-icon>add_circle</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                    </div>
+                    <div class="col-md-7 texto-detalle">
+                      <b>{{ e.fcre | date:"dd-MM-yyyy" }} - {{ e.udep | uppercase }}</b>&nbsp;{{ e.observacion_accion | uppercase }}
+                    </div>
+                    <div class="col-md-2 text-right">
+                      
+                      <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
+                        <mat-icon class="text-gray">edit_note</mat-icon>
+                      </button>
+                      <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                        <mat-icon class="text-gray">attach_file</mat-icon>
+                      </button>
+
+                    </div>
+                  </div>
+                </mat-list>
+              </mat-selection-list>
+            </div>
+
+            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+            </mat-paginator>
+
+          </mat-tab>
+        </mat-tab-group> 
+      </div>
+    </div>
+
+  </div>
+  <!-- Fin de Tarjeta Padre -->
+</div>
