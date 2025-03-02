@@ -1114,9 +1114,10 @@ export class RsconsultaComponent implements OnInit {
 
   dwUrl(e) {
     let valorAnio =
-      e.fecha != undefined ? parseInt(e.fecha.substring(0, 4)) : 0;
+      e.fecha_resolucion != undefined ? parseInt(e.fecha_resolucion.substring(0, 4)) : 0;
 
     if (valorAnio < 2025) {
+      console.log(e)
       this.descargarAntes2025(e);
     } else {
       if (e.archivo != undefined && e.archivo != "") {
@@ -1144,11 +1145,13 @@ export class RsconsultaComponent implements OnInit {
     }
 
     anio = anio.substring(0, 4);
+    console.log(anio, codigo, this.UbicacionCarpetas)
     this.UbicacionCarpetas.forEach((e) => {
       if (e.anio == anio) {
         let peticion = e.nombre + "/" + codigo + ".pdf";
         // https://10.190.1.160
         // this.carpeta = "/cdn/" + e.nombre + "/" + codigo + ".pdf";
+        console.log(peticion)
         this.apiService.DwsCdn(peticion);
         return;
       }
