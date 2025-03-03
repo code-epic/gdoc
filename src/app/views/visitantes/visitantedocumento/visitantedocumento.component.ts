@@ -265,7 +265,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
           this.ncontrolv = true
           this.salidavisible = true
           this.camponumsalida = 4
-          this.consultarDocumento(numc)
+   
         }
 
       } else {
@@ -273,7 +273,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
           var numc = this.rutaActiva.snapshot.params.numc
           if (numc == 'salida') this.SalidaTipo()
         }
-        this.consultarDocumento(id)
+     
       }
 
 
@@ -380,79 +380,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     this.nasociacion = ''
   }
 
-  /**
-   * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
-   * @param numBase64  : base64
-   */
-  async consultarDocumento(numBase64: string) {
-    const base = atob(numBase64)
-    this.xAPI.funcion = 'WKF_CDocumentoDetalle'
-    this.xAPI.parametros = base
-    this.xAPI.valores = ''
-    // console.log(this.estadoActual)
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        // console.log(data)
-        data.Cuerpo.forEach(e => {
 
-          this.Doc = e
-          this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
-          this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
-          if (e.alerta != null) {
-            this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
-            this.WAlerta.activo = 1
-            this.WAlerta.documento = this.Doc.wfdocumento
-            this.WAlerta.estado = this.estadoActual
-            this.WAlerta.estatus = this.estadoOrigen
-            this.WAlerta.usuario = this.loginService.Usuario.id
-          }
-
-
-
-        });
-
-        this.selTipoDocumento()
-        const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
-        this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
-        this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const historial = this.Doc.historial != null ? JSON.parse(this.Doc.historial) : []
-        this.lstHistorial = historial.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
-        this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-
-        const dependencia = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
-        this.lstDependencias = dependencia.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-
-
-        const cuentasaux = this.Doc.puntodecuenta != null ? JSON.parse(this.Doc.puntodecuenta) : []
-        this.lstPuntosCuentasAux = cuentasaux.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-
-        this.toppingsaux.setValue('1')
-
-
-
-
-        //Carga de Documentos
-        this.bPDF = this.Doc.archivo != "" ? true : false
-        this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
-
-        this.activarTipo = this.validarTipoDoc()
-        console.log(this.Doc)
-        // this.serializar =  btoa( JSON.stringify(this.Doc.norigen))
-        // console.log( this.serializar)
-      },
-      (error) => {
-        console.error(error)
-      }
-    )
-  }
 
   dwUrl(ncontrol: string, archivo: string): string {
     return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
@@ -491,134 +419,8 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
   }
   //registrar Un documento pasando por el WorkFlow
 
-  registrar() {
-
-    this.ngxService.startLoader("loader-aceptar")
-    this.obtenerWorkFlow() //Obtener valores de una API
-
-    if (this.rutaActiva.snapshot.params.numc != undefined) {
-      this.actualizarDocumentos()
-      return
-    } else if (this.rutaActiva.snapshot.params.id != undefined && this.rutaActiva.snapshot.params.id != 'salida') {
-      this.actualizarDocumentos()
-      return
-    } else if (this.validarCamposObligatorios()) {
-      this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Documentos`)
-      this.ngxService.stopLoader("loader-aceptar")
-      return
-    }
 
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.obtenerDatos(data)
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          (xdata) => {
-            if (this.fplazo.year != undefined) {
-              this.obtenerAlertaWorkFlow(xdata)
-              this.apiService.Ejecutar(this.xAPI).subscribe(
-                (ydata) => {
-
-                  this.ngxService.stopLoader("loader-aceptar")
-                },
-                (errot) => {
-
-                  this.toastrService.error(data.msj, `GDoc Wkf.Alerta`)
-                  this.ngxService.stopLoader("loader-aceptar")
-                }
-              )
-            }
-            const cant = this.lstCuenta.length
-
-            if (cant > 0) {
-              this.salvarCuentas(this.Doc.wfdocumento)
-
-            } else {
-              this.aceptar(this.Doc.ncontrol)
-              this.limpiarDoc()
-              this.ngxService.stopLoader("loader-aceptar")
-            }
-            const cantdep = this.lstDependencias.length
-            const mpuntocuenta = this.toppings.value.length
-
-            if (cantdep > 0) {
-              this.salvarDependencias(this.Doc.wfdocumento)
-              if (mpuntocuenta > 0) {
-                this.lstPC = this.toppings.value
-                this.salvarPuntoCuenta(this.Doc.wfdocumento)
-              }
-            } else {
-              this.aceptar(this.Doc.ncontrol)
-              this.limpiarDoc()
-              this.ngxService.stopLoader("loader-aceptar")
-            }
-
-
-          },
-          (errot) => {
-            this.toastrService.error(data.msj, `GDoc Wkf.Documento.Detalle`)
-            this.ngxService.stopLoader("loader-aceptar")
-          }
-        )
-
-      }, //En caso de fallar Wkf
-      (errot) => {
-        var mensaje = errot + ' - ' + this.xAPI.funcion
-        this.toastrService.error(mensaje, `GDoc Wkf.Documento`)
-        this.ngxService.stopLoader("loader-aceptar")
-
-
-      }
-    )
-
-
-
-  }
-
-  //Obtener los dados de Documento
-  obtenerDatos(data: any) {
-    if (data.tipo == 0) {
-      var mensaje = data.msj + ' - ' + this.xAPI.funcion
-      this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
-      return false
-    }
-    this.xAPI.funcion = 'WKF_IDocumentoDetalle'
-    if (this.estadoActual != 9) {
-      this.Doc.ncontrol = this.utilService.Semillero(data.msj).toUpperCase()
-
-    } else {
-      this.Doc.salida = this.Doc.ncontrol.toUpperCase()
-      this.Doc.ncontrol = this.Doc.ncontrol.toUpperCase()
-
-    }
-    this.Doc.wfdocumento = parseInt(data.msj)
-    this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
-    this.Doc.forigen = this.forigen != undefined ? this.utilService.ConvertirFecha(this.forigen) : this.utilService.ConvertirFecha(this.fcreacion)
-
-
-    this.Doc.contenido = this.Doc.contenido.toUpperCase()
-    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
-
-    this.Doc.creador = this.loginService.Usuario.id
-
-    this.xAPI.valores = JSON.stringify(this.Doc)
-  }
-
-  //Obtener alerta del Documento
-  obtenerAlertaWorkFlow(data: any) {
-    if (data.tipo == 0) {
-      this.toastrService.error(data.msj, `GDoc Wkf.Alerta`);
-      return false
-    }
-    this.WAlerta.activo = 1
-    this.WAlerta.documento = this.Doc.wfdocumento
-    this.WAlerta.estado = this.WkDoc.estado
-    this.WAlerta.estatus = this.WkDoc.estatus
-    this.WAlerta.usuario = this.WkDoc.usuario
-    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
-    this.xAPI.funcion = 'WKF_IAlerta'
-    this.xAPI.valores = JSON.stringify(this.WAlerta)
-  }
 
   protected aceptar(msj: string) {
     if (this.activarMensaje) return false
@@ -649,476 +451,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
   }
 
 
-  async actualizarDocumentos() {
 
-    if (this.Doc.contenido == '') {
-      this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
-      return
-    }
-    let wfd = this.Doc.wfdocumento
-
-    this.Doc.fcreacion = typeof this.fcreacion === 'object' ? this.utilService.ConvertirFecha(this.fcreacion) : this.Doc.fcreacion.substring(0, 10)
-    this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10)
-    this.Doc.creador = this.loginService.Usuario.id
-
-    this.xAPI.funcion = 'WKF_ADocumentoDetalle'
-    this.xAPI.parametros = ''
-
-    this.Doc.contenido = this.Doc.contenido.toUpperCase()
-    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
-
-    this.xAPI.valores = JSON.stringify(this.Doc)
-
-    if (this.WAlerta.documento != 0) this.WAlerta.fecha = typeof this.fplazo === 'object' ? this.utilService.ConvertirFecha(this.fplazo) : this.fplazo.substring(0, 10)
-
-
-
-
-    await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-
-       
-
-        if (this.titulo == 'Salida') {
-          this.insertarObservacion()
-          this.salvarDependencias(wfd)
-          this.lstPC = this.toppings.value
-
-          this.salvarPuntoCuenta(wfd)
-         
-          this.ruta.navigate(['/salidas']);
-
-        } else {
-          console.log(this.Doc)
-          
-          const cant = this.lstCuenta.length
-
-            if (cant > 0) {
-              
-              let fnx = {
-                'funcion': 'WKF_ESubDocumentoPuntoCuenta',
-                'parametros' : this.Doc.wfdocumento.toString(),
-                'valores': ''
-              }
-              // console.log(fnx)
-
-              this.apiService.Ejecutar(fnx).subscribe(
-                async data => {
-                  // console.log(data)
-                  await this.salvarCuentas(this.Doc.wfdocumento)
-                  
-                },
-                err => {
-                  this.ruta.navigate(['/registrar']);
-                }
-              )
-
-            }else{
-              this.ruta.navigate(['/registrar']);
-            }
-
-
-         
-
-          
-          
-        }
-
-        this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
-        this.ngxService.stopLoader("loader-aceptar")
-
-
-      },
-      (errot) => {
-        this.toastrService.error(errot, `GDoc Wkf.Actualizar Documentos`)
-        this.ngxService.stopLoader("loader-aceptar")
-      }
-    )
-
-
-
-  }
-
-  insertarObservacion() {
-    const usuario = this.loginService.Usuario.id
-    this.xAPI.funcion = 'WKF_IDocumentoObservacion'
-    this.xAPI.valores = JSON.stringify(
-      {
-        "documento": this.Doc.wfdocumento,
-        "estado": this.estadoActual, //Estado que ocupa
-        "estatus": this.estadoOrigen,
-        "observacion": 'DOCUMENTO EDITADO EN SALIDA',
-        "accion": '20',
-        "usuario": usuario
-      }
-    )
-
-    this.xAPI.parametros = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-
-
-        await this.guardarAlerta(1)
-        //this.ruta.navigate(['/salidas']);
-        //this.location.back()
-
-      },
-      (errot) => {
-        this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
-      }) //
-  }
-
-  //Guardar la alerte define el momento y estadus
-  guardarAlerta(activo: number) {
-    this.WAlerta.documento = this.Doc.wfdocumento
-
-    this.WAlerta.activo = activo
-    this.WAlerta.estado = this.estadoActual
-    this.WAlerta.estatus = this.estadoOrigen
-    this.WAlerta.usuario = this.loginService.Usuario.id
-    this.WAlerta.observacion = 'DOCUMENTO EDITADO EN SALIDA'
-
-    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
-
-    this.xAPI.funcion = 'WKF_AAlertas'
-    this.xAPI.parametros = ''
-    this.xAPI.valores = JSON.stringify(this.WAlerta)
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async alerData => {
-        console.log(alerData)
-      },
-      (errot) => {
-        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
-      }) //
-  }
-
-
-
-  agregarDependencia(): IWKFDependencia {
-    let validar = false
-
-    const dependencia: IWKFDependencia = {
-      documento: 0,
-      nombre: this.Doc.unidad.toUpperCase() + ' / ' + this.Doc.comando.toUpperCase(),
-    }
-
-    this.lstDependencias.push(dependencia)
-
-    return dependencia
-  }
-
-
-  eliminarDependencia(pos: number, id: string) {
-
-    if (id == undefined || id == '') {
-      this.lstDependencias.splice(pos, 1)
-      return false
-    }
-    this.ngxService.startLoader("loader-aceptar")
-    this.xAPI.funcion = "WKF_EDocumentoDependencia"
-    this.xAPI.parametros = id.toString()
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-        this.lstDependencias.splice(pos, 1)
-        this.ngxService.stopLoader("loader-aceptar")
-      },
-      error => {
-        this.toastrService.error(
-          'Fallo eliminar dependencia',
-          `WKF_EDocumentoDependencia`
-        );
-        this.ngxService.stopLoader("loader-aceptar")
-        console.error('Fallo consultando los datos de Configuraciones', error)
-      }
-    )
-
-  }
-
-  async salvarPuntoCuenta(numc: number) {
-
-    const cant = this.lstPC.length
-    if (cant == 0) {
-      this.ngxService.stopLoader("loader-aceptar")
-      return
-    } else {
-      const cuenta = this.lstPC[0]
-      const p_cuenta = cuenta.split('|')
-      this.xAPI.funcion = 'WKF_IPuntoCuentaMultiple'
-      this.xAPI.valores = ''
-      this.xAPI.parametros = numc + ',' + p_cuenta[0].trim() + ',' + p_cuenta[1].trim() + ',1'
-      // console.log('insertando puntoscuenta ', this.xAPI)
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.lstPC.splice(0, 1)
-          const c = this.lstPC.length
-          if (c == 0) {
-            this.ngxService.stopLoader("loader-aceptar")
-          } else {
-            this.salvarPuntoCuenta(numc)
-          }
-        },
-        (errot) => {
-          this.toastrService.error(errot, `GDoc Wkf.IDocumentoPuntoCuenta`)
-          this.ngxService.stopLoader("loader-aceptar")
-        }
-      )
-    }
-  }
-
-
-  async salvarDependencias(numc: number) {
-
-    const cant = this.lstDependencias.length
-
-    if (cant == 0) {
-      this.ngxService.stopLoader("loader-aceptar")
-      return
-    } else {
-
-      this.xAPI.funcion = 'WKF_IDocumentoDependencia'
-      this.xAPI.valores = ''
-      this.xAPI.parametros = numc + ',' + this.lstDependencias[0].nombre
-      // console.log('insertando dependicia ', this.xAPI)
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.lstDependencias.splice(0, 1)
-          const c = this.lstDependencias.length
-          if (c == 0) {
-            this.ngxService.stopLoader("loader-aceptar")
-            //this.aceptar(this.Doc.ncontrol)
-            this.limpiarDoc()
-          } else {
-            this.salvarDependencias(numc)
-          }
-        },
-        (errot) => {
-          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`)
-          this.ngxService.stopLoader("loader-aceptar")
-        }
-      )
-    }
-  }
-
-  editarCuenta() {
-
-    if (this.PosicionCuenta != -1) {
-      const wkcuenta: IWKFCuenta = {
-        documento: 0,
-        cuenta: this.cuenta.toUpperCase(),
-        estado: 1,
-        estatus: 1,
-        cedula: this.cedula,
-        cargo: this.cargo,
-        nmilitar: this.nmilitar,
-        fecha: typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha) : this.utilService.ConvertirFecha(this.subfechaDate),
-        resumen: this.resumen.toUpperCase(),
-        usuario: this.loginService.Usuario.id,
-        activo: 0
-      }
-
-      this.lstCuenta[this.PosicionCuenta] = wkcuenta
-      this.cuenta = ''
-      this.resumen = ''
-      this.subfecha = ''
-      this.subfechaDate = null
-      this.cedula = ''
-      this.cargo = ''
-      this.nmilitar = ''
-      this.PosicionCuenta = -1
-      this.editar = !this.editar
-    }
-
-  }
-
-  agregarCuenta(tipo: number): IWKFCuenta {
-    let validar = false
-
-    switch (this.Doc.tipo.toLowerCase()) {
-      case "punto de cuenta":
-        if (this.cuenta == '' || this.resumen == '' || this.subfecha == '') validar = true
-        break;
-
-      default:
-        if (this.cedula == '' || this.cargo == '' || this.nmilitar == '') validar = true
-        break;
-    }
-
-    if (validar) {
-      this.toastrService.info('Todos los campos son requeridos', `GDoc Wkf.Agregar Cuentas`)
-      return
-    }
-    const wkcuenta: IWKFCuenta = {
-      documento: 0,
-      cuenta: this.cuenta.toUpperCase(),
-      estado: 1,
-      estatus: 1,
-      cedula: this.cedula,
-      cargo: this.cargo,
-      nmilitar: this.nmilitar,
-      fecha: typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha) : this.utilService.FechaActual(),
-      resumen: this.resumen.toUpperCase(),
-      usuario: this.loginService.Usuario.id,
-      activo: 0
-    }
-
-    this.lstCuenta.push(wkcuenta)
-
-    if (tipo == 1) {
-      this.cuenta = ''
-      this.resumen = ''
-      this.subfecha = ''
-    }
-    this.cedula = ''
-    this.cargo = ''
-    this.nmilitar = ''
-
-
-    return wkcuenta
-  }
-
-  selEditarCuenta(pos: number) {
-    const wkcuenta = this.lstCuenta[pos]
-
-    this.cuenta = wkcuenta.cuenta
-    this.resumen = wkcuenta.resumen
-
-    this.subfechaDate = NgbDate.from(this.formatter.parse(wkcuenta.fecha.substring(0, 10)))
-
-    this.cedula = wkcuenta.cedula
-    this.cargo = wkcuenta.cargo
-    this.nmilitar = wkcuenta.nmilitar
-
-    this.PosicionCuenta = pos
-    this.editar = !this.editar
-  }
-
-  eliminarCuenta(pos: number) {
-
-    this.lstCuenta.splice(pos, 1)
-    this.cuenta = ''
-    this.resumen = ''
-    this.subfecha = ''
-    this.cedula = ''
-    this.cargo = ''
-    this.nmilitar = ''
-    this.editar = false
-  }
-
-
-  async salvarCuentas(numc: number) {
-    const cant = this.lstCuenta.length
-    // console.log('entrando en confianza... ', cant)
-    // console.log('entrando en confianza... ', this.lstCuenta)
-    if (cant == 0) {
-      this.ngxService.stopLoader("loader-aceptar")
-      return
-    } else {
-      this.xAPI.funcion = 'WKF_ISubDocumento'
-      this.xAPI.parametros = ''
-      this.lstCuenta[0].documento = numc
-      this.xAPI.valores = JSON.stringify(this.lstCuenta[0])
-      await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          this.lstCuenta.splice(0, 1)
-          const c = this.lstCuenta.length
-          if (c == 0) {
-            this.ngxService.stopLoader("loader-aceptar")
-            this.aceptar(this.Doc.ncontrol)
-            this.limpiarDoc()
-          } else {
-            this.salvarCuentas(numc)
-          }
-        },
-        (errot) => {
-          this.aceptar(this.Doc.ncontrol)
-          this.limpiarDoc()
-          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`)
-          this.ngxService.stopLoader("loader-aceptar")
-        }
-      )
-    }
-  }
-
-
-  selTipoDocumento() {
-    const tipo = this.Doc.tipo.toLowerCase()
-    this.puntocuenta = false
-    this.resolucion = false
-    this.booPuntoCuenta = false
-    this.lstCuenta = []
-
-
-    if (tipo.indexOf('punto') >= 0) {
-      this.setDescripcionPunto()
-      this.puntocuenta = true
-      this.resolucion = true
-
-      if (tipo.indexOf('contratos') >= 0) {
-        this.setDescripcionContratos()
-      }
-
-      if (tipo.indexOf('multiple') >= 0) {
-        this.puntocuenta = false
-        this.resolucion = false
-        if (this.titulo == 'Salida') {
-          // console.log('entrando')
-          this.cargarPuntosdeCuenta()
-          return true
-        }
-
-        this.toastrService.warning("Debe dirigirse al modulo de salida para usar esta opcion", `GDoc Salida`)
-
-
-
-      }
-
-      if (this.titulo == 'Salida') {
-        this.puntocuenta = false
-        this.resolucion = false
-      }
-
-
-
-
-    } else if (tipo == 'resolucion' ||
-      tipo == 'tramitacion por organo regular' ||
-      tipo == 'comision de servicio') {
-      this.resolucion = true
-    }
-  }
-
-
-  cargarPuntosdeCuenta() {
-
-    this.ngxService.startLoader("loader-aceptar")
-    this.xAPI.funcion = 'WKF_CPuntoCuentaSalida'
-    this.xAPI.parametros = '5'
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-
-        data.Cuerpo.map(e => {
-          this.lstPuntosCuentas.push(e.cuen + ' | ' + e.udep + ' ' + e.fori.substring(0, 10))
-        })
-        this.ngxService.stopLoader("loader-aceptar")
-        this.booPuntoCuenta = true
-      },
-      (error) => {
-        console.error("No existe la funcion ", error)
-        this.ngxService.stopLoader("loader-aceptar")
-      }
-
-    )
-  }
-
-
-  //Listar los archivos asociados al documento
-  verArchivos(content) {
-    // this.lstImg.push({ a: 1 })
-    this.modalService.open(content, { size: 'lg' })
-
-  }
 
   /**
    * Consultar datos generales del militar 
@@ -1167,70 +500,78 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Consultar Documento al mismo tiempo que selecciona el plazo o la alerta del mismo segun su estado
-   * @param numBase64  : base64
-   */
-  async consultarDocumentoSalida() {
-    if (this.titulo == 'Salida') return false
-    if (this.Doc.salida == '') return false
-    let dwf = ''
-    if (this.Doc.norigen != '') dwf = this.Doc.norigen
-    this.xAPI.funcion = 'WKF_CDocumentoDetalleSalida'
-    this.xAPI.parametros = '9,1,' + this.Doc.salida
-    this.xAPI.valores = ''
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        data.Cuerpo.forEach(e => {
-          this.Doc = e
-          this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
-          this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
-          if (e.alerta != null) {
-            this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
-            this.WAlerta.activo = 1
-            this.WAlerta.documento = this.Doc.wfdocumento
-            this.WAlerta.estado = this.estadoActual
-            this.WAlerta.estatus = this.estadoOrigen
-            this.WAlerta.usuario = this.loginService.Usuario.id
-          }
-          this.nasociacion = this.Doc.ncontrol
-          this.Doc.ncontrol = ''
-        });
-
-        this.Doc.norigen = dwf
-        this.selTipoDocumento()
-        const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
-        this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-        // console.log(this.lstCuenta)
-
-        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
-        this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const historial = this.Doc.historial != null ? JSON.parse(this.Doc.historial) : []
-        this.lstHistorial = historial.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
-        this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        const dependencias = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
-        this.lstDependencias = dependencias.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-        //Carga de Documentos
-        this.bPDF = this.Doc.archivo != "" ? true : false
-        this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
-
-        this.activarTipo = this.validarTipoDoc()
-
-        // this.serializar =  btoa( JSON.stringify(this.Doc.norigen))
-        // console.log( this.serializar)
+  initializeCamera() {
+    let streaming: boolean = false;
+    const video: HTMLVideoElement | null = document.querySelector("#video");
+    const canvas: HTMLCanvasElement | null = document.querySelector("#canvas");
+    const photo: HTMLImageElement | null = document.querySelector("#photo");
+    const startbutton: HTMLButtonElement | null = document.querySelector("#startbutton");
+    const width: number = 320;
+    let height: number = 0;
+  
+    navigator.mediaDevices.getUserMedia(
+      {
+        video: true,
+        audio: false,
       },
-      (error) => {
-        console.error(error)
+    ).then(function (stream: MediaStream) {
+        if (video) {
+          video.srcObject = stream;
+          video.play();
+        }
+      }).catch(function (err: any) {
+        console.log("An error occurred! " + err);
+      });
+  
+    if (video) {
+      video.addEventListener(
+        "canplay",
+        function (ev: Event) {
+          if (!streaming) {
+            height = video.videoHeight / (video.videoWidth / width);
+            video.setAttribute("width", width.toString());
+            video.setAttribute("height", height.toString());
+            if (canvas) {
+              canvas.setAttribute("width", width.toString());
+              canvas.setAttribute("height", height.toString());
+            }
+            streaming = true;
+          }
+        },
+        false,
+      );
+    }
+  
+    function takepicture() {
+      if (canvas) {
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+        if (context && video) {
+          context.drawImage(video, 0, 0, width, height);
+          const data = canvas.toDataURL("image/png");
+          if (photo) {
+            photo.setAttribute("src", data);
+          }
+        }
       }
-    )
+    }
+  
+    if (startbutton) {
+      startbutton.addEventListener(
+        "click",
+        function (ev: MouseEvent) {
+          takepicture();
+          ev.preventDefault();
+        },
+        false,
+      );
+    }
   }
+  
+  
 
-
+ 
   ngOnDestroy(): void {
     // this.editor.destroy()
     // this.xeditor.destroy()
