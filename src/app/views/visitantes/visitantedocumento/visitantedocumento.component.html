@@ -52,7 +52,6 @@
                                             <i class="ni ni-settings-gear-65"></i>
                                             <span>Configuración</span>
                                         </a>
-
                                     </div>
                                 </li>
                             </ul>
@@ -65,33 +64,46 @@
                         <div class="col-md-8">
                             <div class="form-row">
                                 <div class="form-group col-md-4">
-                                    <label for="txtCedula">Cedula</label>
-                                    <input type="txtCedula" class="form-control" 
-                                         [(ngModel)]="cedula"   [ngModelOptions]="{standalone: true}" 
-                                         value="" (blur)="consultarCedula()">
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label for="txtSalida">Nombres</label>
-                                    <input type="txtSalida" class="form-control" value="">
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label for="txtSalida">Apellidos</label>
-                                    <input type="txtSalida" class="form-control" value="">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-4">
-                                    <label for="cmbTipoDocumento">Tipo Persona</label>
-                                    
+                                    <label for="cmbTipoDocumento">Visitante</label>
                                         <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
                                             [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" id="tdoc">
                                             <option value="0">Seleccione</option>
                                             <option value="1">CIVIL</option>
                                             <option value="2">MILITAR</option>
-                                        </select>
-                                        
+                                        </select> 
                                 </div>
                                 <div class="form-group col-md-4">
+                                    <label for="cmbTipoDocumento">Motivo Visita</label>
+                                    
+                                        <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
+                                            [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" id="tdoc">
+                                            <option value="0">Seleccione</option>
+                                            <option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </option>
+                                        </select>  
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>{{sCedula}}</label>
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="cedula" value="{{cedula}}" (blur)="consultarCedula()" id="cedula">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>{{sGrado}}</label>
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="cargo" value="{{cargo}}" [disabled]="isPunto" id="grado">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="cmbUnidad">{{sNombre}}</label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="nmilitar" value="{{nmilitar}}" [disabled]="isPunto">
+                                    </div>
+    
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
                                     <label for="cmbUnidad">Unidad o Dependencia</label>
                                     <select class="form-control" [ngModelOptions]="{standalone: true}"
                                         [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}" id="unid">
@@ -99,7 +111,7 @@
                                         <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-6">
                                     <label>Componente / Gran Comando</label>
                                     <div class="input-group">
                                         <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.comando"
@@ -116,12 +128,42 @@
                                 </div> 
                             </div>
                             <div class="form-row">
-                                <div class="form-group col-md-12">
-                                    <label for="txtContenido">Motivo de la Visita</label>
-                                    <div class="NgxEditor__Wrapper">
-                                        <angular-editor [placeholder]="'Enter text here...'" [config]="editorConfig" [(ngModel)]="Doc.contenido"></angular-editor>
-                                    </div>
+                                <div class="form-group col-md-6" *ngIf="forigenv">
+                                    <label for="tmsOrigen">Fecha Visita</label>
+                                    <form class="form-inline">
+                                        <div class="form-group" style="width:100%">
+                                            <div class="input-group" style="width:100%">
+                                                <input class="form-control" placeholder="AAAA-MM-DD"
+                                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="forigen" ngbDatepicker
+                                                    #fo="ngbDatepicker" [value]="formatter.format(forigenDate)"
+                                                    [placement]="placement" [positionTarget]="buttonEl" readonly>
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button"
+                                                        id="fori">
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
+                                <div class="form-group col-md-6">
+                                    <label for="tmsCreacion">Plazo</label>
+                                    <form class="form-inline">
+                                        <div class="form-group" style="width:100%">
+                                            <div class="input-group" style="width:100%">
+                                                <input class="form-control" placeholder="AAAA-MM-DD"
+                                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="fplazo"
+                                                    ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+                                                    [positionTarget]="buttonEl" readonly>
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="fd.toggle()"
+                                                        type="button" id="fplazo"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                               
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -153,9 +195,6 @@
                         </div>
                     </div>
                     <hr>
-
-
-
                     <div class="row">
                         <div class="col-md-12">
                             <div class="text-right">

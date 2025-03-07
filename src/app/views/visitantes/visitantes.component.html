@@ -63,11 +63,40 @@
           (selectedIndexChange)="seleccionNavegacion($event)">
           <mat-tab>
             <ng-template mat-tab-label>
-              &nbsp;REGISTRADOS
+              &nbsp;RECIBIDOS
             </ng-template>
             <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
               <mat-selection-list >
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1 texto-lista" >
+                    
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      NUM. CONTROL
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      FECHA / ORIGEN
+                    </div>
+                    <div class="col-md-3 texto-lista">
+                      UNIDAD DEPENDENCIA
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                        value="{{xyear}}" style="margin-top: -20px;">
+                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                      </select>
+                     
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
+                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                    </select>
+                  </div>
+
+                  </div>
 
                 </mat-list>
               </mat-selection-list>
@@ -109,11 +138,40 @@
           </mat-tab>
           <mat-tab>
             <ng-template mat-tab-label>
-              &nbsp;HISTÓRICO DE VISITANTES
+              &nbsp;HISTÓRICO VISITANTES
             </ng-template>
             <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
               <mat-selection-list >
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-1 texto-lista" >
+                    
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      NUM. CONTROL
+                    </div>
+
+                    <div class="col-md-2 texto-lista">
+                      FECHA / ORIGEN
+                    </div>
+                    <div class="col-md-3 texto-lista">
+                      UNIDAD DEPENDENCIA
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                        value="{{xyear}}" style="margin-top: -20px;">
+                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                      </select>
+                     
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(1)">
+                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                    </select>
+                  </div>
+
+                  </div>
 
                 </mat-list>
               </mat-selection-list>
