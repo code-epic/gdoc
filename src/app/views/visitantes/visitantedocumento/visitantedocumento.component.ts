@@ -2,12 +2,9 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import {
   NgbModal,
-  NgbDateStruct,
   NgbDate,
-  NgbCalendar,
   NgbDateParserFormatter,
 } from "@ng-bootstrap/ng-bootstrap";
-import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import Swal from "sweetalert2";
 
@@ -22,7 +19,6 @@ import {
 import { LoginService } from "src/app/services/seguridad/login.service";
 import { UtilService } from "src/app/services/util/util.service";
 
-import { Location } from "@angular/common";
 import {
   FormControl,
   FormBuilder,
@@ -44,6 +40,8 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     showToolbar: false,
     placeholder: "",
   };
+
+  form: FormGroup
 
   public estadoActual = 14;
   public estadoOrigen = 1;
@@ -252,12 +250,10 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     private apiService: ApiService,
     private modalService: NgbModal,
     private utilService: UtilService,
-    private toastrService: ToastrService,
     private rutaActiva: ActivatedRoute,
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
-    private location: Location,
     private fb: FormBuilder,
     private ruta: Router
   ) {
@@ -324,6 +320,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.iniciarFormulario()
     // this.editor = new Editor()
     // this.xeditor = new Editor()
 
@@ -378,6 +375,35 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
         ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion")))
         : [];
     this.listarConfiguracion();
+  }
+
+  iniciarFormulario() {
+    this.form = this.fb.group({
+      tipoVisitante: ['', Validators.required],
+      motivoVisita: ['', Validators.required],
+      cedula: ['', Validators.required],
+      cargo: [{ value: '', disabled: this.isPunto }, Validators.required],
+      nmilitar: [{ value: '', disabled: this.isPunto }, Validators.required],
+      unidad: ['', Validators.required],
+      comando: ['', Validators.required],
+      forigen: ['', Validators.required],
+      fplazo: ['', Validators.required],
+    });
+  }
+
+  guardar(){
+    this.Doc.tipo = this.form.get('tipoVisitante')?.value
+    this.Doc.contenido = this.form.get('motivoVisita')?.value
+    this.Doc.remitente = this.form.get('cedula')?.value
+    this.Doc.unidad = this.form.get('unidad')?.value
+    this.Doc.comando = this.form.get('comando')?.value
+    this.Doc.forigen = this.form.get('forigen')?.value
+    this.Doc.fcreacion = this.form.get('fplazo')?.value
+    this.Doc.creador = this.loginService.Usuario.id
+    this.Doc.norigen = this.form.get('cargo')?.value
+    this.Doc.nexpediente = this.form.get('nmilitar')?.value
+    console.log(this.Doc);
+    
   }
 
   setDescripcionPunto() {
@@ -531,7 +557,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
    * Consultar datos generales del militar
    */
   consultarCedula() {
-    if (this.cedula == "") return false;
+    if (this.form.get('cedula')?.value == "") return false;
     this.isPunto = true;
     if (
       this.Doc.tipo.toLowerCase() == "destitucion/punto de cuenta" ||
@@ -541,7 +567,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     } else {
       this.ngxService.startLoader("loader-aceptar");
       this.xAPI.funcion = "MPPD_CDatosBasicos";
-      this.xAPI.parametros = this.cedula;
+      this.xAPI.parametros = this.form.get('cedula')?.value;
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {

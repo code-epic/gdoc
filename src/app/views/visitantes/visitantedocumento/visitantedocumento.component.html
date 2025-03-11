@@ -60,151 +60,142 @@
                 </div>
                 <div class="card-body">
                     <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="form-row">
-                                <div class="form-group col-md-4">
-                                    <label for="cmbTipoDocumento">Visitante</label>
-                                        <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
-                                            [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" id="tdoc">
-                                            <option value="0">Seleccione</option>
-                                            <option value="1">CIVIL</option>
-                                            <option value="2">MILITAR</option>
-                                        </select> 
+                    <form [formGroup]="form" (ngSubmit)="guardar()">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="form-row">
+    
+                                    <div class="col-md-4">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>Visitante</mat-label>
+                                            <mat-select [disabled]="activarTipo" formControlName="tipoVisitante" id="tdoc">
+                                                <mat-option>Seleccione</mat-option>
+                                                <mat-option value="1">CIVIL</mat-option>
+                                                <mat-option value="2">MILITAR</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+    
+                                    <div class="col-md-4">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>Motivo Visita</mat-label>
+                                            <mat-select [disabled]="activarTipo" formControlName="motivoVisita" id="tdoc">
+                                                <mat-option>Seleccione</mat-option>
+                                                <mat-option *ngFor="let x of lstT" [value]="x.nomb">{{ x.nomb }} </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+    
+                                    <div class="col-md-4">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>{{sCedula}}</mat-label>
+                                            <input matInput formControlName="cedula" (keydown.tab)="consultarCedula()" id="cedula">
+                                        </mat-form-field>
+                                    </div>
+    
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label for="cmbTipoDocumento">Motivo Visita</label>
-                                    
-                                        <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
-                                            [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}" id="tdoc">
-                                            <option value="0">Seleccione</option>
-                                            <option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </option>
-                                        </select>  
+    
+                                <div class="form-row">
+    
+                                    <div class="col-md-6">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>{{sGrado}}</mat-label>
+                                            <input matInput formControlName="cargo" [disabled]="isPunto">
+                                        </mat-form-field>
+                                    </div>
+    
+                                    <div class="col-md-6">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>{{sNombre}}</mat-label>
+                                            <input matInput formControlName="nmilitar" [disabled]="isPunto">
+                                        </mat-form-field>
+                                    </div>
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label>{{sCedula}}</label>
-                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="cedula" value="{{cedula}}" (blur)="consultarCedula()" id="cedula">
+    
+                                <div class="form-row">
+    
+                                    <div class="col-md-6">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>Unidad o Dependencia</mat-label>
+                                            <mat-select formControlName="unidad">
+                                                <mat-option>Seleccione</mat-option>
+                                                <mat-option *ngFor="let x of lstU" [value]="x.nomb">{{ x.nomb }} </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+    
+                                    <div class="col-md-6">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>Componente / Gran Comando</mat-label>
+                                            <mat-select formControlName="comando">
+                                                <mat-option>Seleccione</mat-option>
+                                                <mat-option *ngFor="let x of lstC" [value]="x.nomb">{{ x.nomb }}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+    
                                 </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label>{{sGrado}}</label>
-                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="cargo" value="{{cargo}}" [disabled]="isPunto" id="grado">
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="cmbUnidad">{{sNombre}}</label>
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                            [(ngModel)]="nmilitar" value="{{nmilitar}}" [disabled]="isPunto">
+    
+                                <div class="form-row">
+    
+                                    <div class="col-md-6">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>Fecha Visita</mat-label>
+                                            <input matInput [matDatepicker]="fechaVisita" formControlName="forigen">
+                                            <mat-datepicker-toggle matSuffix [for]="fechaVisita"></mat-datepicker-toggle>
+                                            <mat-datepicker #fechaVisita></mat-datepicker>
+                                        </mat-form-field>
+                                    </div>
+    
+                                    <div class="col-md-6">
+                                        <mat-form-field appearance="outline">
+                                            <mat-label>Plazo</mat-label>
+                                            <input matInput [matDatepicker]="fechaPlazo" formControlName="fplazo">
+                                            <mat-datepicker-toggle matSuffix [for]="fechaPlazo"></mat-datepicker-toggle>
+                                            <mat-datepicker #fechaPlazo></mat-datepicker>
+                                        </mat-form-field>
                                     </div>
     
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="cmbUnidad">Unidad o Dependencia</label>
-                                    <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}" id="unid">
-                                        <option value="0">Seleccione</option>
-                                        <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label>Componente / Gran Comando</label>
-                                    <div class="input-group">
-                                        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.comando"
-                                            value="{{Doc.comando}}" id="coma">
-                                            <option value="0">Seleccione</option>
-                                            <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
-                                        </select>
-                                        <div class="input-group-append"   *ngIf="booDependencia">
-                                            <button *ngIf="!editar" type="button"  (click)="agregarDependencia()" id="btndependencia" class="btn btn-success">
-                                                <i class="fa fa-plus" aria-hidden="true"></i>
-                                            </button>
+                            <div class="col-md-3">
+                                <div class="image-blur">
+                                    <div class="col-md-12" *ngIf="!mostrarCamara">
+                                        <div class="text-center">
+                                            <img [src]="fotoCapturada" alt="Foto capturada"
+                                                style="width: 240px; height: 180px;" />
+                                            <br>
                                         </div>
                                     </div>
-                                </div> 
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-6" *ngIf="forigenv">
-                                    <label for="tmsOrigen">Fecha Visita</label>
-                                    <form class="form-inline">
-                                        <div class="form-group" style="width:100%">
-                                            <div class="input-group" style="width:100%">
-                                                <input class="form-control" placeholder="AAAA-MM-DD"
-                                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="forigen" ngbDatepicker
-                                                    #fo="ngbDatepicker" [value]="formatter.format(forigenDate)"
-                                                    [placement]="placement" [positionTarget]="buttonEl" readonly>
-                                                <div class="input-group-append">
-                                                    <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button"
-                                                        id="fori">
-                                                    </button>
-                                                </div>
+                                    <div class="col-md-12" *ngIf="mostrarCamara">
+                                        <div class="text-center">
+                                            <div id="video-container" *ngIf="mostrarCamara">
                                             </div>
+                                            <br>
                                         </div>
-                                    </form>
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="tmsCreacion">Plazo</label>
-                                    <form class="form-inline">
-                                        <div class="form-group" style="width:100%">
-                                            <div class="input-group" style="width:100%">
-                                                <input class="form-control" placeholder="AAAA-MM-DD"
-                                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="fplazo"
-                                                    ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
-                                                    [positionTarget]="buttonEl" readonly>
-                                                <div class="input-group-append">
-                                                    <button #buttonEl class="btn calendario" (click)="fd.toggle()"
-                                                        type="button" id="fplazo"></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                               
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="image-blur">
-                                <div class="col-md-12"  *ngIf="!mostrarCamara" >
-                                    <div class="text-center" style="padding: 5px;">
-                                        <img [src]="fotoCapturada" alt="Foto capturada" style="width: 240px; height: 180px;" />
-                                        <br>
                                     </div>
                                 </div>
-                                <div class="col-md-12"  *ngIf="mostrarCamara" style="padding: 5px;" >
-                                    <div class="text-center">
-                                        <div id="video-container" *ngIf="mostrarCamara" >
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="text-center">
+                                            <button class="btn bg-primary text-white" id="startbutton" *ngIf="!bCamara"
+                                                (click)="capturarFoto()">Tomar Foto</button>
                                         </div>
-                                        <br>
-                                        <!-- <div *ngIf="formulario.get('foto')?.invalid && formulario.get('foto')?.touched">
-                                            La foto es requerida.
-                                          </div> -->
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12"> 
-                                    <div class="text-center">
-                                        <button class="btn bg-primary text-white" id="startbutton" *ngIf="!bCamara" (click)="capturarFoto()">Tomar Foto</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <hr>
-                    <div class="row">
+                        <hr>
+                        <div class="row">
                         <div class="col-md-12">
                             <div class="text-right">
-                                <button class="btn bg-primary text-white"
-                                    id="registrar">Registrar</button>&nbsp;&nbsp;&nbsp;
-                                <button class="btn bg-warning text-white"
-                                id="registrar" (click)="cancelar()">Cancelar</button>
+                                <button class="btn bg-primary text-white" type="submit" [disabled]="form.invalid">Registrar</button>&nbsp;&nbsp;&nbsp;
+                                    <button class="btn bg-warning text-white" type="button"
+                                    (click)="cancelar()">Cancelar</button>
                             </div>
                         </div>
                     </div>
+                    </form>
                 </div>
             </div>
         </div>
