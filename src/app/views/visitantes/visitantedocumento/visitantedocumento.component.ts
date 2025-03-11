@@ -277,7 +277,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
       .then((stream) => {
         this.vdE = document.createElement('video');
         this.vdE.srcObject = stream;
-        this.vdE.width = 380
+        this.vdE.width = 280
         this.vdE.height = 180
         this.vdE.play();
         const videoContainer = document.getElementById('video-container');

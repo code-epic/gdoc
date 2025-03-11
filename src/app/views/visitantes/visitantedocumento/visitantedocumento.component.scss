@@ -81,3 +81,30 @@ th, td {
     text-overflow: ellipsis; 
     margin: 12px 0;
   }
+
+  .image-blur {
+    position: relative;
+    width: 100%;
+  
+    .blurred-image {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1.0125); /* Centramos y escalamos la imagen */
+      width: 100%; /* Mantenemos el ancho original */
+      height: auto;
+      filter: blur(10px); /* Aplicamos el efecto de desenfoque */
+      border-radius: 50%;
+      z-index: 1; /* Colocamos la imagen de fondo detrás */
+    }
+    
+    .front-image {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); /* Centramos la imagen */
+      width: 80%; /* Ajusta el tamaño de la imagen frontal */
+      height: auto;
+      z-index: 2; /* Colocamos la imagen frontal encima */
+    }
+  }
