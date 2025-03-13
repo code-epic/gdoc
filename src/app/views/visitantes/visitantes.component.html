@@ -73,14 +73,14 @@
                     
                     </div>
                     <div class="col-md-2 texto-lista">
-                      NUM. CONTROL
+                      FECHA
                     </div>
 
                     <div class="col-md-2 texto-lista">
-                      FECHA / ORIGEN
+                      NOMBRES
                     </div>
                     <div class="col-md-3 texto-lista">
-                      UNIDAD DEPENDENCIA
+                      UNIDAD
                     </div>
                     <div class="col-md-2 texto-lista">
                       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
@@ -95,8 +95,7 @@
                       <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
                     </select>
                   </div>
-
-                  </div>
+                </div>
 
                 </mat-list>
               </mat-selection-list>
@@ -105,26 +104,24 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Example " class="text-gray"
+                      <button mat-icon-button aria-label="Example " class="text-primary"
                         (click)="open(observacion, e.idd)" id="recibir">
                         <mat-icon>task_alt</mat-icon>
                       </button>
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      {{ e.fcre | date:"dd-MM-yyyy" }}
                     </div>
-                    
                     <div class="col-md-2 texto-lista">
-                      {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
+                      {{ e.remi | uppercase}}
                     </div>
                     <div class="col-md-6 texto-detalle">
-                      {{ e.udep | uppercase }} ( {{ e.ultimo_nombre | uppercase }})
+                      {{ e.udep | uppercase }} 
                     </div>
                     <div class="col-md-1 text-right">
                       <button mat-icon-button aria-label="Privado">
                         <mat-icon *ngIf="e.privado" class="text-gray">no_encryption</mat-icon>
                       </button>
-
                     </div>
                   </div>
                 </mat-list>
@@ -148,14 +145,13 @@
                     
                     </div>
                     <div class="col-md-2 texto-lista">
-                      NUM. CONTROL
+                      FECHA
                     </div>
-
                     <div class="col-md-2 texto-lista">
-                      FECHA / ORIGEN
+                      NOMBRES
                     </div>
                     <div class="col-md-3 texto-lista">
-                      UNIDAD DEPENDENCIA
+                      UNIDAD
                     </div>
                     <div class="col-md-2 texto-lista">
                       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
@@ -180,26 +176,23 @@
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Visibilidad" class="text-gray" (click)="open(observacion, e.idd)" id="procesados">
+                      <!-- <button mat-icon-button aria-label="Visibilidad" class="text-gray" (click)="open(observacion, e.idd)" id="procesados">
                         <mat-icon>add_circle</mat-icon>
-                      </button>
+                      </button> -->
                     </div>
-
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      {{ e.fech | date:"dd-MM-yyyy" }}
                     </div>
-                    <div class="col-md-7 texto-detalle">
-                      <b>{{ e.fcre | date:"dd-MM-yyyy" }} - {{ e.udep | uppercase }}</b>&nbsp;{{ e.observacion_accion | uppercase }}
+                    <div class="col-md-2 texto-lista">
+                      {{ e.remi | uppercase}}
                     </div>
-                    <div class="col-md-2 text-right">
-                      
-                      <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">
-                        <mat-icon class="text-gray">edit_note</mat-icon>
-                      </button>
+                    <div class="col-md-6 texto-detalle">
+                      {{ e.udep | uppercase }} 
+                    </div>
+                    <div class="col-md- text-right">
                       <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
                         <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
-
                     </div>
                   </div>
                 </mat-list>
@@ -218,3 +211,51 @@
   </div>
   <!-- Fin de Tarjeta Padre -->
 </div>
+<ng-template #observacion let-modal>
+  <div class="modal-header header bg-gradient-info">
+    <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-group col-md-12">
+      <label for="txtobservacion">Observaciones</label>
+      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="Observacion"></textarea>
+    </div>
+    <div class="form-group  col-md-12">
+      <label>Acción</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
+        (change)="selAccion()" id="slcaceptar">
+        <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+      </select>
+
+    </div>
+    <div class="form-group  col-md-12" *ngIf="clasificacion">
+      <label>Area</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
+        <option value="S">SELECCIONE</option>
+        <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
+      </select>
+    </div>
+
+    <div class="form-group  col-md-12"  *ngIf="vplazo">
+      <label for="tmsCreacion">Plazo / Alerta</label>
+      <div class="form-group" style="width:100%">
+        <div class="input-group" style="width:100%">
+          <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+            [positionTarget]="buttonEl" readonly>
+          <div class="input-group-append">
+            <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button" id="btnplazo"></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')" id="btnaceptar">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+    <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>

@@ -39,8 +39,8 @@ export class VisitantesComponent implements OnInit {
  
 
   public cmbAcciones = [
-    { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
-    { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
+    { 'valor': '0', 'texto': 'ATENDIDO', 'visible': '0' },
+    { 'valor': '1', 'texto': 'ENTREGADO', 'visible': '0' },
     { 'valor': '2', 'texto': 'ELABORAR OFICIO', 'visible': '1' },
     { 'valor': '3', 'texto': 'EN MANOS DEL DIRECTOR DEL DESPACHO', 'visible': '1' },
     { 'valor': '4', 'texto': 'EN MANOS DEL SUB DIRECTOR DEL DESPACHO', 'visible': '1' },
@@ -150,8 +150,6 @@ export class VisitantesComponent implements OnInit {
   }
 
 
-
-
   open(content, id) {
     this.numControl = id
     this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
@@ -197,7 +195,7 @@ export class VisitantesComponent implements OnInit {
     try {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          // console.log(data)
+          console.log(data)
           this.buzon = data.Cuerpo.map((e) => {
             e.existe = e.anom == '' ? true : false;
             e.privado = e.priv == 1 ? true : false;
@@ -296,8 +294,6 @@ export class VisitantesComponent implements OnInit {
 
 
   insertarObservacion() {
-
-
     if (this.AccionTexto == "S") {
       this.toastrService.warning(
         'Debe seleccionar una accion ',

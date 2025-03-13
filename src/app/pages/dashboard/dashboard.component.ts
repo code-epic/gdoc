@@ -22,13 +22,15 @@ export class DashboardComponent implements OnInit {
   public Menu = []
 
   public image = [
-    { id: '/control', src : 'documentos' },
+    { id: '/control', src : 'control' },
     { id: '/secretaria', src : 'secretaria' },
     { id: '/resoluciones', src : 'resoluciones' },
     { id: '/ayudantia', src : 'ayudantia2' },
     { id: '/timonel', src : 'timonel' },
     { id: '/acami', src : 'acami' },
     { id: '/personal', src : 'personal' },
+    { id: '/visitantes', src : 'visitantes' },
+    { id: '/generales', src : 'generales' },
   ]
 
   constructor(
