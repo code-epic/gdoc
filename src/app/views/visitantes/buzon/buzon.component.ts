@@ -18,7 +18,7 @@ import { UtilService } from 'src/app/services/util/util.service';
 })
 export class BuzonComponent implements OnInit {
 
-  public estadoActual = 2
+  public estadoActual = 14
   public estatusAcutal = 1
   fecha_desde = '-09-01'
   fecha_hasta = '-10-01'
