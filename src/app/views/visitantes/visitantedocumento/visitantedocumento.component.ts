@@ -26,6 +26,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { AngularEditorConfig } from "@kolkov/angular-editor";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
   selector: "app-visitantedocumento",
@@ -41,7 +42,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     placeholder: "",
   };
 
-  form: FormGroup
+  form: FormGroup;
 
   public estadoActual = 14;
   public estadoOrigen = 1;
@@ -53,23 +54,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
   public fsalida = "Fecha de Creación (*)";
   public forigenv = true; // Visibilidad de Input Fecha Origen
 
-  public camposalida = 2;
-  public camposfechasalida = 3;
-  public camponumsalida = 2;
-
-  masterSelected: boolean;
-  checklist: any;
-  checkedList: any;
-
   public bPDF = false;
-
-  closeResult = "";
-
-  title = "Documentos";
-  placement = "bottom-start";
-
-  lineCountCache: number = 0;
-  PosicionCuenta: number = -1;
 
   // editor: Editor = new Editor;
   // xeditor: Editor = new Editor;
@@ -254,15 +239,16 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
+    private toastrService: ToastrService,
     private fb: FormBuilder,
     private ruta: Router
   ) {
     this.formulario = this.fb.group({
-      cedula: ['', Validators.required],
-      nombre: ['', Validators.required],
+      cedula: ["", Validators.required],
+      nombre: ["", Validators.required],
       foto: [null, Validators.required],
     });
-    this.iniciarCamara()
+    this.iniciarCamara();
   }
 
   // Método para iniciar la cámara
@@ -271,33 +257,33 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     navigator.mediaDevices
       .getUserMedia({ video: true })
       .then((stream) => {
-        this.vdE = document.createElement('video');
+        this.vdE = document.createElement("video");
         this.vdE.srcObject = stream;
-        this.vdE.width = 280
-        this.vdE.height = 180
+        this.vdE.width = 280;
+        this.vdE.height = 180;
         this.vdE.play();
-        const videoContainer = document.getElementById('video-container');
+        const videoContainer = document.getElementById("video-container");
         if (videoContainer) {
           videoContainer.appendChild(this.vdE);
         }
       })
       .catch((error) => {
-        console.error('Error al acceder a la cámara:', error);
+        console.error("Error al acceder a la cámara:", error);
       });
   }
 
   // Método para capturar la foto
   capturarFoto() {
     if (this.vdE) {
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       canvas.width = this.vdE.videoWidth;
       canvas.height = this.vdE.videoHeight;
-      
-      const context = canvas.getContext('2d');
+
+      const context = canvas.getContext("2d");
       if (context) {
         context.drawImage(this.vdE, 0, 0, canvas.width, canvas.height);
-        this.fotoCapturada = canvas.toDataURL('image/png'); // Convertir a base64
-        this.formulario.get('foto')?.setValue(this.fotoCapturada); // Asignar al formulario
+        this.fotoCapturada = canvas.toDataURL("image/png"); // Convertir a base64
+        this.formulario.get("foto")?.setValue(this.fotoCapturada); // Asignar al formulario
         this.mostrarCamara = false; // Ocultar la cámara después de capturar la foto
         if (this.vdE.srcObject) {
           const stream = this.vdE.srcObject as MediaStream;
@@ -305,42 +291,27 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
         }
       }
     }
-    this.bCamara = true
+    this.bCamara = true;
   }
 
   // Método para enviar el formulario
   onSubmit() {
     if (this.formulario.valid) {
       const formData = this.formulario.value;
-      console.log('Datos del formulario:', formData);
+      console.log("Datos del formulario:", formData);
       // Aquí puedes enviar formData a tu API o servicio
     } else {
-      console.error('Formulario inválido');
+      console.error("Formulario inválido");
     }
   }
 
   async ngOnInit() {
-    this.iniciarFormulario()
+    this.iniciarFormulario();
     // this.editor = new Editor()
     // this.xeditor = new Editor()
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id;
-      if (id == "salida") {
-        this.SalidaTipo();
-        if (this.rutaActiva.snapshot.params.numc != undefined) {
-          var numc = this.rutaActiva.snapshot.params.numc;
-          this.ncontrolt = "Nro de Control";
-          this.ncontrolv = true;
-          this.salidavisible = true;
-          this.camponumsalida = 4;
-        }
-      } else {
-        if (this.rutaActiva.snapshot.params.numc != undefined) {
-          var numc = this.rutaActiva.snapshot.params.numc;
-          if (numc == "salida") this.SalidaTipo();
-        }
-      }
     } else {
       this.limpiarDoc();
     }
@@ -379,31 +350,31 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
 
   iniciarFormulario() {
     this.form = this.fb.group({
-      tipoVisitante: ['', Validators.required],
-      motivoVisita: ['', Validators.required],
-      cedula: ['', Validators.required],
-      cargo: [{ value: '', disabled: this.isPunto }, Validators.required],
-      nmilitar: [{ value: '', disabled: this.isPunto }, Validators.required],
-      unidad: ['', Validators.required],
-      comando: ['', Validators.required],
-      forigen: ['', Validators.required],
-      fplazo: ['', Validators.required],
+      tipoVisitante: ["", Validators.required],
+      motivoVisita: ["", Validators.required],
+      cedula: ["", Validators.required],
+      cargo: [{ value: "", disabled: this.isPunto }, Validators.required],
+      nmilitar: [{ value: "", disabled: this.isPunto }, Validators.required],
+      unidad: ["", Validators.required],
+      comando: ["", Validators.required],
+      forigen: ["", Validators.required],
+      fplazo: ["", Validators.required],
     });
   }
 
-  guardar(){
-    this.Doc.tipo = this.form.get('tipoVisitante')?.value
-    this.Doc.contenido = this.form.get('motivoVisita')?.value
-    this.Doc.remitente = this.form.get('cedula')?.value
-    this.Doc.unidad = this.form.get('unidad')?.value
-    this.Doc.comando = this.form.get('comando')?.value
-    this.Doc.forigen = this.form.get('forigen')?.value
-    this.Doc.fcreacion = this.form.get('fplazo')?.value
-    this.Doc.creador = this.loginService.Usuario.id
-    this.Doc.norigen = this.form.get('cargo')?.value
-    this.Doc.nexpediente = this.form.get('nmilitar')?.value
-    console.log(this.Doc);
-    
+  guardar() {
+    this.Doc.tipo = this.form.get("tipoVisitante")?.value;
+    this.Doc.contenido = this.form.get("motivoVisita")?.value;
+    this.Doc.remitente = this.form.get("cedula")?.value;
+    this.Doc.unidad = this.form.get("unidad")?.value;
+    this.Doc.comando = this.form.get("comando")?.value;
+    this.Doc.forigen = this.form.get("forigen")?.value;
+    this.Doc.fcreacion = this.form.get("fplazo")?.value;
+    this.Doc.creador = this.loginService.Usuario.id;
+    this.Doc.norigen = this.form.get("cargo")?.value;
+    this.Doc.nexpediente = this.form.get("nmilitar")?.value;
+    console.log(this.Doc)
+    this.registrar()
   }
 
   setDescripcionPunto() {
@@ -418,29 +389,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     this.sNombre = "Monto Total";
   }
 
-  SalidaTipo() {
-    this.titulo = "Salida";
-    this.booDependencia = true;
-    this.estadoActual = 9;
-    this.estadoOrigen = 2;
-    this.ncontrolv = false;
-    this.salidavisible = false;
-    this.origenvisible = false;
-    this.forigenv = false;
-    this.ncontrolt = "Nro de Salida";
-    this.remitentet = "Destinatario";
-    this.fsalida = "Fecha de Salida";
-    this.camposalida = 4;
-    this.camposfechasalida = 4;
-  }
-
-  validarTipoDoc(): boolean {
-    return (
-      this.Doc.tipo.toLowerCase() == "resolucion" ||
-      this.Doc.tipo.toLowerCase() == "tramitacion por organo regular" ||
-      this.Doc.tipo.toLowerCase() == "punto de cuenta"
-    );
-  }
+ 
 
   listarConfiguracion() {
     // console.log(this.Configuracion)
@@ -494,20 +443,6 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     this.modalService.open(content);
   }
 
-  //obtenerWorkFlow Permite generar los primeros valores de la red del documento
-  obtenerWorkFlow() {
-    this.WkDoc = {
-      nombre: "Control de Gestion",
-      workflow: 2,
-      estado: this.estadoActual,
-      estatus: this.estadoOrigen,
-      observacion: "Creando " + this.titulo,
-      usuario: this.loginService.Usuario.id,
-    };
-    this.xAPI.funcion = "WKF_IDocumento";
-    this.xAPI.valores = JSON.stringify(this.WkDoc);
-  }
-
   activarHistorial() {
     this.bHist = !this.bHist;
   }
@@ -543,12 +478,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
       allowEscapeKey: true,
     }).then((result) => {
       if (!result.isConfirmed) {
-        if (this.estadoActual == 9) {
-          this.ruta.navigate(["/salidas"]);
-          return;
-        }
-
-        this.ruta.navigate(["/registrar"]);
+        this.ruta.navigate(["/visitantes"]);
       }
     });
   }
@@ -557,7 +487,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
    * Consultar datos generales del militar
    */
   consultarCedula() {
-    if (this.form.get('cedula')?.value == "") return false;
+    if (this.form.get("cedula")?.value == "") return false;
     this.isPunto = true;
     if (
       this.Doc.tipo.toLowerCase() == "destitucion/punto de cuenta" ||
@@ -567,61 +497,132 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     } else {
       this.ngxService.startLoader("loader-aceptar");
       this.xAPI.funcion = "MPPD_CDatosBasicos";
-      this.xAPI.parametros = this.form.get('cedula')?.value;
+      this.xAPI.parametros = this.form.get("cedula")?.value;
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data)
-          // const militar = data.Cuerpo.map((e) => {
-          //   e.resoluciones = JSON.parse(e.resoluciones);
-          //   e.entradas = JSON.parse(e.entradas);
-          //   e.componente = this.Componentes.filter((el) => {
-          //     return el.cod_componente == e.componente;
-          //   })[0].nombre_componente;
-          //   e.categoria = this.Categorias.filter((el) => {
-          //     return el.cod_categoria == e.categoria;
-          //   })[0].nombre_categoria;
-          //   e.clasificacion = this.Clasificaciones.filter((el) => {
-          //     return el.cod_clasificacion == e.clasificacion;
-          //   })[0].des_clasificacion;
-          //   e.grado = this.Grados.filter((el) => {
-          //     return el.cod_grado == e.grado;
-          //   })[0].nombres_grado;
-          //   return e;
-          // })[0];
-
-          // if (data.Cuerpo.length > 0) {
-          //   this.nmilitar = militar.nombres;
-          //   this.cargo = militar.grado + " " + militar.componente;
-          // } else {
-          //   this.cedula = "";
-          //   this.nmilitar = "";
-          //   this.cargo = "";
-          //   this.toastrService.info(
-          //     "Debe dirigirse al departamento de resoluciones",
-          //     `GDoc Resoluciones`
-          //   );
-          // }
-
-          this.ngxService.stopLoader("loader-aceptar")
+          console.log(data);
+          this.ngxService.stopLoader("loader-aceptar");
         },
         (error) => {
-          this.ngxService.stopLoader("loader-aceptar")
-          console.error("Error de conexion a los datos ", error)
+          this.ngxService.stopLoader("loader-aceptar");
+          console.error("Error de conexion a los datos ", error);
         }
       );
     }
   }
 
-
-  cancelar(){
-    this.bCamara = false
-    this.iniciarCamara()
+  cancelar() {
+    this.bCamara = false;
+    this.iniciarCamara();
   }
- 
-  
+
   ngOnDestroy(): void {
     // this.editor.destroy()
     // this.xeditor.destroy()
+  }
+
+  //obtenerWorkFlow Permite generar los primeros valores de la red del documento
+  obtenerWorkFlow() {
+    this.WkDoc = {
+      nombre: "Visitantes",
+      workflow: 2,
+      estado: this.estadoActual,
+      estatus: this.estadoOrigen,
+      observacion: "Control de visitas ",
+      usuario: this.loginService.Usuario.id,
+    };
+    this.xAPI.funcion = "WKF_IDocumento";
+    this.xAPI.valores = JSON.stringify(this.WkDoc);
+  }
+
+  registrar() {
+    this.ngxService.startLoader("loader-aceptar");
+    this.obtenerWorkFlow(); //Obtener valores de una API
+    
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.obtenerDatos(data);
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          (xdata) => {
+            if (this.fplazo.year != undefined) {
+              this.obtenerAlertaWorkFlow(xdata);
+              this.apiService.Ejecutar(this.xAPI).subscribe(
+                (ydata) => {
+                  this.ngxService.stopLoader("loader-aceptar");
+                },
+                (errot) => {
+                  this.toastrService.error(data.msj, `GDoc Wkf.Alerta`)
+                  this.ngxService.stopLoader("loader-aceptar");
+                }
+              )
+            }
+        
+
+            this.aceptar(this.Doc.ncontrol);
+            this.limpiarDoc();
+            this.ngxService.stopLoader("loader-aceptar");
+
+            const cantdep = this.lstDependencias.length;
+            const mpuntocuenta = this.toppings.value.length;
+
+            this.aceptar(this.Doc.ncontrol);
+            this.limpiarDoc();
+            this.ngxService.stopLoader("loader-aceptar");
+          },
+          (errot) => {
+            this.toastrService.error(data.msj, `GDoc Wkf.Documento.Detalle`)
+            this.ngxService.stopLoader("loader-aceptar");
+          }
+        );
+      }, //En caso de fallar Wkf
+      (errot) => {
+        var mensaje = errot + " - " + this.xAPI.funcion;
+        this.toastrService.error(mensaje, `GDoc Wkf.Documento`)
+        this.ngxService.stopLoader("loader-aceptar");
+      }
+    );
+  }
+
+  //Obtener los dados de Documento
+  obtenerDatos(data: any) {
+    if (data.tipo == 0) {
+      var mensaje = data.msj + " - " + this.xAPI.funcion;
+      this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
+      return false;
+    }
+    this.xAPI.funcion = "WKF_IDocumentoDetalle";
+
+    this.Doc.ncontrol = this.utilService.Semillero(data.msj).toUpperCase();
+
+    this.Doc.wfdocumento = parseInt(data.msj);
+    this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion);
+    this.Doc.forigen =
+      this.forigen != undefined
+        ? this.utilService.ConvertirFecha(this.forigen)
+        : this.utilService.ConvertirFecha(this.fcreacion);
+
+    this.Doc.contenido = this.Doc.contenido.toUpperCase();
+    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase();
+
+    this.Doc.creador = this.loginService.Usuario.id;
+
+    this.xAPI.valores = JSON.stringify(this.Doc);
+  }
+
+  //Obtener alerta del Documento
+  obtenerAlertaWorkFlow(data: any) {
+    if (data.tipo == 0) {
+      this.toastrService.error(data.msj, `GDoc Wkf.Alerta`);
+      return false;
+    }
+    this.WAlerta.activo = 1;
+    this.WAlerta.documento = this.Doc.wfdocumento;
+    this.WAlerta.estado = this.WkDoc.estado;
+    this.WAlerta.estatus = this.WkDoc.estatus;
+    this.WAlerta.usuario = this.WkDoc.usuario;
+    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo);
+    this.xAPI.funcion = "WKF_IAlerta";
+    this.xAPI.valores = JSON.stringify(this.WAlerta);
   }
 }
