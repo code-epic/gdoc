@@ -359,6 +359,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
       comando: ["", Validators.required],
       forigen: ["", Validators.required],
       fplazo: ["", Validators.required],
+      observacion: ["", Validators.required],
     });
   }
 
@@ -373,7 +374,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     this.Doc.creador = this.loginService.Usuario.id;
     this.Doc.norigen = this.form.get("cargo")?.value;
     this.Doc.nexpediente = this.form.get("nmilitar")?.value;
-    console.log(this.Doc)
+    this.Doc.instrucciones = this.form.get("observacion")?.value;
     this.registrar()
   }
 

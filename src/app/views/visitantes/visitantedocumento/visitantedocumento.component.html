@@ -41,6 +41,9 @@
                                                 <mat-option value="1">MILITAR</mat-option>
                                                 <mat-option value="2">CIVIL</mat-option>
                                             </mat-select>
+                                            <mat-error *ngIf="form.get('tipoVisitante').hasError('required')">
+                                                El campo es requerido
+                                            </mat-error>
                                         </mat-form-field>
                                     </div>
     
@@ -53,13 +56,28 @@
                                                 <mat-option value="VIS">VISITA</mat-option>
                                                 <!-- <mat-option *ngFor="let x of lstT" [value]="x.nomb">{{ x.nomb }} </mat-option> -->
                                             </mat-select>
+                                            <mat-error *ngIf="form.get('motivoVisita').hasError('required')">
+                                                El campo es requerido
+                                            </mat-error>
                                         </mat-form-field>
                                     </div>
     
                                     <div class="col-md-4">
                                         <mat-form-field appearance="outline">
                                             <mat-label>{{sCedula}}</mat-label>
-                                            <input matInput formControlName="cedula" (keydown.tab)="consultarCedula()" id="cedula">
+                                            <input 
+                                            matInput 
+                                            formControlName="cedula" 
+                                            (keydown.tab)="consultarCedula()" 
+                                            onkeypress='return event.charCode >= 48 && event.charCode <= 57'
+                                            [maxlength]="'12'"
+                                            onPaste="return false" 
+                                            onCopy="return false"
+                                            onCut="return false"
+                                            >
+                                            <mat-error *ngIf="form.get('cedula').hasError('required')">
+                                                El campo es requerido
+                                            </mat-error>
                                         </mat-form-field>
                                     </div>
     
@@ -71,6 +89,9 @@
                                         <mat-form-field appearance="outline">
                                             <mat-label>{{sGrado}}</mat-label>
                                             <input matInput formControlName="cargo" [disabled]="isPunto">
+                                            <mat-error *ngIf="form.get('cargo').hasError('required')">
+                                                El campo es requerido
+                                            </mat-error>
                                         </mat-form-field>
                                     </div>
     
@@ -78,6 +99,9 @@
                                         <mat-form-field appearance="outline">
                                             <mat-label>{{sNombre}}</mat-label>
                                             <input matInput formControlName="nmilitar" [disabled]="isPunto">
+                                            <mat-error *ngIf="form.get('nmilitar').hasError('required')">
+                                                El campo es requerido
+                                            </mat-error>
                                         </mat-form-field>
                                     </div>
                                 </div>
@@ -91,6 +115,9 @@
                                                 <mat-option>Seleccione</mat-option>
                                                 <mat-option *ngFor="let x of lstU" [value]="x.nomb">{{ x.nomb }} </mat-option>
                                             </mat-select>
+                                            <mat-error *ngIf="form.get('unidad').hasError('required')">
+                                                El campo es requerido
+                                            </mat-error>
                                         </mat-form-field>
                                     </div>
     
@@ -101,6 +128,9 @@
                                                 <mat-option>Seleccione</mat-option>
                                                 <mat-option *ngFor="let x of lstC" [value]="x.nomb">{{ x.nomb }}</mat-option>
                                             </mat-select>
+                                            <mat-error *ngIf="form.get('comando').hasError('required')">
+                                                El campo es requerido
+                                            </mat-error>
                                         </mat-form-field>
                                     </div>
     
@@ -111,24 +141,40 @@
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Fecha Visita</mat-label>
-                                            <input matInput [matDatepicker]="fechaVisita" formControlName="forigen">
+                                            <input matInput [matDatepicker]="fechaVisita" formControlName="forigen" readonly>
                                             <mat-datepicker-toggle matSuffix [for]="fechaVisita"></mat-datepicker-toggle>
                                             <mat-datepicker #fechaVisita></mat-datepicker>
+                                            <mat-error *ngIf="form.get('forigen').hasError('required')">
+                                                El campo es requerido
+                                            </mat-error>
                                         </mat-form-field>
                                     </div>
     
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Plazo</mat-label>
-                                            <input matInput [matDatepicker]="fechaPlazo" formControlName="fplazo">
+                                            <input matInput [matDatepicker]="fechaPlazo" formControlName="fplazo" readonly>
                                             <mat-datepicker-toggle matSuffix [for]="fechaPlazo"></mat-datepicker-toggle>
                                             <mat-datepicker #fechaPlazo></mat-datepicker>
+                                            <mat-error *ngIf="form.get('fplazo').hasError('required')">
+                                                El campo es requerido
+                                            </mat-error>
                                         </mat-form-field>
                                     </div>
                                     <div class="col-md-12">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Observación</mat-label>
-                                            <textarea matInput></textarea>
+                                            <textarea 
+                                                matInput 
+                                                formControlName="observacion"
+                                                onPaste="return false" 
+                                                onCopy="return false"
+                                                onCut="return false"
+                                                [maxlength]="'150'"
+                                            ></textarea>
+                                            <mat-error *ngIf="form.get('observacion').hasError('required')">
+                                                El campo es requerido
+                                            </mat-error>
                                         </mat-form-field>
                                     </div>
                                 </div>
