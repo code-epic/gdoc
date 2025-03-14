@@ -60,15 +60,10 @@
 
 }
 
-input{
+mat-label, mat-option, mat-select{
     text-transform: uppercase;
 }
-select{
-    text-transform: uppercase;
-}
-textarea {
-    text-transform: uppercase;
-}
+
 
 .seleccion{
     display: flex;
