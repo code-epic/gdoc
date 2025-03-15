@@ -104,6 +104,21 @@ th, td {
     }
   }
 
+  .image-frame {
+    display: inline-block;
+    padding: 10px; /* Espacio alrededor de la imagen */
+    background-color: #fff; /* Color de fondo del marco */
+    border: 8px solid #ddd; /* Borde del marco */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+    border-radius: 13px; /* Esquinas redondeadas */
+    padding-bottom: 0;
+    margin-bottom: 10px;
+}
+
+.framed-image {
+    border-radius: 5px; /* Esquinas redondeadas para la imagen */
+    margin-bottom: 10px;
+}
 
 mat-form-field{
     width: 100%;
