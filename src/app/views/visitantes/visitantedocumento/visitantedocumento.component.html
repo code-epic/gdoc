@@ -29,7 +29,7 @@
                 </div>
                 <div class="card-body">
                     <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
-                    <form [formGroup]="form" (ngSubmit)="guardar()">
+                    <form [formGroup]="form" (ngSubmit)="aceptar()">
                         <div class="row">
                             <div class="col-md-9">
                                 <div class="form-row">
@@ -37,7 +37,7 @@
                                     <div class="col-md-4">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Visitante</mat-label>
-                                            <mat-select formControlName="tipoVisitante">
+                                            <mat-select formControlName="tipoVisitante" (selectionChange)="cambioTipoVisitante($event)">
                                                 <mat-option value="1">MILITAR</mat-option>
                                                 <mat-option value="2">CIVIL</mat-option>
                                             </mat-select>
@@ -88,7 +88,7 @@
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>{{sGrado}}</mat-label>
-                                            <input matInput formControlName="cargo" [disabled]="isPunto">
+                                            <input matInput formControlName="cargo" [disabled]="form.get('cargo')?.disabled">
                                             <mat-error *ngIf="form.get('cargo').hasError('required')">
                                                 El campo es requerido
                                             </mat-error>
@@ -98,7 +98,7 @@
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>{{sNombre}}</mat-label>
-                                            <input matInput formControlName="nmilitar" [disabled]="isPunto">
+                                            <input matInput formControlName="nmilitar" [disabled]="form.get('nmilitar')?.disabled">
                                             <mat-error *ngIf="form.get('nmilitar').hasError('required')">
                                                 El campo es requerido
                                             </mat-error>
@@ -111,10 +111,7 @@
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Unidad o Dependencia</mat-label>
-                                            <mat-select formControlName="unidad">
-                                                <mat-option>Seleccione</mat-option>
-                                                <mat-option *ngFor="let x of lstU" [value]="x.nomb">{{ x.nomb }} </mat-option>
-                                            </mat-select>
+                                            <input matInput formControlName="unidad" placeholder="Unidad o Dependencia">
                                             <mat-error *ngIf="form.get('unidad').hasError('required')">
                                                 El campo es requerido
                                             </mat-error>
@@ -126,7 +123,10 @@
                                             <mat-label>Componente</mat-label>
                                             <mat-select formControlName="comando">
                                                 <mat-option>Seleccione</mat-option>
-                                                <mat-option *ngFor="let x of lstC" [value]="x.nomb">{{ x.nomb }}</mat-option>
+                                                <mat-option value="1">EJERCITO BOLIVARIANO</mat-option>
+                                                <mat-option value="2">AVIACION BOLIVARIANA</mat-option>
+                                                <mat-option value="3">ARMADA NACIONAL</mat-option>
+                                                <mat-option value="4">GUARDIA NACIONAL</mat-option>
                                             </mat-select>
                                             <mat-error *ngIf="form.get('comando').hasError('required')">
                                                 El campo es requerido
@@ -206,9 +206,9 @@
                         <div class="row">
                         <div class="col-md-12">
                             <div class="text-right">
-                                <button class="btn bg-primary text-white" type="submit" [disabled]="form.invalid">Registrar</button>&nbsp;&nbsp;&nbsp;
+                                <button class="btn bg-primary text-white" type="submit" [disabled]="form.invalid">REGISTRAR</button>&nbsp;&nbsp;&nbsp;
                                     <button class="btn bg-warning text-white" type="button"
-                                    (click)="cancelar()">Cancelar</button>
+                                    (click)="limpiarDoc()">LIMPIAR</button>
                             </div>
                         </div>
                     </div>

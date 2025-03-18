@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
-import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
@@ -191,7 +191,8 @@ export class VisitantesComponent implements OnInit {
 
   async listarBuzon(): Promise<void> {
     // console.log('Entrando en listado')
-    this.ngxService.startLoader("loader-aceptar")
+    this.ngxService.startLoader("loader-recibidos")
+    this.ngxService.startLoader("loader-historico")
     try {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
@@ -201,24 +202,7 @@ export class VisitantesComponent implements OnInit {
             e.privado = e.priv == 1 ? true : false;
             e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
             e.color = 'green'
-            switch (e.tdoc.toLowerCase()) {
-              case 'punto de cuenta':
-                e.simbolo = "-P"
-                e.color = 'green'
-                break;
-              case 'tramitacion por organo regular':
-                e.simbolo = "-T"
-                e.color = 'brown'
-                break;
-              case 'resolucion':
-                e.simbolo = "-R"
-                e.color = 'orange'
-                break;
-              default:
-                e.simbolo = ''
-                break;
-            }
-
+            e.simbolo = ''
             e.completed = false;
 
             return e;
@@ -230,15 +214,18 @@ export class VisitantesComponent implements OnInit {
             this.pageSize = 10;
             this.recorrerElementos(0);
           }
-          this.ngxService.stopLoader("loader-aceptar")
+          this.ngxService.stopLoader("loader-recibidos")
+          this.ngxService.stopLoader("loader-historico")
         },
         (error) => {
-          this.ngxService.stopLoader("loader-aceptar")
+          this.ngxService.stopLoader("loader-recibidos")
+          this.ngxService.stopLoader("loader-historico")
         }
       )
     } catch (error) {
       console.error(error)
-      this.ngxService.stopLoader("loader-aceptar")
+      this.ngxService.stopLoader("loader-recibidos")
+      this.ngxService.stopLoader("loader-historico")
     }
   }
 

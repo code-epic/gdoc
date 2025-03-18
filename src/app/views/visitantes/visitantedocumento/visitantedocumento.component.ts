@@ -7,23 +7,16 @@ import { IWKFAlerta, IDocumento, IWKFDocumento } from "src/app/services/control/
 import { LoginService } from "src/app/services/seguridad/login.service";
 import { UtilService } from "src/app/services/util/util.service";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { AngularEditorConfig } from "@kolkov/angular-editor";
 import { ToastrService } from "ngx-toastr";
 import Swal from "sweetalert2";
+import { error } from "console";
 
 @Component({
   selector: "app-visitantedocumento",
   templateUrl: "./visitantedocumento.component.html",
   styleUrls: ["./visitantedocumento.component.scss"],
 })
-export class VisitantedocumentoComponent implements OnInit, OnDestroy {
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    enableToolbar: false,
-    showToolbar: false,
-    placeholder: "",
-  };
+export class VisitantedocumentoComponent implements OnInit {
 
   form: FormGroup;
 
@@ -131,7 +124,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     public formatter: NgbDateParserFormatter,
     private toastrService: ToastrService,
     private fb: FormBuilder,
-    private ruta: Router
+    private ruta: Router,
   ) {
   }
 
@@ -152,13 +145,6 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
         if (e.nombre == "configurar") this.Configurar = true;
       });
     }
-
-    this.Configuracion =
-      sessionStorage.getItem("MD_CConfiguracion") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion")))
-        : [];
-
-    this.listarConfiguracion();
   }
 
   iniciarFormulario() {
@@ -166,8 +152,8 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
       tipoVisitante: ["", Validators.required],
       motivoVisita: ["", Validators.required],
       cedula: ["", Validators.required],
-      cargo: [{ value: "", disabled: this.isPunto }, Validators.required],
-      nmilitar: [{ value: "", disabled: this.isPunto }, Validators.required],
+      cargo: ["" , Validators.required],
+      nmilitar: ["" , Validators.required],
       unidad: ["", Validators.required],
       comando: ["", Validators.required],
       forigen: ["", Validators.required],
@@ -175,6 +161,9 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
       observacion: ["", Validators.required],
       foto: ["", Validators.required],
     });
+
+    this.form.get("cargo")?.disable()
+    this.form.get("nmilitar")?.disable()
   }
 
   // Método para iniciar la cámara
@@ -221,6 +210,16 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     this.bCamara = true;
   }
 
+  cambioTipoVisitante(e: any){
+    if(e.value == 1){
+      this.form.get("cargo")?.disable()
+      this.form.get("nmilitar")?.disable()
+    }else{
+      this.form.get("cargo")?.disable()
+      this.form.get("nmilitar")?.enable()
+    }
+  }
+
   guardar() {
     this.Doc.tipo = this.form.get("tipoVisitante")?.value;
     this.Doc.contenido = this.form.get("motivoVisita")?.value;
@@ -234,45 +233,37 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     this.Doc.nexpediente = this.form.get("nmilitar")?.value;
     this.Doc.instrucciones = this.form.get("observacion")?.value;
     this.Doc.archivo = this.form.get("foto")?.value;
+    console.log(this.Doc);
+    
+
+    const base64Data = this.form.get("foto")?.value.split(",")[1];
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: "image/png" });
+    const formData = new FormData();
+    formData.append("archivo", blob, "foto.png");
+
+    this.apiService.EnviarArchivosDinamicos(formData).subscribe(
+      (data) => {
+        console.log("Archivo enviado correctamente:", data);
+      },
+      (error) => {
+        console.error("Error al enviar la foto:", error);
+      }
+    );
+    
     this.registrar()
   }
 
-  listarConfiguracion() {
-    this.Configuracion.forEach((e) => {
-      switch (e.tipo) {
-        case "3":
-          this.lstU.push(e);
-          break;
-        case "4":
-          this.lstC.push(e);
-          break;
-      }
-    });
-  }
-
   limpiarDoc() {
-    var dia = this.utilService.FechaActual();
-
-    this.forigen = "";
-    this.fplazo = "";
-    this.Doc.ncontrol = "";
-    this.Doc.norigen = "";
-    this.Doc.contenido = "";
-    this.Doc.instrucciones = "";
-    this.Doc.nexpediente = "";
-    this.Doc.codigo = "0";
-    this.Doc.salida = "";
-    this.Doc.tipo = "0";
-    this.Doc.remitente = "0";
-    this.Doc.unidad = "0";
-    this.Doc.creador = "";
-    this.fcreacionDate = NgbDate.from(this.formatter.parse(dia));
-    this.fcreacion = dia;
+    this.cancelar()
+    this.form.reset()
   }
 
   //registrar Un documento pasando por el WorkFlow
 
-  protected aceptar(msj: string) {
+  aceptar() {
     if (this.activarMensaje) return false;
     this.activarMensaje = true;
     Swal.fire({
@@ -287,7 +278,7 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
       allowEscapeKey: true,
     }).then((result) => {
       if (!result.isConfirmed) {
-        this.ruta.navigate(["/visitantes"]);
+        this.guardar()
       }
     });
   }
@@ -329,11 +320,6 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    // this.editor.destroy()
-    // this.xeditor.destroy()
-  }
-
   //obtenerWorkFlow Permite generar los primeros valores de la red del documento
   obtenerWorkFlow() {
     this.WkDoc = {
@@ -350,45 +336,25 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
 
   registrar() {
     this.ngxService.startLoader("loader-aceptar");
-    this.obtenerWorkFlow(); //Obtener valores de una API
-    
+    this.obtenerWorkFlow();
+  
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.obtenerDatos(data);
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (xdata) => {
-            if (this.fplazo.year != undefined) {
-              this.obtenerAlertaWorkFlow(xdata);
-              this.apiService.Ejecutar(this.xAPI).subscribe(
-                (ydata) => {
-                  this.ngxService.stopLoader("loader-aceptar");
-                },
-                (errot) => {
-                  this.toastrService.error(data.msj, `GDoc Wkf.Alerta`)
-                  this.ngxService.stopLoader("loader-aceptar");
-                }
-              )
-            }
-        
-
-            this.aceptar(this.Doc.ncontrol);
-            this.limpiarDoc();
-            this.ngxService.stopLoader("loader-aceptar");
-
-
-            this.aceptar(this.Doc.ncontrol);
-            this.limpiarDoc();
+            this.obtenerAlertaWorkFlow(xdata);
             this.ngxService.stopLoader("loader-aceptar");
           },
-          (errot) => {
-            this.toastrService.error(data.msj, `GDoc Wkf.Documento.Detalle`)
+          (error) => {
+            this.toastrService.error(data.msj, `GDoc Wkf.Documento.Detalle`);
             this.ngxService.stopLoader("loader-aceptar");
           }
         );
-      }, //En caso de fallar Wkf
-      (errot) => {
-        var mensaje = errot + " - " + this.xAPI.funcion;
-        this.toastrService.error(mensaje, `GDoc Wkf.Documento`)
+      },
+      (error) => {
+        var mensaje = error + " - " + this.xAPI.funcion;
+        this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
         this.ngxService.stopLoader("loader-aceptar");
       }
     );
@@ -406,11 +372,11 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     this.Doc.ncontrol = this.utilService.Semillero(data.msj).toUpperCase();
 
     this.Doc.wfdocumento = parseInt(data.msj);
-    this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion);
+    this.Doc.fcreacion = this.utilService.convertirFechaVEN(this.Doc.fcreacion);
     this.Doc.forigen =
       this.forigen != undefined
-        ? this.utilService.ConvertirFecha(this.forigen)
-        : this.utilService.ConvertirFecha(this.fcreacion);
+        ? this.utilService.convertirFechaVEN(this.Doc.fcreacion)
+        : this.utilService.convertirFechaVEN(this.Doc.forigen);
 
     this.Doc.contenido = this.Doc.contenido.toUpperCase();
     this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase();
@@ -431,8 +397,9 @@ export class VisitantedocumentoComponent implements OnInit, OnDestroy {
     this.WAlerta.estado = this.WkDoc.estado;
     this.WAlerta.estatus = this.WkDoc.estatus;
     this.WAlerta.usuario = this.WkDoc.usuario;
-    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo);
+    this.WAlerta.fecha = this.utilService.convertirFechaVEN(this.Doc.forigen);
     this.xAPI.funcion = "WKF_IAlerta";
     this.xAPI.valores = JSON.stringify(this.WAlerta);
-  }
+    this.ruta.navigate(["/visitantes"]);
+  } 
 }

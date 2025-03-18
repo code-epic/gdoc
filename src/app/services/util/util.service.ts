@@ -44,7 +44,18 @@ export class UtilService {
   }
   //retorna fecha en formato Dia/Mes/Anio
   ConvertirFecha(fecha: any): string {
+    console.log(fecha);
+    
     return fecha.year + "-" + +fecha.month + "-" + fecha.day;
+  }
+
+  convertirFechaVEN(fecha: any): string {
+    const f = new Date(fecha);
+    const year = f.getFullYear();
+    const month = String(f.getMonth() + 1).padStart(2, "0");
+    const day = String(f.getDate()).padStart(2, "0");
+  
+    return `${year}-${month}-${day}`;
   }
 
   Semillero(id: string): string {

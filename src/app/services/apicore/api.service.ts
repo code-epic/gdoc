@@ -157,6 +157,16 @@ export class ApiService {
     return this.http.post<any>(this.URL + "subirarchivos", frm, httpOptions);
   }
 
+    //EnviarArchivos dinamicos
+    EnviarArchivosDinamicos(frm: FormData): Observable<any> {
+      var httpOptions = {
+        headers: new HttpHeaders({
+          'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+        })
+      };
+      return this.http.post<any>(this.URL + "subirarchivosdinamicos", frm, httpOptions);
+    }
+
   //  Consulta el PID de una funcion
   ExecFnxId(id: string): any {
     var url = this.URL + `fnx:${id}`
