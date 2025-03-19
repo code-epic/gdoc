@@ -229,34 +229,6 @@ export class VisitantesComponent implements OnInit {
     }
   }
 
-  // async listarBuzon() {
-  //   var bz = []
-
-  //   await this.apiService.Ejecutar(this.xAPI).subscribe(
-  //     (data) => {
-  //       data.Cuerpo.forEach(e => {
-  //         e.existe = e.anom == '' ? true : false
-  //         e.privado = e.priv == 1 ? true : false
-  //         e.completed = false
-  //         e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
-  //         e.color = 'warn'
-  //         bz.push(e)
-  //       })//Registros recorridos como elementos
-
-  //       this.longitud = bz.length
-  //       if (this.longitud > 0) {
-  //         this.estilocheck = ''
-  //         this.bzOriginal = bz
-  //         this.recorrerElementos(0)
-  //       }
-
-  //     },
-  //     (error) => {
-
-  //     }
-  //   )
-  // }
-
   pageChangeEvent(e) {
     this.pageSize = e.pageSize
     this.recorrerElementos(e.pageIndex)
@@ -532,6 +504,12 @@ export class VisitantesComponent implements OnInit {
     }
 
   }
+
+  dwUrl(e) {
+    console.log(e)
+    this.apiService.DwsImg(btoa("F_" + e.remi) + "/" + e.anom);
+  }
+  
 
 
 }

@@ -9,7 +9,6 @@ import { UtilService } from "src/app/services/util/util.service";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import Swal from "sweetalert2";
-import { error } from "console";
 
 @Component({
   selector: "app-visitantedocumento",
@@ -17,7 +16,6 @@ import { error } from "console";
   styleUrls: ["./visitantedocumento.component.scss"],
 })
 export class VisitantedocumentoComponent implements OnInit {
-
   form: FormGroup;
 
   public estadoActual = 14;
@@ -36,15 +34,18 @@ export class VisitantedocumentoComponent implements OnInit {
   public forigen: any;
   public fcuenta: any;
   public fplazo: any;
-
+  
   public fcreacionDate: NgbDate | null;
-
+  
   public activarMensaje = false;
-
+  
   public cargo: string = "";
   public nmilitar: string = "";
   public salida: string = "Nro. de Salida";
   public booPuntoCuenta: boolean = false;
+  
+  public fechaActual: string = "";
+  public horaActual: string = ""
 
   public WkDoc: IWKFDocumento = {
     nombre: "",
@@ -65,7 +66,7 @@ export class VisitantedocumentoComponent implements OnInit {
     tipo: "0",
     remitente: "0",
     unidad: "0",
-    comando: "0",
+    comando: "100",
     contenido: "",
     instrucciones: "",
     codigo: "0",
@@ -107,7 +108,7 @@ export class VisitantedocumentoComponent implements OnInit {
 
   public isPunto: boolean = true;
   public sCedula: string = "Cédula";
-  public sGrado: string = "Grado / Jerarquía";
+  public sGrado: string = "Cargo";
   public sNombre: string = "Nombres y Apellidos";
   public bCamara: boolean = false;
 
@@ -124,13 +125,18 @@ export class VisitantedocumentoComponent implements OnInit {
     public formatter: NgbDateParserFormatter,
     private toastrService: ToastrService,
     private fb: FormBuilder,
-    private ruta: Router,
-  ) {
-  }
+    private ruta: Router
+  ) {}
 
   async ngOnInit() {
-    this.iniciarCamara();
     this.iniciarFormulario();
+
+    this.actualizarFechaHoraActual();
+    setInterval(() => {
+      this.actualizarFechaHoraActual();
+    }, 1000);
+
+    this.iniciarCamara();
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id;
@@ -148,22 +154,60 @@ export class VisitantedocumentoComponent implements OnInit {
   }
 
   iniciarFormulario() {
+  
     this.form = this.fb.group({
       tipoVisitante: ["", Validators.required],
-      motivoVisita: ["", Validators.required],
-      cedula: ["", Validators.required],
-      cargo: ["" , Validators.required],
-      nmilitar: ["" , Validators.required],
-      unidad: ["", Validators.required],
-      comando: ["", Validators.required],
-      forigen: ["", Validators.required],
-      fplazo: ["", Validators.required],
-      observacion: ["", Validators.required],
-      foto: ["", Validators.required],
-    });
+      motivoVisita: [{ value: "", disabled: true }, Validators.required],
+      cedula: [{ value: "", disabled: true }, Validators.required],
+      cargo: [{ value: "", disabled: true }, Validators.required],
+      nmilitar: [{ value: "", disabled: true }, Validators.required],
+      unidad: [{ value: "", disabled: true }, Validators.required],
+      comando: [{ value: "", disabled: true }, Validators.required],
+      forigen: [{ value: "", disabled: true  }, Validators.required],
+      fplazo: [{ value: "", disabled: true }, Validators.required],
+      observacion: [{ value: "", disabled: true }, Validators.required],
+      foto: [{ value: "", disabled: true }, Validators.required],
+    });    
+  
+    this.form.get("tipoVisitante")?.valueChanges.subscribe((value) => {
+      if (value) {
+        this.form.get("motivoVisita")?.enable();
+        this.form.get("cedula")?.enable();
+        this.form.get("cargo")?.enable();
+        this.form.get("nmilitar")?.enable();
+        this.form.get("unidad")?.enable();
+        this.form.get("comando")?.enable();
+        this.form.get("forigen")?.enable();
+        this.form.get("fplazo")?.enable();
+        this.form.get("observacion")?.enable();
+        this.form.get("foto")?.enable();
+      } else {
+        this.form.get("motivoVisita")?.disable();
+        this.form.get("cedula")?.disable();
+        this.form.get("cargo")?.disable();
+        this.form.get("nmilitar")?.disable();
+        this.form.get("unidad")?.disable();
+        this.form.get("comando")?.disable();
+        this.form.get("forigen")?.disable();
+        this.form.get("fplazo")?.disable();
+        this.form.get("observacion")?.disable();
+        this.form.get("foto")?.disable();
+      }
+    });    
+  }
 
-    this.form.get("cargo")?.disable()
-    this.form.get("nmilitar")?.disable()
+  actualizarFechaHoraActual() {
+    const diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+    const ahora = new Date();
+    const diaSemana = diasSemana[ahora.getDay()];
+    const dia = ahora.getDate().toString().padStart(2, "0");
+    const mes = (ahora.getMonth() + 1).toString().padStart(2, "0"); // Los meses comienzan desde 0
+    const anio = ahora.getFullYear();
+    const horas = ahora.getHours().toString().padStart(2, "0");
+    const minutos = ahora.getMinutes().toString().padStart(2, "0");
+    const segundos = ahora.getSeconds().toString().padStart(2, "0");
+    this.fechaActual = `${diaSemana} ${dia}/${mes}/${anio}`;
+    this.horaActual = `${horas}:${minutos}:${segundos}`
   }
 
   // Método para iniciar la cámara
@@ -210,14 +254,25 @@ export class VisitantedocumentoComponent implements OnInit {
     this.bCamara = true;
   }
 
-  cambioTipoVisitante(e: any){
-    if(e.value == 1){
-      this.form.get("cargo")?.disable()
-      this.form.get("nmilitar")?.disable()
-    }else{
-      this.form.get("cargo")?.disable()
-      this.form.get("nmilitar")?.enable()
+  cambioTipoVisitante(e: any) {
+    const hoy = new Date();
+    const manana = new Date();
+    manana.setDate(hoy.getDate() + 1)
+
+    if (e.value == 1) {
+      this.form.get("cargo")?.disable();
+      this.form.get("nmilitar")?.disable();
+      this.sGrado = "Grado / Jerarquía";
+    } else {
+      this.form.get("cargo")?.enable();
+      this.form.get("nmilitar")?.enable();
+      this.sGrado = "Cargo";
     }
+
+    this.form.get("comando")?.setValue("100");
+    this.form.get("forigen")?.setValue(hoy);
+    this.form.get("fplazo")?.setValue(manana);
+    console.log(this.form.value);
   }
 
   guardar() {
@@ -232,56 +287,41 @@ export class VisitantedocumentoComponent implements OnInit {
     this.Doc.norigen = this.form.get("cargo")?.value;
     this.Doc.nexpediente = this.form.get("nmilitar")?.value;
     this.Doc.instrucciones = this.form.get("observacion")?.value;
-    this.Doc.archivo = this.form.get("foto")?.value;
-    console.log(this.Doc);
-    
+    let nameID = btoa("F_" + this.Doc.remitente); //esta es la llave de la carpeta
+    let nmb = this.Doc.remitente + ".png" //id de la imagen en BD
+    this.Doc.archivo = nmb;
+    // console.log(this.Doc);
 
     const base64Data = this.form.get("foto")?.value.split(",")[1];
     const byteCharacters = atob(base64Data);
-    const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
+    const byteNumbers = new Array(byteCharacters.length)
+      .fill(0)
+      .map((_, i) => byteCharacters.charCodeAt(i));
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: "image/png" });
     const formData = new FormData();
-    formData.append("archivo", blob, "foto.png");
+    
+    formData.append("archivos", blob, nmb );
+    formData.append("identificador", nameID);
 
-    this.apiService.EnviarArchivosDinamicos(formData).subscribe(
+    this.apiService.EnviarArchivos(formData).subscribe(
       (data) => {
+        this.registrar();
         console.log("Archivo enviado correctamente:", data);
+        // this.limpiarDoc
       },
       (error) => {
         console.error("Error al enviar la foto:", error);
       }
     );
-    
-    this.registrar()
   }
 
   limpiarDoc() {
-    this.cancelar()
-    this.form.reset()
+    this.cancelar();
+    this.form.reset();
   }
 
   //registrar Un documento pasando por el WorkFlow
-
-  aceptar() {
-    if (this.activarMensaje) return false;
-    this.activarMensaje = true;
-    Swal.fire({
-      title: "El Visitante se ha registrado exitosamente",
-      text: "¿Desea registar otro visitante?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Si",
-      cancelButtonText: "No",
-      allowEscapeKey: true,
-    }).then((result) => {
-      if (!result.isConfirmed) {
-        this.guardar()
-      }
-    });
-  }
 
   /**
    * Consultar datos generales del militar
@@ -302,6 +342,9 @@ export class VisitantedocumentoComponent implements OnInit {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           console.log(data);
+          let militar = data.Cuerpo[0];
+          this.form.get("cargo")?.setValue(militar.descripcion);
+          this.form.get("nmilitar")?.setValue(militar.nombres);
           this.ngxService.stopLoader("loader-aceptar");
         },
         (error) => {
@@ -337,13 +380,14 @@ export class VisitantedocumentoComponent implements OnInit {
   registrar() {
     this.ngxService.startLoader("loader-aceptar");
     this.obtenerWorkFlow();
-  
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.obtenerDatos(data);
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (xdata) => {
-            this.obtenerAlertaWorkFlow(xdata);
+            // this.obtenerAlertaWorkFlow(xdata);
+            this.aceptar();
             this.ngxService.stopLoader("loader-aceptar");
           },
           (error) => {
@@ -400,6 +444,30 @@ export class VisitantedocumentoComponent implements OnInit {
     this.WAlerta.fecha = this.utilService.convertirFechaVEN(this.Doc.forigen);
     this.xAPI.funcion = "WKF_IAlerta";
     this.xAPI.valores = JSON.stringify(this.WAlerta);
-    this.ruta.navigate(["/visitantes"]);
-  } 
+  }
+
+  aceptar() {
+    if (this.activarMensaje) return false;
+    this.activarMensaje = true;
+    Swal.fire({
+      title: "El visitante se ha registrado exitosamente",
+      text: "¿Desea registar otro visitante?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si",
+      cancelButtonText: "No",
+      allowEscapeKey: true,
+    }).then((result) => {
+      if (!result.isConfirmed) {
+        this.ruta.navigate(["/visitantes"]);
+      } else {
+        this.limpiarDoc();
+      }
+    });
+  }
+
+
+
 }

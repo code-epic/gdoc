@@ -14,7 +14,7 @@
                             <h6 class="text-uppercase text-muted ls-1 mb-1">Control de Visitantes</h6>
                             <h2 class="mb-0">Registrar Visitantes</h2>
                         </div>
-                      
+
                         <div class="col-md-1">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
@@ -24,20 +24,21 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
                 </div>
                 <div class="card-body">
                     <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
-                    <form [formGroup]="form" (ngSubmit)="aceptar()">
+                    <form [formGroup]="form" (ngSubmit)="guardar()">
                         <div class="row">
                             <div class="col-md-9">
                                 <div class="form-row">
-    
+
                                     <div class="col-md-4">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Visitante</mat-label>
-                                            <mat-select formControlName="tipoVisitante" (selectionChange)="cambioTipoVisitante($event)">
+                                            <mat-select formControlName="tipoVisitante"
+                                                (selectionChange)="cambioTipoVisitante($event)">
                                                 <mat-option value="1">MILITAR</mat-option>
                                                 <mat-option value="2">CIVIL</mat-option>
                                             </mat-select>
@@ -46,11 +47,11 @@
                                             </mat-error>
                                         </mat-form-field>
                                     </div>
-    
+
                                     <div class="col-md-4">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Motivo Visita</mat-label>
-                                            <mat-select  formControlName="motivoVisita">
+                                            <mat-select formControlName="motivoVisita">
                                                 <mat-option value="EDC">ENTREGA DE DOCUMENTACION</mat-option>
                                                 <mat-option value="REU">REUNION</mat-option>
                                                 <mat-option value="VIS">VISITA</mat-option>
@@ -61,53 +62,49 @@
                                             </mat-error>
                                         </mat-form-field>
                                     </div>
-    
+
                                     <div class="col-md-4">
                                         <mat-form-field appearance="outline">
                                             <mat-label>{{sCedula}}</mat-label>
-                                            <input 
-                                            matInput 
-                                            formControlName="cedula" 
-                                            (keydown.tab)="consultarCedula()" 
-                                            onkeypress='return event.charCode >= 48 && event.charCode <= 57'
-                                            [maxlength]="'12'"
-                                            onPaste="return false" 
-                                            onCopy="return false"
-                                            onCut="return false"
-                                            >
+                                            <input matInput formControlName="cedula" (keydown.tab)="consultarCedula()"
+                                                onkeypress='return event.charCode >= 48 && event.charCode <= 57'
+                                                [maxlength]="'12'" onPaste="return false" onCopy="return false"
+                                                onCut="return false">
                                             <mat-error *ngIf="form.get('cedula').hasError('required')">
                                                 El campo es requerido
                                             </mat-error>
                                         </mat-form-field>
                                     </div>
-    
+
                                 </div>
-    
+
                                 <div class="form-row">
-    
+
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>{{sGrado}}</mat-label>
-                                            <input matInput formControlName="cargo" [disabled]="form.get('cargo')?.disabled">
+                                            <input matInput formControlName="cargo"
+                                                [disabled]="form.get('cargo')?.disabled">
                                             <mat-error *ngIf="form.get('cargo').hasError('required')">
                                                 El campo es requerido
                                             </mat-error>
                                         </mat-form-field>
                                     </div>
-    
+
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>{{sNombre}}</mat-label>
-                                            <input matInput formControlName="nmilitar" [disabled]="form.get('nmilitar')?.disabled">
+                                            <input matInput formControlName="nmilitar"
+                                                [disabled]="form.get('nmilitar')?.disabled">
                                             <mat-error *ngIf="form.get('nmilitar').hasError('required')">
                                                 El campo es requerido
                                             </mat-error>
                                         </mat-form-field>
                                     </div>
                                 </div>
-    
+
                                 <div class="form-row">
-    
+
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Unidad o Dependencia</mat-label>
@@ -117,43 +114,43 @@
                                             </mat-error>
                                         </mat-form-field>
                                     </div>
-    
+
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Componente</mat-label>
                                             <mat-select formControlName="comando">
-                                                <mat-option>Seleccione</mat-option>
-                                                <mat-option value="1">EJERCITO BOLIVARIANO</mat-option>
-                                                <mat-option value="2">AVIACION BOLIVARIANA</mat-option>
-                                                <mat-option value="3">ARMADA NACIONAL</mat-option>
-                                                <mat-option value="4">GUARDIA NACIONAL</mat-option>
+                                                <mat-option value="100">EJERCITO BOLIVARIANO</mat-option>
+                                                <mat-option value="200">AVIACION BOLIVARIANA</mat-option>
+                                                <mat-option value="300">ARMADA NACIONAL</mat-option>
+                                                <mat-option value="400">GUARDIA NACIONAL</mat-option>
                                             </mat-select>
                                             <mat-error *ngIf="form.get('comando').hasError('required')">
                                                 El campo es requerido
                                             </mat-error>
                                         </mat-form-field>
                                     </div>
-    
+
                                 </div>
-    
+
                                 <div class="form-row">
-    
+
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Fecha Visita</mat-label>
-                                            <input matInput [matDatepicker]="fechaVisita" formControlName="forigen" readonly>
-                                            <mat-datepicker-toggle matSuffix [for]="fechaVisita"></mat-datepicker-toggle>
+                                            <input matInput [matDatepicker]="fechaVisita" formControlName="forigen">
+                                            <mat-datepicker-toggle matSuffix
+                                                [for]="fechaVisita"></mat-datepicker-toggle>
                                             <mat-datepicker #fechaVisita></mat-datepicker>
                                             <mat-error *ngIf="form.get('forigen').hasError('required')">
                                                 El campo es requerido
                                             </mat-error>
                                         </mat-form-field>
                                     </div>
-    
+
                                     <div class="col-md-6">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Plazo</mat-label>
-                                            <input matInput [matDatepicker]="fechaPlazo" formControlName="fplazo" readonly>
+                                            <input matInput [matDatepicker]="fechaPlazo" formControlName="fplazo">
                                             <mat-datepicker-toggle matSuffix [for]="fechaPlazo"></mat-datepicker-toggle>
                                             <mat-datepicker #fechaPlazo></mat-datepicker>
                                             <mat-error *ngIf="form.get('fplazo').hasError('required')">
@@ -161,17 +158,13 @@
                                             </mat-error>
                                         </mat-form-field>
                                     </div>
+
                                     <div class="col-md-12">
                                         <mat-form-field appearance="outline">
                                             <mat-label>Observación</mat-label>
-                                            <textarea 
-                                                matInput 
-                                                formControlName="observacion"
-                                                onPaste="return false" 
-                                                onCopy="return false"
-                                                onCut="return false"
-                                                [maxlength]="'150'"
-                                            ></textarea>
+                                            <textarea matInput formControlName="observacion" onPaste="return false"
+                                                onCopy="return false" onCut="return false"
+                                                [maxlength]="'150'"></textarea>
                                             <mat-error *ngIf="form.get('observacion').hasError('required')">
                                                 El campo es requerido
                                             </mat-error>
@@ -180,14 +173,16 @@
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <div class="col-md-12 d-flex justify-content-center align-items-center" *ngIf="!mostrarCamara">
+                                <div class="col-md-12 d-flex justify-content-center align-items-center"
+                                    *ngIf="!mostrarCamara">
                                     <div class="image-frame text-center">
                                         <img [src]="fotoCapturada" alt="Foto capturada"
                                             style="width: 200px; height: 150px;" class="framed-image" />
                                         <br>
                                     </div>
                                 </div>
-                                <div class="col-md-12 d-flex justify-content-center align-items-center" *ngIf="mostrarCamara">
+                                <div class="col-md-12 d-flex justify-content-center align-items-center"
+                                    *ngIf="mostrarCamara">
                                     <div class="image-frame text-center">
                                         <div id="video-container" *ngIf="mostrarCamara">
                                         </div>
@@ -204,14 +199,20 @@
                         </div>
                         <hr>
                         <div class="row">
-                        <div class="col-md-12">
-                            <div class="text-right">
-                                <button class="btn bg-primary text-white" type="submit" [disabled]="form.invalid">REGISTRAR</button>&nbsp;&nbsp;&nbsp;
+                            <div class="col-md-2 d-flex flex-column justify-content-center gap-1 align-items-start">
+                                <span class="text-muted">{{ fechaActual }}</span>
+                                <span class="text-muted">{{ horaActual }}</span>
+                            </div>
+                            <div class="col-md-10">
+
+                                <div class="text-right">
+                                    <button class="btn bg-primary text-white" type="submit"
+                                        [disabled]="form.invalid">REGISTRAR</button>&nbsp;&nbsp;&nbsp;
                                     <button class="btn bg-warning text-white" type="button"
-                                    (click)="limpiarDoc()">LIMPIAR</button>
+                                        (click)="limpiarDoc()">LIMPIAR</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     </form>
                 </div>
             </div>

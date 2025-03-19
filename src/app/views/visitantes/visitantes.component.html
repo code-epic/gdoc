@@ -59,24 +59,23 @@
           </div>
         </div>
 
-        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
-          (selectedIndexChange)="seleccionNavegacion($event)">
+        <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" (selectedIndexChange)="seleccionNavegacion($event)">
           <mat-tab>
             <ng-template mat-tab-label>
               &nbsp;RECIBIDOS
             </ng-template>
             <ngx-ui-loader [loaderId]="'loader-recibidos'"></ngx-ui-loader>
-            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
-              <mat-selection-list >
+            <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
-                    <div class="col-md-1 texto-lista" >
-                    
+                    <div class="col-md-1 texto-lista">
+        
                     </div>
                     <div class="col-md-2 texto-lista">
                       FECHA
                     </div>
-
+        
                     <div class="col-md-2 texto-lista">
                       NOMBRES
                     </div>
@@ -84,29 +83,28 @@
                       UNIDAD
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
-                        value="{{xyear}}" style="margin-top: -20px;">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear" value="{{xyear}}"
+                        style="margin-top: -20px;">
                         <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
                       </select>
-                     
+        
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
-                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
-                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
-                    </select>
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses" value="{{xmeses}}"
+                        style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
+                        <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
-
+        
                 </mat-list>
               </mat-selection-list>
               <mat-selection-list #lstDocumentos>
-                <mat-list *ngFor="let e of buzon; let i=index "
-                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                <mat-list *ngFor="let e of buzon; let i=index " style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                      <button mat-icon-button aria-label="Example " class="text-primary"
-                        (click)="open(observacion, e.idd)" id="recibir">
+                      <button mat-icon-button aria-label="Example " class="text-primary" (click)="open(observacion, e.idd)"
+                        id="recibir">
                         <mat-icon>task_alt</mat-icon>
                       </button>
                     </div>
@@ -114,10 +112,12 @@
                       {{ e.fcre | date:"dd-MM-yyyy" }}
                     </div>
                     <div class="col-md-2 texto-lista">
-                      {{ e.remi | uppercase}}
+                      <a (click)="dwUrl(e)">
+                        {{ e.remi | uppercase}}
+                      </a>
                     </div>
                     <div class="col-md-6 texto-detalle">
-                      {{ e.udep | uppercase }} 
+                      {{ e.udep | uppercase }}
                     </div>
                     <div class="col-md-1 text-right">
                       <button mat-icon-button aria-label="Privado">
@@ -128,23 +128,23 @@
                 </mat-list>
               </mat-selection-list>
             </div>
-
+        
             <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
-
+        
           </mat-tab>
           <mat-tab>
             <ng-template mat-tab-label>
               &nbsp;HISTÓRICO VISITANTES
             </ng-template>
             <ngx-ui-loader [loaderId]="'loader-historico'"></ngx-ui-loader>
-            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
-              <mat-selection-list >
+            <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
-                    <div class="col-md-1 texto-lista" >
-                    
+                    <div class="col-md-1 texto-lista">
+        
                     </div>
                     <div class="col-md-2 texto-lista">
                       FECHA
@@ -156,40 +156,41 @@
                       UNIDAD
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
-                        value="{{xyear}}" style="margin-top: -20px;">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear" value="{{xyear}}"
+                        style="margin-top: -20px;">
                         <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
                       </select>
-                     
+        
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
-                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(1)">
-                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
-                    </select>
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses" value="{{xmeses}}"
+                        style="margin-top: -20px;" (change)="seleccionNavegacion(1)">
+                        <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                      </select>
+                    </div>
+        
                   </div>
-
-                  </div>
-
+        
                 </mat-list>
               </mat-selection-list>
               <mat-selection-list #lstProcesados>
-                <mat-list *ngFor="let e of buzon; let i=index "
-                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                <mat-list *ngFor="let e of buzon; let i=index " style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
                       <!-- <button mat-icon-button aria-label="Visibilidad" class="text-gray" (click)="open(observacion, e.idd)" id="procesados">
-                        <mat-icon>add_circle</mat-icon>
-                      </button> -->
+                                <mat-icon>add_circle</mat-icon>
+                              </button> -->
                     </div>
                     <div class="col-md-2 texto-lista">
                       {{ e.fech | date:"dd-MM-yyyy" }}
                     </div>
                     <div class="col-md-2 texto-lista">
-                      {{ e.remi | uppercase}}
+                      <a (click)="dwUrl(e)">
+                        {{ e.remi | uppercase}}
+                      </a>
                     </div>
                     <div class="col-md-6 texto-detalle">
-                      {{ e.udep | uppercase }} 
+                      {{ e.udep | uppercase }}
                     </div>
                     <div class="col-md- text-right">
                       <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
@@ -200,11 +201,11 @@
                 </mat-list>
               </mat-selection-list>
             </div>
-
+        
             <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
-
+        
           </mat-tab>
         </mat-tab-group> 
       </div>
