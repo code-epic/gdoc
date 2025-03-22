@@ -193,7 +193,7 @@
                       {{ e.udep | uppercase }}
                     </div>
                     <div class="col-md- text-right">
-                      <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                      <button mat-icon-button aria-label="Adjuntar" (click)="openFicha(ficha, i)">
                         <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
                     </div>
@@ -215,7 +215,7 @@
   <!-- Fin de Tarjeta Padre -->
 </div>
 <ng-template #observacion let-modal>
-  <div class="modal-header header bg-gradient-info">
+  <div class="modal-header header bg-gradient-success">
     <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
   </div>
   <div class="modal-body">
@@ -256,9 +256,68 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')" id="btnaceptar">
+    <button class="btn bg-gradient-success text-white " (click)="insertarObservacion();modal.close('Save')" id="btnaceptar">
       <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
     <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
+
+<ng-template #ficha let-modal>
+  <div class="modal-header header bg-gradient-success w-100 d-flex justify-content-center align-content-center">
+    <h2 class="modal-title text-white text-center mb-0" id="modal-basic-title">FICHA</h2>
+  </div>
+  
+  <div class="modal-body">
+    <div class="row">
+
+      <div class="col-md-4 d-flex flex-column justify-content-center align-content-center">
+        <div class="image-frame text-center">
+          <img  id="miImagen" alt="Foto capturada" class="framed-image" />
+          <br>
+        </div>
+        <span class="w-100 text-center mt-3">{{visitante.remi}}</span>
+      </div>
+
+      <div class="col-md-4">
+        <div class="d-flex flex-column justify-content-center align-content-center">
+          <span class="fw-bolder">Nombre</span>
+          <span>{{visitante.nexp}}</span>
+          <br>
+          <span class="fw-bolder">Grado</span>
+          <span>{{visitante.nori}}</span>
+          <br>
+          <span class="fw-bolder">F. Visita</span>
+          <span>{{visitante.fech | date: 'yyyy-MM-dd'}}</span>
+          <br>
+          <span class="fw-bolder">Motivo</span>
+          <span>{{obtenerMotivo(visitante.cont)}}</span>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="d-flex flex-column justify-content-center align-content-center">
+          <span class="fw-bolder">Componente</span>
+          <span>{{obtenerComponente(visitante.coma)}}</span>
+          <br>
+          <span class="fw-bolder">UNIDAD</span>
+          <span>{{visitante.udep}}</span>
+          <br>
+          <span class="fw-bolder">F. Plazo</span>
+          <span>{{obtenerComponente(visitante.fcre | date: 'yyyy-MM-dd')}}</span>
+          <br>
+          <span class="fw-bolder">Observacion</span>
+          <span>{{visitante.inst}}</span>
+          <br>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+  <div class="modal-footer">
+    <button class="btn btn-warning" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cerrar</button>
   </div>
 </ng-template>

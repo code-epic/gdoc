@@ -276,6 +276,7 @@ export class VisitantedocumentoComponent implements OnInit {
   }
 
   guardar() {
+    this.ngxService.startLoader("loader-aceptar");
     this.Doc.tipo = this.form.get("tipoVisitante")?.value;
     this.Doc.contenido = this.form.get("motivoVisita")?.value;
     this.Doc.remitente = this.form.get("cedula")?.value;
@@ -327,6 +328,7 @@ export class VisitantedocumentoComponent implements OnInit {
    * Consultar datos generales del militar
    */
   consultarCedula() {
+    this.ngxService.startLoader("loader-aceptar");
     if (this.form.get("cedula")?.value == "") return false;
     this.isPunto = true;
     if (
@@ -335,7 +337,6 @@ export class VisitantedocumentoComponent implements OnInit {
     ) {
       this.isPunto = false;
     } else {
-      this.ngxService.startLoader("loader-aceptar");
       this.xAPI.funcion = "MPPD_CDatosBasicos";
       this.xAPI.parametros = this.form.get("cedula")?.value;
       this.xAPI.valores = "";
@@ -378,7 +379,6 @@ export class VisitantedocumentoComponent implements OnInit {
   }
 
   registrar() {
-    this.ngxService.startLoader("loader-aceptar");
     this.obtenerWorkFlow();
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -386,7 +386,6 @@ export class VisitantedocumentoComponent implements OnInit {
         this.obtenerDatos(data);
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (xdata) => {
-            // this.obtenerAlertaWorkFlow(xdata);
             this.aceptar();
             this.ngxService.stopLoader("loader-aceptar");
           },
@@ -411,7 +410,7 @@ export class VisitantedocumentoComponent implements OnInit {
       this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
       return false;
     }
-    this.xAPI.funcion = "WKF_IDocumentoDetalle";
+    this.xAPI.funcion = "WKF_IDocumentoDetalleFile";
 
     this.Doc.ncontrol = this.utilService.Semillero(data.msj).toUpperCase();
 

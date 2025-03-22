@@ -65,6 +65,8 @@ export class VisitantesComponent implements OnInit {
   public bzOriginal = [] //Listado Original
   public buzon = []
 
+  public visitante: any
+  public imageUrl: string | null = null;
 
   public bzBusqueda = []
   public bzAlertasO = []
@@ -153,10 +155,45 @@ export class VisitantesComponent implements OnInit {
   open(content, id) {
     this.numControl = id
     this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
-    this.modalService.open(content);
-
+    this.modalService.open(content)
   }
 
+  openFicha(c, i) {
+    this.modalService.open(c, {
+      centered: true,
+      size: 'xl'
+    })
+
+    this.visitante = this.buzon[i];
+    this.loadImage();
+  }
+
+  obtenerComponente(c: string): string{
+    switch(c){
+      case "100":
+        return "EJERCITO BOLIVARIANO"
+      case "200":
+        return "AVIACION BOLIVARIANA"
+      case "300":
+        return "ARMADA BOLIVARIANA"
+      case "400":
+        return "GUARDIA NACIONAL"
+    }
+
+    return c || ''
+  }
+
+  obtenerMotivo(m: string): string{
+    switch(m){
+      case "EDC":
+        return "ENTREGA DE DOCUMENTACION"
+      case "REU":
+        return "REUNION"
+      case "VIS":
+        return "VISITA"
+    }
+    return m || ''
+  }
 
   seleccionNavegacion(e) {
     this.buzon = []
@@ -188,15 +225,15 @@ export class VisitantesComponent implements OnInit {
 
   }
 
-
   async listarBuzon(): Promise<void> {
-    // console.log('Entrando en listado')
+    console.log('Entrando en listado')
+    console.log(this.xAPI);
+    
     this.ngxService.startLoader("loader-recibidos")
     this.ngxService.startLoader("loader-historico")
     try {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data)
           this.buzon = data.Cuerpo.map((e) => {
             e.existe = e.anom == '' ? true : false;
             e.privado = e.priv == 1 ? true : false;
@@ -204,7 +241,6 @@ export class VisitantesComponent implements OnInit {
             e.color = 'green'
             e.simbolo = ''
             e.completed = false;
-
             return e;
           });
           this.longitud = this.buzon.length;
@@ -460,11 +496,6 @@ export class VisitantesComponent implements OnInit {
       }) //
   }
 
-
-
-
-
-
   fileSelected(e) {
     this.archivos.push(e.target.files[0])
   }
@@ -506,11 +537,24 @@ export class VisitantesComponent implements OnInit {
   }
 
   dwUrl(e) {
-    console.log(e)
+    console.log(e);
     this.apiService.DwsImg(btoa("F_" + e.remi) + "/" + e.anom);
   }
-  
 
+  async loadImage() {
+    if (this.visitante) {
+      try {      
+        let nameID = btoa("F_" + this.visitante.remi); // esta es la llave de la carpeta
+        let nmb = this.visitante.anom; // id de la imagen en BD
 
+        const imageUrl = await this.apiService.DwsImgSource(nameID + '/' + nmb);
+        const imgElement = document.getElementById('miImagen') as HTMLImageElement;
+        imgElement.src = imageUrl;
+        
+    } catch (error) {
+        console.error('Error al cargar la imagen:', error);
+    }
+    }
+  }
 }
 
