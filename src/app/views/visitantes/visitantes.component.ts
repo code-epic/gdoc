@@ -234,6 +234,8 @@ export class VisitantesComponent implements OnInit {
     try {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
+          console.log(data);
+          
           this.buzon = data.Cuerpo.map((e) => {
             e.existe = e.anom == '' ? true : false;
             e.privado = e.priv == 1 ? true : false;

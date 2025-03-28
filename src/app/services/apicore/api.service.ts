@@ -235,12 +235,12 @@ export class ApiService {
 
         this.http.get(ruta, httpOptions).subscribe(
             (response: any) => {
-                const blob = new Blob([response], { type: 'image/png' });
-                const url = window.URL.createObjectURL(blob);
-                resolve(url); // Resolvemos la promesa con la URL de la imagen
+              const blob = new Blob([response], { type: 'image/png' });
+              const url = window.URL.createObjectURL(blob);
+              resolve(url); // Resolvemos la promesa con la URL de la imagen
             },
-            (error) => {
-                reject(error);
+            (error) => {                
+              reject(error);
             }
         );
     });

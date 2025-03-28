@@ -343,10 +343,15 @@ export class VisitantedocumentoComponent implements OnInit {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           console.log(data);
-          let militar = data.Cuerpo[0];
-          this.form.get("cargo")?.setValue(militar.descripcion);
-          this.form.get("nmilitar")?.setValue(militar.nombres);
-          this.ngxService.stopLoader("loader-aceptar");
+          if(data){
+            let militar = data.Cuerpo[0];
+            this.form.get("cargo")?.setValue(militar.descripcion);
+            this.form.get("nmilitar")?.setValue(militar.nombres);
+            this.ngxService.stopLoader("loader-aceptar");
+          }else{
+            this.ngxService.stopLoader("loader-aceptar");
+            console.error("CEDULA INVALIDA");
+          }
         },
         (error) => {
           this.ngxService.stopLoader("loader-aceptar");
