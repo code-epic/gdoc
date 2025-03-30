@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { NgbDate, NgbDateParserFormatter } from "@ng-bootstrap/ng-bootstrap";
 import { NgxUiLoaderService } from "ngx-ui-loader";
@@ -9,6 +9,7 @@ import { UtilService } from "src/app/services/util/util.service";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import Swal from "sweetalert2";
+import { switchMap } from "rxjs";
 
 @Component({
   selector: "app-visitantedocumento",
@@ -201,7 +202,7 @@ export class VisitantedocumentoComponent implements OnInit {
     const ahora = new Date();
     const diaSemana = diasSemana[ahora.getDay()];
     const dia = ahora.getDate().toString().padStart(2, "0");
-    const mes = (ahora.getMonth() + 1).toString().padStart(2, "0"); // Los meses comienzan desde 0
+    const mes = (ahora.getMonth() + 1).toString().padStart(2, "0");
     const anio = ahora.getFullYear();
     const horas = ahora.getHours().toString().padStart(2, "0");
     const minutos = ahora.getMinutes().toString().padStart(2, "0");
@@ -255,6 +256,7 @@ export class VisitantedocumentoComponent implements OnInit {
   }
 
   cambioTipoVisitante(e: any) {
+    this.limpiarDoc(e.value)
     const hoy = new Date();
     const manana = new Date();
     manana.setDate(hoy.getDate() + 1)
@@ -272,7 +274,6 @@ export class VisitantedocumentoComponent implements OnInit {
     this.form.get("comando")?.setValue("100");
     this.form.get("forigen")?.setValue(hoy);
     this.form.get("fplazo")?.setValue(manana);
-    console.log(this.form.value);
   }
 
   guardar() {
@@ -317,18 +318,26 @@ export class VisitantedocumentoComponent implements OnInit {
     );
   }
 
-  limpiarDoc() {
+  limpiarDoc(e = null) {
     this.cancelar();
     this.form.reset();
+    if (e) {
+      this.form.get("tipoVisitante")?.setValue(e);
+    }
   }
-
-  //registrar Un documento pasando por el WorkFlow
 
   /**
    * Consultar datos generales del militar
    */
   consultarCedula() {
-    this.ngxService.startLoader("loader-aceptar");
+    if(this.form.get('tipoVisitante').value == "1"){
+      this.consultarMilitar()
+    }else{
+      this.consultarCivil()
+    }
+  }
+
+  consultarMilitar(){
     if (this.form.get("cedula")?.value == "") return false;
     this.isPunto = true;
     if (
@@ -337,28 +346,40 @@ export class VisitantedocumentoComponent implements OnInit {
     ) {
       this.isPunto = false;
     } else {
+      this.ngxService.startLoader("loader-aceptar");
       this.xAPI.funcion = "MPPD_CDatosBasicos";
       this.xAPI.parametros = this.form.get("cedula")?.value;
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           console.log(data);
-          if(data){
+          if(data.Cuerpo[0]){
             let militar = data.Cuerpo[0];
+            this.form.get("cargo")?.disable();
+            this.form.get("nmilitar")?.disable();
             this.form.get("cargo")?.setValue(militar.descripcion);
             this.form.get("nmilitar")?.setValue(militar.nombres);
             this.ngxService.stopLoader("loader-aceptar");
           }else{
             this.ngxService.stopLoader("loader-aceptar");
-            console.error("CEDULA INVALIDA");
+            this.toastrService.error('Cedula invalida', 'Introduzca el nombre y cargo');
+            this.form.get("cargo")?.enable();
+            this.form.get("nmilitar")?.enable();
           }
         },
         (error) => {
           this.ngxService.stopLoader("loader-aceptar");
+          this.toastrService.error('Error de conexion a los datos', 'Introduzca el nombre y cargo');
           console.error("Error de conexion a los datos ", error);
+          this.form.get("cargo")?.enable();
+          this.form.get("nmilitar")?.enable();
         }
       );
     }
+  }
+
+  consultarCivil(){
+    
   }
 
   cancelar() {
@@ -367,6 +388,27 @@ export class VisitantedocumentoComponent implements OnInit {
       this.form.get("foto")?.setValue("");
       this.iniciarCamara();
     }
+  }
+
+  registrar() {
+    this.obtenerWorkFlow();
+  
+    this.apiService.Ejecutar(this.xAPI).pipe(
+      switchMap((data) => {
+        this.obtenerDatos(data);
+        return this.apiService.Ejecutar(this.xAPI);
+      })
+    ).subscribe(
+      (xdata) => {
+        this.aceptar();
+        this.ngxService.stopLoader("loader-aceptar");
+      },
+      (error) => {
+        const mensaje = error + " - " + this.xAPI.funcion;
+        this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
+        this.ngxService.stopLoader("loader-aceptar");
+      }
+    );
   }
 
   //obtenerWorkFlow Permite generar los primeros valores de la red del documento
@@ -381,31 +423,6 @@ export class VisitantedocumentoComponent implements OnInit {
     };
     this.xAPI.funcion = "WKF_IDocumento";
     this.xAPI.valores = JSON.stringify(this.WkDoc);
-  }
-
-  registrar() {
-    this.obtenerWorkFlow();
-
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.obtenerDatos(data);
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          (xdata) => {
-            this.aceptar();
-            this.ngxService.stopLoader("loader-aceptar");
-          },
-          (error) => {
-            this.toastrService.error(data.msj, `GDoc Wkf.Documento.Detalle`);
-            this.ngxService.stopLoader("loader-aceptar");
-          }
-        );
-      },
-      (error) => {
-        var mensaje = error + " - " + this.xAPI.funcion;
-        this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
-        this.ngxService.stopLoader("loader-aceptar");
-      }
-    );
   }
 
   //Obtener los dados de Documento
@@ -450,6 +467,15 @@ export class VisitantedocumentoComponent implements OnInit {
     this.xAPI.valores = JSON.stringify(this.WAlerta);
   }
 
+  formularioValido(): boolean{
+    if (this.form.get("tipoVisitante")?.value == "1") {
+      return this.form.invalid || this.form.get("nombre")?.value == ""      
+    }else{
+      return this.form.invalid
+    }
+    return false
+  }
+
   aceptar() {
     if (this.activarMensaje) return false;
     this.activarMensaje = true;
@@ -471,7 +497,4 @@ export class VisitantedocumentoComponent implements OnInit {
       }
     });
   }
-
-
-
 }
