@@ -26,6 +26,7 @@
                 </div>
             </div>
             <div class="card-body bg-transparent">
+                <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
                 <div class="row justify-content-md-center">
                     <div class="col-md-8">
                         <div class="form-group">
@@ -94,7 +95,7 @@
                                 {{ config.obse | uppercase}}
                             </div>
                             <div class="col-md-2 text-right" >
-                              <button mat-icon-button aria-label="Eliminar" (click)="eliminar(config.id)">
+                              <button mat-icon-button aria-label="Eliminar" (click)="eliminar(config.id, config.nomb)">
                                 <mat-icon>delete</mat-icon>
                               </button>
                             </div>
