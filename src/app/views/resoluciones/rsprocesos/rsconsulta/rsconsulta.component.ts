@@ -1113,25 +1113,26 @@ export class RsconsultaComponent implements OnInit {
   }
 
   dwUrl(e) {
-    let valorAnio =
-      e.fecha_resolucion != undefined ? parseInt(e.fecha_resolucion.substring(0, 4)) : 0;
-
-    if (valorAnio < 2025) {
-      console.log(e)
-      this.descargarAntes2025(e);
-    } else {
-      if (e.archivo != undefined && e.archivo != "") {
-        if (e.formato == "") {
-          let cedula = e.cedula != undefined ? e.cedula : this.dwCedula;
-          this.apiService.DwsResol(btoa("R" + cedula) + "/" + e.archivo);
-        } else {
-          let valor = e.titulo == undefined ? e.numero : e.titulo;
-          let acce = btoa("ASC" + valor + e.formato);
-          this.apiService.DwsResol(acce + "/" + e.archivo);
-        }
-      } else {
+    // let valorAnio =  e.fecha_resolucion != undefined? parseInt(e.fecha_resolucion.substring(0, 4)): 0;
+    if (e.fecha_resolucion != undefined) {
+      if (this.utilService.esFechaAntesMarzo2025(e.fecha_resolucion)) {
         this.descargarAntes2025(e);
+      } else {
+        if (e.archivo != undefined && e.archivo != "") {
+          if (e.formato == "") {
+            let cedula = e.cedula != undefined ? e.cedula : this.dwCedula;
+            this.apiService.DwsResol(btoa("R" + cedula) + "/" + e.archivo);
+          } else {
+            let valor = e.titulo == undefined ? e.numero : e.titulo;
+            let acce = btoa("ASC" + valor + e.formato);
+            this.apiService.DwsResol(acce + "/" + e.archivo);
+          }
+        } else {
+          this.descargarAntes2025(e);
+        }
       }
+    } else {
+      this.descargarAntes2025(e);
     }
   }
 
@@ -1145,13 +1146,13 @@ export class RsconsultaComponent implements OnInit {
     }
 
     anio = anio.substring(0, 4);
-    console.log(anio, codigo, this.UbicacionCarpetas)
+    console.log(anio, codigo, this.UbicacionCarpetas);
     this.UbicacionCarpetas.forEach((e) => {
       if (e.anio == anio) {
         let peticion = e.nombre + "/" + codigo + ".pdf";
         // https://10.190.1.160
         // this.carpeta = "/cdn/" + e.nombre + "/" + codigo + ".pdf";
-        console.log(peticion)
+        console.log(peticion);
         this.apiService.DwsCdn(peticion);
         return;
       }
