@@ -61,114 +61,125 @@
 
         <mat-tab-group mat-stretch-tabs class="example-stretched-tabs"
           (selectedIndexChange)="seleccionNavegacion($event)">
-          <mat-tab>
+          <mat-tab style="overflow-x: hidden;">
             <ng-template mat-tab-label>
               &nbsp;RECIBIDOS
             </ng-template>
-            <ngx-ui-loader [loaderId]="'loader-recibidos'"></ngx-ui-loader>
-            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
-              <mat-selection-list >
-                <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                  <div class="row">
-                    <div class="col-md-1 texto-lista" >
-                    
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      FECHA
+            <div style="overflow-x: hidden; width: 98%;">
+              <ngx-ui-loader [loaderId]="'loader-recibidos'"></ngx-ui-loader>
+              <div>
+                <mat-selection-list>
+                  <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                    <div class="row my-3">
+                      <div class="col-md-8"></div>
+                      <div class="col-md-2 texto-lista">
+                        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                          value="{{xyear}}" style="margin-top: -20px;">
+                          <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                        </select>
+
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                          value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
+                          <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                        </select>
+                      </div>
                     </div>
 
-                    <div class="col-md-2 texto-lista">
-                      NOMBRES
-                    </div>
-                    <div class="col-md-3 texto-lista">
-                      UNIDAD
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
-                        value="{{xyear}}" style="margin-top: -20px;">
-                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
-                      </select>
-                     
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
-                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
-                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
-                    </select>
-                  </div>
-                </div>
+                    <div class="row">
+                      <div class="col-md-1 texto-lista">
 
-                </mat-list>
-              </mat-selection-list>
-              <mat-selection-list #lstDocumentos>
-                <mat-list *ngFor="let e of buzon; let i=index "
-                  style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                  <div class="row">
-                    <div class="col-md-1">
-                      <button mat-icon-button aria-label="Example " class="text-primary"
-                        (click)="open(observacion, e.idd)" id="recibir">
-                        <mat-icon>task_alt</mat-icon>
-                      </button>
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        FECHA
+                      </div>
+
+                      <div class="col-md-5 texto-lista">
+                        NOMBRES
+                      </div>
+                      <div class="col-md-4 texto-lista">
+                        UNIDAD
+                      </div>
                     </div>
-                    <div class="col-md-2 texto-lista">
-                      {{ e.fcre | date:"dd-MM-yyyy" }}
+
+                  </mat-list>
+                </mat-selection-list>
+                <mat-selection-list #lstDocumentos>
+                  <mat-list *ngFor="let e of buzon; let i=index "
+                    style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                    <div class="row">
+                      <div class="col-md-1">
+                        <button mat-icon-button aria-label="Example " class="text-primary"
+                          (click)="open(observacion, e.idd)" id="recibir">
+                          <mat-icon>task_alt</mat-icon>
+                        </button>
+                      </div>
+                      <div class="col-md-2 texto-lista">
+                        {{ e.fech | date:"dd-MM-yyyy" }}
+                      </div>
+                      <div class="col-md-4 texto-lista">
+                        <a (click)="dwUrl(e)">
+                          {{e.nori || ''}} {{ e.nexp | uppercase}}
+                        </a>
+                      </div>
+                      <div class="col-md-4 texto-detalle">
+                        {{ e.udep | uppercase }}
+                      </div>
+                      <div class="col-md-1 text-right">
+                        <button mat-icon-button aria-label="Privado">
+                          <mat-icon *ngIf="e.privado" class="text-gray">no_encryption</mat-icon>
+                        </button>
+                      </div>
                     </div>
-                    <div class="col-md-2 texto-lista">
-                      {{ e.remi | uppercase}}
-                    </div>
-                    <div class="col-md-6 texto-detalle">
-                      {{ e.udep | uppercase }} 
-                    </div>
-                    <div class="col-md-1 text-right">
-                      <button mat-icon-button aria-label="Privado">
-                        <mat-icon *ngIf="e.privado" class="text-gray">no_encryption</mat-icon>
-                      </button>
-                    </div>
-                  </div>
-                </mat-list>
-              </mat-selection-list>
+                  </mat-list>
+                </mat-selection-list>
+              </div>
+
+              <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+              </mat-paginator>
             </div>
-
-            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
-              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
-            </mat-paginator>
-
           </mat-tab>
-          <mat-tab>
+
+          <mat-tab style="overflow-x: hidden;">
             <ng-template mat-tab-label>
               &nbsp;HISTÓRICO VISITANTES
             </ng-template>
             <ngx-ui-loader [loaderId]="'loader-historico'"></ngx-ui-loader>
-            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
-              <mat-selection-list >
+            <div style="overflow-x: hidden; width: 98%;">
+              <mat-selection-list>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                  <div class="row">
-                    <div class="col-md-1 texto-lista" >
-                    
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      FECHA
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      NOMBRES
-                    </div>
-                    <div class="col-md-3 texto-lista">
-                      UNIDAD
-                    </div>
+                  <div class="row my-3">
+                    <div class="col-md-8"></div>
                     <div class="col-md-2 texto-lista">
                       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
                         value="{{xyear}}" style="margin-top: -20px;">
                         <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
                       </select>
-                     
+
                     </div>
                     <div class="col-md-2 texto-lista">
                       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
-                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(1)">
-                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
-                    </select>
+                        value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(1)">
+                        <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                      </select>
+                    </div>
                   </div>
 
+                  <div class="row">
+                    <div class="col-md-1 texto-lista">
+
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      FECHA
+                    </div>
+                    <div class="col-md-5 texto-lista">
+                      NOMBRES
+                    </div>
+                    <div class="col-md-4 texto-lista">
+                      UNIDAD
+                    </div>
                   </div>
 
                 </mat-list>
@@ -179,34 +190,37 @@
                   <div class="row">
                     <div class="col-md-1">
                       <!-- <button mat-icon-button aria-label="Visibilidad" class="text-gray" (click)="open(observacion, e.idd)" id="procesados">
-                        <mat-icon>add_circle</mat-icon>
-                      </button> -->
+                                <mat-icon>add_circle</mat-icon>
+                              </button> -->
                     </div>
                     <div class="col-md-2 texto-lista">
                       {{ e.fech | date:"dd-MM-yyyy" }}
                     </div>
-                    <div class="col-md-2 texto-lista">
-                      {{ e.remi | uppercase}}
+                    <div class="col-md-4 texto-lista">
+                      <a (click)="dwUrl(e)">
+                        {{e.nori || ''}} {{ e.nexp | uppercase}}
+                      </a>
                     </div>
-                    <div class="col-md-6 texto-detalle">
-                      {{ e.udep | uppercase }} 
+                    <div class="col-md-4 texto-detalle">
+                      {{ e.udep | uppercase }}
                     </div>
-                    <div class="col-md- text-right">
-                      <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                    <div class="col-md-1 text-right">
+                      <button mat-icon-button aria-label="Adjuntar" (click)="openFicha(ficha, i)">
                         <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
                     </div>
                   </div>
                 </mat-list>
               </mat-selection-list>
+
+              <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+              </mat-paginator>
             </div>
 
-            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
-              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
-            </mat-paginator>
-
           </mat-tab>
-        </mat-tab-group> 
+        </mat-tab-group>
+
       </div>
     </div>
 
@@ -214,7 +228,7 @@
   <!-- Fin de Tarjeta Padre -->
 </div>
 <ng-template #observacion let-modal>
-  <div class="modal-header header bg-gradient-info">
+  <div class="modal-header header bg-gradient-success">
     <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
   </div>
   <div class="modal-body">
@@ -239,7 +253,7 @@
       </select>
     </div>
 
-    <div class="form-group  col-md-12"  *ngIf="vplazo">
+    <div class="form-group  col-md-12" *ngIf="vplazo">
       <label for="tmsCreacion">Plazo / Alerta</label>
       <div class="form-group" style="width:100%">
         <div class="input-group" style="width:100%">
@@ -255,9 +269,68 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')" id="btnaceptar">
+    <button class="btn bg-gradient-success text-white " (click)="insertarObservacion();modal.close('Save')"
+      id="btnaceptar">
       <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
     <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
+
+<ng-template #ficha let-modal>
+  <div class="modal-header header bg-gradient-info w-100 d-flex justify-content-center align-content-center">
+    <h2 class="modal-title text-white text-center mb-0" id="modal-basic-title">FICHA</h2>
+  </div>
+
+  <div class="modal-body">
+    <div class="row">
+
+      <div class="col-md-4 d-flex flex-column justify-content-center align-content-center">
+        <div class="image-frame text-center">
+          <img id="miImagen" alt="Foto capturada" class="framed-image" />
+          <br>
+        </div>
+        <span class="w-100 text-center mt-3">{{visitante.remi}}</span>
+      </div>
+
+      <div class="col-md-4">
+        <div class="d-flex flex-column justify-content-center align-content-center">
+          <span class="fw-bolder">Nombre</span>
+          <span>{{visitante.nexp.toUpperCase()}}</span>
+          <br>
+          <span class="fw-bolder">Grado</span>
+          <span>{{visitante.nori.toUpperCase()}}</span>
+          <br>
+          <span class="fw-bolder">F. Visita</span>
+          <span>{{visitante.fech | date: 'yyyy-MM-dd'}}</span>
+          <br>
+          <span class="fw-bolder">Motivo</span>
+          <span>{{obtenerMotivo(visitante.cont)}}</span>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="d-flex flex-column justify-content-center align-content-center">
+          <span class="fw-bolder">Componente</span>
+          <span>{{obtenerComponente(visitante.coma).toUpperCase()}}</span>
+          <br>
+          <span class="fw-bolder">UNIDAD</span>
+          <span>{{visitante.udep.toUpperCase()}}</span>
+          <br>
+          <span class="fw-bolder">F. Plazo</span>
+          <span>{{obtenerComponente(visitante.fcre | date: 'yyyy-MM-dd')}}</span>
+          <br>
+          <span class="fw-bolder">Observacion</span>
+          <span>{{visitante.inst.toUpperCase()}}</span>
+          <br>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-warning" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cerrar</button>
   </div>
 </ng-template>

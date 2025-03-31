@@ -164,7 +164,7 @@ export class ApiService {
           'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         })
       };
-      return this.http.post<any>(this.URL + "subirarchivosdinamicos", frm, httpOptions);
+      return this.http.post<any>(this.URL + "subirarchivos", frm, httpOptions);
     }
 
   //  Consulta el PID de una funcion
@@ -202,6 +202,48 @@ export class ApiService {
 
   Dws(peticion: string): string {
     return this.URL + 'dw/' + peticion
+  }
+
+  DwsImg(peticion: string) {
+    let ruta = this.URL + 'dwsimg/' + peticion
+    // console.log(ruta)
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+      }),
+      responseType: 'blob' as 'json'
+    };
+
+    this.http.get(ruta, httpOptions).subscribe((response: any) => {
+      const blob = new Blob([response], { type: 'image/png' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url);
+    });
+  }
+
+  DwsImgSource(peticion: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        let ruta = this.URL + 'dwsimg/' + peticion;
+        const httpOptions = {
+            headers: new HttpHeaders({
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+            }),
+            responseType: 'blob' as 'json'
+        };
+
+        this.http.get(ruta, httpOptions).subscribe(
+            (response: any) => {
+              const blob = new Blob([response], { type: 'image/png' });
+              const url = window.URL.createObjectURL(blob);
+              resolve(url); // Resolvemos la promesa con la URL de la imagen
+            },
+            (error) => {                
+              reject(error);
+            }
+        );
+    });
   }
 
   DwsResol(peticion: string) {

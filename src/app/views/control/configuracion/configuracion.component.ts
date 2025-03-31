@@ -3,7 +3,6 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { LoginService } from 'src/app/services/seguridad/login.service';
-import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -27,39 +26,15 @@ export class ConfiguracionComponent implements OnInit {
   public lst = [] //Consulta Global de Configuraciones
   public lista = [] //Objeto filtrado
   public tipo = 0
-  constructor(private apiService: ApiService, 
+  
+  constructor(
+    private apiService: ApiService, 
     private toastrService: ToastrService,
     private loginService: LoginService,
-    private ruta: Router,
-    private ngxService: NgxUiLoaderService) { 
-
-
-  }
+    private ngxService: NgxUiLoaderService) { }
 
   ngOnInit(): void {
-    this.listarConfiguracion()
-  }
-
-  listarConfiguracion(){
-    this.xApi.funcion = 'MD_CConfiguracion'
-    this.xApi.parametros = '%'
-    this.xApi.valores = ''
-    this.apiService.Ejecutar(this.xApi).subscribe(
-      data => {
-        this.lst = data.Cuerpo
-      },
-      error => {
-        console.error('Fallo consultando los datos de Configuraciones')
-      }
-    )
-  }
-
-
-  selTipo(){
-    this.lista = []
-    this.lst.forEach(e => {
-      if ( e.tipo == this.tipo ) this.lista.push(e)
-    });
+    this.listarConfiguracion();
   }
 
   guardar(){
@@ -115,14 +90,14 @@ export class ConfiguracionComponent implements OnInit {
 
   }
 
-   limpiar(){
+  limpiar(){
     this.nombre = ""
     this.observacion = ""
     this.registrar = !this.registrar
     this.ngxService.stopLoader("loader-registrar")
   }
 
-  eliminar(id : string){
+  eliminar(id : string, n : string){
     Swal.fire({
       title: 'Elimiar',
       text: "¿Está seguro que desea eliminar?",
@@ -133,36 +108,68 @@ export class ConfiguracionComponent implements OnInit {
       confirmButtonText: 'Si!'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.ejecutar(id)
+        this.ejecutar(id, n)
       }
     })    
   }
 
-
-
-  ejecutar(id : string){
-    this.ngxService.startLoader("loader-registrar")
+  ejecutar(id : string, n: string){
     this.xApi.funcion = 'MPPD_EConfiguracion'
     this.xApi.parametros = id
+    
     this.xApi.valores = ''
     this.apiService.Ejecutar(this.xApi).subscribe(
       data => {
+        this.selTipo(true)
+
         this.toastrService.success(
-          'Tu archivo ha sido cargado con exito ',
+          `${n} ha sido eliminado con exito`,
           `MPPD_EConfiguracion`
         );
-        this.ngxService.stopLoader("loader-aceptar")
-        this.ruta.navigate(['/principal'])
       },
       error => {
         this.toastrService.error(
           error,
           `MPPD_EConfiguracion`
         );
-        this.ngxService.stopLoader("loader-aceptar")
         console.error('Fallo consultando los datos de Configuraciones')
       }
     )
+  }
+
+  listarConfiguracion(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.xApi.funcion = 'MD_CConfiguracion';
+      this.xApi.parametros = '%';
+      this.xApi.valores = '';
+      this.apiService.Ejecutar(this.xApi).subscribe(
+        data => {
+          this.lst = data.Cuerpo;
+          resolve(); // Resuelve la promesa cuando los datos se cargan
+        },
+        error => {
+          console.error('Fallo consultando los datos de Configuraciones');
+          reject(error); // Rechaza la promesa en caso de error
+        }
+      );
+    });
+  }
+
+  async selTipo(consultar: boolean = false) {
+    this.ngxService.startLoader("loader-aceptar")
+
+    if (consultar) {
+      this.lst = []
+      await this.listarConfiguracion();
+    }
+
+    this.lista = [];
+    this.lst.forEach(e => {
+      if (e.tipo == this.tipo) {
+        this.lista.push(e);
+      }
+    });
+    this.ngxService.stopLoader("loader-aceptar")
   }
 
   // testing(){

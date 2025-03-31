@@ -116,3 +116,14 @@ select{
 textarea {
   text-transform: uppercase;
 }
+
+.fw-bolder{
+  font-weight: bolder;
+  text-transform: uppercase;
+}
+
+.framed-image{
+  width: 200px; 
+  height: 150px;
+  border-radius: 10px;
+}
