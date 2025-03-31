@@ -120,7 +120,7 @@
                       </div>
                       <div class="col-md-4 texto-lista">
                         <a (click)="dwUrl(e)">
-                          {{e.nori || ''}} {{ e.nexp | uppercase}}
+                          {{e.nori.toUpperCase() || ''}} {{ e.nexp | uppercase}}
                         </a>
                       </div>
                       <div class="col-md-4 texto-detalle">
@@ -198,7 +198,7 @@
                     </div>
                     <div class="col-md-4 texto-lista">
                       <a (click)="dwUrl(e)">
-                        {{e.nori || ''}} {{ e.nexp | uppercase}}
+                        {{e.nori.toUpperCase() || ''}} {{ e.nexp | uppercase}}
                       </a>
                     </div>
                     <div class="col-md-4 texto-detalle">
@@ -287,7 +287,12 @@
 
       <div class="col-md-4 d-flex flex-column justify-content-center align-content-center">
         <div class="image-frame text-center">
-          <img id="miImagen" alt="Foto capturada" class="framed-image" />
+          <img
+          id="miImagen" 
+          alt="Foto capturada" 
+          class="framed-image"
+          (dblclick)="abrirModalVistaPrevia(vistaPrevia)"
+          />
           <br>
         </div>
         <span class="w-100 text-center mt-3">{{visitante.remi}}</span>
@@ -329,8 +334,17 @@
     </div>
   </div>
 
+  <mat-divider></mat-divider>
+
   <div class="modal-footer">
     <button class="btn btn-warning" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cerrar</button>
   </div>
+</ng-template>
+
+<ng-template #vistaPrevia let-modal>
+<div class="modal-body text-center" style="padding: 0.5rem; border-radius: 15px;">
+  <img [src]="imageUrl" 
+  alt="Vista previa" class="image-large" />
+</div>
 </ng-template>

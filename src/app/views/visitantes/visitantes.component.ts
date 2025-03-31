@@ -9,7 +9,6 @@ import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
 
-
 @Component({
   selector: 'app-visitantes',
   templateUrl: './visitantes.component.html',
@@ -557,6 +556,13 @@ export class VisitantesComponent implements OnInit {
         console.error('Error al cargar la imagen:', error);
     }
     }
+  }
+
+  abrirModalVistaPrevia(vistaPrevia: any): void {
+    this.modalService.open(vistaPrevia, {
+      centered: true,
+      size: 'lg'
+    });
   }
 }
 
