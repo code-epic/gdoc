@@ -299,4 +299,24 @@ export class UtilService {
     }
     return str;
   }
+
+  esFechaAntesMarzo2025(dateString: string): boolean {
+    // Dividir el string en día, mes y año
+    const [dayStr, monthStr, yearStr] = dateString.split('-');
+    const day = parseInt(dayStr, 10);
+    const month = parseInt(monthStr, 10);
+    const year = parseInt(yearStr, 10);
+  
+    // Validar que los valores son números
+    if (isNaN(day) || isNaN(month) || isNaN(year)) {
+      return false; // Formato inválido
+    }
+  
+    // Crear la fecha (los meses en JavaScript van de 0 a 11)
+    const inputDate = new Date(year, month - 1, day);
+    const cutoffDate = new Date(2025, 3, 1); // 1 de abril de 2025
+  
+    // Comparar las fechas
+    return inputDate < cutoffDate;
+  }
 }
