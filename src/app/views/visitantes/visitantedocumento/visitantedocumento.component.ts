@@ -117,6 +117,8 @@ export class VisitantedocumentoComponent implements OnInit {
   mostrarCamara: boolean = false; // Para controlar la visibilidad de la cámara
   vdE: HTMLVideoElement | null = null;
 
+  registrando: boolean = false
+
   constructor(
     private apiService: ApiService,
     private utilService: UtilService,
@@ -277,6 +279,7 @@ export class VisitantedocumentoComponent implements OnInit {
   }
 
   guardar() {
+    this.registrando = true
     this.ngxService.startLoader("loader-aceptar");
     this.Doc.tipo = this.form.get("tipoVisitante")?.value;
     this.Doc.contenido = this.form.get("motivoVisita")?.value;
@@ -468,12 +471,15 @@ export class VisitantedocumentoComponent implements OnInit {
   }
 
   formularioValido(): boolean{
-    if (this.form.get("tipoVisitante")?.value == "1") {
-      return this.form.invalid || this.form.get("nombre")?.value == ""      
-    }else{
-      return this.form.invalid
+    if (this.registrando) {
+      return true; 
     }
-    return false
+  
+    if (this.form.get("tipoVisitante")?.value == "1") {
+      return this.form.invalid || this.form.get("nombre")?.value == "";
+    } else {
+      return this.form.invalid;
+    }
   }
 
   aceptar() {
@@ -493,6 +499,7 @@ export class VisitantedocumentoComponent implements OnInit {
       if (!result.isConfirmed) {
         this.ruta.navigate(["/visitantes"]);
       } else {
+        this.registrando = false
         this.limpiarDoc();
       }
     });
