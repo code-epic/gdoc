@@ -119,7 +119,7 @@
                         {{ e.fech | date:"dd-MM-yyyy" }}
                       </div>
                       <div class="col-md-4 texto-lista">
-                        <a (click)="dwUrl(e)">
+                        <a>
                           {{e.nori.toUpperCase() || ''}} {{ e.nexp | uppercase}}
                         </a>
                       </div>
@@ -197,7 +197,7 @@
                       {{ e.fech | date:"dd-MM-yyyy" }}
                     </div>
                     <div class="col-md-4 texto-lista">
-                      <a (click)="dwUrl(e)">
+                      <a>
                         {{e.nori.toUpperCase() || ''}} {{ e.nexp | uppercase}}
                       </a>
                     </div>
@@ -288,12 +288,16 @@
       <div class="col-md-4 d-flex flex-column justify-content-center align-content-center">
         <div class="image-frame text-center">
           <img
-          id="miImagen" 
-          alt="Foto capturada" 
-          class="framed-image"
-          (dblclick)="abrirModalVistaPrevia(vistaPrevia)"
+            *ngIf="imageUrl; else loadingSpinner"
+            [src]="imageUrl" 
+            id="miImagen"
+            alt="Foto capturada" 
+            class="framed-image" 
+            (click)="abrirModalVistaPrevia(vistaPrevia)"
           />
-          <br>
+          <ng-template style="width: 25%;" class="image-frame" #loadingSpinner>
+            <mat-spinner></mat-spinner>
+          </ng-template>
         </div>
         <span class="w-100 text-center mt-3">{{visitante.remi}}</span>
       </div>
@@ -343,8 +347,15 @@
 </ng-template>
 
 <ng-template #vistaPrevia let-modal>
-<div class="modal-body text-center" style="padding: 0.5rem; border-radius: 15px;">
-  <img [src]="imageUrl" 
-  alt="Vista previa" class="image-large" />
-</div>
+  <div class="modal-body image-frame text-center" style="padding: 0.5rem; border-radius: 15px;">
+    <img 
+    *ngIf="imageUrl; else loadingSpinnerPrevious"
+    id="miImagen"
+    alt="Vista previa" 
+    class="image-large" />
+
+    <ng-template style="width: 25%; display: flex; justify-content: center; align-items: center; padding: 2rem 0;" #loadingSpinnerPrevious>
+      <mat-spinner></mat-spinner>
+    </ng-template>
+  </div>
 </ng-template>

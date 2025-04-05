@@ -35,7 +35,7 @@ export class VisitantesComponent implements OnInit {
 
   public cmbDestino = 'S'
 
- 
+
 
   public cmbAcciones = [
     { 'valor': '0', 'texto': 'ATENDIDO', 'visible': '0' },
@@ -54,7 +54,7 @@ export class VisitantesComponent implements OnInit {
   public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
-    valores : ''
+    valores: ''
   }
   public lst = []
   public lstEstados = [] //Listar Estados
@@ -105,10 +105,10 @@ export class VisitantesComponent implements OnInit {
     observacion: ''
   }
 
-  public DocAdjunto : DocumentoAdjunto = {
-    documento : '',
-    archivo : '',
-    usuario : ''
+  public DocAdjunto: DocumentoAdjunto = {
+    documento: '',
+    archivo: '',
+    usuario: ''
   }
 
   public lstMeses = []
@@ -124,9 +124,9 @@ export class VisitantesComponent implements OnInit {
     private loginService: LoginService,
     private modalService: NgbModal) {
 
-      this.lstMeses = this.apiService.Xmeses
-      this.lstYear = this.apiService.Xyear
-      
+    this.lstMeses = this.apiService.Xmeses
+    this.lstYear = this.apiService.Xyear
+
   }
 
   ngOnInit(): void {
@@ -153,7 +153,7 @@ export class VisitantesComponent implements OnInit {
 
   open(content, id) {
     this.numControl = id
-    this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
+    this.hashcontrol = btoa("D" + this.numControl) //Cifrar documentos
     this.modalService.open(content)
   }
 
@@ -167,8 +167,8 @@ export class VisitantesComponent implements OnInit {
     this.loadImage();
   }
 
-  obtenerComponente(c: string): string{
-    switch(c){
+  obtenerComponente(c: string): string {
+    switch (c) {
       case "100":
         return "EJERCITO BOLIVARIANO"
       case "200":
@@ -182,8 +182,8 @@ export class VisitantesComponent implements OnInit {
     return c || ''
   }
 
-  obtenerMotivo(m: string): string{
-    switch(m){
+  obtenerMotivo(m: string): string {
+    switch (m) {
       case "EDC":
         return "ENTREGA DE DOCUMENTACION"
       case "REU":
@@ -207,15 +207,15 @@ export class VisitantesComponent implements OnInit {
 
     switch (e) {
       case 0:
-        this.xAPI.parametros = `${this.estadoActual},${this.estatusAcutal},${this.fecha_desde},${this.fecha_hasta}` 
+        this.xAPI.parametros = `${this.estadoActual},${this.estatusAcutal},${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon()
         break
       case 1:
-        this.xAPI.parametros = `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}` 
+        this.xAPI.parametros = `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon()
         break
       case 2:
-        this.xAPI.parametros = `${this.estadoActual},3,${this.fecha_desde},${this.fecha_hasta}` 
+        this.xAPI.parametros = `${this.estadoActual},3,${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon()
         break
       default:
@@ -227,14 +227,14 @@ export class VisitantesComponent implements OnInit {
   async listarBuzon(): Promise<void> {
     console.log('Entrando en listado')
     console.log(this.xAPI);
-    
+
     this.ngxService.startLoader("loader-recibidos")
     this.ngxService.startLoader("loader-historico")
     try {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           console.log(data);
-          
+
           this.buzon = data.Cuerpo.map((e) => {
             e.existe = e.anom == '' ? true : false;
             e.privado = e.priv == 1 ? true : false;
@@ -507,7 +507,7 @@ export class VisitantesComponent implements OnInit {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
           this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
-          this.xAPI.parametros =  '' 
+          this.xAPI.parametros = ''
           this.DocAdjunto.archivo = this.archivos[0].name
           this.DocAdjunto.usuario = this.loginService.Usuario.id
           this.DocAdjunto.documento = this.numControl
@@ -520,7 +520,7 @@ export class VisitantesComponent implements OnInit {
                   'Tu archivo ha sido cargado con exito ',
                   `GDoc Registro`
                 );
-               
+
               } else {
                 this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
               }
@@ -544,17 +544,24 @@ export class VisitantesComponent implements OnInit {
 
   async loadImage() {
     if (this.visitante) {
-      try {      
+      this.imageUrl = null
+      try {
         let nameID = btoa("F_" + this.visitante.remi); // esta es la llave de la carpeta
         let nmb = this.visitante.anom; // id de la imagen en BD
 
-        const imageUrl = await this.apiService.DwsImgSource(nameID + '/' + nmb);
+        const url = await this.apiService.DwsImgSource(nameID + '/' + nmb);
         const imgElement = document.getElementById('miImagen') as HTMLImageElement;
-        imgElement.src = imageUrl;
-        
-    } catch (error) {
+        const vistaPrevia = document.getElementById('vistaPrevia') as HTMLImageElement;
+        if (vistaPrevia) {
+          vistaPrevia.src = url
+          this.imageUrl = url
+        }
+        imgElement.src = url;
+        this.imageUrl = url
+
+      } catch (error) {
         console.error('Error al cargar la imagen:', error);
-    }
+      }
     }
   }
 
@@ -563,6 +570,7 @@ export class VisitantesComponent implements OnInit {
       centered: true,
       size: 'lg'
     });
+    this.loadImage();
   }
 }
 
