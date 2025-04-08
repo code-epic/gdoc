@@ -119,8 +119,8 @@
                         {{ e.fech | date:"dd-MM-yyyy" }}
                       </div>
                       <div class="col-md-4 texto-lista">
-                        <a (click)="dwUrl(e)">
-                          {{e.nori || ''}} {{ e.nexp | uppercase}}
+                        <a>
+                          {{e.nori.toUpperCase() || ''}} {{ e.nexp | uppercase}}
                         </a>
                       </div>
                       <div class="col-md-4 texto-detalle">
@@ -197,8 +197,8 @@
                       {{ e.fech | date:"dd-MM-yyyy" }}
                     </div>
                     <div class="col-md-4 texto-lista">
-                      <a (click)="dwUrl(e)">
-                        {{e.nori || ''}} {{ e.nexp | uppercase}}
+                      <a>
+                        {{e.nori.toUpperCase() || ''}} {{ e.nexp | uppercase}}
                       </a>
                     </div>
                     <div class="col-md-4 texto-detalle">
@@ -287,8 +287,17 @@
 
       <div class="col-md-4 d-flex flex-column justify-content-center align-content-center">
         <div class="image-frame text-center">
-          <img id="miImagen" alt="Foto capturada" class="framed-image" />
-          <br>
+          <img
+            *ngIf="imageUrl; else loadingSpinner"
+            [src]="imageUrl" 
+            id="miImagen"
+            alt="Foto capturada" 
+            class="framed-image" 
+            (click)="abrirModalVistaPrevia(vistaPrevia)"
+          />
+          <ng-template style="width: 25%;" class="image-frame" #loadingSpinner>
+            <mat-spinner></mat-spinner>
+          </ng-template>
         </div>
         <span class="w-100 text-center mt-3">{{visitante.remi}}</span>
       </div>
@@ -329,8 +338,24 @@
     </div>
   </div>
 
+  <mat-divider></mat-divider>
+
   <div class="modal-footer">
     <button class="btn btn-warning" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cerrar</button>
+  </div>
+</ng-template>
+
+<ng-template #vistaPrevia let-modal>
+  <div class="modal-body image-frame text-center" style="padding: 0.5rem; border-radius: 15px;">
+    <img 
+    *ngIf="imageUrl; else loadingSpinnerPrevious"
+    id="miImagen"
+    alt="Vista previa" 
+    class="image-large" />
+
+    <ng-template style="width: 25%; display: flex; justify-content: center; align-items: center; padding: 2rem 0;" #loadingSpinnerPrevious>
+      <mat-spinner></mat-spinner>
+    </ng-template>
   </div>
 </ng-template>

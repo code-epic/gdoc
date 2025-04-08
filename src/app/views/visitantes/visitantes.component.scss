@@ -126,4 +126,16 @@ textarea {
   width: 200px; 
   height: 150px;
   border-radius: 10px;
+  cursor: pointer;
+}
+
+.image-large {
+  width: 100%; 
+  border-radius: 10px;
+}
+
+.image-frame{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
