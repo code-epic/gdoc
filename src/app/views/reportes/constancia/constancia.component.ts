@@ -47,7 +47,8 @@ export class ConstanciaComponent implements OnInit {
     privacidad: 0,
     historial: '',
     traza: '',
-    subdocumento: ''
+    subdocumento: '',
+    
   }
 
   public WAlerta: IWKFAlerta = {
@@ -80,6 +81,7 @@ export class ConstanciaComponent implements OnInit {
   public sGrado: string = 'GRADO /  GERARQUIA'
   public sNombre: string = 'NOMBRES Y APELLIDOS'
   public sAccion: string = 'ACCION TOMADA'
+  public btraza: boolean = false
 
   constructor(
     private apiService: ApiService,
@@ -95,6 +97,7 @@ export class ConstanciaComponent implements OnInit {
       this.lstUsuario = sessionStorage.getItem("CEP_CUsuario") != undefined ? JSON.parse(atob(sessionStorage.getItem("CEP_CUsuario"))) : []
 
       this.consultarDocumento(id)
+      this.ngxService.startLoader("loader-aceptar")
     }
 
 
@@ -111,7 +114,7 @@ export class ConstanciaComponent implements OnInit {
   consultarDocumento(numBase64: string) {
     const base = atob(numBase64)
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
-    this.ngxService.startLoader("loader-aceptar")
+    
     this.xAPI.parametros = base
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -162,23 +165,28 @@ export class ConstanciaComponent implements OnInit {
           this.Doc.contenido = this.domSanitizer.sanitize(SecurityContext.HTML, this.Doc.contenido)
           // console.log(this.lstTraza);
           if (this.lstSubDoc.length > 0) this.bCuentas = true
-          console.log(this.lstSubDoc)
+          
           if (this.Doc.tipo.toLocaleLowerCase().indexOf('contratos') >= 0) {
             this.setDescripcionContratos()
           }
           const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
-          // console.log('traza:', traza)
-          this.lstTraza = await traza.map(e => {
-            // console.log(e)
-            let el = typeof e == 'object' ? e : JSON.parse(e)
-            let nombre = this.lstUsuario.filter(ex => {
-              return ex.key == el.usuario
+        
+          if ( this.lstTraza.length == 0){
+            this.nexpediente = this.Doc.estado_doc + ' / ' + this.Doc.estatus_doc
+          }else{
+            this.btraza = true
+            this.lstTraza = await traza.map(e => {
+              let el = typeof e == 'object' ? e : JSON.parse(e)
+              let nombre = this.lstUsuario.filter(ex => {
+                return ex.key == el.usuario
+              })
+  
+              el.descripcion = nombre[0]==undefined ? '' : nombre[0].nomb
+              return el
             })
+            this.lstTraza.sort((a, b) => b.id - a.id)
+          }
 
-            el.descripcion = nombre[0]==undefined ? '' : nombre[0].nomb
-            return el
-          })
-          this.lstTraza.sort((a, b) => b.id - a.id)
           this.ngxService.stopLoader("loader-aceptar")
         });
       },
