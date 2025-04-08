@@ -508,69 +508,69 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       return
     }
 
-    console.log(this.fcreacion)
+    // console.log(this.fcreacion)
 
-    // this.apiService.Ejecutar(this.xAPI).subscribe(
-    //   (data) => {
-    //     this.obtenerDatos(data)
-    //     this.apiService.Ejecutar(this.xAPI).subscribe(
-    //       (xdata) => {
-    //         if (this.fplazo.year != undefined) {
-    //           this.obtenerAlertaWorkFlow(xdata)
-    //           this.apiService.Ejecutar(this.xAPI).subscribe(
-    //             (ydata) => {
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.obtenerDatos(data)
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          (xdata) => {
+            if (this.fplazo.year != undefined) {
+              this.obtenerAlertaWorkFlow(xdata)
+              this.apiService.Ejecutar(this.xAPI).subscribe(
+                (ydata) => {
 
-    //               this.ngxService.stopLoader("loader-aceptar")
-    //             },
-    //             (errot) => {
+                  this.ngxService.stopLoader("loader-aceptar")
+                },
+                (errot) => {
 
-    //               this.toastrService.error(data.msj, `GDoc Wkf.Alerta`)
-    //               this.ngxService.stopLoader("loader-aceptar")
-    //             }
-    //           )
-    //         }
-    //         const cant = this.lstCuenta.length
+                  this.toastrService.error(data.msj, `GDoc Wkf.Alerta`)
+                  this.ngxService.stopLoader("loader-aceptar")
+                }
+              )
+            }
+            const cant = this.lstCuenta.length
 
-    //         if (cant > 0) {
-    //           this.salvarCuentas(this.Doc.wfdocumento)
+            if (cant > 0) {
+              this.salvarCuentas(this.Doc.wfdocumento)
 
-    //         } else {
-    //           this.aceptar(this.Doc.ncontrol)
-    //           this.limpiarDoc()
-    //           this.ngxService.stopLoader("loader-aceptar")
-    //         }
-    //         const cantdep = this.lstDependencias.length
-    //         const mpuntocuenta = this.toppings.value.length
+            } else {
+              this.aceptar(this.Doc.ncontrol)
+              this.limpiarDoc()
+              this.ngxService.stopLoader("loader-aceptar")
+            }
+            const cantdep = this.lstDependencias.length
+            const mpuntocuenta = this.toppings.value.length
 
-    //         if (cantdep > 0) {
-    //           this.salvarDependencias(this.Doc.wfdocumento)
-    //           if (mpuntocuenta > 0) {
-    //             this.lstPC = this.toppings.value
-    //             this.salvarPuntoCuenta(this.Doc.wfdocumento)
-    //           }
-    //         } else {
-    //           this.aceptar(this.Doc.ncontrol)
-    //           this.limpiarDoc()
-    //           this.ngxService.stopLoader("loader-aceptar")
-    //         }
-
-
-    //       },
-    //       (errot) => {
-    //         this.toastrService.error(data.msj, `GDoc Wkf.Documento.Detalle`)
-    //         this.ngxService.stopLoader("loader-aceptar")
-    //       }
-    //     )
-
-    //   }, //En caso de fallar Wkf
-    //   (errot) => {
-    //     var mensaje = errot + ' - ' + this.xAPI.funcion
-    //     this.toastrService.error(mensaje, `GDoc Wkf.Documento`)
-    //     this.ngxService.stopLoader("loader-aceptar")
+            if (cantdep > 0) {
+              this.salvarDependencias(this.Doc.wfdocumento)
+              if (mpuntocuenta > 0) {
+                this.lstPC = this.toppings.value
+                this.salvarPuntoCuenta(this.Doc.wfdocumento)
+              }
+            } else {
+              this.aceptar(this.Doc.ncontrol)
+              this.limpiarDoc()
+              this.ngxService.stopLoader("loader-aceptar")
+            }
 
 
-    //   }
-    // )
+          },
+          (errot) => {
+            this.toastrService.error(data.msj, `GDoc Wkf.Documento.Detalle`)
+            this.ngxService.stopLoader("loader-aceptar")
+          }
+        )
+
+      }, //En caso de fallar Wkf
+      (errot) => {
+        var mensaje = errot + ' - ' + this.xAPI.funcion
+        this.toastrService.error(mensaje, `GDoc Wkf.Documento`)
+        this.ngxService.stopLoader("loader-aceptar")
+
+
+      }
+    )
 
 
 
