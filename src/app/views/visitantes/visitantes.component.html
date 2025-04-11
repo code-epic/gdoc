@@ -127,8 +127,8 @@
                         {{ e.udep | uppercase }}
                       </div>
                       <div class="col-md-1 text-right">
-                        <button mat-icon-button aria-label="Privado">
-                          <mat-icon *ngIf="e.privado" class="text-gray">no_encryption</mat-icon>
+                        <button mat-icon-button aria-label="Privado" (click)="abrirModalVistaPrevia(vistaPrevia, e)">
+                          <mat-icon class="text-gray">attach_file</mat-icon>
                         </button>
                       </div>
                     </div>
@@ -205,7 +205,7 @@
                       {{ e.udep | uppercase }}
                     </div>
                     <div class="col-md-1 text-right">
-                      <button mat-icon-button aria-label="Adjuntar" (click)="openFicha(ficha, i)">
+                      <button mat-icon-button aria-label="Adjuntar" (click)="openFicha(ficha, e)">
                         <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
                     </div>
@@ -287,17 +287,12 @@
 
       <div class="col-md-4 d-flex flex-column justify-content-center align-content-center">
         <div class="image-frame text-center">
+          <ngx-ui-loader [loaderId]="'loader-ficha'"></ngx-ui-loader>
           <img
-            *ngIf="imageUrl; else loadingSpinner"
-            [src]="imageUrl" 
             id="miImagen"
-            alt="Foto capturada" 
             class="framed-image" 
             (click)="abrirModalVistaPrevia(vistaPrevia)"
           />
-          <ng-template style="width: 25%;" class="image-frame" #loadingSpinner>
-            <mat-spinner></mat-spinner>
-          </ng-template>
         </div>
         <span class="w-100 text-center mt-3">{{visitante.remi}}</span>
       </div>
@@ -347,15 +342,10 @@
 </ng-template>
 
 <ng-template #vistaPrevia let-modal>
-  <div class="modal-body image-frame text-center" style="padding: 0.5rem; border-radius: 15px;">
+  <ngx-ui-loader [loaderId]="'loader-vistaPrevia'"></ngx-ui-loader>
+  <div class="modal-body image-frameVistaPrevia text-center" style="padding: 0.5rem; border-radius: 15px;">
     <img 
-    *ngIf="imageUrl; else loadingSpinnerPrevious"
-    id="miImagen"
-    alt="Vista previa" 
+    id="vistaPrevia"
     class="image-large" />
-
-    <ng-template style="width: 25%; display: flex; justify-content: center; align-items: center; padding: 2rem 0;" #loadingSpinnerPrevious>
-      <mat-spinner></mat-spinner>
-    </ng-template>
   </div>
 </ng-template>

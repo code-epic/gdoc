@@ -231,6 +231,7 @@ export class VisitantedocumentoComponent implements OnInit {
       })
       .catch((error) => {
         console.error("Error al acceder a la cámara:", error);
+        this.toastrService.error("Verifique la conexion!", "Camara No Disponible!");
       });
   }
 
@@ -316,6 +317,7 @@ export class VisitantedocumentoComponent implements OnInit {
         // this.limpiarDoc
       },
       (error) => {
+        this.toastrService.error("Error al enviar la foto", "Error");
         console.error("Error al enviar la foto:", error);
       }
     );
@@ -502,6 +504,10 @@ export class VisitantedocumentoComponent implements OnInit {
         this.registrando = false
         this.limpiarDoc();
       }
+      this.toastrService.success(
+        "El visitante se ha registrado exitosamente",
+        "Registro de Visitante"
+      );
     });
   }
 }
