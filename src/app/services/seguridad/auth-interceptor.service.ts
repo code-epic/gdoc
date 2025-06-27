@@ -1,62 +1,80 @@
-
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import Swal from 'sweetalert2'
+import { Injectable } from "@angular/core";
+import {
+  HttpInterceptor,
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpErrorResponse,
+} from "@angular/common/http";
+import { Observable, throwError } from "rxjs";
+import { catchError } from "rxjs/operators";
+import Swal from "sweetalert2";
+import { LoginService } from "src/app/services/seguridad/login.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthInterceptorService implements HttpInterceptor {
+  constructor(private _login: LoginService) {}
 
-  constructor(
-    private router: Router
-  ) {}
+  intercept(
+    req: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+    let token: string = sessionStorage.getItem("token")
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-  
-    const token: string = sessionStorage.getItem('token')
+    if (sessionStorage.getItem("recovery") != undefined)
+      token = sessionStorage.getItem("recovery")
 
     let request = req;
 
     if (token) {
-      // request = req.clone({
-      //   setHeaders: {
-      //     authorization: `Bearer ${ token }`
-      //   }
-      // });
+      request = req.clone({
+        setHeaders: {
+          authorization: `Bearer ${token}`,
+        },
+      });
     }
-    
+
     return next.handle(request).pipe(
       catchError((err: HttpErrorResponse) => {
-       
-        if (err.status === 401) {
-          console.error('Evaluacion de Token', err.error.msj)
-          this.cerrar(err.error.msj)
+        // console.log(err);
+        if (token) {
+          switch (err.status) {
+            case 401:
+              this.cerrar('Credenciales Invalidas')
+              break;
+            case 403: // Evaluacion de ha expirado
+              this.cerrar('Su sesión ha expirado')
+              break;
+            case 404: // Evaluacion de ha expirado
+              this.cerrar('Sandra server no se encuentra disponible')
+              break;
+            case 504:
+              this.cerrar('Sandra Server no responde, verifique su conexión')
+            default:
+              break;
+          }
         }
-
-        return throwError( err );
-
+        return throwError(() => err);
       })
-    )
+    );
   }
 
-  cerrar(msj : string){
-    
+  cerrar(msj: string) {
     Swal.fire({
-      title: 'Alerta',
+      title: "Alerta",
       text: msj,
-      icon: 'error',
+      icon: "error",
       showCancelButton: false,
-      confirmButtonColor: '#3085d6',
-      confirmButtonText: 'Gracias por su tiempo'
+      confirmButtonColor: "#3085d6",
+      confirmButtonText: "Gracias por su tiempo",
+      allowEscapeKey: false,
+      allowOutsideClick: false,
     }).then((result) => {
       if (result.isConfirmed) {
-        sessionStorage.removeItem('token')
-        window.location.href = '/';
+        this._login.logout();
       }
-    })    
+    });
   }
 }

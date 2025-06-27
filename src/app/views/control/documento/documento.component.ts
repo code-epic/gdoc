@@ -484,9 +484,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   validarCamposObligatorios(): boolean {
     if (this.titulo == 'Documento') {
-      return this.fcreacion == '' || this.forigen == '' || this.Doc.contenido == '' || this.fplazo == ''
+      return this.fcreacion == '' || this.fcreacion == undefined || this.forigen == '' || this.Doc.contenido == '' || this.fplazo == ''
     } else {
-      return this.fcreacion == '' || this.Doc.contenido == '' || this.fplazo == ''
+      return this.fcreacion == '' || this.fcreacion == undefined || this.Doc.contenido == '' || this.fplazo == ''
     }
   }
   //registrar Un documento pasando por el WorkFlow
@@ -508,6 +508,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       return
     }
 
+    // console.log(this.fcreacion)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -625,7 +626,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.activarMensaje = true
     Swal.fire({
       title: 'El Documento Registrado es # ' + msj,
-      text: "¿Desea registar otro documento?",
+      text: "¿Desea registrar otro documento?",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',

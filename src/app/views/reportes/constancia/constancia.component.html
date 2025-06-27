@@ -142,7 +142,7 @@
                         </div>
 
 
-                        <table summary="" class="table table-bordered table-hover">
+                        <table summary="" class="table table-bordered table-hover" *ngIf="btraza">
                             <thead>
                                 <tr>
                                     <th data-priority="1" colspan="5">Historial de Acciones</th>
@@ -167,8 +167,8 @@
                             </tbody>
                         </table>
 
-                        <div class="form-group  col-md-12 text-justify"
-                            style="font-size: small; padding: 15px; border: 0px solid #ccc">
+                        <div *ngIf="btraza" class="form-group  col-md-12 text-justify"
+                            style="font-size: small; padding: 7px; border: 0px solid #ccc">
                         </div>
 
                         <table summary="" class="table table-bordered table-hover">
@@ -181,7 +181,7 @@
                             <tbody>
                                 <tr>
                                     <th>UBICACIÓN ACTUAL EXPEDIENTE: </th>
-                                    <td>{{ nexpediente }}</td>
+                                    <td>{{ nexpediente | uppercase }}</td>
                                     <td rowspan="3"></td>
                                 </tr>
                                 <tr>
@@ -200,45 +200,6 @@
                     <br>
                     <br>
                     <br>
-                    <br>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-12" style="display: none;">
-                            <table
-                                summary="This table shows how to create responsive tables using RWD-Table-Patterns' functionality"
-                                class="table table-bordered table-hover">
-
-                                <thead>
-                                    <tr>
-                                        <th>Country</th>
-                                        <th data-priority="1">Número de Control</th>
-                                        <th data-priority="2">Número de Origen</th>
-                                        <th data-priority="3">Fecha de Origen</th>
-                                        <th data-priority="4">Fecha de Recepción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Argentina</td>
-                                        <td>Spanish (official), English, Italian, German, French</td>
-                                        <td>41,803,125</td>
-                                        <td>31.3</td>
-                                        <td>2,780,387</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Australia</td>
-                                        <td>English 79%, native and other languages</td>
-                                        <td>23,630,169</td>
-                                        <td>37.3</td>
-                                        <td>7,739,983</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-
-
 
 
                 </div>

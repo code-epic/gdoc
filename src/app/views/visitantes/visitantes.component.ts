@@ -78,6 +78,8 @@ export class VisitantesComponent implements OnInit {
   public Observacion = ''
   public AccionTexto: string = '0'
 
+  public visitanteVistaPrevia: any
+
   public hashcontrol = ''
 
   public archivos = []
@@ -155,16 +157,6 @@ export class VisitantesComponent implements OnInit {
     this.numControl = id
     this.hashcontrol = btoa("D" + this.numControl) //Cifrar documentos
     this.modalService.open(content)
-  }
-
-  openFicha(c, i) {
-    this.modalService.open(c, {
-      centered: true,
-      size: 'xl'
-    })
-
-    this.visitante = this.buzon[i];
-    this.loadImage();
   }
 
   obtenerComponente(c: string): string {
@@ -542,35 +534,67 @@ export class VisitantesComponent implements OnInit {
     this.apiService.DwsImg(btoa("F_" + e.remi) + "/" + e.anom);
   }
 
-  async loadImage() {
-    if (this.visitante) {
-      this.imageUrl = null
+  openFicha(c, e) {
+    this.modalService.open(c, {
+      centered: true,
+      size: 'xl'
+    })
+
+    this.visitante = e
+    this.loadImage(e);
+  }
+
+  async loadImage(e: any) {
+    if (e) {
+      this.ngxService.startLoader("loader-ficha")
       try {
-        let nameID = btoa("F_" + this.visitante.remi); // esta es la llave de la carpeta
-        let nmb = this.visitante.anom; // id de la imagen en BD
+        console.log('Cargando imagen para e:', e);
+        let nameID = btoa("F_" + e.remi);
+        let nmb = e.anom;
+        const imageUrl = await this.apiService.DwsImgSource(nameID + '/' + nmb);
 
-        const url = await this.apiService.DwsImgSource(nameID + '/' + nmb);
         const imgElement = document.getElementById('miImagen') as HTMLImageElement;
-        const vistaPrevia = document.getElementById('vistaPrevia') as HTMLImageElement;
-        if (vistaPrevia) {
-          vistaPrevia.src = url
-          this.imageUrl = url
+        if (imgElement) {
+          imgElement.src = imageUrl;
+        } else {
+          console.error('El elemento con ID "miImagen" no existe en el DOM');
         }
-        imgElement.src = url;
-        this.imageUrl = url
-
       } catch (error) {
-        console.error('Error al cargar la imagen:', error);
+          console.error('Error al cargar la imagen:', error);
+      }finally{
+        this.ngxService.stopLoader("loader-ficha")
       }
     }
   }
 
-  abrirModalVistaPrevia(vistaPrevia: any): void {
+  abrirModalVistaPrevia(vistaPrevia: any, e: any = null): void {
     this.modalService.open(vistaPrevia, {
       centered: true,
       size: 'lg'
     });
-    this.loadImage();
+    if (e != null) {
+      this.visitanteVistaPrevia = e
+    }
+    this.loadImageVistaPrevia()
+  }
+
+  async loadImageVistaPrevia() {
+    if (this.visitanteVistaPrevia) {
+      this.ngxService.startLoader("loader-vistaPrevia")
+      try {      
+        let nameID = btoa("F_" + this.visitanteVistaPrevia.remi); // esta es la llave de la carpeta
+        let nmb = this.visitanteVistaPrevia.anom; // id de la imagen en BD
+        const imageUrl = await this.apiService.DwsImgSource(nameID + '/' + nmb);
+        const imgElement = document.getElementById('vistaPrevia') as HTMLImageElement;
+        if (imgElement) {
+          imgElement.src = imageUrl;
+        }
+      } catch (error) {
+        console.error('Error al cargar la imagen:', error);
+      }finally{
+        this.ngxService.stopLoader("loader-vistaPrevia")
+      }
+    }
   }
 }
 
