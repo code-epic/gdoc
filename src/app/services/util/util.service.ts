@@ -314,7 +314,7 @@ export class UtilService {
   
     // Crear la fecha (los meses en JavaScript van de 0 a 11)
     const inputDate = new Date(year, month - 1, day);
-    const cutoffDate = new Date(2025, 8, 1); // 1 de abril de 2025
+    const cutoffDate = new Date(2025, 12, 1); // 1 de abril de 2025
   
     // Comparar las fechas
     return inputDate < cutoffDate;

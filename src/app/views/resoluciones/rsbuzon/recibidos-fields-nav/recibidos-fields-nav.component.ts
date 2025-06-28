@@ -78,28 +78,26 @@ MPPD_CCarpetasGroup
 
   }
   async OpcionesCarpetas() {
-
-    if (this.xnumCarpeta == '' || this.xcomponente == ''){
-    this.xAPI.funcion = 'MPPD_CCarpetasGroup'
-    this.xAPI.parametros = `${this.xnumCarpeta},${this.xcomponente}`
-    this.xAPI.valores = null
-
-    await this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {
-          console.log(data)
-            if (data.Cuerpo != undefined ){
-                data.Cuerpo.forEach(e => {
-                  let rp = e.responsable.toString()
-                    this.xtipo = e.cod_acto.toString()
-                    this.xestatus = e.estatus.toString()
-                    this.xprioridad = e.accion.toString()
-                    this.xclasificacion = e.cod_tipo_entrada.toString()
-                    this.xresponsable = rp!=''?rp:'0'
-                })
-              }
-        },
-        err => { }
-    )
+    if (this.xnumCarpeta != '' || this.xcomponente != ''){
+      this.xAPI.funcion = 'MPPD_CCarpetasGroup'
+      this.xAPI.parametros = `${this.xnumCarpeta},${this.xcomponente}`
+      this.xAPI.valores = null
+      await this.apiService.Ejecutar(this.xAPI).subscribe(
+          (data) => {
+            console.log(data)
+              if (data.Cuerpo != undefined ){
+                  data.Cuerpo.forEach(e => {
+                    let rp = e.responsable.toString()
+                      this.xtipo = e.cod_acto.toString()
+                      this.xestatus = e.estatus.toString()
+                      this.xprioridad = e.accion.toString()
+                      this.xclasificacion = e.cod_tipo_entrada.toString()
+                      this.xresponsable = rp!=''?rp:'0'
+                  })
+                }
+          },
+          err => { }
+      )
   }
 }
 
