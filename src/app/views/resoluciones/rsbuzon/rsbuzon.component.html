@@ -361,13 +361,13 @@
                                                                         </div>
 
 
-                                                                        <div class="col-md-3 texto-lista">
+                                                                        <div class="col-md-4 texto-lista">
                                                                             NOMBRES Y APELLIDOS
                                                                         </div>
-                                                                        <div class="col-md-2 texto-lista">
+                                                                        <div class="col-md-3 texto-lista">
                                                                             DIGITAL
                                                                         </div>
-                                                                        <div class="col-md-3 text-right texto-lista">
+                                                                        <div class="col-md-1 text-right texto-lista">
                                                                             ACCION
                                                                         </div>
 
@@ -398,16 +398,18 @@
                                                                         </div>
 
 
-                                                                        <div class="col-md-3 texto-sub-lista">
+                                                                        <div class="col-md-4 texto-sub-lista">
                                                                             {{ e.nombres_apellidos }}
                                                                         </div>
-                                                                        <div class="col-md-2 texto-sub-lista">
+                                                                        <div class="col-md-3 texto-sub-lista">
                                                                             {{ e.digital }}
                                                                         </div>
                                                                         <div
-                                                                            class="col-md-3 text-right texto-sub-lista">
-                                                                            {{ e.obse==''?'PROCESAR':getDetalleX(e.obse)
-                                                                            }}
+                                                                            class="col-md-1 text-right texto-sub-lista"
+                                                                            #tooltip="matTooltip"
+                                                                            matTooltip="{{ e.obse==''?'PROCESAR':getDetalleX(e.obse) }}"
+                                                                            >
+                                                                            {{e.obse==''?'PR':e.obse }}
                                                                         </div>
 
                                                                     </div>

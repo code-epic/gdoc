@@ -45,7 +45,7 @@ export class AuthInterceptorService implements HttpInterceptor {
               this.cerrar('Credenciales Invalidas')
               break;
             case 403: // Evaluacion de ha expirado
-              this.cerrar('Su sesión ha expirado')
+             // this.cerrar('Su sesión ha expirado')
               break;
             case 404: // Evaluacion de ha expirado
               this.cerrar('Sandra server no se encuentra disponible')

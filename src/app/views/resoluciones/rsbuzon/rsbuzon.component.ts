@@ -1196,9 +1196,10 @@ export class RsbuzonComponent implements OnInit {
         this.xAPI.funcion = 'MPPD_ListarResponsables'
         this.xAPI.parametros = 'Resoluciones'
         this.xAPI.valores = null
-
+        console.log(this.xAPI)
         await this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
+                console.log(data)
                 if (data.msj == undefined) {
                     data.forEach(e => {
                         this.lstResponsable.push({
