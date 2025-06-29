@@ -780,13 +780,13 @@ export class RsbuzonComponent implements OnInit {
                     case '0': //Oficio por opinión
                         this.promoverBuzon(0, this.utilService.FechaActual());
                         break;
-                     case '8': //Oficio por opinión
+                     case '8': //Oficio por SILENCIO ADMINISTRATIVO
                         this.promoverBuzon(3, this.utilService.FechaActual());
                         break;
-                    case '9': //Oficio por opinión
+                    case '9': //Oficio por DECISION
                         this.promoverBuzon(4, this.utilService.FechaActual());
                         break;
-                     case '10': //Oficio por opinión
+                     case '10': //Oficio por OPINION
                         this.promoverBuzon(5, this.utilService.FechaActual());
                         break;
                     case '1': //Rechazar en el estado inicial
