@@ -12,14 +12,13 @@
         <div class="collapse navbar-collapse" [ngbCollapse]="isCollapsed" id="sidenav-collapse-main">
           <!-- Navigation -->
           <ul class="navbar-nav">
-            <!-- <li *ngFor="let menuItem of menuItems" class="{{menuItem.class}} nav-item"></li> -->
             <li *ngFor="let menuItem of menuItems" class=" nav-item">
               <a routerLinkActive="active" [routerLink]="[menuItem.path]" class="nav-link">
                 <i class="ni {{ menuItem.icon + ' ' +  menuItem.class}}"></i>
                 {{menuItem.title}}
               </a>
             </li>
-            <li class=" nav-item">
+            <!-- <li class=" nav-item">
               <a routerLinkActive="active" [routerLink]="['/buscador']" class="nav-link">
                 <i class="ni ni-books text-blue"></i>
                 Buscador
@@ -30,7 +29,7 @@
                 <i class="ni ni-basket text-red"></i>
                 Papelera
               </a>
-            </li>
+            </li> -->
           </ul>
         </div>
       </div>

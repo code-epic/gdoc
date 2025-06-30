@@ -58,6 +58,7 @@ import { RsestadisticasComponent } from 'src/app/views/resoluciones/rsestadistic
 import { MreportesComponent } from 'src/app/views/secretaria/mreportes/mreportes.component';
 import { VisitantesComponent } from 'src/app/views/visitantes/visitantes.component';
 import { VisitantedocumentoComponent } from 'src/app/views/visitantes/visitantedocumento/visitantedocumento.component';
+import { PublicarComponent } from 'src/app/views/publicaciones/publicar/publicar.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -309,6 +310,11 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'rsprocesos',
         component: RsprocesosComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'publicaciones',
+        component: PublicarComponent,
         canActivate: [AuthGuardGuard]
     },
     {

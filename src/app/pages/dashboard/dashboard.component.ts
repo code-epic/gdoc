@@ -31,6 +31,8 @@ export class DashboardComponent implements OnInit {
     { id: '/personal', src : 'personal' },
     { id: '/visitantes', src : 'visitantes' },
     { id: '/generales', src : 'generales' },
+    { id: '/publicaciones', src : 'generales' },
+    { id: '/buzonresueltos', src : 'control' },
   ]
 
   constructor(
@@ -50,10 +52,6 @@ export class DashboardComponent implements OnInit {
         this.resolucionService.Listar(i) //
       }
     }
-
-
-    
-    
   }
 
 

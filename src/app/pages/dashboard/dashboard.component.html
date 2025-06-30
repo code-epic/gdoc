@@ -13,7 +13,7 @@
             <div class="card px-lg-2 py-lg-2">
               <img class="card-img-top" src="./assets/img/brand/{{ posicion( e.url ) }}.jpg" style="height: 144px;" alt="Card image cap">
               <div class="card-body">
-                <h4 class="card-title text-center"><strong>{{e.descripcion}}</strong></h4>
+                <h4 class="card-title text-center"><strong>{{e.descripcion || e.nombre}}</strong></h4>
               </div>
             </div>
           </div>

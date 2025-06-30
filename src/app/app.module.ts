@@ -13,23 +13,16 @@ import { ComponentsModule } from './components/components.module';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CustomPaginator } from './paginator-intl';
-// import { ControlComponent } from './views/control/control.component';
 import { SecretariaComponent } from './views/secretaria/secretaria.component';
 import { ResolucionesComponent } from './views/resoluciones/resoluciones.component';
 import { AyudantiaComponent } from './views/ayudantia/ayudantia.component';
 import { TimonelComponent } from './views/timonel/timonel.component';
 import { AcamiComponent } from './views/acami/acami.component';
 import { PersonalComponent } from './views/personal/personal.component';
-// import { RegistrarComponent } from './views/control/registrar/registrar.component';
-// import { DocumentoComponent } from './views/control/documento/documento.component';
-// import { BuzonComponent } from './views/control/buzon/buzon.component';
-// import { SalidasComponent } from './views/control/salidas/salidas.component';
 import { ProyectoComponent } from './views/ayudantia/procesos/proyecto/proyecto.component';
 import { NgxUiLoaderModule, NgxUiLoaderConfig } from "ngx-ui-loader";
 
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatCommonModule, MatNativeDateModule } from '@angular/material/core';
-
-// import { ConfiguracionComponent } from './views/control/configuracion/configuracion.component';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { AuthGuardGuard } from './services/seguridad/auth-guard.guard';
 import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
@@ -41,7 +34,6 @@ import { AyreportesComponent } from './views/ayudantia/ayreportes/ayreportes.com
 import { GeneralesComponent } from './views/generales/generales.component';
 import { ArchivoComponent } from './views/archivo/archivo.component';
 import { AycotizacionesComponent } from './views/ayudantia/procesos/aycotizaciones/aycotizaciones.component';
-// import { PendientesComponent } from './views/control/pendientes/pendientes.component';
 import { ProcesosComponent } from './views/ayudantia/procesos/procesos.component';
 import { RsprocesosComponent } from './views/resoluciones/rsprocesos/rsprocesos.component';
 import { RsbuzonComponent } from './views/resoluciones/rsbuzon/rsbuzon.component';
@@ -51,15 +43,6 @@ import { ConstanciaComponent } from './views/reportes/constancia/constancia.comp
 import { MinisterialComponent } from './views/secretaria/ministerial/ministerial.component';
 import { FichaproyectoComponent } from './views/reportes/fichaproyecto/fichaproyecto.component';
 import { CotizacionComponent } from './views/reportes/cotizacion/cotizacion.component';
-import { AutocompleteLibModule } from 'angular-ng-autocomplete';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatSelectModule } from '@angular/material/select';
-import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { RstranscripcionComponent } from './views/resoluciones/rstranscripcion/rstranscripcion.component';
 import { RsrevisionComponent } from './views/resoluciones/rsrevision/rsrevision.component';
 import { RsconfiguracionComponent } from './views/resoluciones/rsconfiguracion/rsconfiguracion.component';
@@ -79,23 +62,18 @@ import { SpresidencialComponent } from './views/secretaria/spresidencial/spresid
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { OresolucionesComponent } from './views/resoluciones/rsprocesos/oresoluciones/oresoluciones.component';
 import { RsconsultaComponent } from './views/resoluciones/rsprocesos/rsconsulta/rsconsulta.component';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { EresolucionesComponent } from './views/resoluciones/rsprocesos/eresoluciones/eresoluciones.component';
-import { MatTreeModule } from '@angular/material/tree';
 import { RsdatosbasicosmasivosComponent } from './views/resoluciones/rsconfiguracion/rsdatosbasicosmasivos/rsdatosbasicosmasivos.component';
 import { RscondecoracionesComponent } from './views/resoluciones/rsconfiguracion/rscondecoraciones/rscondecoraciones.component';
 import { RseliminacionesComponent } from './views/resoluciones/rsconfiguracion/rseliminaciones/rseliminaciones.component';
 import { ConsultaGeneralComponent } from './views/consulta-general/consulta-general.component';
 import { SbuscadorComponent } from './views/secretaria/sbuscador/sbuscador.component';
-import { MatRadioModule } from '@angular/material/radio';
 import { ListadosComponent } from './views/notas/listados/listados.component';
 import { GralconsultasComponent } from './views/generales/gralconsultas/gralconsultas.component';
 import { GralestadisticasComponent } from './views/generales/gralestadisticas/gralestadisticas.component';
 import { GraledicionComponent } from './views/generales/graledicion/graledicion.component';
 import { GrallibroComponent } from './views/generales/grallibro/grallibro.component';
 import { TableGrallibroModalComponent } from './views/generales/grallibro/modal/table-grallibro-modal/table-grallibro-modal.component';
-import { MatTableModule } from '@angular/material/table';
-import { MatBadgeModule } from '@angular/material/badge';
 import {SharedModule} from './shared/shared.module';
 import { RecibidosFieldsNavComponent } from './views/resoluciones/rsbuzon/recibidos-fields-nav/recibidos-fields-nav.component';
 import { RsconsultaentradasComponent } from './views/resoluciones/rsprocesos/rsconsultaentradas/rsconsultaentradas.component';
@@ -104,6 +82,8 @@ import { RsalertasComponent } from './views/resoluciones/rsalertas/rsalertas.com
 import { TableRsreportesModalComponent } from './views/resoluciones/rsreportes/modal/table-rsreportes-modal/table-rsreportes-modal.component';
 import { RsestadisticasComponent } from './views/resoluciones/rsestadisticas/rsestadisticas.component';
 import { MreportesComponent } from './views/secretaria/mreportes/mreportes.component';
+import { PublicarComponent } from './views/publicaciones/publicar/publicar.component';
+import {MatStepperModule} from '@angular/material/stepper';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -167,7 +147,8 @@ const ngWizardConfig: NgWizardConfig = {
       preventDuplicates: false
     }),
     AngularFileUploaderModule,
-    SharedModule
+    SharedModule,
+    MatStepperModule
   ],
   declarations: [
     AppComponent,
@@ -238,7 +219,8 @@ const ngWizardConfig: NgWizardConfig = {
     RsalertasComponent,
     TableRsreportesModalComponent,
     RsestadisticasComponent,
-    MreportesComponent
+    MreportesComponent,
+    PublicarComponent
   ],
   providers: [
     {

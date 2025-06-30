@@ -1,145 +1,240 @@
 <ngx-ui-loader [loaderId]="'loader-x'"></ngx-ui-loader>
-<div class="row">
-
-  <!-- En el Modulo de Reportes -->
-  <div class="row" *ngIf="formularioAGenerar != 0">
-    <div class="form-group col-md-3">
-      <label for="">Componente</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente"
-         value="{{componente}}">
-        <option value="%">TODOS LOS COMPONENTES</option>
-        <option *ngFor="let e of Componentes;" [value]="e.cod_componente + '|' + e.nombre_componente">{{
-          e.nombre_componente }}
-        </option>
-      </select>
-    </div>
-    <div class="form-group col-md-3">
-      <label for="">Grado</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="grado" value="{{grado}}">
-        <option value="%">TODOS</option>
-        <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
-      </select>
-    </div>
-
-    <div class="form-group col-md-3">
-      <label for="">Situación</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="situacion" value="{{situacion}}">
-        <option value="ACT">ACTIVO</option>
-        <option value="RINC">REINCORPORADO</option>
-      </select>
-    </div>
-
-    <div class="form-group col-md-3">
-      <label for="">Categoria</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="categoria" value="{{categoria}}">
-        <option value="%">TODAS</option>
-        <option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}
-        </option>
-      </select>
-    </div>
-
-    <div class="form-group col-md-4">
-      <label for="">Clasificación</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="clasificacion"
-        value="{{clasificacion}}">
-        <option value="%">TODAS</option>
-        <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
-          {{e.des_clasificacion}}</option>
-      </select>
-    </div>
-
-   
-
-    <div class="form-group col-md-4" *ngIf="bFrm">
-      <label for="">Codigo</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="codigos" value="{{codigos}}">
-        <option value="0">SELECCIONE EL CODIGO</option>
-        <option value="1">AZUL</option>
-        <option value="2">AMARILLO</option>
-        <option value="3">ROJO</option>
-      </select>
-    </div>
-
-    <div class="form-group col-md-4 text-left botones">
-      <button class="btn bg-primary text-white " (click)="relfexion(true)">
-        <span class="fa fa-search"></span>&nbsp;&nbsp;{{txtBoton}}
-      </button>
-      &nbsp;&nbsp;&nbsp;
-
-      <button class="btn bg-orange text-white" (click)="downloadCSVEx()">
-        <span class="fa fa-print"></span>&nbsp;&nbsp;Generar CSV
-      </button>
-    </div>
-  </div>
 
 
-  <!-- En la configuracion -->
-  <div class="form-group col-md-3" *ngIf="formularioAGenerar == 0">
-    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="codigos" value="{{codigos}}">
-      <option value="0">SELECCIONE EL CODIGO</option>
-      <option value="1">AZUL</option>
-      <option value="2">AMARILLO</option>
-      <option value="3">ROJO</option>
-    </select>
-  </div>
+<mat-stepper #stepper>
+  <mat-step [stepControl]="firstFormGroup" errorMessage="Resoluciones pendientes">
+    <form [formGroup]="firstFormGroup">
+      <ng-template matStepLabel>Sleccionar resoluciones</ng-template>
+      <br>
 
-  <div class="form-group col-md-6 text-left" *ngIf="formularioAGenerar == 0">
-    <button class="btn bg-primary text-white " (click)="consultarListado()">
-      <span class="fa fa-search"></span>&nbsp;&nbsp;Generar Reporte
-    </button>
-    &nbsp;&nbsp;&nbsp;
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+          <mat-form-field appearance="outline" class="search-input-field">
+            <mat-label>Número de resuelto</mat-label>
+            <input matInput placeholder="Número de resuelto" [ngModelOptions]="{standalone: true}" [(ngModel)]="numero"
+              (keyup.enter)="consultarResolucion($event)">
 
-    <button *ngIf="bxls" class="btn bg-orange text-white" (click)="downloadCSVEx()">
-      <span class="fa fa-print"></span>&nbsp;&nbsp;Generar CSV
-    </button>
-  </div>
-</div>
+            <button mat-icon-button matSuffix (click)="consultarResolucion(undefined)">
+              <mat-icon>search</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+      </div>
 
-<!-- TABLA -->
-<div class="row" *ngIf="dbDatosNombre">
-  <div class="col-md-12">
+      <hr>
 
-    <table style="width: 100%;" class="zigzag" border="1">
-      <thead>
-        <tr>
-          <th style="width: 60px;"> NUM.</th>
-          <th> COMPONENTE</th>
-          <th> CATEGORIA</th>
-          <th> GRADO</th>
-          <th> NOMBRE COMPLETO</th>
-          <th style="width: 110px;"> CEDULA</th>
-          <th *ngIf="bmotivo"> MOTIVO</th>
-          <th *ngIf="bnombramiento" style="width: 320px;">NOMBRAMIENTO</th>
-          <th *ngIf="bascenso" style="width: 320px;">ASCENSO</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let e of lstNombres; index as i">
-          <td>{{ i+1 }}</td>
-          <td>{{e.cnombre}} </td>
-          <td>{{e.clasificacion }} </td>
-          <td>{{e.gnombre}} </td>
-          <td>{{ e.nombres_apellidos }}</td>
-          <td>{{e.cedula}} </td>
-          <td *ngIf="bmotivo" [innerHTML]="e.motivo"></td>
-          <td *ngIf="bnombramiento" style="width: 160px; font-size: 9px;text-align: center" 
-              [innerHTML]="filtrarNombramiento(e)">
-          <td *ngIf="bascenso" style="width: 160px; font-size: 9px;text-align: center" 
-              [innerHTML]="filtrarAscenso(e)">
-          </td>
-        </tr>
-      </tbody>
+      <div *ngIf="blistar">
 
-    </table>
+        <div class="row" class="controlador">
 
+          <div class="col-md-12">
+
+            <table style="width: 100%;" border="1">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>RESOLUCIONES.</th>
+                  <th style="text-align:center">CANT.</th>
+                  <th>FECHA</th>
+                  <th>ACC</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of lstResoluciones; let i = index">
+                  <td>{{ i+1 }}</td>
+                  <td>{{ e.numero_resol }} - {{ e.des_resol }}</td>
+                  <td style="text-align:center"> <b> {{e.cantidad}} </b></td>
+                  <td style="text-align:right"> {{e.fecha_resol | date:'dd/MM/YY'}}</td>
+                  <td style="text-align: center;">
+                    <button mat-icon-button aria-label="Editar" (click)="agregar(e.numero_resol, e.fecha_resol, i)">
+                      <mat-icon class="text-blue">check_circle</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+
+            <hr>
+          </div>
+
+        </div>
+        <br><br>
+        <div class="row">
+          <div class="col-md-12" style="padding-left: 30px;">
+
+            <B>
+              <font style="color:rgb(87, 44, 44)">
+                NOTA: RECUERDE TENER PRESENTE QUE ESTA ACCION ACTIVARA LOS RESUELTOS PARA SER VISUALIZADOS POR OTROS
+                USUARIOS
+              </font>
+            </B>
+          </div>
+
+        </div>
+        <hr>
+      </div>
+
+
+
+
+
+
+      <div style="text-align: right;">
+        <!-- <p>Go to a different step to see the error state</p> -->
+        <button mat-button matStepperNext class="btn-primary pull-rigth">Siguiente</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="secondFormGroup" errorMessage="Address is required.">
+    <form [formGroup]="secondFormGroup">
+      <ng-template matStepLabel>Seleccionar usuarios</ng-template>
+
+      <div class="form-group col-md-12">
+        <mat-form-field class="example-chip-list" appearance="">
+          <mat-label>Resoluciones para publicar</mat-label>
+          <mat-chip-list #chipList aria-label="Resoluciones">
+            <mat-chip *ngFor="let rsl of resoluciones" (removed)="remove(rsl)">
+              {{rsl.numero}}
+              <button matChipRemove>
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip>
+          </mat-chip-list>
+        </mat-form-field>
+      </div>
+
+      <div class="row" class="controlador">
+
+        <div class="col-md-12">
+
+          <table style="width: 100%;" border="1">
+            <thead>
+              <tr>
+                <th style="width: 30px;">#</th>
+                <th>Codigo</th>
+                <th style="text-align:center">Nombre / Correo</th>
+                <th>Oficina</th>
+                <th style="width: 40px;text-align: center;">#</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of lstUsr; let i = index">
+                <td style="text-align: center;font-weight: bold;">{{ i+1 }}</td>
+                <td>V-{{ e.cedula }} </td>
+                <td style="text-align:left"> {{ e.nombre }} / {{e.correo}}</td>
+                <td style="text-align:left"> {{e.sucursal }}</td>
+                <td style="text-align: center;">
+                  <button mat-icon-button aria-label="Editar"
+                    (click)="agregarUsuario(e.nombre, e.cedula, e.correo, i)">
+                    <mat-icon class="text-blue">check_circle</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+
+
+
+      <div style="text-align: right;">
+        <!-- <p>Go to a different step to see the error state</p> -->
+        <button mat-button matStepperPrevious class="btn-warning">Anterior</button> &nbsp;&nbsp;
+        <button mat-button matStepperNext class="btn-primary">Siguiente</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Publicar</ng-template>
+    
+     <div class="form-group col-md-12">
+        <mat-form-field class="example-chip-list" appearance="">
+          <mat-label>Resoluciones para publicar</mat-label>
+          <mat-chip-list #chipList aria-label="Resoluciones">
+            <mat-chip *ngFor="let rsl of resoluciones" (removed)="remove(rsl)">
+              {{rsl.numero}}
+              <button matChipRemove>
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip>
+          </mat-chip-list>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group col-md-12">
+
+      </div>
+
+
+
+
+       <div class="form-group col-md-12">
+        <mat-form-field class="example-chip-list" appearance="">
+          <mat-label>Usuarios para publicar</mat-label>
+          <mat-chip-list #chipList aria-label="Usuarios">
+            <mat-chip *ngFor="let rsl of usuarios" (removed)="remove(rsl)">
+              {{rsl.nombre}}
+              <button matChipRemove>
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip>
+          </mat-chip-list>
+        </mat-form-field>
+      </div>
     
 
 
-
-    <div class="row justify-content-center mt-4">
-      <button class="btn bg-primary text-white " (click)="openDialog()">
-        <span class="fa fa-print"></span>&nbsp;&nbsp;Imprimir {{txtBoton}}
-      </button>
+    <div style="text-align: right;">
+       <button mat-button matStepperPrevious class="btn-warning">Anterior</button> &nbsp;&nbsp;
+        <button mat-button matStepperNext class="btn-success">Enviar</button>
     </div>
+  </mat-step>
+</mat-stepper>
+
+
+
+<!-- <br>
+
+ -->
+
+
+
+<br>
+
+
+
+<ng-template #observacion let-modal>
+  <div class="modal-body">
+
+
+
+
+
+    <div class="form-group col-md-12">
+      <label for="txtobservacion">Observaciones</label>
+      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="Observacion"></textarea>
+    </div>
+
+    <div class="form-group  col-md-12" *ngIf="clasificacion">
+      <label>Usuarios</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
+        <option value="S">SELECCIONE</option>
+        <option *ngFor="let x of lstUser" value="{{ x.login }}">{{ x.nombre }}</option>
+      </select>
+    </div>
+
+
   </div>
-</div>
+  <div class="modal-footer">
+    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')"
+      id="btnaceptar">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar
+    </button>
+    <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar
+    </button>
+  </div>
+</ng-template>
