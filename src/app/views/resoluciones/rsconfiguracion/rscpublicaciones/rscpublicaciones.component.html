@@ -46,7 +46,8 @@
                   <td style="text-align:center"> <b> {{e.cantidad}} </b></td>
                   <td style="text-align:right"> {{e.fecha_resol | date:'dd/MM/YY'}}</td>
                   <td style="text-align: center;">
-                    <button mat-icon-button aria-label="Editar" (click)="agregar(e.numero_resol, e.fecha_resol, i)">
+                    <button mat-icon-button aria-label="Editar" 
+                    (click)="agregar(e.numero_resol, e.fecha_resol, i)">
                       <mat-icon class="text-blue">check_circle</mat-icon>
                     </button>
                   </td>
@@ -126,7 +127,7 @@
                 <td style="text-align:left"> {{e.sucursal }}</td>
                 <td style="text-align: center;">
                   <button mat-icon-button aria-label="Editar"
-                    (click)="agregarUsuario(e.nombre, e.cedula, e.correo, i)">
+                    (click)="agregarUsuario(e.nombre, e.correo,  e.login,  e.sucursal, i)">
                     <mat-icon class="text-blue">check_circle</mat-icon>
                   </button>
                 </td>
@@ -188,7 +189,7 @@
 
     <div style="text-align: right;">
        <button mat-button matStepperPrevious class="btn-warning">Anterior</button> &nbsp;&nbsp;
-        <button mat-button matStepperNext class="btn-success">Enviar</button>
+        <button mat-button matStepperNext class="btn-success" (click)="validarUsuarios()">Enviar</button>
     </div>
   </mat-step>
 </mat-stepper>

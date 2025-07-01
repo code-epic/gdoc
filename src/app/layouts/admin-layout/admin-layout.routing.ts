@@ -59,6 +59,7 @@ import { MreportesComponent } from 'src/app/views/secretaria/mreportes/mreportes
 import { VisitantesComponent } from 'src/app/views/visitantes/visitantes.component';
 import { VisitantedocumentoComponent } from 'src/app/views/visitantes/visitantedocumento/visitantedocumento.component';
 import { PublicarComponent } from 'src/app/views/publicaciones/publicar/publicar.component';
+import { BuzonresueltosComponent } from 'src/app/views/publicaciones/buzonresueltos/buzonresueltos.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -315,6 +316,11 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'publicaciones',
         component: PublicarComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'buzonresueltos',
+        component: BuzonresueltosComponent,
         canActivate: [AuthGuardGuard]
     },
     {

@@ -16,12 +16,16 @@ import { ValidatorFn, AbstractControl, ValidationErrors, } from '@angular/forms'
 export interface Resoluciones {
   numero: string;
   fecha: string;
+  asunto: string;
+  ruta: string;
+  login: string;
 }
 
 export interface Usuarios {
   nombre: string;
-  codigo: string;
+  login: string;
   correo: string;
+  sucursal: string;
 }
 
 export function listaNoVaciaValidator(rsl: any[]): ValidatorFn {
@@ -113,9 +117,12 @@ export class RscpublicacionesComponent implements OnInit {
   }
 
   agregar(num: string, fecha: string, pos: number) {
-    let lst = {
+    let lst : Resoluciones = {
       'numero': num,
-      'fecha': fecha
+      'fecha': fecha,
+      'asunto': '',
+      'ruta': '',
+      'login': ''
     }
     this.resoluciones.push(lst)
 
@@ -126,11 +133,12 @@ export class RscpublicacionesComponent implements OnInit {
     // this.benviar = true
   }
 
-  agregarUsuario(nombre: string, codigo: string, correo: string, pos: number) {
+  agregarUsuario(nombre: string, correo: string, login: string, sucursal: string, pos: number) {
     let lst = {
       'nombre': nombre,
       'correo': correo,
-      'codigo': codigo
+      'login': login,
+      'sucursal': sucursal
     }
     this.usuarios.push(lst)
 
@@ -195,5 +203,61 @@ export class RscpublicacionesComponent implements OnInit {
     }
 
   }
+
+
+  validarUsuarios(){
+    console.log(this.usuarios.length, this.usuarios)
+    if(this.usuarios.length == 0 || this.usuarios[0].correo == undefined) {
+      this._snackBar.open("Debe seleccionar minimo un usuario para continuar", "OK")
+      return false
+    }
+    this.insertarUsuario()
+  }
+
+  insertarUsuario(){
+   
+    let usuario = {
+      'correo': this.usuarios[0].correo,
+      'login':this.usuarios[0].login,
+      'sucursal': this.usuarios[0].sucursal,
+    }
+    this.usuarios.splice(0, 1);
+    this.xAPI.funcion = 'MPPD_IBuzon_Usuario'
+    this.xAPI.valores = JSON.stringify(usuario)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        console.log(data.msj)
+        this.insertarUsuario()
+      },
+      err => {
+
+      }
+    )
+    
+    
+  }
+
+
+  validarResueltos(){
+    if(this.resoluciones.length == 0 ) {
+      
+      return false
+    }
+    
+  }
+
+  insertarResueltos(){
+    let rsl = {
+      'numero': this.usuarios[0].correo,
+      'fecha': this.usuarios[0].login,
+      'asunto': this.usuarios[0].sucursal,
+    }
+    this.usuarios.splice(0, 1);
+    this.xAPI.funcion = 'MPPD_IBuzon_Resoluciones'
+    this.xAPI.valores = JSON.stringify(rsl)
+
+  }
+
+
 
 }

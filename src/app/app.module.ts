@@ -84,6 +84,7 @@ import { RsestadisticasComponent } from './views/resoluciones/rsestadisticas/rse
 import { MreportesComponent } from './views/secretaria/mreportes/mreportes.component';
 import { PublicarComponent } from './views/publicaciones/publicar/publicar.component';
 import {MatStepperModule} from '@angular/material/stepper';
+import { BuzonresueltosComponent } from './views/publicaciones/buzonresueltos/buzonresueltos.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
@@ -220,7 +221,8 @@ const ngWizardConfig: NgWizardConfig = {
     TableRsreportesModalComponent,
     RsestadisticasComponent,
     MreportesComponent,
-    PublicarComponent
+    PublicarComponent,
+    BuzonresueltosComponent
   ],
   providers: [
     {
