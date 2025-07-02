@@ -571,6 +571,24 @@ export class RsbuzonComponent implements OnInit {
                     if (e.tdoc == 'PUNTO DE CUENTA') {
                         i = i + 1
                     }
+                    e.color = 'green'
+                    switch (e.tdoc.toLowerCase()) {
+                    case 'punto de cuenta':
+                        e.simbolo = "-P"
+                        e.color = 'green'
+                        break;
+                    case 'tramitacion por organo regular':
+                        e.simbolo = "-T"
+                        e.color = 'brown'
+                        break;
+                    case 'resolucion':
+                        e.simbolo = "-R"
+                        e.color = 'orange'
+                        break;
+                    default:
+                        e.simbolo = ''
+                        break;
+                    }
                     return e;
                 }); //Registros recorridos como elementos
                 if (tipo == 0) {
@@ -1033,7 +1051,8 @@ export class RsbuzonComponent implements OnInit {
         var elementos = ``
         let i = 0
         let coma = ''
-        await this.lstAll.forEach(e => {
+        // console.log(this.bzClasificar)
+        await this.bzClasificar.forEach(e => {
 
             if (e.completed) {
                 if (i > 0) coma = ','

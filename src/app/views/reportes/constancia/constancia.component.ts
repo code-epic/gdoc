@@ -48,7 +48,7 @@ export class ConstanciaComponent implements OnInit {
     historial: '',
     traza: '',
     subdocumento: '',
-    
+
   }
 
   public WAlerta: IWKFAlerta = {
@@ -114,7 +114,7 @@ export class ConstanciaComponent implements OnInit {
   consultarDocumento(numBase64: string) {
     const base = atob(numBase64)
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
-    
+
     this.xAPI.parametros = base
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -151,7 +151,8 @@ export class ConstanciaComponent implements OnInit {
             return typeof e == 'object' ? e : JSON.parse(e)
           })
 
-          const codigo = this.Doc.codigo + ' / ' + this.Doc.nexpediente
+          // console.log(this.Doc.codigo, this.Doc.nexpediente)
+          const codigo = this.Doc.nexpediente != '' ? this.Doc.codigo + ' / ' + this.Doc.nexpediente : ''
           this.nexpediente = codigo.toUpperCase()
 
           // console.log('Doc:', this.lstUsuario)
@@ -159,29 +160,30 @@ export class ConstanciaComponent implements OnInit {
             return ex.key == this.Doc.creador
           })
 
-          this.Doc.creador = nombre[0]==undefined ? '' : nombre[0].nomb
+          this.Doc.creador = nombre[0] == undefined ? '' : nombre[0].nomb
           //this.safeHtml = this.domSanitizer.bypassSecurityTrustHtml(this.Doc.contenido)
           //console.log(this.safeHtml);
           this.Doc.contenido = this.domSanitizer.sanitize(SecurityContext.HTML, this.Doc.contenido)
-          // console.log(this.lstTraza);
+          console.log(this.lstTraza);
           if (this.lstSubDoc.length > 0) this.bCuentas = true
-          
+
           if (this.Doc.tipo.toLocaleLowerCase().indexOf('contratos') >= 0) {
             this.setDescripcionContratos()
           }
           const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
-        
-          if ( this.lstTraza.length == 0){
-            this.nexpediente = this.Doc.estado_doc + ' / ' + this.Doc.estatus_doc
-          }else{
+          // console.log(traza);
+
+          if (traza.length == 0) {
+            this.nexpediente = this.Doc.estado_doc != '' ? this.Doc.estado_doc + ' / ' + this.Doc.estatus_doc : ''
+          } else {
             this.btraza = true
             this.lstTraza = await traza.map(e => {
               let el = typeof e == 'object' ? e : JSON.parse(e)
               let nombre = this.lstUsuario.filter(ex => {
                 return ex.key == el.usuario
               })
-  
-              el.descripcion = nombre[0]==undefined ? '' : nombre[0].nomb
+
+              el.descripcion = nombre[0] == undefined ? '' : nombre[0].nomb
               return el
             })
             this.lstTraza.sort((a, b) => b.id - a.id)
@@ -215,8 +217,12 @@ export class ConstanciaComponent implements OnInit {
       case 'BD':
         texto = 'NO PROCESAR POR ASCENSO'
         break;
-
-
+      case 'FR':
+        texto = 'FIRMADO'
+        break;
+      case 'ESP':
+        texto = 'EN ESPERA'
+        break;
       default:
         texto = 'PROCESAR'
         break;
@@ -224,11 +230,11 @@ export class ConstanciaComponent implements OnInit {
     return texto
   }
 
-  getDepartamento(e) : string {
-    
-    return e.toUpperCase()=='REGISTRAR'?'REGISTRO Y ESCANEO': e.toUpperCase()
+  getDepartamento(e): string {
+
+    return e.toUpperCase() == 'REGISTRAR' ? 'REGISTRO Y ESCANEO' : e.toUpperCase()
   }
 
- 
+
 
 }
