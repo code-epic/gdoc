@@ -108,7 +108,7 @@
                       </button>
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.idd )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     
                     <div class="col-md-2 texto-lista">
@@ -183,7 +183,7 @@
                     </div>
 
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.idd )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-7 texto-detalle">
                       <b>{{ e.fcre | date:"dd-MM-yyyy" }} - {{ e.udep | uppercase }}</b>&nbsp;{{ e.observacion_accion | uppercase }}
@@ -259,7 +259,7 @@
                     </div>
 
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.idd )]">{{ e.numc }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-7 texto-detalle">
                       <b>{{ e.fcre | date:"dd-MM-yyyy" }} - {{ e.udep | uppercase }}</b>&nbsp;{{ e.nombre_accion | uppercase }}

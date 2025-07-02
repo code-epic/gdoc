@@ -161,10 +161,7 @@ export class PendientesComponent implements OnInit {
       var2: new FormControl("333", [Validators.required]),
     });
 
-    console.log("************************************************");
-    console.log("ESTE ES EL JSON QUE VA PARA EL BACKEND DE EJEMPL");
-    console.log(this.form.getRawValue());
-    console.log("************************************************");
+
 
   
 
@@ -202,6 +199,7 @@ export class PendientesComponent implements OnInit {
     this.ngxService.startLoader("loader-aceptar");
     return await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        // console.log(data.Cuerpo)
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
           e.busqueda = this.utilService.ConvertirCadena( e.norigen + " " + e.ncontrol + " " + e.contenido + e.estatus_nombre + " " +  
           e.remitente + " " + e.nombre + " " + e.creado + " " + e.salida + " " + e.unidad + " " + e.subdocumento

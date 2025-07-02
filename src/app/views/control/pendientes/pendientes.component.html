@@ -148,7 +148,7 @@
             <div class="col-md-12">
               <div class="row enlace" *ngFor="let e of bzSeguimiento; let i = index">
                 <div class="col-md-8">
-                  <a routerLinkActive="active" [routerLink]="['/constancia', constancia(e.numc)]">
+                  <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.id )]">
                     {{ e.numc }} - {{ e.tdoc }}
                   </a>
                   | CREADO {{ e.fecha | date : "dd/MM/yyyy hh:mm:ss" }}

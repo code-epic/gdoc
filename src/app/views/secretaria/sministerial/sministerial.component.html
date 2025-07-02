@@ -102,7 +102,7 @@
 
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]">{{ e.numc }}
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.idd )]">{{ e.numc }}
                         &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
 
@@ -190,7 +190,7 @@
 
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]"
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.idd )]"
                         [matTooltip]="e.numc">{{ getDetalle(e) }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
 
@@ -272,7 +272,7 @@
 
                     </div>
                     <div class="col-md-2 texto-lista">
-                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.numc )]"
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.idd )]"
                         [matTooltip]="e.numc">{{ getDetalle(e) }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
 
