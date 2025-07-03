@@ -78,6 +78,7 @@ MPPD_CCarpetasGroup
 
   }
   async OpcionesCarpetas() {
+    console.log('entrando controles')
     if (this.xnumCarpeta != '' || this.xcomponente != ''){
       this.xAPI.funcion = 'MPPD_CCarpetasGroup'
       this.xAPI.parametros = `${this.xnumCarpeta},${this.xcomponente}`
@@ -166,27 +167,7 @@ MPPD_CCarpetasGroup
   }
 
   reactiveForm() {
-    // console.log('Control de SideBar... ', this.formSidenav)
-    //SI QUIERES INHABILITAR TODO EL FORMULARIO:
-    /*
-    this.formSidenav.disable();
-    */
-
-    //SI QUIERES INHABILITAR SOLO UN INPUT O SELECT
-    /*
-    this.formSidenav.get('formControlNameAQUI').disable();
-    */
-
-    //QUIERES AGREGAR ALGUNA VALIDACION A SOLO UN CAMPO LUEGO DE SLECCIONAR OTRO CAMPO
-    /*
-    his.formSidenav.get('formControlNameAQUI').setValidators([AQUI VA LA VALIDACION, ANGULAR TE TRAE UNAS CUANTAS POR DEFECTO Validators.required, Validators.regex('a-z')]);
-     */
-
-    // QUIERES SABER CUANDO UN USER ESCRIBA EN UN CAMPO ESPECIFICO:
-
-    // this.formSidenav.get('formSidenav').valueChanges.subscribe((value) => {
-    //   console.log("VALUE", value);
-    // });
+    
   
   }
 

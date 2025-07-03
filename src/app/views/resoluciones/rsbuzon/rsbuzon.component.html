@@ -172,7 +172,7 @@
 
                                                                 <div class="col-md-5 texto-detalle"
                                                                     #tooltip="matTooltip"
-                                                                    matTooltip="{{ e.cont | uppercase}}">
+                                                                    matTooltip="{{ e.numc }}: {{ e.cont | uppercase}}">
 
                                                                     {{ e.udep | uppercase }}
                                                                 </div>
@@ -368,7 +368,7 @@
                                                                             DIGITAL
                                                                         </div>
                                                                         <div class="col-md-1 text-right texto-lista">
-                                                                            ACCION
+                                                                            #
                                                                         </div>
 
                                                                     </div>
@@ -555,17 +555,7 @@
                                             </mat-tab>
 
 
-                                            <!-- <mat-tab>
-                                                    <ng-template mat-tab-label>
-                                                        &nbsp;VISTA
-                                                    </ng-template>
-
-                                                    <div class="container">
-
-                                                    </div>
-
-
-                                                </mat-tab> -->
+                                        
                                         </mat-tab-group>
 
                                         <br><br><br><br><br>

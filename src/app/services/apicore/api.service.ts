@@ -94,18 +94,18 @@ export class ApiService {
   }
 
   public Xmeses = [
-    {'id': 0, 'mes' : 'ENERO', 'desde':'01-01', 'hasta': '01-31'},
-    {'id': 1, 'mes' : 'FEBRERO', 'desde':'02-01', 'hasta': '02-29'},
-    {'id': 2, 'mes' : 'MARZO', 'desde':'03-01', 'hasta': '03-31'},
-    {'id': 3, 'mes' : 'ABRIL', 'desde':'04-01', 'hasta': '04-30'},
-    {'id': 4, 'mes' : 'MAYO', 'desde':'05-01', 'hasta': '05-31'},
-    {'id': 5, 'mes' : 'JUNIO', 'desde':'06-01', 'hasta': '06-30'},
-    {'id': 6, 'mes' : 'JULIO', 'desde':'07-01', 'hasta': '07-31'},
-    {'id': 7, 'mes' : 'AGOSTO', 'desde':'08-01', 'hasta': '08-31'},
-    {'id': 8, 'mes' : 'SEPTIEMBRE', 'desde':'09-01', 'hasta': '10-01'},
-    {'id': 9, 'mes' : 'OCTUBRE', 'desde':'10-01', 'hasta': '11-01'},
-    {'id': 10, 'mes' : 'NOMVIEMBRE', 'desde':'11-01', 'hasta': '12-01'},
-    {'id': 11, 'mes' : 'DICIEMBRE', 'desde':'12-01', 'hasta': '12-31'},
+    {'id': 0, 'mes' : 'ENERO', 'desde':'01-01 00:00:00', 'hasta': '01-31 23:59:59'},
+    {'id': 1, 'mes' : 'FEBRERO', 'desde':'02-01 00:00:00', 'hasta': '02-29 23:59:59'},
+    {'id': 2, 'mes' : 'MARZO', 'desde':'03-01 00:00:00', 'hasta': '03-31 23:59:59'},
+    {'id': 3, 'mes' : 'ABRIL', 'desde':'04-01 00:00:00', 'hasta': '04-30 23:59:59'},
+    {'id': 4, 'mes' : 'MAYO', 'desde':'05-01 00:00:00', 'hasta': '05-31 23:59:59'},
+    {'id': 5, 'mes' : 'JUNIO', 'desde':'06-01 00:00:00', 'hasta': '06-30 23:59:59'},
+    {'id': 6, 'mes' : 'JULIO', 'desde':'07-01 00:00:00', 'hasta': '07-31 23:59:59'},
+    {'id': 7, 'mes' : 'AGOSTO', 'desde':'08-01 00:00:00', 'hasta': '08-31 23:59:59'},
+    {'id': 8, 'mes' : 'SEPTIEMBRE', 'desde':'09-01 00:00:00', 'hasta': '10-01 23:59:59'},
+    {'id': 9, 'mes' : 'OCTUBRE', 'desde':'10-01 00:00:00', 'hasta': '11-01 23:59:59'},
+    {'id': 10, 'mes' : 'NOMVIEMBRE', 'desde':'11-01 00:00:00', 'hasta': '12-01 23:59:59'},
+    {'id': 11, 'mes' : 'DICIEMBRE', 'desde':'12-01 00:00:00', 'hasta': '12-31 23:59:59'},
   ]
 
   public Xyear = [

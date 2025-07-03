@@ -4,7 +4,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 
-import { ActivatedRoute, Router } from "@angular/router"
+import { Router } from "@angular/router"
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap"
 
 import { Resolucion } from "src/app/services/control/documentos.service"
@@ -12,7 +12,6 @@ import {
     NgbCalendar,
     NgbDateAdapter,
     NgbDateParserFormatter,
-    NgbDatepickerModule,
     NgbDateStruct,
 } from "@ng-bootstrap/ng-bootstrap"
 import { ToastrService } from 'ngx-toastr';
@@ -99,8 +98,12 @@ export class RsbuzonComponent implements OnInit {
     public estadoActual = 3;
     public estatusActual = 1;
     public destino = 14;
-    public fecha_desde = '2024-09-01'
-    public fecha_hasta = '2024-09-30'
+    fecha_desde = '-09-01'
+    fecha_hasta = '-09-30'
+    xyear = '2024'
+    public lstMeses = []
+    public lstYear = []
+    public xmeses = ''
 
     public extender_plazo: any;
     public x = false;
@@ -136,15 +139,6 @@ export class RsbuzonComponent implements OnInit {
         { valor: '8', texto: 'SILENCIO ADMINISTRATIVO', visible: '0' },
         { valor: '9', texto: 'EN ESPERA DE DECISION', visible: '0' },
         { valor: '10', texto: 'EN ESPERA DE OPINION', visible: '0' },
-        // { valor: '3', texto: 'EN MANOS DEL DIRECTOR DEL DESPACHO', visible: '1' },
-        // {
-        //     valor: '4',
-        //     texto: 'EN MANOS DEL SUB DIRECTOR DEL DESPACHO',
-        //     visible: '1',
-        // },
-        // { valor: '5', texto: 'ARCHIVAR', visible: '1' },
-        // { valor: '6', texto: 'REDISTRIBUCION', visible: '1' },
-        // { valor: '7', texto: 'SALIDA', visible: '2' },
     ];
 
     public lstAcciones = [];
@@ -221,7 +215,7 @@ export class RsbuzonComponent implements OnInit {
 
     public searchView = "none"
     public contentView = ""
-  
+
 
 
     public Resolucion: Resolucion = {
@@ -362,7 +356,7 @@ export class RsbuzonComponent implements OnInit {
     public CuentaGenera: any
     public tipo: any
     public archivos: any;
-    
+
     public lstDigitalesDevuelto = []
 
     constructor(
@@ -379,15 +373,21 @@ export class RsbuzonComponent implements OnInit {
         private dateAdapter: NgbDateAdapter<string>,
         private fb: FormBuilder
     ) {
+
+        this.lstMeses = this.apiService.Xmeses
+        this.lstYear = this.apiService.Xyear
     }
 
     async ngOnInit() {
+
+        this.xmeses = new Date().getMonth().toString()
+        this.xyear = new Date().getFullYear().toString()
 
         this.Componentes =
             sessionStorage.getItem('MPPD_CComponente') != undefined
                 ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
                 : []
-        console.log(this.Componentes)
+        // console.log(this.Componentes)
         this.TipoResoluciones = sessionStorage.getItem("MPPD_CTipoResolucion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion"))) : []
 
         this.listarResponsables()
@@ -468,9 +468,6 @@ export class RsbuzonComponent implements OnInit {
 
 
     openResolucion(content) {
-      
-
-        //this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
         let modalRef = this.modalService.open(content, {
             centered: true,
             windowClass: "my-custom-modal-class",
@@ -511,7 +508,8 @@ export class RsbuzonComponent implements OnInit {
         this.xAPI.valores = '';
         this.selNav = e;
 
-        // console.log('entrando...', e)
+        this.fecha_desde = this.xyear + '-' + this.lstMeses[0].desde
+        this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
         switch (e) {
             case 0:
                 this.cargarAcciones(0);
@@ -573,21 +571,21 @@ export class RsbuzonComponent implements OnInit {
                     }
                     e.color = 'green'
                     switch (e.tdoc.toLowerCase()) {
-                    case 'punto de cuenta':
-                        e.simbolo = "-P"
-                        e.color = 'green'
-                        break;
-                    case 'tramitacion por organo regular':
-                        e.simbolo = "-T"
-                        e.color = 'brown'
-                        break;
-                    case 'resolucion':
-                        e.simbolo = "-R"
-                        e.color = 'orange'
-                        break;
-                    default:
-                        e.simbolo = ''
-                        break;
+                        case 'punto de cuenta':
+                            e.simbolo = "-P"
+                            e.color = 'green'
+                            break;
+                        case 'tramitacion por organo regular':
+                            e.simbolo = "-T"
+                            e.color = 'brown'
+                            break;
+                        case 'resolucion':
+                            e.simbolo = "-R"
+                            e.color = 'orange'
+                            break;
+                        default:
+                            e.simbolo = ''
+                            break;
                     }
                     return e;
                 }); //Registros recorridos como elementos
@@ -798,13 +796,13 @@ export class RsbuzonComponent implements OnInit {
                     case '0': //Oficio por opinión
                         this.promoverBuzon(0, this.utilService.FechaActual());
                         break;
-                     case '8': //Oficio por SILENCIO ADMINISTRATIVO
+                    case '8': //Oficio por SILENCIO ADMINISTRATIVO
                         this.promoverBuzon(3, this.utilService.FechaActual());
                         break;
                     case '9': //Oficio por DECISION
                         this.promoverBuzon(4, this.utilService.FechaActual());
                         break;
-                     case '10': //Oficio por OPINION
+                    case '10': //Oficio por OPINION
                         this.promoverBuzon(5, this.utilService.FechaActual());
                         break;
                     case '1': //Rechazar en el estado inicial
@@ -859,7 +857,7 @@ export class RsbuzonComponent implements OnInit {
 
         var usuario = this.loginService.Usuario.id;
         var i = 0;
-        var estatus = activo!=0?activo:1; //NOTA DE ENTREGA
+        var estatus = activo != 0 ? activo : 1; //NOTA DE ENTREGA
         //Buscar en Wk de acuerdo al usuario y la app activa
         this.xAPI.funcion = 'WKF_APromoverEstatus';
         this.xAPI.valores = '';
@@ -945,8 +943,6 @@ export class RsbuzonComponent implements OnInit {
         console.log(this.xAPI);
         await this.apiService.Ejecutar(this.xAPI).subscribe(
             async (data) => {
-                //this.xAPI.funcion = 'WKF_ASubDocumentoAlerta'
-                //await this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
                 this.toastrService.success(
                     'El documento ha sido redistribuido segun su selección',
                     `GDoc Wkf.DocumentoObservacion`
@@ -1015,27 +1011,7 @@ export class RsbuzonComponent implements OnInit {
             await this.apiService.EnviarArchivos(frm).subscribe((data) => {
                 this.xAPI.funcion = 'WKF_ADocumentoAdjunto';
                 this.xAPI.parametros = '';
-                // this.DocAdjunto.archivo = this.archivos[0].name
-                // this.DocAdjunto.usuario = this.loginService.Usuario.id
-                // this.DocAdjunto.documento = this.numControl
-                // this.xAPI.valores = JSON.stringify(this.DocAdjunto)
 
-                // this.apiService.Ejecutar(this.xAPI).subscribe(
-                //   (xdata) => {
-                //     if (xdata.tipo == 1) {
-                //       this.toastrService.success(
-                //         'Tu archivo ha sido cargado con exito ',
-                //         `GDoc Registro`
-                //       );
-
-                //     } else {
-                //       this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
-                //     }
-                //   },
-                //   (error) => {
-                //     this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
-                //   }
-                // )
             });
         } catch (error) {
             console.error(error);
@@ -1047,13 +1023,10 @@ export class RsbuzonComponent implements OnInit {
     }
 
     async crearCarpeta() {
-        //'240827-20150','240815-19764','240815-19763'
         var elementos = ``
         let i = 0
         let coma = ''
-        // console.log(this.bzClasificar)
         await this.bzClasificar.forEach(e => {
-
             if (e.completed) {
                 if (i > 0) coma = ','
                 elementos += coma + `'${e.numc}'`
@@ -1061,7 +1034,6 @@ export class RsbuzonComponent implements OnInit {
             }
 
         })
-        // console.log(elementos)
         var componente = parseInt(this.xcomponente)
         var numero = this.numCarpeta;
         var tipo = this.xtipo
@@ -1074,8 +1046,6 @@ export class RsbuzonComponent implements OnInit {
         var usuario = this.loginService.Usuario.cedula;
 
 
-        // var estatus = 3; //NOTA DE ENTREGA
-        //Buscar en Wk de acuerdo al usuario y la app activa
         this.xAPI.funcion = 'MPPD_GEntradasResoluciones';
         this.xAPI.parametros =
             `'0',${elementos}##${componente}##${numero}##${tipo}##${estatus}##${clasificacion}##${prioridad}##${observacion}##${usuario}##${idtrans}`;
@@ -1098,21 +1068,7 @@ export class RsbuzonComponent implements OnInit {
             }
         );
 
-        // lstBz.forEach((e) => {
-        //     i++;
-        //     if (e.completed == true) {
-        //         this.xAPI.parametros = `${e.idd},${this.estadoActual},${this.destino},${estatus},${numero},${usuario}`;
-        //         this.apiService.Ejecutar(this.xAPI).subscribe(
-        //             (data) => {
-        //                 this.actualizarBzRegistrados(e.numc, 0);
-        //             },
-        //             (errot) => {
-        //                 this.toastrService.error(errot, `GDoc Wkf.Estatus`);
-        //             }
-        //         ); //
-        //     }
-        // });
-        //this.seleccionNavegacion(0)
+
     }
 
     actualizarBzRegistrados(codigo, tipo) {
@@ -1165,11 +1121,11 @@ export class RsbuzonComponent implements OnInit {
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
-                
+                console.log(data)
                 this.lstAllx = data.Cuerpo
                 let arr = this.lstAllx.map((e) => {
                     e.completed = false;
-                    if(e.digital != '') this.lstDigitalesDevuelto.push(e.digital)
+                    if (e.digital != '') this.lstDigitalesDevuelto.push(e.digital)
                     return e;
                 });
                 this.lstCedula = arr
@@ -1215,10 +1171,10 @@ export class RsbuzonComponent implements OnInit {
         this.xAPI.funcion = 'MPPD_ListarResponsables'
         this.xAPI.parametros = 'Resoluciones'
         this.xAPI.valores = null
-        console.log(this.xAPI)
+        // console.log(this.xAPI)
         await this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
-                console.log(data)
+                // console.log(data)
                 if (data.msj == undefined) {
                     data.forEach(e => {
                         this.lstResponsable.push({
@@ -1237,7 +1193,7 @@ export class RsbuzonComponent implements OnInit {
         if (e.s_estatus == null) e.s_estatus = 1
         let pos = parseInt(e.s_estatus) - 1;
         // console.log('CANT: ', pos,    this.lstAccionesMininisterial)
-        return this.lstAccionesMininisterial[pos]!=undefined?this.lstAccionesMininisterial[pos].texto:''
+        return this.lstAccionesMininisterial[pos] != undefined ? this.lstAccionesMininisterial[pos].texto : ''
 
 
     }
@@ -1485,7 +1441,7 @@ export class RsbuzonComponent implements OnInit {
 
     seleccionTipo() {
         this.desactivarVista()
-      
+
 
         if (this.fecha_resolucion == "") {
             this._snackBar.open("Debe seleccionar una fecha para continuar", "OK")
@@ -1589,10 +1545,10 @@ export class RsbuzonComponent implements OnInit {
     }
 
 
-  viewUnidad() {
-    this.searchView = ""
-    this.contentView = "none"
-  }
+    viewUnidad() {
+        this.searchView = ""
+        this.contentView = "none"
+    }
 
 
     resetearFechas(active: boolean) {
@@ -1600,8 +1556,8 @@ export class RsbuzonComponent implements OnInit {
         this.ultimo_ascenso = ""
         this.comision_inicio = ""
         this.comision_fin = ""
-      }
-    
+    }
+
 
 
     validarCategoriaCeseReserva(codigo: number) {

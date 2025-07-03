@@ -12,7 +12,7 @@
 
         <div class="card-header bg-transparent">
           <div class="row align-items-center">
-            <div class="col-md-10">
+            <div class="col-md-11">
               <h6 class="text-uppercase text-muted ls-1 mb-1">PRINCIPAL</h6>
               <h2 class="mb-0">Módulo de Generales / Consultas</h2>
             </div>
@@ -25,49 +25,101 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-1">
-              <ul class="navbar-nav align-items-right d-none d-md-flex">
-                <li class="nav-item" ngbDropdown placement="bottom-right">
-                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
-                    <div class="media align-items-center">
-                      <div class="example-button-row">
-                        <button mat-icon-button aria-label="">
-                          <mat-icon>more_vert</mat-icon>
-                        </button>
-                      </div>
-                    </div>
-                  </a>
-                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                    <a routerLinkActive="active" [routerLink]="['/rsentradas']" class="dropdown-item">
-                      <i class="fa fa-plus"></i>
-                      <span>Nueva Entrada</span>
-                    </a>
-                  </div>
-                </li>
-              </ul>
-            </div>
+
 
           </div>
         </div>
 
         <div class="card-body">
 
-
           <div class="row">
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-6">
+              <label for="">Componente</label>
               <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente"
-                value="{{componente}}">
-                <option value="0">SELECCIONAR COMPONENTE</option>
-                <option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}
+                (change)="consultarEspecialidades(); consultarEstudios()" value="{{componente}}">
+                <option value="%">TODOS LOS COMPONENTES</option>
+                <option *ngFor="let e of Componentes;" [value]="e.cod_componente + '|' + e.nombre_componente">{{
+                  e.nombre_componente }}
                 </option>
               </select>
             </div>
 
             <div class="form-group col-md-3">
-              <button class="btn bg-primary text-white " (click)="ConsultarListado()">
-                <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar listado </button>
+              <label for="">Situación</label>
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="situacion"
+                value="{{situacion}}">
+                <option value="ACT">ACTIVO</option>
+                <option value="RINC">REINCORPORADO</option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-3">
+              <label for="">Promoción</label>
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="promocion"
+                value="{{promocion}}">
+                <option value="%">TODAS</option>
+                <option *ngFor="let e of lstPromocion;" [value]="e.promocion">{{ e.promocion }}
+                </option>
+              </select>
+            </div>
+
+
+            <div class="form-group col-md-4">
+              <label for="">Categoria</label>
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="categoria"
+                value="{{categoria}}">
+                <option value="%">TODAS</option>
+                <option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}
+                </option>
+              </select>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="">Clasificación</label>
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="clasificacion"
+                value="{{clasificacion}}">
+                <option value="%">TODAS</option>
+                <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
+                  {{e.des_clasificacion}}</option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-4">
+              <label for="">Grado</label>
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="grado" value="{{grado}}">
+                <option value="%">TODOS</option>
+                <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
+              </select>
+            </div>
+
+
+
+            <div class="form-group col-md-4">
+              <label for="">Especialidad</label>
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="especialidad"
+                value="{{especialidad}}">
+                <option value="%">TODAS</option>
+                <option *ngFor="let e of lstEspecialidad;" [value]="e.especialidad">{{ e.especialidad | uppercase }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="">Estudios</label>
+              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="estudios"
+                value="{{estudios}}">
+                <option value="%">TODAS</option>
+                <option *ngFor="let e of lstEstudios;" [value]="e.estudios">{{ e.estudios | uppercase }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-3">
+              <label for="">&nbsp;</label><br>
+              <button class="btn bg-primary text-white " (click)="consultarListado()">
+                <span class="fa fa-search"></span>&nbsp;&nbsp;Listar Nóminas
+              </button>
             </div>
           </div>
+
 
           <div class="row" #pdfTable>
             <div class="col-md-12">
@@ -86,18 +138,11 @@
                 <tbody>
                   <tr *ngFor="let e of lstGenerales; let i= index">
                     <td>{{ i+1 }}</td>
-                     <td>{{ e.cedula }}</td>
-                   <!-- <td> 
-                      <img align="left" src="https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/{{ e.cedula }}/foto.jpg"
-                        onerror="this.src='assets/img/theme/ndisponible.jpeg'"
-                        style="width: 75px; vertical-align: top; margin-right: 20px;border-radius: 5%;">
-
-                    </td> -->
+                    <td>{{ e.cedula }}</td>
                     <td>{{ e.nombre }}</td>
                     <td>{{ e.nombres }}</td>
-                    <td>{{ e.promocion }}</td>
-                    <!-- <td>{{ e.situacion }}</td> -->
-                    <td>{{filtrarNombramiento(e) }}</td>
+                    <td>{{ e.promocion | date:'dd/MM/YYYY' }}</td>
+                    <td [innerHTML]="filtrarNombramiento(e)"></td>
                   </tr>
                 </tbody>
               </table>

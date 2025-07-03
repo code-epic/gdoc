@@ -1,7 +1,6 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { NgbDateParserFormatter, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -15,9 +14,24 @@ import { UtilService } from 'src/app/services/util/util.service';
 export class GralconsultasComponent implements OnInit {
 
   selected = new FormControl(0);
-  componente = '0'
-  Componentes = [] 
+  componente = '%'
+  situacion = 'ACT'
+  promocion = '%'
+  especialidad = '%'
+  estudios = '%'
+  grado = '%'
+  clasificacion = '%'
+  categoria = '%'
+
+  Componentes = []
+  Grados = []
+  Categorias = []
+  Clasificaciones = []
+
   lstGenerales = []
+  lstPromocion = []
+  lstEspecialidad = []
+  lstEstudios = []
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -26,89 +40,174 @@ export class GralconsultasComponent implements OnInit {
   }
 
   constructor(private apiService: ApiService,
-    private modalService: NgbModal,
-    private ruta: Router,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
-    private rutaActiva: ActivatedRoute,
-    private utilService: UtilService) { }
+    public utils: UtilService) { }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.Componentes =
-    sessionStorage.getItem("MPPD_CComponente") != undefined
-      ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
-      : [];
+      sessionStorage.getItem("MPPD_CComponente") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
+        : [];
+    this.Componentes =
+      sessionStorage.getItem('MPPD_CComponente') != undefined
+        ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
+        : []
+
+    this.Grados =
+      sessionStorage.getItem("MPPD_CGrado") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado"))).slice(0, 8)
+        : [];
+    this.Categorias =
+      sessionStorage.getItem("MPPD_CCategorias") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias")))
+        : [];
+    this.Clasificaciones =
+      sessionStorage.getItem("MPPD_CClasificacion") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion")))
+        : [];
+
+    await this.consultarPromociones()
   }
 
-  ConsultarListado(){
-    this.xAPI.funcion = 'MPPD_CLibroGenerales'
-    this.xAPI.parametros = this.componente.split('|')[0];
+  consultarPromociones() {
+    this.xAPI.funcion = 'MPPD_CPromociones'
+    this.xAPI.parametros = ''
     this.xAPI.valores = ''
-    this.ngxService.startLoader("loader-gennerales");
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-       
-        // console.log(data)
-        
-        this.lstGenerales = data.Cuerpo.length > 0? data.Cuerpo: []
-        this.ngxService.stopLoader("loader-gennerales");
+      data => {
+        this.lstPromocion = data.Cuerpo
+      },
+      error => { }
+
+    )
+  }
+
+  consultarEspecialidades() {
+    let cmp = this.componente.split('|')[0]
+    this.lstEspecialidad = []
+    this.xAPI.funcion = 'MPPD_CEspecialidad'
+    this.xAPI.parametros = cmp
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        this.lstEspecialidad = data.Cuerpo
+      },
+      error => { }
+
+    )
+  }
+
+  consultarEstudios() {
+    let cmp = this.componente.split('|')[0]
+    this.lstEspecialidad = []
+    this.xAPI.funcion = 'MPPD_CEstudios'
+    this.xAPI.parametros = cmp
+    this.xAPI.valores = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        console.log(data)
+        this.lstEstudios = data.Cuerpo
+      },
+      error => { }
+
+    )
+  }
+
+  consultarListado() {
+    let cmp = this.componente.split('|')[0]
+    let sit = this.situacion
+    let pro = this.promocion
+    let esp = this.especialidad
+    let est = this.estudios
+    let cat = this.categoria
+
+
+    let valorsql = this.grado == '%' ? `DB.cod_grado <=8` : ` DB.cod_grado =${this.grado}`
+    this.xAPI.funcion = 'MPPD_CLibroGenerales'
+    this.xAPI.parametros = cmp + ',' + sit + ',' + pro + ',' + esp + ',' + est + ',' + valorsql + ',' + cat
+    this.xAPI.valores = ''
+
+    this.lstGenerales = []
+    this.ngxService.startLoader('loader-gennerales')
+
+    console.log(this.xAPI)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      data => {
+        console.log(data)
+        this.lstGenerales = data.Cuerpo.length > 0 ? data.Cuerpo : []
+        this.ngxService.stopLoader('loader-gennerales')
 
       },
       (error) => {
-        console.error("Error de conexion a los datos ", error)
+        console.error('Error de conexion a los datos ', error)
       }
     )
   }
 
-  filtrarNombramiento(e): string {
-    let nmb = JSON.parse(e).filter(e => {
-        return e.tipo != 13;
-    }).sort( (a, b) => {
-        if (a.fecha > b.fecha) {
-            return -1;
-        } else if (a.fecha < b.fecha) {
-            return 1;
-        } else {
-            return 0;
-        }
-    });
+   filtrarNombramiento(e): string {
+        let otro_cargo = e.cargo
 
-    let texto = '';
-    if (nmb.length !== 0) {
-        if (nmb[0].asunto === undefined ) {
-            texto = '';
+        let nmb = JSON.parse(e.resoluciones).filter(e => {
+            return e.tipo != 13;
+        }).sort((a, b) => {
+            if (a.fecha > b.fecha) {
+                return -1;
+            } else if (a.fecha < b.fecha) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
+        let texto = '';
+        if (nmb.length !== 0) {
+            if (nmb[0].asunto === undefined) {
+                texto = '';
+            } else {
+                let xcargo = otro_cargo == undefined ? '' : otro_cargo
+                texto = nmb[0].asunto + `<br> RESOL. ${nmb[0].numero} <br> ${nmb[0].fecha}<br> ${xcargo}`
+            }
         } else {
-            texto = nmb[0].asunto + `<br> RESOL. <br> ${nmb[0].numero} <br> ${nmb[0].fecha}<br>`  +
-            nmb[1].asunto + `<br> RESOL. <br> ${nmb[1].numero} <br> ${nmb[1].fecha}<br>`
+            texto = 'SIN NOMBRAMIENTO';
         }
-    } else {
-        texto = 'SIN NOMBRAMIENTO';
+        return texto;
     }
-    return texto;
-}
 
-filtrarAscenso(e) {
-    let asc = JSON.parse(e).filter(e => {
-        return e.tipo == 13;
-    }).sort((a, b) => {
-        if (a.fecha > b.fecha) {
-            return -1;
-        } else if (a.fecha < b.fecha) {
-            return 1;
+    filtrarAscenso(e) {
+        let area = this.getMerito(e.merito)
+        let asc = JSON.parse(e.resoluciones).filter(e => {
+            return e.tipo == 13;
+        }).sort((a, b) => {
+            if (a.fecha > b.fecha) {
+                return -1;
+            } else if (a.fecha < b.fecha) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        let texto = ''
+        if (asc.length !== 0) {
+            texto = `RESOL. ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${area}`
         } else {
-            return 0;
-        }
-    });
-    let texto = ''
-    if (asc.length !== 0) {
-        let pos = asc[0].orden == 0 ? '1 DE 1' : asc[0].orden + ' DE ' + asc[0].cantidad
-        texto =  `RESOL. <br> ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${pos}`
-    } else {
-        texto = 'SIN RESUELTO'
-    }
-    return texto
-}
+            texto = 'SIN RESUELTO'
 
-  
-  
+        }
+        return texto
+    }
+
+    setDefaultPic(event: any) {
+        event.target.src = this.utils.imgNoDisponible;
+    }
+
+    getEscudo(comp): string {
+        return comp == '%' ? 'mppd.png' : comp + '.jpeg'
+    }
+
+    getMerito(merito): string {
+        return merito == '' || merito == undefined ? '': merito.replace('/', ' DE ') 
+    }
+
+
 }
