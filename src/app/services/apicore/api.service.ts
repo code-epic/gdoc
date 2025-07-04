@@ -93,7 +93,7 @@ export class ApiService {
   //Dirección Get para servicios en la página WEB
   URL = environment.API
 
-  hash = environment.Hash
+  // hash = environment.Hash
 
   public pID: ProcessID = {
     id: '',
@@ -141,7 +141,7 @@ export class ApiService {
   //Ejecutar Api generales
   Ejecutar(xAPI: IAPICore): Observable<any> {
     // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
-    var url = this.URL + "crud" + this.hash
+    var url = this.URL + "crud:" + environment.Hash
     //console.info( JSON.stringify(xAPI ))
     return this.http.post<any>(url, xAPI, this.httpOptions);
   }
