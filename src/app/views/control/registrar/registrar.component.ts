@@ -42,6 +42,8 @@ export class RegistrarComponent implements OnInit {
 
   public focus;
   public hashcontrol = ''
+  progreso = []
+  posicionProgreso: number = 0
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -137,7 +139,7 @@ export class RegistrarComponent implements OnInit {
     this.strRuta = environment.Url + environment.API
     this.lstMeses = this.apiService.Xmeses
     this.lstYear = this.apiService.Xyear
-  
+
   }
 
 
@@ -224,9 +226,10 @@ export class RegistrarComponent implements OnInit {
   }
 
 
-  open(content, id) {
+  open(content, id, posicion) {
     this.numControl = id
     this.hashcontrol = btoa("D" + this.numControl) //Cifrar documentos
+    this.posicionProgreso = posicion
     this.modalService.open(content);
 
   }
@@ -257,6 +260,8 @@ export class RegistrarComponent implements OnInit {
           this.buzon = data.Cuerpo.map((e) => {
             e.existe = e.anom == '' ? true : false;
             e.privado = e.priv == 1 ? true : false;
+            e.statusprogreso = false
+            e.progreso = 0
             e.color = 'green'
             switch (e.tdoc.toLowerCase()) {
               case 'punto de cuenta':
@@ -300,7 +305,7 @@ export class RegistrarComponent implements OnInit {
   }
 
 
- 
+
 
   seleccionNavegacion(e) {
     this.selNav = e
@@ -314,7 +319,7 @@ export class RegistrarComponent implements OnInit {
     switch (e) {
       case 0:
         this.xAPI.parametros = `1,1,${this.fecha_desde},${this.fecha_hasta}`
-        
+
         this.listarBuzon()
         break;
       case 1:
@@ -381,7 +386,7 @@ export class RegistrarComponent implements OnInit {
         this.xAPI.funcion = 'WKF_ARedistribuir' //'WKF_AUbicacion'
         this.xAPI.valores = ''
         this.xAPI.parametros = `10,10,1,${usuario},${id}`
-        console.log(codigo, id )
+        console.log(codigo, id)
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
             if (data.tipo == 1) {
@@ -459,7 +464,7 @@ export class RegistrarComponent implements OnInit {
 
 
   ConsultarCtrl(id: string) {
-   
+
     this.btnNota = false
     this.consultarEstados(id)
     this.UbicacionSeleccionLista = id
@@ -487,53 +492,86 @@ export class RegistrarComponent implements OnInit {
   }
 
   async SubirArchivo(e) {
-    this.ngxService.startLoader("loader-aceptar")
+    
     var frm = new FormData(document.forms.namedItem("forma"))
+    this.buzon[this.posicionProgreso].statusprogreso = true
     try {
-      await this.apiService.EnviarArchivos(frm).subscribe(
-        (data) => {
-          this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
-          this.xAPI.parametros = ''
-          this.DocAdjunto.archivo = this.archivos[0].name
-          this.DocAdjunto.usuario = this.loginService.Usuario.id
-          this.DocAdjunto.documento = this.numControl
-          this.xAPI.valores = JSON.stringify(this.DocAdjunto)
-          this.apiService.Ejecutar(this.xAPI).subscribe(
-            (xdata) => {
-              if (xdata.tipo == 1) {
-                this.toastrService.success(
-                  'Tu archivo ha sido cargado con exito ',
-                  `GDoc Registro`
-                );
+      await this.apiService.EnviarArchivosProgress(frm).subscribe({
+        next: (event) => {
+          this.buzon[this.posicionProgreso].progreso = event.progress
+          // console.log('Subiendo:', event.progress);
+          if (event.state === 'DONE') {
+            this.ngxService.startLoader("loader-aceptar")
+            this.buzon[this.posicionProgreso].anom = 'X'
+          //  document.getElementById("formFile"). ('')
 
-              } else {
-                this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
-              }
-              this.ngxService.stopLoader("loader-aceptar")
-            },
-            (error) => {
-              this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
-              this.ngxService.stopLoader("loader-aceptar")
-            }
-          )
+            
+            this.cargarSubDetalle()
+          }
+
+        },
+        error: (err) => {
+          this.toastrService.error(err, `GDoc Adjunto`);
+
+          console.error('Error al subir el archivo:', err);
+
+        },
+        complete: () => {
+          this.buzon[this.posicionProgreso].statusprogreso = false
+          this.buzon[this.posicionProgreso].progreso = 0
+          
+
+          // console.log('Subida de archivo completada.');
+
+
+
+
         }
-      )
+      });
+
     } catch (error) {
       console.error(error)
     }
 
   }
 
+  cargarSubDetalle() {
+    this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
+    this.xAPI.parametros = ''
+    this.DocAdjunto.archivo = this.archivos[0].name
+    this.DocAdjunto.usuario = this.loginService.Usuario.id
+    this.DocAdjunto.documento = this.numControl
+    this.xAPI.valores = JSON.stringify(this.DocAdjunto)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (xdata) => {
+        if (xdata.tipo == 1) {
+          this.toastrService.success(
+            'Tu archivo ha sido cargado con exito ',
+            `GDoc Registro`
+          );
+
+        } else {
+          this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+        }
+        this.ngxService.stopLoader("loader-aceptar")
+      },
+      (error) => {
+        this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
+        this.ngxService.stopLoader("loader-aceptar")
+      }
+    )
+  }
+
 
   async notaEntrega(id: string) {
     this.btnNota = false
     var cantidad = this.lstNotaEntrega.length
-    
+
     if (cantidad > 0) {
       var i = 0
       this.lstNotaEntrega.forEach(e => {
         var origen = e.dest
-        
+
         var estatus = 1
         var usuario = this.loginService.Usuario.id
         var id = e.idd
@@ -680,7 +718,7 @@ export class RegistrarComponent implements OnInit {
 
   consultarEstados(id) {
     this.lstEstados.map(e => {
-      if ( e.id == id) this.EstadoDescripcion = e.nomb
+      if (e.id == id) this.EstadoDescripcion = e.nomb
     })
 
   }

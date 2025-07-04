@@ -71,7 +71,7 @@
                       </mat-checkbox>
                     </div>
                     <div class="col-md-2">
-                      <button mat-icon-button aria-label="Example " (click)="open(content, 0)" id="clasificar">
+                      <button mat-icon-button aria-label="Example " (click)="open(content, 0, 0)" id="clasificar">
                         <mat-icon>folder_copy</mat-icon>
                       </button>
                     </div>
@@ -123,17 +123,17 @@
                       {{ e.udep | uppercase }}
                     </div>
 
-                    <div class="col-md-2 text-right " style="margin-top:-20px;">
+                    <div class="col-md-2 text-right " style="margin-top:-20px;" *ngIf="!e.statusprogreso">
                       <button mat-icon-button aria-label="Privado">
                         <mat-icon *ngIf="e.privado" class="text-warning">no_encryption</mat-icon>
                       </button>
                       <button mat-icon-button aria-label="Editar" (click)="editar( e.idd )">
                         <mat-icon class="text-gray">edit_note</mat-icon>
                       </button>
-                      <button *ngIf="e.anom==''"  mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                      <button *ngIf="e.anom==''"  mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc, i)">
                         <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
-                      <button *ngIf="e.anom!=''" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
+                      <button *ngIf="e.anom!=''" mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc, i)">
                         <mat-icon class="text-blue">attach_file</mat-icon>
                       </button>
                       
@@ -141,6 +141,9 @@
                         <mat-icon class="text-gray">delete_outline</mat-icon>
                       </button>
 
+                    </div>
+                    <div class="col-md-2 text-right " style="margin-top:10px;" *ngIf="e.statusprogreso">
+                      PROGRESO (<b> {{ e.progreso }}% </b>) &nbsp;&nbsp;
                     </div>
                   </div>
                 </mat-list>
