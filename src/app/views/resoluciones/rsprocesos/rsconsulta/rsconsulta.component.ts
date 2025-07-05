@@ -27,6 +27,7 @@ import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
+import { environment } from "src/environments/environment";
 
 interface ITipoResolucion {
   codigo: string;
@@ -990,7 +991,7 @@ export class RsconsultaComponent implements OnInit {
     let nameFnx = "Fnx_MYSQLCsvLoad";
     let fnx = {
       funcion: nameFnx,
-      codigo: "9c9ae59f7e1e5868908b1225fa8a66c0.sse",
+      codigo: environment.Hash,
       basedatos: "mppd",
       dir: data.msj,
       file: data.contenido[0].split("|")[1],

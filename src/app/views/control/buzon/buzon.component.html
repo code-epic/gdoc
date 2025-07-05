@@ -293,13 +293,44 @@
               &nbsp;ALERTAS
             </ng-template>
 
-            <div class="container">
+            <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+               <mat-selection-list>
+                <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
+                  <div class="row">
+                    <div class="col-md-2 texto-lista">
+                      &nbsp;CODIGO
+                    </div>
+
+                    <div class="col-md-4 texto-lista">
+                      UNIDAD DEPENDENCIA
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      FECHA / ORIGEN
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                        value="{{xyear}}" style="margin-top: -20px;">
+                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                      </select>
+
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                        value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(3)">
+                        <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                      </select>
+                    </div>
+
+                  </div>
+
+                </mat-list>
+              </mat-selection-list>
               <mat-selection-list #lstAlertas>
                 <mat-list *ngFor="let e of buzon; let i=index "
                   style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-2 texto-lista">
-                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.ncontrol )]">{{ e.ncontrol }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
+                      <a  routerLinkActive="active"  [routerLink]="['/constancia', constancia( e.id )]">{{ e.ncontrol }} &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-4 texto-lista">
                       {{ e.unidad | uppercase }}
@@ -313,7 +344,7 @@
                     <div class="col-md-1 text-right ">
                       <button mat-icon-button aria-label="Privado">
                         <!--  -->
-                        <mat-icon class="text-warning" (click)="open(alerta, e.id_alerta)">today</mat-icon>
+                        <mat-icon class="text-warning" (click)="open(alerta, e.id_alerta, e.id)">today</mat-icon>
                       </button>
 
                     </div>

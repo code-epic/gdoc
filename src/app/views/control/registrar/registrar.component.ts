@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatAccordion } from '@angular/material/expansion';
 import { PageEvent } from '@angular/material/paginator';
 import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
@@ -15,7 +15,6 @@ import { NgxUiLoaderService } from 'ngx-ui-loader'
 import Swal from 'sweetalert2'
 import { Md5 } from "md5-typescript";
 import { UtilService } from 'src/app/services/util/util.service';
-import { error } from 'console';
 
 
 
@@ -26,10 +25,7 @@ import { error } from 'console';
 })
 export class RegistrarComponent implements OnInit {
 
-  @ViewChild('fileUpload1')
-
-  private fileUpload1: AngularFileUploaderComponent;
-
+  @ViewChild('fileInput') fileInput!: ElementRef
   @ViewChild(MatAccordion) accordion: MatAccordion;
 
   public estadoActual = 1
@@ -59,6 +55,8 @@ export class RegistrarComponent implements OnInit {
   lengthOfi = 0;
   pageSizeOfi = 10;
   pageSizeOptions: number[] = [5, 10, 25, 100];
+
+  btnEnviar : boolean = false
 
   // MatPaginator Output
   pageEvent: PageEvent;
@@ -133,7 +131,6 @@ export class RegistrarComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private modalService: NgbModal) {
 
-    // customize default values of modals used by this component tree
     config.backdrop = 'static';
     config.keyboard = false;
     this.strRuta = environment.Url + environment.API
@@ -144,8 +141,6 @@ export class RegistrarComponent implements OnInit {
 
 
   ngOnInit(): void {
-    // this.editor = new Editor();
-    // console.log( new Date().getMonth(), new Date().getFullYear() )
     this.xmeses = new Date().getMonth().toString()
     this.xyear = new Date().getFullYear().toString()
     this.listarEstados()
@@ -169,34 +164,7 @@ export class RegistrarComponent implements OnInit {
   }
 
 
-  async ConsultarAlertas(): Promise<void> {
-    this.ngxService.startLoader("loader-aceptar")
-    this.xAPI.funcion = 'WKF_CAlertas'
-    this.xAPI.parametros = '1,1'
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.bzAlertas = data.Cuerpo.map((e) => {
-          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow';
-          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`;
-          e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto;
-          e.busqueda = this.utilService.ConvertirCadena(
-            e.ncontrol + e.remitente + e.plazo + e.texto
-          );
-
-          return e;
-
-        }
-        );
-        this.longitud = this.bzAlertas.length;
-        this.bzOriginal = this.bzAlertas;
-        this.pageSize = 10;
-        this.ngxService.stopLoader("loader-aceptar")
-        this.recorrerElementos(0);
-      },
-      (error) => {
-      }
-    )
-  }
+ 
 
   updateAllComplete() {
     this.allComplete = this.buzon != null && this.buzon.every(t => t.completed);
@@ -227,6 +195,10 @@ export class RegistrarComponent implements OnInit {
 
 
   open(content, id, posicion) {
+
+    if (this.fileInput) this.fileInput.nativeElement.value = ''
+    this.archivos = []
+    this.lblFile = ''
     this.numControl = id
     this.hashcontrol = btoa("D" + this.numControl) //Cifrar documentos
     this.posicionProgreso = posicion
@@ -241,7 +213,6 @@ export class RegistrarComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data.Cuerpo)
         this.lstEstados = data.Cuerpo.filter(e => { return e.esta == 1 });
       },
       (error) => {
@@ -251,12 +222,10 @@ export class RegistrarComponent implements OnInit {
   }
 
   async listarBuzon(): Promise<void> {
-    console.log('Entrando en listado')
     this.ngxService.startLoader("loader-aceptar")
     try {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data)
           this.buzon = data.Cuerpo.map((e) => {
             e.existe = e.anom == '' ? true : false;
             e.privado = e.priv == 1 ? true : false;
@@ -315,6 +284,7 @@ export class RegistrarComponent implements OnInit {
     this.bzOriginal = []
     this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
     this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
+    this.pageSize = 10;
 
     switch (e) {
       case 0:
@@ -327,11 +297,58 @@ export class RegistrarComponent implements OnInit {
         this.listarBuzon()
         break;
       case 2:
+        this.xAPI.parametros = `1,1,${this.fecha_desde},${this.fecha_hasta}`
         this.ConsultarAlertas()
         break;
       default:
         break;
     }
+  }
+
+   async ConsultarAlertas() {
+    this.ngxService.startLoader("loader-aceptar")
+    this.xAPI.funcion = 'WKF_CAlertas'
+    
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.bzAlertas = data.Cuerpo.map((e) => {
+          const { color, texto } = this.formatearContador(e.contador)
+          e.color = color
+          e.texto = texto
+          e.busqueda = this.utilService.ConvertirCadena(
+              e.ncontrol + e.remitente + e.plazo + e.texto
+          )
+          return e;
+
+        })
+        this.longitud = this.bzAlertas.length;
+        this.bzOriginal = this.bzAlertas;
+        this.pageSize = 10;
+        this.ngxService.stopLoader("loader-aceptar")
+        this.recorrerElementos(0);
+      },
+      (error) => {
+      }
+    )
+  }
+
+  formatearContador(contador: number): { color: string, texto: string } {
+    let color: string;
+    let texto: string;
+
+    if (contador === 0) {
+        color = 'text-yellow'; // Podría ser rojo o amarillo según tu lógica de "vence hoy"
+        texto = 'Se vence hoy';
+    } else if (contador > 0) {
+        color = 'text-red';
+        const dias = contador === 1 ? 'Día' : 'Días';
+        texto = `Tiene ${contador} ${dias} vencido`;
+    } else { // contador < 0
+        color = 'text-yellow';
+        const dias = contador * -1 === 1 ? 'Día' : 'Días';
+        texto = `Faltan ${contador * -1} ${dias} para vencer`;
+    }
+    return { color, texto };
   }
 
   pageChangeEvent(e) {
@@ -386,7 +403,6 @@ export class RegistrarComponent implements OnInit {
         this.xAPI.funcion = 'WKF_ARedistribuir' //'WKF_AUbicacion'
         this.xAPI.valores = ''
         this.xAPI.parametros = `10,10,1,${usuario},${id}`
-        console.log(codigo, id)
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
             if (data.tipo == 1) {
@@ -489,43 +505,30 @@ export class RegistrarComponent implements OnInit {
   fileSelected(e) {
     this.lblFile = e.target.files[0].name
     this.archivos.push(e.target.files[0])
+    this.btnEnviar = true
   }
 
-  async SubirArchivo(e) {
+  async SubirArchivo(e, posicion) {
     
     var frm = new FormData(document.forms.namedItem("forma"))
-    this.buzon[this.posicionProgreso].statusprogreso = true
+    this.buzon[posicion].statusprogreso = true
+    this.btnEnviar = false
     try {
       await this.apiService.EnviarArchivosProgress(frm).subscribe({
         next: (event) => {
-          this.buzon[this.posicionProgreso].progreso = event.progress
-          // console.log('Subiendo:', event.progress);
+          this.buzon[posicion].progreso = event.progress
           if (event.state === 'DONE') {
-            this.ngxService.startLoader("loader-aceptar")
-            this.buzon[this.posicionProgreso].anom = 'X'
-          //  document.getElementById("formFile"). ('')
-
-            
+            this.buzon[posicion].anom = 'X'
             this.cargarSubDetalle()
           }
-
         },
         error: (err) => {
-          this.toastrService.error(err, `GDoc Adjunto`);
-
-          console.error('Error al subir el archivo:', err);
-
+          this.toastrService.error(err, `GDoc Adjunto`)
+          console.error('Error al subir el archivo:', err)
         },
         complete: () => {
-          this.buzon[this.posicionProgreso].statusprogreso = false
-          this.buzon[this.posicionProgreso].progreso = 0
-          
-
-          // console.log('Subida de archivo completada.');
-
-
-
-
+          this.buzon[posicion].statusprogreso = false
+          this.buzon[posicion].progreso = 0
         }
       });
 
@@ -545,6 +548,9 @@ export class RegistrarComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (xdata) => {
         if (xdata.tipo == 1) {
+          if (this.fileInput) this.fileInput.nativeElement.value = ''
+          this.lblFile = ''
+          this.archivos = []
           this.toastrService.success(
             'Tu archivo ha sido cargado con exito ',
             `GDoc Registro`

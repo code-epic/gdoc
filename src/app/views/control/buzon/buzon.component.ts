@@ -37,7 +37,7 @@ export class BuzonComponent implements OnInit {
 
   public cmbDestino = 'S'
 
- 
+
 
   public cmbAcciones = [
     { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
@@ -56,7 +56,7 @@ export class BuzonComponent implements OnInit {
   public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
-    valores : ''
+    valores: ''
   }
   public lst = []
   public lstEstados = [] //Listar Estados
@@ -105,10 +105,10 @@ export class BuzonComponent implements OnInit {
     observacion: ''
   }
 
-  public DocAdjunto : DocumentoAdjunto = {
-    documento : '',
-    archivo : '',
-    usuario : ''
+  public DocAdjunto: DocumentoAdjunto = {
+    documento: '',
+    archivo: '',
+    usuario: ''
   }
 
   public lstMeses = []
@@ -124,9 +124,9 @@ export class BuzonComponent implements OnInit {
     private loginService: LoginService,
     private modalService: NgbModal) {
 
-      this.lstMeses = this.apiService.Xmeses
-      this.lstYear = this.apiService.Xyear
-      
+    this.lstMeses = this.apiService.Xmeses
+    this.lstYear = this.apiService.Xyear
+
   }
 
   ngOnInit(): void {
@@ -152,40 +152,12 @@ export class BuzonComponent implements OnInit {
   }
 
 
-  async ConsultarAlertas(): Promise<void> {
-    this.ngxService.startLoader("loader-aceptar")
-    this.xAPI.funcion = 'WKF_CAlertas'
-    this.xAPI.parametros = '2,2'
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.bzAlertas = data.Cuerpo.map((e) => {
-          e.color = e.contador >= 0 ? 'text-red' : 'text-yellow';
-          e.texto = e.contador >= 0 ? `Tiene ${e.contador} Dias vencido` : `Faltan ${e.contador * -1} Dia para vencer`;
-          e.texto = e.contador == 0 ? 'Se vence hoy' : e.texto;
-          e.busqueda = this.utilService.ConvertirCadena(
-            e.ncontrol + e.remitente + e.plazo + e.texto
-          );
-
-          return e;
-
-        }
-        );
-        this.longitud = this.bzAlertas.length;
-        this.bzOriginal = this.bzAlertas;
-        this.pageSize = 10;
-        this.ngxService.stopLoader("loader-aceptar")
-        this.recorrerElementos(0);
-      },
-      (error) => {
-      }
-    )
-  }
 
 
 
   open(content, id) {
     this.numControl = id
-    this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
+    this.hashcontrol = btoa("D" + this.numControl) //Cifrar documentos
     this.modalService.open(content);
 
   }
@@ -201,27 +173,76 @@ export class BuzonComponent implements OnInit {
     this.cargarAcciones(e)
     this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
     this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
+    this.pageSize = 10;
 
     switch (e) {
       case 0:
-        this.xAPI.parametros = `${this.estadoActual},${this.estatusAcutal},${this.fecha_desde},${this.fecha_hasta}` 
+        this.xAPI.parametros = `${this.estadoActual},${this.estatusAcutal},${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon()
         break
       case 1:
-        this.xAPI.parametros = `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}` 
+        this.xAPI.parametros = `${this.estadoActual},2,${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon()
         break
       case 2:
-        this.xAPI.parametros = `${this.estadoActual},3,${this.fecha_desde},${this.fecha_hasta}` 
+        this.xAPI.parametros = `${this.estadoActual},3,${this.fecha_desde},${this.fecha_hasta}`
         this.listarBuzon()
         break
       case 3:
+        this.xAPI.parametros = `2,2,${this.fecha_desde},${this.fecha_hasta}`
         this.ConsultarAlertas()
       default:
         break
     }
 
   }
+
+  async ConsultarAlertas() {
+    this.ngxService.startLoader("loader-aceptar")
+    this.xAPI.funcion = 'WKF_CAlertas'
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.bzAlertas = data.Cuerpo.map((e) => {
+          const { color, texto } = this.formatearContador(e.contador)
+          e.color = color
+          e.texto = texto
+          e.busqueda = this.utilService.ConvertirCadena(
+            e.ncontrol + e.remitente + e.plazo + e.texto
+          )
+          return e;
+
+        })
+        this.longitud = this.bzAlertas.length;
+        this.bzOriginal = this.bzAlertas;
+        this.pageSize = 10;
+        this.ngxService.stopLoader("loader-aceptar")
+        this.recorrerElementos(0);
+      },
+      (error) => {
+      }
+    )
+  }
+
+  formatearContador(contador: number): { color: string, texto: string } {
+    let color: string;
+    let texto: string;
+
+    if (contador === 0) {
+      color = 'text-yellow'; // Podría ser rojo o amarillo según tu lógica de "vence hoy"
+      texto = 'Se vence hoy';
+    } else if (contador > 0) {
+      color = 'text-red';
+      const dias = contador === 1 ? 'Día' : 'Días';
+      texto = `Tiene ${contador} ${dias} vencido`;
+    } else { // contador < 0
+      color = 'text-yellow';
+      const dias = contador * -1 === 1 ? 'Día' : 'Días';
+      texto = `Faltan ${contador * -1} ${dias} para vencer`;
+    }
+    return { color, texto };
+  }
+
+
 
   listarEstados() {
     this.xAPI.funcion = 'WKF_CEstados'
@@ -240,12 +261,10 @@ export class BuzonComponent implements OnInit {
   }
 
   async listarBuzon(): Promise<void> {
-    // console.log('Entrando en listado')
     this.ngxService.startLoader("loader-aceptar")
     try {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          // console.log(data)
           this.buzon = data.Cuerpo.map((e) => {
             e.existe = e.anom == '' ? true : false;
             e.privado = e.priv == 1 ? true : false;
@@ -292,33 +311,7 @@ export class BuzonComponent implements OnInit {
     }
   }
 
-  // async listarBuzon() {
-  //   var bz = []
 
-  //   await this.apiService.Ejecutar(this.xAPI).subscribe(
-  //     (data) => {
-  //       data.Cuerpo.forEach(e => {
-  //         e.existe = e.anom == '' ? true : false
-  //         e.privado = e.priv == 1 ? true : false
-  //         e.completed = false
-  //         e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
-  //         e.color = 'warn'
-  //         bz.push(e)
-  //       })//Registros recorridos como elementos
-
-  //       this.longitud = bz.length
-  //       if (this.longitud > 0) {
-  //         this.estilocheck = ''
-  //         this.bzOriginal = bz
-  //         this.recorrerElementos(0)
-  //       }
-
-  //     },
-  //     (error) => {
-
-  //     }
-  //   )
-  // }
 
   pageChangeEvent(e) {
     this.pageSize = e.pageSize
@@ -568,7 +561,7 @@ export class BuzonComponent implements OnInit {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
           this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
-          this.xAPI.parametros =  '' 
+          this.xAPI.parametros = ''
           this.DocAdjunto.archivo = this.archivos[0].name
           this.DocAdjunto.usuario = this.loginService.Usuario.id
           this.DocAdjunto.documento = this.numControl
@@ -581,7 +574,7 @@ export class BuzonComponent implements OnInit {
                   'Tu archivo ha sido cargado con exito ',
                   `GDoc Registro`
                 );
-               
+
               } else {
                 this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
               }

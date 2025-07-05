@@ -70,7 +70,7 @@ export class CtrlalertasComponent implements OnInit {
   async Filtrar(){
     this.ngxService.startLoader("loader-estatus");
     this.lstDocumentosAux = []
-    console.log(this.areas)
+    // console.log(this.areas)
     await this.lstDocumentos.map( e => {
       if (this.areas == '0') {
         if (e.estatus_alerta == this.estatus) this.lstDocumentosAux.push(e)
