@@ -470,6 +470,7 @@ export class RsconsultaComponent implements OnInit {
     this.dbDatos = false;
     this.dbResolucion = false;
     this.resolucion = "";
+    this.lstAscenso = []
     if (this.cedula != "") {
       this.consultarCedula(undefined);
       return false;
@@ -500,6 +501,7 @@ export class RsconsultaComponent implements OnInit {
       this.blResolucionPanel = false;
       this.blDatosBasicos = false;
       this.lstEntradas = [];
+      this.lstAscenso = []
       this.lstResoluciones = [];
 
       if (this.cedula == "") return false;

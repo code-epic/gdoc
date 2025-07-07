@@ -490,7 +490,7 @@
                                                         <tr *ngFor="let e of lstNombres; index as i">
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ e.grado_abreviado }}</td>
-                                                            <td>{{ e.nombres }}</td>
+                                                            <td>{{ e.nombres  | uppercase }}</td>
                                                             <td><a class="enlace"
                                                                     (click)="MoverForm(e.cedula);volverDatos(0)"
                                                                     style="font-weight: bold; color: brown;">
