@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { environment } from 'src/environments/environment';
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ToastrService } from "ngx-toastr";
@@ -27,7 +28,6 @@ import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
-import { environment } from "src/environments/environment";
 
 interface ITipoResolucion {
   codigo: string;
@@ -317,8 +317,8 @@ export class RsconsultaComponent implements OnInit {
     private _snackBar: MatSnackBar
   ) {
     this.Estados =
-      sessionStorage.getItem("MPPD_CEstadoResolucion") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CEstadoResolucion")))
+      sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR)))
         : [];
   }
 
@@ -330,6 +330,7 @@ export class RsconsultaComponent implements OnInit {
     this.dbResolucion = false;
     this.dbDatos = false;
     this.dbDatosNombre = false;
+    this.blResolucionPanel = false;
     this.blDatosBasicos = false;
 
     if (this.orden_pagina == 1) {
@@ -354,50 +355,50 @@ export class RsconsultaComponent implements OnInit {
         tk == "Confidencial" || tk == "Administrador" ? true : false;
     }
     this.Componentes =
-      sessionStorage.getItem("MPPD_CComponente") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
+      sessionStorage.getItem(environment.funcion.COMPONENTE_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.COMPONENTE_CONSULTAR)))
         : [];
     this.Grados =
-      sessionStorage.getItem("MPPD_CGrado") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado")))
+      sessionStorage.getItem(environment.funcion.GRADO_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.GRADO_CONSULTAR)))
         : [];
     this.Categorias =
-      sessionStorage.getItem("MPPD_CCategorias") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias")))
+      sessionStorage.getItem(environment.funcion.CATEGORIAS_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CATEGORIAS_CONSULTAR)))
         : [];
     this.Clasificaciones =
-      sessionStorage.getItem("MPPD_CClasificacion") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion")))
+      sessionStorage.getItem(environment.funcion.CLASIFICACION_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CLASIFICACION_CONSULTAR)))
         : [];
     this.TipoEntradas =
-      sessionStorage.getItem("MPPD_CTipoEntrada") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoEntrada")))
+      sessionStorage.getItem(environment.funcion.TIPO_ENTRADA_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.TIPO_ENTRADA_CONSULTAR)))
         : [];
     this.TipoResoluciones =
-      sessionStorage.getItem("MPPD_CTipoResolucion") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion")))
+      sessionStorage.getItem(environment.funcion.TIPO_RESOLUCION_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.TIPO_RESOLUCION_CONSULTAR)))
         : [];
 
     this.Carpetas =
-      sessionStorage.getItem("MPPD_CCarpetaEntrada") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetaEntrada")))
+      sessionStorage.getItem(environment.funcion.CARPETA_ENTRADA_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CARPETA_ENTRADA_CONSULTAR)))
         : [];
     this.OrdenNumero =
-      sessionStorage.getItem("MPPD_COrdenEntrada") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_COrdenEntrada")))
+      sessionStorage.getItem(environment.funcion.ORDEN_ENTRADA_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.ORDEN_ENTRADA_CONSULTAR)))
         : [];
     this.GradoIPSFA =
-      sessionStorage.getItem("MPPD_CGradoIPSFA") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGradoIPSFA")))
+      sessionStorage.getItem(environment.funcion.GRADO_IPSFA_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.GRADO_IPSFA_CONSULTAR)))
         : [];
     this.UbicacionCarpetas =
-      sessionStorage.getItem("MPPD_CCarpetas") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetas")))
+      sessionStorage.getItem(environment.funcion.CARPETAS_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CARPETAS_CONSULTAR)))
         : [];
 
     this.UbicacionCarpetasEntrada =
-      sessionStorage.getItem("MPPD_CCarpetaEntrada") != undefined
-        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetaEntrada")))
+      sessionStorage.getItem(environment.funcion.CARPETA_ENTRADA_CONSULTAR) != undefined
+        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CARPETA_ENTRADA_CONSULTAR)))
         : [];
 
     // console.log(this.Estados)
@@ -453,7 +454,7 @@ export class RsconsultaComponent implements OnInit {
   consultar(e) {
     if (e.keyCode == 13) {
       this.cedula = this.cedula.replace(".", "");
-      this.xAPI.funcion = "MPPD_CUnidad";
+      this.xAPI.funcion = environment.funcion.UNIDAD_CONSULTAR;
       this.xAPI.parametros = this.cedula;
       this.xAPI.valores = "";
 
@@ -508,7 +509,7 @@ export class RsconsultaComponent implements OnInit {
 
       this.cedula = this.cedula.replace(/\./g, "");
       this.ngxService.startLoader("loader-buscar");
-      this.xAPI.funcion = "MPPD_CDatosBasicos";
+      this.xAPI.funcion = environment.funcion.DATOS_BASICOS_CONSULTAR;
       this.xAPI.parametros = this.cedula;
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -657,7 +658,7 @@ export class RsconsultaComponent implements OnInit {
 
       if (this.IResolucion.numero == "") return false;
       this.ngxService.startLoader("loader-buscar");
-      this.xAPI.funcion = "MPPD_CResoluciones";
+      this.xAPI.funcion = environment.funcion.ENTRADAS_RESOLUCIONES;
       this.xAPI.parametros = this.IResolucion.numero;
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -722,11 +723,11 @@ export class RsconsultaComponent implements OnInit {
         ? ""
         : " AND  rs.observacion LIKE '%" + this.observaciones + "%' ";
 
-    this.xAPI.funcion = "MPPD_CResolucionesRangoTipo";
+    this.xAPI.funcion = environment.funcion.RESOLUCIONES_RANGO_TIPO;
     codigo = asunto + instrucciones + observaciones + causa;
 
     if (this.busqueda != "1") {
-      this.xAPI.funcion = "MPPD_CResolucionesRango";
+      this.xAPI.funcion = environment.funcion.RESOLUCIONES_RANGO;
       codigo += grado + componente + categoria;
     }
 
@@ -853,7 +854,7 @@ export class RsconsultaComponent implements OnInit {
 
   getAdministracion(id: string) {
     this.lstCausa = [];
-    this.xAPI.funcion = "MPPD_CCausaResolucion";
+    this.xAPI.funcion = environment.funcion.CLASIFICACION_CONSULTAR;
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = id;
     this.xAPI.valores = "";
@@ -872,7 +873,7 @@ export class RsconsultaComponent implements OnInit {
   getCausa(id: string) {
     this.lstCausa = [];
     this.lstMotivo = [];
-    this.xAPI.funcion = "MPPD_CCausaResolucion";
+    this.xAPI.funcion = environment.funcion.CLASIFICACION_CONSULTAR;
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = id;
     this.xAPI.valores = "";
@@ -891,7 +892,7 @@ export class RsconsultaComponent implements OnInit {
 
   getMotivo() {
     this.lstMotivo = [];
-    this.xAPI.funcion = "MPPD_CMotivoResolucion";
+    this.xAPI.funcion = environment.funcion.TIPO_RESOLUCION_CONSULTAR;
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = this.IResolucion.causa.toString();
     this.xAPI.valores = "";
@@ -924,7 +925,7 @@ export class RsconsultaComponent implements OnInit {
 
       this.ngxService.startLoader("loader-buscar");
 
-      this.xAPI.funcion = "MPPD_CDatosBasicosNombre";
+      this.xAPI.funcion = environment.funcion.DATOS_BASICOS_NOMBRE;
       var grado = this.dbgrado == "%" ? "LIKE '%'" : " = " + this.dbgrado;
       var componente =
         this.dbcomponente == "%" ? "LIKE '%'" : " = " + this.dbcomponente;
@@ -1042,7 +1043,7 @@ export class RsconsultaComponent implements OnInit {
    */
   ConsultaPostPID(tipo: string) {
     this.xAPI.funcion =
-      tipo == "0" ? "MPPD_CCedulaFileCSV" : "MPPD_CCedulaFileCSVSaime";
+      tipo == "0" ? environment.funcion.CEDULA_FILE_CSV : environment.funcion.CEDULA_FILE_CSVSaime;
     this.xAPI.parametros = "";
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -1230,7 +1231,7 @@ export class RsconsultaComponent implements OnInit {
   }
 
   ConsultaExpandida() {
-    this.xAPI.funcion = "MPPD_CCedulaRango";
+    this.xAPI.funcion = environment.funcion.COMPONENTE_CONSULTAR;
     this.xAPI.parametros = "cedula##" + this.rango_cedula;
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -1321,9 +1322,9 @@ export class RsconsultaComponent implements OnInit {
   getResueltoID(id) {
     this.ngxService.startLoader("loader-buscar");
 
-    this.xAPI.funcion = "MPPD_CResueltoID";
+    this.xAPI.funcion = environment.funcion.RESUELTO_ID;
     this.xAPI.parametros = id.toString();
-    this.xAPI.valores = {};
+    this.xAPI.valores = "";
     this.instruccion = "";
     this.observacion = "";
 
@@ -1422,7 +1423,7 @@ export class RsconsultaComponent implements OnInit {
       confirmButtonText: "Si",
     }).then((result) => {
       if (result.isConfirmed) {
-        this.xAPI.funcion = "MPPD_EEntradas";
+        this.xAPI.funcion = environment.funcion.ENTRADAS_ELIMINAR;
         this.xAPI.parametros = e.id.toString();
         this.xAPI.valores = "";
         // console.log(this.xAPI)

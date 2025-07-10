@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiService, IAPICore } from '../apicore/api.service';
+import { environment } from 'src/environments/environment';
 
 export interface Objetos {
   id: string;
@@ -169,28 +170,28 @@ export class ResolucionService {
   Listar(tipo: number) {
     switch (tipo) {
       case 1:
-        this.xAPI.funcion = 'MPPD_CComponente'
+        this.xAPI.funcion = environment.funcion.COMPONENTE_CONSULTAR
         break
       case 2:
-        this.xAPI.funcion = 'MPPD_CGrado'
+        this.xAPI.funcion = environment.funcion.GRADO_CONSULTAR
         break
       case 3:
-        this.xAPI.funcion = 'MPPD_CTipoResolucion'
+        this.xAPI.funcion = environment.funcion.TIPO_RESOLUCION_CONSULTAR
         break
       case 4:
-        this.xAPI.funcion = 'MPPD_CCategorias'
+        this.xAPI.funcion = environment.funcion.CATEGORIAS_CONSULTAR
         break
       case 5:
-        this.xAPI.funcion = 'MPPD_CClasificacion'
+        this.xAPI.funcion = environment.funcion.CLASIFICACION_CONSULTAR
         break
       case 6:
-        this.xAPI.funcion = 'MPPD_CEstadoResolucion'
+        this.xAPI.funcion = environment.funcion.ESTADO_RESOLUCION_CONSULTAR
         break
       case 7:
-        this.xAPI.funcion = 'MPPD_COrdenEntrada'
+        this.xAPI.funcion = environment.funcion.ORDEN_ENTRADA_CONSULTAR
         break
       case 8:
-        this.xAPI.funcion = 'MPPD_CCarpetaEntrada'
+        this.xAPI.funcion = environment.funcion.CARPETA_ENTRADA_CONSULTAR
         break
       case 9:
         this.xAPI.funcion = 'CEP_CUsuario'
@@ -200,16 +201,16 @@ export class ResolucionService {
         this.xAPI.parametros = '%'
         break
       case 11:
-        this.xAPI.funcion = 'MPPD_CGradoIPSFA'
+        this.xAPI.funcion = environment.funcion.GRADO_IPSFA_CONSULTAR
         break
       case 12:
-        this.xAPI.funcion = 'MPPD_CCarpetas'
+        this.xAPI.funcion = environment.funcion.CARPETAS_CONSULTAR
         break
       case 13: 
-        this.xAPI.funcion = 'MPPD_CCarpetaEntrada'
+        this.xAPI.funcion = environment.funcion.CARPETA_ENTRADA_CONSULTAR
         break
       default:
-        this.xAPI.funcion = 'MPPD_CTipoEntrada'
+        this.xAPI.funcion = environment.funcion.TIPO_ENTRADA_CONSULTAR
         break
     }
 

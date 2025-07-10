@@ -1,5 +1,6 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { AllService } from 'src/app/services/allservice.service';
+import { environment } from 'src/environments/environment';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -415,7 +416,7 @@ export class RsbuzonComponent implements OnInit {
 
 
     listarEstados() {
-        this.xAPI.funcion = 'WKF_CEstados';
+        this.xAPI.funcion = environment.funcion.ESTADOS;
         this.xAPI.parametros = '%';
         this.xAPI.valores = '';
         this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -506,7 +507,7 @@ export class RsbuzonComponent implements OnInit {
 
     seleccionNavegacion(e) {
 
-        this.xAPI.funcion = 'WKF_CDocumentosResoluciones';
+        this.xAPI.funcion = environment.funcion.DOCUMENTOS_RESOLUCIONES;
         this.xAPI.valores = '';
         this.selNav = e;
 
@@ -525,7 +526,7 @@ export class RsbuzonComponent implements OnInit {
                 break;
             case 2:
                 // this.cargarAcciones(1);
-                this.xAPI.funcion = 'WKF_CGrupoCarpetas';
+                this.xAPI.funcion = environment.funcion.GRUPO_CARPETAS;
                 this.xAPI.parametros = '';
                 // this.listarCarpetas();
                 this.subEntrada()
@@ -613,7 +614,7 @@ export class RsbuzonComponent implements OnInit {
     async subEntrada() {
 
         this.lstCarpetas = []
-        this.xAPI.funcion = 'MPPD_CGrupoCarpertaEntrada';
+        this.xAPI.funcion = environment.funcion.GRUPO_CARPETA_ENTRADA;
         this.xAPI.parametros = '36'
         this.xAPI.valores = ''
 
@@ -679,7 +680,7 @@ export class RsbuzonComponent implements OnInit {
     }
 
     async listarSubDocumentos(estatus: number) {
-        this.xAPI.funcion = 'WKF_CSubDocumentoResoluciones';
+        this.xAPI.funcion = environment.funcion.SUBDOCUMENTO_RESOLUCIONES;
         this.xAPI.parametros = '4,2,3,' + estatus;
         this.bzSubDocumentos = [];
         await this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -781,7 +782,7 @@ export class RsbuzonComponent implements OnInit {
 
     insertarObservacion() {
         var usuario = this.loginService.Usuario.id;
-        this.xAPI.funcion = 'WKF_IDocumentoObservacion';
+        this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
         this.xAPI.valores = JSON.stringify({
             documento: this.numControl,
             estado: this.estadoActual, //Estado que ocupa
@@ -819,7 +820,7 @@ export class RsbuzonComponent implements OnInit {
     }
 
     async rechazarBuzon() {
-        this.xAPI.funcion = 'WKF_AUbicacionRechazo';
+        this.xAPI.funcion = environment.funcion.UBICACION_RECHAZO;
         this.xAPI.valores = '';
         this.xAPI.parametros =
             '1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl;
@@ -861,7 +862,7 @@ export class RsbuzonComponent implements OnInit {
         var i = 0;
         var estatus = activo != 0 ? activo : 1; //NOTA DE ENTREGA
         //Buscar en Wk de acuerdo al usuario y la app activa
-        this.xAPI.funcion = 'WKF_APromoverEstatus';
+        this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
         this.xAPI.valores = '';
 
         this.xAPI.parametros = `${estatus},${usuario},${this.numControl}`;
@@ -895,7 +896,7 @@ export class RsbuzonComponent implements OnInit {
     async redistribuir(destino: number = 0) {
         var dst = destino != 0 ? destino : this.cmbDestino;
 
-        this.xAPI.funcion = 'WKF_ARedistribuir';
+        this.xAPI.funcion = environment.funcion.REDISTRIBUIR;
         this.xAPI.valores = '';
         this.xAPI.parametros =
             dst +
@@ -930,7 +931,7 @@ export class RsbuzonComponent implements OnInit {
     async promoverPuntoCuenta(destino: number = 0, estatus: number) {
         var dst = destino != 0 ? destino : this.cmbDestino;
 
-        this.xAPI.funcion = 'WKF_ASubDocumentoRedistribuir';
+        this.xAPI.funcion = environment.funcion.SUBDOCUMENTO_REDISTRIBUIR;
         this.xAPI.valores = '';
         this.xAPI.parametros =
             dst +
@@ -993,7 +994,7 @@ export class RsbuzonComponent implements OnInit {
         this.WAlerta.observacion = this.Observacion.toUpperCase();
         this.WAlerta.fecha = fecha;
 
-        this.xAPI.funcion = 'WKF_AAlertas';
+        this.xAPI.funcion = environment.funcion.ALERTAS;
         this.xAPI.parametros = '';
         this.xAPI.valores = JSON.stringify(this.WAlerta);
         this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -1011,7 +1012,7 @@ export class RsbuzonComponent implements OnInit {
         var frm = new FormData(document.forms.namedItem('forma'));
         try {
             await this.apiService.EnviarArchivos(frm).subscribe((data) => {
-                this.xAPI.funcion = 'WKF_ADocumentoAdjunto';
+                this.xAPI.funcion = environment.funcion.DOCUMENTO_ADJUNTO;
                 this.xAPI.parametros = '';
 
             });
@@ -1048,7 +1049,7 @@ export class RsbuzonComponent implements OnInit {
         var usuario = this.loginService.Usuario.cedula;
 
 
-        this.xAPI.funcion = 'MPPD_GEntradasResoluciones';
+        this.xAPI.funcion = environment.funcion.ENTRADAS_RESOLUCIONES;
         this.xAPI.parametros =
             `'0',${elementos}##${componente}##${numero}##${tipo}##${estatus}##${clasificacion}##${prioridad}##${observacion}##${usuario}##${idtrans}`;
         console.log(this.xAPI.parametros)
@@ -1117,7 +1118,7 @@ export class RsbuzonComponent implements OnInit {
         this.blistado = false
     }
     listarCedulasEnCarpeta(e) {
-        this.xAPI.funcion = 'MPPD_CEntradasProceso'
+        this.xAPI.funcion = environment.funcion.ENTRADAS_PROCESO
         this.xAPI.parametros = `${e.llav},${e.componente},36`
         this.xAPI.valores = null
 
@@ -1170,7 +1171,7 @@ export class RsbuzonComponent implements OnInit {
 
 
     async listarResponsables() {
-        this.xAPI.funcion = 'MPPD_ListarResponsables'
+        this.xAPI.funcion = environment.funcion.LISTAR_RESPONSABLES
         this.xAPI.parametros = 'Resoluciones'
         this.xAPI.valores = null
         // console.log(this.xAPI)
@@ -1233,7 +1234,7 @@ export class RsbuzonComponent implements OnInit {
         var i = 0
         var estatus = 3 //NOTA DE ENTREGA
         //Buscar en Wk de acuerdo al usuario y la app activa
-        this.xAPI.funcion = 'WKF_AUbicacion'
+        this.xAPI.funcion = environment.funcion.UBICACION
         this.xAPI.valores = ''
 
 
@@ -1355,7 +1356,7 @@ export class RsbuzonComponent implements OnInit {
         }).then((result) => {
             if (result.isConfirmed) {
                 let where = `${this.numCarpeta}`
-                this.xAPI.funcion = 'MPPD_UCarpetasGroup'
+                this.xAPI.funcion = environment.funcion.CARPETAS_GROUP_UPDATE
                 this.xAPI.parametros = where
                 this.xAPI.valores = null
 
@@ -1563,7 +1564,7 @@ export class RsbuzonComponent implements OnInit {
 
     getAdministracion(id: string) {
         this.lstCausa = []
-        this.xAPI.funcion = "MPPD_CCausaResolucion"
+        this.xAPI.funcion = environment.funcion.CAUSA_RESOLUCION
         this.ngxService.startLoader("loader-buscar")
         this.xAPI.parametros = id
         this.xAPI.valores = ""
@@ -1582,7 +1583,7 @@ export class RsbuzonComponent implements OnInit {
     getCausa(id: string) {
         this.lstCausa = []
         this.lstMotivo = []
-        this.xAPI.funcion = "MPPD_CCausaResolucion"
+        this.xAPI.funcion = environment.funcion.CAUSA_RESOLUCION
         this.ngxService.startLoader("loader-buscar")
         this.xAPI.parametros = id
         this.xAPI.valores = ""
@@ -1604,7 +1605,7 @@ export class RsbuzonComponent implements OnInit {
 
     getMotivo() {
         this.lstMotivo = []
-        this.xAPI.funcion = "MPPD_CMotivoResolucion"
+        this.xAPI.funcion = environment.funcion.MOTIVO_RESOLUCION
         this.ngxService.startLoader("loader-buscar")
         this.xAPI.parametros = this.IResolucion.solicitud.toString()
         this.xAPI.valores = ""

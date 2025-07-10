@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -8,6 +9,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-rsconsultaentradas',
@@ -81,15 +83,15 @@ export class RsconsultaentradasComponent implements OnInit {
     })
   
 
-    this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : []
-    this.Grados = sessionStorage.getItem("MPPD_CGrado") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado"))) : []
-    this.Categorias = sessionStorage.getItem("MPPD_CCategorias") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias"))) : []
-    this.Clasificaciones = sessionStorage.getItem("MPPD_CClasificacion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion"))) : []
-    this.TipoEntradas = sessionStorage.getItem("MPPD_CTipoEntrada") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoEntrada"))) : []
-    this.TipoResoluciones = sessionStorage.getItem("MPPD_CTipoResolucion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion"))) : []
-    this.Estados = sessionStorage.getItem("MPPD_CEstadoResolucion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CEstadoResolucion"))) : []
-    this.Carpetas = sessionStorage.getItem("MPPD_CCarpetaEntrada") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetaEntrada"))) : []
-    this.OrdenNumero = sessionStorage.getItem("MPPD_COrdenEntrada") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_COrdenEntrada"))) : []
+    this.Componentes = sessionStorage.getItem(environment.funcion.COMPONENTE_CONSULTAR) != undefined ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.COMPONENTE_CONSULTAR))) : []
+    this.Grados = sessionStorage.getItem(environment.funcion.GRADO_CONSULTAR) != undefined ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.GRADO_CONSULTAR))) : []
+    this.Categorias = sessionStorage.getItem(environment.funcion.CATEGORIAS_CONSULTAR) != undefined ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CATEGORIAS_CONSULTAR))) : []
+    this.Clasificaciones = sessionStorage.getItem(environment.funcion.CLASIFICACION_CONSULTAR) != undefined ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CLASIFICACION_CONSULTAR))) : []
+    this.TipoEntradas = sessionStorage.getItem(environment.funcion.TIPO_ENTRADA_CONSULTAR) != undefined ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.TIPO_ENTRADA_CONSULTAR))) : []
+    this.TipoResoluciones = sessionStorage.getItem(environment.funcion.TIPO_RESOLUCION_CONSULTAR) != undefined ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.TIPO_RESOLUCION_CONSULTAR))) : []
+    this.Estados = sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR) != undefined ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR))) : []
+    this.Carpetas = sessionStorage.getItem(environment.funcion.CARPETA_ENTRADA_CONSULTAR) != undefined ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CARPETA_ENTRADA_CONSULTAR))) : []
+    this.OrdenNumero = sessionStorage.getItem(environment.funcion.ORDEN_ENTRADA_CONSULTAR) != undefined ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.ORDEN_ENTRADA_CONSULTAR))) : []
 
     
   
@@ -111,10 +113,10 @@ export class RsconsultaentradasComponent implements OnInit {
 
     let desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
     let hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
-    let estatus = this.estatus = ''? '%': this.estatus
+    let estatus = this.estatus === '' ? '%' : this.estatus
 
     
-    this.xAPI.funcion = 'MPPD_CEntradasResoluciones'
+    this.xAPI.funcion = environment.funcion.ENTRADAS_RESOLUCIONES
     this.xAPI.parametros = `${estatus},${desde},${hasta},${codigo},${asunto},${observacion},${ncarpeta}`
     this.xAPI.valores = ''
     console.log(this.xAPI.parametros)
@@ -179,10 +181,10 @@ export class RsconsultaentradasComponent implements OnInit {
 
     let desde = new Date().getFullYear()  +'-01-01'
     let hasta = new Date().getFullYear()  +'-12-31'
-    let estatus = this.estatus = ''? '%': this.estatus
+    let estatus = this.estatus === '' ? '%' : this.estatus
 
     
-    this.xAPI.funcion = 'MPPD_CEntradasResoluciones'
+    this.xAPI.funcion = environment.funcion.ENTRADAS_RESOLUCIONES
     this.xAPI.parametros = `${estatus},${desde},${hasta},${codigo},${asunto},${observacion},${ncarpeta}`
     this.xAPI.valores = ''
     console.log(this.xAPI.parametros)

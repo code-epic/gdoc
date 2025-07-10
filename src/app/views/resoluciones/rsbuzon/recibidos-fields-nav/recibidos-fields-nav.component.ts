@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { environment } from 'src/environments/environment';
 import { FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
@@ -80,7 +81,7 @@ MPPD_CCarpetasGroup
   async OpcionesCarpetas() {
     console.log('entrando controles')
     if (this.xnumCarpeta != '' || this.xcomponente != ''){
-      this.xAPI.funcion = 'MPPD_CCarpetasGroup'
+      this.xAPI.funcion = environment.funcion.CARPETAS_GROUP
       this.xAPI.parametros = `${this.xnumCarpeta},${this.xcomponente}`
       this.xAPI.valores = null
       await this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -120,7 +121,7 @@ MPPD_CCarpetasGroup
       if (result.isConfirmed) {
         let cadena = `${this.xtipo},${this.xclasificacion},${this.xestatus},${this.xresponsable},${this.xprioridad},${this.xnumCarpeta},${this.xcomponente},`
         let where = `${this.numCarpeta},${this.componente}`
-        this.xAPI.funcion = 'MPPD_UCarpetasGroup'
+        this.xAPI.funcion = environment.funcion.CARPETAS_GROUP_UPDATE
         this.xAPI.parametros = cadena + where
         this.xAPI.valores = null
     
@@ -147,7 +148,7 @@ MPPD_CCarpetasGroup
     
 
   async listarResponsables() {
-    this.xAPI.funcion = 'MPPD_ListarResponsables'
+    this.xAPI.funcion = environment.funcion.LISTAR_RESPONSABLES
     this.xAPI.parametros = 'Resoluciones'
     this.xAPI.valores = null
 

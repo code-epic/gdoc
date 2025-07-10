@@ -7,6 +7,55 @@ export const environment = {
   ID : 'ID-001',
   Url: 'http://10.190.1.160',
   API: '/devel/api/',
-  Hash: '3a39a4d2f9869b08b9c2c2d9bad7334f.sse'
+  Hash: '3a39a4d2f9869b08b9c2c2d9bad7334f.sse',
+  funcion: {
+    COMPONENTE_CONSULTAR: 'MPPD_CComponente',
+    TIPO_RESOLUCION_CONSULTAR: 'MPPD_CTipoResolucion',
+    ESTADO_RESOLUCION_CONSULTAR: 'MPPD_CEstadoResolucion',
+    CARPETAS_GROUP: 'MPPD_CCarpetasGroup',
+    CARPETAS_GROUP_UPDATE: 'MPPD_UCarpetasGroup',
+    LISTAR_RESPONSABLES: 'MPPD_ListarResponsables',
+    GRUPO_CARPETA_ENTRADA: 'MPPD_CGrupoCarpertaEntrada',
+    ENTRADAS_PROCESO: 'MPPD_CEntradasProceso',
+    ENTRADAS_RESOLUCIONES: 'MPPD_GEntradasResoluciones',
+    CAUSA_RESOLUCION: 'MPPD_CCausaResolucion',
+    MOTIVO_RESOLUCION: 'MPPD_CMotivoResolucion',
+    GRADO_CONSULTAR: 'MPPD_CGrado',
+    CATEGORIAS_CONSULTAR: 'MPPD_CCategorias',
+    CLASIFICACION_CONSULTAR: 'MPPD_CClasificacion',
+    ORDEN_ENTRADA_CONSULTAR: 'MPPD_COrdenEntrada',
+    CARPETA_ENTRADA_CONSULTAR: 'MPPD_CCarpetaEntrada',
+    GRADO_IPSFA_CONSULTAR: 'MPPD_CGradoIPSFA',
+    CARPETAS_CONSULTAR: 'MPPD_CCarpetas',
+    TIPO_ENTRADA_CONSULTAR: 'MPPD_CTipoEntrada',
+    UNIDAD_CONSULTAR: 'MPPD_CUnidad',
+    DATOS_BASICOS_CONSULTAR: 'MPPD_CDatosBasicos',
+    DATOS_BASICOS_NOMBRE: 'MPPD_CDatosBasicosNombre',
+    RESOLUCIONES_RANGO_TIPO: 'MPPD_CResolucionesRangoTipo',
+    RESOLUCIONES_RANGO: 'MPPD_CResolucionesRango',
+    CEDULA_FILE_CSV: 'MPPD_CCedulaFileCSV',
+    CEDULA_FILE_CSVSaime: 'MPPD_CCedulaFileCSVSaime',
+    RESUELTO_ID: 'MPPD_CResueltoID',
+    ENTRADAS_ELIMINAR: 'MPPD_EEntradas',
+    ESTADISTICAS_BAJAS: 'MPPD_CEstadicasBajas',
+    // WKF_
+    ESTADOS: 'WKF_CEstados',
+    DOCUMENTOS_RESOLUCIONES: 'WKF_CDocumentosResoluciones',
+    GRUPO_CARPETAS: 'WKF_CGrupoCarpetas',
+    SUBDOCUMENTO_RESOLUCIONES: 'WKF_CSubDocumentoResoluciones',
+    DOCUMENTO_OBSERVACION: 'WKF_IDocumentoObservacion',
+    UBICACION_RECHAZO: 'WKF_AUbicacionRechazo',
+    PROMOVER_ESTATUS: 'WKF_APromoverEstatus',
+    REDISTRIBUIR: 'WKF_ARedistribuir',
+    SUBDOCUMENTO_REDISTRIBUIR: 'WKF_ASubDocumentoRedistribuir',
+    ALERTAS: 'WKF_AAlertas',
+    DOCUMENTO_ADJUNTO: 'WKF_ADocumentoAdjunto',
+    UBICACION: 'WKF_AUbicacion',
+  }
 };
+
+export function getFuncion(key: keyof typeof environment.funcion): string {
+  return environment.funcion[key];
+}
+
 

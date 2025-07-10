@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbDateParserFormatter, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
@@ -63,7 +64,7 @@ export class RsestadisticasComponent implements OnInit {
 
 
   consultarBajas() {
-    this.xAPI.funcion = "MPPD_CEstadicasBajas"
+    this.xAPI.funcion = environment.funcion.ESTADISTICAS_BAJAS
     this.xAPI.parametros = ''
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
