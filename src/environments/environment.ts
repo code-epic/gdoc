@@ -17,6 +17,7 @@ export const environment = {
     LISTAR_RESPONSABLES: 'MPPD_ListarResponsables',
     GRUPO_CARPETA_ENTRADA: 'MPPD_CGrupoCarpertaEntrada',
     ENTRADAS_PROCESO: 'MPPD_CEntradasProceso',
+    CONSULTAR_RESOLUCIONES: 'MPPD_CResoluciones',
     ENTRADAS_RESOLUCIONES: 'MPPD_GEntradasResoluciones',
     CAUSA_RESOLUCION: 'MPPD_CCausaResolucion',
     MOTIVO_RESOLUCION: 'MPPD_CMotivoResolucion',

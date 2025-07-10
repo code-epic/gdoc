@@ -658,7 +658,7 @@ export class RsconsultaComponent implements OnInit {
 
       if (this.IResolucion.numero == "") return false;
       this.ngxService.startLoader("loader-buscar");
-      this.xAPI.funcion = environment.funcion.ENTRADAS_RESOLUCIONES;
+      this.xAPI.funcion = environment.funcion.CONSULTAR_RESOLUCIONES;
       this.xAPI.parametros = this.IResolucion.numero;
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
