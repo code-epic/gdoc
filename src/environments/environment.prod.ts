@@ -10,6 +10,7 @@ export const environment = {
     ESTADO_RESOLUCION_CONSULTAR: 'MPPD_CEstadoResolucion',
     CARPETAS_GROUP: 'MPPD_CCarpetasGroup',
     CARPETAS_GROUP_UPDATE: 'MPPD_UCarpetasGroup',
+    CONSULTAR_RANGO_CEDULAS: 'MPPD_CCedulaRango',
     LISTAR_RESPONSABLES: 'MPPD_ListarResponsables',
     GRUPO_CARPETA_ENTRADA: 'MPPD_CGrupoCarpertaEntrada',
     ENTRADAS_PROCESO: 'MPPD_CEntradasProceso',

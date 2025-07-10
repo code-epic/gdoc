@@ -12,6 +12,7 @@ export const environment = {
     COMPONENTE_CONSULTAR: 'MPPD_CComponente',
     TIPO_RESOLUCION_CONSULTAR: 'MPPD_CTipoResolucion',
     ESTADO_RESOLUCION_CONSULTAR: 'MPPD_CEstadoResolucion',
+    CONSULTAR_RANGO_CEDULAS: 'MPPD_CCedulaRango',
     CARPETAS_GROUP: 'MPPD_CCarpetasGroup',
     CARPETAS_GROUP_UPDATE: 'MPPD_UCarpetasGroup',
     LISTAR_RESPONSABLES: 'MPPD_ListarResponsables',
