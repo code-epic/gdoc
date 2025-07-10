@@ -8,7 +8,11 @@ ul {
     font-weight: bold;
 }
 
-.texto-sub-lista{
+.texto-sub-lista {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
   margin-top: 12.5px;
   font-weight: normal;
   color: #434141;

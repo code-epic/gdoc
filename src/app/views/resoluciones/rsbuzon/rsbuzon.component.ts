@@ -1,4 +1,5 @@
 import { Component, Injectable, OnInit } from '@angular/core';
+import { AllService } from 'src/app/services/allservice.service';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -371,7 +372,8 @@ export class RsbuzonComponent implements OnInit {
         private _snackBar: MatSnackBar,
         private ngbCalendar: NgbCalendar,
         private dateAdapter: NgbDateAdapter<string>,
-        private fb: FormBuilder
+        private fb: FormBuilder,
+        private allService: AllService
     ) {
 
         this.lstMeses = this.apiService.Xmeses
@@ -1304,36 +1306,8 @@ export class RsbuzonComponent implements OnInit {
         }
     }
 
-    getDetalleX(e): string {
-        let text = "PROCESAR"
-        let cont = e.split("|")
-        if (cont.length > 0) {
-
-            switch (cont[1]) {
-                case "PR":
-                    text = "PROCESAR"
-                    break;
-                case "NP":
-                    text = "NO PROCESAR"
-                    break;
-                case "NPPIDD":
-                    text = "NP POR INT. DEL DIRECTOR"
-                    break;
-                case "NPPIDJ":
-                    text = "NP POR INT. DEL JEFE DE AREA"
-                    break;
-                case "CR":
-                    text = "CODIGO ROJO"
-                    break;
-            }
-        }
-
-
-
-        // let cont = e.split("|")
-        // if (cont.length > 0) text = cont[1]
-
-        return text
+    getDetalleX(e: string): string {
+        return this.allService.getDetalleX(e);
     }
 
     getDetalleEnabled(e): boolean {
