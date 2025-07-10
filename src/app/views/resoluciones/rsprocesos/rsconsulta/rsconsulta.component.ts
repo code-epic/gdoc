@@ -1232,7 +1232,7 @@ export class RsconsultaComponent implements OnInit {
 
   ConsultaExpandida() {
     this.xAPI.funcion = environment.funcion.CONSULTAR_RANGO_CEDULAS;
-    this.xAPI.parametros = "cedula##" + this.rango_cedula;
+    this.xAPI.parametros = this.rango_cedula + "cedula##"
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
