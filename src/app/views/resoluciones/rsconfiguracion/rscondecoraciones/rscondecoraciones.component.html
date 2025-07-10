@@ -48,9 +48,10 @@
             <mat-label style="width:100%">Tipo de Resolución</mat-label>
             <mat-select placeholder="Documento" [ngModelOptions]="{standalone: true}" [(ngModel)]="tipo"
                 (selectionChange)="SelTipo($event)">
-                <mat-option value="0">CONDECORACIONES</mat-option>
-                <mat-option value="2">RESERVA ACTIVA</mat-option>
-                <mat-option value="3">CESE DEL EMPLEO</mat-option>
+                <mat-option value="29">CONDECORACIONES</mat-option>
+                <mat-option value="85">NOMBRAMIENTOS</mat-option>
+                <mat-option value="10">RESERVA ACTIVA</mat-option>
+                <mat-option value="9">CESE DEL EMPLEO</mat-option>
             </mat-select>
             <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>

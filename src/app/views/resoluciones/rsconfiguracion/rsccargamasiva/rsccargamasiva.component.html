@@ -92,7 +92,25 @@
             </mat-select>
         </mat-form-field>
     </div>
+
     <div class="col-md-4" *ngIf="blAscenso">
+
+        <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                <mat-label>Clasificacion</mat-label>
+                <mat-select placeholder="Clasificacion" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="IDatosBasicos.clasificacion">
+                <mat-option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion">{{e.des_clasificacion}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <!-- <select class="form-control" [ngModelOptions]="{standalone: true}" 
+        [(ngModel)]="IDatosBasicos.clasificacion"
+          value="{{IDatosBasicos.clasificacion}}">
+          <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
+            {{e.des_clasificacion}}</option>
+        </select> -->
+      </div>
+
+    <div class="col-md-3" *ngIf="blAscenso">
         <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
             <mat-label>Componente</mat-label>
             <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}"
@@ -103,7 +121,7 @@
         </mat-form-field>
     </div>
 
-    <div class="col-md-4" *ngIf='blAscenso'>
+    <div class="col-md-3" *ngIf='blAscenso'>
         <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
             <mat-label>Grado</mat-label>
             <mat-select placeholder="Grado para el ascenso" [ngModelOptions]="{standalone: true}"
@@ -113,14 +131,14 @@
             </mat-select>
         </mat-form-field>
     </div>
-    <div class="col-md-4" *ngIf='blAscenso'>
+    <div class="col-md-3" *ngIf='blAscenso'>
         <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
             <mat-label>Cantidad de registros</mat-label>
             <input matInput placeholder="Orden de Merito" [ngModelOptions]="{standalone: true}"
                 [(ngModel)]="IDatosBasicos.orden">
         </mat-form-field>
     </div>
-    <div class="col-md-4" *ngIf='blAscenso'>
+    <div class="col-md-3" *ngIf='blAscenso'>
         <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
             <mat-label>Fecha del Ascenso ( * )</mat-label>
 

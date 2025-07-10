@@ -941,6 +941,7 @@ export class RsccargamasivaComponent implements OnInit {
       archivo_resuelto: this.archivo_otro + '|' + this.otra_llave,
       cantidad : this.IDatosBasicos.orden.toString(), 
       categoria: this.IDatosBasicos.categoria,
+      clasificacion: this.IDatosBasicos.clasificacion,
       componente: this.IDatosBasicos.componente,
       fecha: this.IResolucion.fecha_resolucion,
       ascenso: this.IResolucion.ultimo_ascenso,

@@ -994,7 +994,9 @@ export class RscondecoracionesComponent implements OnInit {
       distribucion: this.IResolucion.distribucion,
       usuario: this.loginService.Usuario.cedula,
     };
-
+    let acc = 'plotes'
+    if (this.tipo === 85) acc='plotesnombramientos' 
+    console.log(acc)
     this.apiService.EjecutarLotes(otraresol).subscribe(
       (data) => {
         this.ngxService.stopLoader("loader-aceptar");
