@@ -11,6 +11,14 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 })
 
 export class LoginComponent implements OnInit {
+
+  goBack() {
+    window.history.back();
+  }
+
+  enviar() {
+    // Acción para el botón enviar
+  }
   
 
 

@@ -35,7 +35,16 @@
     margin-top:20px;
     background:#FAFAFA;
   }
-  .order-card {
+  .auto-shrink-text {
+  display: inline-block;
+  max-width: 100%;
+  font-size: clamp(12px, 2vw, 18px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-card {
     color: #fff;
   }
 

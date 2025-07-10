@@ -23,6 +23,24 @@ import { AngularEditorConfig } from '@kolkov/angular-editor';
 
 export class DocumentoComponent implements OnInit, OnDestroy {
 
+  confirmarSalir() {
+    Swal.fire({
+      title: '¿Está seguro que desea salir?',
+      text: 'Se perderán los cambios no guardados.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, salir',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.history.back();
+      }
+    });
+  }
+
+
   editorConfig: AngularEditorConfig = {
     editable: true,
     spellcheck: true,

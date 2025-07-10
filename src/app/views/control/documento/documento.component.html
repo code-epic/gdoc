@@ -388,10 +388,18 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="text-right">
-                                <button class="btn bg-primary text-white" (click)="registrar()"
-                                    id="registrar">Aceptar</button>
-                            </div>
+                            <div class="row">
+    <div class="col-md-6 text-left">
+        <button class="btn btn-sm bg-primary text-white py-2" style="height:38px; min-width:100px;" (click)="registrar()" id="registrar">
+            <i class="fa fa-check mr-1"></i> Aceptar
+        </button>
+    </div>
+    <div class="col-md-6 text-right">
+        <button class="btn btn-sm btn-warning text-white py-2" style="height:38px; min-width:100px;" (click)="confirmarSalir()">
+            <i class="fa fa-times mr-1"></i> Cancelar
+        </button>
+    </div>
+</div>
                         </div>
                     </div>
                 </div>
