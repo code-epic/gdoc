@@ -1,0 +1,110 @@
+<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--9">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col-md-10">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Chatbot</h6>
+                            <h2 class="mb-0">Chatbot</h2>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>arrow_back</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <ul class="navbar-nav align-items-center d-none d-md-flex">
+                                <li class="nav-item" ngbDropdown placement="bottom-right">
+                                    <a class="nav-link pr-0" role="button" ngbDropdownToggle>
+                                        <div class="media align-items-center">
+                                            <div class="example-button-row">
+                                                <button mat-icon-button
+                                                    aria-label="Example icon-button with a heart icon">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+                                        <a routerLinkActive="active" [routerLink]="['/documento']"
+                                            class="dropdown-item">
+                                            <i class="fa fa-plus"></i>
+                                            <span>Nuevo Documento</span>
+                                        </a>
+                                        <a routerLinkActive="active" [routerLink]="['/notasentregas']"
+                                            class="dropdown-item">
+                                            <i class="fa fa-search"></i>
+                                            <span>Notas de Entrega</span>
+                                        </a>
+                                        <a routerLinkActive="active" [routerLink]="['/configuracion']"
+                                            class="dropdown-item">
+                                            <i class="ni ni-settings-gear-65"></i>
+                                            <span>Configuración</span>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12" id="sandbox">
+                            <div class="chat-container bordered" id="chat-container">
+                                <div class="message-list">
+                                    <div *ngFor="let msg of messages">
+                                        <ng-container *ngIf="msg.from === 'bot'; else userMsg">
+                                            <div class="bubble bot-bubble">
+                                                <span class="robot-emoji" aria-label="Robot">🤖</span>
+                                                <span class="bot-text">{{ msg.message }}</span>
+                                            </div>
+                                        </ng-container>
+                                        <ng-template #userMsg>
+                                            <div class="bubble user-bubble">
+                                                <span class="user-text">{{ msg.message }}</span>
+                                            </div>
+                                        </ng-template>
+                                    </div>
+                                    <div *ngIf="loading" class="bubble bot-bubble loading-bubble">
+                                        <span class="robot-emoji" aria-label="Robot">🤖</span>
+                                        <span class="vertical-dot-typing"><span></span><span></span><span></span></span>
+                                        <span class="loading-text">Por favor espere...</span>
+                                    </div>
+                                </div>
+
+                                <div class="input-area">
+                                    <input type="text" [(ngModel)]="message" (keyup.enter)="sendMessage()"
+                                        placeholder="Escribe un mensaje..." />
+
+                                    <!-- <button (click)="sendMessage()">Enviar</button> -->
+                                    <button class="btn btn-send" aria-label="Enviar" (click)="sendMessage()">
+                                        <span class="fa fa-paper-plane"></span>&nbsp;Enviar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <br>
+                <br>
+                <br>
+
+            </div>
+        </div>
+    </div>
+</div>

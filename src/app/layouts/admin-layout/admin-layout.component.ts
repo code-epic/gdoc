@@ -8,8 +8,8 @@ import {InactiveUserService} from '../../core/service/inactivity/inactive-user.s
 })
 export class AdminLayoutComponent implements OnInit {
   isInactive = false;
-  public activar = false
-  public opened:boolean = true;
+  public activar = false;
+  public opened = true;
   public events: string[] = [];
   constructor(private inactiveUserService: InactiveUserService) { }
 
@@ -25,7 +25,7 @@ export class AdminLayoutComponent implements OnInit {
     this.inactiveUserService.reset();
   }
 
-  onChangeSidenav(event:boolean) {
+  onChangeSidenav(event: boolean) {
     this.opened = !this.opened;
   }
 

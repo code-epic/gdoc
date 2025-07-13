@@ -41,8 +41,8 @@ export interface IAPICore {
 
 
 export interface ceDocumento {
-  id?: string //Id del documento
-  nomb?: string //Nombre
+  id?: string // Id del documento
+  nomb?: string // Nombre
   obse?: string
   tipo?: string
   esta?: string
@@ -51,18 +51,18 @@ export interface ceDocumento {
 
 
 export interface DocumentoAdjunto {
-  archivo?: string //CodeEncrypt
+  archivo?: string // CodeEncrypt
   usuario?: string
   documento?: string
 }
 
 export interface WTipoArchivo {
   ruta?: string
-  archivo?: string //CodeEncrypt
+  archivo?: string // CodeEncrypt
 }
 
 export interface DocumentoAdjunto {
-  archivo?: string //CodeEncrypt
+  archivo?: string // CodeEncrypt
   usuario?: string
   documento?: string
 }
@@ -90,7 +90,7 @@ interface UploadProgressEvent {
   providedIn: 'root'
 })
 export class ApiService {
-  //Dirección Get para servicios en la página WEB
+  // Dirección Get para servicios en la página WEB
   URL = environment.API
 
   // hash = environment.Hash
@@ -138,38 +138,38 @@ export class ApiService {
   }
 
 
-  //Ejecutar Api generales
+  // Ejecutar Api generales
   Ejecutar(xAPI: IAPICore): Observable<any> {
     // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
-    var url = this.URL + "crud:" + environment.Hash
-    //console.info( JSON.stringify(xAPI ))
+    const url = this.URL + 'crud:' + environment.Hash
+    // console.info( JSON.stringify(xAPI ))
     return this.http.post<any>(url, xAPI, this.httpOptions);
   }
-  //Ejecutar Api generales
+  // Ejecutar Api generales
   ExecFnx(fnx: any): any {
-    var url = this.URL + "fnx";
+    const url = this.URL + 'fnx';
     return this.http.post<any>(url, fnx, this.httpOptions);
   }
 
   //  Consulta el PID de una funcion
   GetFnxId(id: string): any {
-    var url = this.URL + `fnx:${id}`;
+    const url = this.URL + `fnx:${id}`;
     return this.http.get<any>(url, this.httpOptions);
   }
 
-  //EnviarArchivos generales
+  // EnviarArchivos generales
   EnviarArchivos(frm: FormData): Observable<any> {
-    var httpOptions = {
+    const httpOptions = {
       headers: new HttpHeaders({
         'Authorization': 'Bearer ' + sessionStorage.getItem('token')
       })
     };
-    return this.http.post<any>(this.URL + "subirarchivos", frm, httpOptions);
+    return this.http.post<any>(this.URL + 'subirarchivos', frm, httpOptions);
   }
 
-  //EnviarArchivos generales
+  // EnviarArchivos generales
   EnviarArchivosProgress(frm: FormData):  Observable<{loaded: number, total: number, progress : number, state :  string}> {
-    var httpOptions = {
+    const httpOptions = {
       headers: new HttpHeaders({
         'Authorization': 'Bearer ' + sessionStorage.getItem('token')
       }),
@@ -177,7 +177,7 @@ export class ApiService {
       observe: 'events' // Observa todos los eventos, no solo la respuesta final
     };
     // return this.http.post<any>(this.URL + "subirarchivos", frm, httpOptions);
-    return this.http.post<any>(this.URL + "subirarchivos", frm, httpOptions as { // <--- Cast del objeto options
+    return this.http.post<any>(this.URL + 'subirarchivos', frm, httpOptions as { // <--- Cast del objeto options
         headers?: HttpHeaders;
         observe: 'events'; // Necesitas esta línea para asegurarte que la sobrecarga con 'events' sea elegida
         reportProgress: boolean; // Y esta para la sobrecarga de progreso
@@ -209,19 +209,19 @@ export class ApiService {
     );
   }
 
-    //EnviarArchivos dinamicos
+    // EnviarArchivos dinamicos
     EnviarArchivosDinamicos(frm: FormData): Observable<any> {
-      var httpOptions = {
+      const httpOptions = {
         headers: new HttpHeaders({
           'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         })
       };
-      return this.http.post<any>(this.URL + "subirarchivos", frm, httpOptions);
+      return this.http.post<any>(this.URL + 'subirarchivos', frm, httpOptions);
     }
 
   //  Consulta el PID de una funcion
   ExecFnxId(id: string): any {
-    var url = this.URL + `fnx:${id}`
+    const url = this.URL + `fnx:${id}`
     return this.http.get<any>(url, this.httpOptions)
   }
 
@@ -257,7 +257,7 @@ export class ApiService {
   }
 
   DwsImg(peticion: string) {
-    let ruta = this.URL + 'dwsimg/' + peticion
+    const ruta = this.URL + 'dwsimg/' + peticion
     // console.log(ruta)
     const httpOptions = {
       headers: new HttpHeaders({
@@ -276,7 +276,7 @@ export class ApiService {
 
   DwsImgSource(peticion: string): Promise<string> {
     return new Promise((resolve, reject) => {
-        let ruta = this.URL + 'dwsimg/' + peticion;
+        const ruta = this.URL + 'dwsimg/' + peticion;
         const httpOptions = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
@@ -291,7 +291,7 @@ export class ApiService {
               const url = window.URL.createObjectURL(blob);
               resolve(url); // Resolvemos la promesa con la URL de la imagen
             },
-            (error) => {                
+            (error) => {
               reject(error);
             }
         );
@@ -299,7 +299,7 @@ export class ApiService {
   }
 
   DwsResol(peticion: string) {
-    let ruta = this.URL + 'dws/' + peticion
+    const ruta = this.URL + 'dws/' + peticion
     // console.log(ruta)
     const httpOptions = {
       headers: new HttpHeaders({
@@ -317,7 +317,7 @@ export class ApiService {
   }
 
   DwsResolDigital(peticion: string) {
-    let ruta = this.URL + 'dws/' + peticion
+    const ruta = this.URL + 'dws/' + peticion
     console.log(ruta)
     const httpOptions = {
       headers: new HttpHeaders({
@@ -336,7 +336,7 @@ export class ApiService {
 
 
   DwsCdn(peticion: string) {
-    let ruta = this.URL + 'dwscdn/' + peticion
+    const ruta = this.URL + 'dwscdn/' + peticion
     console.log(ruta)
     const httpOptions = {
       headers: new HttpHeaders({
@@ -353,11 +353,11 @@ export class ApiService {
     });
   }
 
-  
+
 
 
   getDwsCdn(tpf: WTipoArchivo): Observable<any> {
-    let ruta = this.URL + 'dwscdn'
+    const ruta = this.URL + 'dwscdn'
 
     const httpOptions = {
       headers: new HttpHeaders({
@@ -371,25 +371,25 @@ export class ApiService {
   }
 
 
-  //Ejecutar Api generales
+  // Ejecutar Api generales
   EjecutarProceso(xInterface): Observable<any> {
     // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
-    var url = this.URL + "pascensos"
-    //console.info( JSON.stringify(xAPI ))
+    const url = this.URL + 'pascensos'
+    // console.info( JSON.stringify(xAPI ))
     return this.http.post<any>(url, xInterface, this.httpOptions);
   }
-  //Ejecutar Api generales
+  // Ejecutar Api generales
   EjecutarIngreso(xInterface): Observable<any> {
     // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
-    var url = this.URL + "pingresos"
-    //console.info( JSON.stringify(xAPI ))
+    const url = this.URL + 'pingresos'
+    // console.info( JSON.stringify(xAPI ))
     return this.http.post<any>(url, xInterface, this.httpOptions);
   }
 
   EjecutarLotes(xInterface, accion : string = ''): Observable<any> {
     // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
-    var url = this.URL + "plotes"
-    //console.info( JSON.stringify(xAPI ))
+    const url = this.URL + 'plotes'
+    // console.info( JSON.stringify(xAPI ))
     return this.http.post<any>(url, xInterface, this.httpOptions);
   }
 

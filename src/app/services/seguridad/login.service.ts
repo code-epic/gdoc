@@ -6,25 +6,25 @@ import { environment } from '../../../environments/environment';
 
 import { JwtHelperService } from '@auth0/angular-jwt';
 
-export interface IUsuario{
-  nombre : string,
-  cedula : string,
-  tipo : string,
-  componente : string,
-  clave : string,
-  correo : string,
+export interface IUsuario {
+  nombre: string;
+  cedula: string;
+  tipo: string;
+  componente: string;
+  clave: string;
+  correo: string;
 }
 
-export interface IToken{
-  token : string,
+export interface IToken {
+  token: string;
 }
 
-export interface UClave{
-  login: string,
-  clave : string,
-  nueva: string,
-  repetir: string,
-  correo : string,
+export interface UClave {
+  login: string;
+  clave: string;
+  nueva: string;
+  repetir: string;
+  correo: string;
 }
 
 @Injectable({
@@ -34,90 +34,90 @@ export interface UClave{
 
 
 export class LoginService {
- 
-  public URL : string =  environment.API
-  
-  public Id : string = ''
-  
-  public SToken : any
 
-  public Token : any
+  public URL: string =  environment.API;
 
-  public Usuario : any
+  public Id = '';
 
-  public Aplicacion : any
+  public SToken: any;
 
-  constructor(private router: Router, private http : HttpClient) {
-    this.Id = environment.ID
-    if (sessionStorage.getItem("token") != undefined ) this.SToken = sessionStorage.getItem("token");
+  public Token: any;
+
+  public Usuario: any;
+
+  public Aplicacion: any;
+
+  constructor(private router: Router, private http: HttpClient) {
+    this.Id = environment.ID;
+    if (sessionStorage.getItem('token') != undefined ) { this.SToken = sessionStorage.getItem('token'); }
   }
 
   async Iniciar() {
-    await this.getUserDecrypt()
-    this.obenterAplicacion()
-    
+    await this.getUserDecrypt();
+    this.obenterAplicacion();
+
   }
-  getLogin(user: string, clave : string) : Observable<IToken>{
-    var usuario = {
-      "nombre" : user,
-      "clave" : clave,
-    }
-    var url = this.URL + 'wusuario/login'
-    return this.http.post<IToken>(url, usuario )
-  }
-  
-  makeUser(user: IUsuario): Observable<any>{    
-    var url = this.URL + 'identicacion'   
-    return this.http.post<any>( url, user )
+  getLogin(user: string, clave: string): Observable<IToken> {
+    let usuario = {
+      'nombre' : user,
+      'clave' : clave,
+    };
+    let url = this.URL + 'wusuario/login';
+    return this.http.post<IToken>(url, usuario );
   }
 
-  logout(){
+  makeUser(user: IUsuario): Observable<any> {
+    let url = this.URL + 'identicacion';
+    return this.http.post<any>( url, user );
+  }
+
+  logout() {
     this.router.navigate(['login']);
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("id");
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('id');
   }
 
-  protected getUserDecrypt() : any {    
-    var token = sessionStorage.getItem("token");
+  protected getUserDecrypt(): any {
+    let token = sessionStorage.getItem('token');
     const helper = new JwtHelperService();
     const decodedToken = helper.decodeToken(token);
-    this.Token = decodedToken
-    this.Usuario = this.Token.Usuario
-    
-    return this.Token
+    this.Token = decodedToken;
+    this.Usuario = this.Token.Usuario;
+
+    return this.Token;
   }
-  
-  //ObenterAplicacion 
-  protected obenterAplicacion(){
-    var Aplicacion = this.Token.Usuario.Aplicacion
+
+  // ObenterAplicacion
+  protected obenterAplicacion() {
+    let Aplicacion = this.Token.Usuario.Aplicacion;
     Aplicacion.forEach(e => {
-      if(e.id == this.Id ){
+      if (e.id == this.Id ) {
         this.Aplicacion = e;
       }
     });
   }
-  
-  obtenerMenu() : any {
-    return this.Aplicacion.Rol.Menu
+
+  obtenerMenu(): any {
+    return this.Aplicacion.Rol.Menu;
   }
 
-  obtenerPrivilegiosMenu(idUrl : string) : any {
-    var App = this.Aplicacion
-    var Menu: any
-    App.Rol.Menu.forEach(e => {if (e.url == idUrl) Menu = e});
-    return Menu
-    
+  obtenerPrivilegiosMenu(idUrl: string): any {
+    let App = this.Aplicacion;
+    let Menu: any;
+    App.Rol.Menu.forEach(e => {if (e.url == idUrl) { Menu = e; }});
+    return Menu;
+
   }
 
-  obtenerSubMenu(idUrl : string) : any{   
-    var App = this.Aplicacion
-    var SubMenu = [] 
-    App.Rol.Menu.forEach(e => {if (e.url == idUrl) SubMenu = e.SubMenu});
-    return SubMenu
+  obtenerSubMenu(idUrl: string): any {
+    let App = this.Aplicacion;
+    let SubMenu = [];
+    App.Rol.Menu.forEach(e => {if (e.url == idUrl) { SubMenu = e.SubMenu; }});
+    return SubMenu;
   }
 
   isLogged() {
-    return sessionStorage.getItem("token") ? true : false;
+    return sessionStorage.getItem('token') ? true : false;
   }
 
 }

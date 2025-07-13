@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, ViewChild } from "@angular/core";
+import { RsconsultaSessionService } from 'src/app/services/resoluciones/rsconsulta-session.service';
 import { environment } from 'src/environments/environment';
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
@@ -40,6 +41,9 @@ interface ITipoResolucion {
   styleUrls: ["./rsconsulta.component.scss"],
 })
 export class RsconsultaComponent implements OnInit {
+  @ViewChild('modalConfirmarDescarga', { static: true }) modalConfirmarDescarga: any;
+  archivoParaDescargar: { ncontrol: string, archivo: string } | null = null;
+
   public cedula: string = "";
   public resolucion: string = "";
 
@@ -305,8 +309,11 @@ export class RsconsultaComponent implements OnInit {
 
   public bEliminarEntrada: boolean = false;
 
+  documentoSeleccionado: any;
+
   constructor(
     private apiService: ApiService,
+    private rsconsultaSessionService: RsconsultaSessionService,
     private utilService: UtilService,
     private loginService: LoginService,
     private ngxService: NgxUiLoaderService,
@@ -320,6 +327,20 @@ export class RsconsultaComponent implements OnInit {
       sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR) != undefined
         ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR)))
         : [];
+  }
+
+  abrirModalDescargaNew(modalRef: any, documento: any) {
+    this.documentoSeleccionado = documento;
+    this.modalService.open(modalRef, { centered: true });
+  }
+
+  descargarSeleccionado() {
+    // Lógica de descarga aquí, usando this.documentoSeleccionado
+    // Por ejemplo: this.apiService.descargarArchivo(this.documentoSeleccionado);
+    // Puedes personalizar esto según tu backend
+    if (this.documentoSeleccionado) {
+      // Ejemplo: window.open(this.documentoSeleccionado.url, '_blank');
+    }
   }
 
   convertirFecha(fecha: string): string {
@@ -354,52 +375,19 @@ export class RsconsultaComponent implements OnInit {
       this.blConfidencial =
         tk == "Confidencial" || tk == "Administrador" ? true : false;
     }
-    this.Componentes =
-      sessionStorage.getItem(environment.funcion.COMPONENTE_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.COMPONENTE_CONSULTAR)))
-        : [];
-    this.Grados =
-      sessionStorage.getItem(environment.funcion.GRADO_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.GRADO_CONSULTAR)))
-        : [];
-    this.Categorias =
-      sessionStorage.getItem(environment.funcion.CATEGORIAS_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CATEGORIAS_CONSULTAR)))
-        : [];
-    this.Clasificaciones =
-      sessionStorage.getItem(environment.funcion.CLASIFICACION_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CLASIFICACION_CONSULTAR)))
-        : [];
-    this.TipoEntradas =
-      sessionStorage.getItem(environment.funcion.TIPO_ENTRADA_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.TIPO_ENTRADA_CONSULTAR)))
-        : [];
-    this.TipoResoluciones =
-      sessionStorage.getItem(environment.funcion.TIPO_RESOLUCION_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.TIPO_RESOLUCION_CONSULTAR)))
-        : [];
-
-    this.Carpetas =
-      sessionStorage.getItem(environment.funcion.CARPETA_ENTRADA_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CARPETA_ENTRADA_CONSULTAR)))
-        : [];
-    this.OrdenNumero =
-      sessionStorage.getItem(environment.funcion.ORDEN_ENTRADA_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.ORDEN_ENTRADA_CONSULTAR)))
-        : [];
-    this.GradoIPSFA =
-      sessionStorage.getItem(environment.funcion.GRADO_IPSFA_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.GRADO_IPSFA_CONSULTAR)))
-        : [];
-    this.UbicacionCarpetas =
-      sessionStorage.getItem(environment.funcion.CARPETAS_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CARPETAS_CONSULTAR)))
-        : [];
-
-    this.UbicacionCarpetasEntrada =
-      sessionStorage.getItem(environment.funcion.CARPETA_ENTRADA_CONSULTAR) != undefined
-        ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.CARPETA_ENTRADA_CONSULTAR)))
-        : [];
+    // Usar el servicio para cargar los datos desde sessionStorage
+    const datos = this.rsconsultaSessionService.cargarDatosDesdeSession(environment);
+    this.Componentes = datos.Componentes;
+    this.Grados = datos.Grados;
+    this.Categorias = datos.Categorias;
+    this.Clasificaciones = datos.Clasificaciones;
+    this.TipoEntradas = datos.TipoEntradas;
+    this.TipoResoluciones = datos.TipoResoluciones;
+    this.Carpetas = datos.Carpetas;
+    this.OrdenNumero = datos.OrdenNumero;
+    this.GradoIPSFA = datos.GradoIPSFA;
+    this.UbicacionCarpetas = datos.UbicacionCarpetas;
+    this.UbicacionCarpetasEntrada = datos.UbicacionCarpetasEntrada;
 
     // console.log(this.Estados)
 
@@ -1439,6 +1427,17 @@ export class RsconsultaComponent implements OnInit {
         );
       }
     });
+  }
+
+  abrirModalDescarga(ncontrol: string, archivo: string) {
+    this.archivoParaDescargar = { ncontrol, archivo };
+    this.modalService.open(this.modalConfirmarDescarga, { centered: true });
+  }
+
+  confirmarDescarga() {
+    if (!this.archivoParaDescargar) return;
+    this.dwUrlDigital(this.archivoParaDescargar.ncontrol, this.archivoParaDescargar.archivo);
+    this.archivoParaDescargar = null;
   }
 
   dwUrlDigital(ncontrol: string, archivo: string) {

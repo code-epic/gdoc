@@ -60,6 +60,7 @@ import { VisitantesComponent } from 'src/app/views/visitantes/visitantes.compone
 import { VisitantedocumentoComponent } from 'src/app/views/visitantes/visitantedocumento/visitantedocumento.component';
 import { PublicarComponent } from 'src/app/views/publicaciones/publicar/publicar.component';
 import { BuzonresueltosComponent } from 'src/app/views/publicaciones/buzonresueltos/buzonresueltos.component';
+import { ChatbotComponent } from 'src/app/views/chatbot/chatbot.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -71,6 +72,11 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'control',
         component: ControlComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'chatbot',
+        component: ChatbotComponent,
         canActivate: [AuthGuardGuard]
     },
     {

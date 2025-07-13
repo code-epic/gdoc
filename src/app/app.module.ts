@@ -59,6 +59,7 @@ import { SbuzonComponent } from './views/secretaria/sbuzon/sbuzon.component';
 import { SalertaComponent } from './views/secretaria/salerta/salerta.component';
 import { SministerialComponent } from './views/secretaria/sministerial/sministerial.component';
 import { SpresidencialComponent } from './views/secretaria/spresidencial/spresidencial.component';
+import { ChatbotComponent } from './views/chatbot/chatbot.component';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { OresolucionesComponent } from './views/resoluciones/rsprocesos/oresoluciones/oresoluciones.component';
 import { RsconsultaComponent } from './views/resoluciones/rsprocesos/rsconsulta/rsconsulta.component';
@@ -222,7 +223,8 @@ const ngWizardConfig: NgWizardConfig = {
     RsestadisticasComponent,
     MreportesComponent,
     PublicarComponent,
-    BuzonresueltosComponent
+    BuzonresueltosComponent,
+    ChatbotComponent
   ],
   providers: [
     {
