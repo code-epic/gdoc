@@ -310,6 +310,11 @@ export class RsconsultaComponent implements OnInit {
   public bEliminarEntrada: boolean = false;
 
   documentoSeleccionado: any;
+  public lstMeses = []
+  public lstYear = []
+  public xyear = '2024'
+  public xmeses = ''
+  public xdia = ''
 
   constructor(
     private apiService: ApiService,
@@ -370,6 +375,10 @@ export class RsconsultaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.xmeses = new Date().getMonth().toString()
+    this.xyear = new Date().getFullYear().toString()
+    this.xdia = new Date().getDate().toString()
+
     if (this.loginService.Usuario.token != undefined) {
       let tk = this.loginService.Usuario.token;
       this.blConfidencial =
@@ -724,7 +733,7 @@ export class RsconsultaComponent implements OnInit {
         codigo += " AND rs.cod_tipo_resol = " + this.tipo.codigo;
     }
     if (estatus == 1) {
-      this.xAPI.parametros = "1900-01-01,2025-01-01," + codigo;
+      this.xAPI.parametros = `1990-01-01,${this.xyear}-${ parseInt(this.xmeses) +  1}-${this.xdia},` + codigo;
     } else {
       this.xAPI.parametros = desde + "," + hasta + "," + codigo;
     }

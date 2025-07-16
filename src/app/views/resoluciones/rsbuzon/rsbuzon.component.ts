@@ -1051,7 +1051,7 @@ export class RsbuzonComponent implements OnInit {
 
         this.xAPI.funcion = environment.funcion.ENTRADAS_RESOLUCIONES;
         this.xAPI.parametros =
-            `'0',${elementos}##${componente}##${numero}##${tipo}##${estatus}##${clasificacion}##${prioridad}##${observacion}##${usuario}##${idtrans}`;
+            `'0',${elementos}cedula##${componente}cedula##${numero}cedula##${tipo}cedula##${estatus}cedula##${clasificacion}cedula##${prioridad}cedula##${observacion}cedula##${usuario}cedula##${idtrans}`;
         console.log(this.xAPI.parametros)
         if (this.numCarpeta == '') {
             this.toastrService.error(
