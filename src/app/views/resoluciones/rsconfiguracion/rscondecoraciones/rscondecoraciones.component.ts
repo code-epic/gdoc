@@ -995,7 +995,8 @@ export class RscondecoracionesComponent implements OnInit {
       usuario: this.loginService.Usuario.cedula,
     };
     let acc = 'plotes'
-    if (this.tipo === 85) acc='plotesnombramientos' 
+    console.log(this.tipo)
+    if (this.tipo === '85') acc='plotesnombramientos' 
     console.log(acc)
     this.apiService.EjecutarLotes(otraresol).subscribe(
       (data) => {

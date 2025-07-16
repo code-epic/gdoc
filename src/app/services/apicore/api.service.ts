@@ -105,7 +105,7 @@ export class ApiService {
 
   public Xmeses = [
     {'id': 0, 'mes' : 'ENERO', 'desde':'01-01 00:00:00', 'hasta': '01-31 23:59:59'},
-    {'id': 1, 'mes' : 'FEBRERO', 'desde':'02-01 00:00:00', 'hasta': '02-29 23:59:59'},
+    {'id': 1, 'mes' : 'FEBRERO', 'desde':'02-01 00:00:00', 'hasta': '02-28 23:59:59'},
     {'id': 2, 'mes' : 'MARZO', 'desde':'03-01 00:00:00', 'hasta': '03-31 23:59:59'},
     {'id': 3, 'mes' : 'ABRIL', 'desde':'04-01 00:00:00', 'hasta': '04-30 23:59:59'},
     {'id': 4, 'mes' : 'MAYO', 'desde':'05-01 00:00:00', 'hasta': '05-31 23:59:59'},

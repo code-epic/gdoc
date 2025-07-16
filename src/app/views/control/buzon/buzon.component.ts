@@ -174,10 +174,11 @@ export class BuzonComponent implements OnInit {
     this.fecha_desde = this.xyear + '-' + this.lstMeses[this.xmeses].desde
     this.fecha_hasta = this.xyear + '-' + this.lstMeses[this.xmeses].hasta
     this.pageSize = 10;
-
+    
     switch (e) {
       case 0:
         this.xAPI.parametros = `${this.estadoActual},${this.estatusAcutal},${this.fecha_desde},${this.fecha_hasta}`
+        console.log(this.xAPI.parametros)
         this.listarBuzon()
         break
       case 1:
