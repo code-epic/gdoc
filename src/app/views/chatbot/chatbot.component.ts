@@ -31,65 +31,82 @@ export class ChatbotComponent {
     this.loadHistory();
 
     this.userId = this.getUserId();
-    this.messages.push({ message: `Tu ID de sesión es: ${this.userId}`, id: `${this.userId}`, from: 'user' });
-
-    // 2. Guardar el historial de la conversación en localStorage.
-    this.saveHistory(); 
+    let message = 'NOMBRE DEL USUARIO';
     // URL de tu servidor Go, incluyendo el puerto y la ruta específica
-    const serverUrl = 'wss://localhost:3000/sandra_ws';
-    
+    const encodedMessage = encodeURIComponent(message); // Codifica el contenido del mensaje
+
+    // Construye la URL del servidor, incluyendo el ID del usuario y el mensaje como parámetros de consulta
+    const serverUrl = `wss://localhost:3000/sandra_ws?userId=${this.userId}&initialMessage=${encodedMessage}`;
+    // const serverUrl = 'wss://localhost:3000/sandra_ws';
+
     // Crea una nueva instancia de WebSocket
     this.ws = new WebSocket(serverUrl);
 
     this.ws.onopen = () => {
-      console.log('Conectado al servidor')
       this.messages.push({ message: '¡Conectado al servidor!', id: `${this.userId}`, from: 'bot' });
+      const messageObject = {
+        id: this.userId,
+        message: 'Evaluando conexion'
+      };
+      this.ws.send(JSON.stringify(messageObject));
     };
 
+    // En tu componente de Angular
     this.ws.onmessage = (event) => {
-      // if (this.loading) this.loading = false;
-      // console.log('Mensaje recibido:', event.data)
-      // this.messages.push({ message: `${event.data}`, id: `${this.userId}`, from: 'bot' });
-      // this.saveHistory(); 
-      const lastMessage = this.messages[this.messages.length - 1];
+      try {
+        const data = JSON.parse(event.data); // Intentar parsear el JSON
+        // console.log(data)
+        // Asumiendo que `data` es de tipo { Content: string, Done: boolean }
+        if (data && typeof data.content === 'string' && typeof data.done === 'boolean') {
+          const lastMessage = this.messages[this.messages.length - 1];
 
-      // Si el último mensaje es del bot, concatena el nuevo fragmento.
-      if (lastMessage && lastMessage.from === 'bot') {
-        lastMessage.message += event.data;
-      } else {
-        // Si no, crea un nuevo mensaje del bot.
-        this.messages.push({ from: 'bot', message: event.data, id: `${this.userId}` });
+          // Si el último mensaje es del bot, sigue añadiendo los chunks
+          if (lastMessage && lastMessage.from === 'bot' && this.loading) {
+            lastMessage.message += data.content; // Añade el contenido
+          } else {
+            // Si es el primer chunk de una nueva respuesta, crea un nuevo mensaje
+            this.messages.push({ from: 'bot', message: data.content, id: `${this.userId}` });
+          }
+
+          // Si el campo 'Done' es true, la respuesta ha terminado
+          if (data.done) {
+            console.log('Respuesta de Ollama terminada.');
+            this.loading = false; 
+            this.saveHistory(); 
+          }
+        } else {
+          console.warn('Mensaje de WebSocket con formato inesperado o no JSON:', event.data);
+          this.messages.push({ from: 'bot', message: String(event.data), id: `${this.userId}` });
+          this.loading = false; 
+          this.saveHistory();
+        }
+      } catch (e) {
+        console.error('Error al parsear mensaje WebSocket:', e, 'Mensaje crudo:', event.data);
+        this.messages.push({ from: 'bot', message: String(event.data), id: `${this.userId}` });
+        this.loading = false; 
+        this.saveHistory();
       }
-      this.saveHistory(); 
     };
+
+    // this.ws.onmessage = (event) => {
+    //   const lastMessage = this.messages[this.messages.length - 1];
+    //   if (lastMessage && lastMessage.from === 'bot') {
+    //     lastMessage.message += event.data;
+    //   } else {
+    //     this.messages.push({ from: 'bot', message: event.data, id: `${this.userId}` });
+    //   }
+    //   this.saveHistory(); 
+    // };
 
     this.ws.onclose = () => {
-      console.log('Conexión cerrada')
-      this.messages.push({ message: 'Conexión cerrada.', id: `${this.userId}`, from: 'bot' });
-      // 3. Guardar el historial de la conversación en localStorage.
-      this.saveHistory(); 
+      // this.messages.push({ message: 'Conexión cerrada.', id: `${this.userId}`, from: 'bot' });
+      this.saveHistory();
     };
-    // Maneja el evento de conexión exitosa
-    // this.ws.onopen = () => {
-    //   this.messages.push({ text: '¡Conectado al servidor!', from: 'bot' });
-    // };
-
-    // // Maneja los mensajes entrantes del servidor
-    // this.ws.onmessage = (event) => {
-    //   if (this.loading) this.loading = false;
-    //   this.messages.push({ text: event.data, from: 'bot' });
-    // };
-
     // // Maneja los errores de conexión
-    // this.ws.onerror = (error) => {
-    //   console.error('Error del WebSocket:', error);
-    //   this.messages.push({ text: 'Error: No se pudo conectar al servidor.', from: 'bot' });
-    // };
-
-    // // Maneja el cierre de la conexión
-    // this.ws.onclose = () => {
-    //   this.messages.push({ text: 'Conexión cerrada.', from: 'bot' });
-    // };
+    this.ws.onerror = (error) => {
+      console.error('Error del WebSocket:', error);
+      this.messages.push({ message: 'Error: No se pudo conectar al servidor.', id: `${this.userId}`, from: 'bot' });
+    };
   }
 
   // Nuevo método para obtener un ID único o recuperar uno existente.
@@ -104,14 +121,15 @@ export class ChatbotComponent {
 
   // Generador UUID v4 compatible con navegadores
   private uuidv4(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
   }
   // Método para enviar mensajes al servidor
   public sendMessage(): void {
-    if (this.ws && this.message.trim()) {
+    // console.log(this.ws)
+    if (this.ws) {
       if (this.ws.readyState === WebSocket.OPEN) {
         // Crea un objeto JSON con el ID y el mensaje.
         const messageObject = {
@@ -120,11 +138,12 @@ export class ChatbotComponent {
         };
         console.log('Enviando mensaje:', messageObject);
         this.ws.send(JSON.stringify(messageObject));
+        console.log('Enviando mensaje:', JSON.stringify(messageObject))
         this.loading = true;
-        this.messages.push({ message: `Tú: ${this.message}`, id: `${this. userId}`, from: 'user' });
+        this.messages.push({ message: `Tú: ${this.message}`, id: `${this.userId}`, from: 'user' });
         this.message = '';
         // 3. Guardar el historial de la conversación en localStorage.
-        this.saveHistory(); 
+        this.saveHistory();
       } else {
         this.messages.push({ message: 'Error: Conexión no está abierta.', id: `${this.userId}`, from: 'bot' });
       }
@@ -144,8 +163,8 @@ export class ChatbotComponent {
   //   }
   // }
 
-   // Nuevo método para guardar el historial en localStorage.
-   private saveHistory(): void {
+  // Nuevo método para guardar el historial en localStorage.
+  private saveHistory(): void {
     const historyString = JSON.stringify(this.messages);
     localStorage.setItem('chat_history', historyString);
   }
