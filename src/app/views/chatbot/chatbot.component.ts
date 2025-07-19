@@ -47,10 +47,19 @@ export class ChatbotComponent {
     };
 
     this.ws.onmessage = (event) => {
-      if (this.loading) this.loading = false;
-      console.log('Mensaje recibido:', event.data)
-      this.messages.push({ message: `${event.data}`, id: `${this.userId}`, from: 'bot' });
-      // 3. Guardar el historial de la conversación en localStorage.
+      // if (this.loading) this.loading = false;
+      // console.log('Mensaje recibido:', event.data)
+      // this.messages.push({ message: `${event.data}`, id: `${this.userId}`, from: 'bot' });
+      // this.saveHistory(); 
+      const lastMessage = this.messages[this.messages.length - 1];
+
+      // Si el último mensaje es del bot, concatena el nuevo fragmento.
+      if (lastMessage && lastMessage.from === 'bot') {
+        lastMessage.message += event.data;
+      } else {
+        // Si no, crea un nuevo mensaje del bot.
+        this.messages.push({ from: 'bot', message: event.data, id: `${this.userId}` });
+      }
       this.saveHistory(); 
     };
 
