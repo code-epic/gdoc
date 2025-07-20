@@ -126,6 +126,18 @@ ul {
   max-width: 400px;
   font-family: 'Inter', Arial, sans-serif;
   transition: box-shadow 0.2s;
+  height: 600px;
+  overflow-y: auto;
+}
+
+.message-list {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+  max-height: calc(600px - 100px);
 }
 
 .loading-bubble {
@@ -202,6 +214,7 @@ ul {
 
 
 .bot-bubble {
+  padding: 12px;
   background: #f4f6fa;
   color: #555;
   align-self: flex-start;
@@ -215,6 +228,7 @@ ul {
 
 
 .user-bubble {
+  padding: 12px;
   background: #e8f0fe;
   color: #35506c;
   align-self: flex-end;
