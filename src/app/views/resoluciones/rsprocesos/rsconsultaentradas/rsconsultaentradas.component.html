@@ -1,5 +1,5 @@
 <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
-<div class="container">
+
 
   <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" [selectedIndex]="selected.value"
     (selectedIndexChange)="selected.setValue($event)">
@@ -9,6 +9,8 @@
         &nbsp;GENERAL
       </ng-template>
       <br><br>
+      
+      <div  style="padding: 15px; width: 100%;">  
 
       <div *ngIf="!bEntradas">
         <div class="form-row">
@@ -74,11 +76,11 @@
         <div class="form-row">
           <div class="form-group col-md-12 text-right">
             <button class="btn bg-success text-white " (click)="Consultar();">
-              <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar por Rango
+              Consultar por rango
             </button>
             &nbsp;&nbsp;
             <button class="btn bg-primary text-white " (click)="ConsultarFecha();">
-              <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar año en curso
+              Consultar año en curso
             </button>
           </div>
         </div>
@@ -97,13 +99,6 @@
               <mat-icon>open_in_browser</mat-icon>
             </button>
           </div>
-          <!-- <div *ngIf="blDatosBasicos"
-              class="example-button-row text-right text-white">
-              <button style="background-color: #2a9a17;" mat-icon-button
-                  title="Editar datos Basicos" (click)="editarDatosBasicos()">
-                  <mat-icon>manage_accounts</mat-icon>
-              </button>
-          </div> -->
 
         </div>
       </div>
@@ -154,7 +149,7 @@
         </div>
       </div>
 
-
+      </div>
 
     </mat-tab>
     <mat-tab>
@@ -165,8 +160,6 @@
     </mat-tab>
   </mat-tab-group>
 
-
-</div>
 
 
 <!-- Adjuntar Imagenes al Documento -->

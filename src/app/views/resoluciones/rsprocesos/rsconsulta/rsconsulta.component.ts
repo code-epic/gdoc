@@ -431,7 +431,7 @@ export class RsconsultaComponent implements OnInit {
       this.consultarCedula(undefined);
     });
 
-    console.log(this.loginService.Usuario);
+    // console.log(this.loginService.Usuario);
     this.bEliminarEntrada =
       this.loginService.Usuario.cargo == "Transcriptor Premium" ? true : false;
   }

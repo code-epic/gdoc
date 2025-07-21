@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { ExcelService } from 'src/app/services/util/excel.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
@@ -48,6 +49,7 @@ export class RsalertasComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private utilService: UtilService, 
     private msj: MensajeService, 
+    private excelService: ExcelService,
     private apiService: ApiService,) { }
 
   ngOnInit(): void {
@@ -86,6 +88,7 @@ export class RsalertasComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data: any) => {
         this.lstAlertas = data.Cuerpo
+        // this.csvHead = data.Cabecera;
         this.ngxService.stopLoader('loader-buscar')
       },
       (error) => {
@@ -96,18 +99,24 @@ export class RsalertasComponent implements OnInit {
   }
 
 
-  async downloadCSVEx() {
-    // await this.relfexion(true)
-    let head = this.csvHead.map((e) => {
-      console.log(e.nombre);
-      return e.nombre;
-    });
-    this.utilService.downloadFile(
-      head,
-      this.lstAlertas,
-      "RC-" + this.utilService.GenerarUnicId(),
-      this.delimitador
-    );
-  }
+
+    exportExcel(): void {
+      let xlsx = []
+      this.lstAlertas.forEach((e) => {
+        xlsx.push({
+          'Cedula': e.cedula,
+          'Nombre': e.nombres_apellidos,
+          'Grado': e.ngrado,
+          'Componente': e.ncomponente,
+          'Comision': e.inicio_comision,
+          'Fin Comision': e.fin_comision,
+          'Asunto': e.asunto,
+          'Numero Resolucion': e.numero_resol,
+          'Dias Restantes': e.dias_restantes, 
+         
+        })
+      })
+      this.excelService.exportToExcel(xlsx, 'alertas_export');
+    }
 
 }

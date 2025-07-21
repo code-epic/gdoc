@@ -34,7 +34,7 @@ export class NavbarComponent implements OnInit {
     this.listTitles = ROUTES.filter(listTitle => listTitle);
 
     this.msj.contenido$.subscribe( e => {
-      console.log(e)
+      // console.log(e)
       this.alerta = e.valor
     })
 
