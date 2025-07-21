@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2'
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MensajeService } from 'src/app/services/util/mensaje.service';
 
 @Component({
   selector: 'app-navbar',
@@ -17,10 +18,10 @@ export class NavbarComponent implements OnInit {
   public location: Location;
   @Output() onChange = new EventEmitter<any>();
   public nombre : string = 'Analista'
+  public alerta : boolean = false
 
   constructor(location: Location,  
-    private element: ElementRef, 
-    private router: Router,
+    private msj: MensajeService,
     private modalService: NgbModal,
     private loginService : LoginService ) {
     this.location = location;
@@ -31,6 +32,12 @@ export class NavbarComponent implements OnInit {
     this.nombre = this.loginService.Usuario.nombre
 
     this.listTitles = ROUTES.filter(listTitle => listTitle);
+
+    this.msj.contenido$.subscribe( e => {
+      console.log(e)
+      this.alerta = e.valor
+    })
+
   }
 
   open(content) {
@@ -70,6 +77,7 @@ export class NavbarComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         sessionStorage.clear()
+        localStorage.clear()
         window.location.href = './';
       }
     })    

@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { MensajeService } from 'src/app/services/util/mensaje.service';
 import { UtilService } from 'src/app/services/util/util.service';
 
 @Component({
@@ -86,6 +87,7 @@ export class RsrevisionComponent implements OnInit {
   
     constructor(
       private apiService: ApiService,
+      private msj: MensajeService,  
       private ruta: Router,
       private toastrService: ToastrService,
       private loginService: LoginService,
@@ -95,6 +97,11 @@ export class RsrevisionComponent implements OnInit {
     }
   
     ngOnInit(): void {
+      let alertas = {
+        'tipo': 'alerta',
+        'valor': true
+      }
+      this.msj.contenido$.emit(alertas)
       this.listarEstados()
       this.seleccionNavegacion(0)
       this.listarSubDocumentos(1)

@@ -21,6 +21,7 @@ import {
   NgbDatepickerModule,
   NgbDateStruct,
 } from "@ng-bootstrap/ng-bootstrap"
+import { MensajeService } from 'src/app/services/util/mensaje.service';
 
 
 export interface ITipoResolucion {
@@ -297,15 +298,17 @@ export class RsentradasComponent implements OnInit {
     private toastrService: ToastrService,
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter,
+    private msj: MensajeService,
     private _snackBar: MatSnackBar,
     private ruta: Router) { }
 
   ngOnInit(): void {
 
-
-    // this.editor = new Editor()
-    // this.xeditor = new Editor()
-    // this.xobser = new Editor()
+    let alertas = {
+      'tipo' : 'alerta',
+      'valor': true
+    }
+    this.msj.contenido$.emit(alertas)
 
     if (this.entradas != undefined) {
       let e = this.entradas.rs;
@@ -331,23 +334,12 @@ export class RsentradasComponent implements OnInit {
 
       )
 
-      
-      // this.codigo = 
-
       this.editar = true
-     
       this.Resolucion.cedula = this.Entradas.cedula
-      // this.clasificacion = this.Entradas.tipo_entrada
-
       console.log(this.entradas)
-
-
-      // this.myControl.value( this.Entradas.tipo_entrada )
-
       this.consultarCedula()
       this.estatus = this.entradas.rs.estatus.toString()
       this.codigo = this.entradas.rs.cod_acto.toString()
-
     }
     this.archivos = []
 

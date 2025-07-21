@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { IAPICore } from 'src/app/services/apicore/api.service';
+import { FormControl } from '@angular/forms';
+import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { MensajeService } from 'src/app/services/util/mensaje.service';
 import { UtilService } from 'src/app/services/util/util.service';
 
 @Component({
@@ -13,7 +15,7 @@ export class RsalertasComponent implements OnInit {
   dbDatosNombre = false
   bFrm = false
 
-  lstNombres = []
+  lstAlertas = []
 
   xAPI: IAPICore = {
     funcion: '',
@@ -36,32 +38,53 @@ export class RsalertasComponent implements OnInit {
   clasificacion = ''
   grado = ''
 
+  selected = new FormControl(0);
 
-  
-  constructor(private utilService: UtilService,) { }
+
+
+  constructor(private utilService: UtilService, private msj: MensajeService, private apiService: ApiService,) { }
 
   ngOnInit(): void {
     this.Componentes =
-    sessionStorage.getItem('MPPD_CComponente') != undefined
-      ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
-      : []
+      sessionStorage.getItem('MPPD_CComponente') != undefined
+        ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
+        : []
 
-  this.Grados =
-    sessionStorage.getItem("MPPD_CGrado") != undefined
-      ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado")))
-      : [];
-  this.Categorias =
-    sessionStorage.getItem("MPPD_CCategorias") != undefined
-      ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias")))
-      : [];
-  this.Clasificaciones =
-    sessionStorage.getItem("MPPD_CClasificacion") != undefined
-      ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion")))
-      : [];
+    this.Grados =
+      sessionStorage.getItem("MPPD_CGrado") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado")))
+        : [];
+    this.Categorias =
+      sessionStorage.getItem("MPPD_CCategorias") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias")))
+        : [];
+    this.Clasificaciones =
+      sessionStorage.getItem("MPPD_CClasificacion") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion")))
+        : [];
+
+    let alertas = {
+      'tipo': 'alerta',
+      'valor': true
+    }
+    this.msj.contenido$.emit(alertas)
+    this.ConsultarAlertas()
 
   }
 
-  ConsultarAlertas(){}
+  ConsultarAlertas() { 
+    this.xAPI.funcion = 'PRC_CAlertasResoluciones'
+    this.xAPI.valores = ''
+    this.xAPI.parametros = ''
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data: any) => {
+      this.lstAlertas = data.Cuerpo
+    },
+    (error) => {
+      console.log(error);
+    }
+  )  
+  }
 
 
   async downloadCSVEx() {
@@ -72,7 +95,7 @@ export class RsalertasComponent implements OnInit {
     });
     this.utilService.downloadFile(
       head,
-      this.lstNombres,
+      this.lstAlertas,
       "RC-" + this.utilService.GenerarUnicId(),
       this.delimitador
     );

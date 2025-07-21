@@ -1,0 +1,30 @@
+// Bell icon animation styles
+.bell-icon-container {
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+    
+    .bell-icon {
+      animation: bellShake 0.6s ease-in-out;
+    }
+  }
+}
+
+.bell-icon {
+  transition: all 0.3s ease;
+  transform-origin: center top;
+}
+
+// Keyframe animation for bell shake effect
+@keyframes bellShake {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: rotate(-10deg);
+  }
+  20%, 40%, 60%, 80% {
+    transform: rotate(10deg);
+  }
+}

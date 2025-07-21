@@ -10,6 +10,15 @@
      </div>
 
     <ul class="navbar-nav align-items-center d-none d-md-flex">
+      <!-- Alert/Bell Icon -->
+      <li class="nav-item" *ngIf="alerta">
+        <a class="nav-link bell-icon-container" [routerLink]="['/rsalertas']" routerLinkActive="active" title="Alertas">
+          <div class="avatar rounded-circle bg-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+            <i class="ni ni-bell-55 text-warning bell-icon" style="font-size: 22px;"></i>
+          </div>
+        </a>
+      </li>
+      
       <li class="nav-item" ngbDropdown placement="bottom-right">
         <a class="nav-link pr-0" role="button" ngbDropdownToggle>
           <div class="media align-items-center">

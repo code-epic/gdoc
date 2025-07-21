@@ -61,6 +61,7 @@ export class RsconsultaentradasComponent implements OnInit {
   observacion_entrada = ''
   opttodos = "0"
 
+
   constructor(
     private apiService: ApiService,
     private utilService: UtilService,

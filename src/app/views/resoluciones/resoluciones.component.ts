@@ -7,6 +7,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { Resolucion } from 'src/app/services/control/documentos.service';
 import { ResolucionService } from 'src/app/services/resoluciones/resolucion.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
+import { MensajeService } from 'src/app/services/util/mensaje.service';
 import * as internal from 'stream';
 
 @Component({
@@ -92,7 +93,7 @@ export class ResolucionesComponent implements OnInit {
   
 
   constructor(private apiService: ApiService,
-  
+    private msj: MensajeService,
     private modalService: NgbModal,
     public dialog: MatDialog,
     public loginService: LoginService,
@@ -101,6 +102,11 @@ export class ResolucionesComponent implements OnInit {
 
   async ngOnInit() {
     //this.xApi.funcion = "MPPD_CGeneral"
+    let alertas = {
+      'tipo' : 'alerta',
+      'valor': true
+    }
+    this.msj.contenido$.emit(alertas)
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
    
