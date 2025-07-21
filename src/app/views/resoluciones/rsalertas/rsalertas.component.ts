@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
 import { UtilService } from 'src/app/services/util/util.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-rsalertas',
@@ -73,7 +74,7 @@ export class RsalertasComponent implements OnInit {
   }
 
   ConsultarAlertas() { 
-    this.xAPI.funcion = 'PRC_CAlertasResoluciones'
+    this.xAPI.funcion = environment.funcion.MPPD_CAlertasResoluciones
     this.xAPI.valores = ''
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(

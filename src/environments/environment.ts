@@ -40,6 +40,7 @@ export const environment = {
     RESUELTO_ID: 'MPPD_CResueltoID',
     ENTRADAS_ELIMINAR: 'MPPD_EEntradas',
     ESTADISTICAS_BAJAS: 'MPPD_CEstadicasBajas',
+    MPPD_CAlertasResoluciones: 'MPPD_CAlertasResoluciones',
     // WKF_
     ESTADOS: 'WKF_CEstados',
     DOCUMENTOS_RESOLUCIONES: 'WKF_CDocumentosResoluciones',
