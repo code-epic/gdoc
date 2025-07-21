@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -43,7 +44,11 @@ export class RsalertasComponent implements OnInit {
 
 
 
-  constructor(private utilService: UtilService, private msj: MensajeService, private apiService: ApiService,) { }
+  constructor(
+    private ngxService: NgxUiLoaderService,
+    private utilService: UtilService, 
+    private msj: MensajeService, 
+    private apiService: ApiService,) { }
 
   ngOnInit(): void {
     this.Componentes =
@@ -73,18 +78,21 @@ export class RsalertasComponent implements OnInit {
 
   }
 
-  ConsultarAlertas() { 
+  ConsultarAlertas() {
+    this.ngxService.startLoader('loader-buscar')
     this.xAPI.funcion = environment.funcion.MPPD_CAlertasResoluciones
     this.xAPI.valores = ''
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data: any) => {
-      this.lstAlertas = data.Cuerpo
-    },
-    (error) => {
-      console.log(error);
-    }
-  )  
+        this.lstAlertas = data.Cuerpo
+        this.ngxService.stopLoader('loader-buscar')
+      },
+      (error) => {
+        console.log(error);
+        this.ngxService.stopLoader('loader-buscar')
+      }
+    )
   }
 
 

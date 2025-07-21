@@ -182,8 +182,8 @@ export class ChatbotComponent implements OnInit, OnDestroy {
 
   sendMClient(): void {
     let data = {
-      clientId: this.idx,
-      message: this.msjx
+      'clientId': this.idx,
+      'message': this.msjx
     }
 
     this.idx = ''
