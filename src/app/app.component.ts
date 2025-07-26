@@ -7,4 +7,12 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'GDoc MPPD';
+
+  constructor() { }
+
+  ngOnInit() {
+  
+  }
+
+  
 }

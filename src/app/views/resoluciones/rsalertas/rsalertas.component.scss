@@ -134,11 +134,14 @@
   margin-left: 8px;
   }
   
+
+
+  
   
   .enlace {
     font-size: 14px;
     padding-top: 10px;
-    border-bottom: 1px solid #f2f2f2;
+    // border-bottom: 1px solid #f2f2f2;
     padding-bottom: 5px;
   }
   
@@ -154,11 +157,10 @@
     font-size: 11px;
   }
   
-  
-  .enlace:hover {
-    background-color: #f6fefe;
+  .enlace :hover {
+    cursor: hand;
+    color:blue;
   }
-  
   .enlace > div > p {
     color: #2a0b5b;
   }
@@ -399,6 +401,7 @@ table {
   font-family:sans-serif;
   th, td {
     padding:.25em .5em;
+    font-size: 11px;
     text-align:left;
     &:nth-child(2) {
       text-align:left;

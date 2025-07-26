@@ -87,6 +87,11 @@ import { PublicarComponent } from './views/publicaciones/publicar/publicar.compo
 import {MatStepperModule} from '@angular/material/stepper';
 import { BuzonresueltosComponent } from './views/publicaciones/buzonresueltos/buzonresueltos.component';
 
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { PushService } from './services/util/push.service';
+import { environment } from '../environments/environment';
+
+
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
   "bgsOpacity": 0.2,
@@ -150,7 +155,12 @@ const ngWizardConfig: NgWizardConfig = {
     }),
     AngularFileUploaderModule,
     SharedModule,
-    MatStepperModule
+    MatStepperModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production, //!isDevMode(), // Habilita el Service Worker solo en producción por defecto
+      // Registra el ServiceWorker después de 30 segundos (opcional)
+      registrationStrategy: 'registerImmediately'
+    })
   ],
   declarations: [
     AppComponent,
@@ -243,6 +253,7 @@ const ngWizardConfig: NgWizardConfig = {
     {
       provide: MAT_DATE_LOCALE, useValue: 'es-ES'
     },
+    PushService,
     
   ],
   bootstrap: [AppComponent]

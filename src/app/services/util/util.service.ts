@@ -319,4 +319,19 @@ export class UtilService {
     // Comparar las fechas
     return inputDate < cutoffDate;
   }
+
+  // Generador UUID v4 compatible con navegadores
+  uuidv4(): string {
+    let id = localStorage.getItem('userId');
+    if (!id) {
+      id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      }); // Genera un ID universal único
+      localStorage.setItem('userId', id);
+    }
+    return id;
+  }
+
+
 }

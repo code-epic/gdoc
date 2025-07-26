@@ -4,7 +4,7 @@ import { SessionService, ConnectionStatus } from 'src/app/services/seguridad/ses
 
 import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/apicore/api.service';
-import { environment } from 'src/environments/environment';
+import { UtilService } from 'src/app/services/util/util.service';
 
 // Define tus tipos de mensaje si los recibes como JSON de Ollama y otros
 interface OllamaChunk {
@@ -44,10 +44,13 @@ export class ChatbotComponent implements OnInit, OnDestroy {
   idx: string = '';
 
 
-  constructor(private sessionService: SessionService, private apiService: ApiService) { }
+  constructor(
+    private utilService: UtilService,
+    private sessionService: SessionService, 
+    private apiService: ApiService) { }
 
   ngOnInit(): void {
-    this.userId = this.getUserId();
+    this.userId = this.utilService.uuidv4();
     this.loadHistory(); // Carga el historial al iniciar
     // 1. Suscribirse a los mensajes del sessionService
     this.wsMessagesSubscription = this.sessionService.messages$.subscribe(
@@ -123,23 +126,8 @@ export class ChatbotComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Nuevo método para obtener un ID único o recuperar uno existente.
-  private getUserId(): string {
-    let id = localStorage.getItem('userId');
-    if (!id) {
-      id = this.uuidv4(); // Genera un ID universal único
-      localStorage.setItem('userId', id);
-    }
-    return id;
-  }
 
-  // Generador UUID v4 compatible con navegadores
-  private uuidv4(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
+  
 
    // Método para enviar mensajes al servidor
   public sendMessage(): void {

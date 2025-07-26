@@ -338,6 +338,10 @@ export const AdminLayoutRoutes: Routes = [
         path: 'rsprocesos/rsconsulta',
         component: RsconsultaComponent,
         canActivate: [AuthGuardGuard]
+    },{
+        path: 'rsprocesos/rsconsulta/:id',
+        component: RsconsultaComponent,
+        canActivate: [AuthGuardGuard]
     },
     {
         path: 'rsconfiguracion',

@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  enableServiceWorker: true,
   ID : 'ID-001',
   Url: 'https://10.190.1.160',
   API: '/v1/api/',
@@ -37,6 +38,8 @@ export const environment = {
     ENTRADAS_ELIMINAR: 'MPPD_EEntradas',
     ESTADISTICAS_BAJAS: 'MPPD_CEstadicasBajas',
     MPPD_CAlertasResoluciones: 'MPPD_CAlertasResoluciones',
+    MPPD_CAlertasReicorporacion: 'MPPD_CAlertasReicorporacion',
+    MPPD_UAlertasResoluciones: 'MPPD_UAlertasResoluciones',
     // WKF_
     ESTADOS: 'WKF_CEstados',
     DOCUMENTOS_RESOLUCIONES: 'WKF_CDocumentosResoluciones',

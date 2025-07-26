@@ -1,104 +1,153 @@
 <div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
-    <div class="container-fluid">
-        <p></p>
-    </div>
+  <div class="container-fluid">
+    <p></p>
+  </div>
 </div>
 <div class="container-fluid mt--9">
-    <div class="row">
-        <div class="col-xl-12 col-md-12 col-lg-12">
-            <div class="card shadow">
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
 
-                <div class="card-header bg-transparent">
-                    <div class="row align-items-center">
-                        <div class="col-md-11">
-                            <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
-                            <h2 class="mb-0">Alertas</h2>
-                        </div>
-                        <div class="col-md-1">
-                            <div class="media align-items-center">
-                                <div class="example-button-row">
-                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                                        <mat-icon>arrow_back</mat-icon>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
-                    <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" [selectedIndex]="selected.value"
-                    (selectedIndexChange)="selected.setValue($event)">
-                
-                    <mat-tab>
-                      <ng-template mat-tab-label>
-                        &nbsp; ALERTAS GLOBALES
-                      </ng-template>
-                      <br>
-                      <div class="example-large-box mat-elevation-z4" style="padding: 15px;">
-
-                        <div class="row justify-content-end mt-4" style="padding-right: 15px;">
-                          <button class="btn bg-primary text-white " (click)="exportExcel()">
-                            <span class="fa fa-file-excel"></span>&nbsp;&nbsp;Exportar Excel
-                          </button>
-                        </div>
-                        <br>
-                        <br>
-                      <!-- TABLA -->
-                      <div class="row">
-                        <div class="col-md-12">
-                          <table style="width: 100%;" class="zigzag" border="1">
-                            <thead>
-                              <tr>
-                                <th style="width: 60px;">NUM.</th>
-                                <th>COMPONENTE</th>
-                                <th>GRADO</th>
-                                <th>NOMBRE COMPLETO</th>
-                                <th style="width: 110px;">CEDULA</th>
-                                <th>ASUNTO</th>
-                                <th>TIPO</th>
-                                <th>VENC.</th>
-                                <th>NUM. RESOLUCION</th>
-                                <th>DIAS</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr *ngFor="let e of lstAlertas; let i = index">
-                                <td>{{ i+1 }}</td>
-                                <td>{{e.ncomponente}} </td>
-                                <td>{{e.ngrado}} </td>
-                                <td>{{ e.nombres_apellidos }}</td>
-                                <td>{{e.cedula}} </td>
-                                <td [innerHTML]="e.asunto"></td>
-                                <td>{{e.des_resol}}</td>
-                                <td>{{e.fin_comision  | date:"dd/MM/yyyy"  }}</td>
-                                <td>{{e.numero_resol}}</td>
-                                <td>{{e.dias_restantes}}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-
-                        </div>
-                      </div>
-                      </div>
-
-
-
-
-                    </mat-tab>
-                    <mat-tab>
-                      <ng-template mat-tab-label>
-                        &nbsp;BUSQUEDAS GENERALES
-                      </ng-template>
-                    </mat-tab>
-                </mat-tab-group>
-                </div>
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-11">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
+              <h2 class="mb-0">Alertas Generales</h2>
             </div>
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <mat-icon>arrow_back</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
+
+        <div class="card-body">
+          <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
+          <mat-tab-group mat-stretch-tabs class="example-stretched-tabs" [selectedIndex]="selected.value"
+            (selectedIndexChange)="selected.setValue($event)">
+
+            <mat-tab>
+              <ng-template mat-tab-label>
+                &nbsp; ALERTAS POR COMISIONES ( {{lstAlertas.length}} )
+              </ng-template>
+              <div class="container" style="margin-right: 10px; margin-left: 10px; padding:0px;">
+                <div class="row justify-content-end mt-4" style="margin-right: 7px;">
+                  <button class="btn bg-primary text-white " (click)="exportExcel()">
+                    <span class="fa fa-file-excel"></span>&nbsp;&nbsp;Exportar Excel
+                  </button>
+                </div>
+                <br>
+                <br>
+                <div class="row">
+                  <div class="col-md-12">
+                    <table style="width: 100%;" border="1">
+                      <thead>
+                        <tr>
+                          <th style="width: 60px;">#</th>
+                          <th>COMP.</th>
+                          <th>GRADO</th>
+                          <th>NOMBRE COMPLETO</th>
+                          <th style="width: 110px;">CEDULA</th>
+                          <th>ASUNTO</th>
+                          <th>TIPO</th>
+                          <th>VENC.</th>
+                          <th>RESOL.</th>
+                          <th>DIAS</th>
+                          <th>ACC</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let e of lstAlertas; let i = index">
+                          <td style="text-align: center;">{{ i+1 }}</td>
+                          <td style="text-align: center;">{{e.ncomponente}} </td>
+                          <td style="text-align: center;">{{e.ngrado}} </td>
+                          <td>{{ e.nombres_apellidos }}</td>
+                          <td>
+                            <a class="enlace" (click)="dwUrl(e)" style="font-weight: bold; color: brown;">
+                              {{ e.cedula }} </a>
+                          </td>
+                          <td [innerHTML]="e.asunto"></td>
+                          <td>{{e.des_resol}}</td>
+                          <td>{{e.fin_comision | date:"dd/MM/yyyy" }}</td>
+                          <td>{{e.numero_resol}}</td>
+                          <td>{{e.dias_restantes}}</td>
+                          <td style="text-align: center;">
+                            <button mat-icon-button aria-label="Editar" (click)="abrirModal(observacion, e, i);">
+                              <mat-icon class="text-blue">edit</mat-icon>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                  </div>
+                </div>
+              </div>
+            </mat-tab>
+
+            <mat-tab>
+              <ng-template mat-tab-label>
+                &nbsp;ALERTAS DE REINCORPORACIONES ( {{lstReicorporaciones.length}} )
+              </ng-template>
+              <div class="container" style="margin-right: 10px; margin-left: 10px; padding:0px;">
+                <div class="row justify-content-end mt-4" style="margin-right: 7px;">
+                  <button class="btn bg-primary text-white " (click)="exportExcelReincorporaciones()">
+                    <span class="fa fa-file-excel"></span>&nbsp;&nbsp;Exportar Excel
+                  </button>
+                </div>
+                <br>
+                <br>
+                <!-- TABLA -->
+                <div class="row">
+                  <div class="col-md-12">
+                    <table style="width: 100%;" border="1">
+                      <thead>
+                        <tr>
+                          <th style="width: 60px;">#</th>
+                          <th>COMP.</th>
+                          <th>GRADO</th>
+                          <th>NOMBRE COMPLETO</th>
+                          <th style="width: 110px;">CEDULA</th>
+                          <th>ASUNTO</th>
+                          <th>VENC.</th>
+                          <th>RESOL.</th>
+                          <th>DIAS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let e of lstReicorporaciones; let i = index">
+                          <td style="text-align: center;">{{ i+1 }}</td>
+                          <td style="text-align: center;">{{e.ncomponente}} </td>
+                          <td style="text-align: center;">{{e.ngrado}} </td>
+                          <td>{{ e.nombres_apellidos }}</td>
+                          <td>
+                            <a class="enlace" (click)="dwUrl(e)" style="font-weight: bold; color: brown;">
+                              {{ e.cedula }} </a>
+                          </td>
+                          <td [innerHTML]="e.asunto"></td>
+                          <td>{{e.fin_comision | date:"dd/MM/yyyy" }}</td>
+                          <td>{{e.numero_resol}}</td>
+                          <td>{{e.dias_restantes}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                  </div>
+                </div>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </div>
     </div>
-    <!-- Fin de Tarjeta Padre -->
+  </div>
+  <!-- Fin de Tarjeta Padre -->
 </div>
 
 
@@ -109,91 +158,23 @@
 
 
 
-<!-- 
+<ng-template #observacion let-modal>
 
-<div class="container mb-5">
-  <div class="row">
-      <ngx-ui-loader [loaderId]="'loader-x'"></ngx-ui-loader>
-      <div class="row">
-      
-        <div class="row">
-          <div class="form-group col-md-3">
-            <label for="">Componente</label>
-            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente"
-               value="{{componente}}">
-              <option value="%">TODOS LOS COMPONENTES</option>
-              <option *ngFor="let e of Componentes;" [value]="e.cod_componente + '|' + e.nombre_componente">{{
-                e.nombre_componente }}
-              </option>
-            </select>
-          </div>
-      
-          <div class="form-group col-md-3">
-            <label for="">Situación</label>
-            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="situacion" value="{{situacion}}">
-              <option value="ACT">ACTIVO</option>
-              <option value="RINC">REINCORPORADO</option>
-            </select>
-          </div>
-      
-          <div class="form-group col-md-3">
-            <label for="">Categoria</label>
-            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="categoria" value="{{categoria}}">
-              <option value="%">TODAS</option>
-              <option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}
-              </option>
-            </select>
-          </div>
-      
-          <div class="form-group col-md-3">
-            <label for="">Clasificación</label>
-            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="clasificacion"
-              value="{{clasificacion}}">
-              <option value="%">TODAS</option>
-              <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
-                {{e.des_clasificacion}}</option>
-            </select>
-          </div>
-      
-          <div class="form-group col-md-4">
-            <label for="">Grado</label>
-            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="grado" value="{{grado}}">
-              <option value="%">TODOS</option>
-              <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
-            </select>
-          </div>
-      
-        
-      
-          <div class="form-group col-md-4 text-left botones">
-            <button class="btn bg-primary text-white " >
-              <span class="fa fa-search"></span>&nbsp;&nbsp;Generar Alertas
-            </button>
-            &nbsp;&nbsp;&nbsp;
-      
-            <button class="btn bg-orange text-white" (click)="downloadCSVEx()">
-              <span class="fa fa-print"></span>&nbsp;&nbsp;Generar CSV
-            </button>
-          </div>
-        </div>
-      
-      
-     
-      
-        <div class="form-group col-md-6 text-left">
-          <button class="btn bg-primary text-white " (click)="ConsultarAlertas()">
-            <span class="fa fa-search"></span>&nbsp;&nbsp;Generar Reporte
-          </button>
-          &nbsp;&nbsp;&nbsp;
-      
-          <button *ngIf="bxls" class="btn bg-orange text-white" (click)="downloadCSVEx()">
-            <span class="fa fa-print"></span>&nbsp;&nbsp;Generar CSV
-          </button>
-        </div>
-      </div>
-      
-      
-
+  <div class="modal-body">
+    <h4 class="modal-title text-blue">FINALIZAR {{ tipo }} - {{resolucion}}</h4>
+    <div class="form-group col-md-12 " style="margin: 0px; padding: 0px;">
+      <label for="txtobservacion">OBSERVACIONES</label>
+      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="txtObservacion"></textarea>
+    </div>
+    <hr>
+    <div class="form-group col-md-12 text-right" style="margin: 0px; padding: 0px;">
+      <button class=" btn bg-primary text-white " (click)=" insertarObservacion();" id="btnaceptar">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Finalizar
+      </button>
+      <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+        <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar
+      </button>
+    </div>
   </div>
-  <br><br><br>
-</div> -->
+</ng-template>

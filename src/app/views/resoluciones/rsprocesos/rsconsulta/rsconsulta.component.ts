@@ -29,6 +29,8 @@ import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
+import { ActivatedRoute, Router } from "@angular/router";
+import { MensajeService } from "src/app/services/util/mensaje.service";
 
 interface ITipoResolucion {
   codigo: string;
@@ -315,6 +317,7 @@ export class RsconsultaComponent implements OnInit {
   public xyear = '2024'
   public xmeses = ''
   public xdia = ''
+  public blAlertas: boolean = false;  
 
   constructor(
     private apiService: ApiService,
@@ -325,56 +328,24 @@ export class RsconsultaComponent implements OnInit {
     private toastrService: ToastrService,
     private modalService: NgbModal,
     public dialog: MatDialog,
+    private rutaActiva: ActivatedRoute,
     public formatter: NgbDateParserFormatter,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private msj: MensajeService, 
+    private router: Router,
   ) {
     this.Estados =
       sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR) != undefined
         ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR)))
         : [];
+
+        
+
   }
 
-  abrirModalDescargaNew(modalRef: any, documento: any) {
-    this.documentoSeleccionado = documento;
-    this.modalService.open(modalRef, { centered: true });
-  }
-
-  descargarSeleccionado() {
-    // Lógica de descarga aquí, usando this.documentoSeleccionado
-    // Por ejemplo: this.apiService.descargarArchivo(this.documentoSeleccionado);
-    // Puedes personalizar esto según tu backend
-    if (this.documentoSeleccionado) {
-      // Ejemplo: window.open(this.documentoSeleccionado.url, '_blank');
-    }
-  }
-
-  convertirFecha(fecha: string): string {
-    return fecha != "" ? this.utilService.ConvertirFechaHumana(fecha) : "";
-  }
-  volverResolucion() {
-    this.blResolucionPanel = !this.blResolucionPanel;
-    this.dbResolucion = false;
-    this.dbDatos = false;
-    this.dbDatosNombre = false;
-    this.blResolucionPanel = false;
-    this.blDatosBasicos = false;
-
-    if (this.orden_pagina == 1) {
-      this.dbResolucion = true;
-    } else {
-      this.dbDatosNombre = true;
-    }
-  }
-
-  volverDatos(tipo: number) {
-    this.blResolucionPanel = !this.blResolucionPanel;
-    this.dbResolucion = false;
-    this.dbDatos = true;
-    this.dbDatosNombre = false;
-    this.orden_pagina = tipo;
-  }
 
   ngOnInit(): void {
+
     this.xmeses = new Date().getMonth().toString()
     this.xyear = new Date().getFullYear().toString()
     this.xdia = new Date().getDate().toString()
@@ -434,6 +405,63 @@ export class RsconsultaComponent implements OnInit {
     // console.log(this.loginService.Usuario);
     this.bEliminarEntrada =
       this.loginService.Usuario.cargo == "Transcriptor Premium" ? true : false;
+    
+      if (this.rutaActiva.snapshot.params.id != undefined) {
+      var id = this.rutaActiva.snapshot.params.id
+      this.cedula = id;
+      this.consultarCedula(undefined)
+      this.blAlertas = true;
+      let alertas = {
+        'tipo': 'alerta',
+        'valor': true
+      }
+      this.msj.contenido$.emit(alertas)
+    } 
+  }
+
+
+  irAlertas(){
+    this.router.navigate(['/rsalertas/']);
+  }
+  
+  abrirModalDescargaNew(modalRef: any, documento: any) {
+    this.documentoSeleccionado = documento;
+    this.modalService.open(modalRef, { centered: true });
+  }
+
+  descargarSeleccionado() {
+    // Lógica de descarga aquí, usando this.documentoSeleccionado
+    // Por ejemplo: this.apiService.descargarArchivo(this.documentoSeleccionado);
+    // Puedes personalizar esto según tu backend
+    if (this.documentoSeleccionado) {
+      // Ejemplo: window.open(this.documentoSeleccionado.url, '_blank');
+    }
+  }
+
+  convertirFecha(fecha: string): string {
+    return fecha != "" ? this.utilService.ConvertirFechaHumana(fecha) : "";
+  }
+  volverResolucion() {
+    this.blResolucionPanel = !this.blResolucionPanel;
+    this.dbResolucion = false;
+    this.dbDatos = false;
+    this.dbDatosNombre = false;
+    this.blResolucionPanel = false;
+    this.blDatosBasicos = false;
+
+    if (this.orden_pagina == 1) {
+      this.dbResolucion = true;
+    } else {
+      this.dbDatosNombre = true;
+    }
+  }
+
+  volverDatos(tipo: number) {
+    this.blResolucionPanel = !this.blResolucionPanel;
+    this.dbResolucion = false;
+    this.dbDatos = true;
+    this.dbDatosNombre = false;
+    this.orden_pagina = tipo;
   }
 
   displayFn(tr: ITipoResolucion): string {

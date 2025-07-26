@@ -55,7 +55,7 @@ export class LoginService {
   async Iniciar() {
     await this.getUserDecrypt();
     this.obenterAplicacion();
-
+    
   }
   getLogin(user: string, clave: string): Observable<IToken> {
     let usuario = {
@@ -105,6 +105,7 @@ export class LoginService {
     let App = this.Aplicacion;
     let Menu: any;
     App.Rol.Menu.forEach(e => {if (e.url == idUrl) { Menu = e; }});
+    console.log(Menu)
     return Menu;
 
   }
@@ -113,6 +114,7 @@ export class LoginService {
     let App = this.Aplicacion;
     let SubMenu = [];
     App.Rol.Menu.forEach(e => {if (e.url == idUrl) { SubMenu = e.SubMenu; }});
+   
     return SubMenu;
   }
 

@@ -178,11 +178,11 @@
                                         </div>
 
                                         <div class="row" style="padding-top: 5px">
-                                            <div class="col-md-9">
+                                            <div class="col-md-10">
                                                 <h2 *ngIf="blDatosBasicos" style="margin-top: 10px; margin-left: -3px">
                                                     DATOS BASICOS</h2>
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
 
                                                 <div *ngIf="blResolucionPanel"
                                                     class="example-button-row text-right text-white">
@@ -196,6 +196,14 @@
                                                     <button style="background-color: #2a9a17;" mat-icon-button
                                                         title="Editar datos Basicos" (click)="editarDatosBasicos()">
                                                         <mat-icon>manage_accounts</mat-icon>
+                                                    </button>
+                                                </div>
+
+                                                <div *ngIf="blAlertas"
+                                                    class="example-button-row text-right text-white">
+                                                    <button style="background-color: #6d2814;" mat-icon-button
+                                                        title="Ir a Alertas" (click)="irAlertas()">
+                                                        <mat-icon>notifications</mat-icon>
                                                     </button>
                                                 </div>
 

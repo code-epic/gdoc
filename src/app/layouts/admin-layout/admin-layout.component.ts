@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {InactiveUserService} from '../../core/service/inactivity/inactive-user.service';
+import { PushService } from 'src/app/services/util/push.service';
+import { SwPush } from '@angular/service-worker';
 
 @Component({
   selector: 'app-admin-layout',
@@ -11,12 +13,30 @@ export class AdminLayoutComponent implements OnInit {
   public activar = false;
   public opened = true;
   public events: string[] = [];
-  constructor(private inactiveUserService: InactiveUserService) { }
+    // title = 'my-angular-pwa';
+    isPushEnabled = false; // Estado para el botón
+
+  constructor(
+    private inactiveUserService: InactiveUserService, 
+    private pushService: PushService, 
+    private swPush: SwPush) { }
 
   ngOnInit() {
-    // setInterval(
-    //   this.consultarAlertas, 3000
-    // )
+    this.pushService.requestPermission();
+    // Escuchar notificaciones tan pronto como la app se inicie
+    this.pushService.listenForPushNotifications();
+    console.log('Escuchando notificaciones push...')
+
+    // Comprobar si las notificaciones push están soportadas y si ya hay una suscripción
+    if (this.swPush.isEnabled) {
+      this.swPush.subscription.subscribe(subscription => {
+        this.isPushEnabled = !!subscription; // True si hay suscripción, False si no
+        console.log('Estado de suscripción push:', subscription ? 'Activa' : 'Inactiva')
+       
+      });
+      
+    } 
+
     this.inactiveUserService.userInactive.subscribe(isInactive => this.isInactive = isInactive);
   }
 
