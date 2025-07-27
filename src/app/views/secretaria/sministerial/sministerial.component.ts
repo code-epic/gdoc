@@ -279,6 +279,7 @@ export class SministerialComponent implements OnInit {
   async listarBuzon() {
     var bz = []
     this.ngxService.startLoader("loader-aceptar")
+    // console.log(this.xAPI)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         // console.log('data texto')

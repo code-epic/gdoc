@@ -61,6 +61,7 @@ import { VisitantedocumentoComponent } from 'src/app/views/visitantes/visitanted
 import { PublicarComponent } from 'src/app/views/publicaciones/publicar/publicar.component';
 import { BuzonresueltosComponent } from 'src/app/views/publicaciones/buzonresueltos/buzonresueltos.component';
 import { ChatbotComponent } from 'src/app/views/chatbot/chatbot.component';
+import { SnuevoComponent } from 'src/app/views/secretaria/snuevo/snuevo.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -270,8 +271,8 @@ export const AdminLayoutRoutes: Routes = [
         canActivate: [AuthGuardGuard],
     },
     {
-        path: 'ministerial/agregar',
-        component: MinisterialComponent,
+        path: 'snuevo',
+        component: SnuevoComponent,
         canActivate: [AuthGuardGuard],
     },
     {

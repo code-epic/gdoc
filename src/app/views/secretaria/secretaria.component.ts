@@ -113,7 +113,7 @@ export class SecretariaComponent implements OnInit {
 
   async ngOnInit() {
     await this.loginService.Iniciar()
-    console.log(this.loginService.Aplicacion)
+    // console.log(this.loginService.Aplicacion)
     //this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
    
   }

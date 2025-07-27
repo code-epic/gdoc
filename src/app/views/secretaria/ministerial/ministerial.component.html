@@ -80,24 +80,6 @@
                 </form>
               </div>
 
-              <div class="form-group col-md-4">
-                <label>{{lblOrigenComando}}</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="comando"
-                  value="{{comando}}" [readOnly]="edit == 0 ? true : false">
-              </div>
-
-              <div class="form-group  col-md-2">
-                <label>N. De Cuenta</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cuenta"
-                  value="{{cuenta}}" [readOnly]="edit == 0 ? true : false">
-              </div>
-
-              <div class="form-group  col-md-2" [ngClass]="edit == 1 ? 'd-none' : ''">
-                <label>Fecha</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
-                  value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
-              </div>
-
               <div class="form-group col-md-2" [ngClass]="edit == 0 ? 'd-none' : ''">
                 <label for="tmsOrigen">Fecha Origen (*) </label>
                 <form class="form-inline">
@@ -114,6 +96,30 @@
                   </div>
                 </form>
               </div>
+
+              <div class="form-group  col-md-2">
+                <label>N. De Cuenta</label>
+                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cuenta"
+                  value="{{cuenta}}" [readOnly]="edit == 0 ? true : false">
+              </div>
+
+              <div class="form-group col-md-4">
+                <label>{{lblOrigenComando}}</label>
+                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="comando"
+                  value="{{comando}}" [readOnly]="edit == 0 ? true : false">
+              </div>
+
+               <div class="form-group  col-md-2" [ngClass]="edit == 1 ? 'd-none' : ''">
+                <label>Fecha</label>
+                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
+                  value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
+              </div>
+
+              
+
+             
+
+              
             </div>
 
               <div class="form-row row" [ngClass]="edit == 0 ? 'd-none' : ''">

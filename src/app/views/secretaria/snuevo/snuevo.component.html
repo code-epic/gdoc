@@ -1,0 +1,497 @@
+<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--9">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 col-lg-12">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col-md-10">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Secretaria</h6>
+                            <h2 class="mb-0">Registrar Documento Presidencial</h2>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" *ngIf="bPDF"
+                                        (click)="verArchivos(archivos)">
+                                        <mat-icon>wallpaper</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="media align-items-center">
+                                <div class="example-button-row">
+                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                        <mat-icon>arrow_back</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="txtControl"> {{ncontrolt}} </label>
+                            <input type="text" class="form-control" id="txtControl"
+                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.ncontrol" [readonly]="ncontrolv">
+                        </div>
+                        <div class="form-group col-md-2" *ngIf="origenvisible">
+                            <label for="txtOrigen">Nro. Origen (*) </label>
+                            <input type="txtOrigen" class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Doc.norigen" id="nori">
+                        </div>
+                        <div class="form-group col-md-4" *ngIf="forigenv">
+                            <label for="tmsOrigen">Fecha Origen (*) </label>
+                            <form class="form-inline">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
+                                        <input class="form-control" placeholder="AAAA-MM-DD"
+                                            [ngModelOptions]="{standalone: true}" [(ngModel)]="forigen" ngbDatepicker
+                                            #fo="ngbDatepicker" [value]="formatter.format(forigenDate)"
+                                            [placement]="placement" [positionTarget]="buttonEl" readonly>
+                                        <div class="input-group-append">
+                                            <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button"
+                                                id="fori">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="tmsCreacion">{{fsalida}}</label>
+                            <form class="form-inline">
+                                <div class="form-group" style="width:100%">
+                                    <div class="input-group" style="width:100%">
+                                        <input class="form-control" placeholder="AAAA-MM-DD"
+                                            [ngModelOptions]="{standalone: true}"
+                                            [value]="formatter.format(fcreacionDate)" [(ngModel)]="fcreacion"
+                                            ngbDatepicker #fc="ngbDatepicker" [placement]="placement"
+                                            [positionTarget]="buttonEl" readonly>
+                                        <div class="input-group-append">
+                                            <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button"
+                                                id="fcre"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="form-group col-md-2" *ngIf="false">
+                            <label for="txtSalida">{{salida}}</label>
+                            <input type="txtSalida" class="form-control" value="{{Doc.salida}}"
+                                 [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Doc.salida">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="cmbTipoDocumento">Tipo de Documento</label>
+
+                            <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
+                                [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}"  id="tdoc">
+                                <option value="PUNTO DE CUENTA">PUNTO DE CUENTA</option>
+                                <!-- <option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </option> -->
+
+                            </select>
+
+                        </div>
+                        <div class="form-group col-md-3" style="display: none;">
+                            <label for="cmbRemitente">{{remitentet}}</label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                [(ngModel)]="Doc.remitente" value="{{Doc.remitente}}" id="remi">
+                                <option value="PRESIDENCIAL">PRESIDENCIAL</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="cmbUnidad">Unidad o Dependencia</label>
+                            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.unidad"
+                                value="{{Doc.unidad}}" id="unid">
+                                <option value="0">Seleccione</option>
+                                <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>Componente / Gran Comando</label>
+                            <div class="input-group">
+                                <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.comando" value="{{Doc.comando}}" id="coma">
+                                    <option value="0">Seleccione</option>
+                                    <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
+                                </select>
+                                <div class="input-group-append" *ngIf="booDependencia">
+                                    <button *ngIf="!editar" type="button" (click)="agregarDependencia()"
+                                        id="btndependencia" class="btn btn-success">
+                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-6" *ngIf="booPuntoCuenta">
+                            <label>Selecciona el/los punto de cuenta</label>
+                            <mat-form-field style="width: 100%;">
+                                <mat-select [formControl]="toppings" multiple>
+                                    <mat-option *ngFor="let ptc of lstPuntosCuentas" [value]="ptc">{{ptc}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="form-group col-md-6" *ngIf="booPuntoCuenta">
+                            <label>Puntos de Cuenta Asociados</label>
+                            <mat-form-field style="width: 100%;">
+                                <mat-select [formControl]="toppingsaux">
+                                    <mat-option *ngFor="let e of lstPuntosCuentasAux; let i=index"
+                                        [value]="i">{{e.cuenta + ' ' + e.observacion + ' ' + e.estatus}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group col-md-12" *ngIf="booDependencia">
+                            <table class="table align-items-center table-flush" style="width:100%">
+                                <thead class="thead-light">
+                                    <th># ACC</th>
+                                    <th>Unidades o Dependencias Seleccionadas</th>
+                                </thead>
+                                <tbody>
+                                    <tr [ngModelOptions]="{standalone: true}"
+                                        *ngFor="let el of lstDependencias;let i=index">
+                                        <td style="width:20px">
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                (click)="eliminarDependencia( i, el.id )"><i class="fa fa-trash"
+                                                    aria-hidden="true"></i>
+                                            </button>
+                                        </td>
+                                        <td>{{ el.nombre }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtContenido">Contenido del Oficio (*) </label>
+                            <div class="NgxEditor__Wrapper">
+                                <angular-editor [placeholder]="'Introduzca el contenido del oficio...'" [config]="editorConfig"
+                                    [(ngModel)]="Doc.contenido"></angular-editor>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-row col-md-12" *ngIf="puntocuenta">
+                            <div class="form-group col-md-2">
+                                <label>Nro. Cuenta</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="cuenta" value="{{cuenta}}" id="cuenta">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Asunto de la Cuenta</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="resumen" value="{{resumen}}" id="resconte">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="tmsOrigen">Fecha Cuenta</label>
+                                <form class="form-inline">
+                                    <div class="form-group" style="width:100%">
+                                        <div class="input-group" style="width:100%">
+                                            <input class="form-control" placeholder="AAAA-MM-DD"
+                                                [ngModelOptions]="{standalone: true}" [(ngModel)]="subfecha"
+                                                ngbDatepicker #fcu="ngbDatepicker"
+                                                [value]="formatter.format(subfechaDate)" [placement]="placement"
+                                                [positionTarget]="buttonEl" readonly>
+                                            <div class="input-group-append">
+                                                <button #buttonEl class="btn calendario" (click)="fcu.toggle()"
+                                                    type="button" id="fcuenta">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="form-row col-md-12" *ngIf="resolucion">
+                            <div class="form-group col-md-2">
+                                <label>{{sCedula}}</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="cedula" value="{{cedula}}" (blur)="consultarCedula()" id="cedula">
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label>{{sGrado}}</label>
+                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="cargo" value="{{cargo}}" [disabled]="isPunto" id="grado">
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="cmbUnidad">{{sNombre}}</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="nmilitar" value="{{nmilitar}}" [disabled]="isPunto">
+                                    <div class="input-group-prepend">
+                                        <button *ngIf="!editar" type="button" class="btn btn-success"
+                                            (click)="mensajeAgregarCuenta()" id="agregar">
+                                            <i class="fa fa-plus" aria-hidden="true"></i>
+                                        </button>
+                                        <button *ngIf="editar" type="button" class="btn btn-primary"
+                                            (click)="editarCuenta()">
+                                            <i class="fa fa-edit" aria-hidden="true"></i>
+                                        </button>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12" *ngIf="resolucion">
+                            <table class="table align-items-center table-flush"
+                                style="table-layout: fixed; border-collapse: collapse; width:100%;">
+                                <thead class="thead-light">
+                                    <th style="text-align:center;width:10px">N°</th>
+                                    <th style="text-align:center;width:120px">ACCIÓN</th>
+                                    <th [style.display]="puntocuenta?'':'none'">Cuenta</th>
+                                    <th [style.display]="puntocuenta?'':'none'">Resumen</th>
+                                    <th [style.display]="puntocuenta?'':'none'">Fecha</th>
+                                    <th>{{sGrado}}</th>
+                                    <th>{{sNombre}}</th>
+                                    <th>{{sCedula}}</th>
+                                </thead>
+                                <tbody>
+                                    <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
+                                        <td style="text-align:center;width:10px">
+                                            <font style="font-weight: bold;"> {{i+1}}</font>
+                                        </td>
+                                        <td style="text-align:center;width:120px">
+
+                                            <div class="btn-group" role="group" aria-label="Basic"
+                                                *ngIf="el.activo == 0">
+                                                <button type="button" class="btn btn-primary btn-sm"
+                                                    (click)="selEditarCuenta( i )"><i class="fa fa-edit"
+                                                        aria-hidden="true"></i></button>
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                    (click)="eliminarCuenta( i )"><i class="fa fa-trash"
+                                                        aria-hidden="true"></i></button>
+                                            </div>
+                                            <button *ngIf="el.activo != 0" type="button" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                                &nbsp;&nbsp;En Proceso </button>
+                                        </td>
+                                        <td [style.display]="puntocuenta?'':'none'">{{ el.cuenta }}</td>
+                                        <td [style.display]="puntocuenta?'':'none'">{{ el.resumen.substring(0,20) }}...
+                                        </td>
+                                        <td [style.display]="puntocuenta?'':'none'">{{ el.fecha.substring(0,10) }}</td>
+                                        <td>{{ el.cargo.substring(0,20) }}...</td>
+                                        <td>{{ el.nmilitar.substring(0,25) }}...</td>
+                                        <td>{{ el.cedula }}</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtInstrucciones">Instrucciones Generales</label>
+                            <div class="NgxEditor__Wrapper">
+                                <angular-editor [placeholder]="'Introduzca las instrucciones generales...'" [config]="editorConfig"
+                                    [(ngModel)]="Doc.instrucciones"></angular-editor>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="display: none;">
+                        <div class="col-md-8"   >
+
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="tmsCreacion">Plazo / Alerta (*)</label>
+                                    <form class="form-inline">
+                                        <div class="form-group" style="width:100%">
+                                            <div class="input-group" style="width:100%">
+                                                <input class="form-control" placeholder="AAAA-MM-DD"
+                                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="fplazo"
+                                                    [value]="formatter.format(fplazoDate)"
+                                                    ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+                                                    [positionTarget]="buttonEl" readonly>
+                                                <div class="input-group-append">
+                                                    <button #buttonEl class="btn calendario" (click)="fd.toggle()"
+                                                        type="button" id="fplazo"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Privacidad / Nivel de Acceso</label>
+                                    <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Doc.privacidad" value="{{Doc.privacidad}}">
+                                        <option value="0">PUBLICO</option>
+                                        <option value="1">CONFIDENCIAL</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6" >
+                                    <label for="cmbCodArchivo">Código de Archivo</label>
+                                    <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Doc.codigo" value="{{Doc.codigo}}" id="cod">
+                                        <option value="SEC">SECRETARIA</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6" >
+                                    <label for="">Expediente</label>
+                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                        <div class="col-md-4" >
+                            <label for="txtobservacion">Lista de Asociación</label>
+                            <textarea class="form-control" name="" id="observacion" cols="30" rows="6"
+                                [(ngModel)]="nasociacion" value="{{ nasociacion }}" readonly></textarea>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6 text-left">
+                                    <button class="btn btn-sm bg-primary text-white py-2"
+                                        style="height:38px; min-width:100px;" (click)="registrar()" id="registrar">
+                                        <i class="fa fa-check mr-1"></i> Aceptar
+                                    </button>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <button class="btn btn-sm btn-warning text-white py-2"
+                                        style="height:38px; min-width:100px;" (click)="confirmarSalir()">
+                                        <i class="fa fa-times mr-1"></i> Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- Adjuntar Imagenes al Documento -->
+    <ng-template #archivos let-modal>
+        <div class="modal-header header bg-gradient-success">
+            <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
+
+        </div>
+        <div class="modal-body">
+
+
+            <div class="form-group col-md-12">
+                <div class="card card-profile">
+                    <div class="card-header bg-info"
+                        style="background-image: url('./assets/img/theme/inn.svg'); height: 80px;">
+                        <div class="card-avatar text-center">
+                            <a href="javascript:;">
+                                <img class="img img-raised rounded-circle" src="./assets/img/theme/pdf2.jpeg"
+                                    style="width:100px;z-index: 1; margin-top: -5px;">3
+                            </a>
+                        </div>
+                    </div>
+                    <br>
+
+                    <div class="card-body pt-0">
+
+                        <div class="d-flex justify-content-between">
+                            <a [href]="download" target="_top" rel="noopener noreferrer"
+                                class="btn btn-primary mt-3">Descargar</a>
+                            <a (click)="activarHistorial()" class="btn btn-default float-right mt-3">Historial</a>
+                        </div>
+                        <br><br>
+                        <div class="text-center">
+                            <div class="font-weight-50">
+                                Publicado<span class="font-weight-light">, {{ Doc.fcreacion | date:"dd-MM-yy
+                                    hh:mm:ss"}}</span>
+                                <br>
+                                <h5 class="h4" style="font-size: 10px;">{{ Doc.creador }}</h5>
+                            </div>
+                        </div>
+                        <div style="margin-left: -10px;height:300px;overflow-x:scroll;width:104%" *ngIf="bHist">
+                            <table class="table">
+                                <thead class="thead-light">
+                                    <th>Documento</th>
+                                    <th>Usuario</th>
+                                    <th>Fecha</th>
+                                </thead>
+                                <tbody>
+
+                                    <tr [ngModelOptions]="{standalone: true}"
+                                        *ngFor="let el of lstHzAdjunto;let i=index">
+
+                                        <td>
+                                            <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"
+                                                rel="noopener noreferrer">
+                                                {{ el.nombre.substring(20,32) }}
+                                            </a>
+                                        </td>
+                                        <td>{{ el.usuario }}</td>
+                                        <td>{{ el.fecha | date:"dd/MM/yy hh:mm:ss"}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+                <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+        </div>
+    </ng-template>
+
+
+
+
+    <!-- Adjuntar Imagenes al Documento -->
+    <ng-template #punto let-x>
+        <div class="modal-header header bg-gradient-primary">
+            <h4 class="modal-title" id="modal-basic-title">Agregar puntos de cuenta</h4>
+
+        </div>
+        <div class="modal-body">
+            <div class="container">
+                <div class="form-group col-md-12">
+                    <mat-form-field>
+                        <mat-label>Selecciona un punto de cuenta</mat-label>
+                        <mat-select [formControl]="toppings" multiple>
+                            <mat-option *ngFor="let topping of toppingList" [value]="topping">{{topping}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-warning" aria-label="Close" (click)="x.dismiss('Close')">
+                <span class="fa fa-times"></span>&nbsp;&nbsp;Aceptar</button>
+        </div>
+    </ng-template>

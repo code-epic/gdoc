@@ -1,11 +1,11 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
 import { Router } from '@angular/router';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
+import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
 import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
@@ -18,7 +18,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader'
 })
 export class SpresidencialComponent implements OnInit {
 
-
+  @ViewChild('fileInput') fileInput!: ElementRef
 
   public estadoActual = 4
   public estadoOrigen = 5
@@ -53,7 +53,7 @@ export class SpresidencialComponent implements OnInit {
 
   longitud = 0;
   pageSize = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 50,  100];
+  pageSizeOptions: number[] = [5, 10, 25, 50, 100];
 
   // MatPaginator Output
   pageEvent: PageEvent;
@@ -113,7 +113,21 @@ export class SpresidencialComponent implements OnInit {
   public posicionPagina = 0
   public placement = 'bottom'
   public filtro = 0
-   public xTipo = ''
+  public xTipo = ''
+
+  public hashcontrol = ''
+  progreso = []
+  posicionProgreso: number = 0
+
+  public DocAdjunto: DocumentoAdjunto = {
+    documento: '',
+    archivo: '',
+    usuario: ''
+  }
+  lblFile: any;
+  public archivos = []
+
+  btnEnviar: boolean = false
 
 
   constructor(
@@ -187,19 +201,21 @@ export class SpresidencialComponent implements OnInit {
     )
   }
 
+  open(content, id, posicion) {
 
-  open(content, id) {
+    if (this.fileInput) this.fileInput.nativeElement.value = ''
+    this.archivos = []
+    this.lblFile = ''
     this.numControl = id
-    if (this.selNav == 1) {
-      this.modalService.open(content, { size: 'lg' })
-    } else {
-      this.modalService.open(content)
-    }
+    this.hashcontrol = btoa("D" + this.numControl) //Cifrar documentos
+    this.posicionProgreso = posicion
+    this.modalService.open(content);
+
   }
 
   seleccionNavegacion(e) {
     this.buzon = []
-    this.xAPI.funcion = 'WKF_CDocumentosGestion'
+    this.xAPI.funcion = 'WKF_CDocumentosSecretaria'
     this.xAPI.valores = ''
     this.selNav = e
     this.vministerial = true
@@ -260,12 +276,10 @@ export class SpresidencialComponent implements OnInit {
   async listarBuzon() {
     var bz = []
     this.ngxService.startLoader("loader-aceptar")
-    console.log(this.xAPI)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         console.log(data)
         data.Cuerpo.forEach(e => {
-          
           e.existe = e.anom != '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.completed = false
@@ -302,13 +316,21 @@ export class SpresidencialComponent implements OnInit {
 
   }
 
+
+  //editar
+  work(e) {
+    const base = btoa(JSON.stringify(e))
+    this.ruta.navigate(['/ministerial', base])
+  }
+
   //editar
   editar(e) {
-    
-    const base = btoa( JSON.stringify(e))
-    const tipo = "editar"
-    this.ruta.navigate(['/ministerial', tipo, base])
+    const base = btoa(JSON.stringify(e))
+    this.ruta.navigate(['/snuevo', base])
   }
+
+
+
 
   insertarObservacion() {
     var usuario = this.loginService.Usuario.id
@@ -369,7 +391,6 @@ export class SpresidencialComponent implements OnInit {
           'El documento ha sido enviado al origen',
           `GDoc Wkf.DocumentoObservacion`
         )
-        console.log(data)
         this.seleccionNavegacion(this.selNav)
       },
       (error) => {
@@ -415,7 +436,6 @@ export class SpresidencialComponent implements OnInit {
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
     this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
-    console.log(this.xAPI.parametros)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
@@ -476,11 +496,10 @@ export class SpresidencialComponent implements OnInit {
 
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
-    console.log(this.WAlerta);
     this.xAPI.valores = JSON.stringify(this.WAlerta)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async alerData => {
-        console.log(alerData)
+        
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
@@ -492,12 +511,79 @@ export class SpresidencialComponent implements OnInit {
   }
 
   getDetalle(e): string {
-   
-    if (e.s_cuenta == '' ){
+
+    if (e.s_cuenta == '') {
       return e.numc
     }
     return e.tdoc == "PUNTO DE CUENTA" ? e.s_cuenta : e.numc
+
+  }
+
+
+  fileSelected(e) {
+    this.lblFile = e.target.files[0].name
+    this.archivos.push(e.target.files[0])
+    this.btnEnviar = true
+  }
+
+  async SubirArchivo(e, posicion) {
     
+    var frm = new FormData(document.forms.namedItem("forma"))
+    this.buzon[posicion].statusprogreso = true
+    this.btnEnviar = false
+    try {
+      await this.apiService.EnviarArchivosProgress(frm).subscribe({
+        next: (event) => {
+          this.buzon[posicion].progreso = event.progress
+          if (event.state === 'DONE') {
+            this.buzon[posicion].anom = 'X'
+            this.cargarSubDetalle()
+          }
+        },
+        error: (err) => {
+          this.toastrService.error(err, `GDoc Adjunto`)
+          console.error('Error al subir el archivo:', err)
+        },
+        complete: () => {
+          this.buzon[posicion].statusprogreso = false
+          this.buzon[posicion].progreso = 0
+        }
+      });
+
+    } catch (error) {
+      console.error(error)
+    }
+
+  }
+
+  cargarSubDetalle() {
+    this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
+    this.xAPI.parametros = ''
+    this.DocAdjunto.archivo = this.archivos[0].name
+    this.DocAdjunto.usuario = this.loginService.Usuario.id
+    this.DocAdjunto.documento = this.numControl
+    this.xAPI.valores = JSON.stringify(this.DocAdjunto)
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (xdata) => {
+        if (xdata.tipo == 1) {
+          if (this.fileInput) this.fileInput.nativeElement.value = ''
+          this.lblFile = ''
+          this.archivos = []
+          this.toastrService.success(
+            'Tu archivo ha sido cargado con exito ',
+            `GDoc Registro`
+          );
+
+        } else {
+          this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+        }
+        this.ngxService.stopLoader("loader-aceptar")
+      },
+      (error) => {
+        this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
+        this.ngxService.stopLoader("loader-aceptar")
+      }
+    )
   }
 
 

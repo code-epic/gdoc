@@ -313,7 +313,7 @@ export class SbuzonComponent implements OnInit {
             this.rechazarBuzon()
             break;
           case "2"://Aceptar y promover el documento
-            this.estatusOrigen = 6
+            this.estatusOrigen = 5 //mover al 6 de presidencial
             this.promoverBuzon(0, this.utilService.FechaActual())
             break;
           case "3"://Aceptar y promover el documento

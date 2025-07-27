@@ -18,7 +18,8 @@ export class RsconsultaSessionService {
       OrdenNumero: this.leerSession(environment.funcion.ORDEN_ENTRADA_CONSULTAR),
       GradoIPSFA: this.leerSession(environment.funcion.GRADO_IPSFA_CONSULTAR),
       UbicacionCarpetas: this.leerSession(environment.funcion.CARPETAS_CONSULTAR),
-      UbicacionCarpetasEntrada: this.leerSession(environment.funcion.CARPETA_ENTRADA_CONSULTAR)
+      UbicacionCarpetasEntrada: this.leerSession(environment.funcion.CARPETA_ENTRADA_CONSULTAR),
+      Configuracion: this.leerSession(environment.funcion.CONSULTAR_CONFIGURACION)
     };
   }
 

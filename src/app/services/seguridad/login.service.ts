@@ -105,7 +105,7 @@ export class LoginService {
     let App = this.Aplicacion;
     let Menu: any;
     App.Rol.Menu.forEach(e => {if (e.url == idUrl) { Menu = e; }});
-    console.log(Menu)
+    // console.log(Menu)
     return Menu;
 
   }

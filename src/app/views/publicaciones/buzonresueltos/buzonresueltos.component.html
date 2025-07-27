@@ -46,26 +46,37 @@
                             <ngx-ui-loader [loaderId]="'ldbuzon'"></ngx-ui-loader>
 
                             <div class="example-large-box mat-elevation-z4">
+                           
+
+                                
                                 <mat-selection-list style="padding: 15px; width: 100%;">
 
                                     <mat-list
-                                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: 55px;">
-                                        <div class="row" style="margin-top:10px">
+                                        style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: 45px;">
+                                        <div class="row" style="margin-top:-10px">
                                           
                                             <div class="col-md-1"></div>
-                                            <div class="col-md-2 texto-lista">
-                                                NUMERO
+                                            <div class="col-md-3 texto-lista">
+                                                NUMERO / FECHA
 
                                             </div>
-                                            <div class="col-md-2 texto-lista">
-                                                FECHA
-                                            </div>
+                                          
 
-                                            <div class="col-md-6 texto-lista">
+                                            <div class="col-md-4 texto-lista">
                                                 ASUNTO
                                             </div>
-                                            <div class="col-md-1 text-right texto-lista">
-                                                ACC.
+                                            <div class="col-md-2 texto-lista">
+                                                <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
+                                                  value="{{xyear}}" style="margin-top: -15px;">
+                                                  <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                                                </select>
+                                               
+                                              </div>
+                                              <div class="col-md-2 texto-lista">
+                                                <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
+                                                value="{{xmeses}}" style="margin-top: -15px;" (change)="seleccionNavegacion(0)">
+                                                <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                                              </select>
                                             </div>
 
                                         </div>
@@ -82,10 +93,7 @@
                                                     1}} </font>
                                             </div>
                                             <div class="col-md-2 texto-lista">
-                                                &nbsp;<font color="{{e.color}}">{{ e.simbolo }}</font>
-                                            </div>
-                                            <div class="col-md-2 texto-lista">
-                                                {{ e.fcre | date:"dd/MM/yyyy" }} | {{ e.nori }}
+                                                &nbsp;<font color="{{e.color}}">{{ e.simbolo }} / {{ e.fcre | date:"dd/MM/yyyy" }}</font>
                                             </div>
 
                                             <div class="col-md-6 texto-detalle" #tooltip="matTooltip"

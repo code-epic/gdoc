@@ -18,6 +18,7 @@ export const environment = {
     ENTRADAS_RESOLUCIONES: 'MPPD_GEntradasResoluciones',
     CONSULTAR_RESOLUCIONES: 'MPPD_CResoluciones',
     CAUSA_RESOLUCION: 'MPPD_CCausaResolucion',
+    CONSULTAR_CONFIGURACION: 'MD_CConfiguracion', 
     MOTIVO_RESOLUCION: 'MPPD_CMotivoResolucion',
     GRADO_CONSULTAR: 'MPPD_CGrado',
     CATEGORIAS_CONSULTAR: 'MPPD_CCategorias',

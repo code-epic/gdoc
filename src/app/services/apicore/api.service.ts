@@ -114,7 +114,7 @@ export class ApiService {
     {'id': 7, 'mes' : 'AGOSTO', 'desde':'08-01 00:00:00', 'hasta': '08-31 23:59:59'},
     {'id': 8, 'mes' : 'SEPTIEMBRE', 'desde':'09-01 00:00:00', 'hasta': '10-01 23:59:59'},
     {'id': 9, 'mes' : 'OCTUBRE', 'desde':'10-01 00:00:00', 'hasta': '11-01 23:59:59'},
-    {'id': 10, 'mes' : 'NOMVIEMBRE', 'desde':'11-01 00:00:00', 'hasta': '12-01 23:59:59'},
+    {'id': 10, 'mes' : 'NOVIEMBRE', 'desde':'11-01 00:00:00', 'hasta': '12-01 23:59:59'},
     {'id': 11, 'mes' : 'DICIEMBRE', 'desde':'12-01 00:00:00', 'hasta': '12-31 23:59:59'},
   ]
 

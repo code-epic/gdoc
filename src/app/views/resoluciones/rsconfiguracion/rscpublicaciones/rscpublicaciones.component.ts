@@ -71,10 +71,12 @@ export class RscpublicacionesComponent implements OnInit {
   public benviar: boolean = false
   public lstRs = []
   public lstUsr = []
+  public lstUsrFiltrados = []
   addOnBlur = true;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   resoluciones: Resoluciones[] = [];
   usuarios: Usuarios[] = [];
+  search: string = ''
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -157,7 +159,8 @@ export class RscpublicacionesComponent implements OnInit {
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstUsr = data
+        this.lstUsr = data  
+        this.lstUsrFiltrados = data
         this.ngxService.stopLoader("loader-x");
 
       },
@@ -256,6 +259,16 @@ export class RscpublicacionesComponent implements OnInit {
     this.xAPI.funcion = 'MPPD_IBuzon_Resoluciones'
     this.xAPI.valores = JSON.stringify(rsl)
 
+  }
+
+  consultarUsuarios(){
+    if(this.search == "") {
+      this.lstUsr = this.lstUsrFiltrados
+      this.search = ""
+      return
+    }
+    this.lstUsr = this.lstUsrFiltrados.filter((usr: Usuarios) => usr.nombre.toLowerCase().includes(this.search.toLowerCase()))
+    this.search = ""
   }
 
 

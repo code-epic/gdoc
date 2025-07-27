@@ -153,6 +153,17 @@ export class MinisterialComponent implements OnInit {
 
   public edit = 0
 
+  // Contenido de los labels
+
+  public lblDecision = 'Decision del Ministro'
+  public lblBtn = 'Aceptar'
+  public lblComentario = 'Comentario del MPPD'
+  public lblOrigenComando = 'Gran Comando'
+  public fechaElaboracion = ''
+  public fechaOrigen = ''
+  public numc = ''
+
+
   @ViewChild('templateBottomSheet') TemplateBottomSheet: TemplateRef<any>;
   hashcontrol: string;
   lblFile: any;
@@ -171,49 +182,11 @@ export class MinisterialComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private modalService: NgbModal) { }
 
-  // Contenido de los labels
-
-  public lblDecision = 'Decision del Ministro'
-  public lblBtn = 'Aceptar'
-  public lblComentario = 'Comentario del MPPD'
-  public lblOrigenComando = 'Gran Comando'
-  public fechaElaboracion = ''
-  public fechaOrigen = ''
-
-  /**
-   * Cambia el contenido de los labels
-   */
-  cambiarContenido() {
-    this.edit = 1
-    this.lblDecision = 'Decision Presidencial'
-    this.lblComentario = 'Comentario Presidencial'
-    this.lblBtn = 'Agregar'
-    this.lblOrigenComando = 'Origen de la Cuenta'
-
-    this.lstAcciones = [
-      { 'valor': '1', 'texto': 'PARA LA FIRMA MPPD', 'visible': '1' },
-      { 'valor': '2', 'texto': 'PARA LA FIRMA PRESIDENCIAL', 'visible': '1' },
-      { 'valor': '3', 'texto': 'DIRECTOR', 'visible': '1' },
-      { 'valor': '4', 'texto': 'SUB-DIRECTOR', 'visible': '1' },
-      { 'valor': '5', 'texto': 'JEFE DE SECRETARIA', 'visible': '1' },
-      { 'valor': '6', 'texto': 'TRANSCRIPTOR', 'visible': '1' },
-      { 'valor': '7', 'texto': 'ARCHIVO', 'visible': '1' },
-    ]
-  }
-
-  verArchivos(content) {
-    this.modalService.open(content, { size: 'lg' })
-  }
-
-  public numc = ''
 
   ngOnInit(): void {
     this.fplazo = NgbDate.from(this.formatter.parse(this.utilService.FechaActual()))
-
     this.extender_plazo = NgbDate.from(this.formatter.parse(this.utilService.FechaActual()))
-
     let ruta = this.rutaActiva.snapshot.params.id
-
     if (ruta == 'agregar') {
       this.cambiarContenido()
     }
@@ -244,6 +217,32 @@ export class MinisterialComponent implements OnInit {
       }
     }
   }
+
+  /**
+ * Cambia el contenido de los labels
+ */
+  cambiarContenido() {
+    this.edit = 1
+    this.lblDecision = 'Decision Presidencial'
+    this.lblComentario = 'Comentario Presidencial'
+    this.lblBtn = 'Agregar'
+    this.lblOrigenComando = 'Origen de la Cuenta'
+
+    this.lstAcciones = [
+      { 'valor': '1', 'texto': 'PARA LA FIRMA MPPD', 'visible': '1' },
+      { 'valor': '2', 'texto': 'PARA LA FIRMA PRESIDENCIAL', 'visible': '1' },
+      { 'valor': '3', 'texto': 'DIRECTOR', 'visible': '1' },
+      { 'valor': '4', 'texto': 'SUB-DIRECTOR', 'visible': '1' },
+      { 'valor': '5', 'texto': 'JEFE DE SECRETARIA', 'visible': '1' },
+      { 'valor': '6', 'texto': 'TRANSCRIPTOR', 'visible': '1' },
+      { 'valor': '7', 'texto': 'ARCHIVO', 'visible': '1' },
+    ]
+  }
+
+  verArchivos(content) {
+    this.modalService.open(content, { size: 'lg' })
+  }
+
 
   listarEstados() {
     this.xAPI.funcion = 'WKF_CEstados'

@@ -7,9 +7,9 @@
       <ng-template matStepLabel>Sleccionar resoluciones</ng-template>
       <br>
 
-      <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-          <mat-form-field appearance="outline" class="search-input-field">
+      <div class="row">
+        <div class="col-md-12 col-lg-12 text-right">
+          <mat-form-field appearance="outline" class="search-input-field" style="width: 350px;">
             <mat-label>Número de resuelto</mat-label>
             <input matInput placeholder="Número de resuelto" [ngModelOptions]="{standalone: true}" [(ngModel)]="numero"
               (keyup.enter)="consultarResolucion($event)">
@@ -106,7 +106,17 @@
       </div>
 
       <div class="row" class="controlador">
-
+        <div class="col-md-12 text-right">
+          <mat-form-field appearance="outline" class="search-input-field" style="width: 350px;">
+            <mat-label>Buscar</mat-label>
+            <input matInput placeholder="Buscar" 
+            (blur)="consultarUsuarios()" (keyup.enter)="consultarUsuarios()"
+            [ngModelOptions]="{standalone: true}" [(ngModel)]="search">
+            <button mat-icon-button matSuffix (click)="consultarUsuarios()">
+              <mat-icon>search</mat-icon>
+            </button>
+          </mat-form-field> 
+        </div>
         <div class="col-md-12">
 
           <table style="width: 100%;" border="1">
@@ -189,7 +199,7 @@
 
     <div style="text-align: right;">
        <button mat-button matStepperPrevious class="btn-warning">Anterior</button> &nbsp;&nbsp;
-        <button mat-button matStepperNext class="btn-success" (click)="validarUsuarios()">Enviar</button>
+        <button mat-button matStepperNext class="btn-success" (click)="validarUsuarios()">Enviar y publicar</button>
     </div>
   </mat-step>
 </mat-stepper>
