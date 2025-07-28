@@ -263,9 +263,8 @@
     </div>
 </div>
 
-<div class="form-row">
-    <div class="form-group col-md-12">
-
+<div class="form-row" *ngIf="blAsunto">
+    <div class="form-group col-md-12" >
         <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
             [(ngModel)]="IResolucion.asunto" placeholder="Introduzca el asunto..."
             style="width: 100%">{{IResolucion.asunto}}</textarea>
@@ -323,7 +322,7 @@
 <div class="row" *ngIf="btnAccion">
     <div class="col-md-12">
         <div class="text-right">
-            <button *ngIf="btncargando" class="btn bg-success text-white" (click)="SubirArchivo()">Procesar
+            <button class="btn bg-success text-white" (click)="SubirArchivo()">Procesar
                 solicitud</button>
         </div>
     </div>

@@ -38,6 +38,7 @@ import {
 } from "@ng-bootstrap/ng-bootstrap";
 import { FormsModule } from "@angular/forms";
 import { JsonPipe } from "@angular/common";
+import { CsvValidatorService } from "src/app/services/util/csvvalidator.service";
 
 export interface ITipoResolucion {
   codigo: string;
@@ -378,9 +379,6 @@ export class RscondecoracionesComponent implements OnInit {
   public btnAccion: boolean = true
 
   public foto_cedula: string = "";
-
-  public btncargando : boolean = true
-
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
   public TipoResoluciones: any;
@@ -423,6 +421,9 @@ export class RscondecoracionesComponent implements OnInit {
   archivo_otro: string
   otra_llave: string 
 
+  errors: any[] = [];
+  blAsunto: boolean = true;
+
   constructor(
     private apiService: ApiService,
     private modalService: NgbModal,
@@ -435,7 +436,8 @@ export class RscondecoracionesComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private ngbCalendar: NgbCalendar,
     private dateAdapter: NgbDateAdapter<string>,
-    private ruta: Router
+    private ruta: Router,
+    private csvValidator: CsvValidatorService
   ) {}
 
   ngOnInit(): void {
@@ -506,14 +508,22 @@ export class RscondecoracionesComponent implements OnInit {
   }
 
   SelTipo(e) {
-    if ( e.value == 0) {
-      this.getResueltoID('29',0);
-    }else  if ( e.value == 2) {
-      this.getResueltoID('10',2);
-    }else{
-      this.getResueltoID('9',2);
+    this.blAsunto = true;
+    switch (e.value) {
+      case '0':
+        this.getResueltoID('29', 0);
+        break;
+      case '2':
+        this.getResueltoID('10', 2);
+        break;  
+      case '85':
+        this.blAsunto = false;
+        //this.getResueltoID('85', 2);
+        break;
+      default:
+        this.getResueltoID('9', 2);
     }
-    console.log(e.value, " SELECCIONAR TIPO")
+    console.log(e.value, "SELECCIONAR TIPO");
   }
 
   get today() {
@@ -857,10 +867,72 @@ export class RscondecoracionesComponent implements OnInit {
   }
 
   fileSelected(e) {
-    this.archivos = e.target.files;
+    console.log(this.tipo)
+    if(this.tipo == undefined || this.tipo == "") {
+      this.toastrService.error(
+        "Debe seleccionar un tipo de resolucion",
+        `GDoc MPPD resuelto`
+      );
+      return;
+    }
+    const files = Array.from((e.target as HTMLInputElement).files ?? []);
 
-    this.seleccionarFormato();
+    if (this.tipo != "85") {
+      this.archivos = e.target.files;
+      this.seleccionarFormato();
+      return;
+    }
+
+
+
+    // 1. Filtrar solo CSV
+    const csvFiles = files.filter(f => f.name.toLowerCase().endsWith('.csv'));
+
+    // 2. Validar cada CSV
+    csvFiles.forEach(file => {
+      this.csvValidator.validate(file).subscribe(result => {
+        if (result.isValid) {
+          this.archivos = e.target.files;
+          this.seleccionarFormato();
+          console.log('El archivo es valido')
+        } else {
+          let errores = ""
+          result.errors.forEach(e => {
+            // let i = 1
+            errores = e.text
+          
+            // e.recommendations.forEach(element => {
+            //   errores += i + ". " + element + "<br>"
+            //   i++
+            // });
+          });
+          
+          this.alertmsj(errores)
+          this.errors.push(...result.errors);
+        }
+      });
+    });
+    
   }
+
+   alertmsj(texto){
+    Swal.fire({
+      title: 'Error al cargar los archivos',
+      text: texto,
+      icon: 'warning',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Aceptar',
+      allowEscapeKey: true,
+    }).then((result) => {
+      if (!result.isConfirmed) {
+        this.archivos = [];
+        document.forms.namedItem("forma").reset();
+          return
+        }
+    })  
+   }
+
 
   seleccionarFormato() {
     let csv,
@@ -929,7 +1001,7 @@ export class RscondecoracionesComponent implements OnInit {
     }
     
     this.ngxService.startLoader("loader-aceptar");
-    this.btncargando = false
+    this.btnAccion = false
 
     this.evaluarDatos();
     this.files.hash = this.hashcontrol;
@@ -984,7 +1056,7 @@ export class RscondecoracionesComponent implements OnInit {
     let otraresol = {
       llave: this.llave,
       numero : this.IResolucion.numero, 
-      tipo : this.IResolucion.tipo.toString(), 
+      tipo : this.tipo.toString(), 
       fecha: this.IResolucion.fecha_resolucion,
       causa: this.IResolucion.solicitud.toString(),
       motivo: this.IResolucion.reserva.toString(),
@@ -998,13 +1070,12 @@ export class RscondecoracionesComponent implements OnInit {
     console.log(this.tipo)
     if (this.tipo === '85') acc='plotesnombramientos' 
     console.log(acc)
-    this.apiService.EjecutarLotes(otraresol).subscribe(
+    this.apiService.EjecutarLotes(otraresol, acc).subscribe(
       (data) => {
-        this.ngxService.stopLoader("loader-aceptar");
+        this.ngxService.stopLoader("loader-aceptbtncargandoar");
         
         this.resetearFechas(true)
-        this.btnAccion = false
-        this.btncargando = true
+        this.btnAccion = true
         this.limpiarFrm()
         this.llave = this.utilService.GenerarUnicId();
         this.aceptar("");

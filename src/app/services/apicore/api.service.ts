@@ -388,7 +388,7 @@ export class ApiService {
 
   EjecutarLotes(xInterface, accion : string = ''): Observable<any> {
     // return this.http.post<any>(this.URL + "crud" + this.hash, xAPI, this.httpOptions);
-    const url = this.URL + 'plotes'
+    const url = this.URL + accion
     // console.info( JSON.stringify(xAPI ))
     return this.http.post<any>(url, xInterface, this.httpOptions);
   }
