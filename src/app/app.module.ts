@@ -91,6 +91,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { PushService } from './services/util/push.service';
 import { environment } from '../environments/environment';
 import { SnuevoComponent } from './views/secretaria/snuevo/snuevo.component';
+import { AdministracionpublicaComponent } from './views/resoluciones/nomina/administracionpublica/administracionpublica.component';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -236,7 +237,8 @@ const ngWizardConfig: NgWizardConfig = {
     PublicarComponent,
     BuzonresueltosComponent,
     ChatbotComponent,
-    SnuevoComponent
+    SnuevoComponent,
+    AdministracionpublicaComponent
   ],
   providers: [
     {

@@ -93,7 +93,7 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             <label for="cmbTipoDocumento">Tipo de Documento</label>
 
                             <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
@@ -104,14 +104,15 @@
                             </select>
 
                         </div>
-                        <div class="form-group col-md-3" style="display: none;">
-                            <label for="cmbRemitente">{{remitentet}}</label>
+                        <div class="form-group col-md-3" >
+                            <label for="cmbRemitente">Remitente</label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}"
                                 [(ngModel)]="Doc.remitente" value="{{Doc.remitente}}" id="remi">
                                 <option value="PRESIDENCIAL">PRESIDENCIAL</option>
+                                <option value="VICEPRESIDENCIAL">VICEPRESIDENCIAL</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             <label for="cmbUnidad">Unidad o Dependencia</label>
                             <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.unidad"
                                 value="{{Doc.unidad}}" id="unid">
@@ -119,7 +120,7 @@
                                 <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
                             </select>
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             <label>Componente / Gran Comando</label>
                             <div class="input-group">
                                 <select class="form-control" [ngModelOptions]="{standalone: true}"

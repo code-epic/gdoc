@@ -295,7 +295,7 @@ export class SnuevoComponent implements OnInit {
   }
 
   validarTipoDoc(): boolean {
-    return this.Doc.tipo.toLowerCase() == 'resolucion' || this.Doc.tipo.toLowerCase() == 'tramitacion por organo regular' || this.Doc.tipo.toLowerCase() == 'punto de cuenta'
+    return  this.Doc.tipo.toLowerCase() == 'punto de cuenta'
   }
 
   listarConfiguracion() {

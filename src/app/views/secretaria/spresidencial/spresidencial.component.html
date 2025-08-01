@@ -93,11 +93,12 @@
                     <div class="col-md-2 texto-lista">
                       <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.idd )]">{{ e.nori }}</a>
                     </div>
-                    <!-- <div class="col-md-2 texto-lista">
-                      {{ e.nori | uppercase }}
-                    </div> -->
-                    <div class="col-md-7 texto-lista">
+                    
+                    <div class="col-md-5 texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }} &nbsp; {{ e.udep | uppercase }}
+                    </div>
+                    <div class="col-md-2 texto-lista">
+                      {{ e.remi | uppercase }}
                     </div>
                     <div class="col-md-2 text-right" *ngIf="!e.statusprogreso">
                       <button mat-icon-button aria-label="Editar" (click)="editar(e.numc)">

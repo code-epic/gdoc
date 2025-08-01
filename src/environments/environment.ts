@@ -58,6 +58,7 @@ export const environment = {
     ALERTAS: 'WKF_AAlertas',
     DOCUMENTO_ADJUNTO: 'WKF_ADocumentoAdjunto',
     UBICACION: 'WKF_AUbicacion',
+    CONSULTAR_NOMBRAMIENTOS: 'MPPD_CNombramientos',
   }
 };
 
