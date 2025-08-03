@@ -45,6 +45,7 @@ export const environment = {
     MPPD_CAlertasResoluciones: 'MPPD_CAlertasResoluciones',
     MPPD_CAlertasReicorporacion: 'MPPD_CAlertasReicorporacion', 
     MPPD_UAlertasResoluciones: 'MPPD_UAlertasResoluciones',
+    CONSULTAR_ADMINISTRACION: 'MPPD_CNominaAdministrativa',
     // WKF_
     ESTADOS: 'WKF_CEstados',
     DOCUMENTOS_RESOLUCIONES: 'WKF_CDocumentosResoluciones',

@@ -31,11 +31,11 @@
                 </div>
 
                 <div class="card-body">
-                    <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
+                   
 
                     <div *ngIf="bmenu" class="col-md-12 row justify-content-center text-center">
                         <div class="col-md-2"></div>
-                        <div class="col-md-2 cardround" (click)="cambiarFormulario(1)">
+                        <!-- <div class="col-md-2 cardround" (click)="cambiarFormulario(1)">
                             <div class="text-center botones">
                                 <br>
                                 <h2 class="text-center text-red"><i class="fa fa-exclamation"
@@ -43,9 +43,9 @@
                                 </h2>
                                 <p>Codigos Rojos</p>
                             </div>
-                        </div>
+                        </div> -->
 
-                        <div class="col-md-2 cardround" (click)="cambiarFormulario(2)">
+                        <!-- <div class="col-md-2 cardround" (click)="cambiarFormulario(2)">
                             <div class="text-center botones">
                                 <br>
                                 <h2 class="text-center text-orange"><i class="fa fa-arrow-down"
@@ -53,7 +53,7 @@
                                 </h2>
                                 <p>Bajas</p>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="col-md-2 cardround" (click)="cambiarFormulario(3)">
                             <div class="text-center botones">
@@ -61,11 +61,11 @@
                                 <h2 class="text-center text-blue"><i class="fa fa-clipboard-check"
                                         style="font-size: 42px;"></i>
                                 </h2>
-                                <p>Nombramientos</p>
+                                <p>Administración</p>
                             </div>
                         </div>
 
-                        <div class="col-md-2 cardround" (click)="cambiarFormulario(4)">
+                        <!-- <div class="col-md-2 cardround" (click)="cambiarFormulario(4)">
                             <div class="text-center botones">
                                 <br>
                                 <h2 class="text-center text-green"><i class="fa fa-arrow-up"
@@ -73,35 +73,69 @@
                                 </h2>
                                 <p>Ascensos</p>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="col-md-2"></div>
                     </div>
                     <br>
-                    <div  *ngIf="!bmenu" class="row" style="padding-top: 5px">
-                        <div class="col-md-9">
-                            <h2 style="margin-top: 10px; margin-left: -3px;padding-left: 20px;">
-                                REPORTE GENERAL</h2>
-                        </div>
-                        <div class="col-md-3">
+                    
 
-                            <div 
-                                class="example-button-row text-right text-white">
-                                <button style="background-color: #2a9a17;" mat-icon-button
-                                    title="Volver Atrás" (click)="volver()">
-                                    <mat-icon>open_in_browser</mat-icon>
-                                </button>
-                            </div>
-                            
+                    <ngx-ui-loader [loaderId]="'lbuscar'"></ngx-ui-loader>
+                    <div  *ngIf="!bmenu"  class="d-flex justify-content-end mb-3 gap-2">
 
-                        </div>
+                        <button class="btn  bg-primary text-white" (click)="exportExcel()">
+                        <i class="fas fa-file-excel mr-1"></i> Exportar Excel
+                        </button>
+                        <button class="btn  bg-warning text-white" (click)="volver()">
+                            <i class="fas fa-arrow-left mr-1"></i> Mostrar Menu
+                        </button>
                     </div>
-                    <div class="row p-4" *ngIf="!bmenu">
-                        <div class="col-md-12">
-                            <app-rscpublicaciones *ngIf="formularioAGenerar != 0" [formularioAGenerar]="formularioAGenerar" ></app-rscpublicaciones>
-                        </div>
-                    </div>
+                    <div *ngIf="!bmenu" class="row">
+                        <div class="col-md-12 text-center col-lg-12">
 
+                            <table id="tbl-ejercitos" class="tbl-ejercitos table-container" border="1">
+                                <thead>
+                                    <tr class="header-principal">
+                                        <th class="celda-grado">#</th>
+                                        <th class="bloque ejercito">GRADO</th>
+                                        <th class="bloque armada">CATEGORIA</th>    
+                                        <th class="bloque aviacion">ESPECIALIDAD</th>
+                                        <th class="bloque guardia">COMP.</th>
+                                        <th class="celda-total">PROM.</th>
+                                        <th class="celda-total">NOMBRES Y APELLIDO</th>
+                                        <th class="celda-total">CEDULA</th>
+                                        <th class="celda-total">TIEMPO ADM.</th>
+                                        <!-- <th class="celda-total">TIEMPO EN EL CARGO ACTUAL</th> -->
+                                        <th class="celda-total">ENTE</th>
+                                        <!-- <th class="celda-total">OBSERVACION</th> -->
+                                        <th class="celda-total">RETORNO</th>
+                                    </tr>
+
+                                
+                                </thead>
+                                <tbody>
+                                   <tr *ngFor="let e of lst; index as i">
+                                    <td>{{ i+1 }}</td>
+                                    <td style="font-weight: bold;">{{e.ngrado}}</td>
+                                    <td style="font-weight: bold;">{{e.n_categoria}}</td>
+                                    <td style="font-weight: bold;">{{e.especialidad | uppercase}}</td>
+                                    <td style="font-weight: bold;">{{e.ncomponente}}</td>
+                                    <td>{{e.fecha_promocion | date:"yyyy"}}</td>
+                                    <td>{{e.nombres_apellidos}}</td>
+                                    <td>{{e.cedula}}</td>
+                                    <td>{{e.total }}</td>
+                                    <td>{{e.des_reserva}}</td>
+                                    <!-- <td></td> -->
+                                    <td>{{e.fecha_fin_periodo | date:"dd/MM/yyyy"}}</td>
+                                   </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                        </div>
+
+                    </div>
+                    <br><br>
+                  
                     
                 </div>
             </div>
