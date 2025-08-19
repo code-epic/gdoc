@@ -31,6 +31,7 @@ import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
 import { ActivatedRoute, Router } from "@angular/router";
 import { MensajeService } from "src/app/services/util/mensaje.service";
+import { ExcelService } from "src/app/services/util/excel.service";
 
 interface ITipoResolucion {
   codigo: string;
@@ -333,6 +334,7 @@ export class RsconsultaComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private msj: MensajeService, 
     private router: Router,
+    private excelService: ExcelService,
   ) {
     this.Estados =
       sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR) != undefined
@@ -769,6 +771,7 @@ export class RsconsultaComponent implements OnInit {
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
+        // console.log(data)
         this.csvHead = data.Cabecera;
         this.resolucion = desde + " - " + hasta + " : " + data.Cuerpo.length;
         this.ngxService.stopLoader("loader-buscar");
@@ -1096,37 +1099,31 @@ export class RsconsultaComponent implements OnInit {
       "Ex-" + this.idTransaccion,
       this.delimitador
     );
+   
   }
 
   downloadCSV() {
-    // let head = this.csvHead.map((e) => {
-    //   return e.nombre;
-    // });
-
-    let head = [
-      "cedula",
-      "nombre_grado",
-      "nombres_apellidos",
-      "nombre_componente",
-      "nombre_categoria",
-      "des_clasificacion",
-      "sexo",
-      "fecha_resolucion",
-      "numero",
-      "descripcion_tipo",
-      "asunto",
-      "nombre_causa",
-      "nombre_motivo",
-      "especialidad",
-      "falta",
-    ];
-
-    this.utilService.downloadFile(
-      head,
-      this.lstResolucionesX,
-      "RS-" + this.utilService.GenerarUnicId(),
-      this.delimitador
-    );
+     let xlsx = []
+      this.lstResolucionesX.forEach((e) => {
+        xlsx.push({
+            'cedula': e.cedula,
+            'Grado' : e.grado_abreviado,
+            'Componente': e.componente_abreviado,
+            'Nombre': e.nombres_apellidos,
+            // 'sexo' :,
+            // 'fecha_resolucion': ,
+            // 'numero' : ,
+            // 'descripcion_tipo' : ,
+            // 'asunto' : ,
+            // 'nombre_causa' : ,
+            // 'nombre_motivo' : ,
+            // 'especialidad' :  d,
+            // 'falta',
+          'Asunto': e.asunto,
+         
+        })
+      })
+      this.excelService.exportToExcel(xlsx, "Ex-" + this.idTransaccion,);
   }
 
   downloadCSVEx() {

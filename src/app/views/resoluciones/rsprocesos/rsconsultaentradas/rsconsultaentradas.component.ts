@@ -185,7 +185,7 @@ export class RsconsultaentradasComponent implements OnInit {
     let estatus = this.estatus === '' ? '%' : this.estatus
 
     
-    this.xAPI.funcion = environment.funcion.ENTRADAS_RESOLUCIONES
+    this.xAPI.funcion = environment.funcion.CONSULTAR_ENTRADAS_RESOLUCIONES
     this.xAPI.parametros = `${estatus},${desde},${hasta},${codigo},${asunto},${observacion},${ncarpeta}`
     this.xAPI.valores = ''
     console.log(this.xAPI.parametros)

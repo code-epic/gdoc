@@ -16,6 +16,7 @@ export const environment = {
     GRUPO_CARPETA_ENTRADA: 'MPPD_CGrupoCarpertaEntrada',
     ENTRADAS_PROCESO: 'MPPD_CEntradasProceso',
     ENTRADAS_RESOLUCIONES: 'MPPD_GEntradasResoluciones',
+    CONSULTAR_ENTRADAS_RESOLUCIONES: 'MPPD_CEntradasResoluciones',
     CONSULTAR_RESOLUCIONES: 'MPPD_CResoluciones',
     CAUSA_RESOLUCION: 'MPPD_CCausaResolucion',
     CONSULTAR_CONFIGURACION: 'MD_CConfiguracion', 
