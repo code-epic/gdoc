@@ -3,7 +3,11 @@
   "version": "1.2.0",
   "scripts": {
     "ng": "ng",
+<<<<<<< Updated upstream
     "start": "export NODE_OPTIONS=--openssl-legacy-provider; ng serve --host 0.0.0.0  --port 4300 --proxy-config ./src/proxy.conf.json",
+=======
+    "start": "ng serve --host 0.0.0.0  --port 4201 --proxy-config ./src/proxy.conf.json",
+>>>>>>> Stashed changes
     "build": "ng build --prod --aot --build-optimizer --common-chunk --vendor-chunk --optimization --progress",
     "test": "ng test",
     "lint": "ng lint",
