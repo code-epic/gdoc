@@ -667,8 +667,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.ruta.navigate(['/registrar']);
       }
 
-
-
     })
   }
 

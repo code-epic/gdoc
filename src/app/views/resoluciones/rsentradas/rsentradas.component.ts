@@ -97,8 +97,8 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
 export class RsentradasComponent implements OnInit {
 
   public id: string = ''
-  public estadoActual = 1
-  public estadoOrigen = 1
+  public estadoActual: number = 1
+  public estadoOrigen: number = 1
   public fecha: any
   public vigencia: any
 
@@ -136,6 +136,7 @@ export class RsentradasComponent implements OnInit {
     fecha_resolucion: '',
     detalle: '',
     accion: 0
+
 
   }
 
@@ -249,7 +250,6 @@ export class RsentradasComponent implements OnInit {
   bHistorial = false
   blAceptar: boolean = true
   bPDF = false
-
   nControl = ''
 
   value = ''
@@ -287,7 +287,7 @@ export class RsentradasComponent implements OnInit {
   @Input() entradas: any;
   editar: boolean = false
 
-
+  activarMensaje: boolean = false;
 
 
   constructor(private apiService: ApiService,
@@ -373,8 +373,36 @@ export class RsentradasComponent implements OnInit {
 
 
 
-  }
 
+
+  }
+  protected aceptar(msj: string): void {
+    if (this.activarMensaje) return;
+    console.log(msj);
+    this.activarMensaje = true;
+    Swal.fire({
+      title: 'El ' + msj,
+      text: "¿Desea registrar otro documento?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'No',
+      allowEscapeKey: true,
+    }).then((result) => {
+      this.activarMensaje = false;
+      if (!result.isConfirmed) {
+        {
+          this.ruta.navigate(['/resoluciones']);
+        }
+      } else {
+        this.blAceptar = true;
+        this.limpiarFrm();
+      }
+    });
+
+  }
   activar() {
     this.bclasificacion = false
   }
@@ -652,17 +680,19 @@ export class RsentradasComponent implements OnInit {
   }
 
   async SubirArchivo() {
-    // Validación antes de continuar
-    if (!this.Entradas.cuenta || this.Entradas.cuenta.trim() === '') {
-      this.toastrService.error('GDoc MPPD Debe colocar punto cuenta', 'Error');
-      return;
-    }
     this.validarCampos()
     this.blAceptar = false
 
     this.ngxService.startLoader("loader-entrada")
     var frm = new FormData(document.forms.namedItem("forma"))
     try {
+
+      if (!this.Entradas.cuenta || this.Entradas.cuenta.trim() === '') {
+        this.ngxService.stopLoader("loader-entrada");
+        this.blAceptar = true;
+        this.toastrService.error("GDOC MPPD El campo cuenta es obligatorio", "Error");
+        return;
+      }
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
         this.Entradas.archivo = this.archivos[0] == undefined ? '' : this.archivos[0].name
         if (!this.editar) {
@@ -684,6 +714,7 @@ export class RsentradasComponent implements OnInit {
     if (this.Resolucion.cedula == '') {
       this._snackBar.open("Debe seleccionar una cedula", "OK")
       return
+
     }
     this.Entradas.cedula = this.Resolucion.cedula
     this.Entradas.egrado = parseInt(this.Resolucion.codigo_grado.toString())
@@ -703,18 +734,22 @@ export class RsentradasComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-
         this.toastrService.info('Proceso exitoso', `GDoc MPPD Insertar resuelto`);
         this.ngxService.stopLoader("loader-entrada");
-        this.blAceptar = false
-        this.limpiarFrm()
-        //this.utilService.contenido$.emit( this.Entradas.cedula );
+        this.blAceptar = false;
+        if (data.Cuerpo && data.Cuerpo[0] && data.Cuerpo[0].id) {
+          this.aceptar(data.Cuerpo[0].id.toString());
+        } else {
+          this.aceptar('Documento guardado exitosamente');
+        }
+
       },
       error => {
-        console.error(error, 'GDoc Resoluciones entradas')
+        console.error(error, 'GDoc Resoluciones entradas');
+        this.blAceptar = true;
       }
-    );
 
+    );
   }
 
   actualizar() {
@@ -747,10 +782,13 @@ export class RsentradasComponent implements OnInit {
         this.toastrService.info('Proceso exitoso', `GDoc MPPD Insertar resuelto`);
         this.ngxService.stopLoader("loader-entrada");
         this.utilService.contenido$.emit(this.Entradas.cedula);
-        this.blAceptar = false
+        this.blAceptar = false;
+        this.aceptar('Documento actualizado exitosamente');
       },
+
       error => {
-        console.error(error, 'GDoc Resoluciones entradas')
+        console.error(error, 'GDoc Resoluciones entradas');
+        this.blAceptar = true;
       }
     );
 
