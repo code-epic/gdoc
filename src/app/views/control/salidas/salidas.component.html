@@ -11,10 +11,11 @@
         <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
         <div class="card-header bg-transparent">
           <div class="row align-items-center">
-            <div class="col-md-10">
+            <div class="col-md-9">
               <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
               <h2 class="mb-0">Salidas</h2>
             </div>
+            <!-- Botón Volver Atrás -->
             <div class="col-md-1">
               <div class="media align-items-center">
                 <div class="example-button-row">
@@ -24,10 +25,22 @@
                 </div>
               </div>
             </div>
+            <!-- Botón Nueva Salida -->
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Nuevo Documento" routerLinkActive="active"
+                    [routerLink]="['/documento/salida']" class="dropdown-item" id="salida">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Dropdown more_vert -->
             <div class="col-md-1">
               <ul class="navbar-nav align-items-center d-none d-md-flex">
                 <li class="nav-item" ngbDropdown placement="bottom-right">
-                  <a class="nav-link pr-0" role="button" ngbDropdownToggle id="more">
+                  <a class="nav-link pr-0" role="button" ngbDropdownToggle>
                     <div class="media align-items-center">
                       <div class="example-button-row">
                         <button mat-icon-button aria-label="Example icon-button with a heart icon">
@@ -60,11 +73,11 @@
             </ng-template>
 
             <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
-              <mat-selection-list >
+              <mat-selection-list>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
-                    <div class="col-md-1 texto-lista" >
-                    
+                    <div class="col-md-1 texto-lista">
+
                     </div>
                     <div class="col-md-2 texto-lista">
                       NUM. CONTROL
@@ -81,14 +94,14 @@
                         value="{{xyear}}" style="margin-top: -20px;">
                         <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
                       </select>
-                     
+
                     </div>
                     <div class="col-md-2 texto-lista">
                       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
-                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
-                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
-                    </select>
-                  </div>
+                        value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
+                        <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                      </select>
+                    </div>
 
                   </div>
 
@@ -142,15 +155,15 @@
             <ng-template mat-tab-label>
               &nbsp;PROCESADAS
             </ng-template>
-            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
-              <mat-selection-list >
+            <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                     
+
                     </div>
                     <div class="col-md-2 texto-lista">
-                     NUMERO CONTROL
+                      NUMERO CONTROL
                     </div>
 
                     <div class="col-md-2 texto-lista">
@@ -164,14 +177,14 @@
                         value="{{xyear}}" style="margin-top: -20px;">
                         <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
                       </select>
-                     
+
                     </div>
                     <div class="col-md-2 texto-lista">
                       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
-                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
-                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
-                    </select>
-                  </div>
+                        value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
+                        <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                      </select>
+                    </div>
 
                   </div>
 
@@ -227,15 +240,15 @@
               &nbsp;PENDIENTES
             </ng-template>
 
-            <div  style="margin-right: 10px; margin-left: 10px; padding:0px;">
-              <mat-selection-list >
+            <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              <mat-selection-list>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
                     <div class="col-md-1">
-                     
+
                     </div>
                     <div class="col-md-2 texto-lista">
-                     NUMERO CONTROL
+                      NUMERO CONTROL
                     </div>
 
                     <div class="col-md-2 texto-lista">
@@ -249,14 +262,14 @@
                         value="{{xyear}}" style="margin-top: -20px;">
                         <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
                       </select>
-                     
+
                     </div>
                     <div class="col-md-2 texto-lista">
                       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
-                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
-                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
-                    </select>
-                  </div>
+                        value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
+                        <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                      </select>
+                    </div>
 
                   </div>
 
@@ -273,7 +286,8 @@
                     </div>
 
                     <div class="col-md-2 texto-lista">
-                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.idd )]">{{ e.saso | uppercase }}
+                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.idd )]">{{ e.saso |
+                        uppercase }}
                         &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
                     <div class="col-md-4 texto-lista">
@@ -286,13 +300,13 @@
 
                     <div class="col-md-2 text-right">
                       <button mat-icon-button aria-label="Privado">
-                        <mat-icon  class="text-gray" (click)="mensajeReversarDoc(e.idd)" >history</mat-icon>
+                        <mat-icon class="text-gray" (click)="mensajeReversarDoc(e.idd)">history</mat-icon>
                       </button>
 
                       <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc)">
                         <mat-icon class="text-gray">attach_file</mat-icon>
                       </button>
-                     
+
 
                     </div>
                   </div>
@@ -383,8 +397,8 @@
     <div class="form-row col-md-12" *ngIf="archivar">
       <div class="form-group col-md-6">
         <label for="">Código de Archivo</label>
-        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="codigo"
-          value="{{codigo}}" id="cod">
+        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="codigo" value="{{codigo}}"
+          id="cod">
           <option value="0">Seleccione</option>
           <option *ngFor="let x of lstCA" value="{{x.nomb}}">{{ x.nomb }} -- {{ x.obse }}</option>
         </select>

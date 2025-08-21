@@ -298,7 +298,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     } else {
       this.limpiarDoc()
-       
+
     }
     await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu("/control")
@@ -319,7 +319,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
 
- 
+
 
   setDescripcionPunto() {
     this.sCedula = 'Cédula'
@@ -345,9 +345,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.forigenv = false
     this.ncontrolt = 'Nro de Salida'
     this.remitentet = 'Destinatario'
-    this.fsalida = 'Fecha de Salida'
+    this.fsalida = 'Fecha de Salida (*)'
     this.camposalida = 4
     this.camposfechasalida = 4
+    let fechaActual = new Date().toISOString().substring(0, 10);
+    this.fcreacion = NgbDate.from(this.formatter.parse(fechaActual))
   }
 
   validarTipoDoc(): boolean {
@@ -396,8 +398,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.Doc.unidad = '0'
     this.Doc.creador = ''
     let fechaActual = new Date().toISOString().substring(0, 10);
-    
-    
     this.fcreacion = NgbDate.from(this.formatter.parse(fechaActual))
 
     this.nasociacion = ''
@@ -412,7 +412,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
     this.xAPI.parametros = base
     this.xAPI.valores = ''
-     console.log('fechaActual'); 
+    console.log('fechaActual');
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
         console.log(data)
@@ -701,7 +701,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
-       
+
 
         if (this.titulo == 'Salida') {
           this.insertarObservacion()
@@ -709,43 +709,43 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.lstPC = this.toppings.value
 
           this.salvarPuntoCuenta(wfd)
-         
+
           this.ruta.navigate(['/salidas']);
 
         } else {
           console.log(this.Doc)
-          
+
           const cant = this.lstCuenta.length
 
-            if (cant > 0) {
-              
-              let fnx = {
-                'funcion': 'WKF_ESubDocumentoPuntoCuenta',
-                'parametros' : this.Doc.wfdocumento.toString(),
-                'valores': ''
-              }
-              // console.log(fnx)
+          if (cant > 0) {
 
-              this.apiService.Ejecutar(fnx).subscribe(
-                async data => {
-                  // console.log(data)
-                  await this.salvarCuentas(this.Doc.wfdocumento)
-                  
-                },
-                err => {
-                  this.ruta.navigate(['/registrar']);
-                }
-              )
-
-            }else{
-              this.ruta.navigate(['/registrar']);
+            let fnx = {
+              'funcion': 'WKF_ESubDocumentoPuntoCuenta',
+              'parametros': this.Doc.wfdocumento.toString(),
+              'valores': ''
             }
+            // console.log(fnx)
+
+            this.apiService.Ejecutar(fnx).subscribe(
+              async data => {
+                // console.log(data)
+                await this.salvarCuentas(this.Doc.wfdocumento)
+
+              },
+              err => {
+                this.ruta.navigate(['/registrar']);
+              }
+            )
+
+          } else {
+            this.ruta.navigate(['/registrar']);
+          }
 
 
-         
 
-          
-          
+
+
+
         }
 
         this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
@@ -1159,7 +1159,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.xAPI.valores = ''
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          
+
           const militar = data.Cuerpo.map(e => {
             e.resoluciones = JSON.parse(e.resoluciones)
             e.entradas = JSON.parse(e.entradas)

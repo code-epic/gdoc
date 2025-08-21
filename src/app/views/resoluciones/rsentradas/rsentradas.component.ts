@@ -287,7 +287,7 @@ export class RsentradasComponent implements OnInit {
   @Input() entradas: any;
   editar: boolean = false
 
-  
+
 
 
   constructor(private apiService: ApiService,
@@ -305,7 +305,7 @@ export class RsentradasComponent implements OnInit {
   ngOnInit(): void {
 
     let alertas = {
-      'tipo' : 'alerta',
+      'tipo': 'alerta',
       'valor': true
     }
     this.msj.contenido$.emit(alertas)
@@ -328,7 +328,7 @@ export class RsentradasComponent implements OnInit {
       this.Entradas.responsable = e.responsable
       this.Entradas.componente = e.componente
       this.clasificacion = e.cod_tipo_entrada
-      this.xclasificacion = e.des_tipo_resol!=''?e.des_tipo_resol:e.des_tipo_entrada.toString()
+      this.xclasificacion = e.des_tipo_resol != '' ? e.des_tipo_resol : e.des_tipo_entrada.toString()
       this.fecha_resolucion = this.utilService.ConvertirFechaDia(
         e.fecha_entrada
 
@@ -368,14 +368,14 @@ export class RsentradasComponent implements OnInit {
       map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
     )
 
-    
+
     this.xcomponente = this.Entradas.componente.toString()
-    
+
 
 
   }
 
-  activar(){
+  activar() {
     this.bclasificacion = false
   }
 
@@ -629,37 +629,42 @@ export class RsentradasComponent implements OnInit {
   }
 
 
-  validarCampos(){
-   
-    if( parseInt(this.codigo) != this.Entradas.acto){
+  validarCampos() {
+
+    if (parseInt(this.codigo) != this.Entradas.acto) {
       this.Entradas.acto = parseInt(this.codigo)
     }
 
-    if( parseInt(this.xcomponente) != this.Entradas.componente){
+    if (parseInt(this.xcomponente) != this.Entradas.componente) {
       this.Entradas.componente = parseInt(this.xcomponente)
     }
-    
+
     // console.log(this.xcomponente)
 
-    if (this.clasificacion.codigo != undefined ) {
-      if( this.Entradas.tipo_entrada != parseInt( this.clasificacion.codigo)) {
-        this.Entradas.tipo_entrada = parseInt( this.clasificacion.codigo)
+    if (this.clasificacion.codigo != undefined) {
+      if (this.Entradas.tipo_entrada != parseInt(this.clasificacion.codigo)) {
+        this.Entradas.tipo_entrada = parseInt(this.clasificacion.codigo)
       }
     }
 
-   
+
 
   }
 
   async SubirArchivo() {
+    // Validación antes de continuar
+    if (!this.Entradas.cuenta || this.Entradas.cuenta.trim() === '') {
+      this.toastrService.error('GDoc MPPD Debe colocar punto cuenta', 'Error');
+      return;
+    }
     this.validarCampos()
     this.blAceptar = false
-    
+
     this.ngxService.startLoader("loader-entrada")
     var frm = new FormData(document.forms.namedItem("forma"))
     try {
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
-        this.Entradas.archivo = this.archivos[0]==undefined?'':this.archivos[0].name
+        this.Entradas.archivo = this.archivos[0] == undefined ? '' : this.archivos[0].name
         if (!this.editar) {
 
           this.guardar()
@@ -671,7 +676,7 @@ export class RsentradasComponent implements OnInit {
     } catch (error) {
       this.toastrService.error(error, `GDoc MPPD Insertar resuelto subir el archivo`)
     }
- 
+
   }
 
 
@@ -734,7 +739,7 @@ export class RsentradasComponent implements OnInit {
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(update)
     console.log(this.xAPI.valores)
-    
+
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
