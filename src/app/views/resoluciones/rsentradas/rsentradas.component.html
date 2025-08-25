@@ -115,8 +115,7 @@
             <div class="col-md-3">
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Formato del Documento</mat-label>
-                    <mat-select placeholder="Documento"  [(value)]="codigo"
-                        required="required">
+                    <mat-select placeholder="Documento" [(value)]="codigo" required="required">
                         <mat-option value="1">RESOLUCION</mat-option>
                         <mat-option value="0">ORDEN GENERAL</mat-option>
                     </mat-select>
@@ -127,16 +126,15 @@
             <div class="col-md-3">
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Fecha (*)</mat-label>
-                    <input matInput placeholder="Fecha " [ngModelOptions]="{standalone: true}"
-                        ngbDatepicker #fo="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
+                    <input matInput placeholder="Fecha " [ngModelOptions]="{standalone: true}" ngbDatepicker
+                        #fo="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
                         [(ngModel)]="fecha_resolucion">
-                    <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button"
-                        id="fori">edit_calendar</mat-icon>
+                    <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button" id="fori">edit_calendar</mat-icon>
 
 
                 </mat-form-field>
             </div>
-            
+
 
             <div class="col-md-3">
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
@@ -149,11 +147,11 @@
             </div>
 
             <div class="form-group col-md-3">
-                
-                <mat-form-field  class="example-full-width" appearance="outline" style="width:100%">
+
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label style="width:100%">Cuenta</mat-label>
-                    <input  type="text" matInput  
-                    [ngModelOptions]="{standalone: true}" [(ngModel)]="Entradas.cuenta" value="{{Entradas.cuenta}}" >
+                    <input type="text" matInput required="required" placeholder="Cuenta"
+                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Entradas.cuenta" value="{{Entradas.cuenta}}">
                 </mat-form-field>
             </div>
 
@@ -161,9 +159,8 @@
             <div class="col-md-4">
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Componente</mat-label>
-                    <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}" 
-                    [(ngModel)]="xcomponente" value="{{xcomponente}}"
-                        required="required">
+                    <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}" [(ngModel)]="xcomponente"
+                        value="{{xcomponente}}" required="required">
                         <mat-option *ngFor="let e of Componentes;"
                             [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
                     </mat-select>
@@ -173,10 +170,12 @@
 
 
             <div class="form-group col-md-5">
-                <mat-form-field *ngIf="bclasificacion" class="example-full-width" appearance="outline" style="width:100%">
+                <mat-form-field *ngIf="bclasificacion" class="example-full-width" appearance="outline"
+                    style="width:100%">
                     <input readonly="readonly" type="text" matInput (click)="activar()" [(ngModel)]="xclasificacion">
                 </mat-form-field>
-                <mat-form-field *ngIf="!bclasificacion" class="example-full-width" appearance="outline" style="width:100%">
+                <mat-form-field *ngIf="!bclasificacion" class="example-full-width" appearance="outline"
+                    style="width:100%">
                     <mat-label style="width:100%">Clasificacion de documento</mat-label>
                     <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto"
                         (blur)="seleccionTipo()" [(ngModel)]="clasificacion">
@@ -192,7 +191,7 @@
             <div class="col-md-3">
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Estatus</mat-label>
-                    <mat-select placeholder="Estatus"  required="required" [(value)]="estatus">
+                    <mat-select placeholder="Estatus" required="required" [(value)]="estatus">
                         <mat-option *ngFor="let e of Estados;"
                             [value]="e.cod_estado_resol">{{e.des_estado_resol}}</mat-option>
 
@@ -222,7 +221,7 @@
 
 
         <div class="form-row">
-            
+
             <div class="col-md-5">
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Responsable</mat-label>
@@ -255,8 +254,10 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="text-right">
-                    <button *ngIf="!editar && blAceptar" class="btn bg-primary text-white" (click)="SubirArchivo()">Aceptar</button>
-                    <button *ngIf="editar && blAceptar" class="btn bg-warning text-white" (click)="SubirArchivo()">Actualizar</button>
+                    <button *ngIf="!editar && blAceptar" class="btn bg-primary text-white"
+                        (click)="SubirArchivo()">Aceptar</button>
+                    <button *ngIf="editar && blAceptar" class="btn bg-warning text-white"
+                        (click)="SubirArchivo()">Actualizar</button>
                 </div>
             </div>
         </div>

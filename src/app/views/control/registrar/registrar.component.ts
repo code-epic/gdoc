@@ -728,4 +728,8 @@ export class RegistrarComponent implements OnInit {
     })
 
   }
+
+  navegar(){
+    this.ruta.navigate(['/documento']);
+  }
 }

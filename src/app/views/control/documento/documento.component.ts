@@ -88,7 +88,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public fcuenta: any
   public fplazo: any
 
-  public fcreacionDate: NgbDate | null
   public forigenDate: NgbDate | null
   public fcuentaDate: NgbDate | null
 
@@ -259,7 +258,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     private rutaActiva: ActivatedRoute,
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
-    public formatter: NgbDateParserFormatter,
+    private formatter: NgbDateParserFormatter,
     private location: Location,
     private ruta: Router) {
 
@@ -319,6 +318,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.listarConfiguracion()
   }
 
+
+
+
   setDescripcionPunto() {
     this.sCedula = 'Cédula'
     this.sGrado = 'Grado / Jerarquía'
@@ -343,9 +345,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.forigenv = false
     this.ncontrolt = 'Nro de Salida'
     this.remitentet = 'Destinatario'
-    this.fsalida = 'Fecha de Salida'
+    this.fsalida = 'Fecha de Salida (*)'
     this.camposalida = 4
     this.camposfechasalida = 4
+    let fechaActual = new Date().toISOString().substring(0, 10);
+    this.fcreacion = NgbDate.from(this.formatter.parse(fechaActual))
   }
 
   validarTipoDoc(): boolean {
@@ -393,8 +397,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.Doc.remitente = '0'
     this.Doc.unidad = '0'
     this.Doc.creador = ''
-    this.fcreacionDate = NgbDate.from(this.formatter.parse(dia))
-    this.fcreacion = dia
+    let fechaActual = new Date().toISOString().substring(0, 10);
+    this.fcreacion = NgbDate.from(this.formatter.parse(fechaActual))
+
     this.nasociacion = ''
   }
 
@@ -407,14 +412,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
     this.xAPI.parametros = base
     this.xAPI.valores = ''
-    // console.log(this.estadoActual)
+    console.log('fechaActual');
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        // console.log(data)
+        console.log(data)
         data.Cuerpo.forEach(e => {
 
           this.Doc = e
-          this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
+          this.fcreacion = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
           this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
           if (e.alerta != null) {
             this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
@@ -662,8 +667,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.ruta.navigate(['/registrar']);
       }
 
-
-
     })
   }
 
@@ -696,7 +699,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
-       
+
 
         if (this.titulo == 'Salida') {
           this.insertarObservacion()
@@ -704,43 +707,43 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.lstPC = this.toppings.value
 
           this.salvarPuntoCuenta(wfd)
-         
+
           this.ruta.navigate(['/salidas']);
 
         } else {
           console.log(this.Doc)
-          
+
           const cant = this.lstCuenta.length
 
-            if (cant > 0) {
-              
-              let fnx = {
-                'funcion': 'WKF_ESubDocumentoPuntoCuenta',
-                'parametros' : this.Doc.wfdocumento.toString(),
-                'valores': ''
-              }
-              // console.log(fnx)
+          if (cant > 0) {
 
-              this.apiService.Ejecutar(fnx).subscribe(
-                async data => {
-                  // console.log(data)
-                  await this.salvarCuentas(this.Doc.wfdocumento)
-                  
-                },
-                err => {
-                  this.ruta.navigate(['/registrar']);
-                }
-              )
-
-            }else{
-              this.ruta.navigate(['/registrar']);
+            let fnx = {
+              'funcion': 'WKF_ESubDocumentoPuntoCuenta',
+              'parametros': this.Doc.wfdocumento.toString(),
+              'valores': ''
             }
+            // console.log(fnx)
+
+            this.apiService.Ejecutar(fnx).subscribe(
+              async data => {
+                // console.log(data)
+                await this.salvarCuentas(this.Doc.wfdocumento)
+
+              },
+              err => {
+                this.ruta.navigate(['/registrar']);
+              }
+            )
+
+          } else {
+            this.ruta.navigate(['/registrar']);
+          }
 
 
-         
 
-          
-          
+
+
+
         }
 
         this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
@@ -1154,7 +1157,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.xAPI.valores = ''
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          
+
           const militar = data.Cuerpo.map(e => {
             e.resoluciones = JSON.parse(e.resoluciones)
             e.entradas = JSON.parse(e.entradas)
@@ -1202,7 +1205,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       async data => {
         data.Cuerpo.forEach(e => {
           this.Doc = e
-          this.fcreacionDate = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
+          this.fcreacion = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
           this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
           if (e.alerta != null) {
             this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))

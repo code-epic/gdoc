@@ -8,7 +8,6 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { RsconsultaSessionService } from 'src/app/services/resoluciones/rsconsulta-session.service';
 import { ExcelService } from 'src/app/services/util/excel.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
-import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
 
 @Component({

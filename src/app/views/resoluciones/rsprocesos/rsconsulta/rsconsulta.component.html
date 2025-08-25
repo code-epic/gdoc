@@ -503,6 +503,7 @@
                                                         <tr>
                                                             <th> NUM.</th>
                                                             <th> GRADO</th>
+                                                            <th> COMPONENTE</th>
                                                             <th> NOMBRE COMPLETO</th>
                                                             <th style="width: 110px;"> CEDULA</th>
                                                             <th style="width: 90px;"> FECHA</th>
@@ -515,6 +516,7 @@
                                                         <tr *ngFor="let e of lstResolucionesS; index as i">
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ e.grado_abreviado }}</td>
+                                                            <td>{{ e.componente_abreviado }}</td>
                                                             <td>{{ e.nombres_apellidos | uppercase }}</td>
                                                             <td><a class="enlace"
                                                                     (click)="obtenerCedula(e.cedula);volverDatos(1)"
@@ -766,12 +768,13 @@
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
                                                         <tr>
-                                                            <th colspan="9" class="text-center" style="padding: 15px;">
+                                                            <th colspan="10" class="text-center" style="padding: 15px;">
                                                                 FICHA DE DATOS RESOLUCIONES ( {{ resolucion }} ) </th>
                                                         </tr>
                                                         <tr>
                                                             <th> NUM.</th>
                                                             <th style="width: 80px;"> GRADO</th>
+                                                            <th style="width: 80px;"> COMP.</th>
                                                             <th> NOMBRE COMPLETO</th>
                                                             <th> CEDULA</th>
                                                             <th> RESOLUCION</th>
@@ -785,6 +788,7 @@
                                                         <tr *ngFor="let e of lstResolucionesX; index as i">
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ e.grado_abreviado }}</td>
+                                                            <td>{{ e.componente_abreviado }}</td>
                                                             <td>{{ e.nombres_apellidos }}</td>
 
                                                             <td><a class="enlace"

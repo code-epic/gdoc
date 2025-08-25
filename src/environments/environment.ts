@@ -21,6 +21,7 @@ export const environment = {
     ENTRADAS_PROCESO: 'MPPD_CEntradasProceso',
     CONSULTAR_RESOLUCIONES: 'MPPD_CResoluciones',
     ENTRADAS_RESOLUCIONES: 'MPPD_GEntradasResoluciones',
+    CONSULTAR_ENTRADAS_RESOLUCIONES: 'MPPD_CEntradasResoluciones',
     CAUSA_RESOLUCION: 'MPPD_CCausaResolucion',
     CONSULTAR_CONFIGURACION: 'MD_CConfiguracion', 
     MOTIVO_RESOLUCION: 'MPPD_CMotivoResolucion',
@@ -45,6 +46,7 @@ export const environment = {
     MPPD_CAlertasResoluciones: 'MPPD_CAlertasResoluciones',
     MPPD_CAlertasReicorporacion: 'MPPD_CAlertasReicorporacion', 
     MPPD_UAlertasResoluciones: 'MPPD_UAlertasResoluciones',
+    CONSULTAR_ADMINISTRACION: 'MPPD_CNominaAdministrativa',
     // WKF_
     ESTADOS: 'WKF_CEstados',
     DOCUMENTOS_RESOLUCIONES: 'WKF_CDocumentosResoluciones',

@@ -97,8 +97,8 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
 export class RsentradasComponent implements OnInit {
 
   public id: string = ''
-  public estadoActual = 1
-  public estadoOrigen = 1
+  public estadoActual: number = 1
+  public estadoOrigen: number = 1
   public fecha: any
   public vigencia: any
 
@@ -136,6 +136,7 @@ export class RsentradasComponent implements OnInit {
     fecha_resolucion: '',
     detalle: '',
     accion: 0
+
 
   }
 
@@ -249,7 +250,6 @@ export class RsentradasComponent implements OnInit {
   bHistorial = false
   blAceptar: boolean = true
   bPDF = false
-
   nControl = ''
 
   value = ''
@@ -287,7 +287,7 @@ export class RsentradasComponent implements OnInit {
   @Input() entradas: any;
   editar: boolean = false
 
-  
+  activarMensaje: boolean = false;
 
 
   constructor(private apiService: ApiService,
@@ -305,7 +305,7 @@ export class RsentradasComponent implements OnInit {
   ngOnInit(): void {
 
     let alertas = {
-      'tipo' : 'alerta',
+      'tipo': 'alerta',
       'valor': true
     }
     this.msj.contenido$.emit(alertas)
@@ -328,7 +328,7 @@ export class RsentradasComponent implements OnInit {
       this.Entradas.responsable = e.responsable
       this.Entradas.componente = e.componente
       this.clasificacion = e.cod_tipo_entrada
-      this.xclasificacion = e.des_tipo_resol!=''?e.des_tipo_resol:e.des_tipo_entrada.toString()
+      this.xclasificacion = e.des_tipo_resol != '' ? e.des_tipo_resol : e.des_tipo_entrada.toString()
       this.fecha_resolucion = this.utilService.ConvertirFechaDia(
         e.fecha_entrada
 
@@ -368,14 +368,39 @@ export class RsentradasComponent implements OnInit {
       map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
     )
 
-    
+
     this.xcomponente = this.Entradas.componente.toString()
-    
+
+
+
 
 
   }
+  protected aceptar(msj: string): void {
+    if (this.activarMensaje) return;
+    this.activarMensaje = true;
+    Swal.fire({
+      title: msj,
+      text: "¿Desea registrar otro documento?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'No',
+      allowEscapeKey: true,
+    }).then((result) => {
+      this.activarMensaje = false;
+      if (result.isConfirmed) {
+        this.blAceptar = true;
+        this.limpiarFrm();
+      } else {
+        this.ruta.navigate(['/resoluciones']);
+      }
+    });
 
-  activar(){
+  }
+  activar() {
     this.bclasificacion = false
   }
 
@@ -629,37 +654,44 @@ export class RsentradasComponent implements OnInit {
   }
 
 
-  validarCampos(){
-   
-    if( parseInt(this.codigo) != this.Entradas.acto){
+  validarCampos() {
+
+    if (parseInt(this.codigo) != this.Entradas.acto) {
       this.Entradas.acto = parseInt(this.codigo)
     }
 
-    if( parseInt(this.xcomponente) != this.Entradas.componente){
+    if (parseInt(this.xcomponente) != this.Entradas.componente) {
       this.Entradas.componente = parseInt(this.xcomponente)
     }
-    
+
     // console.log(this.xcomponente)
 
-    if (this.clasificacion.codigo != undefined ) {
-      if( this.Entradas.tipo_entrada != parseInt( this.clasificacion.codigo)) {
-        this.Entradas.tipo_entrada = parseInt( this.clasificacion.codigo)
+    if (this.clasificacion.codigo != undefined) {
+      if (this.Entradas.tipo_entrada != parseInt(this.clasificacion.codigo)) {
+        this.Entradas.tipo_entrada = parseInt(this.clasificacion.codigo)
       }
     }
 
-   
+
 
   }
 
   async SubirArchivo() {
+    if (!this.Entradas.cuenta || this.Entradas.cuenta.trim() === '') {
+      this.blAceptar = true;
+      this.toastrService.error("GDOC MPPD El campo cuenta es obligatorio", "Error");
+      return;
+    }
     this.validarCampos()
     this.blAceptar = false
-    
+
     this.ngxService.startLoader("loader-entrada")
     var frm = new FormData(document.forms.namedItem("forma"))
     try {
+
+
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
-        this.Entradas.archivo = this.archivos[0]==undefined?'':this.archivos[0].name
+        this.Entradas.archivo = this.archivos[0] == undefined ? '' : this.archivos[0].name
         if (!this.editar) {
 
           this.guardar()
@@ -671,7 +703,7 @@ export class RsentradasComponent implements OnInit {
     } catch (error) {
       this.toastrService.error(error, `GDoc MPPD Insertar resuelto subir el archivo`)
     }
- 
+
   }
 
 
@@ -679,6 +711,7 @@ export class RsentradasComponent implements OnInit {
     if (this.Resolucion.cedula == '') {
       this._snackBar.open("Debe seleccionar una cedula", "OK")
       return
+
     }
     this.Entradas.cedula = this.Resolucion.cedula
     this.Entradas.egrado = parseInt(this.Resolucion.codigo_grado.toString())
@@ -698,18 +731,17 @@ export class RsentradasComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-
         this.toastrService.info('Proceso exitoso', `GDoc MPPD Insertar resuelto`);
         this.ngxService.stopLoader("loader-entrada");
-        this.blAceptar = false
-        this.limpiarFrm()
-        //this.utilService.contenido$.emit( this.Entradas.cedula );
+        this.blAceptar = false;
+        this.aceptar('Entrada Registrada Exitosamente');
       },
       error => {
-        console.error(error, 'GDoc Resoluciones entradas')
+        console.error(error, 'GDoc Resoluciones entradas');
+        this.blAceptar = true;
       }
-    );
 
+    );
   }
 
   actualizar() {
@@ -734,7 +766,7 @@ export class RsentradasComponent implements OnInit {
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(update)
     console.log(this.xAPI.valores)
-    
+
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -742,10 +774,13 @@ export class RsentradasComponent implements OnInit {
         this.toastrService.info('Proceso exitoso', `GDoc MPPD Insertar resuelto`);
         this.ngxService.stopLoader("loader-entrada");
         this.utilService.contenido$.emit(this.Entradas.cedula);
-        this.blAceptar = false
+        this.blAceptar = false;
+        this.aceptar('Documento actualizado exitosamente');
       },
+
       error => {
-        console.error(error, 'GDoc Resoluciones entradas')
+        console.error(error, 'GDoc Resoluciones entradas');
+        this.blAceptar = true;
       }
     );
 

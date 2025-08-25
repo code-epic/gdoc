@@ -29,100 +29,142 @@
 
                 <div class="card-body">
                     <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
-                    <div class="container mb-5">
-                        <div class="row">
-                            
+                    <div class="d-flex justify-content-end mb-3 gap-2">
 
-                                <div class="row text-center">
-
-
-
-                                    <table style="width: 100%;">
-                                        <thead style="width: 100%;">
-                                            <tr>
-                                                <td rowspan="2" >
-                                                    GRADOS
-                                                </td>
-                                                <td colspan="9">
-                                                    EJERCITO BOLIVARIANO
-                                                </td>
-                                                <td colspan="9">
-                                                   ARMADA BOLIVARIANA
-                                                </td >
-                                                <td colspan="9">
-                                                    AVIACION MILITAR BOLIVARIANA
-                                                </td>
-                                                <td colspan="9">
-                                                    GUARDIA NACIONAL BOLIVARIANA
-                                                </td>
-                                                <td rowspan="2"> TOTAL </td>
-                                            </tr>
-                                            <tr class="font-small">
-                                               
-                                                <td *ngFor="let e of lstTitulos;">
-                                                    {{e.valor}}
-                                                </td>
-
-                                                <td *ngFor="let e of lstTitulos;">
-                                                    {{e.valor}}
-                                                </td>
-                                              
-
-                                                <td *ngFor="let e of lstTitulos;">
-                                                    {{e.valor}}
-                                                </td>
-
-                                                <td *ngFor="let e of lstTitulos;">
-                                                    {{e.valor}}
-                                                </td>
-                                             
-                                            </tr>
-
-                                        </thead>
-
-                                        <tbody>
-                                            <tr *ngFor="let e of lstGrados">
-                                                <td >{{e.grado}}</td>
-                                                <td>{{ encontrarPosicionCat(0, 4, e.id, 1) }}</td>
-                                                <td>0</td>
-                                                <td>0</td>
-                                                <td>0</td>
-                                                <td>{{ encontrarPosicion(0, 7, e.id) }}</td>
-                                                <td>{{ encontrarPosicion(0, 5, e.id) }}</td>
-                                                <td>{{ encontrarPosicion(0, 3, e.id) }}</td>
-                                                <td>{{ encontrarPosicion(0, 1, e.id) }}</td>
-                                                <td></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        <button class="btn  bg-primary text-white" (click)="printTable()">
+                            <i class="fas fa-print mr-1"></i> Imprimir reporte
+                        </button>
+                    </div>
+                    <div class="row">
 
 
+                        <!-- End Legend Section -->
 
+                        <div class="col-md-12 text-center col-lg-12">
 
+                            <table id="tbl-ejercitos" class="tbl-ejercitos table-container" border="1">
+                                <thead>
+                                    <tr class="header-principal">
+                                        <th rowspan="2" class="celda-grado">GRA.</th>
 
+                                        <!-- Bloques de fuerzas -->
+                                        <th colspan="9" class="bloque ejercito">EJÉRCITO BOLIVARIANO</th>
+                                        <th colspan="9" class="bloque armada">ARMADA BOLIVARIANA</th>
+                                        <th colspan="9" class="bloque aviacion">AVIACIÓN MILITAR BOLIVARIANA</th>
+                                        <th colspan="9" class="bloque guardia">GUARDIA NACIONAL BOLIVARIANA</th>
 
+                                        <th rowspan="2" class="celda-total">TOTAL</th>
+                                    </tr>
 
+                                    <!-- Sub-encabezados dinámicos -->
+                                    <tr class="sub-header">
+                                        <!-- Ejército -->
+                                        <th *ngFor="let e of lstTitulos" class="sub-celda ejercito">{{ e.valor }}
+                                        </th>
 
+                                        <!-- Armada -->
+                                        <th *ngFor="let e of lstTitulos" class="sub-celda armada">{{ e.valor }}</th>
 
+                                        <!-- Aviación -->
+                                        <th *ngFor="let e of lstTitulos" class="sub-celda aviacion">{{ e.valor }}
+                                        </th>
 
+                                        <!-- Guardia Nacional -->
+                                        <th *ngFor="let e of lstTitulos" class="sub-celda guardia">{{ e.valor }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let e of lstGrados">
+                                        <td>{{e.codigo}}</td>
+                                        <!-- EJERCITO -->
+                                        <td  class="sub-celda ejercito">{{ encontrarPosicion(0, 4, e.n_codigo) }}</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>{{ encontrarPosicion(0, 7, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(0, 5, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(0, 3, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(0, 1, e.n_codigo) }}</td>
+                                        <td>{{ getSubTotal() }}</td>
 
+                                        <!-- ARMADA -->
+                                        <td class="sub-celda armada">{{ encontrarPosicion(1, 4, e.n_codigo) }}</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>{{ encontrarPosicion(1, 7, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(1, 5, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(1, 3, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(1, 1, e.n_codigo) }}</td>
+                                        <td>{{ getSubTotal() }}</td>
 
+                                        <!-- AVIACION -->
+                                        <td class="sub-celda aviacion">{{ encontrarPosicion(2, 4, e.n_codigo) }}</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>{{ encontrarPosicion(2, 7, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(2, 5, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(2, 3, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(2, 1, e.n_codigo) }}</td>
+                                        <td>{{ getSubTotal() }}</td>
 
+                                        <!-- GUARDIA -->
+                                        <td class="sub-celda guardia">{{ encontrarPosicion(3, 4, e.n_codigo) }}</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>{{ encontrarPosicion(3, 7, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(3, 5, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(3, 3, e.n_codigo) }}</td>
+                                        <td>{{ encontrarPosicion(3, 1, e.n_codigo) }}</td>
+                                        <td>{{ getSubTotal() }}</td>
 
+                                        <td colspan="2" class="sub-celda">{{ getTotalGlobal() }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                        </div>
 
+                        <!-- Legend Section -->
 
+                    </div>
+                    <br><br>
+                    <div class="row">
 
-
-
-
-
+                        <div class="col-md-12 text-center col-lg-12">
+                            <div class="card">
+                                <div class="card-header  py-2">
+                                    <h6 class="mb-0">LEYENDA DE ESTADISTICAS</h6>
+                                </div>
+                                <div class="card-body p-3" style="font-size: 12px;">
+                                    <div class="row">
+                                        <div class="col-md-3 col-6 mb-2"><b>PS C:</b> Propia solicitud Comando
+                                        </div>
+                                        <div class="col-md-3 col-6 mb-2"><b>PS T:</b> Propia solicitud técnico
+                                        </div>
+                                        <div class="col-md-3 col-6 mb-2"><b>PS OT:</b> Propia solicitud
+                                            Oficial de tropa</div>
+                                        <div class="col-md-3 col-6 mb-2"><b>CE A:</b> Cese de empleo
+                                            asimiliado</div>
+                                        <div class="col-md-3 col-6 mb-2"><b>SMD:</b> Separación por medidas
+                                            disciplinarias</div>
+                                        <div class="col-md-3 col-6 mb-2"><b>RAIAP:</b> Reserva Activa por
+                                            Invalidez absoluta y permanente</div>
+                                        <div class="col-md-3 col-6 mb-2"><b>PMAX:</b> Permanencia Máxima en el
+                                            grado</div>
+                                        <div class="col-md-3 col-6 mb-2"><b>TSC:</b> Tiempo de Servicio
+                                            Cumplido</div>
+                                    </div>
                                 </div>
 
-                            
-
+                            </div>
                         </div>
-                        <br><br><br>
                     </div>
+                    <br><br>
+
                 </div>
             </div>
         </div>

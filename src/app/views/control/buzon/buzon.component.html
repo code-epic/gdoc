@@ -426,7 +426,7 @@
       <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
       <label>Seleccionar Archivo</label>
       <div class="file-loading">
-        <input (change)="fileSelected($event)" class="file-input" name="archivos" type="file" accept=".pdf">
+        <input (change)="fileSelected($event)" class="file-input" name="archivos" type="file" accept=".pdf" multiple>
       </div>
       <div id="errorBlock" class="help-block"></div>
     </form>

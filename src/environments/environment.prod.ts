@@ -16,6 +16,7 @@ export const environment = {
     GRUPO_CARPETA_ENTRADA: 'MPPD_CGrupoCarpertaEntrada',
     ENTRADAS_PROCESO: 'MPPD_CEntradasProceso',
     ENTRADAS_RESOLUCIONES: 'MPPD_GEntradasResoluciones',
+    CONSULTAR_ENTRADAS_RESOLUCIONES: 'MPPD_CEntradasResoluciones',
     CONSULTAR_RESOLUCIONES: 'MPPD_CResoluciones',
     CAUSA_RESOLUCION: 'MPPD_CCausaResolucion',
     CONSULTAR_CONFIGURACION: 'MD_CConfiguracion', 
@@ -41,6 +42,7 @@ export const environment = {
     MPPD_CAlertasResoluciones: 'MPPD_CAlertasResoluciones',
     MPPD_CAlertasReicorporacion: 'MPPD_CAlertasReicorporacion',
     MPPD_UAlertasResoluciones: 'MPPD_UAlertasResoluciones',
+    CONSULTAR_ADMINISTRACION: 'MPPD_CNominaAdministrativa',
     // WKF_
     ESTADOS: 'WKF_CEstados',
     DOCUMENTOS_RESOLUCIONES: 'WKF_CDocumentosResoluciones',
