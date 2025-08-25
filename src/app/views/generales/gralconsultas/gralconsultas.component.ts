@@ -145,57 +145,110 @@ export class GralconsultasComponent implements OnInit {
     )
   }
 
-   filtrarNombramiento(e): string {
-        let otro_cargo = e.cargo
+   /**
+    * Filtra y formatea la información de nombramiento de un empleado
+    * @param e - Objeto que contiene la información del empleado
+    * @returns string - Texto formateado con la información del nombramiento
+    */
+   filtrarNombramiento(e: any): string {
+       try {
+           // 1. Validar entrada
+           if (!e || typeof e !== 'object') {
+               console.warn('Objeto de entrada inválido:', e);
+               return 'SIN NOMBRAMIENTO';
+           }
 
-        let nmb = JSON.parse(e.resoluciones).filter(e => {
-            return e.tipo != 13;
-        }).sort((a, b) => {
-            if (a.fecha > b.fecha) {
-                return -1;
-            } else if (a.fecha < b.fecha) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
+           // 2. Obtener cargo con manejo seguro
+           const cargo = e.cargo || '';
 
-        let texto = '';
-        if (nmb.length !== 0) {
-            if (nmb[0].asunto === undefined) {
-                texto = '';
-            } else {
-                let xcargo = otro_cargo == undefined ? '' : otro_cargo
-                texto = nmb[0].asunto + `<br> RESOL. ${nmb[0].numero} <br> ${nmb[0].fecha}<br> ${xcargo}`
-            }
-        } else {
-            texto = 'SIN NOMBRAMIENTO';
-        }
-        return texto;
+           // 3. Validar y parsear resoluciones
+           let resoluciones = [];
+           try {
+               if (e.resoluciones && typeof e.resoluciones === 'string') {
+                   const parsed = JSON.parse(e.resoluciones);
+                   resoluciones = Array.isArray(parsed) ? parsed : [];
+               }
+           } catch (error) {
+               console.error('Error al parsear resoluciones:', error);
+               return 'SIN NOMBRAMIENTO';
+           }
+
+           // 4. Filtrar y ordenar con validaciones
+           const nombramientos = (Array.isArray(resoluciones) ? resoluciones : [])
+               .filter(res => {
+                   try {
+                       return res && 
+                           typeof res === 'object' && 
+                           'tipo' in res && 
+                           res.tipo !== 13;
+                   } catch (error) {
+                       console.warn('Elemento de resolución inválido:', res, error);
+                       return false;
+                   }
+               })
+               .sort((a, b) => {
+                   if (!a || !b) return 0;
+                   const fechaA = a.fecha || '';
+                   const fechaB = b.fecha || '';
+                   return fechaB.localeCompare(fechaA); // Orden descendente
+               });
+
+           // 5. Validar si hay resultados
+           if (!nombramientos.length || !nombramientos[0]) {
+               return 'SIN NOMBRAMIENTO';
+           }
+
+           const primerNmb = nombramientos[0];
+           const asunto = primerNmb.asunto || '';
+           const numero = primerNmb.numero || '';
+           const fecha = primerNmb.fecha || '';
+
+           // 6. Retornar resultado formateado
+           return asunto 
+               ? `${asunto}<br>RESOL. ${numero}<br>${fecha}${cargo ? '<br>' + cargo : ''}`
+               : '';
+
+       } catch (error) {
+           console.error('Error inesperado en filtrarNombramiento:', error);
+           return 'SIN NOMBRAMIENTO';
+       }
+   }
+
+filtrarAscenso(e) {
+
+  console.log(e)
+    // 1. Validar que el objeto de entrada 'e' no sea nulo
+    if (!e) {
+        return 'SIN RESUELTO';
     }
 
-    filtrarAscenso(e) {
-        let area = this.getMerito(e.merito)
-        let asc = JSON.parse(e.resoluciones).filter(e => {
-            return e.tipo == 13;
-        }).sort((a, b) => {
-            if (a.fecha > b.fecha) {
-                return -1;
-            } else if (a.fecha < b.fecha) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
-        let texto = ''
-        if (asc.length !== 0) {
-            texto = `RESOL. ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${area}`
-        } else {
-            texto = 'SIN RESUELTO'
+    let area = this.getMerito(e.merito);
 
+    // 2. Obtener las resoluciones o un array vacío si el valor es nulo o inválido
+    const resoluciones = e.resoluciones ? JSON.parse(e.resoluciones) : [];
+
+    // 3. Usar el array 'resoluciones' para filtrar, validando cada elemento
+    let asc = resoluciones.filter(res => {
+        // Asegurarse de que el elemento no es null antes de leer 'tipo'
+        return res && res.tipo == 13;
+    }).sort((a, b) => {
+        if (a.fecha > b.fecha) {
+            return -1;
+        } else if (a.fecha < b.fecha) {
+            return 1;
+        } else {
+            return 0;
         }
-        return texto
+    });
+
+    let texto = '';
+    if (asc.length !== 0) {
+        texto = `RESOL. ${asc[0].numero} <br> ${asc[0].fecha}<br><br> ${area}`;
+    } else {
+        texto = 'SIN RESUELTO';
     }
+    return texto;
+}
 
     setDefaultPic(event: any) {
         event.target.src = this.utils.imgNoDisponible;

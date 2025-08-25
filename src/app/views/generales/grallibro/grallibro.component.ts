@@ -127,6 +127,8 @@ export class GrallibroComponent implements OnInit {
    * 
    */
   consultarListado() {
+
+    console.log('Estoy aqui')
     
     let cmp = this.componente.split('|')[0]
     let sit = this.situacion
