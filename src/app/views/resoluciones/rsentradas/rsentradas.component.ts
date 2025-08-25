@@ -378,10 +378,9 @@ export class RsentradasComponent implements OnInit {
   }
   protected aceptar(msj: string): void {
     if (this.activarMensaje) return;
-    console.log(msj);
     this.activarMensaje = true;
     Swal.fire({
-      title: 'El ' + msj,
+      title: msj,
       text: "¿Desea registrar otro documento?",
       icon: 'warning',
       showCancelButton: true,
@@ -392,13 +391,11 @@ export class RsentradasComponent implements OnInit {
       allowEscapeKey: true,
     }).then((result) => {
       this.activarMensaje = false;
-      if (!result.isConfirmed) {
-        {
-          this.ruta.navigate(['/resoluciones']);
-        }
-      } else {
+      if (result.isConfirmed) {
         this.blAceptar = true;
         this.limpiarFrm();
+      } else {
+        this.ruta.navigate(['/resoluciones']);
       }
     });
 
@@ -680,6 +677,11 @@ export class RsentradasComponent implements OnInit {
   }
 
   async SubirArchivo() {
+    if (!this.Entradas.cuenta || this.Entradas.cuenta.trim() === '') {
+      this.blAceptar = true;
+      this.toastrService.error("GDOC MPPD El campo cuenta es obligatorio", "Error");
+      return;
+    }
     this.validarCampos()
     this.blAceptar = false
 
@@ -687,12 +689,7 @@ export class RsentradasComponent implements OnInit {
     var frm = new FormData(document.forms.namedItem("forma"))
     try {
 
-      if (!this.Entradas.cuenta || this.Entradas.cuenta.trim() === '') {
-        this.ngxService.stopLoader("loader-entrada");
-        this.blAceptar = true;
-        this.toastrService.error("GDOC MPPD El campo cuenta es obligatorio", "Error");
-        return;
-      }
+
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {
         this.Entradas.archivo = this.archivos[0] == undefined ? '' : this.archivos[0].name
         if (!this.editar) {
@@ -737,12 +734,7 @@ export class RsentradasComponent implements OnInit {
         this.toastrService.info('Proceso exitoso', `GDoc MPPD Insertar resuelto`);
         this.ngxService.stopLoader("loader-entrada");
         this.blAceptar = false;
-        if (data.Cuerpo && data.Cuerpo[0] && data.Cuerpo[0].id) {
-          this.aceptar(data.Cuerpo[0].id.toString());
-        } else {
-          this.aceptar('Documento guardado exitosamente');
-        }
-
+        this.aceptar('Entrada Registrada Exitosamente');
       },
       error => {
         console.error(error, 'GDoc Resoluciones entradas');
