@@ -9,6 +9,7 @@ export const environment = {
   Url: 'http://10.190.1.160',
   API: '/devel/api/',
   Hash: '3a39a4d2f9869b08b9c2c2d9bad7334f.sse',
+  version: 'Wed Aug 20 2025 09:55:33 GMT-0400 (Venezuela Time)',
   funcion: {
     COMPONENTE_CONSULTAR: 'MPPD_CComponente',
     TIPO_RESOLUCION_CONSULTAR: 'MPPD_CTipoResolucion',
