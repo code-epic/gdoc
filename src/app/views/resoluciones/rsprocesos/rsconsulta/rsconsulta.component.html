@@ -780,7 +780,7 @@
                                                             <th> RESOLUCION</th>
                                                             <th style="width: 90px;"> FECHA</th>
                                                             <th>TIPO</th>
-                                                            <th>DESCRIPCION</th>
+                                                            <!-- <th>DESCRIPCION</th> -->
                                                             <th>ASUNTO</th>
                                                         </tr>
                                                     </thead>
@@ -803,12 +803,12 @@
                                                                     {{ e.numero }} </a> </td>
                                                             <td>{{ convertirFecha(e.fecha_resolucion) }}</td>
                                                             <td>{{ obtenerTipo(e.tipo) }}</td>
-                                                            <td>{{ e.administracion }}</td>
-                                                            <td *ngIf="validarSeguridad(e)" style="color:brown;">
-
+                                                            <!-- <td>{{ e.administracion }}</td> -->
+                                                            <!-- <td *ngIf="validarSeguridad(e)" style="color:brown;"> -->
+<!-- 
                                                                 <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
                                                                     RESOLUCIONES</b>
-                                                            </td>
+                                                            </td> -->
                                                             <td *ngIf="!validarSeguridad(e)"
                                                                 [innerHTML]="asuntohtml(e)">
                                                             </td>
