@@ -692,6 +692,9 @@ export class RsconsultaComponent implements OnInit {
         (data) => {
           this.resolucion = this.IResolucion.numero;
           this.IResolucion.numero = "";
+          console.log('Datos de resoluciones (lstResolucionesS):', data.Cuerpo);
+          console.log('Primer elemento lstResolucionesS:', data.Cuerpo[0]);
+          console.log('Campos disponibles lstResolucionesS:', Object.keys(data.Cuerpo[0]));
           this.ngxService.stopLoader("loader-buscar");
           this.lstResolucionesS = data.Cuerpo;
           this.dbResolucion = true;
@@ -774,6 +777,9 @@ export class RsconsultaComponent implements OnInit {
         // console.log(data)
         this.csvHead = data.Cabecera;
         this.resolucion = desde + " - " + hasta + " : " + data.Cuerpo.length;
+        console.log('Datos recibidos de la API:', data.Cuerpo);
+        console.log('Primer elemento:', data.Cuerpo[0]);
+        console.log('Campos disponibles:', Object.keys(data.Cuerpo[0]));
         this.ngxService.stopLoader("loader-buscar");
         if (this.busqueda == "1") {
           this.lstResolucionesTipo = data.Cuerpo;
