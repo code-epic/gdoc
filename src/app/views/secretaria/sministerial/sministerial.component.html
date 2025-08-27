@@ -54,7 +54,7 @@
             <ng-template mat-tab-label>
               &nbsp;MINISTERIAL
             </ng-template>
-            <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+            <div style="overflow-x: hidden; width: 98%;">
               <mat-selection-list>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
@@ -65,10 +65,10 @@
                       NUMERO CONTROL
                     </div>
 
-                    <div class="col-md-1 texto-lista">
+                    <div class="col-md-2 texto-lista">
                       ORIGEN
                     </div>
-                    <div class="col-md-4 texto-lista">
+                    <div class="col-md-3 texto-lista">
                       UNIDAD DEPENDENCIA
                     </div>
                     <div class="col-md-2 texto-lista">
@@ -94,7 +94,7 @@
                 <mat-list *ngFor="let e of buzon; let i=index " class="mat-list-general">
                   <div class="row">
 
-                    <div class="col-md-1 text-left">
+                    <div class="col-md-1 d-flex justify-content-center">
 
                       <button mat-icon-button aria-label="Editar" (click)="editar(e)">
                         <mat-icon class="text-gray">edit_note</mat-icon>
@@ -106,10 +106,10 @@
                         &nbsp;<font color="green">{{ e.simbolo }}</font></a>
                     </div>
 
-                    <div class="col-md-1  texto-lista">
+                    <div class="col-md-2  texto-lista">
                       {{ e.nori }}
                     </div>
-                    <div class="col-md-6 texto-detalle">
+                    <div class="col-md-5 texto-detalle">
                       {{ e.udep | uppercase }} / {{ e.coma | uppercase }}
                     </div>
 
@@ -142,7 +142,7 @@
               &nbsp;ENVIADOS A LA DIV. DE RESOLUCIONES
             </ng-template>
 
-            <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+            <div style="overflow-x: hidden; width: 98%;">
               <mat-selection-list>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
@@ -153,10 +153,10 @@
                       NUMERO CONTROL
                     </div>
 
-                    <div class="col-md-1 texto-lista">
+                    <div class="col-md-2 texto-lista">
                       ORIGEN
                     </div>
-                    <div class="col-md-4 texto-lista">
+                    <div class="col-md-3 texto-lista">
                       UNIDAD DEPENDENCIA
                     </div>
                     <div class="col-md-2 texto-lista">
@@ -182,7 +182,7 @@
                 <mat-list *ngFor="let e of buzon; let i=index " class="mat-list-general">
                   <div class="row">
 
-                    <div class="col-md-1 text-left">
+                    <div class="col-md-1 d-flex justify-content-center">
 
                       <button mat-icon-button aria-label="Editar" (click)="editar(e)">
                         <mat-icon class="text-gray">edit_note</mat-icon>
@@ -224,7 +224,7 @@
               &nbsp;DEVUELTOS
             </ng-template>
 
-            <div style="margin-right: 10px; margin-left: 10px; padding:0px;">
+            <div style="overflow-x: hidden; width: 98%;">
               <mat-selection-list>
                 <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
                   <div class="row">
@@ -235,10 +235,10 @@
                       NUMERO CONTROL
                     </div>
 
-                    <div class="col-md-1 texto-lista">
+                    <div class="col-md-2 texto-lista">
                       ORIGEN
                     </div>
-                    <div class="col-md-4 texto-lista">
+                    <div class="col-md-3 texto-lista">
                       UNIDAD DEPENDENCIA
                     </div>
                     <div class="col-md-2 texto-lista">
@@ -279,7 +279,7 @@
                     <div class="col-md-2  texto-lista">
                       {{ e.fcre | date:"dd-MM-yyyy" }} | {{ e.nori | uppercase }}
                     </div>
-                    <div class="col-md-6 texto-detalle">
+                    <div class="col-md-5 texto-detalle">
                       {{ e.udep | uppercase }} / {{ e.coma | uppercase }}
                     </div>
                     <div class="col-md-1 text-right ">
