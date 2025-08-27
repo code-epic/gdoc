@@ -278,7 +278,7 @@ export class RsbuzonComponent implements OnInit {
     selected = new FormControl(0);
     public lstCarpetasRecibido = [
         { 'id': 1, 'nomb': 'CONTROL DE GESTIÓN', 'cant': 0, 'cod': 'CG' },
-        { 'id': 2, 'nomb': 'SECRRETARIA', 'cant': 0, 'cod': 'SC' }
+        { 'id': 2, 'nomb': 'SECRETARIA', 'cant': 0, 'cod': 'SC' }
     ]
     public lstCarpetas = [];
     public lstCarpetasAux = [];
