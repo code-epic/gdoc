@@ -49,6 +49,9 @@ export class RsconsultaComponent implements OnInit {
 
   public cedula: string = "";
   public resolucion: string = "";
+  public hayCorreccion(): boolean {
+  return this.lstResolucionesS && this.lstResolucionesS.some(e => this.getCorreccion(e));
+}
 
   public xAPI: IAPICore = {
     funcion: "",
