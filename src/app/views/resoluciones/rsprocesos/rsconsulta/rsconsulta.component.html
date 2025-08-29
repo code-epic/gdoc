@@ -319,16 +319,19 @@
                                                 <table style="width: 100%;" class="zigzag" border="1">
                                                     <thead>
                                                         <tr>
-                                                            <th colspan="7" class="text-center" style="padding: 15px;">
+                                                            <th colspan="10" class="text-center" style="padding: 15px;">
                                                                 LISTADO GENERAL POR PERSONA </th>
                                                         </tr>
                                                         <tr>
                                                             <th> NUM.</th>
                                                             <th> GRADO</th>
+                                                            <th *ngIf="mostrarComponenteColumna" > COMPONENTE </th>
                                                             <th> NOMBRE COMPLETO</th>
                                                             <th style="width: 110px;"> CEDULA</th>
                                                             <th style="width: 90px;"> PROMOCION</th>
                                                             <th> SEXO </th>
+                                                            <th> CATEGORIA </th>
+                                                            <th> CLASIFICACION </th>
                                                             <th>SITUACION</th>
                                                         </tr>
                                                     </thead>
@@ -336,6 +339,7 @@
                                                         <tr *ngFor="let e of lstNombres; index as i">
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ e.grado_abreviado }}</td>
+                                                            <td *ngIf="mostrarComponenteColumna" >{{ e.componente_abreviado }}</td>
                                                             <td>{{ e.nombres | uppercase }}</td>
                                                             <td><a class="enlace"
                                                                     (click)="MoverForm(e.cedula);volverDatos(0)"
@@ -348,6 +352,9 @@
                                                             <td>
                                                                 {{ e.sexo | uppercase }}
                                                             </td>
+                                                            
+                                                            <td>{{ e.nombre_categoria }}</td>
+                                                            <td>{{ e.des_clasificacion }}</td>
                                                             <td>
                                                                 {{ getSituation(e.situacion) | uppercase }}
                                                             </td>

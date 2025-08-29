@@ -49,8 +49,10 @@ export class RsconsultaComponent implements OnInit {
 
   public cedula: string = "";
   public resolucion: string = "";
+  public mostrarComponenteColumna: boolean = false;
   public hayCorreccion(): boolean {
   return this.lstResolucionesS && this.lstResolucionesS.some(e => this.getCorreccion(e));
+  
 }
 
   public xAPI: IAPICore = {
@@ -777,7 +779,7 @@ export class RsconsultaComponent implements OnInit {
     this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
-        // console.log(data)
+        console.log(data)
         this.csvHead = data.Cabecera;
         this.resolucion = desde + " - " + hasta + " : " + data.Cuerpo.length;
         console.log('Datos recibidos de la API:', data.Cuerpo);
@@ -980,9 +982,12 @@ export class RsconsultaComponent implements OnInit {
           if (data.Cuerpo.length > 0) {
             this.dbDatosNombre = true;
           }
-
+          
           this.nombre = "";
+          this.mostrarComponenteColumna = this.dbcomponente === "%";
+
         },
+        
         (error) => {
           console.error("Error de conexion a los datos ", error);
           this.ngxService.stopLoader("loader-buscar");
@@ -990,6 +995,8 @@ export class RsconsultaComponent implements OnInit {
       );
     }
   }
+
+  
 
   verificarNombre() {
     this.consultarNombre(undefined);
@@ -1115,20 +1122,28 @@ export class RsconsultaComponent implements OnInit {
      let xlsx = []
       this.lstResolucionesX.forEach((e) => {
         xlsx.push({
-            'cedula': e.cedula,
-            'Grado' : e.grado_abreviado,
-            'Componente': e.componente_abreviado,
-            'Nombre': e.nombres_apellidos,
-            'Resolucion': e.numero,
-            'Fecha': this.convertirFecha(e.fecha_resolucion),
-            'Tipo' : this.obtenerTipo(e.tipo),
-            'Descripcion' : e.administracion,
+            'CEDULA': e.cedula,
+            'GRADO' : e.grado_abreviado,
+            'NOMBRES Y APELLIDOS': e.nombres_apellidos,
+            'COMPONENTE': e.nombre_componente,
+            'CATEGORIA': e.nombre_categoria,
+            'CLASIFICACION': e.des_clasificacion,
+            'SEXO': e.sexo,
+            'FECHA RSL': this.convertirFecha(e.fecha_resolucion),
+            'AÑo RSL': e.fecha_resolucion != undefined? e.fecha_resolucion.substring(0, 4): '', 
+            'NRO RSL': e.numero,
+            'TIPO RSL' : this.obtenerTipo(e.tipo),
+            'ASUNTO RSL': e.asunto,
+            'TIPO DE SOLICITUD' : e.administracion,
+            'ESPECIALIDAD' : e.especialidad,
+            'MOTIVO' : e.nombre_motivo,
             // 'asunto' : ,
-            // 'nombre_causa' : ,
-            // 'nombre_motivo' : ,
-            // 'especialidad' :  d,
-            // 'falta',
-          'Asunto': e.asunto,
+            // 'nombre_causa' : 
+            'DELITO O FALTA': e.falta,
+            'OBSERVACIONES RSL' : e.observacion,
+            'INSTRUCCIONES ESPECIALES' : e.instrucciones,
+            'DISTRIBUCCION' : e.distribucion == 0? 'PUBLICAR': e.distribucion == 1? 'PUBLICAR': e.distribucion == 2? 'CONFIDENCIAL': e.distribucion == 3? 'RESERVADA': '',
+          
          
         })
       })
