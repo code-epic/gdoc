@@ -111,6 +111,7 @@ export class CustomDateParserFormatter extends NgbDateParserFormatter {
   ],
 })
 export class OresolucionesComponent implements OnInit {
+  [x: string]: any
 
   public id: string = ""
 
@@ -298,7 +299,7 @@ export class OresolucionesComponent implements OnInit {
   public xasunto: string = ""
   public cresolucion = ""
   public fresolucion = ""
-  public aresolucion = ""
+  public aresolucion: any
 
   public blNombramiento: boolean = false
   public blCorregir: boolean = false
@@ -369,6 +370,7 @@ export class OresolucionesComponent implements OnInit {
   public cmbGrado = '0'
   public otro_resuelto = ''
   public lstHistorico: any
+  public blHistorico = false
   
 
 
@@ -852,7 +854,23 @@ export class OresolucionesComponent implements OnInit {
     )
   }
 
+  irAnterior() {
+    if (this.menu) {
+      history.back()
+    } else {
+      this.menu = true
+      this.dbasico = false
+      this.aresolucion = false
+      this.aentradas = false
+      this.masivo = false
+      this.lotes = false
+      this.generales = false
+      this.dpublicaciones = false
+      this.eliminaciones = false
+      this.titulo = 'Procesos'
+    }
 
+  }
 
   getDetalle() {
 
