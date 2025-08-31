@@ -55,8 +55,8 @@ export class SbuzonComponent implements OnInit {
   public lstEstados = [] //Listar Estados
 
   longitud = 0;
-  pageSize = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+  pageSize = 25;
+  pageSizeOptions: number[] = [10, 25, 50, 100];
 
   // MatPaginator Output
   pageEvent: PageEvent;
