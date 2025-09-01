@@ -54,7 +54,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public estadoOrigen = 1
 
   public ncontrolv = true // visibilidad del input numero de control
-  public ncontrolt = 'Nro. Control'
+  public ncontrolt = 'Número Control'
   public remitentet = 'Remitente'
   public origenvisible: boolean = true // Visibilidad del Input Numero de Origen
   public fsalida = 'Fecha de Creación (*)'
@@ -516,6 +516,20 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   registrar() {
 
+    if (!this.Doc.norigen || this.Doc.norigen.trim() === '') {
+    this.toastrService.error('GDoc MPPD debe ingresar un Número Origen', 'Campo requerido');
+    this.ngxService.stopLoader("loader-aceptar");
+    return;
+  }
+
+  // Validación para Punto de Cuenta
+  if (this.Doc.tipo && this.Doc.tipo.toLowerCase().indexOf('punto de cuenta') >= 0) {
+    if (!this.lstCuenta || this.lstCuenta.length === 0) {
+      this.toastrService.error('GDoc MPPD debe agregar al menos un Punto de Cuenta', 'Campo requerido');
+      this.ngxService.stopLoader("loader-aceptar");
+      return;
+    }
+  }
     this.ngxService.startLoader("loader-aceptar")
     this.obtenerWorkFlow() //Obtener valores de una API
 

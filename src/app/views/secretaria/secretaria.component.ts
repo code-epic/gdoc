@@ -17,13 +17,13 @@ export class SecretariaComponent implements OnInit {
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
 
-  public rdocumento : string = "none"
-  public rtarjetas  : string = ""
-  public rlistado : string = "none"
+  public rdocumento: string = "none"
+  public rtarjetas: string = ""
+  public rlistado: string = "none"
 
   public paginador = 10
   public focus;
-  public xAPI : IAPICore = {
+  public xAPI: IAPICore = {
     funcion: '',
     parametros: '',
   };
@@ -38,7 +38,19 @@ export class SecretariaComponent implements OnInit {
     accion: "CargarUrl('control', 'buzon')",
     clase: "f-left",
     color: "bg-blue",
-    
+
+  },
+
+  {
+    url: "/spresidencial",
+    js: "",
+    descripcion: "Presidencial",
+    icono: "fa fa-landmark",
+    nombre: "Presidenciales",
+    accion: "CargarUrl('control', 'pendientes')",
+    clase: "f-left",
+    color: "bg-red",
+
   },
   {
     url: "/sministerial/ministeriales",
@@ -51,17 +63,6 @@ export class SecretariaComponent implements OnInit {
     color: "bg-green",
   },
   {
-    url: "/spresidencial",
-    js: "",
-    descripcion: "Presidencial",
-    icono: "fa fa-landmark",
-    nombre: "Presidenciales",
-    accion: "CargarUrl('control', 'pendientes')",
-    clase: "f-left",
-    color: "bg-red",
-    
-  },
-  {
     url: "/sbuscador",
     js: "",
     descripcion: "Buscador de Documentos",
@@ -70,9 +71,9 @@ export class SecretariaComponent implements OnInit {
     accion: "CargarUrl('control', 'pendientes')",
     clase: "f-left",
     color: "bg-purple",
-    
-    },
-    {
+
+  },
+  {
     url: "/consulta-general",
     js: "",
     descripcion: "Consulta General",
@@ -81,7 +82,7 @@ export class SecretariaComponent implements OnInit {
     accion: "CargarUrl('control', 'pendientes')",
     clase: "f-left",
     color: "bg-orange",
-    
+
   },
   {
     url: "/sministerial/tramitaciones-por-organo-regular",
@@ -92,7 +93,7 @@ export class SecretariaComponent implements OnInit {
     accion: "CargarUrl('control', 'pendientes')",
     clase: "f-left",
     color: "bg-info",
-    
+
   },
   {
     url: "/sministerial/otros-documentos",
@@ -104,36 +105,36 @@ export class SecretariaComponent implements OnInit {
     clase: "f-left",
     color: "bg-gray",
   }
-]
+  ]
 
-  constructor(private apiService: ApiService, 
+  constructor(private apiService: ApiService,
     public dialog: MatDialog,
-    public loginService : LoginService,
-    public ruta : Router) { }
+    public loginService: LoginService,
+    public ruta: Router) { }
 
   async ngOnInit() {
     await this.loginService.Iniciar()
     // console.log(this.loginService.Aplicacion)
     //this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
-   
-  }
-
-
-
-
-
-
-
-
-
 
   }
 
 
 
-  
-      
-    
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
 
 
 
