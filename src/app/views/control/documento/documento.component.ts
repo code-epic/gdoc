@@ -54,7 +54,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public estadoOrigen = 1
 
   public ncontrolv = true // visibilidad del input numero de control
-  public ncontrolt = 'Número Control'
+  public ncontrolt = 'Número de Control'
   public remitentet = 'Remitente'
   public origenvisible: boolean = true // Visibilidad del Input Numero de Origen
   public fsalida = 'Fecha de Creación (*)'
@@ -107,7 +107,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public cedula: string = ''
   public cargo: string = ''
   public nmilitar: string = ''
-  public salida: string = 'Número de Salida'
+  public salida: string = 'Nro. de Salida'
   public booPuntoCuenta: boolean = false
 
   public WkDoc: IWKFDocumento = {
@@ -278,7 +278,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.SalidaTipo()
         if (this.rutaActiva.snapshot.params.numc != undefined) {
           var numc = this.rutaActiva.snapshot.params.numc
-          this.ncontrolt = 'Número de Control'
+          this.ncontrolt = 'Nro de Control'
           this.ncontrolv = true
           this.salidavisible = true
           this.camponumsalida = 4
@@ -343,7 +343,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.salidavisible = false
     this.origenvisible = false
     this.forigenv = false
-    this.ncontrolt = 'Nro de Salida(*)'
+    this.ncontrolt = 'Nro de Salida'
     this.remitentet = 'Destinatario'
     this.fsalida = 'Fecha de Salida (*)'
     this.camposalida = 4
@@ -506,26 +506,54 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   validarCamposObligatorios(): boolean {
-    if (this.fcreacion == '' || this.fcreacion == undefined || this.forigen == '' || this.Doc.contenido == '' || this.fplazo == '') {
+  // Validar campos comunes
+  if (this.fcreacion == '' || this.fcreacion == undefined ||
+this.Doc.contenido == '' || this.fplazo == '') {
     return true;
   }
-  
+
   // Validar Número de Origen solo si es entrada (no salida y el campo está visible)
   if (this.origenvisible && this.titulo !== 'Salida' && (!this.Doc.norigen || this.Doc.norigen.trim() === '')) {
     this.toastrService.error('GDoc MPPD debe ingresar un Número de Origen', 'Campo requerido');
     return true;
   }
+    const tipoDoc = this.Doc.tipo.toLowerCase();
+  
+  // Para PUNTO DE CUENTA simple (cuando el formulario está visible)
+ // Solo validar si los campos de cuenta están visibles
+if (this.puntocuenta) {
+  if (!this.cuenta?.trim()) {
+    this.toastrService.error('Número de Cuenta es requerido', 'Campo requerido');
+    return true;
+  }
+  if (!this.resumen?.trim()) {
+    this.toastrService.error('Asunto de la Cuenta es requerido', 'Campo requerido');
+    return true;
+  }
+  if (!this.subfecha) {
+    this.toastrService.error('Fecha de Cuenta es requerida', 'Campo requerido');
+    return true;
+  }
+}
+  
+  // Para otros tipos que muestran la tabla de resoluciones (RESOLUCIÓN, COMISIÓN, etc.)
+  const tiposConTabla = [
+    'resolucion', 
+    'comision de servicio', 
+    'tramitacion por organo regular',
+    'contratos/punto de cuenta',
+    'destitucion/punto de cuenta'
+  ];
 
-  // Validación para Punto de Cuenta solo si NO es salida
-  if (this.Doc.tipo && this.Doc.tipo.toLowerCase().indexOf('punto de cuenta') >= 0 && this.titulo !== 'Salida') {
+  if (tiposConTabla.includes(tipoDoc)) {
+    // Solo validar que haya registros en la tabla, NO los campos del formulario
     if (!this.lstCuenta || this.lstCuenta.length === 0) {
-      this.toastrService.error('GDoc MPPD debe agregar al menos un Punto de Cuenta', 'Campo requerido');
+      this.toastrService.error('Debe agregar al menos un registro', 'Campo requerido');
       return true;
     }
   }
-
   return false;
-}
+  }
 
   registrar() {
 
@@ -969,13 +997,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   agregarCuenta(tipo: number): IWKFCuenta {
     let validar = false
 
-    // Solo validar Nro. Cuenta si el tipo es Punto de Cuenta
-    if (this.Doc.tipo && this.Doc.tipo.toLowerCase().indexOf('punto de cuenta') >= 0) {
-    if (!this.cuenta || this.cuenta.trim() === '') {
-      this.toastrService.error('GDoc MPPD debe ingresar el Número Cuenta', 'Campo requerido');
-      return;
-    }
-  }
     switch (this.Doc.tipo.toLowerCase()) {
       case "punto de cuenta":
         if (this.cuenta == '' || this.resumen == '' || this.subfecha == '') validar = true
@@ -1085,51 +1106,42 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   selTipoDocumento() {
     const tipo = this.Doc.tipo.toLowerCase()
-    this.puntocuenta = false
-    this.resolucion = false
-    this.booPuntoCuenta = false
-    this.lstCuenta = []
-
+    this.puntocuenta = false;
+    this.resolucion = false;
+    this.booPuntoCuenta = false;
 
     if (tipo.indexOf('punto') >= 0) {
-      this.setDescripcionPunto()
-      this.puntocuenta = true
-      this.resolucion = true
+      this.setDescripcionPunto();
+      this.puntocuenta = true;
+      this.resolucion = true;
 
-      if (tipo.indexOf('contratos') >= 0) {
-        this.setDescripcionContratos()
-      }
+          if (tipo.indexOf('contratos') >= 0) {
+      this.setDescripcionContratos();
+    }
 
       if (tipo.indexOf('multiple') >= 0) {
         this.puntocuenta = false
         this.resolucion = false
         if (this.titulo == 'Salida') {
-          // console.log('entrando')
-          this.cargarPuntosdeCuenta()
+          console.log('entrando')
+          this.cargarPuntosdeCuenta();
           return true
         }
-
-        this.toastrService.warning("Debe dirigirse al modulo de salida para usar esta opcion", `GDoc Salida`)
-
-
-
+        this.toastrService.warning("Debe dirigirse al modulo de salida para usar esta opcion", `GDoc Salida`);
       }
 
       if (this.titulo == 'Salida') {
         this.puntocuenta = false
         this.resolucion = false
       }
-
-
-
+    
 
     } else if (tipo == 'resolucion' ||
       tipo == 'tramitacion por organo regular' ||
       tipo == 'comision de servicio') {
       this.resolucion = true
-    }
-  }
-
+      }
+}
 
   cargarPuntosdeCuenta() {
 
