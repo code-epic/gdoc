@@ -54,7 +54,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public estadoOrigen = 1
 
   public ncontrolv = true // visibilidad del input numero de control
-  public ncontrolt = 'Número Control'
+  public ncontrolt = 'Número de Control'
   public remitentet = 'Remitente'
   public origenvisible: boolean = true // Visibilidad del Input Numero de Origen
   public fsalida = 'Fecha de Creación (*)'
@@ -506,30 +506,57 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   validarCamposObligatorios(): boolean {
-    if (this.titulo == 'Documento') {
-      return this.fcreacion == '' || this.fcreacion == undefined || this.forigen == '' || this.Doc.contenido == '' || this.fplazo == ''
-    } else {
-      return this.fcreacion == '' || this.fcreacion == undefined || this.Doc.contenido == '' || this.fplazo == ''
+  // Validar campos comunes
+  if (this.fcreacion == '' || this.fcreacion == undefined ||
+this.Doc.contenido == '' || this.fplazo == '') {
+    return true;
+  }
+
+  // Validar Número de Origen solo si es entrada (no salida y el campo está visible)
+  if (this.origenvisible && this.titulo !== 'Salida' && (!this.Doc.norigen || this.Doc.norigen.trim() === '')) {
+    this.toastrService.error('GDoc MPPD debe ingresar un Número de Origen', 'Campo requerido');
+    return true;
+  }
+    const tipoDoc = this.Doc.tipo.toLowerCase();
+  
+  // Para PUNTO DE CUENTA simple (cuando el formulario está visible)
+ // Solo validar si los campos de cuenta están visibles
+if (this.puntocuenta) {
+  if (!this.cuenta?.trim()) {
+    this.toastrService.error('Número de Cuenta es requerido', 'Campo requerido');
+    return true;
+  }
+  if (!this.resumen?.trim()) {
+    this.toastrService.error('Asunto de la Cuenta es requerido', 'Campo requerido');
+    return true;
+  }
+  if (!this.subfecha) {
+    this.toastrService.error('Fecha de Cuenta es requerida', 'Campo requerido');
+    return true;
+  }
+}
+  
+  // Para otros tipos que muestran la tabla de resoluciones (RESOLUCIÓN, COMISIÓN, etc.)
+  const tiposConTabla = [
+    'resolucion', 
+    'comision de servicio', 
+    'tramitacion por organo regular',
+    'contratos/punto de cuenta',
+    'destitucion/punto de cuenta'
+  ];
+
+  if (tiposConTabla.includes(tipoDoc)) {
+    // Solo validar que haya registros en la tabla, NO los campos del formulario
+    if (!this.lstCuenta || this.lstCuenta.length === 0) {
+      this.toastrService.error('Debe agregar al menos un registro', 'Campo requerido');
+      return true;
     }
   }
-  //registrar Un documento pasando por el WorkFlow
+  return false;
+  }
 
   registrar() {
 
-    if (!this.Doc.norigen || this.Doc.norigen.trim() === '') {
-    this.toastrService.error('GDoc MPPD debe ingresar un Número Origen', 'Campo requerido');
-    this.ngxService.stopLoader("loader-aceptar");
-    return;
-  }
-
-  // Validación para Punto de Cuenta
-  if (this.Doc.tipo && this.Doc.tipo.toLowerCase().indexOf('punto de cuenta') >= 0) {
-    if (!this.lstCuenta || this.lstCuenta.length === 0) {
-      this.toastrService.error('GDoc MPPD debe agregar al menos un Punto de Cuenta', 'Campo requerido');
-      this.ngxService.stopLoader("loader-aceptar");
-      return;
-    }
-  }
     this.ngxService.startLoader("loader-aceptar")
     this.obtenerWorkFlow() //Obtener valores de una API
 
@@ -1079,51 +1106,42 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   selTipoDocumento() {
     const tipo = this.Doc.tipo.toLowerCase()
-    this.puntocuenta = false
-    this.resolucion = false
-    this.booPuntoCuenta = false
-    this.lstCuenta = []
-
+    this.puntocuenta = false;
+    this.resolucion = false;
+    this.booPuntoCuenta = false;
 
     if (tipo.indexOf('punto') >= 0) {
-      this.setDescripcionPunto()
-      this.puntocuenta = true
-      this.resolucion = true
+      this.setDescripcionPunto();
+      this.puntocuenta = true;
+      this.resolucion = true;
 
-      if (tipo.indexOf('contratos') >= 0) {
-        this.setDescripcionContratos()
-      }
+          if (tipo.indexOf('contratos') >= 0) {
+      this.setDescripcionContratos();
+    }
 
       if (tipo.indexOf('multiple') >= 0) {
         this.puntocuenta = false
         this.resolucion = false
         if (this.titulo == 'Salida') {
-          // console.log('entrando')
-          this.cargarPuntosdeCuenta()
+          console.log('entrando')
+          this.cargarPuntosdeCuenta();
           return true
         }
-
-        this.toastrService.warning("Debe dirigirse al modulo de salida para usar esta opcion", `GDoc Salida`)
-
-
-
+        this.toastrService.warning("Debe dirigirse al modulo de salida para usar esta opcion", `GDoc Salida`);
       }
 
       if (this.titulo == 'Salida') {
         this.puntocuenta = false
         this.resolucion = false
       }
-
-
-
+    
 
     } else if (tipo == 'resolucion' ||
       tipo == 'tramitacion por organo regular' ||
       tipo == 'comision de servicio') {
       this.resolucion = true
-    }
-  }
-
+      }
+}
 
   cargarPuntosdeCuenta() {
 
