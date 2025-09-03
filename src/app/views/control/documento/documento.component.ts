@@ -54,7 +54,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public estadoOrigen = 1
 
   public ncontrolv = true // visibilidad del input numero de control
-  public ncontrolt = 'Nro. Control'
+  public ncontrolt = 'Número Control'
   public remitentet = 'Remitente'
   public origenvisible: boolean = true // Visibilidad del Input Numero de Origen
   public fsalida = 'Fecha de Creación (*)'
@@ -107,7 +107,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public cedula: string = ''
   public cargo: string = ''
   public nmilitar: string = ''
-  public salida: string = 'Nro. de Salida'
+  public salida: string = 'Número de Salida'
   public booPuntoCuenta: boolean = false
 
   public WkDoc: IWKFDocumento = {
@@ -278,7 +278,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.SalidaTipo()
         if (this.rutaActiva.snapshot.params.numc != undefined) {
           var numc = this.rutaActiva.snapshot.params.numc
-          this.ncontrolt = 'Nro de Control'
+          this.ncontrolt = 'Número de Control'
           this.ncontrolv = true
           this.salidavisible = true
           this.camponumsalida = 4
@@ -343,7 +343,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.salidavisible = false
     this.origenvisible = false
     this.forigenv = false
-    this.ncontrolt = 'Nro de Salida'
+    this.ncontrolt = 'Nro de Salida(*)'
     this.remitentet = 'Destinatario'
     this.fsalida = 'Fecha de Salida (*)'
     this.camposalida = 4
@@ -506,13 +506,26 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   validarCamposObligatorios(): boolean {
-    if (this.titulo == 'Documento') {
-      return this.fcreacion == '' || this.fcreacion == undefined || this.forigen == '' || this.Doc.contenido == '' || this.fplazo == ''
-    } else {
-      return this.fcreacion == '' || this.fcreacion == undefined || this.Doc.contenido == '' || this.fplazo == ''
+    if (this.fcreacion == '' || this.fcreacion == undefined || this.forigen == '' || this.Doc.contenido == '' || this.fplazo == '') {
+    return true;
+  }
+  
+  // Validar Número de Origen solo si es entrada (no salida y el campo está visible)
+  if (this.origenvisible && this.titulo !== 'Salida' && (!this.Doc.norigen || this.Doc.norigen.trim() === '')) {
+    this.toastrService.error('GDoc MPPD debe ingresar un Número de Origen', 'Campo requerido');
+    return true;
+  }
+
+  // Validación para Punto de Cuenta solo si NO es salida
+  if (this.Doc.tipo && this.Doc.tipo.toLowerCase().indexOf('punto de cuenta') >= 0 && this.titulo !== 'Salida') {
+    if (!this.lstCuenta || this.lstCuenta.length === 0) {
+      this.toastrService.error('GDoc MPPD debe agregar al menos un Punto de Cuenta', 'Campo requerido');
+      return true;
     }
   }
-  //registrar Un documento pasando por el WorkFlow
+
+  return false;
+}
 
   registrar() {
 
@@ -956,6 +969,13 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   agregarCuenta(tipo: number): IWKFCuenta {
     let validar = false
 
+    // Solo validar Nro. Cuenta si el tipo es Punto de Cuenta
+    if (this.Doc.tipo && this.Doc.tipo.toLowerCase().indexOf('punto de cuenta') >= 0) {
+    if (!this.cuenta || this.cuenta.trim() === '') {
+      this.toastrService.error('GDoc MPPD debe ingresar el Número Cuenta', 'Campo requerido');
+      return;
+    }
+  }
     switch (this.Doc.tipo.toLowerCase()) {
       case "punto de cuenta":
         if (this.cuenta == '' || this.resumen == '' || this.subfecha == '') validar = true
