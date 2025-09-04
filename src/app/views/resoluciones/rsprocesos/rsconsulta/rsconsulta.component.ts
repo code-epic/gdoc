@@ -1150,6 +1150,25 @@ export class RsconsultaComponent implements OnInit {
       this.excelService.exportToExcel(xlsx, "Ex-" + this.idTransaccion,);
   }
 
+          downloadCSVEspecifica() {
+          let xlsx = []
+          this.lstNombres.forEach((e) => {
+              xlsx.push({
+                  'NUM': xlsx.length + 1,
+                  'GRADO': e.grado_abreviado,
+                  'COMPONENTE': e.componente_abreviado,
+                  'NOMBRE COMPLETO': e.nombres,
+                  'CEDULA': e.cedula,
+                  'PROMOCION': this.convertirFecha(e.promocion),
+                  'SEXO': e.sexo,
+                  'CATEGORIA': e.nombre_categoria,
+                  'CLASIFICACION': e.des_clasificacion,
+                  'SITUACION': this.getSituation(e.situacion)
+              })
+          })
+          this.excelService.exportToExcel(xlsx, "Listado_Nombres_" + this.utilService.GenerarUnicId());
+        }
+
   downloadCSVEx() {
     let head = this.csvHead.map((e) => {
       return e.nombre;
