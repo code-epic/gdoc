@@ -23,7 +23,8 @@ export class NavbarComponent implements OnInit {
   constructor(location: Location,  
     private msj: MensajeService,
     private modalService: NgbModal,
-    private loginService : LoginService ) {
+    private loginService : LoginService,
+    private router: Router ) {
     this.location = location;
   }
 
@@ -33,11 +34,50 @@ export class NavbarComponent implements OnInit {
 
     this.listTitles = ROUTES.filter(listTitle => listTitle);
 
+    this.verificarDepartamentoResoluciones();
+
     this.msj.contenido$.subscribe( e => {
       // console.log(e)
       this.alerta = e.valor
-    })
 
+      // Guardar el estado en sessionStorage para persistencia
+     if (this.estaEnResoluciones()) {
+          this.alerta = e.valor;
+          sessionStorage.setItem('alertaEstado', JSON.stringify(e.valor));
+        }
+    });
+
+    // Recuperar el estado guardado si existe
+   if (this.estaEnResoluciones()) {
+      const estadoGuardado = sessionStorage.getItem('alertaEstado');
+      if (estadoGuardado) {
+        this.alerta = JSON.parse(estadoGuardado);
+      }
+    } else {
+      // Si no estamos en resoluciones, forzar a false
+      this.alerta = false;
+      sessionStorage.removeItem('alertaEstado');
+    }
+  }
+  
+
+  // Método para verificar si estamos en el departamento de resoluciones
+  private verificarDepartamentoResoluciones(): void {
+
+
+   if (!this.estaEnResoluciones()) {
+      this.alerta = false;
+      sessionStorage.removeItem('alertaEstado');
+    }
+  }
+
+  // Método para verificar si estamos en el departamento de resoluciones
+  private estaEnResoluciones(): boolean {
+    const currentPath = this.location.path();
+    // Ajusta estas rutas según tus necesidades exactas
+    return currentPath.includes('/resoluciones') ||
+           currentPath.includes('/rsalertas') ||
+           currentPath.includes('/rsconsulta');
   }
 
   open(content) {
@@ -76,11 +116,12 @@ export class NavbarComponent implements OnInit {
       confirmButtonText: 'Si, desconectarme!'
     }).then((result) => {
       if (result.isConfirmed) {
+        sessionStorage.removeItem('alertaEstado');
         sessionStorage.clear()
         localStorage.clear()
         window.location.href = './';
       }
-    })    
+    });
   }
 
 }
