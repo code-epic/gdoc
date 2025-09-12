@@ -62,6 +62,7 @@ import { PublicarComponent } from 'src/app/views/publicaciones/publicar/publicar
 import { BuzonresueltosComponent } from 'src/app/views/publicaciones/buzonresueltos/buzonresueltos.component';
 import { ChatbotComponent } from 'src/app/views/chatbot/chatbot.component';
 import { SnuevoComponent } from 'src/app/views/secretaria/snuevo/snuevo.component';
+import { CodigosrojoComponent } from 'src/app/views/resoluciones/codigosrojo/codigosrojo.component';
 
 
 export const AdminLayoutRoutes: Routes = [
@@ -421,6 +422,11 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'visitantedocumento',
         component: VisitantedocumentoComponent  ,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'codigosrojo',
+        component: CodigosrojoComponent  ,
         canActivate: [AuthGuardGuard]
     }
 ];

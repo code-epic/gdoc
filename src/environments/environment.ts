@@ -62,6 +62,7 @@ export const environment = {
     DOCUMENTO_ADJUNTO: 'WKF_ADocumentoAdjunto',
     UBICACION: 'WKF_AUbicacion',
     CONSULTAR_NOMBRAMIENTOS: 'MPPD_CNombramientos',
+    CONSULTAR_CODIGOS_ROJOS: 'MPPD_CCodigosRojos',
   }
 };
 

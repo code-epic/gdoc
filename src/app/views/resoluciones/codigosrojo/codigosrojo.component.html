@@ -1,1 +1,108 @@
-<p>codigosrojo works!</p>
+
+<div class="header bg-gradient-success pb-8 pt-4 pt-md-8">
+    <div class="container-fluid">
+      <p></p>
+    </div>
+  </div>
+  <div class="container-fluid mt--9">
+    <div class="row">
+      <div class="col-xl-12 col-md-12 col-lg-12">
+        <div class="card shadow">
+  
+          <div class="card-header bg-transparent">
+            <div class="row align-items-center">
+              <div class="col-md-11">
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Resoluciones</h6>
+                <h2 class="mb-0">Alertas Generales</h2>
+              </div>
+              <div class="col-md-1">
+                <div class="media align-items-center">
+                  <div class="example-button-row">
+                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                      <mat-icon>arrow_back</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+  
+            </div>
+          </div>
+  
+          <div class="card-body">
+            <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
+            <br>
+           <div   *ngIf="bmenu"  class="col-md-12 cardround text-center" (click)="ConsultarCodigosRojos()">
+                <div class="text-center botones">
+                    <br>
+                    <h2 class="text-center text-blue"><i class="fa fa-code"
+                            style="font-size: 42px;"></i>
+                    </h2>
+                    <p>Codigos Rojo</p>
+                </div>
+            </div>
+
+
+
+
+
+            <ngx-ui-loader [loaderId]="'lbuscar'"></ngx-ui-loader>
+            <div  *ngIf="!bmenu"  class="d-flex justify-content-end mb-3 gap-2">
+
+                <button class="btn  bg-primary text-white" (click)="exportExcel()">
+                <i class="fas fa-file-excel mr-1"></i> Exportar Excel
+                </button>
+                <button class="btn  bg-warning text-white" (click)="volver()">
+                    <i class="fas fa-arrow-left mr-1"></i> Mostrar Menu
+                </button>
+            </div>
+            <div *ngIf="!bmenu" class="row">
+                <div class="col-md-12 text-center col-lg-12">
+
+                    <table id="tbl-ejercitos" class="tbl-ejercitos table-container" border="1" style="width: 100%;">
+                        <thead>
+                            <tr class="header-principal">
+                                <th class="celda-grado">#</th>
+                                <th class="bloque ejercito">GRADO</th>
+                                <th class="bloque guardia">COMP.</th>
+                                <th class="celda-total">CEDULA</th>
+                                <th class="celda-total" style="width: 300px;">NOMBRES Y APELLIDO</th>
+                                <th class="celda-total">MOTIVO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let e of lstCodigosRojos; index as i">
+                            <td  style="font-weight: bold;">{{ i+1 }}</td>
+                            <td style="font-weight: bold;">{{e.gnombre}}</td>
+                            <td style="font-weight: bold;">{{e.cnombre}}</td>
+                            <td  style="font-weight: bold;">{{e.cedula}}</td>
+                            <td>{{e.nombres_apellidos | uppercase}}</td>
+                            <td >{{limpiarHtml(e.motivo | uppercase)}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                </div>
+
+            </div>
+            <br><br>
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Fin de Tarjeta Padre -->
+  </div>
+  
