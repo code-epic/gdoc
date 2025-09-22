@@ -1237,8 +1237,8 @@ if (this.puntocuenta) {
       async data => {
         data.Cuerpo.forEach(e => {
           this.Doc = e
-          this.fcreacion = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
-          this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
+          // this.fcreacion = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
+          // this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
           if (e.alerta != null) {
             this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
             this.WAlerta.activo = 1
