@@ -62,17 +62,16 @@ export class SecretariaComponent implements OnInit {
     clase: "f-left",
     color: "bg-green",
   },
-  {
-    url: "/sbuscador",
-    js: "",
-    descripcion: "Buscador de Documentos",
-    icono: "fa fa-compass",
-    nombre: "Buscador",
-    accion: "CargarUrl('control', 'pendientes')",
-    clase: "f-left",
-    color: "bg-purple",
-
-  },
+  // {
+  //   url: "/sbuscador",
+  //   js: "",
+  //   descripcion: "Buscador de Documentos",
+  //   icono: "fa fa-compass",
+  //   nombre: "Buscador",
+  //   accion: "CargarUrl('control', 'pendientes')",
+  //   clase: "f-left",
+  //   color: "bg-purple",
+  // },
   {
     url: "/consulta-general",
     js: "",
