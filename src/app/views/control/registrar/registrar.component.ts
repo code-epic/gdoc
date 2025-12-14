@@ -510,6 +510,9 @@ export class RegistrarComponent implements OnInit {
 
   async SubirArchivo(e, posicion) {
     
+
+    console.log(this.hashcontrol)
+    
     var frm = new FormData(document.forms.namedItem("forma"))
     this.buzon[posicion].statusprogreso = true
     this.btnEnviar = false

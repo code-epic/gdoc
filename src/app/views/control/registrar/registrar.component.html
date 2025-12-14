@@ -340,13 +340,11 @@
 <ng-template #adjuntar let-c="close" let-d="dismiss">
   <div class="modal-header header bg-gradient-success">
     <h4 class="modal-title" id="modal-basic-title">Cargar Archivo en {{ numControl }}</h4>
-
   </div>
   <div class="modal-body">
-
-
     <form method="post" enctype="multipart/form-data" id="forma" name="forma">
       <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+      <input type="hidden" name="git" value="true" readonly="readonly">
       <label for="input-folder-2">Seleccionar Archivo</label>
       <div class="custom-file">
         <input (change)="fileSelected($event)" id="formFile" class="custom-file-input" name="archivos" type="file"

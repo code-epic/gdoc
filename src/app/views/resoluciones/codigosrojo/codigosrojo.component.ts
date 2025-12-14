@@ -35,6 +35,7 @@ export class CodigosrojoComponent implements OnInit {
     })
     // this.ConsultarCodigosRojos()
   }
+  
 
   ConsultarCodigosRojos() {
     this.bmenu = false
