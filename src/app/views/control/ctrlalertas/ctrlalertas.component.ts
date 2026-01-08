@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 
@@ -36,6 +35,7 @@ export class CtrlalertasComponent implements OnInit {
   }
 
   listarEstados() {
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = '%'
     this.xAPI.valores = ''
@@ -52,6 +52,7 @@ export class CtrlalertasComponent implements OnInit {
 
   Consultar(){
     this.ngxService.startLoader("loader-estatus");
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = 'WKF_CEstatusAlertas'
     this.xAPI.parametros = '5'
     this.apiService.Ejecutar(this.xAPI).subscribe( 
@@ -62,7 +63,7 @@ export class CtrlalertasComponent implements OnInit {
         this.ngxService.stopLoader("loader-estatus");
       },
       err => {
-
+        this.ngxService.stopLoader("loader-estatus");
       }
     )
   }

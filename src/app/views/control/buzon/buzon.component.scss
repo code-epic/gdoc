@@ -1,55 +1,233 @@
-.iconElimi{
-    color:#a00c1f !important;
-    font-size: 22px !important;
-    cursor: pointer;
+// --- Estilos para las Pestañas (Tabs) ---
+::ng-deep .mat-tab-label {
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  color: #8898aa !important;
+  opacity: 0.8 !important;
+  padding: 0 24px !important;
+  min-width: auto !important;
 }
 
-.iconEdit{
-    color:#5e72e4 !important;
-    font-size: 22px !important;
-    cursor: pointer;
-    padding-right: 6%;
+::ng-deep .mat-tab-label-active {
+  color: #5eaaa8 !important;
+  opacity: 1 !important;
 }
 
-
-.example-section {
-    margin: 12px 0;
+::ng-deep .mat-ink-bar {
+  background-color: #5eaaa8 !important;
+  height: 3px !important;
+  border-radius: 3px 3px 0 0;
 }
+
+// --- Estilos para la Tabla de Documentos ---
+.table {
+  .thead-light th {
+    background-color: #f6f9fc;
+    color: #8898aa;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+    padding-top: 1.2rem;
+    padding-bottom: 1.2rem;
+  }
+
+  .col-checkbox { width: 5%; text-align: center; }
+  .col-main { width: 35%; }
+  .col-details { width: 30%; }
+  .col-filters { width: 30%; }
+  .col-status, .col-actions { display: none; } // Ocultar si no se usan en esta vista específica o ajustar ancho
+}
+
+.document-row-item {
+  transition: background-color 0.3s ease;
+  border-bottom: 1px solid #e9ecef;
+  position: relative;
+
+  // Efecto de destello
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at var(--x) var(--y), rgba(166, 191, 154, 0.2) 0%, transparent 40%);
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+
+  &:hover {
+    background-color: #f6f9fc;
+    &::after {
+      opacity: 1;
+    }
+    .actions-container {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+.document-title {
+  font-weight: 600;
+  color: #32325d;
+  font-size: 0.9rem;
+}
+
+.document-type-symbol {
+  font-weight: bold;
+}
+
+.document-origin {
+  display: block;
+  font-size: 0.8rem;
+  color: #8898aa;
+}
+
+.document-dependency {
+  display: block;
+  color: #525f7f;
+  font-size: 0.85rem;
+}
+
+.document-date {
+  display: block;
+  font-size: 0.8rem;
+  color: #8898aa;
+}
+
+.actions-container {
+  opacity: 0;
+  transform: translateX(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
   
-.example-margin {
-    margin: 0 12px;
+  .mat-icon-button {
+    color: #adb5bd;
+    &:hover {
+      color: #5eaaa8;
+    }
+  }
 }
 
-ul {
-    list-style-type: none;
-    margin-top: 4px;
+// --- Estilos para el Paginador ---
+::ng-deep .mat-paginator {
+  background-color: #f6f9fc;
+  color: #8898aa;
 }
 
-.texto-lista{
-    margin-top: 13px; 
-    font-weight: bold;
+// --- Estilos para los Filtros de la Cabecera ---
+.filter-control-wrapper {
+  position: relative;
+
+  .filter-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #adb5bd;
+    font-size: 1rem;
+    pointer-events: none; // Permite que el clic pase al select
+    transition: color 0.2s ease-in-out;
+    z-index: 5;
+  }
+
+  .custom-select.custom-select-sm {
+    padding-left: 2.8rem; // Espacio para el icono más grande
+    padding-right: 2rem;
+    border-radius: 30px; // Bordes más redondeados
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    height: 45px; // Más alto para mejor clic
+    font-size: 0.9rem; // Texto más legible
+    font-weight: 600;
+    color: #525f7f;
+    min-width: 160px; // Más ancho
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #5eaaa8;
+      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+      outline: none;
+    }
+
+    &:hover {
+      background-color: #fcfcfc;
+      transform: translateY(-1px);
+    }
+  }
+
+  &:focus-within .filter-icon {
+    color: #5eaaa8; // Color del tema al enfocar
+  }
 }
 
-.texto-detalle{
-    margin-top: 13px; 
-    font-size: 12.5px;
+
+// --- Estilos para Controles (Selects, Botones) ---
+.custom-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #525f7f;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+
+  &.custom-select-sm {
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 1.75rem 0.25rem 0.75rem;
+    font-size: .75rem;
+  }
+  &:focus {
+    border-color: #5eaaa8;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(94, 170, 168, 0.25);
+  }
 }
 
+// --- Estilos para el Input de Archivo ---
+.custom-file-upload {
+  border: 2px dashed #e0eafc;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
 
-.example-headers-align .mat-expansion-panel-header-title,
-.example-headers-align .mat-expansion-panel-header-description {
-  flex-basis: 0;
+  &:hover {
+    background-color: #f6f9fc;
+    border-color: #cfdef3;
+  }
+
+  .upload-icon {
+    font-size: 3rem;
+    color: #5eaaa8;
+    margin-bottom: 1rem;
+  }
+
+  .upload-text {
+    color: #525f7f;
+    font-weight: 600;
+  }
+
+  .upload-hint {
+    color: #8898aa;
+    font-size: 0.8rem;
+  }
 }
 
-.example-headers-align .mat-expansion-panel-header-description {
-  justify-content: space-between;
-  align-items: center;
-}
-
-.example-headers-align .mat-form-field + .mat-form-field {
-  margin-left: 8px;
-}
-
+// --- Estilos Específicos de Buzón ---
 .calendario {
     width: 2.75rem;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAcCAYAAAAEN20fAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEUSURBVEiJ7ZQxToVAEIY/YCHGxN6XGOIpnpaEsBSeQC9ArZbm9TZ6ADyBNzAhQGGl8Riv4BLAWAgmkpBYkH1b8FWT2WK/zJ8ZJ4qiI6XUI3ANnGKWBnht2/ZBDRK3hgVGNsCd7/ui+JkEIrKtqurLpEWaphd933+IyI3LEIdpCYCiKD6HcuOa/nwOa0ScJEnk0BJg0UTUWJRl6RxCYEzEmomsIlPU3IPW+grIAbquy+q6fluy/28RIBeRMwDXdXMgXLj/B2uimRXpui4D9sBeRLKl+1N+L+t6RwbWrZliTTTr1oxYtzVWiTQAcRxvTX+eJMnlUDaO1vpZRO5NS0x48sIwfPc87xg4B04MCzQi8hIEwe4bl1DnFMCN2zsAAAAASUVORK5CYII=)!important;
@@ -59,60 +237,6 @@ ul {
     border-color: #bbbfc5 !important;
 }
 
-#codeEditor, #lineCounter {
-    font-family: lucida console, courier new, courier, monospace;
-    margin: 0;
-    padding: 10px 0;
-    height: 75vh;
-    border-radius: 0;
-    resize: none;
-    font-size: 16px;
-    line-height: 1.2;
-    outline: none;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
-#lineCounter:focus-visible,
-#codeEditor:focus-visible {
-    outline:none;
-} 
-#lineCounter {
-    display: flex;
-    border-color: transparent;
-    overflow-y: hidden;
-    text-align: right;
-    box-shadow: none;
-    color: #707070;
-    background-color: #d8d8d8;
-    position: absolute;
-    width: 3.5rem;
-    background-color: #ffffdd;
-    /* border-color: #3E3D32; */
-    color: #928869;
-    border: 0.0625rem solid #c0c2c3;
-    border-right: none;
-    border-radius: 4px 0px 0px 5px;
-}
-
-#codeEditor {
-    padding-left: calc(3.5rem + 5px);
-    width: 100%;
-    background-color: #ffffdd;
-    border-color: #272822;
-    color: #080808;
-    border-left: none !important;
-    border: 0.0625rem solid #c0c2c3;
-    border-radius: 0px 8px 9px 0px;
-
-}
-
-input{
-    text-transform: uppercase;
-}
-select{
-    text-transform: uppercase;
-}
-textarea {
+input, select, textarea {
     text-transform: uppercase;
 }

@@ -1,4 +1,4 @@
-<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+<div class="header bg-pastel-gradient pb-8 pt-5 pt-md-8">
     <div class="container-fluid">
         <p></p>
     </div>
@@ -11,15 +11,15 @@
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
                         <div class="col-md-10">
-                            <h6 class="text-uppercase text-muted ls-1 mb-1">Secretaria</h6>
-                            <h2 class="mb-0">Registrar Documento Presidencial</h2>
+                            <h6 class="text-uppercase ls-1 mb-1" style="color: #5eaaa8; font-weight: 600;">Secretaria</h6>
+                            <h2 class="mb-0" style="color: #5eaaa8; ">Registrar Documento Presidencial</h2>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
                                     <button mat-icon-button title="Volver Atrás" *ngIf="bPDF"
                                         (click)="verArchivos(archivos)">
-                                        <mat-icon>wallpaper</mat-icon>
+                                        <mat-icon style="color: #5eaaa8;">wallpaper</mat-icon>
                                     </button>
                                 </div>
                             </div>
@@ -28,7 +28,7 @@
                             <div class="media align-items-center">
                                 <div class="example-button-row">
                                     <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                                        <mat-icon>arrow_back</mat-icon>
+                                        <mat-icon style="color: #5eaaa8;">arrow_back</mat-icon>
                                     </button>
                                 </div>
                             </div>
@@ -40,114 +40,143 @@
                     <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
                     <div class="form-row">
                         <div class="form-group col-md-2">
-                            <label for="txtControl"> {{ncontrolt}} </label>
-                            <input type="text" class="form-control" id="txtControl"
-                                [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.ncontrol" [readonly]="ncontrolv">
+                            <label for="txtControl" class="form-label-custom"> {{ncontrolt}} </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">tag</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" id="txtControl"
+                                    [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.ncontrol" [readonly]="ncontrolv">
+                            </div>
                         </div>
                         <div class="form-group col-md-2" *ngIf="origenvisible">
-                            <label for="txtOrigen">Nro. Origen (*) </label>
-                            <input type="txtOrigen" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Doc.norigen" id="nori">
+                            <label for="txtOrigen" class="form-label-custom">Nro. Origen (*) </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">description</mat-icon></span>
+                                </div>
+                                <input type="txtOrigen" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.norigen" id="nori">
+                            </div>
                         </div>
                         <div class="form-group col-md-4" *ngIf="forigenv">
-                            <label for="tmsOrigen">Fecha Origen (*) </label>
+                            <label for="tmsOrigen" class="form-label-custom">Fecha Origen (*) </label>
                             <form class="form-inline">
                                 <div class="form-group" style="width:100%">
                                     <div class="input-group" style="width:100%">
-                                        <input class="form-control" placeholder="AAAA-MM-DD"
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text icon-box" (click)="fo.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event</mat-icon></span>
+                                        </div>
+                                        <input class="input-custom" placeholder="AAAA-MM-DD"
                                             [ngModelOptions]="{standalone: true}" [(ngModel)]="forigen" ngbDatepicker
                                             #fo="ngbDatepicker" [value]="formatter.format(forigenDate)"
-                                            [placement]="placement" [positionTarget]="buttonEl" readonly>
-                                        <div class="input-group-append">
-                                            <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button"
-                                                id="fori">
-                                            </button>
-                                        </div>
+                                            [placement]="placement" readonly (click)="fo.toggle()">
                                     </div>
                                 </div>
                             </form>
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="tmsCreacion">{{fsalida}}</label>
+                            <label for="tmsCreacion" class="form-label-custom">{{fsalida}}</label>
                             <form class="form-inline">
                                 <div class="form-group" style="width:100%">
                                     <div class="input-group" style="width:100%">
-                                        <input class="form-control" placeholder="AAAA-MM-DD"
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text icon-box" (click)="fc.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event</mat-icon></span>
+                                        </div>
+                                        <input class="input-custom" placeholder="AAAA-MM-DD"
                                             [ngModelOptions]="{standalone: true}"
                                             [value]="formatter.format(fcreacionDate)" [(ngModel)]="fcreacion"
                                             ngbDatepicker #fc="ngbDatepicker" [placement]="placement"
-                                            [positionTarget]="buttonEl" readonly>
-                                        <div class="input-group-append">
-                                            <button #buttonEl class="btn calendario" (click)="fc.toggle()" type="button"
-                                                id="fcre"></button>
-                                        </div>
+                                            readonly (click)="fc.toggle()">
                                     </div>
                                 </div>
                             </form>
                         </div>
                         <div class="form-group col-md-2" *ngIf="false">
-                            <label for="txtSalida">{{salida}}</label>
-                            <input type="txtSalida" class="form-control" value="{{Doc.salida}}"
-                                 [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Doc.salida">
+                            <label for="txtSalida" class="form-label-custom">{{salida}}</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">outbox</mat-icon></span>
+                                </div>
+                                <input type="txtSalida" class="input-custom" value="{{Doc.salida}}"
+                                     [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.salida">
+                            </div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-3">
-                            <label for="cmbTipoDocumento">Tipo de Documento</label>
-
-                            <select class="form-control" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
-                                [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}"  id="tdoc">
-                                <option value="PUNTO DE CUENTA">PUNTO DE CUENTA</option>
-                                <!-- <option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </option> -->
-
-                            </select>
-
+                            <label for="cmbTipoDocumento" class="form-label-custom">Tipo de Documento</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">category</mat-icon></span>
+                                </div>
+                                <select class="input-custom" [ngModelOptions]="{standalone: true}" [disabled]="activarTipo"
+                                    [(ngModel)]="Doc.tipo" value="{{Doc.tipo}}"  id="tdoc">
+                                    <option value="PUNTO DE CUENTA">PUNTO DE CUENTA</option>
+                                    <!-- <option *ngFor="let x of lstT" value="{{x.nomb}}">{{ x.nomb }} </option> -->
+                                </select>
+                            </div>
                         </div>
                         <div class="form-group col-md-3" >
-                            <label for="cmbRemitente">Remitente</label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="Doc.remitente" value="{{Doc.remitente}}" id="remi">
-                                <option value="PRESIDENCIAL">PRESIDENCIAL</option>
-                                <option value="VICEPRESIDENCIAL">VICEPRESIDENCIAL</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="cmbUnidad">Unidad o Dependencia</label>
-                            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.unidad"
-                                value="{{Doc.unidad}}" id="unid">
-                                <option value="0">Seleccione</option>
-                                <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label>Componente / Gran Comando</label>
+                            <label for="cmbRemitente" class="form-label-custom">Remitente</label>
                             <div class="input-group">
-                                <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">person</mat-icon></span>
+                                </div>
+                                <select class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="Doc.remitente" value="{{Doc.remitente}}" id="remi">
+                                    <option value="PRESIDENCIAL">PRESIDENCIAL</option>
+                                    <option value="VICEPRESIDENCIAL">VICEPRESIDENCIAL</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="cmbUnidad" class="form-label-custom">Unidad o Dependencia</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">account_balance</mat-icon></span>
+                                </div>
+                                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.unidad"
+                                    value="{{Doc.unidad}}" id="unid">
+                                    <option value="0">Seleccione</option>
+                                    <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label class="form-label-custom">Componente / Gran Comando</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">security</mat-icon></span>
+                                </div>
+                                <select class="input-custom" [ngModelOptions]="{standalone: true}"
                                     [(ngModel)]="Doc.comando" value="{{Doc.comando}}" id="coma">
                                     <option value="0">Seleccione</option>
                                     <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
                                 </select>
                                 <div class="input-group-append" *ngIf="booDependencia">
                                     <button *ngIf="!editar" type="button" (click)="agregarDependencia()"
-                                        id="btndependencia" class="btn btn-success">
-                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                        id="btndependencia" class="btn btn-pastel text-white">
+                                        <mat-icon class="text-white" style="font-size: 18px;">add</mat-icon>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group col-md-6" *ngIf="booPuntoCuenta">
-                            <label>Selecciona el/los punto de cuenta</label>
+                            <label class="form-label-custom">Selecciona el/los punto de cuenta</label>
                             <mat-form-field style="width: 100%;">
+                                <mat-icon matPrefix class="mr-2" style="color: #adb5bd;">list</mat-icon>
                                 <mat-select [formControl]="toppings" multiple>
                                     <mat-option *ngFor="let ptc of lstPuntosCuentas" [value]="ptc">{{ptc}}</mat-option>
                                 </mat-select>
                             </mat-form-field>
                         </div>
                         <div class="form-group col-md-6" *ngIf="booPuntoCuenta">
-                            <label>Puntos de Cuenta Asociados</label>
+                            <label class="form-label-custom">Puntos de Cuenta Asociados</label>
                             <mat-form-field style="width: 100%;">
+                                <mat-icon matPrefix class="mr-2" style="color: #adb5bd;">playlist_add_check</mat-icon>
                                 <mat-select [formControl]="toppingsaux">
                                     <mat-option *ngFor="let e of lstPuntosCuentasAux; let i=index"
                                         [value]="i">{{e.cuenta + ' ' + e.observacion + ' ' + e.estatus}}</mat-option>
@@ -166,8 +195,8 @@
                                         *ngFor="let el of lstDependencias;let i=index">
                                         <td style="width:20px">
                                             <button type="button" class="btn btn-danger btn-sm"
-                                                (click)="eliminarDependencia( i, el.id )"><i class="fa fa-trash"
-                                                    aria-hidden="true"></i>
+                                                (click)="eliminarDependencia( i, el.id )">
+                                                <mat-icon class="text-white" style="font-size: 16px;">delete</mat-icon>
                                             </button>
                                         </td>
                                         <td>{{ el.nombre }}</td>
@@ -182,7 +211,7 @@
 
                     <div class="form-row">
                         <div class="form-group col-md-12">
-                            <label for="txtContenido">Contenido del Oficio (*) </label>
+                            <label for="txtContenido" class="form-label-custom">Contenido del Oficio (*) </label>
                             <div class="NgxEditor__Wrapper">
                                 <angular-editor [placeholder]="'Introduzca el contenido del oficio...'" [config]="editorConfig"
                                     [(ngModel)]="Doc.contenido"></angular-editor>
@@ -193,30 +222,38 @@
                     <div class="form-row">
                         <div class="form-row col-md-12" *ngIf="puntocuenta">
                             <div class="form-group col-md-2">
-                                <label>Nro. Cuenta</label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="cuenta" value="{{cuenta}}" id="cuenta">
+                                <label class="form-label-custom">Nro. Cuenta</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">tag</mat-icon></span>
+                                    </div>
+                                    <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="cuenta" value="{{cuenta}}" id="cuenta">
+                                </div>
                             </div>
                             <div class="form-group col-md-6">
-                                <label>Asunto de la Cuenta</label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="resumen" value="{{resumen}}" id="resconte">
+                                <label class="form-label-custom">Asunto de la Cuenta</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">subject</mat-icon></span>
+                                    </div>
+                                    <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="resumen" value="{{resumen}}" id="resconte">
+                                </div>
                             </div>
                             <div class="form-group col-md-4">
-                                <label for="tmsOrigen">Fecha Cuenta</label>
+                                <label for="tmsOrigen" class="form-label-custom">Fecha Cuenta</label>
                                 <form class="form-inline">
                                     <div class="form-group" style="width:100%">
                                         <div class="input-group" style="width:100%">
-                                            <input class="form-control" placeholder="AAAA-MM-DD"
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text icon-box" (click)="fcu.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event</mat-icon></span>
+                                            </div>
+                                            <input class="input-custom" placeholder="AAAA-MM-DD"
                                                 [ngModelOptions]="{standalone: true}" [(ngModel)]="subfecha"
                                                 ngbDatepicker #fcu="ngbDatepicker"
                                                 [value]="formatter.format(subfechaDate)" [placement]="placement"
-                                                [positionTarget]="buttonEl" readonly>
-                                            <div class="input-group-append">
-                                                <button #buttonEl class="btn calendario" (click)="fcu.toggle()"
-                                                    type="button" id="fcuenta">
-                                                </button>
-                                            </div>
+                                                readonly (click)="fcu.toggle()">
                                         </div>
                                     </div>
                                 </form>
@@ -224,28 +261,41 @@
                         </div>
                         <div class="form-row col-md-12" *ngIf="resolucion">
                             <div class="form-group col-md-2">
-                                <label>{{sCedula}}</label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="cedula" value="{{cedula}}" (blur)="consultarCedula()" id="cedula">
-                            </div>
-                            <div class="form-group col-md-5">
-                                <label>{{sGrado}}</label>
-                                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="cargo" value="{{cargo}}" [disabled]="isPunto" id="grado">
-                            </div>
-                            <div class="form-group col-md-5">
-                                <label for="cmbUnidad">{{sNombre}}</label>
-                                <div class="input-group mb-3">
-                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                                        [(ngModel)]="nmilitar" value="{{nmilitar}}" [disabled]="isPunto">
+                                <label class="form-label-custom">{{sCedula}}</label>
+                                <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <button *ngIf="!editar" type="button" class="btn btn-success"
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">badge</mat-icon></span>
+                                    </div>
+                                    <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="cedula" value="{{cedula}}" (blur)="consultarCedula()" id="cedula">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label class="form-label-custom">{{sGrado}}</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">military_tech</mat-icon></span>
+                                    </div>
+                                    <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="cargo" value="{{cargo}}" [disabled]="isPunto" id="grado">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="cmbUnidad" class="form-label-custom">{{sNombre}}</label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">person</mat-icon></span>
+                                    </div>
+                                    <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="nmilitar" value="{{nmilitar}}" [disabled]="isPunto">
+                                    <div class="input-group-append">
+                                        <button *ngIf="!editar" type="button" class="btn btn-pastel text-white"
                                             (click)="mensajeAgregarCuenta()" id="agregar">
-                                            <i class="fa fa-plus" aria-hidden="true"></i>
+                                            <mat-icon class="text-white" style="font-size: 18px;">add</mat-icon>
                                         </button>
                                         <button *ngIf="editar" type="button" class="btn btn-primary"
                                             (click)="editarCuenta()">
-                                            <i class="fa fa-edit" aria-hidden="true"></i>
+                                            <mat-icon class="text-white" style="font-size: 18px;">edit</mat-icon>
                                         </button>
 
                                     </div>
@@ -276,14 +326,14 @@
                                             <div class="btn-group" role="group" aria-label="Basic"
                                                 *ngIf="el.activo == 0">
                                                 <button type="button" class="btn btn-primary btn-sm"
-                                                    (click)="selEditarCuenta( i )"><i class="fa fa-edit"
-                                                        aria-hidden="true"></i></button>
+                                                    (click)="selEditarCuenta( i )">
+                                                    <mat-icon class="text-white" style="font-size: 16px;">edit</mat-icon></button>
                                                 <button type="button" class="btn btn-danger btn-sm"
-                                                    (click)="eliminarCuenta( i )"><i class="fa fa-trash"
-                                                        aria-hidden="true"></i></button>
+                                                    (click)="eliminarCuenta( i )">
+                                                    <mat-icon class="text-white" style="font-size: 16px;">delete</mat-icon></button>
                                             </div>
                                             <button *ngIf="el.activo != 0" type="button" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                                <mat-icon class="text-white" style="font-size: 16px;">warning</mat-icon>
                                                 &nbsp;&nbsp;En Proceso </button>
                                         </td>
                                         <td [style.display]="puntocuenta?'':'none'">{{ el.cuenta }}</td>
@@ -304,7 +354,7 @@
 
                     <div class="form-row">
                         <div class="form-group col-md-12">
-                            <label for="txtInstrucciones">Instrucciones Generales</label>
+                            <label for="txtInstrucciones" class="form-label-custom">Instrucciones Generales</label>
                             <div class="NgxEditor__Wrapper">
                                 <angular-editor [placeholder]="'Introduzca las instrucciones generales...'" [config]="editorConfig"
                                     [(ngModel)]="Doc.instrucciones"></angular-editor>
@@ -317,43 +367,57 @@
 
                             <div class="row">
                                 <div class="form-group col-md-6">
-                                    <label for="tmsCreacion">Plazo / Alerta (*)</label>
+                                    <label for="tmsCreacion" class="form-label-custom">Plazo / Alerta (*)</label>
                                     <form class="form-inline">
                                         <div class="form-group" style="width:100%">
                                             <div class="input-group" style="width:100%">
-                                                <input class="form-control" placeholder="AAAA-MM-DD"
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text icon-box" (click)="fd.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event</mat-icon></span>
+                                                </div>
+                                                <input class="input-custom" placeholder="AAAA-MM-DD"
                                                     [ngModelOptions]="{standalone: true}" [(ngModel)]="fplazo"
                                                     [value]="formatter.format(fplazoDate)"
                                                     ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
-                                                    [positionTarget]="buttonEl" readonly>
-                                                <div class="input-group-append">
-                                                    <button #buttonEl class="btn calendario" (click)="fd.toggle()"
-                                                        type="button" id="fplazo"></button>
-                                                </div>
+                                                    readonly (click)="fd.toggle()">
                                             </div>
                                         </div>
                                     </form>
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label>Privacidad / Nivel de Acceso</label>
-                                    <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                    <label class="form-label-custom">Privacidad / Nivel de Acceso</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text icon-box"><mat-icon class="input-icon">lock</mat-icon></span>
+                                        </div>
+                                    <select class="input-custom" [ngModelOptions]="{standalone: true}"
                                         [(ngModel)]="Doc.privacidad" value="{{Doc.privacidad}}">
                                         <option value="0">PUBLICO</option>
                                         <option value="1">CONFIDENCIAL</option>
                                     </select>
+                                    </div>
                                 </div>
                                 <div class="form-group col-md-6" >
-                                    <label for="cmbCodArchivo">Código de Archivo</label>
-                                    <select class="form-control" [ngModelOptions]="{standalone: true}"
+                                    <label for="cmbCodArchivo" class="form-label-custom">Código de Archivo</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text icon-box"><mat-icon class="input-icon">folder</mat-icon></span>
+                                        </div>
+                                    <select class="input-custom" [ngModelOptions]="{standalone: true}"
                                         [(ngModel)]="Doc.codigo" value="{{Doc.codigo}}" id="cod">
                                         <option value="SEC">SECRETARIA</option>
                                     </select>
+                                    </div>
                                 </div>
                                 <div class="form-group col-md-6" >
-                                    <label for="">Expediente</label>
-                                    <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    <label for="" class="form-label-custom">Expediente</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text icon-box"><mat-icon class="input-icon">folder_open</mat-icon></span>
+                                        </div>
+                                    <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
                                         [(ngModel)]="Doc.nexpediente" value="{{ Doc.nexpediente }}">
+                                    </div>
                                 </div>
 
 
@@ -361,9 +425,14 @@
 
                         </div>
                         <div class="col-md-4" >
-                            <label for="txtobservacion">Lista de Asociación</label>
-                            <textarea class="form-control" name="" id="observacion" cols="30" rows="6"
+                            <label for="txtobservacion" class="form-label-custom">Lista de Asociación</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">link</mat-icon></span>
+                                </div>
+                            <textarea class="input-custom" name="" id="observacion" cols="30" rows="6"
                                 [(ngModel)]="nasociacion" value="{{ nasociacion }}" readonly></textarea>
+                            </div>
                         </div>
                     </div>
                     <hr>
@@ -371,15 +440,15 @@
                         <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-6 text-left">
-                                    <button class="btn btn-sm bg-primary text-white py-2"
-                                        style="height:38px; min-width:100px;" (click)="registrar()" id="registrar">
-                                        <i class="fa fa-check mr-1"></i> Aceptar
+                                    <button class="btn btn-pastel text-white py-2"
+                                        style="min-width:100px;" (click)="registrar()" id="registrar">
+                                        <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar
                                     </button>
                                 </div>
                                 <div class="col-md-6 text-right">
-                                    <button class="btn btn-sm btn-warning text-white py-2"
-                                        style="height:38px; min-width:100px;" (click)="confirmarSalir()">
-                                        <i class="fa fa-times mr-1"></i> Cancelar
+                                    <button class="btn btn-pastel-cancel text-white py-2"
+                                        style="min-width:100px;" (click)="confirmarSalir()">
+                                        <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar
                                     </button>
                                 </div>
                             </div>

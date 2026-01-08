@@ -18,7 +18,7 @@ export class PerfilComponent implements OnInit {
     private modalService: NgbModal) { }
 
   ngOnInit(): void {
-    this.nombre = this.loginService.Usuario.nombre
+    // this.nombre = this.loginService.Usuario.nombre
 
   }
 

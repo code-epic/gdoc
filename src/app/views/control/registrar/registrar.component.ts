@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, HostListener } from '@angular/core';
 import { MatAccordion } from '@angular/material/expansion';
 import { PageEvent } from '@angular/material/paginator';
 import { ApiService, DocumentoAdjunto, IAPICore } from 'src/app/services/apicore/api.service';
@@ -121,6 +121,8 @@ export class RegistrarComponent implements OnInit {
   }
   lblFile: any;
 
+  public selectedEstado: any;
+
 
   constructor(private apiService: ApiService,
     config: NgbModalConfig,
@@ -148,6 +150,14 @@ export class RegistrarComponent implements OnInit {
 
   }
 
+  @HostListener('mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const row = target.closest('.document-row-item');
+    if (row instanceof HTMLElement) {
+      row.style.setProperty('--x', `${event.clientX - row.getBoundingClientRect().left}px`);
+    }
+  }
 
   seleccionLista(event) {
     if (event.charCode == 13) {
@@ -208,6 +218,7 @@ export class RegistrarComponent implements OnInit {
 
 
   listarEstados() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = '%'
     this.xAPI.valores = ''
@@ -278,6 +289,8 @@ export class RegistrarComponent implements OnInit {
 
   seleccionNavegacion(e) {
     this.selNav = e
+    this.xAPI = {} as IAPICore
+
     this.xAPI.funcion = 'WKF_CDocumentosGestion'
     this.xAPI.valores = ''
     this.buzon = []
@@ -307,6 +320,7 @@ export class RegistrarComponent implements OnInit {
 
    async ConsultarAlertas() {
     this.ngxService.startLoader("loader-aceptar")
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CAlertas'
     
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -328,6 +342,8 @@ export class RegistrarComponent implements OnInit {
         this.recorrerElementos(0);
       },
       (error) => {
+        this.ngxService.stopLoader("loader-aceptar")
+
       }
     )
   }
@@ -433,6 +449,7 @@ export class RegistrarComponent implements OnInit {
     var i = 0
     var estatus = 2 //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AUbicacion'
     this.xAPI.valores = ''
 
@@ -484,6 +501,7 @@ export class RegistrarComponent implements OnInit {
     this.btnNota = false
     this.consultarEstados(id)
     this.UbicacionSeleccionLista = id
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CClasificados'
     this.xAPI.valores = ''
     this.xAPI.parametros = id
@@ -511,7 +529,7 @@ export class RegistrarComponent implements OnInit {
   async SubirArchivo(e, posicion) {
     
 
-    console.log(this.hashcontrol)
+    // console.log(this.hashcontrol)
     
     var frm = new FormData(document.forms.namedItem("forma"))
     this.buzon[posicion].statusprogreso = true
@@ -542,6 +560,7 @@ export class RegistrarComponent implements OnInit {
   }
 
   cargarSubDetalle() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
     this.xAPI.parametros = ''
     this.DocAdjunto.archivo = this.archivos[0].name
@@ -584,6 +603,7 @@ export class RegistrarComponent implements OnInit {
         var estatus = 1
         var usuario = this.loginService.Usuario.id
         var id = e.idd
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = 'WKF_APromoverDocumento'
         this.xAPI.valores = ''
         this.xAPI.parametros = origen + ',' + estatus + ',' + this.llave + ',' + usuario + ',' + id
@@ -621,6 +641,7 @@ export class RegistrarComponent implements OnInit {
   reversarDoc(id: string) {
     //WKF_AReversarDocumento
     var usuario = this.loginService.Usuario.id
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AReversarDocumento'
     this.xAPI.valores = ''
     this.xAPI.parametros = '0,1,' + usuario + ',' + id
@@ -649,6 +670,7 @@ export class RegistrarComponent implements OnInit {
 
   insertarObservacion() {
     var usuario = this.loginService.Usuario.id
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify({
       "documento": this.numControl,

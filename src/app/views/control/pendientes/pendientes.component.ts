@@ -144,7 +144,7 @@ export class PendientesComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await this.loginService.Iniciar();
+
     this.SubMenu = await this.loginService.obtenerSubMenu("/control");
     let prv = this.loginService.obtenerPrivilegiosMenu("/control");
     if (prv != undefined && prv.Privilegios != undefined) {
@@ -170,6 +170,8 @@ export class PendientesComponent implements OnInit {
   async ConsultarSeguimiento(funcion: string) {
     let desdeLocal = "";
     let hastaLocal = "";
+
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = funcion;
     this.sinDatos = false;
     
@@ -363,15 +365,6 @@ export class PendientesComponent implements OnInit {
     this.vistacontenido = true;
 
     this.consultarDocument(undefined);
-
-    // const patron = new RegExp(this.utilService.ConvertirCadena(this.buscar));
-    // this.bzBusqueda = this.bzSeguimientoO.filter((e) => patron.test(e.busqueda));
-    // this.longitud = this.bzBusqueda.length;
-    // this.bzSeguimiento = this.bzBusqueda.slice(0, this.pageSize);
-    // this.max_paginador = this.bzBusqueda.length / 10;
-    // this.cantidad = this.bzBusqueda.length;
-    // this.MostrarPaginador();
-    // this.buscar = '';
   }
 
   dwUrl(ncontrol: string, archivo: string): string {
@@ -436,6 +429,7 @@ export class PendientesComponent implements OnInit {
 
   cargarPuntosdeCuenta() {
     this.ngxService.startLoader("loader-aceptar");
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_CPuntoCuentaSalida";
     this.xAPI.parametros = "5";
     this.xAPI.valores = "";

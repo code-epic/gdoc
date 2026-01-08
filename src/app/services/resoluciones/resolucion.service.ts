@@ -170,46 +170,60 @@ export class ResolucionService {
   Listar(tipo: number) {
     switch (tipo) {
       case 1:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.COMPONENTE_CONSULTAR
         break
       case 2:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.GRADO_CONSULTAR
         break
       case 3:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.TIPO_RESOLUCION_CONSULTAR
         break
       case 4:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.CATEGORIAS_CONSULTAR
         break
       case 5:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.CLASIFICACION_CONSULTAR
         break
       case 6:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.ESTADO_RESOLUCION_CONSULTAR
         break
       case 7:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.ORDEN_ENTRADA_CONSULTAR
         break
       case 8:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.CARPETA_ENTRADA_CONSULTAR
         break
       case 9:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = 'CEP_CUsuario'
         break
       case 10:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = 'MD_CConfiguracion'
         this.xAPI.parametros = '%'
         break
       case 11:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.GRADO_IPSFA_CONSULTAR
         break
       case 12:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.CARPETAS_CONSULTAR
         break
       case 13: 
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.CARPETA_ENTRADA_CONSULTAR
         break
       default:
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = environment.funcion.TIPO_ENTRADA_CONSULTAR
         break
     }

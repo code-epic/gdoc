@@ -63,6 +63,7 @@ import { BuzonresueltosComponent } from 'src/app/views/publicaciones/buzonresuel
 import { ChatbotComponent } from 'src/app/views/chatbot/chatbot.component';
 import { SnuevoComponent } from 'src/app/views/secretaria/snuevo/snuevo.component';
 import { CodigosrojoComponent } from 'src/app/views/resoluciones/codigosrojo/codigosrojo.component';
+import { LogoutComponent } from 'src/app/pages/logout/logout.component';
 
 
 export const AdminLayoutRoutes: Routes = [

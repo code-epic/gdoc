@@ -254,6 +254,8 @@ export class MinisterialComponent implements OnInit {
 
 
   listarEstados() {
+
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = '%'
     this.xAPI.valores = ''
@@ -266,6 +268,8 @@ export class MinisterialComponent implements OnInit {
   }
 
   consultarSubID(id: string) {
+
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CSubDocumentoID'
     this.xAPI.parametros = '' + id
     this.xAPI.valores = ''
@@ -307,6 +311,7 @@ export class MinisterialComponent implements OnInit {
   }
 
   listarDatos() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CSubDocVariante'
     this.xAPI.parametros = this.doc.idd
     this.xAPI.valores = ''
@@ -363,7 +368,10 @@ export class MinisterialComponent implements OnInit {
     this.SubDocumento.usuario = this.loginService.Usuario.id
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.SubDocumento)
+
     this.ngxService.startLoader("loader-aceptar")
+
+    this.xAPI = {} as IAPICore
     if (this.blUpdate == false) {
       this.xAPI.funcion = 'WKF_ISubDocVariante'
       this.registrar()
@@ -377,6 +385,7 @@ export class MinisterialComponent implements OnInit {
   registrar() {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = 'WKF_ISubDocumentoAlerta'
         await this.guardarAlerta(90, this.fecha_alerta)
         this.ngxService.stopLoader("loader-aceptar")
@@ -389,6 +398,7 @@ export class MinisterialComponent implements OnInit {
   actualizar() {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
+        this.xAPI = {} as IAPICore
         this.xAPI.funcion = 'WKF_ASubDocumentoAlerta'
         await this.guardarAlerta(91, this.fecha_alerta)
         this.ngxService.stopLoader("loader-aceptar")
@@ -447,12 +457,13 @@ export class MinisterialComponent implements OnInit {
     try {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
-          console.log(this.archivos[0].name)
           this.SubDocumento.nombre_archivo = this.archivos[0].name
           this.DocAdjunto.archivo = this.SubDocumento.nombre_archivo
           this.DocAdjunto.usuario = this.loginService.Usuario.id
           this.DocAdjunto.documento = this.numControl
-          console.log(this.DocAdjunto);
+          
+
+          this.xAPI = {} as IAPICore
           this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
           this.xAPI.parametros = ''
           this.xAPI.valores = JSON.stringify(this.DocAdjunto)
@@ -496,6 +507,7 @@ export class MinisterialComponent implements OnInit {
   async redistribuir(destino: number = 0) {
     var dst = destino != 0 ? destino : this.cmbDestino
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_ASubDocumentoRedistribuir"
     this.xAPI.valores = ''
     this.xAPI.parametros = dst + ',1,' + this.loginService.Usuario.id + ',' + this.ministerial.idd + ',' + this.ministerial.cuenta
@@ -515,6 +527,7 @@ export class MinisterialComponent implements OnInit {
   }
 
   cargarPuntoCuentas() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_CPuntoCuentaDetalle"
     this.xAPI.valores = ''
     this.xAPI.parametros = this.parametros
@@ -550,7 +563,7 @@ export class MinisterialComponent implements OnInit {
   }
 
   async transfererirResoluciones() {
-    console.log('transfererirResoluciones')
+    
     this.ngxService.startLoader("loader-aceptar")
     this.lstNotaEntrega = []
     let i = 0
@@ -611,6 +624,7 @@ export class MinisterialComponent implements OnInit {
     var estatus = 1
     var usuario = this.loginService.Usuario.cedula
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_APromoverSubDocumento'
     this.xAPI.valores = ''
     this.xAPI.parametros = destino + ',' + estatus + ',' + e.llave + '|' + e.observacion + ',' + usuario + ',1,' + e.id

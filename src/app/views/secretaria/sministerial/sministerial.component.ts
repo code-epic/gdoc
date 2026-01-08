@@ -179,6 +179,7 @@ export class SministerialComponent implements OnInit {
 
 
   async ConsultarAlertas() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CAlertas'
     this.xAPI.parametros = '4,2'
     await this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -217,6 +218,7 @@ export class SministerialComponent implements OnInit {
   seleccionNavegacion(e) {
     this.buzon = []
     
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CDocumentosSecretaria'
     this.xAPI.valores = ''
     this.selNav = e
@@ -263,6 +265,7 @@ export class SministerialComponent implements OnInit {
 
 
   listarEstados() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = '%'
     this.xAPI.valores = ''
@@ -308,14 +311,6 @@ export class SministerialComponent implements OnInit {
             bz.push(e)
            
           }
-          // if (this.filtro == 1 && e.tdoc == 'TRAMITACION POR ORGANO REGULAR') {
-          //   bz.push(e)
-          // } else if(this.filtro == 2 && e.tdoc !='PUNTO DE CUENTA' && e.tdoc != 'TRAMITACIONES POR ORGANO REGULAR'){
-          //   bz.push(e)
-          // } else if (this.filtro == 3 && e.tdoc == 'PUNTO DE CUENTA') {
-          //   bz.push(e)
-          // }
-
 
         })//Registros recorridos como elementos
 
@@ -354,6 +349,7 @@ export class SministerialComponent implements OnInit {
 
   insertarObservacion() {
     var usuario = this.loginService.Usuario.id
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify(
       {
@@ -387,6 +383,7 @@ export class SministerialComponent implements OnInit {
   }
 
   async rechazarBuzon() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_AUbicacionRechazo"
     this.xAPI.valores = ''
     this.xAPI.parametros = '1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl
@@ -415,6 +412,7 @@ export class SministerialComponent implements OnInit {
     var i = 0
     var estatus = 1 //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_APromoverEstatus'
     this.xAPI.valores = ''
 
@@ -439,6 +437,7 @@ export class SministerialComponent implements OnInit {
   async redistribuir(destino: number = 0) {
     var dst = destino != 0 ? destino : this.cmbDestino
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
     this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
@@ -498,6 +497,7 @@ export class SministerialComponent implements OnInit {
     this.WAlerta.observacion = this.Observacion.toUpperCase()
     this.WAlerta.fecha = fecha
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
     console.log(this.WAlerta);

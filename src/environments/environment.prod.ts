@@ -1,12 +1,13 @@
 export const environment = {
   production: true,
   enableServiceWorker: true,
-  ID : 'ID-001',
+  ID : 'mppd.gdoc',
   Url: 'https://10.190.1.160',
   API: '/v1/api/',
   Hash: '3a39a4d2f9869b08b9c2c2d9bad7334f.sse',
   version: 'Wed Aug 20 2025 09:55:33 GMT-0400 (Venezuela Time)',
   funcion: {
+    CONSULTAR_USUARIO_PERFIL: '_SYS_CUsuarioPerfil',
     COMPONENTE_CONSULTAR: 'MPPD_CComponente',
     TIPO_RESOLUCION_CONSULTAR: 'MPPD_CTipoResolucion',
     ESTADO_RESOLUCION_CONSULTAR: 'MPPD_CEstadoResolucion',
@@ -59,5 +60,7 @@ export const environment = {
     UBICACION: 'WKF_AUbicacion',
     CONSULTAR_NOMBRAMIENTOS: 'MPPD_CNombramientos',
     CONSULTAR_CODIGOS_ROJOS: 'MPPD_CCodigosRojos',
+    ACTUALIZAR_CLAVE_USUARIO: '_SYS_UUserPanel',
+    ACTUALIZAR_TOTP  : '_SYS_UUserTOTP',
   }
 };

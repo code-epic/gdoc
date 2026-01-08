@@ -416,6 +416,7 @@ export class RsbuzonComponent implements OnInit {
 
 
     listarEstados() {
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.ESTADOS;
         this.xAPI.parametros = '%';
         this.xAPI.valores = '';
@@ -506,7 +507,7 @@ export class RsbuzonComponent implements OnInit {
 
 
     seleccionNavegacion(e) {
-
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.DOCUMENTOS_RESOLUCIONES;
         this.xAPI.valores = '';
         this.selNav = e;
@@ -614,6 +615,7 @@ export class RsbuzonComponent implements OnInit {
     async subEntrada() {
 
         this.lstCarpetas = []
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.GRUPO_CARPETA_ENTRADA;
         this.xAPI.parametros = '36'
         this.xAPI.valores = ''
@@ -680,6 +682,7 @@ export class RsbuzonComponent implements OnInit {
     }
 
     async listarSubDocumentos(estatus: number) {
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.SUBDOCUMENTO_RESOLUCIONES;
         this.xAPI.parametros = '4,2,3,' + estatus;
         this.bzSubDocumentos = [];
@@ -781,6 +784,7 @@ export class RsbuzonComponent implements OnInit {
     }
 
     insertarObservacion() {
+        this.xAPI = {} as IAPICore;
         var usuario = this.loginService.Usuario.id;
         this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
         this.xAPI.valores = JSON.stringify({
@@ -820,6 +824,7 @@ export class RsbuzonComponent implements OnInit {
     }
 
     async rechazarBuzon() {
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.UBICACION_RECHAZO;
         this.xAPI.valores = '';
         this.xAPI.parametros =
@@ -862,6 +867,7 @@ export class RsbuzonComponent implements OnInit {
         var i = 0;
         var estatus = activo != 0 ? activo : 1; //NOTA DE ENTREGA
         //Buscar en Wk de acuerdo al usuario y la app activa
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
         this.xAPI.valores = '';
 
@@ -895,7 +901,7 @@ export class RsbuzonComponent implements OnInit {
 
     async redistribuir(destino: number = 0) {
         var dst = destino != 0 ? destino : this.cmbDestino;
-
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.REDISTRIBUIR;
         this.xAPI.valores = '';
         this.xAPI.parametros =
@@ -930,7 +936,7 @@ export class RsbuzonComponent implements OnInit {
      */
     async promoverPuntoCuenta(destino: number = 0, estatus: number) {
         var dst = destino != 0 ? destino : this.cmbDestino;
-
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.SUBDOCUMENTO_REDISTRIBUIR;
         this.xAPI.valores = '';
         this.xAPI.parametros =
@@ -994,6 +1000,7 @@ export class RsbuzonComponent implements OnInit {
         this.WAlerta.observacion = this.Observacion.toUpperCase();
         this.WAlerta.fecha = fecha;
 
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.ALERTAS;
         this.xAPI.parametros = '';
         this.xAPI.valores = JSON.stringify(this.WAlerta);
@@ -1118,6 +1125,7 @@ export class RsbuzonComponent implements OnInit {
         this.blistado = false
     }
     listarCedulasEnCarpeta(e) {
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.ENTRADAS_PROCESO
         this.xAPI.parametros = `${e.llav},${e.componente},36`
         this.xAPI.valores = null
@@ -1171,6 +1179,7 @@ export class RsbuzonComponent implements OnInit {
 
 
     async listarResponsables() {
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.LISTAR_RESPONSABLES
         this.xAPI.parametros = 'Resoluciones'
         this.xAPI.valores = null
@@ -1234,6 +1243,7 @@ export class RsbuzonComponent implements OnInit {
         var i = 0
         var estatus = 3 //NOTA DE ENTREGA
         //Buscar en Wk de acuerdo al usuario y la app activa
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.UBICACION
         this.xAPI.valores = ''
 
@@ -1389,7 +1399,7 @@ export class RsbuzonComponent implements OnInit {
     async SubirArchivoResoluciones() {
 
 
-        console.log("R" + this.IResolucion.cedula)
+        // console.log("R" + this.IResolucion.cedula)
 
         this.ngxService.startLoader("loader-aceptar");
         if (this.archivos.length > 0) {
@@ -1583,6 +1593,7 @@ export class RsbuzonComponent implements OnInit {
     getCausa(id: string) {
         this.lstCausa = []
         this.lstMotivo = []
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.CAUSA_RESOLUCION
         this.ngxService.startLoader("loader-buscar")
         this.xAPI.parametros = id
@@ -1607,6 +1618,7 @@ export class RsbuzonComponent implements OnInit {
         this.lstMotivo = []
         this.xAPI.funcion = environment.funcion.MOTIVO_RESOLUCION
         this.ngxService.startLoader("loader-buscar")
+        this.xAPI = {} as IAPICore;
         this.xAPI.parametros = this.IResolucion.solicitud.toString()
         this.xAPI.valores = ""
 

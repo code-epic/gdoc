@@ -24,8 +24,6 @@ export class AdminLayoutComponent implements OnInit {
   ngOnInit() {
     this.pushService.requestPermission();
     // Escuchar notificaciones tan pronto como la app se inicie
-    this.pushService.listenForPushNotifications();
-    console.log('Escuchando notificaciones push...')
 
     // Comprobar si las notificaciones push están soportadas y si ya hay una suscripción
     if (this.swPush.isEnabled) {

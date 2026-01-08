@@ -154,6 +154,7 @@ export class ArchivoComponent implements OnInit {
 
 
   listarEstados() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = '%'
     this.xAPI.valores = ''
@@ -173,6 +174,7 @@ export class ArchivoComponent implements OnInit {
 
   seleccionNavegacion(e) {
     this.buzon = []
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CDocumentosGestion'
     this.xAPI.valores = ''
     this.selNav = e
@@ -202,37 +204,6 @@ export class ArchivoComponent implements OnInit {
 
   }
 
-
-
-
-  // async listarBuzon(bz: any) {
-  //   this.ngxService.startLoader("loader-aceptar")
-  //   await this.apiService.Ejecutar(this.xAPI).subscribe(
-  //     (data) => {
-  //       // console.log(data)
-  //       data.Cuerpo.forEach(e => {
-  //         e.existe = e.anom == '' ? true : false
-  //         e.privado = false
-  //         e.completed = false
-  //         //e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
-  //         e.color = 'warn'
-  //         bz.push(e)
-  //       })//Registros recorridos como elementos
-
-  //       // console.log(bz)
-  //       this.lengthOfi = data.Cuerpo.length
-  //       if (this.lengthOfi > 0) {
-  //         this.estilocheck = ''
-  //         this.recorrerElementos(1, this.bzRecibido)
-  //       }
-  //       this.ngxService.stopLoader("loader-aceptar")
-
-  //     },
-  //     (error) => {
-
-  //     }
-  //   )
-  // }
 
 
   async listarBuzon(): Promise<void> {
@@ -348,6 +319,7 @@ export class ArchivoComponent implements OnInit {
 
   insertarObservacion() {
     var usuario = this.loginService.Usuario.id
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify(
       {
@@ -391,6 +363,7 @@ export class ArchivoComponent implements OnInit {
   }
 
   async rechazarBuzon() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_AUbicacionRechazo"
     this.xAPI.valores = ''
     this.xAPI.parametros = '1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl
@@ -435,6 +408,7 @@ export class ArchivoComponent implements OnInit {
     var i = 0
     var estatus = 1 //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_APromoverEstatus'
     this.xAPI.valores = ''
 
@@ -459,6 +433,7 @@ export class ArchivoComponent implements OnInit {
 
   async redistribuir(destino: number = 0) {
     var dst = destino != 0 ? destino : this.cmbDestino
+    this.xAPI = {} as IAPICore
 
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
@@ -489,6 +464,7 @@ export class ArchivoComponent implements OnInit {
     this.WAlerta.observacion = this.Observacion.toUpperCase()
     this.WAlerta.fecha = fecha
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
     console.log(this.WAlerta);

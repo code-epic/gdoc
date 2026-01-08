@@ -1,0 +1,47 @@
+ /* Estilos personalizados para el Sidebar */
+  .navbar-vertical.navbar-expand-md {
+      background: #ffffff;
+      border-right: 1px solid rgba(233, 236, 239, 0.8);
+  }
+
+  .nav-link {
+      color: #525f7f !important;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.75rem 1.5rem;
+      margin: 0.2rem 0.5rem;
+      transition: all 0.3s ease;
+      border-radius: 8px;
+  }
+
+  .nav-link:hover {
+      color: #4a8b89 !important;
+      background-color: rgba(74, 139, 137, 0.08);
+      transform: translateX(3px);
+  }
+
+  .nav-link.active {
+      color: #4a8b89 !important;
+      background-color: rgba(74, 139, 137, 0.12);
+      font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  }
+
+  .nav-link i {
+      color: #4a8b89; /* Color solicitado para iconos */
+      font-size: 1.1rem;
+      margin-right: 0.8rem;
+      transition: color 0.3s ease;
+      vertical-align: middle;
+  }
+
+  .nav-link:hover i,
+  .nav-link.active i {
+      color: #4a8b89 !important;
+  }
+  
+  /* Separador sutil */
+  hr {
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      margin: 1rem 0;
+  }

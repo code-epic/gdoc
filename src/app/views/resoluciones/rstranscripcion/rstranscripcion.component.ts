@@ -169,6 +169,7 @@ export class RstranscripcionComponent implements OnInit {
 
 
   listarEstados() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = '%'
     this.xAPI.valores = ''
@@ -183,7 +184,7 @@ export class RstranscripcionComponent implements OnInit {
 
   async listarBuzon() {
     let user = this.loginService.Usuario.cedula
-
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'MPPD_CCarpertasResponsable'
     this.xAPI.parametros = '36,' + user// '30574644/ 12096976' //16473700
     this.xAPI.valores = ''
@@ -234,6 +235,7 @@ export class RstranscripcionComponent implements OnInit {
     this.WAlerta.observacion = this.Observacion.toUpperCase()
     this.WAlerta.fecha = fecha
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.WAlerta)
@@ -274,6 +276,8 @@ export class RstranscripcionComponent implements OnInit {
   }
 
   async listarResponsables() {
+
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'MPPD_ListarResponsables'
     this.xAPI.parametros = 'Resoluciones'
     this.xAPI.valores = null
@@ -298,6 +302,7 @@ export class RstranscripcionComponent implements OnInit {
     let user = this.loginService.Usuario.cedula
 
     let cadena = `${this.xresponsable},${this.Observacion},${this.codigo_carpeta},${this.componente},${this.fecha_entrada}`
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'MPPD_UCarpetaResponsable'
     this.xAPI.parametros = cadena
     this.xAPI.valores = null

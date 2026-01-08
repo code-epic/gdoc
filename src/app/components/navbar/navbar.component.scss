@@ -28,3 +28,208 @@
     transform: rotate(10deg);
   }
 }
+
+// To open dd on right
+.dropdown-menu-right {
+  right: 0 !important;
+  left: auto !important;
+}
+
+// Cart Touchspin
+.touchspin-cart {
+  .touchspin-wrapper {
+    width: 6.4rem;
+  }
+
+  &:focus-within {
+    box-shadow: none !important;
+  }
+}
+
+app-navbar-bookmark {
+  display: flex;
+}
+
+// Apply style on window scroll for navbar static type
+.navbar-static-style-on-scroll {
+  background-color: #fff !important;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 4px 20px 0px !important;
+}
+
+
+
+
+.drop {
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.7));
+}
+
+.animated-dropdown {
+  animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ======================================================================================
+// Indicador de Progreso Circular
+// ======================================================================================
+
+@keyframes progress-pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+
+  70% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+
+.progress-ring-wrapper {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+
+  .progress-ring {
+    transform: rotate(-90deg);
+
+    circle {
+      fill: transparent;
+      transition: stroke-dashoffset 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .progress-ring__pulse {
+      stroke: rgba(115, 103, 240, 0.3); // Color primario con alpha
+      animation: progress-pulse 2.2s infinite ease-out;
+      transform-origin: center;
+    }
+
+    .progress-ring__track {
+      stroke: #e9ecef;
+    }
+
+    .progress-ring__indicator {
+      stroke: #7367f0; // Color primario del tema
+      stroke-linecap: round;
+    }
+  }
+
+  .progress-ring__text-container {
+    position: absolute;
+    color: #434050;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1;
+
+    .progress-ring__percent-sign {
+      font-size: 0.6rem;
+      font-weight: 600;
+      margin-left: 1px;
+      opacity: 0.8;
+    }
+  }
+}
+
+.dark-layout {
+  .progress-ring-wrapper {
+    .progress-ring__track {
+      stroke: #3b4253; // Color de fondo más oscuro para el tema dark
+    }
+
+    .progress-ring__text-container {
+      color: #d0d2d6; // Texto más claro para el tema dark
+    }
+  }
+}
+
+// Estilos para la sección TOTP en el modal de cambio de clave
+.animated-section {
+  animation: fadeInDown 0.5s ease-in-out;
+}
+
+.qr-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  width: 150px;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  border: 1px dashed #dfe3e7;
+  margin: 0 auto;
+
+  .spinner {
+    animation: spin 1.5s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Estilos corregidos para el grupo de inputs
+.custom-input-group {
+  .input-group-prepend .input-group-text {
+    background-color: #f8f9fe;
+    border: 1px solid #e9ecef;
+    border-right: none;
+    color: #adb5bd;
+  }
+  .input-group-append .input-group-text {
+    background-color: #f8f9fe;
+    border: 1px solid #e9ecef;
+    border-left: none;
+    color: #adb5bd;
+  }
+  .form-control {
+    background-color: #f8f9fe;
+    border: 1px solid #e9ecef;
+    border-left: none;
+    border-right: none;
+  }
+  &:focus-within {
+    .input-group-text, .form-control {
+      border-color: #5eaaa8;
+      background-color: #fff;
+    }
+    .input-group-text i {
+      color: #5eaaa8;
+    }
+  }
+}
+.btn-pastel-save {
+  background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);
+  border: none;
+  color: white;
+}
+.btn-pastel-save:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}

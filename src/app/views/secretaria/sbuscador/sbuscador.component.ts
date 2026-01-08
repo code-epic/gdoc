@@ -400,12 +400,12 @@ export class SbuscadorComponent implements OnInit {
 
   buscarDocumento(): void {
     this.vistacontenido = true;
-    console.log(this.SubDocumento.estatus)
     this.cargador = false
 
     this.consultarDocument(undefined)
     
     this.ngxService.startLoader("loader-aceptar")
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CSeguimientoSecretaria'
     this.xAPI.parametros = 'PUNTO DE CUENTA,' + this.SubDocumento.estatus
     this.xAPI.valores = ''
@@ -484,6 +484,7 @@ export class SbuscadorComponent implements OnInit {
   async ConsultarSeguimiento() {
     let desde = ''
     let hasta = ''
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_CSeguimiento";
 
     if (this.contenidoDocumento != "") {
@@ -606,6 +607,8 @@ export class SbuscadorComponent implements OnInit {
 
   async consultarDocumento(numBase64: string) {
     const base = atob(numBase64)
+
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
     this.xAPI.parametros = base
     this.xAPI.valores = ''
@@ -653,9 +656,6 @@ export class SbuscadorComponent implements OnInit {
         this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
 
         this.activarTipo = this.validarTipoDoc()
-        console.log(this.Doc)
-        // this.serializar =  btoa( JSON.stringify(this.Doc.norigen))
-        // console.log( this.serializar)
       },
       (error) => {
         console.error(error)
@@ -692,6 +692,7 @@ export class SbuscadorComponent implements OnInit {
       "observacion": "Creando " + this.titulo,
       "usuario": this.loginService.Usuario.id
     }
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumento'
     this.xAPI.valores = JSON.stringify(this.WkDoc)
   }
@@ -707,6 +708,7 @@ export class SbuscadorComponent implements OnInit {
       this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
       return false
     }
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoDetalle'
     if (this.estadoActual != 9) {
       this.Doc.ncontrol = this.utilService.Semillero(data.msj).toUpperCase()

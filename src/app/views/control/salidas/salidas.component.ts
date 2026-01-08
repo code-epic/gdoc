@@ -159,6 +159,7 @@ export class SalidasComponent implements OnInit {
 
 
   listarConfiguracion() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'MD_CConfiguracion'
     this.xAPI.parametros = '%'
     this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -198,6 +199,7 @@ export class SalidasComponent implements OnInit {
 
 
   async ConsultarAlertas() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CAlertas'
     this.xAPI.parametros = '9,2'
     await this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -236,6 +238,7 @@ export class SalidasComponent implements OnInit {
     this.bzProcesados = []
     this.bzPendientes = []
     this.bzCerrados = []
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CDocumentosGestion'
     this.xAPI.valores = ''
     this.selNav = e
@@ -276,6 +279,7 @@ export class SalidasComponent implements OnInit {
   }
 
   listarEstados() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = '%'
     this.xAPI.valores = ''
@@ -326,7 +330,7 @@ export class SalidasComponent implements OnInit {
   }
 
   async listarSubDocumentos() {
-
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CSubDocumento'
     this.xAPI.parametros = '4,2,9'
 
@@ -395,6 +399,7 @@ export class SalidasComponent implements OnInit {
 
   insertarObservacion() {
     var usuario = this.loginService.Usuario.id
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify(
       {
@@ -436,6 +441,7 @@ export class SalidasComponent implements OnInit {
   }
 
   async rechazarBuzon() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_AUbicacionRechazo"
     this.xAPI.valores = ''
     this.xAPI.parametros = '1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl
@@ -460,7 +466,7 @@ export class SalidasComponent implements OnInit {
   async promoverBuzon(activo: number, sfecha: string) {
     var fecha = ''
     if (sfecha == '') {
-      console.log(this.extender_plazo)
+      
       if (this.extender_plazo == undefined) {
         this.toastrService.warning(
           'Debe seleccionar una fecha ',
@@ -480,6 +486,7 @@ export class SalidasComponent implements OnInit {
     var i = 0
     var estatus = 1 //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_APromoverEstatus'
     this.xAPI.valores = ''
 
@@ -508,15 +515,16 @@ export class SalidasComponent implements OnInit {
       dst = 11
       estatus = 2
     }
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
     this.xAPI.parametros = dst + ',' + dst + ',' + estatus + ',' + this.loginService.Usuario.id + ',' + this.numControl
-    console.log(this.xAPI.parametros)
+   
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
 
         if (this.AccionTexto == '3' || this.AccionTexto == '4') {
-         
+          this.xAPI = {} as IAPICore
           this.xAPI.funcion = "WKF_ADocumentoArchivo"
           this.xAPI.valores = JSON.stringify({
             codigo: this.codigo,
@@ -600,6 +608,7 @@ export class SalidasComponent implements OnInit {
     this.WAlerta.observacion = this.Observacion.toUpperCase()
     this.WAlerta.fecha = fecha
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
     console.log(this.WAlerta);
@@ -634,6 +643,7 @@ export class SalidasComponent implements OnInit {
   reversarDoc(id: string) {
     //WKF_AReversarDocumento
     var usuario = this.loginService.Usuario.id
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AReversarDocumento'
     this.xAPI.valores = ''
     this.xAPI.parametros = '0,1,' + usuario + ',' + id
@@ -669,6 +679,7 @@ export class SalidasComponent implements OnInit {
     try {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
+          this.xAPI = {} as IAPICore
           this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
           this.xAPI.parametros = ''
           this.DocAdjunto.archivo = this.archivos[0].name
@@ -718,6 +729,7 @@ export class SalidasComponent implements OnInit {
       }).then((result) => {
         if (result.isConfirmed) {
           var usuario = this.loginService.Usuario.id
+          this.xAPI = {} as IAPICore
           this.xAPI.funcion = 'WKF_ARedistribuir' //'WKF_AUbicacion'
           this.xAPI.valores = ''
           this.xAPI.parametros = `10,10,1,${usuario},${id}`

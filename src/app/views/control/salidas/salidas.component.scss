@@ -1,55 +1,155 @@
-.iconElimi{
-    color:#a00c1f !important;
-    font-size: 22px !important;
+// --- Estilos para las Pestañas (Tabs) ---
+::ng-deep .mat-tab-label {
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  color: #8898aa !important;
+  opacity: 0.8 !important;
+  padding: 0 24px !important;
+  min-width: auto !important;
+}
+
+::ng-deep .mat-tab-label-active {
+  color: #5eaaa8 !important;
+  opacity: 1 !important;
+}
+
+::ng-deep .mat-ink-bar {
+  background-color: #5eaaa8 !important;
+  height: 3px !important;
+  border-radius: 3px 3px 0 0;
+}
+
+// --- Estilos para la Tabla de Documentos ---
+.table {
+  .thead-light th {
+    background-color: #f6f9fc;
+    color: #8898aa;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+    padding-top: 1.2rem;
+    padding-bottom: 1.2rem;
+  }
+
+  // Anchos de columna para salidas.component
+  .col-action  { width: 10%; text-align: center; }
+  .col-main    { width: 30%; }
+  .col-details { width: 35%; }
+  .col-filters { width: 25%; }
+}
+
+.document-row-item {
+  transition: background-color 0.3s ease;
+  border-bottom: 1px solid #e9ecef;
+
+  &:hover {
+    background-color: #f6f9fc;
+    .actions-container {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+.document-title {
+  font-weight: 600;
+  color: #32325d;
+  font-size: 0.9rem;
+}
+
+.document-type-symbol {
+  font-weight: bold;
+}
+
+.document-origin,
+.document-date {
+  display: block;
+  font-size: 0.8rem;
+  color: #8898aa;
+}
+
+.document-dependency {
+  display: block;
+  color: #525f7f;
+  font-size: 0.85rem;
+}
+
+.actions-container {
+  opacity: 0;
+  transform: translateX(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.action-icon, .actions-container .mat-icon-button .mat-icon {
+    color: #adb5bd;
+    transition: color 0.2s ease-in-out;
+}
+
+.document-row-item:hover .action-icon,
+.document-row-item:hover .actions-container .mat-icon-button .mat-icon {
+    color: #8898aa;
+    &:hover {
+        color: #5eaaa8; // Color primario del tema
+    }
+}
+
+// --- Estilos para el Paginador ---
+::ng-deep .mat-paginator {
+  background-color: #f6f9fc;
+  color: #8898aa;
+}
+
+// --- Estilos para los Filtros de la Cabecera ---
+.filter-control-wrapper {
+  position: relative;
+
+  .filter-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #adb5bd;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: color 0.2s ease-in-out;
+    z-index: 5;
+  }
+
+  .custom-select.custom-select-sm {
+    padding-left: 2.8rem;
+    padding-right: 2rem;
+    border-radius: 30px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    height: 45px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #525f7f;
+    min-width: 160px;
     cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #5eaaa8;
+      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+      outline: none;
+    }
+
+    &:hover {
+      background-color: #fcfcfc;
+      transform: translateY(-1px);
+    }
+  }
+
+  &:focus-within .filter-icon {
+    color: #5eaaa8;
+  }
 }
 
-.iconEdit{
-    color:#5e72e4 !important;
-    font-size: 22px !important;
-    cursor: pointer;
-    padding-right: 6%;
-}
-
-
-.example-section {
-    margin: 12px 0;
-}
-  
-.example-margin {
-    margin: 0 12px;
-}
-
-ul {
-    list-style-type: none;
-    margin-top: 4px;
-}
-
-.texto-lista{
-    margin-top: 13px; 
-    font-weight: bold;
-}
-
-.texto-detalle{
-    margin-top: 13px; 
-    font-size: 12.5px;
-}
-
-
-.example-headers-align .mat-expansion-panel-header-title,
-.example-headers-align .mat-expansion-panel-header-description {
-  flex-basis: 0;
-}
-
-.example-headers-align .mat-expansion-panel-header-description {
-  justify-content: space-between;
-  align-items: center;
-}
-
-.example-headers-align .mat-form-field + .mat-form-field {
-  margin-left: 8px;
-}
-
+// --- Estilos Específicos de Salidas ---
 .calendario {
     width: 2.75rem;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAcCAYAAAAEN20fAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEUSURBVEiJ7ZQxToVAEIY/YCHGxN6XGOIpnpaEsBSeQC9ArZbm9TZ6ADyBNzAhQGGl8Riv4BLAWAgmkpBYkH1b8FWT2WK/zJ8ZJ4qiI6XUI3ANnGKWBnht2/ZBDRK3hgVGNsCd7/ui+JkEIrKtqurLpEWaphd933+IyI3LEIdpCYCiKD6HcuOa/nwOa0ScJEnk0BJg0UTUWJRl6RxCYEzEmomsIlPU3IPW+grIAbquy+q6fluy/28RIBeRMwDXdXMgXLj/B2uimRXpui4D9sBeRLKl+1N+L+t6RwbWrZliTTTr1oxYtzVWiTQAcRxvTX+eJMnlUDaO1vpZRO5NS0x48sIwfPc87xg4B04MCzQi8hIEwe4bl1DnFMCN2zsAAAAASUVORK5CYII=)!important;
@@ -59,13 +159,6 @@ ul {
     border-color: #bbbfc5 !important;
 }
 
-
-input{
-    text-transform: uppercase;
-}
-select{
-    text-transform: uppercase;
-}
-textarea {
+input, select, textarea {
     text-transform: uppercase;
 }

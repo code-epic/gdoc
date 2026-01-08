@@ -14,6 +14,7 @@ export class GeneralesComponent implements OnInit {
 
   public SubMenu = []
   public Componentes: any
+  public rtarjetas  : string = ""
 
 
   constructor(private apiService: ApiService,
@@ -25,7 +26,7 @@ export class GeneralesComponent implements OnInit {
 
 
   async ngOnInit() {
-    await this.loginService.Iniciar()
+    
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
    
     this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : []

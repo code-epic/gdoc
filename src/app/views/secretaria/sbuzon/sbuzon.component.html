@@ -1,7 +1,7 @@
-<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
-  <div class="container-fluid">
-    <p></p>
-  </div>
+<div class="header bg-pastel-gradient pb-8 pt-4 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
 </div>
 
 <div class="container-fluid mt--9">
@@ -12,13 +12,13 @@
         <div class="card-header bg-transparent">
           <div class="row align-items-center">
             <div class="col-md-10">
-              <h6 class="text-uppercase text-muted ls-1 mb-1">Secretaria</h6>
-              <h2 class="mb-0">Buzón</h2>
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
+              <h2 class="mb-0">Buzón de Secretaria</h2>
             </div>
             <div class="col-md-1">
               <div class="media align-items-center">
                 <div class="example-button-row">
-                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                  <button mat-icon-button title="Volver Atrás" [routerLink]="['/secretaria']">
                     <mat-icon>arrow_back</mat-icon>
                   </button>
                 </div>
@@ -26,12 +26,11 @@
             </div>
             <div class="col-md-1">
               <ul class="navbar-nav align-items-center d-none d-md-flex">
-                <li class="nav-item" ngbDropdown placement="bottom-right">
+                <li class="nav-item" ngbDropdown placement="bottom-right" container="body">
                   <a class="nav-link pr-0" role="button" ngbDropdownToggle>
                     <div class="media align-items-center">
                       <div class="example-button-row">
                         <button mat-icon-button aria-label="Example icon-button with a heart icon">
-                          <!-- <mat-icon>arrow_back</mat-icon> -->
                           <mat-icon>more_vert</mat-icon>
                         </button>
                       </div>
@@ -53,125 +52,72 @@
           (selectedIndexChange)="seleccionNavegacion($event)">
           <mat-tab>
             <ng-template mat-tab-label>
-              &nbsp;RECIBIDOS
+              <mat-icon class="mr-2">inbox</mat-icon>
+              RECIBIDOS
             </ng-template>
 
-            <div style="overflow-x: hidden; width: 98%;">
-              <mat-selection-list >
-                <mat-list style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                  <div class="row">
-                    <div class="col-md-1">
-                     
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                     NUMERO CONTROL
-                    </div>
-
-                    <div class="col-md-2 texto-lista">
-                      FECHA / ORIGEN
-                    </div>
-                    <div class="col-md-3 texto-lista">
-                      UNIDAD DEPENDENCIA
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xyear"
-                        value="{{xyear}}" style="margin-top: -20px;">
-                        <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
-                      </select>
-                     
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="xmeses"
-                      value="{{xmeses}}" style="margin-top: -20px;" (change)="seleccionNavegacion(0)">
-                      <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
-                    </select>
-                  </div>
-
-                  </div>
-
-                </mat-list>
-              </mat-selection-list>
-
-              <mat-selection-list style="margin-top:-7px; ">
-                <mat-list *ngFor="let e of buzon; let i=index "
-                  class="mat-list-general">
-                  <div class="row">
-                    <div class="col-md-1">
-                      <button mat-icon-button aria-label="Example " class="text-gray"
-                        (click)="open(observacion, e.idd)">
+            <div class="table-responsive">
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col" class="col-action">ACCIÓN</th>
+                    <th scope="col" class="col-main">DOCUMENTO</th>
+                    <th scope="col" class="col-details">DETALLES</th>
+                    <th scope="col" class="col-filters">
+                      <div class="d-flex justify-content-end align-items-center">
+                        <div class="filter-control-wrapper mr-2">
+                          <i class="ni ni-calendar-grid-58 filter-icon"></i>
+                          <select class="custom-select custom-select-sm" [(ngModel)]="xyear" (change)="seleccionNavegacion(0)">
+                            <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                          </select>
+                        </div>
+                        <div class="filter-control-wrapper">
+                          <i class="ni ni-collection filter-icon"></i>
+                          <select class="custom-select custom-select-sm" [(ngModel)]="xmeses" (change)="seleccionNavegacion(0)">
+                            <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let e of buzon; let i=index" class="document-row-item">
+                    <td>
+                      <button mat-icon-button aria-label="Recibir" class="text-gray" (click)="open(observacion, e.idd)" matTooltip="Recibir">
                         <mat-icon>task_alt</mat-icon>
                       </button>
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      <a routerLinkActive="active" [routerLink]="['/constancia', constancia( e.idd )]">{{ e.numc }}
-                        &nbsp;<font color="green">{{ e.simbolo }}</font></a>
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      {{ e.fcre | date:"dd/MM/yyyy" }} | {{ e.nori | uppercase }}
-                    </div>
-                    
-                    <div class="col-md-4 texto-detalle" #tooltip="matTooltip"
-                    matTooltip="{{ e.fech | date : 'hh:mm:ss' }}">
-                      {{ e.udep | uppercase }} / {{ e.coma | uppercase }}
-                    </div>
-                    <div class="col-md-2 texto-detalle text-right">
-                      <!-- Llama al tipo de documento que se recibe AC 18/03/24 11:00am -->
-                      {{ e.tdoc | uppercase }}
-                    </div>
-                    <div class="col-md-1 text-right">
-                      <a *ngIf="e.anom!=''"
-                       [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer"
-                        class="href-style">
-                        <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo"
-                          class="image-style" />
-                      </a>
-                    </div>
-                  </div>
-                </mat-list>
-              </mat-selection-list>
+                    </td>
+                    <td>
+                      <div class="media align-items-center">
+                        <div class="media-body">
+                          <a class="document-title" [routerLink]="['/constancia', constancia( e.idd )]">
+                            {{ e.numc }} <span class="document-type-symbol" [style.color]="e.color">{{ e.simbolo }}</span>
+                          </a>
+                          <small class="document-origin">{{ e.nori | uppercase }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="document-dependency">{{ e.udep | uppercase }} / {{ e.coma | uppercase }}</span>
+                      <small class="document-date">{{ e.fcre | date:"dd/MM/yyyy" }} | {{ e.tdoc | uppercase }}</small>
+                    </td>
+                    <td class="text-right">
+                      <div class="actions-container">
+                        <a *ngIf="e.anom!=''" [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer" class="texto-detalle-pdf" matTooltip="Descargar PDF">
+                          <mat-icon class="text-primary">picture_as_pdf</mat-icon>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
           </mat-tab>
-          <!-- <mat-tab>
-            <ng-template mat-tab-label>
-              &nbsp;ALERTAS
-            </ng-template>
-
-            <div class="container">
-              <mat-selection-list #lstAlertas>
-                <mat-list *ngFor="let e of bzAlertas; let i=index " 
-                  class="mat-list-general">
-                  <div class="row">
-                    <div class="col-md-2 texto-lista">
-                      {{ e.ncontrol }}
-                    </div>
-                    <div class="col-md-4 texto-lista">
-                      {{ e.unidad | uppercase }}
-                    </div>
-                    <div class="col-md-2 texto-lista">
-                      {{ e.plazo | date:"dd-MM-yyyy" }}
-                    </div>
-                    <div class="col-md-3 texto-lista  {{ e.color }}">
-                      {{ e.texto | uppercase }}
-                    </div>
-                    <div class="col-md-1 text-right ">
-                      <button mat-icon-button aria-label="Privado">
-                       
-                        <mat-icon class="text-warning" (click)="open(observacion, e.id_alerta)">today</mat-icon>
-                      </button>
-                    </div>
-                  </div>
-                </mat-list>
-              </mat-selection-list>
-            </div>
-
-            <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
-              [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
-            </mat-paginator>
-          </mat-tab> -->
         </mat-tab-group>
       </div>
     </div>
@@ -179,7 +125,7 @@
 </div>
 
 <ng-template #observacion let-modal>
-  <div class="modal-header header bg-gradient-info">
+  <div class="modal-header bg-pastel-gradient">
     <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
   </div>
   <div class="modal-body">
@@ -188,68 +134,87 @@
       <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
         [(ngModel)]="Observacion"></textarea>
     </div>
-    <div class="form-group row">
-      <div class="form-group  col-md-{{tministerial}}">
+    <div class="form-row col-md-12">
+      <div class="form-group col-md-{{tministerial}}">
         <label>Acción</label>
-        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
-          (change)="selAccion()">
-          <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
-        </select>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text icon-box"><mat-icon class="input-icon">rule</mat-icon></span>
+          </div>
+          <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto" (change)="selAccion()">
+            <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group  col-md-4 " *ngIf="vministerial">
+      <div class="form-group col-md-4" *ngIf="vministerial">
         <label>Estatus</label>
-        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbEstatus">
-          <option value="0">SELECCIONE</option>
-          <option *ngFor="let e of lstEstatus" value="{{e.valor}}">{{e.texto}}</option>
-        </select>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text icon-box"><mat-icon class="input-icon">toggle_on</mat-icon></span>
+          </div>
+          <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbEstatus">
+            <option value="0">SELECCIONE</option>
+            <option *ngFor="let e of lstEstatus" value="{{e.valor}}">{{e.texto}}</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group  col-md-4" *ngIf="vministerial">
+      <div class="form-group col-md-4" *ngIf="vministerial">
         <label>Decision del Ministro</label>
-        <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDecision">
-          <option value="0">SELECCIONE</option>
-          <option value="APROBADO">APROBADO</option>
-          <option value="NEGADO">NEGADO</option>
-          <option value="VISTO">VISTO</option>
-          <option value="DIFERIDO">DIFERIDO</option>
-          <option value="OTRO">OTRO</option>
-        </select>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text icon-box"><mat-icon class="input-icon">gavel</mat-icon></span>
+          </div>
+          <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDecision">
+            <option value="0">SELECCIONE</option>
+            <option value="APROBADO">APROBADO</option>
+            <option value="NEGADO">NEGADO</option>
+            <option value="VISTO">VISTO</option>
+            <option value="DIFERIDO">DIFERIDO</option>
+            <option value="OTRO">OTRO</option>
+          </select>
+        </div>
       </div>
     </div>
 
     <div class="form-group  col-md-12" *ngIf="clasificacion">
       <label>Area</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
-        <option value="0">SELECCIONE</option>
-        <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
-      </select>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text icon-box"><mat-icon class="input-icon">place</mat-icon></span>
+        </div>
+        <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
+          <option value="0">SELECCIONE</option>
+          <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
+        </select>
+      </div>
     </div>
 
     <div class="form-group  col-md-12" *ngIf="vplazo">
       <label for="tmsCreacion">Plazo / Alerta</label>
-      <div class="form-group div-style">
-        <div class="input-group div-style">
-          <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
-            [positionTarget]="buttonEl">
-          <div class="input-group-append">
-            <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button"></button>
+      <div class="form-group" style="width:100%">
+        <div class="input-group" style="width:100%">
+          <div class="input-group-prepend">
+            <span class="input-group-text icon-box" (click)="fd.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event</mat-icon></span>
           </div>
+          <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+            [positionTarget]="buttonEl" readonly (click)="fd.toggle()">
         </div>
       </div>
     </div>
   </div>
 
   <div class="modal-footer">
-    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')">
-      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
-    <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
-      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    <button class="btn btn-pastel text-white " (click)="insertarObservacion();modal.close('Save')">
+      <mat-icon class="mr-1 text-white" style="font-size: 18px; vertical-align: middle;">save</mat-icon> Aceptar </button>
+    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="modal.dismiss('Close')">
+      <mat-icon class="mr-1 text-white" style="font-size: 18px; vertical-align: middle;">cancel</mat-icon> Cancelar</button>
   </div>
 </ng-template>
 
 <ng-template #adjuntar let-c="close" let-d="dismiss">
 
-  <div class="modal-header header bg-gradient-success">
+  <div class="modal-header bg-pastel-gradient">
     <h4 class="modal-title" id="modal-basic-title">Cargar Archivo en {{ numControl }}</h4>
   </div>
 
@@ -257,35 +222,44 @@
     <form method="post" enctype="multipart/form-data" id="forma" name="forma">
       <input type="hidden" name="txtFileID" id="txtFileID" [ngModelOptions]="{standalone: true}"
         [(ngModel)]="numControl" value="{{numControl}}" readonly="readonly">
-      <label for="input-folder-2">Seleccionar Archivo</label>
-      <div class="file-loading">
-        <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file"
-          multiple accept=".pdf">
+      <div class="custom-file-upload" (click)="fileInput.click()">
+        <input type="file" class="d-none" (change)="fileSelected($event)" accept=".pdf" #fileInput multiple>
+        <div class="upload-icon">
+          <i class="ni ni-cloud-upload-96"></i>
+        </div>
+        <div class="upload-text">
+          Haz clic aquí para seleccionar archivos
+        </div>
+        <div class="upload-hint">
+          (Solo se permiten archivos PDF)
+        </div>
       </div>
       <div id="errorBlock" class="help-block"></div>
     </form>
   </div>
 
   <div class="modal-footer">
-    <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
-      <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
-    <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
-      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    <button class="btn btn-pastel text-white " (click)="SubirArchivo();c('Save')">
+      <mat-icon class="mr-1 text-white" style="font-size: 18px; vertical-align: middle;">upload</mat-icon> Enviar Archivos </button>
+    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="c('Close')">
+      <mat-icon class="mr-1 text-white" style="font-size: 18px; vertical-align: middle;">cancel</mat-icon> Cancelar</button>
   </div>
 
 </ng-template>
 
 <ng-template #ministerial let-modal>
-  <div class="modal-header header bg-gradient-info">
+  <div class="modal-header bg-pastel-gradient">
     <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
   </div>
   <div class="modal-body">
 
   </div>
   <div class="modal-footer">
-    <button class="btn bg-gradient-info text-white " (click)="insertarObservacion();modal.close('Save')">
-      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
-    <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
-      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    <button class="btn btn-pastel text-white " (click)="insertarObservacion();modal.close('Save')">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar  
+    </button>
+    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar
+    </button>
   </div>
 </ng-template>

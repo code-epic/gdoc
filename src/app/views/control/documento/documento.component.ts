@@ -23,22 +23,7 @@ import { AngularEditorConfig } from '@kolkov/angular-editor';
 
 export class DocumentoComponent implements OnInit, OnDestroy {
 
-  confirmarSalir() {
-    Swal.fire({
-      title: '¿Está seguro que desea salir?',
-      text: 'Se perderán los cambios no guardados.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, salir',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.history.back();
-      }
-    });
-  }
+
 
 
   editorConfig: AngularEditorConfig = {
@@ -109,6 +94,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public nmilitar: string = ''
   public salida: string = 'Nro. de Salida'
   public booPuntoCuenta: boolean = false
+
 
   public WkDoc: IWKFDocumento = {
     nombre: '',
@@ -250,6 +236,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   public sGrado: string = 'Grado / Jerarquía'
   public sNombre: string = 'Nombres y Apellidos'
 
+  public NUMERO_CONTROL: string = '' //Este codigo controlara el semillero para los codigos nuevos
+  public bControl  : boolean = false
+
 
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
@@ -266,12 +255,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-
-
-
-    // this.editor = new Editor()
-    // this.xeditor = new Editor()
-
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
       if (id == 'salida') {
@@ -283,6 +266,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.salidavisible = true
           this.camponumsalida = 4
           this.consultarDocumento(numc)
+          this.bControl = false
         }
 
       } else {
@@ -293,17 +277,11 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.consultarDocumento(id)
       }
 
-
-
-
     } else {
       this.limpiarDoc()
-
     }
-    await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu("/control")
     let prv = this.loginService.obtenerPrivilegiosMenu("/control")
-    // console.log(prv)
     if (prv != undefined && prv.Privilegios != undefined) {
       prv.Privilegios.forEach(e => {
         if (e.nombre == "configurar") this.Configurar = true
@@ -316,10 +294,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.Configuracion = sessionStorage.getItem("MD_CConfiguracion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion"))) : []
     this.listarConfiguracion()
+    
+
   }
-
-
-
 
   setDescripcionPunto() {
     this.sCedula = 'Cédula'
@@ -357,7 +334,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   listarConfiguracion() {
-    // console.log(this.Configuracion)
     this.Configuracion.forEach(e => {
       switch (e.tipo) {
         case "1":
@@ -412,12 +388,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
     this.xAPI.parametros = base
     this.xAPI.valores = ''
-    console.log('fechaActual');
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-        console.log(data)
         data.Cuerpo.forEach(e => {
-
           this.Doc = e
           this.fcreacion = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
           this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
@@ -429,9 +403,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.WAlerta.estatus = this.estadoOrigen
             this.WAlerta.usuario = this.loginService.Usuario.id
           }
-
-
-
         });
 
         this.selTipoDocumento()
@@ -496,6 +467,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       "observacion": "Creando " + this.titulo,
       "usuario": this.loginService.Usuario.id
     }
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumento'
     this.xAPI.valores = JSON.stringify(this.WkDoc)
   }
@@ -506,53 +478,53 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
 
   validarCamposObligatorios(): boolean {
-  // Validar campos comunes
-  if (this.fcreacion == '' || this.fcreacion == undefined ||
-this.Doc.contenido == '' || this.fplazo == '') {
-    return true;
-  }
-
-  // Validar Número de Origen solo si es entrada (no salida y el campo está visible)
-  if (this.origenvisible && this.titulo !== 'Salida' && (!this.Doc.norigen || this.Doc.norigen.trim() === '')) {
-    this.toastrService.error('GDoc MPPD debe ingresar un Número de Origen', 'Campo requerido');
-    return true;
-  }
-    const tipoDoc = this.Doc.tipo.toLowerCase();
-  
-  // Para PUNTO DE CUENTA simple (cuando el formulario está visible)
- // Solo validar si los campos de cuenta están visibles
-if (this.puntocuenta) {
-  if (!this.cuenta?.trim()) {
-    this.toastrService.error('Número de Cuenta es requerido', 'Campo requerido');
-    return true;
-  }
-  if (!this.resumen?.trim()) {
-    this.toastrService.error('Asunto de la Cuenta es requerido', 'Campo requerido');
-    return true;
-  }
-  if (!this.subfecha) {
-    this.toastrService.error('Fecha de Cuenta es requerida', 'Campo requerido');
-    return true;
-  }
-}
-  
-  // Para otros tipos que muestran la tabla de resoluciones (RESOLUCIÓN, COMISIÓN, etc.)
-  const tiposConTabla = [
-    'resolucion', 
-    'comision de servicio', 
-    'tramitacion por organo regular',
-    'contratos/punto de cuenta',
-    'destitucion/punto de cuenta'
-  ];
-
-  if (tiposConTabla.includes(tipoDoc)) {
-    // Solo validar que haya registros en la tabla, NO los campos del formulario
-    if (!this.lstCuenta || this.lstCuenta.length === 0) {
-      this.toastrService.error('Debe agregar al menos un registro', 'Campo requerido');
+    // Validar campos comunes
+    if (this.fcreacion == '' || this.fcreacion == undefined ||
+      this.Doc.contenido == '' || this.fplazo == '') {
       return true;
     }
-  }
-  return false;
+
+    // Validar Número de Origen solo si es entrada (no salida y el campo está visible)
+    if (this.origenvisible && this.titulo !== 'Salida' && (!this.Doc.norigen || this.Doc.norigen.trim() === '')) {
+      this.toastrService.error('GDoc MPPD debe ingresar un Número de Origen', 'Campo requerido');
+      return true;
+    }
+    const tipoDoc = this.Doc.tipo.toLowerCase();
+
+    // Para PUNTO DE CUENTA simple (cuando el formulario está visible)
+    // Solo validar si los campos de cuenta están visibles
+    if (this.puntocuenta) {
+      if (!this.cuenta?.trim()) {
+        this.toastrService.error('Número de Cuenta es requerido', 'Campo requerido');
+        return true;
+      }
+      if (!this.resumen?.trim()) {
+        this.toastrService.error('Asunto de la Cuenta es requerido', 'Campo requerido');
+        return true;
+      }
+      if (!this.subfecha) {
+        this.toastrService.error('Fecha de Cuenta es requerida', 'Campo requerido');
+        return true;
+      }
+    }
+
+    // Para otros tipos que muestran la tabla de resoluciones (RESOLUCIÓN, COMISIÓN, etc.)
+    const tiposConTabla = [
+      'resolucion',
+      'comision de servicio',
+      'tramitacion por organo regular',
+      'contratos/punto de cuenta',
+      'destitucion/punto de cuenta'
+    ];
+
+    if (tiposConTabla.includes(tipoDoc)) {
+      // Solo validar que haya registros en la tabla, NO los campos del formulario
+      if (!this.lstCuenta || this.lstCuenta.length === 0) {
+        this.toastrService.error('Debe agregar al menos un registro', 'Campo requerido');
+        return true;
+      }
+    }
+    return false;
   }
 
   registrar() {
@@ -572,7 +544,6 @@ if (this.puntocuenta) {
       return
     }
 
-    // console.log(this.fcreacion)
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -647,9 +618,10 @@ if (this.puntocuenta) {
       this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
       return false
     }
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoDetalle'
     if (this.estadoActual != 9) {
-      this.Doc.ncontrol = this.utilService.Semillero(data.msj).toUpperCase()
+      this.Doc.ncontrol = this.NUMERO_CONTROL!=''? this.NUMERO_CONTROL: this.utilService.Semillero(data.msj).toUpperCase()
 
     } else {
       this.Doc.salida = this.Doc.ncontrol.toUpperCase()
@@ -681,6 +653,7 @@ if (this.puntocuenta) {
     this.WAlerta.estatus = this.WkDoc.estatus
     this.WAlerta.usuario = this.WkDoc.usuario
     this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IAlerta'
     this.xAPI.valores = JSON.stringify(this.WAlerta)
   }
@@ -693,8 +666,8 @@ if (this.puntocuenta) {
       text: "¿Desea registrar otro documento?",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#5eaaa8',
+      cancelButtonColor: '#ef9a9a',
       confirmButtonText: 'Si',
       cancelButtonText: 'No',
       allowEscapeKey: true,
@@ -724,6 +697,7 @@ if (this.puntocuenta) {
     this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10)
     this.Doc.creador = this.loginService.Usuario.id
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_ADocumentoDetalle'
     this.xAPI.parametros = ''
 
@@ -804,6 +778,7 @@ if (this.puntocuenta) {
 
   insertarObservacion() {
     const usuario = this.loginService.Usuario.id
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify(
       {
@@ -819,12 +794,7 @@ if (this.puntocuenta) {
     this.xAPI.parametros = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async data => {
-
-
         await this.guardarAlerta(1)
-        //this.ruta.navigate(['/salidas']);
-        //this.location.back()
-
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
@@ -842,7 +812,7 @@ if (this.puntocuenta) {
     this.WAlerta.observacion = 'DOCUMENTO EDITADO EN SALIDA'
 
     this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
-
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.WAlerta)
@@ -878,6 +848,7 @@ if (this.puntocuenta) {
       return false
     }
     this.ngxService.startLoader("loader-aceptar")
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_EDocumentoDependencia"
     this.xAPI.parametros = id.toString()
     this.xAPI.valores = ''
@@ -907,6 +878,7 @@ if (this.puntocuenta) {
     } else {
       const cuenta = this.lstPC[0]
       const p_cuenta = cuenta.split('|')
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = 'WKF_IPuntoCuentaMultiple'
       this.xAPI.valores = ''
       this.xAPI.parametros = numc + ',' + p_cuenta[0].trim() + ',' + p_cuenta[1].trim() + ',1'
@@ -938,6 +910,7 @@ if (this.puntocuenta) {
       this.ngxService.stopLoader("loader-aceptar")
       return
     } else {
+      this.xAPI = {} as IAPICore
 
       this.xAPI.funcion = 'WKF_IDocumentoDependencia'
       this.xAPI.valores = ''
@@ -1077,6 +1050,7 @@ if (this.puntocuenta) {
       this.ngxService.stopLoader("loader-aceptar")
       return
     } else {
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = 'WKF_ISubDocumento'
       this.xAPI.parametros = ''
       this.lstCuenta[0].documento = numc
@@ -1115,9 +1089,9 @@ if (this.puntocuenta) {
       this.puntocuenta = true;
       this.resolucion = true;
 
-          if (tipo.indexOf('contratos') >= 0) {
-      this.setDescripcionContratos();
-    }
+      if (tipo.indexOf('contratos') >= 0) {
+        this.setDescripcionContratos();
+      }
 
       if (tipo.indexOf('multiple') >= 0) {
         this.puntocuenta = false
@@ -1134,18 +1108,19 @@ if (this.puntocuenta) {
         this.puntocuenta = false
         this.resolucion = false
       }
-    
+
 
     } else if (tipo == 'resolucion' ||
       tipo == 'tramitacion por organo regular' ||
       tipo == 'comision de servicio') {
       this.resolucion = true
-      }
-}
+    }
+  }
 
   cargarPuntosdeCuenta() {
 
     this.ngxService.startLoader("loader-aceptar")
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CPuntoCuentaSalida'
     this.xAPI.parametros = '5'
     this.xAPI.valores = ''
@@ -1184,6 +1159,7 @@ if (this.puntocuenta) {
       this.isPunto = false
     } else {
       this.ngxService.startLoader("loader-aceptar")
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = 'MPPD_CDatosBasicos'
       this.xAPI.parametros = this.cedula
       this.xAPI.valores = ''
@@ -1230,6 +1206,7 @@ if (this.puntocuenta) {
     if (this.Doc.salida == '') return false
     let dwf = ''
     if (this.Doc.norigen != '') dwf = this.Doc.norigen
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CDocumentoDetalleSalida'
     this.xAPI.parametros = '9,1,' + this.Doc.salida
     this.xAPI.valores = ''
@@ -1275,8 +1252,6 @@ if (this.puntocuenta) {
 
         this.activarTipo = this.validarTipoDoc()
 
-        // this.serializar =  btoa( JSON.stringify(this.Doc.norigen))
-        // console.log( this.serializar)
       },
       (error) => {
         console.error(error)
@@ -1292,7 +1267,7 @@ if (this.puntocuenta) {
         text: '¿Desea mantener los datos de la cuenta?',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: '#5eaaa8',
         confirmButtonText: 'Sí, estoy seguro'
       }).then((result) => {
         if (result.isConfirmed) {
@@ -1307,9 +1282,53 @@ if (this.puntocuenta) {
   }
 
 
+  confirmarSalir() {
+    Swal.fire({
+      title: '¿Está seguro que desea salir?',
+      text: 'Se perderán los cambios no guardados.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#5eaaa8',
+      cancelButtonColor: '#ef9a9a',
+      confirmButtonText: 'Sí, salir',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.history.back();
+      }
+    });
+  }
+
+
   ngOnDestroy(): void {
     // this.editor.destroy()
     // this.xeditor.destroy()
   }
+
+
+  generarNumeroSerie() {
+    this.xAPI = {} as IAPICore
+    this.xAPI.funcion = 'WKF_NumeroSerie'
+    this.xAPI.parametros = 'wkf_mppd'
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        if (data !== undefined) {
+          if (data.valor_actual !== undefined) {
+            this.NUMERO_CONTROL = this.utilService.NuevoSemillero(data.valor_actual)
+            console.log(this.NUMERO_CONTROL)
+            this.registrar()
+          }
+        } else {
+           this.toastrService.info('Falla en la generación del número de serie', 'Campo requerido')
+        }
+
+      },
+      (error) => {
+        console.error("No existe la funcion ", error)
+      }
+    )
+
+  }
+
 }
 

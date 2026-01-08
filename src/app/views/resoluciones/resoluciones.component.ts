@@ -90,6 +90,7 @@ export class ResolucionesComponent implements OnInit {
   public TipoResoluciones: any
   public Estados: any
   public selected: number = 0
+  public rtarjetas  : string = ""
   
 
   constructor(private apiService: ApiService,
@@ -107,7 +108,6 @@ export class ResolucionesComponent implements OnInit {
       'valor': true
     }
     this.msj.contenido$.emit(alertas)
-    await this.loginService.Iniciar()
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
    
     this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : []

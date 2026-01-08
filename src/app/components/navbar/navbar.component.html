@@ -31,9 +31,9 @@
           </div>
         </a>
         <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/perfil']">
+          <a class="dropdown-item" routerLinkActive="active" (click)="ModalChangePassword(ChangePassword)">
             <i class="ni ni-single-02"></i>
-            <span>Perfil</span>
+            <span>Cambiar Contraseña</span>
           </a>
         
           <div class="dropdown-divider"></div>
@@ -46,3 +46,150 @@
     </ul>
   </div>
 </nav>
+
+
+
+
+
+
+
+<ng-template #ChangePassword let-modal>
+
+  <div class="modal-header bg-pastel-gradient">
+    <h3 class="modal-title text-white font-weight-bolder" id="myModalLabel160">
+      <i class="ni ni-key-25 mr-2"></i>Seguridad: Cambiar Clave
+    </h3>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')" aria-label="Close">
+      <span aria-hidden="true" class="text-white">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" tabindex="0" ngbAutofocus>
+    <div class="alert alert-info p-2 mb-3" role="alert" style="background-color: #f6f9fc; border-color: #e0eafc;">
+      <div class="d-flex align-items-center">
+        <i class="ni ni-support-16 mr-2 text-primary"></i>
+        <small class="text-dark">La contraseña debe tener 8-16 caracteres, mayúsculas, minúsculas, números y símbolos (@$!%*?&).</small>
+      </div>
+    </div>
+
+    <form id="frmChange" name="frmChange">
+      <div class="form-group">
+        <label class="form-label font-weight-bold text-muted">Contraseña Actual</label>
+        <div class="input-group input-group-merge custom-input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+          </div>
+          <input [type]="showClave ? 'text' : 'password'" [(ngModel)]="Change.clave"
+            [ngModelOptions]="{standalone: true}" class="form-control" placeholder="Ingrese su clave actual" />
+          <div class="input-group-append">
+            <span class="input-group-text cursor-pointer" (click)="showClave = !showClave">
+              <i class="fa" [class]="showClave ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label font-weight-bold text-muted">Nueva Contraseña</label>
+        <div class="input-group input-group-merge custom-input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="ni ni-key-25"></i></span>
+          </div>
+          <input [type]="showNueva ? 'text' : 'password'" [(ngModel)]="Change.nueva" (input)="checkPasswordStrength($event)"
+            [ngModelOptions]="{standalone: true}" class="form-control"
+            placeholder="Ingrese su nueva clave"
+            [class.is-invalid]="Change.nueva !== Change.repite && Change.repite.length > 0" />
+          <div class="input-group-append">
+            <span class="input-group-text cursor-pointer" (click)="showNueva = !showNueva">
+              <i class="fa" [class]="showNueva ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- Password Strength Indicator -->
+        <div class="mt-2" *ngIf="Change.nueva && Change.nueva.length > 0">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <small class="text-muted font-weight-bold">Seguridad:</small>
+            <small [class]="'font-weight-bold ' + (passwordStrengthColor ? passwordStrengthColor.replace('bg-', 'text-') : '')">{{ passwordStrengthLabel }}</small>
+          </div>
+          <div class="progress" style="height: 6px;">
+            <div role="progressbar" [class]="'progress-bar ' + passwordStrengthColor"
+              [style.width.%]="passwordStrengthWidth" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label font-weight-bold text-muted">Repetir Contraseña</label>
+        <div class="input-group input-group-merge custom-input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="ni ni-key-25"></i></span>
+          </div>
+          <input [type]="showRepite ? 'text' : 'password'" [(ngModel)]="Change.repite"
+            [ngModelOptions]="{standalone: true}" class="form-control" placeholder="Confirme su nueva clave"
+            [class.is-invalid]="Change.nueva !== Change.repite && Change.repite.length > 0" />
+          <div class="input-group-append">
+            <span class="input-group-text cursor-pointer" (click)="showRepite = !showRepite">
+              <i class="fa" [class]="showRepite ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </span>
+          </div>
+        </div>
+        <small class="text-danger" *ngIf="Change.nueva !== Change.repite && Change.repite.length > 0">
+          <i class="ni ni-fat-remove mr-1"></i>Las contraseñas no coinciden
+        </small>
+      </div>
+    </form>
+
+    <!-- Sección TOTP -->
+    <hr class="my-2">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <i class="ni ni-mobile-button mr-2 text-dark"></i>
+        <h6 class="m-0 font-weight-bolder text-dark">Autenticación de Dos Factores (TOTP)</h6>
+      </div>
+      <div class="custom-control custom-switch">
+        <input type="checkbox" class="custom-control-input" id="totp-switch" (change)="toggleTotp($event)" [checked]="isTotpActive" />
+        <label class="custom-control-label" for="totp-switch"></label>
+      </div>
+    </div>
+
+    <div *ngIf="showTotpSection" class="mt-2 animated-section">
+      <div class="alert alert-info p-2" role="alert" style="background-color: #f6f9fc; border-color: #e0eafc;">
+        <div class="d-flex align-items-center">
+          <i class="ni ni-support-16 mr-2 text-primary"></i>
+          <small class="text-dark">Escanee el código QR con una app como Google Authenticator o Authy.</small>
+        </div>
+      </div>
+
+      <div class="row align-items-center">
+        <div class="col-md-4 text-center">
+          <img *ngIf="totpQrCodeUrl" [src]="totpQrCodeUrl" alt="Código QR TOTP" class="img-fluid rounded" style="border: 1px solid #dfe3e7;">
+          <div *ngIf="!totpQrCodeUrl" class="qr-placeholder">
+            <i class="fa fa-spinner fa-spin fa-2x text-muted"></i>
+            <small class="d-block mt-1 text-muted">Generando código...</small>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <p class="small text-muted mb-1">Si no puede escanear, ingrese esta clave manualmente:</p>
+          <div class="input-group">
+            <input type="text" class="form-control form-control-sm" [value]="totpSecret" readonly placeholder="Clave secreta...">
+            <div class="input-group-append">
+              <button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyTotpSecret()" [disabled]="isTotpSecretCopied">
+                <i class="fa" [class]="isTotpSecretCopied ? 'fa-check text-success' : 'fa-copy'"></i>
+              </button>
+            </div>
+          </div>
+          <small *ngIf="isTotpSecretCopied" class="text-success font-weight-bold mt-1 animated-section">¡Clave copiada!</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-pastel-save" (click)="ChangesPassword()"
+      [disabled]="passwordStrengthWidth < 80 || Change.nueva !== Change.repite">
+      <i class="fa fa-save mr-2"></i> Cambiar Clave
+    </button>
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.close('Accept click')">
+      <i class="fa fa-times mr-2"></i> Cancelar
+    </button>
+  </div>
+</ng-template>

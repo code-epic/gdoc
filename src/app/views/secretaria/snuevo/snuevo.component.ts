@@ -238,7 +238,7 @@ export class SnuevoComponent implements OnInit {
 
   async ngOnInit() {
 
-    await this.loginService.Iniciar()
+
     this.SubMenu = await this.loginService.obtenerSubMenu("/secretaria")
     let prv = this.loginService.obtenerPrivilegiosMenu("/secretaria")
     // console.log(prv)
@@ -365,6 +365,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
    */
   async consultarDocumento(numBase64: string) {
     const base = atob(numBase64)
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CDocumentoDetalle'
     this.xAPI.parametros = base
     this.xAPI.valores = ''
@@ -433,6 +434,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
       "observacion": "Creando Presidencial",
       "usuario": this.loginService.Usuario.id
     }
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumento'
     this.xAPI.valores = JSON.stringify(this.WkDoc)
   }
@@ -543,6 +545,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
       this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
       return false
     }
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoDetalle'
     this.Doc.ncontrol = this.utilService.Semillero(data.msj).toUpperCase()
     this.Doc.wfdocumento = parseInt(data.msj)
@@ -566,6 +569,8 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
     this.WAlerta.estatus = this.WkDoc.estatus
     this.WAlerta.usuario = this.WkDoc.usuario
     this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazoDate)
+
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IAlerta'
     this.xAPI.valores = JSON.stringify(this.WAlerta)
   }
@@ -603,6 +608,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
     this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10)
     this.Doc.creador = this.loginService.Usuario.id
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_ADocumentoDetalle'
     this.xAPI.parametros = ''
 
@@ -658,6 +664,8 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
 
   insertarObservacion() {
     const usuario = this.loginService.Usuario.id
+
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify(
       {
@@ -692,6 +700,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
 
     this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazoDate)
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
     this.xAPI.valores = JSON.stringify(this.WAlerta)
@@ -723,6 +732,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
       return false
     }
     this.ngxService.startLoader("loader-aceptar")
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_EDocumentoDependencia"
     this.xAPI.parametros = id.toString()
     this.xAPI.valores = ''
@@ -752,6 +762,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
     } else {
       const cuenta = this.lstPC[0]
       const p_cuenta = cuenta.split('|')
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = 'WKF_IPuntoCuentaMultiple'
       this.xAPI.valores = ''
       this.xAPI.parametros = numc + ',' + p_cuenta[0].trim() + ',' + p_cuenta[1].trim() + ',1'
@@ -783,7 +794,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
       this.ngxService.stopLoader("loader-aceptar")
       return
     } else {
-
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = 'WKF_IDocumentoDependencia'
       this.xAPI.valores = ''
       this.xAPI.parametros = numc + ',' + this.lstDependencias[0].nombre
@@ -922,6 +933,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
       this.ngxService.stopLoader("loader-aceptar")
       return
     } else {
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = 'WKF_ISubDocumento'
       this.xAPI.parametros = ''
       this.lstCuenta[0].documento = numc
@@ -992,6 +1004,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
   cargarPuntosdeCuenta() {
 
     this.ngxService.startLoader("loader-aceptar")
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CPuntoCuentaSalida'
     this.xAPI.parametros = '5'
     this.xAPI.valores = ''
@@ -1030,6 +1043,7 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
       this.isPunto = false
     } else {
       this.ngxService.startLoader("loader-aceptar")
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = 'MPPD_CDatosBasicos'
       this.xAPI.parametros = this.cedula
       this.xAPI.valores = ''

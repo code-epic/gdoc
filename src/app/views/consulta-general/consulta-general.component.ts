@@ -423,7 +423,7 @@ export class ConsultaGeneralComponent implements OnInit {
   consultar(e) {
     if (e.keyCode == 13) {
       this.cedula = this.cedula.replace('.', '')
-      console.log(this.cedula)
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = "MPPD_CUnidad";
       this.xAPI.parametros = this.cedula;
       this.xAPI.valores = "";
@@ -476,8 +476,9 @@ export class ConsultaGeneralComponent implements OnInit {
       if (this.cedula == "") return false;
 
       this.cedula = this.cedula.replace(/\./g, '')
-      console.log(this.cedula)
+      
       this.ngxService.startLoader("loader-buscar");
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = "MPPD_CDatosBasicos";
       this.xAPI.parametros = this.cedula;
       this.xAPI.valores = "";
@@ -626,12 +627,12 @@ export class ConsultaGeneralComponent implements OnInit {
 
       if (this.IResolucion.numero == "") return false;
       this.ngxService.startLoader("loader-buscar");
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = "MPPD_CResoluciones";
       this.xAPI.parametros = this.IResolucion.numero;
       this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          console.log(data);
           this.resolucion = this.IResolucion.numero;
           this.IResolucion.numero = "";
           this.ngxService.stopLoader("loader-buscar");
@@ -692,6 +693,7 @@ export class ConsultaGeneralComponent implements OnInit {
         ? ""
         : " AND  rs.observacion LIKE '%" + this.observaciones + "%' ";
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "MPPD_CResolucionesRangoTipo";
     codigo = asunto + instrucciones + observaciones + causa;
 
@@ -826,6 +828,7 @@ export class ConsultaGeneralComponent implements OnInit {
 
   getAdministracion(id: string) {
     this.lstCausa = [];
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "MPPD_CCausaResolucion";
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = id;
@@ -845,6 +848,7 @@ export class ConsultaGeneralComponent implements OnInit {
   getCausa(id: string) {
     this.lstCausa = [];
     this.lstMotivo = [];
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "MPPD_CCausaResolucion";
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = id;
@@ -864,6 +868,7 @@ export class ConsultaGeneralComponent implements OnInit {
 
   getMotivo() {
     this.lstMotivo = [];
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "MPPD_CMotivoResolucion";
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = this.IResolucion.causa.toString();
@@ -897,6 +902,7 @@ export class ConsultaGeneralComponent implements OnInit {
 
       this.ngxService.startLoader("loader-buscar");
 
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = "MPPD_CDatosBasicosNombre";
       var grado = this.dbgrado == "%" ? "LIKE '%'" : " = " + this.dbgrado;
       var componente =
@@ -1096,6 +1102,7 @@ export class ConsultaGeneralComponent implements OnInit {
   }
 
   ConsultaExpandida() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "MPPD_CCedulaRango";
     this.xAPI.parametros = "cedula##" + this.rango_cedula;
     this.xAPI.valores = "";
@@ -1188,7 +1195,7 @@ export class ConsultaGeneralComponent implements OnInit {
    */
   getResueltoID(id) {
     this.ngxService.startLoader("loader-buscar");
-
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "MPPD_CResueltoID";
     this.xAPI.parametros = id.toString();
     this.xAPI.valores = {};

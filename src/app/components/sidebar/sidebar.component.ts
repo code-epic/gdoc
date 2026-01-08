@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginService } from 'src/app/services/seguridad/login.service';
-import { PushService } from 'src/app/services/util/push.service';
-import { UtilService } from 'src/app/services/util/util.service';
 
 declare interface RouteInfo {
     path: string;
@@ -23,22 +21,15 @@ export class SidebarComponent implements OnInit {
   public isCollapsed = true;
 
   constructor(
-    private utilService: UtilService,
     private router: Router, 
-    private loginService: LoginService, 
-    private pushService: PushService) { 
+    private loginService: LoginService) { 
 
   }
 
   async ngOnInit() {
 
-    // console.log('ENtrando en el menu')
-    
     if (ROUTES.length == 0){
-      await this.loginService.Iniciar()
-      var App = this.loginService.Aplicacion
-      
-      App.Rol.Menu.forEach(e => {
+      this.loginService.obtenerMenu().forEach(e => {
         ROUTES.push({
           path : e.url,
           title: e.nombre,
@@ -54,16 +45,4 @@ export class SidebarComponent implements OnInit {
   }
 
  
-
-
-  subscribe() {
-    this.pushService.subscribeToPush(this.utilService.uuidv4()).subscribe({
-      next: (data) => {
-        console.log('Suscripción exitosa', data);
-      },
-      error: (err) => {
-        console.error('Error al suscribirse a push:', err);
-      }
-    });
-  }
 }

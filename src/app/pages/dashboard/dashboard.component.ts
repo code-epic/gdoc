@@ -4,13 +4,6 @@ import Chart from 'chart.js';
 import { ResolucionService } from 'src/app/services/resoluciones/resolucion.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 
-// core components
-import {
-  chartOptions,
-  parseOptions,
-  chartExample1,
-  chartExample2
-} from "../../variables/charts";
 
 @Component({
   selector: 'app-dashboard',
@@ -42,9 +35,13 @@ export class DashboardComponent implements OnInit {
 
   async ngOnInit() {
 
-    await this.loginService.Iniciar()
+    // await this.loginService.Iniciar()
     this.Menu =  this.loginService.obtenerMenu().filter(
-      e => { return e.url != '/principal'}
+      e => { 
+        
+        return e.url != '/principal'
+
+      }
     )
 
     if (sessionStorage.getItem("CEP_CUsuario") == undefined) {

@@ -394,4 +394,80 @@ export class ApiService {
   }
 
 
+
+  
+  
+  /**
+   * @param id uuid del usuario su conexion 
+   * @returns 
+   */
+  ExecBackup(dump): Observable<any> {
+    var url = this.URL + "db/dump";
+    return this.http.post<any>(url, dump, this.httpOptions);
+  }
+
+
+  /**
+   * @param id uuid del usuario su conexion 
+   * @returns 
+   */
+  ExecRestore(restore): Observable<any> {
+    var url = this.URL + "db/restore";
+    return this.http.post<any>(url, restore, this.httpOptions);
+  }
+
+  /**
+   * @param tipo png | base64
+   * @returns QR
+   */
+  GenerarQR_TOTP(tipo: string): Observable<any> {
+    var url = this.URL + "wusuario/gtotp/" + tipo;
+    return this.http.post<any>(url, {}, this.httpOptions);
+  }
+
+  /**
+  * @param tipo png | base64
+  * @returns QR
+  */
+  Validar_TOTP(codigo: string, tempAuthToken: string): Observable<any> {
+    var httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: "Bearer " + tempAuthToken,
+      }),
+    };
+    var url = this.URL + "wusuario/vtotp";
+    return this.http.post<any>(url, { "codigo": codigo }, httpOptions);
+  }
+
+  /**
+   * @param tipo png | base64
+   * @returns QR
+   */
+  MultipleSesion(tempAuthToken: string): Observable<any> {
+    var httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: "Bearer " + tempAuthToken,
+      }),
+    };
+    var url = this.URL + "wusuario/multiplesesion";
+    return this.http.post<any>(url, {}, httpOptions);
+  }
+
+  /**
+   * @param tipo png | base64
+   * @returns QR
+   */
+  GetImageQR(id: string): Observable<any> {
+    var httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: "Bearer " + this.httpOptions,
+      }),
+    };
+    var url = this.URL + "imgslocalbase64/" + id;
+    console.log(url)
+    return this.http.get(url, httpOptions);
+  }
+
+
+
 }

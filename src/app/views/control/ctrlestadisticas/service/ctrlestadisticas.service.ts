@@ -14,6 +14,7 @@ export class CtrlEstadisticasService {
     constructor(private apiService: ApiService) { }
 
     getAllAreasList() :Observable<any>{
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = 'WKF_CEstados';
         this.xAPI.parametros = '%';
         this.xAPI.valores = '';
@@ -21,6 +22,7 @@ export class CtrlEstadisticasService {
     }
 
     getStaticsPanel(parameter: any) {
+        this.xAPI = {} as IAPICore;
         this.xAPI.funcion = 'WKF_CEstatusAlertasCantidad';
         this.xAPI.parametros = parameter;
         return this.apiService.Ejecutar(this.xAPI);

@@ -159,6 +159,7 @@ export class SbuzonComponent implements OnInit {
 
 
   async ConsultarAlertas() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CAlertas'
     this.xAPI.parametros = '4,2'
     await this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -195,6 +196,7 @@ export class SbuzonComponent implements OnInit {
 
   seleccionNavegacion(e) {
     this.buzon = []
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CDocumentosSecretaria'
     this.xAPI.valores = ''
     this.selNav = e
@@ -221,6 +223,7 @@ export class SbuzonComponent implements OnInit {
 
 
   listarEstados() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = '%'
     this.xAPI.valores = ''
@@ -239,7 +242,7 @@ export class SbuzonComponent implements OnInit {
     this.ngxService.startLoader("loader-aceptar")
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
+        
         data.Cuerpo.forEach(e => {
 
           e.existe = e.anom != '' ? true : false
@@ -290,6 +293,7 @@ export class SbuzonComponent implements OnInit {
 
   insertarObservacion() {
     var usuario = this.loginService.Usuario.id
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify(
       {
@@ -332,6 +336,7 @@ export class SbuzonComponent implements OnInit {
   }
 
   async rechazarBuzon() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_AUbicacionRechazo"
     this.xAPI.valores = ''
     this.xAPI.parametros = '1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl
@@ -341,7 +346,6 @@ export class SbuzonComponent implements OnInit {
           'El documento ha sido enviado al origen',
           `GDoc Wkf.DocumentoObservacion`
         )
-        console.log(data)
         this.seleccionNavegacion(this.selNav)
       },
       (error) => {
@@ -360,6 +364,7 @@ export class SbuzonComponent implements OnInit {
     var i = 0
     var estatus = this.estatusOrigen //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_APromoverEstatus'
     this.xAPI.valores = ''
 
@@ -384,10 +389,11 @@ export class SbuzonComponent implements OnInit {
   async redistribuir(destino: number = 0) {
     var dst = destino != 0 ? destino : this.cmbDestino
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
     this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
-    console.log(this.xAPI.parametros)
+    
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
@@ -446,13 +452,13 @@ export class SbuzonComponent implements OnInit {
     this.WAlerta.observacion = this.Observacion.toUpperCase()
     this.WAlerta.fecha = fecha
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
-    console.log(this.WAlerta);
     this.xAPI.valores = JSON.stringify(this.WAlerta)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async alerData => {
-        console.log(alerData)
+        
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);

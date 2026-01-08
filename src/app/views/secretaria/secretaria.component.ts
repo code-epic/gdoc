@@ -29,83 +29,7 @@ export class SecretariaComponent implements OnInit {
   };
 
 
-  public SubMenu = [{
-    url: "/sbuzon",
-    js: "",
-    descripcion: "Documentos en Buzon",
-    icono: "fa fa-envelope",
-    nombre: "Buzon",
-    accion: "CargarUrl('control', 'buzon')",
-    clase: "f-left",
-    color: "bg-blue",
-
-  },
-
-  {
-    url: "/spresidencial",
-    js: "",
-    descripcion: "Presidencial",
-    icono: "fa fa-landmark",
-    nombre: "Presidenciales",
-    accion: "CargarUrl('control', 'pendientes')",
-    clase: "f-left",
-    color: "bg-red",
-
-  },
-  {
-    url: "/sministerial/ministeriales",
-    js: "",
-    descripcion: "Ministerial",
-    icono: "fa fa-building",
-    nombre: "Ministeriales",
-    accion: "CargarUrl('control', 'salidas')",
-    clase: "f-left",
-    color: "bg-green",
-  },
-  {
-    url: "/sbuscador",
-    js: "",
-    descripcion: "Buscador de Documentos",
-    icono: "fa fa-compass",
-    nombre: "Buscador",
-    accion: "CargarUrl('control', 'pendientes')",
-    clase: "f-left",
-    color: "bg-purple",
-
-  },
-  {
-    url: "/consulta-general",
-    js: "",
-    descripcion: "Consulta General",
-    icono: "fa fa-search",
-    nombre: "Consulta",
-    accion: "CargarUrl('control', 'pendientes')",
-    clase: "f-left",
-    color: "bg-orange",
-
-  },
-  {
-    url: "/sministerial/tramitaciones-por-organo-regular",
-    js: "",
-    descripcion: "Tramitaciones por organo regular",
-    icono: "fa fa-book",
-    nombre: "TOR",
-    accion: "CargarUrl('control', 'pendientes')",
-    clase: "f-left",
-    color: "bg-info",
-
-  },
-  {
-    url: "/sministerial/otros-documentos",
-    js: "",
-    descripcion: "Otros Documentos",
-    icono: "fa fa-file",
-    nombre: "Otros",
-    accion: "CargarUrl('control', 'pendientes')",
-    clase: "f-left",
-    color: "bg-gray",
-  }
-  ]
+  public SubMenu = []
 
   constructor(private apiService: ApiService,
     public dialog: MatDialog,
@@ -113,9 +37,9 @@ export class SecretariaComponent implements OnInit {
     public ruta: Router) { }
 
   async ngOnInit() {
-    await this.loginService.Iniciar()
+    // await this.loginService.Iniciar()
     // console.log(this.loginService.Aplicacion)
-    //this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
+    this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
 
   }
 

@@ -103,8 +103,8 @@ export class ConfiguracionComponent implements OnInit {
       text: "¿Está seguro que desea eliminar?",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#5eaaa8',
+      cancelButtonColor: '#ef9a9a',
       confirmButtonText: 'Si!'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -172,26 +172,5 @@ export class ConfiguracionComponent implements OnInit {
     this.ngxService.stopLoader("loader-aceptar")
   }
 
-  // testing(){
-  //   var configuracion = {
-  //     "nombre" : 'Middleware',
-  //     "version" : '2.0.0 RC.2',
-  //     "identificador" : 1
-  //   }
-
-  //   this.xApi.funcion = 'UTech'
-  //   this.xApi.valores = JSON.stringify(configuracion)
-
-  //   this.apiService.Ejecutar(this.xApi).subscribe(
-  //     data => {
-  //       console.info(data)
-
-  //     },
-  //     error => {
-  //       console.error(error)
-      
-  //     }
-  //   )
-  // }
 
 }

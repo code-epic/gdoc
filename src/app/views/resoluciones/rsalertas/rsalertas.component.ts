@@ -86,6 +86,7 @@ export class RsalertasComponent implements OnInit {
 
   ConsultarAlertas() {
     this.ngxService.startLoader('loader-buscar')
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = environment.funcion.MPPD_CAlertasResoluciones
     this.xAPI.valores = ''
     this.xAPI.parametros = ''
@@ -106,6 +107,7 @@ export class RsalertasComponent implements OnInit {
 
   ConsultarReincorporaciones() {
     this.ngxService.startLoader('loader-buscar')
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = environment.funcion.MPPD_CAlertasReicorporacion
     this.xAPI.valores = ''
     this.xAPI.parametros = ''
@@ -193,6 +195,7 @@ export class RsalertasComponent implements OnInit {
         return
       } 
       this.ngxService.startLoader('loader-buscar')
+      this.xAPI = {} as IAPICore
       this.xAPI.funcion = environment.funcion.MPPD_UAlertasResoluciones
       this.xAPI.valores = ''
       this.xAPI.parametros = `66,${this.txtObservacion.toUpperCase()},${this.id}`

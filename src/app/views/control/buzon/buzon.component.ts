@@ -165,6 +165,7 @@ export class BuzonComponent implements OnInit {
 
   seleccionNavegacion(e) {
     this.buzon = []
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CDocumentosGestion'
     this.xAPI.valores = ''
     this.selNav = e
@@ -200,6 +201,7 @@ export class BuzonComponent implements OnInit {
 
   async ConsultarAlertas() {
     this.ngxService.startLoader("loader-aceptar")
+     this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CAlertas'
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -220,6 +222,8 @@ export class BuzonComponent implements OnInit {
         this.recorrerElementos(0);
       },
       (error) => {
+        this.ngxService.stopLoader("loader-aceptar")
+
       }
     )
   }
@@ -246,6 +250,7 @@ export class BuzonComponent implements OnInit {
 
 
   listarEstados() {
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_CEstados'
     this.xAPI.parametros = '%'
     this.xAPI.valores = ''
@@ -348,6 +353,7 @@ export class BuzonComponent implements OnInit {
       return false
     }
     const usuario = this.loginService.Usuario.id
+     this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoObservacion'
     this.xAPI.valores = JSON.stringify(
       {
@@ -404,6 +410,7 @@ export class BuzonComponent implements OnInit {
   }
 
   async rechazarBuzon() {
+     this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_AUbicacionRechazo"
     this.xAPI.valores = ''
     this.xAPI.parametros = '1,1,1,,' + this.loginService.Usuario.id + ',' + this.numControl
@@ -428,7 +435,6 @@ export class BuzonComponent implements OnInit {
   async promoverBuzon(activo: number, sfecha: string) {
     var fecha = ''
     if (sfecha == '') {
-      console.log(this.extender_plazo)
       if (this.extender_plazo == undefined) {
         this.toastrService.warning(
           'Debe seleccionar una fecha ',
@@ -448,6 +454,7 @@ export class BuzonComponent implements OnInit {
     var i = 0
     var estatus = 1 //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_APromoverEstatus'
     this.xAPI.valores = ''
 
@@ -472,6 +479,7 @@ export class BuzonComponent implements OnInit {
   async redistribuir(destino: number = 0) {
     var dst = destino != 0 ? destino : this.cmbDestino
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
     this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
@@ -534,6 +542,7 @@ export class BuzonComponent implements OnInit {
     this.WAlerta.observacion = this.Observacion.toUpperCase()
     this.WAlerta.fecha = fecha
 
+    this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
     // console.log(this.WAlerta);
@@ -561,6 +570,7 @@ export class BuzonComponent implements OnInit {
     try {
       await this.apiService.EnviarArchivos(frm).subscribe(
         (data) => {
+          this.xAPI = {} as IAPICore
           this.xAPI.funcion = 'WKF_ADocumentoAdjunto'
           this.xAPI.parametros = ''
           this.DocAdjunto.archivo = this.archivos[0].name
