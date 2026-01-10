@@ -139,8 +139,6 @@ export class MinisterialComponent implements OnInit {
     observacion: ''
   }
 
-  public hashdoc = ''
-
   public fecha_alerta: any
   public fplazo: any
   public dwValidate = false
@@ -301,7 +299,7 @@ export class MinisterialComponent implements OnInit {
 
   open(content, id) {
     this.numControl = id
-    this.hashdoc = btoa("D" + this.numControl)
+    this.hashcontrol = btoa("D" + this.numControl)
     this.modalService.open(content);
   }
 

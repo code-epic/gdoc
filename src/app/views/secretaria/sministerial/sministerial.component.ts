@@ -71,6 +71,8 @@ export class SministerialComponent implements OnInit {
 
   public allComplete: boolean = false
 
+  public hashcontrol = ''
+
   public numControl = ''
 
   public Observacion = ''
@@ -208,6 +210,7 @@ export class SministerialComponent implements OnInit {
 
   open(content, id) {
     this.numControl = id
+    this.hashcontrol = btoa("D" + this.numControl) //Cifrar documentos
     if (this.selNav == 1) {
       this.modalService.open(content, { size: 'lg' })
     } else {

@@ -1,85 +1,245 @@
-
-.example-additional-selection {
-  opacity: 0.75;
-  font-size: 0.75em;
+// --- Estilos para las Pestañas (Tabs) ---
+::ng-deep .mat-tab-label {
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  color: #8898aa !important;
+  opacity: 0.8 !important;
+  padding: 0 24px !important;
+  min-width: auto !important;
 }
 
-.iconElimi{
-  color:#a00c1f !important;
-  font-size: 22px !important;
-  cursor: pointer;
+::ng-deep .mat-tab-label-active {
+  color: #5eaaa8 !important;
+  opacity: 1 !important;
 }
 
-.iconEdit{
-  color:#5e72e4 !important;
-  font-size: 22px !important;
-  cursor: pointer;
-  padding-right: 6%;
+::ng-deep .mat-ink-bar {
+  background-color: #5eaaa8 !important;
+  height: 3px !important;
+  border-radius: 3px 3px 0 0;
 }
 
-input{
-  text-transform: uppercase;
-}
-select{
-  text-transform: uppercase;
-}
-textarea {
-  text-transform: uppercase;
+// --- Estilos para la Tabla de Documentos ---
+.table {
+  .thead-light th {
+    background-color: #f6f9fc;
+    color: #8898aa;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+    padding-top: 1.2rem;
+    padding-bottom: 1.2rem;
+  }
+
+  .col-action { width: 5%; text-align: center; }
+  .col-main { width: 35%; }
+  .col-details { width: 30%; }
+  .col-filters { width: 30%; }
 }
 
-.example-section {
-  margin: 12px 0;
+.document-row-item {
+  transition: background-color 0.3s ease;
+  border-bottom: 1px solid #e9ecef;
+  position: relative;
+
+  // Efecto de destello
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at var(--x) var(--y), rgba(166, 191, 154, 0.2) 0%, transparent 40%);
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+
+  &:hover {
+    background-color: #f6f9fc;
+    &::after {
+      opacity: 1;
+    }
+    .actions-container {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 }
 
-.example-margin {
-  margin: 0 12px;
+.document-title {
+  font-weight: 600;
+  color: #32325d;
+  font-size: 0.9rem;
 }
 
-ul {
-  list-style-type: none;
-  margin-top: 4px;
-}
-
-.texto-lista{
-  margin-top: 13px; 
+.document-type-symbol {
   font-weight: bold;
 }
 
-.texto-detalle{
-  margin-top: 13px; 
-  font-size: 12.5px;
+.document-origin {
+  display: block;
+  font-size: 0.8rem;
+  color: #8898aa;
 }
 
-
-.example-headers-align .mat-expansion-panel-header-title,
-.example-headers-align .mat-expansion-panel-header-description {
-flex-basis: 0;
+.document-dependency {
+  display: block;
+  color: #525f7f;
+  font-size: 0.85rem;
 }
 
-.example-headers-align .mat-expansion-panel-header-description {
-justify-content: space-between;
-align-items: center;
+.document-date {
+  display: block;
+  font-size: 0.8rem;
+  color: #8898aa;
 }
 
-.example-headers-align .mat-form-field + .mat-form-field {
-margin-left: 8px;
+.actions-container {
+  opacity: 0;
+  transform: translateX(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  
+  .mat-icon-button {
+    color: #adb5bd;
+    &:hover {
+      color: #5eaaa8;
+    }
+  }
 }
 
-.mat-list-general{
-  border-bottom: 1px rgba(224, 223, 223, 0.945) solid;
+// --- Estilos para el Paginador ---
+::ng-deep .mat-paginator {
+  background-color: #f6f9fc;
+  color: #8898aa;
 }
 
-.div-style{
-  width:100%;
+// --- Estilos para los Filtros de la Cabecera ---
+.filter-control-wrapper {
+  position: relative;
+
+  .filter-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #adb5bd;
+    font-size: 1rem;
+    pointer-events: none; // Permite que el clic pase al select
+    transition: color 0.2s ease-in-out;
+    z-index: 5;
+  }
+
+  .custom-select.custom-select-sm {
+    padding-left: 2.8rem; // Espacio para el icono más grande
+    padding-right: 2rem;
+    border-radius: 30px; // Bordes más redondeados
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    height: 45px; // Más alto para mejor clic
+    font-size: 0.9rem; // Texto más legible
+    font-weight: 600;
+    color: #525f7f;
+    min-width: 160px; // Más ancho
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #5eaaa8;
+      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+      outline: none;
+    }
+
+    &:hover {
+      background-color: #fcfcfc;
+      transform: translateY(-1px);
+    }
+  }
+
+  &:focus-within .filter-icon {
+    color: #5eaaa8; // Color del tema al enfocar
+  }
 }
 
-.href-style{
-  color:darkgrey;
-  font-size: 18px;
-  font-weight: normal;
+// --- Estilos para el Input de Archivo ---
+.custom-file-upload {
+  border: 2px dashed #e0eafc;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #f6f9fc;
+    border-color: #cfdef3;
+  }
+
+  .upload-icon {
+    font-size: 3rem;
+    color: #5eaaa8;
+    margin-bottom: 1rem;
+  }
+
+  .upload-text {
+    color: #525f7f;
+    font-weight: 600;
+  }
+
+  .upload-hint {
+    color: #8898aa;
+    font-size: 0.8rem;
+  }
 }
 
-.image-style{
-  width: 20px;
-  margin-top: 4px;
+.input-custom {
+  display: block;
+  width: 100%;
+  height: calc(1.5em + 1.25rem + 2px);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #8898aa;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  box-shadow: 0 3px 2px rgba(233, 236, 239, 0.05);
+  transition: all 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.icon-box {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-right: 0;
+}
+
+.input-group-text {
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 0.75rem;
+  margin-bottom: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #adb5bd;
+  text-align: center;
+  white-space: nowrap;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+}
+
+.input-icon {
+  font-size: 1.2rem;
+  color: #adb5bd;
+}
+
+input, select, textarea {
+    text-transform: uppercase;
 }

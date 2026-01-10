@@ -1,9 +1,11 @@
+<ngx-ui-loader [loaderId]="'loader-login'"></ngx-ui-loader>
+
 <div class="header bg-pastel-gradient py-5 py-lg-7">
   <div class="container">
     <div class="header-body text-center mb-5">
       <div class="row justify-content-center">
         <div class="col-lg-5 col-md-2">
-          <h1 class="text-white">Sistema de Gestión de Documentos Despacho MPPD</h1>
+          <h1 class="text-white">Sistema de Gestión de Documentos</h1>
         </div>
       </div>
     </div>
@@ -15,6 +17,7 @@
   </div>
 </div>
 <!-- Page content -->
+
 <div class="container mt--8 pb-5">
   <div class="row justify-content-center">
     <div class="col-lg-5 col-md-">
@@ -26,12 +29,10 @@
           </div>
         </div>
         <div class="card-body px-lg-3 py-lg-3">
-          <ngx-ui-loader [loaderId]="'loader-login'"></ngx-ui-loader>
           <ng-container *ngIf="!showTotpSection; else totpBlock">
-            <div class="text-center text-muted mb-4">
+            <!-- <div class="text-center text-muted mb-4">
               <small>Introduzca sus credenciales</small>
-            </div>
-            <!-- (ngSubmit)="login('top-right', 'danger')" -->
+            </div> -->
             <form role="form" #form="ngForm">
             <div class="form-group mb-3">
               <div class="input-group input-group-alternative custom-input-group">
@@ -62,6 +63,16 @@
           <ng-template #totpBlock>
             <ng-container *ngTemplateOutlet="totpSection"></ng-container>
           </ng-template>
+
+          <div class="divider my-2">
+          <p class="card-text text-center"><small>
+            {{ '©' }} GDoc {{ getCurrentDate() | date:'yyyy' }} - Todos los derechos reservados
+            <br>
+            {{version}}
+            <br>
+            Versión: {{ fechaX  }}
+          </small></p>
+        </div>
         </div>
       </div>
      

@@ -12034,6 +12034,17 @@ textarea.input-custom {
   height: auto;
   min-height: 80px;
 }
+.form-group .input-group {
+  width: 100%;
+}
+.table-custom-format {
+  table-layout: fixed;
+  width: 100%;
+}
+.table-custom-format td {
+  vertical-align: middle;
+  font-size: 0.85rem;
+}
 @charset "UTF-8";
 /*!
 

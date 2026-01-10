@@ -13,6 +13,7 @@ import { UtilService } from 'src/app/services/util/util.service'
 import { Location } from '@angular/common';
 import { FormControl } from '@angular/forms';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -1308,14 +1309,13 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   generarNumeroSerie() {
     this.xAPI = {} as IAPICore
-    this.xAPI.funcion = 'WKF_NumeroSerie'
-    this.xAPI.parametros = 'wkf_mppd'
+    this.xAPI.funcion = environment.funcion.NUMERO_DE_CONTROL
+    this.xAPI.parametros = environment.coleciones.CONTADORES
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data !== undefined) {
           if (data.valor_actual !== undefined) {
             this.NUMERO_CONTROL = this.utilService.NuevoSemillero(data.valor_actual)
-            console.log(this.NUMERO_CONTROL)
             this.registrar()
           }
         } else {

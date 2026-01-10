@@ -1013,7 +1013,8 @@ export class OresolucionesComponent implements OnInit {
     this.blAceptar = false
     this.ngxService.startLoader("loader-buscar")
     var frm = new FormData(document.forms.namedItem("forma"))
-    //console.log(this.IResolucion)
+    console.log(this.IResolucion)
+    console.log(this.hashcontrol)
 
     try {
       await this.apiService.EnviarArchivos(frm).subscribe((data) => {

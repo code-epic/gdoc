@@ -1,7 +1,7 @@
 <div class="header bg-pastel-gradient pb-8 pt-5 pt-md-8">
-    <div class="container-fluid">
-        <p></p>
-    </div>
+  <div class="container-fluid">
+    <p></p>
+  </div>
 </div>
 
 <div class="container-fluid mt--9">
@@ -40,7 +40,7 @@
                   <button mat-icon-button title="Volver Atrás" onclick="history.back()">
 
                     <mat-icon>arrow_back</mat-icon>
-                  </button> 
+                  </button>
                 </div>
               </div>
             </div>
@@ -109,41 +109,41 @@
                   value="{{comando}}" [readOnly]="edit == 0 ? true : false">
               </div>
 
-               <div class="form-group  col-md-2" [ngClass]="edit == 1 ? 'd-none' : ''">
+              <div class="form-group  col-md-2" [ngClass]="edit == 1 ? 'd-none' : ''">
                 <label>Fecha</label>
                 <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
                   value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
               </div>
 
-              
 
-             
 
-              
+
+
+
             </div>
 
-              <div class="form-row row" [ngClass]="edit == 0 ? 'd-none' : ''">
-                <div class="form-group  col-md-6">
-                  <label>Tipo de Cuenta</label>
-                  <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
-                    value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
-                </div>
-                <div class="form-group  col-md-6">
-                  <label>Gestion del Ministro</label>
-                  <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
-                    value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
-                </div>
+            <div class="form-row row" [ngClass]="edit == 0 ? 'd-none' : ''">
+              <div class="form-group  col-md-6">
+                <label>Tipo de Cuenta</label>
+                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
+                  value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
               </div>
+              <div class="form-group  col-md-6">
+                <label>Gestion del Ministro</label>
+                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
+                  value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
+              </div>
+            </div>
 
-                <div class="form-row row">
-                  <div class="form-group col-md-12">
-                    <label>Asunto</label> <br>
-                    
-                      <textarea class="form-control w-100" [innerHTML]="asunto"
-                        [readOnly]="edit == 0 ? true : false" rows="6">
+            <div class="form-row row">
+              <div class="form-group col-md-12">
+                <label>Asunto</label> <br>
+
+                <textarea class="form-control w-100" [innerHTML]="asunto" [readOnly]="edit == 0 ? true : false"
+                  rows="6">
                       </textarea>
-                    
-                  </div>
+
+              </div>
             </div>
             <br>
             <div *ngIf="blOficio" class="form-group row" [className]="edit == 1 ? 'd-none' : ''">
@@ -172,9 +172,9 @@
                         <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
                           <td style="width: 20px;">{{i+1}}</td>
                           <td style="display: none;">
-                            <input type="hidden" class="form-control"  id="{{ i }}-nomb" value="{{ el.nombre }}">
-                            <input type="hidden" class="form-control"  id="{{ i }}-cedu" value="{{ el.cedula }}">
-                            <input type="hidden" class="form-control"  id="{{ i }}-carg" value="{{ el.cargo }}">
+                            <input type="hidden" class="form-control" id="{{ i }}-nomb" value="{{ el.nombre }}">
+                            <input type="hidden" class="form-control" id="{{ i }}-cedu" value="{{ el.cedula }}">
+                            <input type="hidden" class="form-control" id="{{ i }}-carg" value="{{ el.cargo }}">
                             <input type="hidden" class="form-control" id="{{ i }}-nomb" value="{{ el.nombre }}">
                             <input type="hidden" class="form-control" id="{{ i }}-cedu" value="{{ el.cedula }}">
                             <input type="hidden" class="form-control" id="{{ i }}-carg" value="{{ el.cargo }}">
@@ -186,14 +186,15 @@
                           <td class="td-width">{{ el.nombre }}</td>
                           <td class="td-width-menor">{{ el.cedula }}</td>
                           <td>
-                              <select class="form-control" id="{{i}}-text" [value]="el.detalle==''?'PR':getDetalle(el.detalle) ">
-                                <option value="PR">PROCESAR</option>
-                                <option value="NP">NO PROCESAR</option>
-                                <option value="NPPIDD">NP POR INT. DEL DIRECTOR</option>
-                                <option value="NPPIDJ">NP POR INT. DEL JEFE DE AREA</option>
-                                <option value="CR">CODIGO ROJO</option>
-                                <option value="BD">NO PROCESAR POR ASCENSO</option>
-                              </select>
+                            <select class="form-control" id="{{i}}-text"
+                              [value]="el.detalle==''?'PR':getDetalle(el.detalle) ">
+                              <option value="PR">PROCESAR</option>
+                              <option value="NP">NO PROCESAR</option>
+                              <option value="NPPIDD">NP POR INT. DEL DIRECTOR</option>
+                              <option value="NPPIDJ">NP POR INT. DEL JEFE DE AREA</option>
+                              <option value="CR">CODIGO ROJO</option>
+                              <option value="BD">NO PROCESAR POR ASCENSO</option>
+                            </select>
                             <!-- <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
                               id="{{i}}-text"> -->
                           </td>
@@ -203,7 +204,8 @@
 
                     <div class="form-group col-md-12 text-right">
                       <br>
-                      <button mat-raised-button  color="warn" (click)="transfererirResoluciones()">Aceptar cambios</button>
+                      <button mat-raised-button color="warn" (click)="transfererirResoluciones()">Aceptar
+                        cambios</button>
                     </div>
                   </mat-expansion-panel>
                 </mat-accordion>
@@ -294,7 +296,7 @@
                     Documento</button>
                   <button class="btn bg-success text-white" *ngIf="dwSub" (click)="open(archivos)">Ver
                     Documento</button>
-                    <button class="btn bg-primary text-white" (click)="aceptar()">{{lblBtn}}</button>
+                  <button class="btn bg-primary text-white" (click)="aceptar()">{{lblBtn}}</button>
                 </div>
               </div>
             </div>
@@ -311,13 +313,26 @@
 
     <div class="modal-body">
       <form method="post" enctype="multipart/form-data" id="forma" name="forma">
-        <input type="hidden" name="txtFileID" id="txtFileID" value="{{hashdoc}}" readonly="readonly">
-        <label for="input-folder-2">Seleccionar Archivo</label>
-          <div class="custom-file">
-            <input (change)="fileSelected($event)" id="input-folder-2" class="custom-file-input" name="input-folder-2" type="file" accept=".pdf">
-            <label for="input-folder-2" class="custom-file-label">{{lblFile}}</label>
+        <div class="custom-file-upload" (click)="fileInput.click()">
+          <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+          <input type="hidden" name="return" value="true" readonly="readonly">
+          <input type="file" name="archivos" class="d-none" (change)="fileSelected($event)" accept=".pdf" #fileInput>
+          <div class="upload-icon">
+            <i class="ni ni-cloud-upload-96"></i>
           </div>
-        <div id="errorBlock" class="help-block"></div>
+          <div class="upload-text" *ngIf="!lblFile || lblFile === 'Seleccionar Archivo'">
+            Haz clic aquí para seleccionar un archivo
+          </div>
+          <div class="upload-text" *ngIf="lblFile && lblFile !== 'Seleccionar Archivo'">
+            {{ lblFile }}
+          </div>
+          <div class="upload-hint">
+            (Solo se permiten archivos PDF)
+          </div>
+        </div>
+
+
+
       </form>
     </div>
 
@@ -418,7 +433,7 @@
     </div>
   </ng-template>
 
-  <div class="div-mayor">
+  <div class="div-mayor" style="display: none;">
     <div id="prtNota">
       <section class="content">
         <div class="wrapper">
@@ -465,3 +480,7 @@
       </section>
     </div>
   </div>
+
+
+
+  

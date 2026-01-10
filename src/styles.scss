@@ -473,3 +473,21 @@ textarea.input-custom {
   height: auto;
   min-height: 80px;
 }
+
+// Refuerzo para asegurar que los grupos ocupen todo el ancho sin inline styles
+.form-group {
+    .input-group {
+        width: 100%;
+    }
+}
+
+// Estilo para simplificar las tablas de "Cuentas" y "Dependencias"
+.table-custom-format {
+    table-layout: fixed;
+    width: 100%;
+    
+    td {
+        vertical-align: middle;
+        font-size: 0.85rem;
+    }
+}

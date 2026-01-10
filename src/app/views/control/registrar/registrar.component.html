@@ -18,7 +18,7 @@
             <div class="col-md-1">
               <div class="media align-items-center">
                 <div class="example-button-row">
-                  <button mat-icon-button title="Volver Atrás"  [routerLink]="['/control']">
+                  <button mat-icon-button title="Volver Atrás" [routerLink]="['/control']">
                     <mat-icon>arrow_back</mat-icon>
                   </button>
                 </div>
@@ -84,7 +84,8 @@
                     <th scope="col" class="col-details">DETALLES</th>
                     <th scope="col" class="col-filters">
                       <div class="d-flex justify-content-end align-items-center">
-                        <button mat-icon-button matTooltip="Clasificar Documentos" (click)="open(content, 0, 0)" id="clasificar" class="mr-2">
+                        <button mat-icon-button matTooltip="Clasificar Documentos" (click)="open(content, 0, 0)"
+                          id="clasificar" class="mr-2">
                           <mat-icon>folder_copy</mat-icon>
                         </button>
                         <div class="filter-control-wrapper mr-2">
@@ -169,10 +170,8 @@
               <div class="classification-sidebar">
                 <h6 class="sidebar-title">Clasificaciones</h6>
                 <div class="category-list">
-                  <a *ngFor="let x of lstEstados" 
-                     class="category-item"
-                     [class.active]="currentId === x.id"
-                     (click)="ConsultarCtrl(x.id); currentId = x.id; selectedEstado = x">
+                  <a *ngFor="let x of lstEstados" class="category-item" [class.active]="currentId === x.id"
+                    (click)="ConsultarCtrl(x.id); currentId = x.id; selectedEstado = x">
                     <mat-icon class="category-icon">{{ x.icon || 'folder_open' }}</mat-icon>
                     <div class="category-details">
                       <span class="category-name">{{ x.nomb }}</span> <br>
@@ -183,7 +182,7 @@
                   </a>
                 </div>
               </div>
-            
+
               <!-- Contenido principal (tabla o estado vacío) -->
               <div class="classification-content">
                 <!-- Estado: Tabla de documentos visible -->
@@ -193,9 +192,8 @@
                       <mat-icon>folder_open</mat-icon>
                       <span>Documentos en <strong>"{{ selectedEstado?.nomb }}"</strong></span>
                     </h3>
-                    <button *ngIf="lstNotaEntrega && lstNotaEntrega.length > 0" 
-                            class="btn btn-sm btn-primary-custom"
-                            (click)="notaEntrega(currentId)">
+                    <button *ngIf="lstNotaEntrega && lstNotaEntrega.length > 0" class="btn btn-sm btn-primary-custom"
+                      (click)="notaEntrega(currentId)">
                       <mat-icon>print</mat-icon>
                       <span>Generar Nota</span>
                     </button>
@@ -227,10 +225,12 @@
                           </td>
                           <td class="text-right align-middle">
                             <div class="actions-container">
-                              <button mat-icon-button matTooltip="Agregar Observación" (click)="open(observacion, e.idd)">
+                              <button mat-icon-button matTooltip="Agregar Observación"
+                                (click)="open(observacion, e.idd)">
                                 <mat-icon class="action-icon">edit_note</mat-icon>
                               </button>
-                              <button mat-icon-button matTooltip="Reversar Documento" (click)="mensajeReversarDoc(e.idd)">
+                              <button mat-icon-button matTooltip="Reversar Documento"
+                                (click)="mensajeReversarDoc(e.idd)">
                                 <mat-icon class="action-icon">history</mat-icon>
                               </button>
                             </div>
@@ -248,15 +248,16 @@
                     </table>
                   </div>
                 </div>
-            
+
                 <!-- Estado: Vacío (ninguna categoría seleccionada) -->
                 <div *ngIf="!btnNota" class="empty-state-container">
                   <div class="d-flex flex-column align-items-center justify-content-center text-center">
                     <div class="empty-state-icon">
                       <mat-icon>rule_folder</mat-icon>
-                   </div>
+                    </div>
                     <h4 class="mt-4">Seleccione una clasificación</h4>
-                    <p class="text-muted small">Elija una categoría de la lista de la izquierda para ver los documentos asociados.</p>
+                    <p class="text-muted small">Elija una categoría de la lista de la izquierda para ver los documentos
+                      asociados.</p>
                   </div>
                 </div>
               </div>
@@ -339,8 +340,8 @@
             </mat-paginator>
           </mat-tab>
         </mat-tab-group>
-      
-      
+
+
       </div>
     </div>
   </div>
@@ -357,7 +358,7 @@
       <label>Clasificación</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino" id="clsf">
         <option value="0">SELECCIONE</option>
-        <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
+        <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb | uppercase }}</option>
       </select>
     </div>
   </div>
@@ -376,21 +377,25 @@
     <h4 class="modal-title text-white" id="modal-basic-title">Cargar Archivo en {{ numControl }}</h4>
   </div>
   <div class="modal-body">
-    <div class="custom-file-upload" (click)="fileInput.click()">
-      <input type="file" class="d-none" (change)="fileSelected($event)" accept=".pdf" #fileInput>
-      <div class="upload-icon">
-        <i class="ni ni-cloud-upload-96"></i>
+    <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+      <div class="custom-file-upload" (click)="fileInput.click()">
+        <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+        <input type="hidden" name="return" value="true" readonly="readonly">
+        <input type="file"  name="archivos" class="d-none" (change)="fileSelected($event)" accept=".pdf" #fileInput>
+        <div class="upload-icon">
+          <i class="ni ni-cloud-upload-96"></i>
+        </div>
+        <div class="upload-text" *ngIf="!lblFile || lblFile === 'Seleccionar Archivo'">
+          Haz clic aquí para seleccionar un archivo
+        </div>
+        <div class="upload-text" *ngIf="lblFile && lblFile !== 'Seleccionar Archivo'">
+          {{ lblFile }}
+        </div>
+        <div class="upload-hint">
+          (Solo se permiten archivos PDF)
+        </div>
       </div>
-      <div class="upload-text" *ngIf="!lblFile || lblFile === 'Seleccionar Archivo'">
-        Haz clic aquí para seleccionar un archivo
-      </div>
-      <div class="upload-text" *ngIf="lblFile && lblFile !== 'Seleccionar Archivo'">
-        {{ lblFile }}
-      </div>
-      <div class="upload-hint">
-        (Solo se permiten archivos PDF)
-      </div>
-    </div>
+    </form>
   </div>
   <div class="modal-footer">
     <button *ngIf="btnEnviar" class="btn btn-pastel text-white "

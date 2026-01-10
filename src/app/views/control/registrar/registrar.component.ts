@@ -15,6 +15,7 @@ import { NgxUiLoaderService } from 'ngx-ui-loader'
 import Swal from 'sweetalert2'
 import { Md5 } from "md5-typescript";
 import { UtilService } from 'src/app/services/util/util.service';
+import { FileService } from 'src/app/services/apicore/file.service';
 
 
 
@@ -131,6 +132,7 @@ export class RegistrarComponent implements OnInit {
     private utilService: UtilService,
     private loginService: LoginService,
     private ngxService: NgxUiLoaderService,
+    private fileService: FileService,
     private modalService: NgbModal) {
 
     config.backdrop = 'static';
@@ -535,7 +537,7 @@ export class RegistrarComponent implements OnInit {
     this.buzon[posicion].statusprogreso = true
     this.btnEnviar = false
     try {
-      await this.apiService.EnviarArchivosProgress(frm).subscribe({
+      await this.fileService.EnviarArchivosProgress(frm).subscribe({
         next: (event) => {
           this.buzon[posicion].progreso = event.progress
           if (event.state === 'DONE') {

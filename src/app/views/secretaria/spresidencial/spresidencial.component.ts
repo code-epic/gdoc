@@ -10,6 +10,7 @@ import { IWKFAlerta } from 'src/app/services/control/documentos.service';
 import { LoginService } from 'src/app/services/seguridad/login.service';
 import { UtilService } from 'src/app/services/util/util.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader'
+import { FileService } from 'src/app/services/apicore/file.service';
 
 @Component({
   selector: 'app-spresidencial',
@@ -138,6 +139,7 @@ export class SpresidencialComponent implements OnInit {
     private utilService: UtilService,
     private ngxService: NgxUiLoaderService,
     private loginService: LoginService,
+    private fileService: FileService,
     private modalService: NgbModal) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
@@ -324,13 +326,6 @@ export class SpresidencialComponent implements OnInit {
     const base = btoa(JSON.stringify(e))
     this.ruta.navigate(['/ministerial', base])
   }
-
-  //editar
-  editar(e) {
-    const base = btoa(JSON.stringify(e))
-    this.ruta.navigate(['/snuevo', base])
-  }
-
 
 
 
@@ -539,7 +534,7 @@ export class SpresidencialComponent implements OnInit {
     this.buzon[posicion].statusprogreso = true
     this.btnEnviar = false
     try {
-      await this.apiService.EnviarArchivosProgress(frm).subscribe({
+      await this.fileService.EnviarArchivosProgress(frm).subscribe({
         next: (event) => {
           this.buzon[posicion].progreso = event.progress
           if (event.state === 'DONE') {

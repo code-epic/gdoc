@@ -6,6 +6,7 @@ import { UtilService } from 'src/app/services/util/util.service';
 import { Subject } from 'rxjs';
 import { ApiService } from 'src/app/services/apicore/api.service';
 import { DOCUMENT } from '@angular/common';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -15,15 +16,12 @@ import { DOCUMENT } from '@angular/common';
 
 export class LoginComponent implements OnInit {
 
-  goBack() {
-    window.history.back();
-  }
-
-  enviar() {
-    // Acción para el botón enviar
-  }
 
 
+
+    public fechafinal
+  public fechaX
+  public build
 
   redirectDelay: number;
   showMessages: any;
@@ -52,6 +50,10 @@ export class LoginComponent implements OnInit {
   private tempAuthToken = ''; // To store the token from the first login step
 
 
+  public version = "1.0.0";
+  public fecha = "";
+
+
   constructor(private router: Router,
     private loginService: LoginService,
     private utilservice: UtilService,
@@ -66,9 +68,28 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.getCurrentDate()
+    this.fechafinal = environment.buildDateTime
+    this.fechaX = this.utilservice.FechaMoment(environment.buildDateTime)
+    this.build = this.utilservice.FechaMomentL(environment.buildDateTime).replace(/\//g, '.')
+
+    this.version = environment.version;
 
   }
 
+
+  getCurrentDate() {
+    return new Date(); // or format as you prefer
+  }
+
+
+  goBack() {
+    window.history.back();
+  }
+
+  enviar() {
+    // Acción para el botón enviar
+  }
 
   async login() {
     this.ngxService.startLoader("loader-login");

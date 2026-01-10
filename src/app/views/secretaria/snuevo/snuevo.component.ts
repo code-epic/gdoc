@@ -221,6 +221,9 @@ export class SnuevoComponent implements OnInit {
   public sGrado: string = 'Grado / Jerarquía'
   public sNombre: string = 'Nombres y Apellidos'
 
+  public NUMERO_CONTROL: string = '' //Este codigo controlara el semillero para los codigos nuevos
+  public bControl  : boolean = false
+
 
   constructor(private apiService: ApiService,
     private modalService: NgbModal,
@@ -241,7 +244,7 @@ export class SnuevoComponent implements OnInit {
 
     this.SubMenu = await this.loginService.obtenerSubMenu("/secretaria")
     let prv = this.loginService.obtenerPrivilegiosMenu("/secretaria")
-    // console.log(prv)
+    console.log(prv)
 
 
     // Usar el servicio para cargar los datos desde sessionStorage
@@ -547,7 +550,8 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
     }
     this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_IDocumentoDetalle'
-    this.Doc.ncontrol = this.utilService.Semillero(data.msj).toUpperCase()
+    this.Doc.ncontrol = this.NUMERO_CONTROL!=''? this.NUMERO_CONTROL: this.utilService.Semillero(data.msj).toUpperCase()
+    // this.utilService.Semillero(data.msj).toUpperCase()
     this.Doc.wfdocumento = parseInt(data.msj)
     this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
     this.Doc.forigen = this.forigen != undefined ? this.utilService.ConvertirFecha(this.forigen) : this.utilService.ConvertirFecha(this.fcreacion)
@@ -1129,6 +1133,33 @@ private parseJsonData<T>(data: string | null, defaultValue: T[] = []): T[] {
     showToolbar: false,
     placeholder: '',
   };
+
+
+  generarNumeroSerie() {
+    this.xAPI = {} as IAPICore
+    this.xAPI.funcion = environment.funcion.NUMERO_DE_CONTROL
+    this.xAPI.parametros = environment.coleciones.CONTADORES
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        if (data !== undefined) {
+          if (data.valor_actual !== undefined) {
+            this.NUMERO_CONTROL = this.utilService.NuevoSemillero(data.valor_actual)
+            this.registrar()
+          }
+        } else {
+           this.toastrService.info('Falla en la generación del número de serie', 'Campo requerido')
+        }
+
+      },
+      (error) => {
+        console.error("No existe la funcion ", error)
+      }
+    )
+
+  }
+
+
 }
+
 
 

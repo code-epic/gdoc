@@ -1,5 +1,8 @@
 import { EventEmitter, Injectable } from "@angular/core";
 import Swal from "sweetalert2";
+import * as moment from 'moment';
+
+
 
 @Injectable({
   providedIn: "root",
@@ -368,6 +371,13 @@ export class UtilService {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  FechaMoment(fecha: any, formato: string = "LLLL") {
+    moment.locale('es')
+    return moment(fecha).format(formato)
+  }
 
+  FechaMomentL(fecha: any) {
+    return this.FechaMoment(fecha, "L")
+  }
 
 }
