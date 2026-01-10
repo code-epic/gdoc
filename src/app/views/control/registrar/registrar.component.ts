@@ -451,10 +451,7 @@ export class RegistrarComponent implements OnInit {
     var i = 0
     var estatus = 2 //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = 'WKF_AUbicacion'
-    this.xAPI.valores = ''
-
+    
     if (this.cmbDestino == 0) {
       this.toastrService.error('Debe seleccionar una opción', `GDoc Wkf.Ubicacion`);
       return
@@ -462,11 +459,13 @@ export class RegistrarComponent implements OnInit {
 
     lstBz.forEach(e => {
       i++
+      this.xAPI = {} as IAPICore
+      this.xAPI.funcion = 'WKF_AUbicacion'
       if (e.completed == true) {
         this.xAPI.parametros = `${this.cmbDestino},${estatus},${llave},${usuario},${e.idd}`
         this.apiService.Ejecutar(this.xAPI).subscribe(
-          (data) => {
-            this.actualizarBzRegistrados(e.numc, 0)
+          async data => {
+            await this.actualizarBzRegistrados(e.numc, 0)
           },
           (errot) => {
             this.toastrService.error(errot, `GDoc Wkf.Estatus`);
@@ -529,9 +528,6 @@ export class RegistrarComponent implements OnInit {
   }
 
   async SubirArchivo(e, posicion) {
-    
-
-    // console.log(this.hashcontrol)
     
     var frm = new FormData(document.forms.namedItem("forma"))
     this.buzon[posicion].statusprogreso = true
@@ -631,7 +627,7 @@ export class RegistrarComponent implements OnInit {
       text: '¿Está seguro que desea reversar este documento?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: '#5eaaa8',
       confirmButtonText: 'Sí, estoy seguro'
     }).then((result) => {
       if (result.isConfirmed) {

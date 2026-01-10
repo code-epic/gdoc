@@ -1,4 +1,4 @@
-<ngx-ui-loader [loaderId]="'loader-login'"></ngx-ui-loader>
+
 
 <div class="header bg-pastel-gradient py-5 py-lg-7">
   <div class="container">
@@ -29,6 +29,7 @@
           </div>
         </div>
         <div class="card-body px-lg-3 py-lg-3">
+          <ngx-ui-loader [loaderId]="'loader-login'"></ngx-ui-loader>
           <ng-container *ngIf="!showTotpSection; else totpBlock">
             <!-- <div class="text-center text-muted mb-4">
               <small>Introduzca sus credenciales</small>

@@ -397,7 +397,7 @@
   <div class="modal-footer">
     <button class="btn btn-pastel text-white " (click)="insertarObservacion();modal.close('Save')" id="btnaceptar">
       <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
-    <button class="btn btn-warning" aria-label="Close" (click)="modal.dismiss('Close')">
+    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="modal.dismiss('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
   </div>
 </ng-template>
@@ -426,9 +426,9 @@
 
   </div>
   <div class="modal-footer">
-    <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
+    <button class="btn btn-pastel text-white " (click)="SubirArchivo();c('Save')">
       <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
-    <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
+    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="c('Close')">
       <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
   </div>
 </ng-template>

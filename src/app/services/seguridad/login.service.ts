@@ -144,8 +144,8 @@ export class LoginService {
       text: "Gracias por su tiempo",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#5eaaa8',
+      cancelButtonColor: '#ef9a9a',
       confirmButtonText: 'Si, cerrar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
