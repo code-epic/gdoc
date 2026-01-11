@@ -491,3 +491,59 @@ textarea.input-custom {
         font-size: 0.85rem;
     }
 }
+
+/* --- Global Table Theme (Pastel Blue-Green) --- */
+.sandratbl {
+  width: 100%;
+  border-collapse: separate; /* Necesario para border-radius */
+  border-spacing: 0;
+  margin-bottom: 1.5rem;
+  background-color: #fff;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 0 2rem 0 rgba(136, 152, 170, 0.15);
+  font-family: 'Open Sans', sans-serif;
+
+  thead {
+    tr {
+        background: linear-gradient(155deg, #6189a8 0%, #75a3c7 100%) !important;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 1rem;
+        border: none;
+        vertical-align: middle;
+        text-align: center;
+      
+    }
+  }
+
+  tbody {
+    tr {
+      transition: all 0.15s ease;
+      
+      td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-top: 1px solid #e9ecef;
+        color: #525f7f;
+        font-size: 0.875rem;
+      }
+
+      &:hover {
+        background-color: rgba(117, 163, 199, 0.08) !important;
+        transform: scale(1.005);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        z-index: 1;
+        position: relative;
+      }
+    }
+  }
+  
+  /* Eliminar bordes por defecto si se usa el atributo border */
+  &[border="1"] {
+    border: none;
+  }
+}

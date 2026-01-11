@@ -385,8 +385,8 @@ export class RsconsultaComponent implements OnInit {
     this.opttodos = "0";
 
     this.fechaRango = new FormGroup({
-      start: new FormControl(new Date(year, month, 13)),
-      end: new FormControl(new Date(year, month, 16)),
+      start: new FormControl({ year: year, month: month + 1, day: 13 }),
+      end: new FormControl({ year: year, month: month + 1, day: 16 }),
     });
 
     this.filteredOptions = this.myControl.valueChanges.pipe(
@@ -714,8 +714,8 @@ export class RsconsultaComponent implements OnInit {
 
   FilConsultar(estatus) {
     let codigo = "";
-    let desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
-    let hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
+    let desde = this.formatter.format(this.fechaRango.value.start);
+    let hasta = this.formatter.format(this.fechaRango.value.end);
     this.lstResolucionesX = [];
     this.lstResolucionesTipo = [];
     this.total = 0;
@@ -1483,8 +1483,8 @@ export class RsconsultaComponent implements OnInit {
       text: "¿Está seguro que desea eliminar la entrada?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
+      confirmButtonColor: '#5eaaa8',
+      cancelButtonColor: '#ef9a9a',
       confirmButtonText: "Si",
     }).then((result) => {
       if (result.isConfirmed) {

@@ -545,7 +545,7 @@ export class BuzonComponent implements OnInit {
     this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_AAlertas'
     this.xAPI.parametros = ''
-    // console.log(this.WAlerta);
+    
     this.xAPI.valores = JSON.stringify(this.WAlerta)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async alerData => {

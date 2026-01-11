@@ -44,26 +44,6 @@ ul {
   color:blue;
 }
 
-table {  
-  font-family:sans-serif;
-  th, td {
-    padding:.25em .5em;
-    text-align:left;
-    &:nth-child(2) {
-      text-align:left;
-    }
-  }
-  th {
-    background-color:rgb(102, 102, 222);
-    color:#fff;
-  }
-  tr {
-    border-bottom: #b9aeae;
-  }
-  tr:nth-child(odd)   { background-color:#f1f1f1; }
-  tr:nth-child(even)    { background-color:#fff; }
-}
-
 
 .input_container {
   border: 1px solid #e5e5e5;
@@ -133,4 +113,24 @@ input[type=file]::file-selector-button:hover {
   padding-top: 22px;
   color: gray;
   width: 100%;
+}
+
+
+
+/* Scrollbar suave estilo moderno */
+.timeline-container::-webkit-scrollbar {
+    width: 4px;
+}
+.timeline-container::-webkit-scrollbar-thumb {
+    background: #e9ecef;
+    border-radius: 10px;
+}
+.timeline-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Efecto hover en el bloque */
+.timeline-block:hover {
+    background-color: #fafcfe;
+    border-radius: 10px;
 }
