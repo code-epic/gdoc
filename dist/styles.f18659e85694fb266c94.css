@@ -12045,6 +12045,131 @@ textarea.input-custom {
   vertical-align: middle;
   font-size: 0.85rem;
 }
+/* --- Global Table Theme (Pastel Blue-Green) --- */
+.sandratbl {
+  width: 100%;
+  border-collapse: separate;
+  /* Necesario para border-radius */
+  border-spacing: 0;
+  margin-bottom: 1.5rem;
+  background-color: #fff;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 0 2rem 0 rgba(136, 152, 170, 0.15);
+  font-family: "Open Sans", sans-serif;
+  /* Eliminar bordes por defecto si se usa el atributo border */
+}
+.sandratbl thead tr {
+  background: linear-gradient(155deg, #6189a8 0%, #75a3c7 100%) !important;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 1rem;
+  border: none;
+  vertical-align: middle;
+  text-align: center;
+}
+.sandratbl tbody tr {
+  transition: all 0.15s ease;
+}
+.sandratbl tbody tr td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-top: 1px solid #e9ecef;
+  color: #525f7f;
+  font-size: 0.875rem;
+}
+.sandratbl tbody tr:hover {
+  background-color: rgba(117, 163, 199, 0.08) !important;
+  transform: scale(1.005);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  z-index: 1;
+  position: relative;
+}
+.sandratbl[border="1"] {
+  border: none;
+}
+/* --- Custom Modal Style (Pixel Width & Animation) --- */
+.modal-custom .modal-dialog {
+  max-width: 1000px !important;
+  width: 1000px !important;
+}
+.modal-custom .modal-content {
+  border-radius: 15px;
+  border: none;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  -webkit-animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@-webkit-keyframes modalPop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes modalPop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@media (max-width: 1024px) {
+  .modal-custom .modal-dialog {
+    max-width: 95% !important;
+    width: 95% !important;
+  }
+}
+/* --- Elegant Title Theme --- */
+.title-elegant {
+  font-family: "Open Sans", sans-serif;
+  color: #525f7f;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.title-elegant::before {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #9cc788 0%, #75a3c7 100%);
+  margin-right: 12px;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.title-elegant::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 20px;
+  width: 35px;
+  height: 2px;
+  background: linear-gradient(90deg, #9cc788 0%, #75a3c7 100%);
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  opacity: 0.6;
+}
+.title-elegant:hover::after {
+  width: calc(100% - 20px);
+  opacity: 1;
+}
 @charset "UTF-8";
 /*!
 

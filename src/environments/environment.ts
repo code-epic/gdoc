@@ -9,7 +9,7 @@ export const environment = {
   Url: 'http://localhost',
   API: '/v1/api/',
   Hash: '3a39a4d2f9869b08b9c2c2d9bad7334f.sse',
-  buildDateTime: 'Sat Jan 10 2026 08:45:52 GMT-0400 (Venezuela Time)',
+  buildDateTime: 'Sun Jan 11 2026 22:51:51 GMT-0400 (Venezuela Time)',
   version: 'Broglie 1.0.1-1b419f3',
   fecha: '2025-04-12 05:08:00',
   coleciones : {
