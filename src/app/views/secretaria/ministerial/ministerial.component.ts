@@ -629,8 +629,12 @@ export class MinisterialComponent implements OnInit {
   }
 
   async notaEntrega(pos) {
-    console.log('notaEntrega', this.lstNotaEntrega);
-
+    // console.log('notaEntrega', this.lstNotaEntrega);
+    if (this.lstNotaEntrega.length == 0) {
+      this.toastrService.info('No hay documentos por actualizar', `GDoc Secretaria`);
+      this.ngxService.stopLoader("loader-aceptar")
+      return
+    }
     let e = this.lstNotaEntrega[pos]
     var destino = 3
     var estatus = 1
