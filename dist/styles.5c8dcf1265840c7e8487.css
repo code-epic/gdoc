@@ -11671,7 +11671,7 @@ input[type=file]::file-selector-button:hover {
 }
 /* Fondo Pastel Elegante para el Header */
 .bg-pastel-gradient {
-  background: linear-gradient(155deg, #9cc788 0%, #75a3c7 100%) !important;
+  background: linear-gradient(155deg, #8aaf78 0%, #6893b4 100%) !important;
   /* Pastel Blue-Green */
 }
 /* Tarjeta del Menú */
@@ -11809,6 +11809,9 @@ input[type=file]::file-selector-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
   background: linear-gradient(135deg, #e57373 0%, #ef5350 100%);
+}
+.btn-pastel-icon {
+  background: linear-gradient(135deg, #416160 0%, #507d7d 100%);
 }
 /* --- Global UI Enhancements (Menus & Buttons) --- */
 button.mat-icon-button {

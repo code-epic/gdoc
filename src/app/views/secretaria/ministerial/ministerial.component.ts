@@ -195,8 +195,10 @@ export class MinisterialComponent implements OnInit {
     if (ruta != undefined) {
       try {
         this.original = this.rutaActiva.snapshot.params.id
-        this.doc = JSON.parse(atob(this.original))
-        // console.log(this.doc);
+        let elemento = JSON.parse(atob(this.original))
+        this.doc = elemento.objeto
+
+        console.log(this.doc);
 
         this.Documento = this.doc
         this.Documento.wfdocumento = this.doc.idd
@@ -215,6 +217,12 @@ export class MinisterialComponent implements OnInit {
         this.listarEstados()
         this.listarDatos()
         
+        if(elemento.tipo == 'PRESIDENCIAL'){
+          this.lblDecision = 'Decision del Presidente'
+          this.lblBackUrl = '/spresidencial'
+          this.lblTitulo = 'PRESIDENCIAL'
+        }
+
 
         if (this.doc.remi == 'VICEPRESIDENCIAL') {
           this.lblDecision = 'Decision del Vicepresidente'
@@ -226,6 +234,8 @@ export class MinisterialComponent implements OnInit {
           this.lblBackUrl = '/spresidencial'
           this.lblTitulo = 'PRESIDENCIAL'
         }
+
+
 
       } catch (error) {
         //this.ruta.navigate(['/secretaria', ''])

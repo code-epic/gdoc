@@ -323,7 +323,11 @@ export class SpresidencialComponent implements OnInit {
 
   //editar
   work(e) {
-    const base = btoa(JSON.stringify(e))
+    let el = {
+      "tipo": "PRESIDENCIAL",
+      "objeto": e
+    }
+    const base = btoa(JSON.stringify(el))
     this.ruta.navigate(['/ministerial', base])
   }
 

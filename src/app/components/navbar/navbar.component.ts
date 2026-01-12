@@ -31,9 +31,12 @@ export class NavbarComponent implements OnInit {
   public listTitles: any[];
   public location: Location;
   @Output() onChange = new EventEmitter<any>();
-  public nombre : string = 'Analista'
-  public alerta : boolean = false
+  public nombre: string = 'Analista'
+  public alerta: boolean = false
   public usuario: string = ''
+  public cedula: string = '';
+  public correo: string = '';
+  public fecha: Date = new Date();
 
 
 
@@ -71,39 +74,48 @@ export class NavbarComponent implements OnInit {
     parametros: ''
   };
 
-  
 
-  constructor(location: Location,  
+
+  constructor(location: Location,
     private msj: MensajeService,
-    private loginService : LoginService,
+    private loginService: LoginService,
     private apiService: ApiService,
     private utilservice: UtilService,
     private modalService: NgbModal,
     private sha256: Sha256Service,
     private ws: WsSandraService,
-    private router: Router ) {
+    private router: Router) {
     this.location = location;
   }
 
   ngOnInit() {
-    
+
+
     this.listTitles = ROUTES.filter(listTitle => listTitle);
+
+    this.nombre = this.loginService.Usuario.nombre
+    this.cedula = this.loginService.Usuario.cedula
+    this.correo = this.loginService.Usuario.correo
+
+    setInterval(() => {
+      this.fecha = new Date();
+    }, 1000);
 
     this.verificarDepartamentoResoluciones();
 
-    this.msj.contenido$.subscribe( e => {
+    this.msj.contenido$.subscribe(e => {
       // console.log(e)
       this.alerta = e.valor
 
       // Guardar el estado en sessionStorage para persistencia
-     if (this.estaEnResoluciones()) {
-          this.alerta = e.valor;
-          sessionStorage.setItem('alertaEstado', JSON.stringify(e.valor));
-        }
+      if (this.estaEnResoluciones()) {
+        this.alerta = e.valor;
+        sessionStorage.setItem('alertaEstado', JSON.stringify(e.valor));
+      }
     });
 
     // Recuperar el estado guardado si existe
-   if (this.estaEnResoluciones()) {
+    if (this.estaEnResoluciones()) {
       const estadoGuardado = sessionStorage.getItem('alertaEstado');
       if (estadoGuardado) {
         this.alerta = JSON.parse(estadoGuardado);
@@ -114,13 +126,13 @@ export class NavbarComponent implements OnInit {
       sessionStorage.removeItem('alertaEstado');
     }
   }
-  
+
 
   // Método para verificar si estamos en el departamento de resoluciones
   private verificarDepartamentoResoluciones(): void {
 
 
-   if (!this.estaEnResoluciones()) {
+    if (!this.estaEnResoluciones()) {
       this.alerta = false;
       sessionStorage.removeItem('alertaEstado');
     }
@@ -131,24 +143,24 @@ export class NavbarComponent implements OnInit {
     const currentPath = this.location.path();
     // Ajusta estas rutas según tus necesidades exactas
     return currentPath.includes('/resoluciones') ||
-           currentPath.includes('/rsalertas') ||
-           currentPath.includes('/rsconsulta');
+      currentPath.includes('/rsalertas') ||
+      currentPath.includes('/rsconsulta');
   }
 
   open(content) {
     this.modalService.open(content);
-  } 
+  }
 
-  getTitle(){
+  getTitle() {
     var titlee = this.location.prepareExternalUrl(this.location.path());
-    if(titlee.charAt(0) === '#'){
-        titlee = titlee.slice( 1 );
+    if (titlee.charAt(0) === '#') {
+      titlee = titlee.slice(1);
     }
-   
-    for(var item = 0; item < this.listTitles.length; item++){
-        if(this.listTitles[item].path === titlee){
-            return this.listTitles[item].title;
-        }
+
+    for (var item = 0; item < this.listTitles.length; item++) {
+      if (this.listTitles[item].path === titlee) {
+        return this.listTitles[item].title;
+      }
     }
     return 'Principal';
   }
@@ -159,7 +171,7 @@ export class NavbarComponent implements OnInit {
     this.onChange.emit(true);
   }
 
-  cerrar(){
+  cerrar() {
     this.loginService.logout();
   }
 
@@ -345,10 +357,10 @@ export class NavbarComponent implements OnInit {
   }
 
 
-   /**
- * Check Password Strength
- * @param password 
- */
+  /**
+* Check Password Strength
+* @param password 
+*/
   checkPasswordStrength(password: string): void {
     const checks = [
       /.{8,}/,       // Mínimo 8 caracteres

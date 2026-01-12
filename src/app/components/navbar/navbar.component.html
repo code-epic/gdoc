@@ -10,11 +10,21 @@
      </div>
 
     <ul class="navbar-nav align-items-center d-none d-md-flex">
+      <!-- Widget de Fecha y Hora -->
+      <li class="nav-item d-none d-lg-block mr-4">
+        <div class="d-flex align-items-center px-3 py-2 rounded shadow-sm" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.1);">
+          <i class="fa fa-calendar-day text-white mr-2"></i>
+          <span class="text-white font-weight-bold small mr-3">{{ fecha | date:'dd MMM yyyy' }}</span>
+          <div style="width: 1px; height: 15px; background: rgba(255,255,255,0.4); margin-right: 12px;"></div>
+          <i class="fa fa-clock text-white mr-2"></i>
+          <span class="text-white font-weight-bold small" style="min-width: 65px;">{{ fecha | date:'h:mm:ss a' }}</span>
+        </div>
+      </li>
       <!-- Alert/Bell Icon -->
       <li class="nav-item" *ngIf="alerta">
         <a class="nav-link bell-icon-container" [routerLink]="['/rsalertas']" routerLinkActive="active" title="Alertas">
-          <div class="avatar rounded-circle bg-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-            <i class="ni ni-bell-55 text-warning bell-icon" style="font-size: 22px;"></i>
+          <div class="avatar avatar-sm rounded-circle btn-pastel-icon d-flex align-items-center justify-content-center" >
+            <i class="ni ni-bell-55 text-white bell-icon" style="font-size: 1.2em;"></i>
           </div>
         </a>
       </li>
@@ -22,8 +32,8 @@
       <li class="nav-item" ngbDropdown placement="bottom-right">
         <a class="nav-link pr-0" role="button" ngbDropdownToggle>
           <div class="media align-items-center">
-            <span class="avatar avatar-sm rounded-circle">
-              <img alt="Escudo" src="assets/img/theme/sketch.jpg">
+            <span class="avatar avatar-sm rounded-circle btn-pastel-icon">
+              <i class="fa fa-user-tie text-white" style="font-size: 1.2em;"></i>
             </span>
             <div class="media-body ml-2 d-none d-lg-block">
               <span class="mb-0 text-sm  font-weight-bold">{{ nombre }}</span>
@@ -42,6 +52,16 @@
             <span>Cerrar Sesión</span>
           </a>
         </div>
+      </li>
+      <li class="nav-item ml-2">
+        <a class="nav-link" (click)="cerrar()" title="Cerrar Sesión" style="cursor: pointer;">
+
+           <div class="media align-items-center">
+            <span class="avatar avatar-sm rounded-circle btn-pastel-icon">
+              <i class="fa fa-sign-out-alt text-white" style="font-size: 1.2em;"></i>
+            </span>
+           </div>
+        </a>
       </li>
     </ul>
   </div>
