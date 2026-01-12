@@ -194,11 +194,13 @@ export class MinisterialComponent implements OnInit {
       try {
         this.original = this.rutaActiva.snapshot.params.id
         this.doc = JSON.parse(atob(this.original))
-        console.log(this.doc);
+        // console.log(this.doc);
 
         this.Documento = this.doc
         this.Documento.wfdocumento = this.doc.idd
         this.numc = this.doc.numc
+
+        this.numControl = this.doc.numc
 
         this.unidad = this.doc.udep
         this.comando = this.doc.coma
@@ -210,7 +212,7 @@ export class MinisterialComponent implements OnInit {
 
         this.listarEstados()
         this.listarDatos()
-        console.log(this.doc.remi)
+        // console.log(this.doc.remi)
         if (this.doc.remi == 'VICEPRESIDENCIAL') {
           this.lblDecision = 'Decision del Vicepresidente'
         }else if (this.doc.remi == 'PRESIDENCIAL') {
@@ -275,8 +277,10 @@ export class MinisterialComponent implements OnInit {
       (data) => {
 
         this.lstCuenta = data.Cuerpo
+        // console.log(this.lstCuenta)
+
         this.cargarDatosBase(this.lstCuenta)
-        console.log(this.lstCuenta)
+
         if (this.lstCuenta[0].cuenta != '' && this.lstCuenta[0].cuenta != null) {
           this.cargarPuntoCuentas()
           this.blOficio = true
@@ -315,7 +319,7 @@ export class MinisterialComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data.Cuerpo);
+        console.log(data.Cuerpo, 'data');
 
         if (data.Cuerpo != undefined && data.Cuerpo.length > 0) {
           this.SubDocumento = data.Cuerpo[0];
@@ -358,6 +362,7 @@ export class MinisterialComponent implements OnInit {
 
   aceptar() {
     this.selFecha()
+    this.xAPI = {} as IAPICore
     this.SubDocumento.accion = this.SubDocumento.accion.toUpperCase()
     this.SubDocumento.historico = this.SubDocumento.historico.toUpperCase()
     this.SubDocumento.subdocumento = parseInt(this.doc.idd)
@@ -369,7 +374,7 @@ export class MinisterialComponent implements OnInit {
 
     this.ngxService.startLoader("loader-aceptar")
 
-    this.xAPI = {} as IAPICore
+    
     if (this.blUpdate == false) {
       this.xAPI.funcion = 'WKF_ISubDocVariante'
       this.registrar()
@@ -566,14 +571,14 @@ export class MinisterialComponent implements OnInit {
     this.lstNotaEntrega = []
     let i = 0
     var fecha = new Date().toISOString()
-    let llave = Md5.init(this.cuenta + fecha)
+    let llave = Md5.init(this.numControl + fecha)
     await this.lstCuenta.forEach(e => {
 
       const text = (<HTMLInputElement>document.getElementById(i + "-text")).value
       const nombre = (<HTMLInputElement>document.getElementById(i + "-nomb")).value
       const cedula = (<HTMLInputElement>document.getElementById(i + "-cedu")).value
       const cargo = (<HTMLInputElement>document.getElementById(i + "-carg")).value
-      if (text != "PR") {
+      if (text != "PE") {
         this.lstNotaEntrega.push({
           id: e.ids,
           nombre: nombre,
@@ -644,6 +649,7 @@ export class MinisterialComponent implements OnInit {
   }
 
   getDetalle(e): string {
+    if (e == null || e == 'null' || e == undefined) return 'PE'
     let text = "PR"
     let cont = e.split("|")
     if (cont.length > 0) text = cont[1]

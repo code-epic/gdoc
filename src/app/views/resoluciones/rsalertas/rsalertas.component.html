@@ -36,9 +36,9 @@
               <ng-template mat-tab-label>
                 &nbsp; ALERTAS POR COMISIONES ( {{lstAlertas.length}} )
               </ng-template>
-              <div class="container" style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              
                 <div class="row justify-content-end mt-4" style="margin-right: 7px;">
-                  <button class="btn bg-primary text-white " (click)="exportExcel()">
+                  <button class="btn btn-pastel text-white " (click)="exportExcel()">
                     <span class="fa fa-file-excel"></span>&nbsp;&nbsp;Exportar Excel
                   </button>
                 </div>
@@ -46,8 +46,8 @@
                 <br>
                 <div class="row">
                   <div class="col-md-12">
-                    <table style="width: 100%;" border="1">
-                      <thead>
+                    <table class="sandratbl">
+                      <thead style="height: 40px;">
                         <tr>
                           <th style="width: 60px;">#</th>
                           <th>COMP.</th>
@@ -65,7 +65,7 @@
                       <tbody>
                         <tr *ngFor="let e of lstAlertas; let i = index">
                           <td style="text-align: center;">{{ i+1 }}</td>
-                          <td style="text-align: center;">{{e.ncomponente}} </td>
+                          <td style="text-align: center;">{{e.ncomponente | uppercase}} </td>
                           <td style="text-align: center;">{{e.ngrado}} </td>
                           <td>{{ e.nombres_apellidos }}</td>
                           <td>
@@ -79,7 +79,7 @@
                           <td>{{e.dias_restantes}}</td>
                           <td style="text-align: center;">
                             <button mat-icon-button aria-label="Editar" (click)="abrirModal(observacion, e, i);">
-                              <mat-icon class="text-blue">edit</mat-icon>
+                              <mat-icon>edit</mat-icon>
                             </button>
                           </td>
                         </tr>
@@ -88,16 +88,16 @@
 
                   </div>
                 </div>
-              </div>
+              
             </mat-tab>
 
             <mat-tab>
               <ng-template mat-tab-label>
                 &nbsp;ALERTAS DE REINCORPORACIONES ( {{lstReicorporaciones.length}} )
               </ng-template>
-              <div class="container" style="margin-right: 10px; margin-left: 10px; padding:0px;">
+              
                 <div class="row justify-content-end mt-4" style="margin-right: 7px;">
-                  <button class="btn bg-primary text-white " (click)="exportExcelReincorporaciones()">
+                  <button class="btn btn-pastel text-white " (click)="exportExcelReincorporaciones()">
                     <span class="fa fa-file-excel"></span>&nbsp;&nbsp;Exportar Excel
                   </button>
                 </div>
@@ -106,8 +106,8 @@
                 <!-- TABLA -->
                 <div class="row">
                   <div class="col-md-12">
-                    <table style="width: 100%;" border="1">
-                      <thead>
+                   <table class="sandratbl">
+                      <thead style="height: 40px;">
                         <tr>
                           <th style="width: 60px;">#</th>
                           <th>COMP.</th>
@@ -123,7 +123,7 @@
                       <tbody>
                         <tr *ngFor="let e of lstReicorporaciones; let i = index">
                           <td style="text-align: center;">{{ i+1 }}</td>
-                          <td style="text-align: center;">{{e.ncomponente}} </td>
+                          <td style="text-align: center;">{{e.ncomponente | uppercase}} </td>
                           <td style="text-align: center;">{{e.ngrado}} </td>
                           <td>{{ e.nombres_apellidos }}</td>
                           <td>
@@ -140,7 +140,6 @@
 
                   </div>
                 </div>
-              </div>
             </mat-tab>
           </mat-tab-group>
         </div>

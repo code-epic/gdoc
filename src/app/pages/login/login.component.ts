@@ -131,13 +131,6 @@ export class LoginComponent implements OnInit {
           e.error.msj || "Error al acceder al sistema",
           3000
         );
-
-        // 
-
-        // this.toastrService.error(
-        //   'Error al acceder a los datos de conexion',
-        //   `Bus Empresarial`
-        // );
       }
     );
   }
@@ -284,7 +277,7 @@ export class LoginComponent implements OnInit {
       },
       (e) => {
         this.loading = false;
-        console.info(e.error.msj)
+        // console.info(e.error.msj)
         let xdata = e.error
 
         if (xdata.tipo == 99) {

@@ -373,6 +373,13 @@ export class UtilService {
 
   FechaMoment(fecha: any, formato: string = "LLLL") {
     moment.locale('es')
+    // Fix: Validar si la fecha es un string no ISO para evitar warning de moment.js
+    if (typeof fecha === 'string' && !fecha.match(/^\d{4}-\d{2}-\d{2}/)) {
+      const date = new Date(fecha);
+      if (!isNaN(date.getTime())) {
+        return moment(date).format(formato);
+      }
+    }
     return moment(fecha).format(formato)
   }
 

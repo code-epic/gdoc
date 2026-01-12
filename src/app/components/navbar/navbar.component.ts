@@ -85,8 +85,6 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {
     
-    // this.nombre = this.loginService.Usuario.nombre
-
     this.listTitles = ROUTES.filter(listTitle => listTitle);
 
     this.verificarDepartamentoResoluciones();

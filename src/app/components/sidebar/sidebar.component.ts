@@ -27,7 +27,7 @@ export class SidebarComponent implements OnInit {
   }
 
   async ngOnInit() {
-
+    
     if (ROUTES.length == 0){
       this.loginService.obtenerMenu().forEach(e => {
         ROUTES.push({

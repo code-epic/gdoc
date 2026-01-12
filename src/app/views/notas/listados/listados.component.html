@@ -11,43 +11,18 @@
         <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
         <div class="card-header bg-transparent">
           <div class="row align-items-center">
-            <div class="col-md-10">
+            <div class="col-md-11">
               <h6 class="text-uppercase text-muted ls-1 mb-1">Notas de Entrega</h6>
               <h2 class="mb-0">Documentos Generales</h2>
             </div>
             <div class="col-md-1">
               <div class="media align-items-center">
                 <div class="example-button-row">
-                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                    <mat-icon>reply</mat-icon>
+                  <button mat-icon-button title="Volver Atrás" [routerLink]="['/registrar']">
+                    <mat-icon>arrow_back</mat-icon>
                   </button>
                 </div>
               </div>
-            </div>
-            <div class="col-md-1">
-              <ul class="navbar-nav align-items-right d-none d-md-flex">
-                <li class="nav-item" ngbDropdown placement="bottom-right">
-                  <a class="nav-link pr-0" role="button" ngbDropdownToggle id="more">
-                    <div class="media align-items-center">
-                      <div class="example-button-row">
-                        <button mat-icon-button aria-label="Detalles">
-                          <mat-icon>more_vert</mat-icon>
-                        </button>
-                      </div>
-                    </div>
-                  </a>
-                  <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
-                    <a routerLinkActive="active" [routerLink]="['/documento']" class="dropdown-item"  id="nuevodocumento">
-                      <i class="fa fa-plus"></i>
-                      <span>Nuevo Documento</span>
-                    </a>
-                    <a routerLinkActive="active" [routerLink]="['/configuracion']" class="dropdown-item" id="config">
-                      <i class="ni ni-settings-gear-65"></i>
-                      <span>Configuración</span>
-                    </a>
-                  </div>
-                </li>
-              </ul>
             </div>
           </div>
         </div>

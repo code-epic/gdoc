@@ -516,6 +516,7 @@ textarea.input-custom {
         border: none;
         vertical-align: middle;
         text-align: center;
+       
       
     }
   }
@@ -545,5 +546,75 @@ textarea.input-custom {
   /* Eliminar bordes por defecto si se usa el atributo border */
   &[border="1"] {
     border: none;
+  }
+}
+
+/* --- Custom Modal Style (Pixel Width & Animation) --- */
+.modal-custom .modal-dialog {
+  max-width: 1000px !important;
+  width: 1000px !important;
+}
+
+.modal-custom .modal-content {
+  border-radius: 15px;
+  border: none;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 1024px) {
+  .modal-custom .modal-dialog {
+    max-width: 95% !important;
+    width: 95% !important;
+  }
+}
+
+/* --- Elegant Title Theme --- */
+.title-elegant {
+  font-family: 'Open Sans', sans-serif;
+  color: #525f7f;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #9cc788 0%, #75a3c7 100%);
+    margin-right: 12px;
+    border-radius: 2px;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 20px;
+    width: 35px;
+    height: 2px;
+    background: linear-gradient(90deg, #9cc788 0%, #75a3c7 100%);
+    border-radius: 2px;
+    transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    opacity: 0.6;
+  }
+
+  &:hover::after {
+    width: calc(100% - 20px);
+    opacity: 1;
   }
 }

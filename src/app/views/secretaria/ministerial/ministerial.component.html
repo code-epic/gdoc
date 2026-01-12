@@ -12,8 +12,9 @@
         <div class="card-header bg-transparent">
           <div class="row align-items-center">
             <div class="col-md-9">
-              <h6 class="text-uppercase text-muted ls-1 mb-1">Ministerial / {{ numControl }}</h6>
-              <h2 class="mb-0">Punto de Cuenta</h2>
+              <h6 class="text-uppercase ls-1 mb-1" style="color: #5eaaa8; font-weight: 600;">Ministerial / {{ numControl
+                }}</h6>
+              <h2 class="mb-0" style="color: #5eaaa8;">Punto de Cuenta</h2>
             </div>
 
             <div class="col-md-1">
@@ -37,8 +38,7 @@
             <div class="col-md-1">
               <div class="media align-items-center">
                 <div class="example-button-row">
-                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-
+                  <button mat-icon-button title="Volver Atrás" [routerLink]="['/sministerial/ministeriales']">
                     <mat-icon>arrow_back</mat-icon>
                   </button>
                 </div>
@@ -49,124 +49,157 @@
 
         <div class="card-body">
           <form>
-            <div class="form-group row">
+            <div class="form-row">
 
               <div class="form-group col-md-2" [ngClass]="edit == 0 ? 'd-none' : ''">
-                <label>N. Control</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="numControl"
-                  value="{{unidad}}" readonly>
+                <label class="form-label-custom">N. Control</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">tag</mat-icon></span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="numControl"
+                    value="{{unidad}}" readonly>
+                </div>
               </div>
 
               <div class="form-group col-md-2" [ngClass]="edit == 1 ? 'd-none' : 'col-md-4'">
-                <label>Unidad Minisiterial</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="unidad"
-                  value="{{unidad}}" [readOnly]="edit == 0 ? true : false">
+                <label class="form-label-custom">Unidad Minisiterial</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon
+                        class="input-icon">account_balance</mat-icon></span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="unidad"
+                    value="{{unidad}}" [readOnly]="edit == 0 ? true : false">
+                </div>
               </div>
 
               <div class="form-group col-md-2" [ngClass]="edit == 0 ? 'd-none' : ''">
-                <label for="tmsOrigen">Fecha Elaboracion (*) </label>
-                <form class="form-inline">
-                  <div class="form-group div-general">
-                    <div class="input-group div-general">
-                      <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="fechaElaboracion" ngbDatepicker #fe="ngbDatepicker" readonly
-                        [placement]="placement" [positionTarget]="buttonElaboracion" readonly>
-                      <div class="input-group-append">
-                        <button #buttonElaboracion class="btn calendario" (click)="fe.toggle()" type="button" id="fori">
-                        </button>
-                      </div>
-                    </div>
+                <label class="form-label-custom">Fecha Elaboracion (*)</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box" (click)="fe.toggle()" style="cursor: pointer;">
+                      <mat-icon class="input-icon">event</mat-icon>
+                    </span>
                   </div>
-                </form>
+                  <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="fechaElaboracion" ngbDatepicker #fe="ngbDatepicker" [placement]="placement" readonly
+                    (click)="fe.toggle()">
+                </div>
               </div>
 
               <div class="form-group col-md-2" [ngClass]="edit == 0 ? 'd-none' : ''">
-                <label for="tmsOrigen">Fecha Origen (*) </label>
-                <form class="form-inline">
-                  <div class="form-group div-general">
-                    <div class="input-group div-general">
-                      <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="fechaOrigen" ngbDatepicker #fo="ngbDatepicker" readonly [placement]="placement"
-                        [positionTarget]="buttonEl" readonly>
-                      <div class="input-group-append">
-                        <button #buttonEl class="btn calendario" (click)="fo.toggle()" type="button" id="fori">
-                        </button>
-                      </div>
-                    </div>
+                <label class="form-label-custom">Fecha Origen (*)</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box" (click)="fo.toggle()" style="cursor: pointer;">
+                      <mat-icon class="input-icon">event</mat-icon>
+                    </span>
                   </div>
-                </form>
+                  <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="fechaOrigen" ngbDatepicker #fo="ngbDatepicker" [placement]="placement" readonly
+                    (click)="fo.toggle()">
+                </div>
               </div>
 
               <div class="form-group  col-md-2">
-                <label>N. De Cuenta</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cuenta"
-                  value="{{cuenta}}" [readOnly]="edit == 0 ? true : false">
+                <label class="form-label-custom">N. De Cuenta</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">tag</mat-icon></span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="cuenta"
+                    value="{{cuenta}}" [readOnly]="edit == 0 ? true : false">
+                </div>
               </div>
 
               <div class="form-group col-md-4">
-                <label>{{lblOrigenComando}}</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="comando"
-                  value="{{comando}}" [readOnly]="edit == 0 ? true : false">
+                <label class="form-label-custom">{{lblOrigenComando}}</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">security</mat-icon></span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="comando"
+                    value="{{comando}}" [readOnly]="edit == 0 ? true : false">
+                </div>
               </div>
 
               <div class="form-group  col-md-2" [ngClass]="edit == 1 ? 'd-none' : ''">
-                <label>Fecha</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
-                  value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
+                <label class="form-label-custom">Fecha</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">event</mat-icon></span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
+                    value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
+                </div>
               </div>
-
-
-
-
-
 
             </div>
 
-            <div class="form-row row" [ngClass]="edit == 0 ? 'd-none' : ''">
+            <div class="form-row" [ngClass]="edit == 0 ? 'd-none' : ''">
               <div class="form-group  col-md-6">
-                <label>Tipo de Cuenta</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
-                  value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
+                <label class="form-label-custom">Tipo de Cuenta</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">category</mat-icon></span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
+                    value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
+                </div>
               </div>
               <div class="form-group  col-md-6">
-                <label>Gestion del Ministro</label>
-                <input type="text" class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
-                  value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
+                <label class="form-label-custom">Gestion del Ministro</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">person</mat-icon></span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="fecha"
+                    value="{{ fecha}}" [readOnly]="edit == 0 ? true : false">
+                </div>
               </div>
             </div>
 
-            <div class="form-row row">
+            <div class="form-row">
               <div class="form-group col-md-12">
-                <label>Asunto</label> <br>
-
-                <textarea class="form-control w-100" [innerHTML]="asunto" [readOnly]="edit == 0 ? true : false"
-                  rows="6">
-                      </textarea>
-
+                <label class="form-label-custom">Asunto</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">subject</mat-icon></span>
+                  </div>
+                  <textarea class="input-custom" [innerHTML]="asunto" [readOnly]="edit == 0 ? true : false"
+                    rows="3"></textarea>
+                </div>
               </div>
             </div>
+
+
             <br>
-            <div *ngIf="blOficio" class="form-group row" [className]="edit == 1 ? 'd-none' : ''">
-              <div class="form-group col-md-12">
+            <div *ngIf="blOficio" class="form-row" [className]="edit == 1 ? 'd-none' : ''">
+              <div class="form-group col-md-12" style="margin: 0px; padding: 0px;">
                 <mat-accordion class="example-headers-align">
-                  <mat-expansion-panel hideToggle>
+                  <mat-expansion-panel>
                     <mat-expansion-panel-header>
-                      <mat-panel-title class="mat-panel-title">
-                        Detalles de puntos de cuenta
+                      <mat-panel-title class="mat-panel-title"
+                        style="align-items: center;color: #5d6060; font-size: 14px;  font-weight: bold;">
+                        <mat-icon class="mr-2" style="color: #5eaaa8;">list_alt</mat-icon>
+                        DETALLES DE PUNTOS DE CUENTA
                       </mat-panel-title>
-                      <mat-panel-description>
-                        Listado general ( {{ lstCuenta.length }} )
+                      <mat-panel-description
+                        style="justify-content: flex-end; align-items: center;color: #5d6060;font-size: 14px; font-weight: bold;">
+                        LISTADO GENERALES ( {{ lstCuenta.length }} )
 
                       </mat-panel-description>
                     </mat-expansion-panel-header>
-                    <table class="table align-items-center table-flush table-general">
-                      <thead class="thead-light">
-                        <th style="width: 20px;">#</th>
-                        <!-- <th style="width: 20px;"> <mat-checkbox [checked]="allComplete" (change)="setAll($event.checked)" color="warn"></mat-checkbox></th> -->
-                        <th>GRADO / COMPONENTE</th>
-                        <th>Nombres y Apellidos</th>
-                        <th>CEDULA</th>
-                        <th>Observaciones</th>
+                    <table class="sandratbl">
+                      <thead>
+                        <tr style="height: 40px;">
+                          <th style="width: 20px;">#</th>
+                          <th>GRADO / COMPONENTE</th>
+                          <th>Nombres y Apellidos</th>
+                          <th>CEDULA</th>
+                          <th style="width: 340px;">Observaciones</th>
+                        </tr>
                       </thead>
                       <tbody>
                         <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
@@ -175,28 +208,34 @@
                             <input type="hidden" class="form-control" id="{{ i }}-nomb" value="{{ el.nombre }}">
                             <input type="hidden" class="form-control" id="{{ i }}-cedu" value="{{ el.cedula }}">
                             <input type="hidden" class="form-control" id="{{ i }}-carg" value="{{ el.cargo }}">
-                            <input type="hidden" class="form-control" id="{{ i }}-nomb" value="{{ el.nombre }}">
-                            <input type="hidden" class="form-control" id="{{ i }}-cedu" value="{{ el.cedula }}">
-                            <input type="hidden" class="form-control" id="{{ i }}-carg" value="{{ el.cargo }}">
-                            <!-- <mat-checkbox class="example-margin texto-lista" [(ngModel)]="el.completed" color="warn"
-                              (ngModelChange)="updateAllComplete()">
-                            </mat-checkbox> -->
                           </td>
                           <td class="td-width">{{ el.cargo }}</td>
-                          <td class="td-width">{{ el.nombre }}</td>
+                          <td class="td-width">{{ el.nombre | uppercase }}</td>
                           <td class="td-width-menor">{{ el.cedula }}</td>
                           <td>
-                            <select class="form-control" id="{{i}}-text"
-                              [value]="el.detalle==''?'PR':getDetalle(el.detalle) ">
-                              <option value="PR">PROCESAR</option>
-                              <option value="NP">NO PROCESAR</option>
-                              <option value="NPPIDD">NP POR INT. DEL DIRECTOR</option>
-                              <option value="NPPIDJ">NP POR INT. DEL JEFE DE AREA</option>
-                              <option value="CR">CODIGO ROJO</option>
-                              <option value="BD">NO PROCESAR POR ASCENSO</option>
-                            </select>
-                            <!-- <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-                              id="{{i}}-text"> -->
+
+                            <div class="form-group" style="margin: 0px; padding: 0px;">
+                              <div class="input-group">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text icon-box"><mat-icon
+                                      class="input-icon">info</mat-icon></span>
+                                </div>
+                                <select class="input-custom" id="{{i}}-text"
+                                  [value]="el.detalle==''?'PR':getDetalle(el.detalle) ">
+                                  <option value="PE">PENDIENTE</option>
+                                  <option value="PR">PROCESAR</option>
+                                  <option value="NP">NO PROCESAR</option>
+                                  <option value="NPPIDD">NP POR INT. DEL DIRECTOR</option>
+                                  <option value="NPPIDJ">NP POR INT. DEL JEFE DE AREA</option>
+                                  <option value="CR">CODIGO ROJO</option>
+                                  <option value="BD">NO PROCESAR POR ASCENSO</option>
+                                </select>
+                              </div>
+                            </div>
+
+
+
+
                           </td>
                         </tr>
                       </tbody>
@@ -204,52 +243,68 @@
 
                     <div class="form-group col-md-12 text-right">
                       <br>
-                      <button mat-raised-button color="warn" (click)="transfererirResoluciones()">Aceptar
-                        cambios</button>
+                      <button mat-raised-button class="btn btn-pastel text-white" (click)="transfererirResoluciones()">
+                        <i class="fa fa-check mr-2"></i> Aceptar los cambios
+                      </button>
                     </div>
                   </mat-expansion-panel>
                 </mat-accordion>
               </div>
             </div>
 
-            <div class="form-group row">
+            <br>
+            <hr>
+            <div class="form-row">
 
               <div class="form-group col-md-4">
-                <label>Accion Tomada</label>
-                <textarea class="form-control" cols="30" rows="6" [ngModelOptions]="{standalone: true}"
-                  [(ngModel)]="SubDocumento.accion"></textarea>
+                <label class="form-label-custom">Accion Tomada</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">gavel</mat-icon></span>
+                  </div>
+                  <textarea class="input-custom" cols="30" rows="7" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="SubDocumento.accion"></textarea>
+                </div>
               </div>
 
 
               <div class="form-group col-md-4">
-                <label for="txtobservacion">Historial</label>
-                <textarea class="form-control" cols="30" rows="6" [ngModelOptions]="{standalone: true}"
-                  [(ngModel)]="SubDocumento.historico"></textarea>
+                <label class="form-label-custom">Historial</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">history</mat-icon></span>
+                  </div>
+                  <textarea class="input-custom" cols="30" rows="7" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="SubDocumento.historico"></textarea>
+                </div>
               </div>
 
               <div class="form-group col-md-4">
-                <div class="col-md-12">
-                  <label>Estatus</label>
-                  <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.estatus"
-                    (change)="selFecha()">
-                    <option value="0">SELECCIONE</option>
-                    <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
-                  </select>
+                <div class="form-group">
+                  <label class="form-label-custom">Estatus</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text icon-box"><mat-icon class="input-icon">info</mat-icon></span>
+                    </div>
+                    <select class="input-custom" [ngModelOptions]="{standalone: true}"
+                      [(ngModel)]="SubDocumento.estatus" (change)="selFecha()">
+                      <option value="0">SELECCIONE</option>
+                      <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+                    </select>
+                  </div>
                 </div>
 
-                <br>
-
-                <div class="col-md-12">
-                  <label for="tmsCreacion">Plazo </label>
-                  <div class="form-group div-general">
-                    <div class="input-group div-general">
-                      <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="fplazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
-                        [positionTarget]="buttonEl" readonly>
-                      <div class="input-group-append">
-                        <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button" disabled></button>
-                      </div>
+                <div class="form-group">
+                  <label class="form-label-custom">Plazo</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text icon-box" (click)="fd.toggle()" style="cursor: pointer;">
+                        <mat-icon class="input-icon">event</mat-icon>
+                      </span>
                     </div>
+                    <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                      [(ngModel)]="fplazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement" readonly
+                      (click)="fd.toggle()">
                   </div>
                 </div>
               </div>
@@ -257,11 +312,14 @@
 
             <hr>
 
-            <div class="form-group row">
-              <div class="col-md-4">
-                <div class="form-group  col-md-12">
-                  <label>{{lblDecision}}</label>
-                  <select class="form-control" [ngModelOptions]="{standalone: true}"
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label class="form-label-custom">{{lblDecision}}</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">gavel</mat-icon></span>
+                  </div>
+                  <select class="input-custom" [ngModelOptions]="{standalone: true}"
                     [(ngModel)]="SubDocumento.decision">
                     <option value="0">SELECCIONE</option>
                     <option value="APROBADO">APROBADO</option>
@@ -274,15 +332,25 @@
               </div>
 
               <div class="form-group col-md-4">
-                <label>{{lblComentario}}</label>
-                <textarea class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
-                  [(ngModel)]="SubDocumento.comentario"></textarea>
+                <label class="form-label-custom">{{lblComentario}}</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">comment</mat-icon></span>
+                  </div>
+                  <textarea class="input-custom" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="SubDocumento.comentario"></textarea>
+                </div>
               </div>
 
               <div class="form-group col-md-4">
-                <label>Archivo</label>
-                <textarea class="form-control" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
-                  [(ngModel)]="SubDocumento.archivo"></textarea>
+                <label class="form-label-custom">Archivo</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box"><mat-icon class="input-icon">attach_file</mat-icon></span>
+                  </div>
+                  <textarea class="input-custom" cols="30" rows="5" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="SubDocumento.archivo"></textarea>
+                </div>
               </div>
 
             </div>
@@ -292,11 +360,15 @@
             <div class="row">
               <div class="col-md-12">
                 <div class="text-right">
-                  <button class="btn bg-purple text-white" (click)="open(adjuntar, numc)">Adjuntar
+                  <button class="btn btn-pastel-cancel text-white" (click)="open(adjuntar, numc)" style="height: 40px;">
+                    <i class="fa fa-upload mr-2"></i> Adjuntar
                     Documento</button>
-                  <button class="btn bg-success text-white" *ngIf="dwSub" (click)="open(archivos)">Ver
-                    Documento</button>
-                  <button class="btn bg-primary text-white" (click)="aceptar()">{{lblBtn}}</button>
+                  <button class="btn btn-pastel text-white" *ngIf="dwSub" (click)="open(archivos)" style="height: 40px;">
+                    <i class="fa fa-download mr-2"></i> Ver Documento</button>
+
+                  <button mat-raised-button class="btn btn-pastel text-white" (click)="aceptar()" style="height: 40px;">
+                    <i class="fa fa-check mr-2"></i> {{lblBtn}}
+                  </button>
                 </div>
               </div>
             </div>
@@ -480,7 +552,3 @@
       </section>
     </div>
   </div>
-
-
-
-  

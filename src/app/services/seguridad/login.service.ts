@@ -224,7 +224,7 @@ export class LoginService {
           this.utils.uuidv4();
 
           sessionStorage.setItem("crypt", texto);
-          this.router.navigate(["home"]).then(() => {
+          this.router.navigate(["dashboard"]).then(() => {
             window.location.reload();
           });
         } catch (e) {

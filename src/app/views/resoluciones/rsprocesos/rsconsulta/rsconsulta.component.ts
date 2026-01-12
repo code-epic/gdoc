@@ -32,6 +32,7 @@ import Swal from "sweetalert2";
 import { ActivatedRoute, Router } from "@angular/router";
 import { MensajeService } from "src/app/services/util/mensaje.service";
 import { ExcelService } from "src/app/services/util/excel.service";
+import * as moment from 'moment';
 
 interface ITipoResolucion {
   codigo: string;
@@ -51,9 +52,9 @@ export class RsconsultaComponent implements OnInit {
   public resolucion: string = "";
   public mostrarComponenteColumna: boolean = false;
   public hayCorreccion(): boolean {
-  return this.lstResolucionesS && this.lstResolucionesS.some(e => this.getCorreccion(e));
-  
-}
+    return this.lstResolucionesS && this.lstResolucionesS.some(e => this.getCorreccion(e));
+
+  }
 
   public xAPI: IAPICore = {
     funcion: "",
@@ -209,6 +210,7 @@ export class RsconsultaComponent implements OnInit {
 
   public xasunto: string = "";
   public tipo: any;
+  public tipodocumento: any
   public nombramiento: string = "";
 
   public dbDatos: boolean = false;
@@ -323,7 +325,7 @@ export class RsconsultaComponent implements OnInit {
   public xyear = '2024'
   public xmeses = ''
   public xdia = ''
-  public blAlertas: boolean = false;  
+  public blAlertas: boolean = false;
 
   constructor(
     private apiService: ApiService,
@@ -337,7 +339,7 @@ export class RsconsultaComponent implements OnInit {
     private rutaActiva: ActivatedRoute,
     public formatter: NgbDateParserFormatter,
     private _snackBar: MatSnackBar,
-    private msj: MensajeService, 
+    private msj: MensajeService,
     private router: Router,
     private excelService: ExcelService,
   ) {
@@ -346,7 +348,7 @@ export class RsconsultaComponent implements OnInit {
         ? JSON.parse(atob(sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR)))
         : [];
 
-        
+
 
   }
 
@@ -375,6 +377,8 @@ export class RsconsultaComponent implements OnInit {
     this.GradoIPSFA = datos.GradoIPSFA;
     this.UbicacionCarpetas = datos.UbicacionCarpetas;
     this.UbicacionCarpetasEntrada = datos.UbicacionCarpetasEntrada;
+
+    this.tipodocumento = "0"
 
     // console.log(this.Estados)
 
@@ -412,8 +416,8 @@ export class RsconsultaComponent implements OnInit {
     // console.log(this.loginService.Usuario);
     this.bEliminarEntrada =
       this.loginService.Usuario.cargo == "Transcriptor Premium" ? true : false;
-    
-      if (this.rutaActiva.snapshot.params.id != undefined) {
+
+    if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
       this.cedula = id;
       this.consultarCedula(undefined)
@@ -423,14 +427,14 @@ export class RsconsultaComponent implements OnInit {
         'valor': true
       }
       this.msj.contenido$.emit(alertas)
-    } 
+    }
   }
 
 
-  irAlertas(){
+  irAlertas() {
     this.router.navigate(['/rsalertas/']);
   }
-  
+
   abrirModalDescargaNew(modalRef: any, documento: any) {
     this.documentoSeleccionado = documento;
     this.modalService.open(modalRef, { centered: true });
@@ -445,9 +449,23 @@ export class RsconsultaComponent implements OnInit {
     }
   }
 
-  convertirFecha(fecha: string): string {
-    return fecha != "" ? this.utilService.ConvertirFechaHumana(fecha) : "";
+  convertirFecha(fecha: any): string {
+    if (!fecha) return "---";
+
+    // Intentamos parsear aceptando los formatos más comunes que vienen de BD o ISO
+    // El segundo parámetro es un array de formatos conocidos para evitar el warning
+    const m = moment(fecha, [moment.ISO_8601, "YYYY-MM-DD HH:mm:ss", "YYYY-MM-DD"]);
+
+    if (m.isValid()) {
+      // Si es válida, usamos tu servicio para el formato humano (ej. 11 Ene 2026)
+      return this.utilService.ConvertirFechaHumana(m.toISOString());
+    } else {
+      // Si moment falla, intentamos una limpieza final por si vienen zonas horarias extrañas
+      const cleanDate = moment(new Date(fecha));
+      return cleanDate.isValid() ? this.utilService.ConvertirFechaHumana(cleanDate.toISOString()) : "Fecha inválida";
+    }
   }
+
   volverResolucion() {
     this.blResolucionPanel = !this.blResolucionPanel;
     this.dbResolucion = false;
@@ -491,7 +509,7 @@ export class RsconsultaComponent implements OnInit {
       this.xAPI.valores = "";
 
       this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {},
+        (data) => { },
         (err) => {
           console.error(err);
         }
@@ -671,7 +689,7 @@ export class RsconsultaComponent implements OnInit {
   asuntohtml(e): string {
     let ad =
       e.administracion == null ? "" : e.administracion.toUpperCase() + "<br>";
-    return ad + e.asunto.toUpperCase();
+    return ad + e.asunto.toUpperCase() + ' 100 '
   }
 
   obtenerResuelto() {
@@ -731,37 +749,22 @@ export class RsconsultaComponent implements OnInit {
 
     this.ngxService.startLoader("loader-buscar");
 
-    var causa =
-      this.causa == "%"
-        ? ""
-        : " AND  rs.cod_solicitud LIKE '%" + this.causa + "%'";
+    const addLike = (field: string, value: string) => (value && value !== '%') ? ` AND ${field} LIKE '%${value}%' ` : '';
+    const addEqual = (field: string, value: string) => (value && value !== '%') ? ` AND ${field} ='${value}'` : '';
 
-    var grado =
-      this.grado == "%" ? "" : " AND db.cod_grado ='" + this.grado + "'";
-    var componente =
-      this.componente == "%"
-        ? ""
-        : " AND db.cod_componente ='" + this.componente + "'";
-    var categoria =
-      this.categoria == "%"
-        ? ""
-        : " AND db.cod_categoria ='" + this.categoria + "'";
+    const causa = addLike('rs.cod_solicitud', this.causa);
+    const grado = addEqual('db.cod_grado', this.grado);
+    const componente = addEqual('db.cod_componente', this.componente);
+    const categoria = addEqual('db.cod_categoria', this.categoria);
+    const instrucciones = addLike('rs.instrucciones', this.instrucciones);
+    const asunto = addLike('rs.asunto', this.asunto);
+    const observaciones = addLike('rs.observacion', this.observaciones);
 
-    var instrucciones =
-      this.instrucciones == ""
-        ? ""
-        : " AND rs.instrucciones LIKE '%" + this.instrucciones + "%' ";
-    var asunto =
-      this.asunto == "" ? "" : " AND rs.asunto LIKE '%" + this.asunto + "%' ";
-    var observaciones =
-      this.observaciones == ""
-        ? ""
-        : " AND  rs.observacion LIKE '%" + this.observaciones + "%' ";
-
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = environment.funcion.RESOLUCIONES_RANGO_TIPO;
     codigo = asunto + instrucciones + observaciones + causa;
 
-    if (this.busqueda != "1") {
+    if (this.busqueda != "1") { //controla si es agrupada o detallada
       this.xAPI.funcion = environment.funcion.RESOLUCIONES_RANGO;
       codigo += grado + componente + categoria;
     }
@@ -771,21 +774,24 @@ export class RsconsultaComponent implements OnInit {
         codigo += " AND rs.cod_tipo_resol = " + this.tipo.codigo;
     }
     if (estatus == 1) {
-      this.xAPI.parametros = `1990-01-01,${this.xyear}-${ parseInt(this.xmeses) +  1}-${this.xdia},` + codigo;
+      const mes = (parseInt(this.xmeses) + 1).toString().padStart(2, '0');
+      const dia = this.xdia.padStart(2, '0');
+      this.xAPI.parametros = `1990-01-01,${this.xyear}-${mes}-${dia},` + codigo;
     } else {
       this.xAPI.parametros = desde + "," + hasta + "," + codigo;
     }
 
-    this.xAPI.valores = "";
+
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         console.log(data)
+        if (data == undefined) {
+          this.ngxService.stopLoader("loader-buscar");
+          return
+        }
         this.csvHead = data.Cabecera;
         this.resolucion = desde + " - " + hasta + " : " + data.Cuerpo.length;
-        console.log('Datos recibidos de la API:', data.Cuerpo);
-        console.log('Primer elemento:', data.Cuerpo[0]);
-        console.log('Campos disponibles:', Object.keys(data.Cuerpo[0]));
-        this.ngxService.stopLoader("loader-buscar");
+
         if (this.busqueda == "1") {
           this.lstResolucionesTipo = data.Cuerpo;
           this.dbResolucionTipo = true;
@@ -799,6 +805,7 @@ export class RsconsultaComponent implements OnInit {
           this.blFiltro = false;
         }
         this.asunto = "";
+        this.ngxService.stopLoader("loader-buscar");
       },
       (error) => {
         console.error("Error de conexion a los datos ", error);
@@ -900,7 +907,12 @@ export class RsconsultaComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstCausa = data.Cuerpo;
+        this.lstCausa = data.Cuerpo.map(e => {
+          e.codigo = e.cod_clasificacion;
+          e.nombre = e.des_clasificacion;
+          return e;
+        })
+
         this.ngxService.stopLoader("loader-buscar");
       },
       (err) => {
@@ -919,7 +931,12 @@ export class RsconsultaComponent implements OnInit {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.lstCausa = data.Cuerpo;
+        this.lstCausa = data.Cuerpo.map(e => {
+          e.codigo = e.cod_clasificacion;
+          e.nombre = e.des_clasificacion;
+          return e;
+        })
+
         this.ngxService.stopLoader("loader-buscar");
         //
       },
@@ -982,12 +999,12 @@ export class RsconsultaComponent implements OnInit {
           if (data.Cuerpo.length > 0) {
             this.dbDatosNombre = true;
           }
-          
+
           this.nombre = "";
           this.mostrarComponenteColumna = this.dbcomponente === "%";
 
         },
-        
+
         (error) => {
           console.error("Error de conexion a los datos ", error);
           this.ngxService.stopLoader("loader-buscar");
@@ -996,7 +1013,7 @@ export class RsconsultaComponent implements OnInit {
     }
   }
 
-  
+
 
   verificarNombre() {
     this.consultarNombre(undefined);
@@ -1115,59 +1132,59 @@ export class RsconsultaComponent implements OnInit {
       "Ex-" + this.idTransaccion,
       this.delimitador
     );
-   
+
   }
 
   downloadCSV() {
-     let xlsx = []
-      this.lstResolucionesX.forEach((e) => {
-        xlsx.push({
-            'CEDULA': e.cedula,
-            'GRADO' : e.grado_abreviado,
-            'NOMBRES Y APELLIDOS': e.nombres_apellidos,
-            'COMPONENTE': e.nombre_componente,
-            'CATEGORIA': e.nombre_categoria,
-            'CLASIFICACION': e.des_clasificacion,
-            'SEXO': e.sexo,
-            'FECHA RSL': this.convertirFecha(e.fecha_resolucion),
-            'AÑo RSL': e.fecha_resolucion != undefined? e.fecha_resolucion.substring(0, 4): '', 
-            'NRO RSL': e.numero,
-            'TIPO RSL' : this.obtenerTipo(e.tipo),
-            'ASUNTO RSL': e.asunto,
-            'TIPO DE SOLICITUD' : e.administracion,
-            'ESPECIALIDAD' : e.especialidad,
-            'MOTIVO' : e.nombre_motivo,
-            // 'asunto' : ,
-            // 'nombre_causa' : 
-            'DELITO O FALTA': e.falta,
-            'OBSERVACIONES RSL' : e.observacion,
-            'INSTRUCCIONES ESPECIALES' : e.instrucciones,
-            'DISTRIBUCCION' : e.distribucion == 0? 'PUBLICAR': e.distribucion == 1? 'PUBLICAR': e.distribucion == 2? 'CONFIDENCIAL': e.distribucion == 3? 'RESERVADA': '',
-          
-         
-        })
+    let xlsx = []
+    this.lstResolucionesX.forEach((e) => {
+      xlsx.push({
+        'CEDULA': e.cedula,
+        'GRADO': e.grado_abreviado,
+        'NOMBRES Y APELLIDOS': e.nombres_apellidos,
+        'COMPONENTE': e.nombre_componente,
+        'CATEGORIA': e.nombre_categoria,
+        'CLASIFICACION': e.des_clasificacion,
+        'SEXO': e.sexo,
+        'FECHA RSL': this.convertirFecha(e.fecha_resolucion),
+        'AÑo RSL': e.fecha_resolucion != undefined ? e.fecha_resolucion.substring(0, 4) : '',
+        'NRO RSL': e.numero,
+        'TIPO RSL': this.obtenerTipo(e.tipo),
+        'ASUNTO RSL': e.asunto,
+        'TIPO DE SOLICITUD': e.administracion,
+        'ESPECIALIDAD': e.especialidad,
+        'MOTIVO': e.nombre_motivo,
+        // 'asunto' : ,
+        // 'nombre_causa' : 
+        'DELITO O FALTA': e.falta,
+        'OBSERVACIONES RSL': e.observacion,
+        'INSTRUCCIONES ESPECIALES': e.instrucciones,
+        'DISTRIBUCCION': e.distribucion == 0 ? 'PUBLICAR' : e.distribucion == 1 ? 'PUBLICAR' : e.distribucion == 2 ? 'CONFIDENCIAL' : e.distribucion == 3 ? 'RESERVADA' : '',
+
+
       })
-      this.excelService.exportToExcel(xlsx, "Ex-" + this.idTransaccion,);
+    })
+    this.excelService.exportToExcel(xlsx, "Ex-" + this.idTransaccion,);
   }
 
-          downloadCSVEspecifica() {
-          let xlsx = []
-          this.lstNombres.forEach((e) => {
-              xlsx.push({
-                  'NUM': xlsx.length + 1,
-                  'GRADO': e.grado_abreviado,
-                  'COMPONENTE': e.componente_abreviado,
-                  'NOMBRE COMPLETO': e.nombres,
-                  'CEDULA': e.cedula,
-                  'PROMOCION': this.convertirFecha(e.promocion),
-                  'SEXO': e.sexo,
-                  'CATEGORIA': e.nombre_categoria,
-                  'CLASIFICACION': e.des_clasificacion,
-                  'SITUACION': this.getSituation(e.situacion)
-              })
-          })
-          this.excelService.exportToExcel(xlsx, "Listado_Nombres_" + this.utilService.GenerarUnicId());
-        }
+  downloadCSVEspecifica() {
+    let xlsx = []
+    this.lstNombres.forEach((e) => {
+      xlsx.push({
+        'NUM': xlsx.length + 1,
+        'GRADO': e.grado_abreviado,
+        'COMPONENTE': e.componente_abreviado,
+        'NOMBRE COMPLETO': e.nombres,
+        'CEDULA': e.cedula,
+        'PROMOCION': this.convertirFecha(e.promocion),
+        'SEXO': e.sexo,
+        'CATEGORIA': e.nombre_categoria,
+        'CLASIFICACION': e.des_clasificacion,
+        'SITUACION': this.getSituation(e.situacion)
+      })
+    })
+    this.excelService.exportToExcel(xlsx, "Listado_Nombres_" + this.utilService.GenerarUnicId());
+  }
 
   downloadCSVEx() {
     let head = this.csvHead.map((e) => {
@@ -1417,14 +1434,11 @@ export class RsconsultaComponent implements OnInit {
   detalle(content, e) {
     //Listar los archivos asociados al documento
     this.getResueltoID(e.id);
-    this.modalService.open(content, { size: "lg" });
+    this.modalService.open(content, { windowClass: 'modal-custom', keyboard: true, centered: true });
   }
 
   detalleEntrada(content, e) {
-    this.modalService.open(content, { size: "lg" });
-
-    console.log(e);
-
+    this.modalService.open(content, { windowClass: 'modal-custom', keyboard: true, centered: true });
     this.documento = e.cod_acto == 0 ? "RESOLUCIÓN" : "ORDEN GENERAL";
     this.responsable_entrada = e.des_responsable;
     this.registrado_entrada = e.des_registrado;
@@ -1433,9 +1447,6 @@ export class RsconsultaComponent implements OnInit {
     this.digital = e.digital;
     this.modificado_entrada = e.f_modificado;
     this.estatus_entrada = e.estatus_descripcion;
-
-    // console.log(new Date(e.f_modificado))
-    // console.log(new Date('2024-09-01 00:00:00'))
 
     if (new Date(e.f_modificado) < new Date("2024-09-01 00:00:00")) {
       this.tipo_entrada = e.des_tipo_entrada;
