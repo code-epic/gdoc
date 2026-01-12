@@ -1,4 +1,5 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Inject } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { ROUTES } from '../sidebar/sidebar.component';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
@@ -11,7 +12,7 @@ import { Sha256Service } from 'src/app/services/util/sha256';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from 'src/environments/environment';
 import { WsSandraService } from 'src/app/services/seguridad/ws-sandra.service';
-
+import { DOCUMENT } from '@angular/common';
 
 
 interface Change {
@@ -46,6 +47,7 @@ export class NavbarComponent implements OnInit {
   public showNueva = false;
   public showRepite = false;
 
+  public changePasswordForm: FormGroup;
 
   public Change: Change = {
     usuario: "",
@@ -68,6 +70,7 @@ export class NavbarComponent implements OnInit {
   public totpSecret: string = '';
   public isTotpSecretCopied: boolean = false;
   public isTotpActive: boolean = false;
+  public booleanIsSidenav = false;
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -78,18 +81,21 @@ export class NavbarComponent implements OnInit {
 
   constructor(location: Location,
     private msj: MensajeService,
+    private fb: FormBuilder,
     private loginService: LoginService,
     private apiService: ApiService,
     private utilservice: UtilService,
     private modalService: NgbModal,
     private sha256: Sha256Service,
     private ws: WsSandraService,
-    private router: Router) {
+    private router: Router,
+    @Inject(DOCUMENT) private document: Document) {
     this.location = location;
   }
 
   ngOnInit() {
 
+    this.initForm();
 
     this.listTitles = ROUTES.filter(listTitle => listTitle);
 
@@ -127,6 +133,31 @@ export class NavbarComponent implements OnInit {
     }
   }
 
+  initForm() {
+    this.changePasswordForm = this.fb.group({
+      clave: ['', Validators.required],
+      nueva: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(16),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/)
+      ]],
+      repite: ['', Validators.required]
+    }, {
+      validators: this.checkPasswords // Nota: es 'validators' en plural para FormBuilder
+    });
+
+    // Suscribirse a cambios para que la validación de "Repetir" sea instantánea al cambiar "Nueva"
+    this.changePasswordForm.get('nueva').valueChanges.subscribe(() => {
+      this.changePasswordForm.get('repite').updateValueAndValidity();
+    });
+  }
+
+  checkPasswords(group: AbstractControl) {
+    const nueva = group.get('nueva').value;
+    const repite = group.get('repite').value;
+    return nueva === repite ? null : { notSame: true };
+  }
 
   // Método para verificar si estamos en el departamento de resoluciones
   private verificarDepartamentoResoluciones(): void {
@@ -165,7 +196,7 @@ export class NavbarComponent implements OnInit {
     return 'Principal';
   }
 
-  booleanIsSidenav = false;
+
   onChangeSidenav() {
     this.booleanIsSidenav = !this.booleanIsSidenav;
     this.onChange.emit(true);
@@ -178,68 +209,53 @@ export class NavbarComponent implements OnInit {
 
 
 
-
-
+  // 3. Asegura que el Modal inicialice todo correctamente
   ModalChangePassword(modal) {
-    this.Change.usuario = this.usuario;
+    this.changePasswordForm.reset();
+    // Reiniciamos valores de fuerza de contraseña
+    this.passwordStrengthWidth = 0;
+    this.passwordStrengthLabel = 'Sin seguridad';
+    this.passwordStrengthColor = '';
+
+    this.Change.usuario = this.loginService.Usuario.usuario;
+
     this.modalService.open(modal, {
       centered: true,
       size: "md",
-      backdrop: false,
+      backdrop: 'static', // Cambiado a static para evitar cierres accidentales
       keyboard: false,
       windowClass: 'fondo-modal'
     });
   }
 
   async ChangesPassword() {
+    if (this.changePasswordForm.invalid) {
+      this.utilservice.AlertMini("top-end", "error", "Verifique los campos del formulario", 3000);
+      this.changePasswordForm.markAllAsTouched();
+      return;
+    }
+
     if (!this.Change.usuario) {
       this.utilservice.AlertMini("top-end", "error", "No existe un usuario", 3000);
       return;
     }
 
-    if (this.Change.nueva !== this.Change.repite) {
-      this.utilservice.AlertMini(
-        "top-end",
-        "error",
-        "La nueva contraseña y su repetición no coinciden.",
-        3000
-      );
-      return;
-    }
+    const formValues = this.changePasswordForm.value;
+    let claveHash = '';
+    let nuevaHash = '';
 
-    const password = this.Change.nueva;
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
-
-    if (!passwordRegex.test(password)) {
-      this.utilservice.AlertMini(
-        "top-end",
-        "error",
-        "La clave no cumple con los requisitos de complejidad.",
-        5000
-      );
-      this.utilservice.AlertMini(
-        "top-end",
-        "info",
-        "Debe tener entre 8 y 16 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales (@$!%*?&).",
-        8000
-      );
-      return;
-    }
-
-
-    await this.sha256.hash(this.Change.clave).then(hash => {
-      this.Change.clave = hash
+    await this.sha256.hash(formValues.clave).then(hash => {
+      claveHash = hash
     })
 
-    await this.sha256.hash(this.Change.nueva).then(hash => {
-      this.Change.nueva = hash
+    await this.sha256.hash(formValues.nueva).then(hash => {
+      nuevaHash = hash
     })
 
 
     let xApi = {
       funcion: environment.funcion.ACTUALIZAR_CLAVE_USUARIO,
-      parametros: `${this.Change.usuario},${this.Change.clave},${this.Change.nueva}`,
+      parametros: `${this.Change.usuario},${claveHash},${nuevaHash}`,
     }
 
     this.apiService.Ejecutar(xApi).subscribe(
@@ -262,12 +278,7 @@ export class NavbarComponent implements OnInit {
   }
 
   clearModal() {
-    this.Change = {
-      usuario: "",
-      clave: "",
-      nueva: "",
-      repite: "",
-    }
+    this.changePasswordForm.reset();
     this.modalService.dismissAll();
   }
 
@@ -283,14 +294,14 @@ export class NavbarComponent implements OnInit {
    * @param event El evento del interruptor.
    */
   toggleTotp(event: any) {
+    // Forma segura de obtener el valor booleano
     const isChecked = event.target.checked;
     this.showTotpSection = isChecked;
 
-    if (isChecked && !this.totpSecret) {
-      this.generateTotp()
+    if (isChecked) {
+      this.generateTotp();
     } else {
-      this.limpiarTotp()
-      console.log('Desactivado')
+      this.limpiarTotp();
     }
   }
 
@@ -375,7 +386,6 @@ export class NavbarComponent implements OnInit {
     }, 0);
 
     this.passwordStrengthWidth = result;
-    console.log(this.passwordStrengthWidth)
 
     if (result < 40) {
       this.passwordStrengthLabel = 'Débil';

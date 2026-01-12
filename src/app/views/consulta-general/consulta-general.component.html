@@ -9,89 +9,100 @@
                 </ng-template>
                 <div class="example-large-box " style="margin: 0px;padding: 15px;">
                     <div class="form-row">
-                        <div class=" col-md-6">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Cuenta u Oficio</mat-label>
-                                <input matInput placeholder="Cuenta u Oficio" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="cuenta" readonly="readonly">
-                            </mat-form-field>
+                        <div class="form-group col-md-6">
+                            <label class="form-label-custom">Cuenta u Oficio</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">tag</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="cuenta" readonly>
+                            </div>
                         </div>
-                        <div class=" col-md-6">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Digital</mat-label>
-                                <input matInput placeholder="Digital" [ngModelOptions]="{standalone: true}" [(ngModel)]="digital"
-                                readonly="readonly">
-                            </mat-form-field>
+                        <div class="form-group col-md-6">
+                            <label class="form-label-custom">Digital</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">cloud_download</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="digital" readonly>
+                            </div>
                         </div>
-                        <div class=" col-md-6">
-            
-                            <mat-form-field appearance="outline">
-                                <mat-label>Documento</mat-label>
-                                <input matInput placeholder="Documento" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="documento" readonly="readonly">
-                            </mat-form-field>
-            
+                        <div class="form-group col-md-6">
+                            <label class="form-label-custom">Documento</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">description</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="documento" readonly>
+                            </div>
                         </div>
-            
-                        <div class=" col-md-6">
-            
-                            <mat-form-field appearance="outline">
-                                <mat-label>Tipo</mat-label>
-                                <input matInput placeholder="Tipo" [ngModelOptions]="{standalone: true}" 
-                                [(ngModel)]="tipo_entrada" readonly="readonly">
-                            </mat-form-field>
-            
-                        </div>
-                        
-                        <div class=" col-md-5">
-            
-                             <mat-form-field appearance="outline">
-                                <mat-label>Estatus</mat-label>
-                                <input matInput placeholder="Estatus" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="estatus_entrada" readonly="readonly">
-                            </mat-form-field> 
-            
+                        <div class="form-group col-md-6">
+                            <label class="form-label-custom">Tipo</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">category</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="tipo_entrada" readonly>
+                            </div>
                         </div>
                         
-                        <div class=" col-md-5">
-            
-                            <mat-form-field appearance="outline">
-                                <mat-label>Carpeta</mat-label>
-                                <input matInput placeholder="Carpeta" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="carpeta_entrada" readonly="readonly">
-                            </mat-form-field>
-            
+                        <div class="form-group col-md-5">
+                            <label class="form-label-custom">Estatus</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">info</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="estatus_entrada" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group col-md-5">
+                            <label class="form-label-custom">Carpeta</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">folder</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="carpeta_entrada" readonly>
+                            </div>
                         </div>
 
-                        <div class=" col-md-2">
-            
-                            <mat-form-field appearance="outline">
-                                <mat-label>Número Carpeta</mat-label>
-                                <input matInput placeholder="Número Carpeta" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="numero" readonly="readonly">
-                            </mat-form-field>
-            
+                        <div class="form-group col-md-2">
+                            <label class="form-label-custom">Número Carpeta</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">format_list_numbered</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="numero" readonly>
+                            </div>
                         </div>
             
-                        <div class=" col-md-12">
-            
-                            <mat-form-field appearance="outline">
-                                <mat-label>Asunto</mat-label>
-                                <input matInput placeholder="Asunto" 
-                                readonly="readonly"
-                                [ngModelOptions]="{standalone: true}" [(ngModel)]="asunto_entrada">
-                            </mat-form-field>
-            
+                        <div class="form-group col-md-12">
+                            <label class="form-label-custom">Asunto</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">subject</mat-icon></span>
+                                </div>
+                                <textarea class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="asunto_entrada" readonly></textarea>
+                            </div>
                         </div>
             
-                        <div class=" col-md-12">
-            
-                            <mat-form-field appearance="outline">
-                                <mat-label>Observacion</mat-label>
-                                <input matInput placeholder="Observacion" 
-                                [ngModelOptions]="{standalone: true}" [(ngModel)]="observacion_entrada" readonly="readonly">
-                            </mat-form-field>
-            
+                        <div class="form-group col-md-12">
+                            <label class="form-label-custom">Observacion</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">comment</mat-icon></span>
+                                </div>
+                                <textarea class="input-custom" [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="observacion_entrada" readonly></textarea>
+                            </div>
                         </div>
             
                     </div>
@@ -139,7 +150,7 @@
 
     </div>
     <div class="modal-footer">
-        <button class="btn bg-gradient-info text-white " (click)="c('Save')">
+        <button class="btn btn-pastel text-white " (click)="c('Save')">
             <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
 
     </div>
@@ -197,89 +208,99 @@
 
 
 
-                                        <div class="row">
-
-                                            <div class="col-md-4">
-                                                <mat-form-field appearance="outline">
-                                                    <mat-label>Nombre Completo</mat-label>
-                                                    <input matInput placeholder="Nombre completo"
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text icon-box">
+                                                            <mat-icon class="input-icon">badge</mat-icon>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="input-custom" placeholder="Nombre completo"
                                                         [ngModelOptions]="{standalone: true}" [(ngModel)]="nombre"
                                                         (keypress)="consultarNombre($event);">
-                                                </mat-form-field>
+                                                </div>
                                             </div>
-                                            <div class="col-md-3">
-                                                <mat-form-field class="example-full-width" appearance="outline"
-                                                    style="width:100%">
-                                                    <mat-label>Componente</mat-label>
-                                                    <mat-select placeholder="Componente"
-                                                        [ngModelOptions]="{standalone: true}"
+                                            <div class="form-group col-md-3">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text icon-box">
+                                                            <mat-icon class="input-icon">security</mat-icon>
+                                                        </span>
+                                                    </div>
+                                                    <select class="input-custom" [ngModelOptions]="{standalone: true}"
                                                         [(ngModel)]="dbcomponente">
-                                                        <mat-option value="%">TODOS</mat-option>
-                                                        <mat-option *ngFor="let e of Componentes;"
-                                                            [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
-                                                    </mat-select>
-                                                </mat-form-field>
+                                                        <option value="%">TODOS</option>
+                                                        <option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}</option>
+                                                    </select>
+                                                </div>
                                             </div>
 
-                                            <div class="col-md-3">
-                                                <mat-form-field class="example-full-width" appearance="outline"
-                                                    style="width:100%">
-                                                    <mat-label>Grado</mat-label>
-                                                    <mat-select placeholder="Grado"
-                                                        [ngModelOptions]="{standalone: true}" [(ngModel)]="dbgrado">
-                                                        <mat-option value="%">TODOS</mat-option>
-                                                        <mat-option *ngFor="let e of Grados"
-                                                            value="{{e.cod_grado}}">{{e.nombre_corto }} -
-                                                            {{e.nombres_grado }}</mat-option>
-                                                    </mat-select>
-                                                </mat-form-field>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <div class="text-right" style="padding-top: 5px;">
-                                                    <button class="btn bg-primary text-white" style="height: 50px;"
-                                                        (click)="verificarNombre()">
-                                                        Consultar
-                                                    </button>
+                                            <div class="form-group col-md-3">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text icon-box">
+                                                            <mat-icon class="input-icon">military_tech</mat-icon>
+                                                        </span>
+                                                    </div>
+                                                    <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="dbgrado">
+                                                        <option value="%">TODOS</option>
+                                                        <option *ngFor="let e of Grados" value="{{e.cod_grado}}">{{e.nombre_corto }} - {{e.nombres_grado }}</option>
+                                                    </select>
                                                 </div>
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <button class="btn btn-pastel text-white w-100" (click)="verificarNombre()">
+                                                    <span class="d-flex align-items-center justify-content-center">
+                                                        <mat-icon class="mr-1" style="font-size: 18px; width: 18px; height: 18px;">search</mat-icon> Consultar
+                                                    </span>
+                                                </button>
                                             </div>
                                         </div>
 
-                                        <div class="row">
-
-                                            <div class="col-md-3">
-                                                <mat-form-field appearance="outline">
-                                                    <mat-label>Cédula</mat-label>
-                                                    <input matInput placeholder="Cédula"
+                                        <div class="form-row">
+                                            <div class="form-group col-md-3">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text icon-box">
+                                                            <mat-icon class="input-icon">fingerprint</mat-icon>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="input-custom" placeholder="Cédula"
                                                         [ngModelOptions]="{standalone: true}" [(ngModel)]="cedula"
                                                         (keypress)="consultarCedula($event)">
-                                                    <mat-icon matSuffix>person_search</mat-icon>
-                                                </mat-form-field>
+                                                </div>
                                             </div>
-                                            <div class="col-md-3">
-                                                <mat-form-field appearance="outline">
-                                                    <mat-label>Numero de resuelto</mat-label>
-                                                    <input matInput placeholder="Numero de resuelto"
+                                            <div class="form-group col-md-3">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text icon-box">
+                                                            <mat-icon class="input-icon">tag</mat-icon>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="input-custom" placeholder="Numero de resuelto"
                                                         [ngModelOptions]="{standalone: true}"
                                                         [(ngModel)]="IResolucion.numero" value="{{IResolucion.numero}}"
                                                         (keypress)="consultarResolucion($event)">
-                                                </mat-form-field>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <mat-form-field appearance="outline">
-                                                    <mat-label>Numero de Orden General</mat-label>
-                                                    <input matInput placeholder="Numero de Orden General">
-                                                </mat-form-field>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="text-right" style="padding-top: 5px;">
-                                                    <button class="btn bg-primary text-white" style="height: 50px;"
-                                                        (click)="verificar()">
-                                                        Consultar por caso
-
-                                                    </button>
                                                 </div>
                                             </div>
-
+                                            <div class="form-group col-md-3">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text icon-box">
+                                                            <mat-icon class="input-icon">description</mat-icon>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="input-custom" placeholder="Numero de Orden General">
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <button class="btn btn-pastel text-white w-100" (click)="verificar()">
+                                                    <span class="d-flex align-items-center justify-content-center">
+                                                        <mat-icon class="mr-1" style="font-size: 18px; width: 18px; height: 18px;">search</mat-icon> Consultar por caso
+                                                    </span>
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <div class="row" style="padding-top: 5px">
@@ -294,106 +315,172 @@
                                         <div class="row" *ngIf="dbDatos">
 
                                             <div class="col-md-12">
-                                                <table style="width: 100%;" border="1" class="zigzag">
-                                                    <tbody>
-                                                        <tr>
-                                                            <th>CEDULA</th>
-                                                            <td [ngStyle]="{'background-color': color_acc}">
-                                                                <font [ngStyle]="{'color': color_texto}">
-                                                                    V-{{IDatosBasicos.cedula}}
-                                                                </font>
-                                                            </td>
-                                                            <th style="width: 210px; text-align: center;">FOTO</th>
-                                                            <th style="text-align: center;">ASCENSOS</th>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>GRADO</th>
-                                                            <td [ngStyle]="{'background-color': color_acc}">
-                                                                <font [ngStyle]="{'color': color_texto}">
-                                                                    {{IDatosBasicos.grado}}
-                                                                </font>
-                                                            </td>
-                                                            <td rowspan="9" valing="center" style="text-align: center;">
-                                                                <div
-                                                                    style="border:0px solid #CCC; padding: 1px;width: 190px">
-                                                                    <img src="{{ obtenerFoto(IDatosBasicos.cedula) }}"
-                                                                        style="width: 189px">
+                                                <div class="card border-0 shadow-sm b-4" style="border-radius: 2px; overflow: hidden;">
+                                                    <div class="card-body p-0">
+                                                        <div class="row no-gutters">
+                                                            <!-- Left Column: Profile & Personal Data -->
+                                                            <div class="col-lg-3 bg-secondary p-4 border-right d-flex flex-column align-items-center">
+                                                                
+                                                                <!-- Photo with elegant frame -->
+                                                                <div class="position-relative mb-3">
+                                                                    <div class="shadow-lg p-1 bg-white rounded">
+                                                                        <img [src]="obtenerFoto(IDatosBasicos.cedula)" class="rounded" 
+                                                                             style="width: 100%; max-width: 220px; height: auto; object-fit: cover;" 
+                                                                             alt="Foto del perfil">
+                                                                    </div>
                                                                 </div>
-                                                            </td>
-                                                            <td rowspan="10" valign="top"
-                                                                style="width: 350px;margin: 0px; padding: 0px">
-                                                                <table style="width: 100%; text-align: center;"
-                                                                    border="1" class="zigzag">
+                                            
+                                                                <h4 class="text-center font-weight-bold text-dark mb-1 text-uppercase">{{IDatosBasicos.nombres || 'NO APLICA'}}</h4>
+                                                                <div class="mb-3">
+                                                                    <span class="badge badge-pill badge-primary shadow-sm px-3 py-2" 
+                                                                          [ngStyle]="{'background-color': color_acc ? color_acc : '#5eaaa8', 'color': color_texto}"
+                                                                          style="font-size: 13px;">
+                                                                        V-{{IDatosBasicos.cedula || 'NO APLICA'}}
+                                                                    </span>
+                                                                </div>
+                                            
+                                                                <!-- Personal Details List -->
+                                                                <div class="w-100 px-2">
+                                                                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                                                        <span class="text-muted text-xs font-weight-bold text-uppercase">Sexo</span>
+                                                                        <span class="font-weight-600 text-dark text-sm">{{ (getSex(IDatosBasicos.sexo) | uppercase) || 'NO APLICA' }}</span>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                                                        <span class="text-muted text-xs font-weight-bold text-uppercase">Situación</span>
+                                                                        <span class="font-weight-600 text-dark text-sm">{{ (getSituation(IDatosBasicos.situacion) | uppercase) || 'NO APLICA' }}</span>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                                                        <span class="text-muted text-xs font-weight-bold text-uppercase">Clasificación</span>
+                                                                        <span class="font-weight-600 text-dark text-sm">{{ (IDatosBasicos.clasificacion | uppercase) || 'NO APLICA' }}</span>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                                                        <span class="text-muted text-xs font-weight-bold text-uppercase">Categoría</span>
+                                                                        <span class="font-weight-600 text-dark text-sm">{{ IDatosBasicos.categoria || 'NO APLICA' }}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                            
+                                                            <!-- Right Column: Professional Info & Timeline -->
+                                                            <div class="col-lg-9 p-4 bg-white">
+                                                                <!-- Header -->
+                                                                <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                                                                    <div class="icon icon-shape btn-pastel text-white rounded-circle shadow mr-3">
+                                                                        <mat-icon>military_tech</mat-icon>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h5 class="text-uppercase text-muted ls-1 mb-0">Información Profesional</h5>
+                                                                        <h2 class="text-dark mb-0">{{IDatosBasicos.grado || 'NO APLICA'}} - {{IDatosBasicos.componente || 'NO APLICA'}}</h2>
+                                                                    </div>
+                                                                </div>
+                                            
+                                                                <!-- Details Cards -->
+                                                                <div class="row mb-3">
+                                                                    <div class="col-md-6 mb-2 mb-md-0">
+                                                                        <div class="p-3 rounded" style="background-color: #f8f9fe; border-left: 4px solid #5e72e4;">
+                                                                            <small class="text-muted text-uppercase font-weight-bold d-block mb-1" style="font-size: 0.7rem;">Especialidad</small>
+                                                                            <span class="h5 font-weight-bold mb-0 text-dark" style="font-size: 0.9rem;">{{ (IDatosBasicos.especialidad | uppercase) || 'NO APLICA' }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="p-3 rounded" style="background-color: #f8f9fe; border-left: 4px solid #11cdef;">
+                                                                            <small class="text-muted text-uppercase font-weight-bold d-block mb-1" style="font-size: 0.7rem;">Fecha de Promoción</small>
+                                                                            <span class="h5 font-weight-bold mb-0 text-dark" style="font-size: 0.9rem;">{{ convertirFecha(IDatosBasicos.promocion) || 'NO APLICA' }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                            
+                                                                <!-- Alerts/Observations -->
+                                                                <div class="mb-3" *ngIf="IDatosBasicos.observaciones">
+                                                                    <div class="alert alert-secondary shadow-sm border-0 mb-2">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <mat-icon class="mr-2 text-muted" style="font-size: 18px; width: 18px; height: 18px;">info</mat-icon>
+                                                                            <span class="text-sm text-dark" style="font-size: 0.85rem;"><strong>OBSERVACIONES:</strong> {{ (IDatosBasicos.observaciones | uppercase) || 'NO APLICA' }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                            
+                                                                <!-- Timeline Section -->
+                                                                <div class="mt-4">
+                                                                    <div class="d-flex align-items-center mb-3">
+                                                                        <h5 class="text-uppercase text-muted ls-1 mb-0" style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;">
+                                                                            Historial de Ascensos
+                                                                        </h5>
+                                                                    </div>
+                                                                    
+                                                                    <div class="timeline-container pl-1 pr-2" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                                                                            
+                                                                            <div *ngFor="let elem of lstAscenso; let i = index; let last = last" class="timeline-block d-flex position-relative pb-4">
+                                                                                
+                                                                                <div class="timeline-axis d-flex flex-column align-items-center mr-3" style="min-width: 24px;">
+                                                                                    <!-- Dot -->
+                                                                                    <div class="timeline-dot shadow-sm" 
+                                                                                         [ngStyle]="{'background-color': i === 0 ? '#5eaaa8' : '#fff', 'border': i === 0 ? 'none' : '2px solid #e9ecef'}"
+                                                                                         style="width: 14px; height: 14px; border-radius: 50%; z-index: 2; margin-top: 6px;">
+                                                                                    </div>
+                                                                                    <!-- Line -->
+                                                                                    <div *ngIf="!last" class="timeline-line" 
+                                                                                         style="width: 2px; flex-grow: 1; background: linear-gradient(to bottom, #e9ecef 0%, #f8f9fe 100%); margin-top: 4px; margin-bottom: -10px;">
+                                                                                    </div>
+                                                                                </div>
 
-                                                                    <tr *ngFor="let elem of lstAscenso">
-                                                                        <td>{{ convertirFecha(elem.fecha_resolucion) }}
-                                                                        </td>
-                                                                        <td>{{ obtenerNombreGrado( elem.grado) }}</td>
-                                                                        <td><a *ngIf="!validarSeguridad( elem )"
-                                                                                class="enlace" (click)="dwUrl( elem )"
-                                                                                target="_blank"
-                                                                                style="font-weight: bold; color: brown;">
-                                                                                {{elem.titulo}} </a> </td>
+                                                                                <div class="timeline-content w-100">
+                                                                                    <div class="row align-items-center">
+                                                                                        <div class="col-md-3 mb-1 mb-md-0">
+                                                                                            <div class="d-flex flex-column">
+                                                                                            <span class="text-muted text-xs font-weight-bold mb-1">
+                                                                                                <i class="ni ni-calendar-grid-58 mr-1"></i> {{ convertirFecha(elem.fecha_resolucion) || '---' }}
+                                                                                            </span>
+                                                                                                <span class="text-dark text-xs font-weight-bold">
+                                                                                                    <i class="fa fa-hashtag mr-1 text-muted"></i> {{ elem.numero || 'S/N' }}
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        </div>
 
-                                                                        <td>{{ obtenerOrdenMerito( elem ) }}</td>
-                                                                    </tr>
-                                                                </table>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>NOMBRE COMPLETO</th>
-                                                            <td [ngStyle]="{'background-color': color_acc}">
-                                                                <font [ngStyle]="{'color': color_texto}">
-                                                                    {{IDatosBasicos.nombres}}
-                                                                </font>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>COMPONENTES</th>
-                                                            <td>{{IDatosBasicos.componente}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>CATEGORIA</th>
-                                                            <td>{{IDatosBasicos.categoria}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>CLASIFICACION</th>
-                                                            <td>{{IDatosBasicos.clasificacion}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>SEXO</th>
-                                                            <td>{{ getSex(IDatosBasicos.sexo) | uppercase }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>SITUACION</th>
-                                                            <td>{{ getSituation(IDatosBasicos.situacion) | uppercase }}
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>FECHA DE PROMOCION</th>
-                                                            <td>{{ convertirFecha(IDatosBasicos.promocion) }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>ESPECIALIDAD</th>
-                                                            <td>{{IDatosBasicos.especialidad | uppercase}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>OBSERVACIONES</th>
-                                                            <td>{{IDatosBasicos.observaciones | uppercase}}</td>
-                                                        </tr>
-                                                        <tr >
-                                                          
-                                                        </tr>
-                                                    </tbody>
+                                                                                        <div class="col-md-4 mb-1 mb-md-0">
+                                                                                            <span class="d-block text-dark font-weight-bold text-sm text-uppercase" style="line-height: 1.2;">
+                                                                                                {{ obtenerNombreGrado(elem.grado) || 'NO APLICA' }}
+                                                                                            </span>
+                                                                                        </div>
 
-                                                </table>
+                                                                                        <div class="col-md-2 text-center mb-1 mb-md-0">
+                                                                                            <div class="d-inline-block">
+                                                                                                <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem;">Orden</small>
+                                                                                                <span class="font-weight-bold text-dark" style="font-size: 0.9rem;">{{ obtenerOrdenMerito(elem) || '-' }}</span>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                        <div class="col-md-3 text-right">
+                                                                                            <button *ngIf="!validarSeguridad(elem)" 
+                                                                                                    class="btn btn-sm btn-pastel text-white shadow-sm" 
+                                                                                                    (click)="dwUrl(elem)" 
+                                                                                                    style="border-radius: 20px; padding: 0.4rem 1rem;">
+                                                                                                <i class="fa fa-download mr-1"></i> Ver
+                                                                                        </button>
+                                                                                        
+                                                                                            <span *ngIf="validarSeguridad(elem)" 
+                                                                                                  class="badge badge-pill badge-warning text-white" style="padding: 0.5em 1em;">
+                                                                                                <i class="fa fa-lock mr-1"></i> Restringido
+                                                                                            </span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    
+                                                                                    <div *ngIf="!last" class="mt-3 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;"></div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                            
+                                                            </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
                                         <div class="row" *ngIf="dbDatosNombre">
                                             <div class="col-md-12">
 
-                                                <table style="width: 100%;" class="zigzag" border="1">
+                                                <table class="sandratbl">
                                                     <thead>
                                                         <tr>
                                                             <th colspan="7" class="text-center" style="padding: 15px;">
@@ -442,7 +529,7 @@
                                             <div class="col-md-12">
                                                 <br><br>
                                                 <h2> ENTRADAS</h2>
-                                                <table style="width: 100%;" class="zigzag" border="1">
+                                                <table class="sandratbl">
                                                     <thead>
 
                                                         <tr>
@@ -492,7 +579,7 @@
                                             <div class="col-md-12">
                                                 <br><br>
                                                 <h2> RESOLUCIONES</h2>
-                                                <table style="width: 100%;" class="zigzag" border="1">
+                                                <table class="sandratbl">
                                                     <thead>
                                                         <tr>
                                                             <th>#</th>
@@ -538,7 +625,7 @@
                                         <div class="row" *ngIf="dbResolucion">
 
                                             <div class="col-md-12">
-                                                <table style="width: 100%;" class="zigzag" border="1">
+                                                <table class="sandratbl">
                                                     <thead>
                                                         <tr>
                                                             <th colspan="8" class="text-center" style="padding: 15px;">
@@ -631,27 +718,31 @@
 
         <div class="form-row">
             <div class="form-group col-md-12">
-                <!-- <label for="txtObjeto">Instrucciones especiales</label>
-                <div class="NgxEditor__Wrapper">
-                    <angular-editor [placeholder]="'Instrucciones...'" [config]="editorConfigx"
-                        [(ngModel)]="instrucciones"></angular-editor>
-                </div> -->
-                <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
-                [(ngModel)]="instrucciones" placeholder="Instrucciones..."
-                style="width: 100%">{{instrucciones}}</textarea>
+                <label class="form-label-custom">Instrucciones especiales</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text icon-box">
+                            <mat-icon class="input-icon">assignment</mat-icon>
+                        </span>
+                    </div>
+                    <textarea class="input-custom" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="instrucciones" placeholder="Instrucciones..."></textarea>
+                </div>
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group col-md-12">
-                <!-- <label for="txtObjeto">Observaciones</label>
-                <div class="NgxEditor__Wrapper">
-                    <angular-editor [placeholder]="'Observaciones...'" [config]="editorConfigx"
-                        [(ngModel)]="observacion"></angular-editor>
-                </div> -->
-                <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="observacion" placeholder="Introduzca el texto para observacion..."
-                        style="width: 100%">{{observacion}}</textarea>
+                <label class="form-label-custom">Observaciones</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text icon-box">
+                            <mat-icon class="input-icon">comment</mat-icon>
+                        </span>
+                    </div>
+                    <textarea class="input-custom" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="observacion" placeholder="Observaciones..."></textarea>
+                </div>
             </div>
         </div>
 
@@ -677,21 +768,23 @@
 
         <div class="form-row">
             <div class="form-group col-md-12">
-                <!-- <label for="txtObjeto">Destino</label>
-                <div class="NgxEditor__Wrapper">
-                    <angular-editor [placeholder]="'Destino...'" [config]="editorConfigx"
-                        [(ngModel)]="destino"></angular-editor>
-                </div> -->
-                <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="destino" placeholder="Introduzca el texto para el destino..."
-                        style="width: 100%">{{destino}}</textarea>
+                <label class="form-label-custom">Destino</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text icon-box">
+                            <mat-icon class="input-icon">place</mat-icon>
+                        </span>
+                    </div>
+                    <textarea class="input-custom" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="destino" placeholder="Destino..."></textarea>
+                </div>
             </div>
         </div>
 
 
     </div>
     <div class="modal-footer">
-        <button class="btn bg-gradient-info text-white " (click)="c('Save')">
+        <button class="btn btn-pastel text-white " (click)="c('Save')">
             <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
 
     </div>

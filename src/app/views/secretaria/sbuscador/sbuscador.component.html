@@ -11,23 +11,14 @@
                 <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
-                        <div class="col-md-4">
-                            <h6 class="text-uppercase text-muted ls-1 mb-1">Secretaria</h6>
-                            <h2 class="mb-0">Buscador de Documentos</h2>
-                        </div>
-                        <div class="col-md-7">
-                            <!-- <div class="div-radio-avanzado">
-                                <mat-radio-group class="mat-radio" [(ngModel)]="opttodos" color="primary">
-                                    <mat-radio-button value="0"> TODAS </mat-radio-button>
-                                    <mat-radio-button value="1"> ENTRADA </mat-radio-button>
-                                    <mat-radio-button value="2"> SALIDA </mat-radio-button>
-                                </mat-radio-group>
-                            </div> -->
+                        <div class="col-md-11">
+                            <h6 class="text-uppercase ls-1 mb-1" style="color: #5eaaa8; font-weight: 600;">Secretaria</h6>
+                            <h2 class="mb-0" style="color: #5eaaa8;">Buscador de Documentos</h2>
                         </div>
                         <div class="col-md-1">
                             <div class="media align-items-center">
                                 <div class="example-button-row">
-                                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                                    <button mat-icon-button title="Volver Atrás" [routerLink]="['/secretaria']"  >
                                         <mat-icon>arrow_back</mat-icon>
                                     </button>
                                 </div>
@@ -37,62 +28,73 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 div-interno-superior">
-                            <div class="div-interno">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>CONTENIDO GENERAL</mat-label>
-                                    <input matInput placeholder="CONTENIDO" [ngModelOptions]="{ standalone: true }"
-                                        [(ngModel)]="contenidoDocumento" (keypress)="consultarDocument($event)" />
-                                </mat-form-field>
+                    <div class="row align-items-end">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label-custom text-muted small font-weight-bold">CONTENIDO GENERAL</label>
+                                <div class="input-group shadow-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">search</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" placeholder="Contenido" [ngModelOptions]="{ standalone: true }"
+                                    [(ngModel)]="contenidoDocumento" (keypress)="consultarDocument($event)">
+                            </div>
                             </div>
                         </div>
 
-                        <div class="col-md-2 seleccionar">
-                            <div class="div-interno">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>TIPO DE NUMERO</mat-label>
-                                    <mat-select [(ngModel)]="tipoDocumento">
-                                        <mat-option value="0" selected>SELECCIONE</mat-option>
-                                        <mat-option value="1">PUNTO DE CUENTA</mat-option>
-                                        <mat-option value="2">NRO. CONTROL</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label-custom text-muted small font-weight-bold">TIPO DE DOCUMENTO</label>
+                                <div class="input-group shadow-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">filter_list</mat-icon></span>
+                                </div>
+                                <select class="input-custom" [(ngModel)]="tipoDocumento" [ngModelOptions]="{ standalone: true }">
+                                    <option value="0" selected>SELECCIONE</option>
+                                    <option value="1">PUNTO DE CUENTA</option>
+                                    <option value="2">NRO. CONTROL</option>
+                                </select>
                             </div>
-                        </div> 
-
-                        <div class="col-md-2 div-interno-superior">
-                            <div class="div-interno">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>NÚMERO</mat-label>
-                                    <input matInput placeholder="NÚMERO" [ngModelOptions]="{ standalone: true }"
-                                        [(ngModel)]="buscar" value="{{ buscar }}"
-                                        (keypress)="consultarDocument($event);" />
-                                </mat-form-field>
                             </div>
                         </div>
 
-                        <div class="col-md-2 seleccionar">
-                            <select style ="height: 50px; margin-top:10px" class="form-control" [ngModelOptions]="{standalone: true}"
-                                [(ngModel)]="SubDocumento.estatus">
-                                <option value="0">SELECCIONE</option>
-                                <option *ngFor="let e of xlstAcciones" value="{{e.valor}}">{{e.texto}}</option>
-                            </select>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="form-label-custom text-muted small font-weight-bold">NÚMERO</label>
+                                <div class="input-group shadow-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">tag</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" placeholder="Número" [ngModelOptions]="{ standalone: true }"
+                                    [(ngModel)]="buscar" (keypress)="consultarDocument($event)">
+                            </div>
+                            </div>
                         </div>
 
-                        <div class="col-md-1">
-                            <button mat-raised-button color="primary" id="registrar" class="boton-buscar"
-                                (click)="buscarDocumento()">
-                                Buscar
-                            </button>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="form-label-custom text-muted small font-weight-bold">ESTATUS</label>
+                                <div class="input-group shadow-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">toggle_on</mat-icon></span>
+                                </div>
+                                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.estatus">
+                                    <option value="0">SELECCIONE</option>
+                                    <option *ngFor="let e of xlstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+                                </select>
+                            </div>
+                            </div>
                         </div>
 
-                        <div class="col-md-1">
-                            <button mat-icon-button (click)="open(busqueda_avanzada)" class="busquedas-avanzadas"
-                                aria-label="">
-                                <!-- <mat-icon>arrow_back</mat-icon> -->
-                                <mat-icon>more_vert</mat-icon>
-                            </button>
+                        <div class="col-md-2">
+                            <div class="form-group d-flex">
+                                <button class="btn btn-pastel text-white btn-block shadow-sm" (click)="buscarDocumento()" style="height: 45px;">
+                                    <i class="fa fa-search mr-2"></i> Buscar
+                                </button>
+                                <button mat-icon-button class="ml-1 text-muted" (click)="open(busqueda_avanzada)" matTooltip="Búsqueda Avanzada">
+                                    <mat-icon>tune</mat-icon>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -103,16 +105,14 @@
                         <div class="row" *ngIf="cargador">
                             <div class="card-body">
                                 <div class="col-md-12">
-                                    <table style="width: 100%;" class="zigzag" border="1">
-                                        <thead>
-
+                                    <table class="sandratbl">
+                                        <thead style="height: 40px;">
                                             <tr>
                                                 <th >#</th>
                                                 <th >UNIDAD O DEPENDENCIA </th>
                                                 <th>N. DE CUENTA</th>
                                                 <th>AÑO</th>
                                                 <th>ASUNTO</th>
-                                                <!-- <th>ESTATUS</th> -->
                                                 <th>DECISIÓN DEL MPPD</th>
                                                 <th>HISTORIAL</th>
                                                 <th>OBSERVACIONES</th>
@@ -147,8 +147,8 @@
     </div>
 
     <ng-template #busqueda_avanzada class="ng-template-avanzado" #adjuntar let-c="close" let-d="dismiss">
-        <div class="modal-header">
-            <h2 class="modal-title">Busqueda Avanzada</h2>
+        <div class="modal-header bg-pastel-gradient">
+            <h4 class="modal-title" id="modal-basic-title">Búsqueda Avanzada</h4>
         </div>
         <div class="modal-body">
             <div class="container">
@@ -203,105 +203,102 @@
                 </div>
 
                 <div class="form-row col-md-12">
-                    <mat-hint class="col-md-2"><span class="categoria span-class">Tipo de Documento</span></mat-hint>
-
-                    <div class="col-md-3">
-                        <mat-form-field appearance="outline">
-                            <mat-label>Clasificacion</mat-label>
-                            <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.tipo"
-                                value="{{Doc.tipo}}" id="tdoc">
-                                <mat-option value="0">SELECCIONE</mat-option>
-                                <mat-option value="presidenciales">PRESIDENCIALES</mat-option>
-                                <mat-option value="punto-de-cuenta">PUNTO DE CUENTA</mat-option>
-                                <mat-option value="acuse-de-recibo">ACUSE DE RECIBO</mat-option>
-                                <mat-option value="oficio">OFICIO</mat-option>
-                                <mat-option value="tramitaciones-por-organo-regular">TRAMITACIONES POR ÓRGANO
-                                    REGULAR</mat-option> </mat-select>
-                        </mat-form-field>
+                    <div class="form-group col-md-4">
+                        <label class="form-label-custom">Clasificación</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text icon-box"><mat-icon class="input-icon">description</mat-icon></span>
+                            </div>
+                            <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.tipo" id="tdoc">
+                                <option value="0">SELECCIONE</option>
+                                <option value="presidenciales">PRESIDENCIALES</option>
+                                <option value="punto-de-cuenta">PUNTO DE CUENTA</option>
+                                <option value="acuse-de-recibo">ACUSE DE RECIBO</option>
+                                <option value="oficio">OFICIO</option>
+                                <option value="tramitaciones-por-organo-regular">TRAMITACIONES POR ÓRGANO REGULAR</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <mat-form-field appearance="outline">
-                            <mat-label>Decision del Ministro</mat-label>
-                            <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.decision">
-                                <mat-option value="0" selected>SELECCIONE</mat-option>
-                                <mat-option value="APROBADO">APROBADO</mat-option>
-                                <mat-option value="NEGADO">NEGADO</mat-option>
-                                <mat-option value="VISTO">VISTO</mat-option>
-                                <mat-option value="DIFERIDO">DIFERIDO</mat-option>
-                                <mat-option value="OTRO">OTRO</mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                    <div class="form-group col-md-4">
+                        <label class="form-label-custom">Decisión del Ministro</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text icon-box"><mat-icon class="input-icon">gavel</mat-icon></span>
+                            </div>
+                            <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.decision">
+                                <option value="0" selected>SELECCIONE</option>
+                                <option value="APROBADO">APROBADO</option>
+                                <option value="NEGADO">NEGADO</option>
+                                <option value="VISTO">VISTO</option>
+                                <option value="DIFERIDO">DIFERIDO</option>
+                                <option value="OTRO">OTRO</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <mat-form-field appearance="outline">
-                            <mat-label>Remitente</mat-label>
-                            <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.remitente"
-                                value="{{Doc.remitente}}" id="remi">
-                                <mat-option value="0">SELECCIONE</mat-option>
-                                <mat-option *ngFor="let x of lstR" value="{{x.nomb}}">{{ x.nomb }}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                    <div class="form-group col-md-4">
+                        <label class="form-label-custom">Remitente</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text icon-box"><mat-icon class="input-icon">person</mat-icon></span>
+                            </div>
+                            <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.remitente" id="remi">
+                                <option value="0">SELECCIONE</option>
+                                <option *ngFor="let x of lstR" value="{{x.nomb}}">{{ x.nomb }}</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
                 <div *ngIf="mostrarCampos">
-                    <div class="form-row col-md-12">
-                        <mat-hint class="col-md-2"><span class="categoria span-class">Por Unidades</span></mat-hint>
-
-                        <div class="col-md-5">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Comando / Gran Comando</mat-label>
-                                <mat-select [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.comando"
-                                    value="{{Doc.comando}}" id="coma">
-                                    <mat-option value="0">SELECCIONE</mat-option>
-                                    <mat-option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label class="form-label-custom">Comando / Gran Comando</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">security</mat-icon></span>
+                                </div>
+                                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.comando" id="coma">
+                                    <option value="0">SELECCIONE</option>
+                                    <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="col-md-5">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Unidad o Dependencia</mat-label>
-                                <mat-select class="col-md-12" [ngModelOptions]="{standalone: true}"
-                                    [(ngModel)]="Doc.unidad" value="{{Doc.unidad}}" id="unid">
-                                    <mat-option value="0">SELECCIONE</mat-option>
-                                    <mat-option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                        <div class="form-group col-md-6">
+                            <label class="form-label-custom">Unidad o Dependencia</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">account_balance</mat-icon></span>
+                                </div>
+                                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="Doc.unidad" id="unid">
+                                    <option value="0">SELECCIONE</option>
+                                    <option *ngFor="let x of lstU" value="{{x.nomb}}">{{ x.nomb }} </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label class="form-label-custom">Acción Tomada</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">rule</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" placeholder="Acción Tomada" [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.accion">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label class="form-label-custom">Asunto</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text icon-box"><mat-icon class="input-icon">subject</mat-icon></span>
+                                </div>
+                                <input type="text" class="input-custom" placeholder="Asunto" [ngModelOptions]="{ standalone: true }" id="nori" [(ngModel)]="asunto" (focus)="focus = true" (blur)="focus = false">
+                            </div>
                         </div>
                     </div>
-
-                    <div class="form-row col-md-12">
-                        <mat-hint class="col-md-2"><span class="categoria span-class">Por Descripcion</span></mat-hint>
-                        <div class="col-md-5">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Accion Tomada</mat-label>
-                                <input matInput [ngModelOptions]="{standalone: true}" [(ngModel)]="SubDocumento.accion"
-                                    placeholder="Accion Tomada">
-                            </mat-form-field>
-                        </div>
-
-                        <div class="col-md-5">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Asunto</mat-label>
-                                <input matInput placeholder="Asunto" type="txtOrigen"
-                                    [ngModelOptions]="{ standalone: true }" id="nori" [(ngModel)]="asunto"
-                                    value="{{buscar`}}" (focus)="focus = true" (blur)="focus = false">
-                            </mat-form-field>
-                        </div>
-                    </div>
-                    <!-- 
-                    <mat-hint style="text-align: end;
-                    width: 100%; 
-                    display: block;">
-                        <span (click)="verMasCampos()" *ngIf="mostrarCampos" class="ver">Ver menos campos <i
-                                class="fa fa-caret-up"></i></span>
-                    </mat-hint> -->
-
-
-
                 </div>
 
                 <div class="col-md-12">
@@ -318,18 +315,13 @@
             </div>
         </div>
 
-        <div class="modal-footer" align="end">
-
-            <button mat-raised-button color="primary" id="registrar" class="butom-search"
-                (click)="buscarYCerrarModal()">
-                Buscar &nbsp;
-                <i class="fa fa-search" aria-hidden="true"></i>
+        <div class="modal-footer">
+            <button class="btn btn-pastel text-white" (click)="buscarYCerrarModal()">
+                <i class="fa fa-search mr-2"></i> Buscar
             </button>
-
-            <button mat-raised-button color="warn" aria-label="Close" (click)="close()" class="butom-close">
-                Cancelar
+            <button class="btn btn-pastel-cancel text-white" (click)="close()">
+                <i class="fa fa-times mr-2"></i> Cancelar
             </button>
-
         </div>
     </ng-template>
     

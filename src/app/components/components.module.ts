@@ -6,6 +6,7 @@ import { FooterComponent } from './footer/footer.component';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -13,7 +14,9 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     CommonModule,
     RouterModule,
     NgbModule,
-    MatSidenavModule
+    MatSidenavModule,
+    FormsModule,           // 2. Agregar aquí
+    ReactiveFormsModule    // 3. Muy importante para el changePasswordForm
   ],
   declarations: [
     FooterComponent,
