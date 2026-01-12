@@ -93,6 +93,7 @@ import { environment } from '../environments/environment';
 import { SnuevoComponent } from './views/secretaria/snuevo/snuevo.component';
 import { AdministracionpublicaComponent } from './views/resoluciones/nomina/administracionpublica/administracionpublica.component';
 import { CodigosrojoComponent } from './views/resoluciones/codigosrojo/codigosrojo.component';
+import { ErrorModalComponent } from './components/error-modal/error-modal.component';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -240,7 +241,8 @@ const ngWizardConfig: NgWizardConfig = {
     ChatbotComponent,
     SnuevoComponent,
     AdministracionpublicaComponent,
-    CodigosrojoComponent
+    CodigosrojoComponent,
+    ErrorModalComponent,
   ],
   providers: [
     {

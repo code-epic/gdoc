@@ -42,7 +42,7 @@ export class ChatbotComponent implements OnInit, OnDestroy {
   // Propiedades para enviar mensajes directos a IDs de cliente (si aún las usas)
   msjx: string = '';
   idx: string = '';
-
+  private userName: string = '';
 
   constructor(
     private utilService: UtilService,
@@ -50,7 +50,9 @@ export class ChatbotComponent implements OnInit, OnDestroy {
     private apiService: ApiService) { }
 
   ngOnInit(): void {
-    this.userId = this.utilService.uuidv4();
+    this.userId = localStorage.getItem('userId') || '';
+    this.userName = ''
+
     this.loadHistory(); // Carga el historial al iniciar
     // 1. Suscribirse a los mensajes del sessionService
     this.wsMessagesSubscription = this.sessionService.messages$.subscribe(
@@ -109,7 +111,7 @@ export class ChatbotComponent implements OnInit, OnDestroy {
     });
 
     // 3. Conectar al sessionService al iniciar el componente
-    this.sessionService.connect(this.userId);
+    this.sessionService.connect(this.userId, this.userName);
 
     this.obtenerSesiones();
     

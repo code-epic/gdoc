@@ -12,7 +12,7 @@
         <div class="card-header bg-transparent">
           <div class="row align-items-center">
             <div class="col-md-9">
-              <h6 class="text-uppercase ls-1 mb-1" style="color: #5eaaa8; font-weight: 600;">Ministerial / {{ numControl
+              <h6 class="text-uppercase ls-1 mb-1" style="color: #5eaaa8; font-weight: 600;">{{ lblTitulo }} / {{ numControl
                 }}</h6>
               <h2 class="mb-0" style="color: #5eaaa8;">Punto de Cuenta</h2>
             </div>
@@ -38,7 +38,7 @@
             <div class="col-md-1">
               <div class="media align-items-center">
                 <div class="example-button-row">
-                  <button mat-icon-button title="Volver Atrás" [routerLink]="['/sministerial/ministeriales']">
+                  <button mat-icon-button title="Volver Atrás" [routerLink]="[lblBackUrl]">
                     <mat-icon>arrow_back</mat-icon>
                   </button>
                 </div>

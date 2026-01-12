@@ -161,6 +161,8 @@ export class MinisterialComponent implements OnInit {
   public fechaElaboracion = ''
   public fechaOrigen = ''
   public numc = ''
+  public lblTitulo = 'MINISTERIAL'
+  public lblBackUrl = '/sministerial/ministeriales'
 
 
   @ViewChild('templateBottomSheet') TemplateBottomSheet: TemplateRef<any>;
@@ -212,11 +214,17 @@ export class MinisterialComponent implements OnInit {
 
         this.listarEstados()
         this.listarDatos()
-        // console.log(this.doc.remi)
+        
+
         if (this.doc.remi == 'VICEPRESIDENCIAL') {
           this.lblDecision = 'Decision del Vicepresidente'
+          this.lblBackUrl = '/spresidencial'
+          this.lblTitulo = 'VICEPRESIDENCIAL'
+
         }else if (this.doc.remi == 'PRESIDENCIAL') {
           this.lblDecision = 'Decision del Presidente'
+          this.lblBackUrl = '/spresidencial'
+          this.lblTitulo = 'PRESIDENCIAL'
         }
 
       } catch (error) {
@@ -324,9 +332,10 @@ export class MinisterialComponent implements OnInit {
         if (data.Cuerpo != undefined && data.Cuerpo.length > 0) {
           this.SubDocumento = data.Cuerpo[0];
           this.original = btoa(JSON.stringify(data.Cuerpo[0]))
-          this.blUpdate = true
+
+          this.blUpdate = this.SubDocumento.historico == ''? false : true
+          this.dwSub = this.SubDocumento.nombre_archivo != "" ? true : false
         }
-        this.dwSub = this.SubDocumento.nombre_archivo != "" ? true : false
       },
       (error) => { }
     )

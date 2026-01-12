@@ -10,6 +10,7 @@ import { UtilService } from 'src/app/services/util/util.service';
 import { Sha256Service } from 'src/app/services/util/sha256';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from 'src/environments/environment';
+import { WsSandraService } from 'src/app/services/seguridad/ws-sandra.service';
 
 
 
@@ -79,6 +80,7 @@ export class NavbarComponent implements OnInit {
     private utilservice: UtilService,
     private modalService: NgbModal,
     private sha256: Sha256Service,
+    private ws: WsSandraService,
     private router: Router ) {
     this.location = location;
   }

@@ -1,382 +1,89 @@
-
-.calendario {
-  width: 2.75rem;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAcCAYAAAAEN20fAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEUSURBVEiJ7ZQxToVAEIY/YCHGxN6XGOIpnpaEsBSeQC9ArZbm9TZ6ADyBNzAhQGGl8Riv4BLAWAgmkpBYkH1b8FWT2WK/zJ8ZJ4qiI6XUI3ANnGKWBnht2/ZBDRK3hgVGNsCd7/ui+JkEIrKtqurLpEWaphd933+IyI3LEIdpCYCiKD6HcuOa/nwOa0ScJEnk0BJg0UTUWJRl6RxCYEzEmomsIlPU3IPW+grIAbquy+q6fluy/28RIBeRMwDXdXMgXLj/B2uimRXpui4D9sBeRLKl+1N+L+t6RwbWrZliTTTr1oxYtzVWiTQAcRxvTX+eJMnlUDaO1vpZRO5NS0x48sIwfPc87xg4B04MCzQi8hIEwe4bl1DnFMCN2zsAAAAASUVORK5CYII=)!important;
-  background-repeat: no-repeat;
-  background-size: 23px;
-  background-position: center;
-  border-color: #bbbfc5 !important;
-}
-
-.iconElimi{
-  color:#a00c1f !important;
-  font-size: 22px !important;
-  cursor: pointer;
-}
-
-.iconEdit{
-  color:#5e72e4 !important;
-  font-size: 22px !important;
-  cursor: pointer;
-  padding-right: 6%;
-}
-
-
+/* 1. Estilos Base */
 .body {
   margin-top: 20px;
-  background: #FAFAFA;
+  background: #f8f9fe; // Un gris más azulado (estilo Argon)
 }
 
-.order-card {
-  color: #fff;
-}
-
-.bg-c-blue {
-  background: linear-gradient(45deg, #4099ff, #73b4ff);
-}
-
-.bg-c-green {
-  background: linear-gradient(45deg, #2ed8b6, #59e0c5);
-}
-
-.bg-c-yellow {
-  background: linear-gradient(45deg, #FFB64D, #ffcb80);
-}
-
-.bg-c-pink {
-  background: linear-gradient(45deg, #FF5370, #ff869a);
-}
-
-.cardround {
-
-  border-radius: 50%;
-  padding: 15px;
-
-
-}
-
+/* 2. Tarjetas y Sombras */
 .card {
-  border-radius: 7px;
-  -webkit-box-shadow: 0 1px 2.94px 0.06px rgba(4, 26, 55, 0.16);
-  box-shadow: 0 1px 2.94px 0.06px rgba(4, 26, 55, 0.16);
-  border: none;
+  border-radius: 1rem; // Bordes más redondeados y suaves
+  border: 0;
+  box-shadow: 0 0 2rem 0 rgba(136, 152, 170, .15); // Sombra más difusa y profesional
   margin-bottom: 30px;
-  -webkit-transition: all 0.3s ease-in-out;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+  }
 }
 
-.card .card-block {
-  padding: 25px;
-}
-
-.order-card i {
-  font-size: 50px;
-}
-
-.f-left {
-  float: left;
-}
-
-.f-right {
-  float: right;
-} 
-
-.botones {
-  border: 1px solid #f2f2f2;
-}
-
-.botones:hover {
-  background-color: #fcf7f7;
-}
-
-.botones > p {
-  font-size: 12px;
-  color: #434141;
-}
-
-input{
+/* 3. Inputs Globales */
+input, select, textarea {
   text-transform: uppercase;
-}
-select{
-  text-transform: uppercase;
-}
-textarea {
-  text-transform: uppercase;
-}
-
-.example-section {
-  margin: 12px 0;
+  // Añade un borde más suave para seguir el patrón sutil
+  border: 1px solid #dee2e6;
+  &:focus {
+    border-color: #adb5bd;
+  }
 }
 
-.example-margin {
-  margin: 0 12px;
-}
-
-ul {
-  list-style-type: none;
-  margin-top: 4px;
-}
-
-.texto-lista{
-  margin-top: 13px; 
-  font-weight: bold;
-}
-
-
-.example-headers-align .mat-expansion-panel-header-title,
-.example-headers-align .mat-expansion-panel-header-description {
-flex-basis: 0;
-}
-
-.example-headers-align .mat-expansion-panel-header-description {
-justify-content: space-between;
-align-items: center;
-}
-
-.example-headers-align .mat-form-field + .mat-form-field {
-margin-left: 8px;
-}
-
-
+/* 4. Enlaces e Historial (Timeline Sutil) */
 .enlace {
   font-size: 14px;
-  padding-top: 10px;
-  border-bottom: 1px solid #f2f2f2;
-  padding-bottom: 5px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f6f9fc;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background-color: #f8f9fe;
+    cursor: pointer;
+  }
+
+  div > p {
+    color: #32325d;
+    font-weight: 600;
+    
+    small {
+      font-weight: 400;
+      color: #8898aa;
+    }
+  }
 }
 
-.enlace > div  {
-  margin-top: 13px; 
+/* 5. Componentes de Angular Material */
+::ng-deep .mat-form-field {
+  width: 100%;
 }
 
-.enlace > div > a {
-  font-weight: bold;
-}
-
-.contenido > p {
-  font-size: 11px;
-}
-
-
-.enlace:hover {
-  background-color: #f6fefe;
-}
-
-.enlace > div > p {
-  color: #2a0b5b;
-}
-
-
-
-.enlace > div > p > small {
-  font-weight: normal;
-  color: #978484;
-}
-
-.calendario {
-  width: 2.75rem;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAcCAYAAAAEN20fAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEUSURBVEiJ7ZQxToVAEIY/YCHGxN6XGOIpnpaEsBSeQC9ArZbm9TZ6ADyBNzAhQGGl8Riv4BLAWAgmkpBYkH1b8FWT2WK/zJ8ZJ4qiI6XUI3ANnGKWBnht2/ZBDRK3hgVGNsCd7/ui+JkEIrKtqurLpEWaphd933+IyI3LEIdpCYCiKD6HcuOa/nwOa0ScJEnk0BJg0UTUWJRl6RxCYEzEmomsIlPU3IPW+grIAbquy+q6fluy/28RIBeRMwDXdXMgXLj/B2uimRXpui4D9sBeRLKl+1N+L+t6RwbWrZliTTTr1oxYtzVWiTQAcRxvTX+eJMnlUDaO1vpZRO5NS0x48sIwfPc87xg4B04MCzQi8hIEwe4bl1DnFMCN2zsAAAAASUVORK5CYII=)!important;
-  background-repeat: no-repeat;
-  background-size: 23px;
-  background-position: center;
-  border-color: #bbbfc5 !important;
-}
-.example-additional-selection {
-  opacity: 0.75;
-  font-size: 0.75em;
-}
-
-
-#codeEditor, #lineCounter {
-  font-family: lucida console, courier new, courier, monospace;
-  margin: 0;
-  padding: 10px 0;
-  height: 75vh;
-  border-radius: 0;
-  resize: none;
-  font-size: 16px;
-  line-height: 1.2;
-  outline: none;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-}
-#lineCounter:focus-visible,
-#codeEditor:focus-visible {
-  outline:none;
-} 
-#lineCounter {
+.mat-radio {
   display: flex;
-  border-color: transparent;
-  overflow-y: hidden;
-  text-align: right;
-  box-shadow: none;
-  color: #707070;
-  background-color: #d8d8d8;
-  position: absolute;
-  width: 3.5rem;
-  background-color: #ffffdd;
-  /* border-color: #3E3D32; */
-  color: #928869;
-  border: 0.0625rem solid #c0c2c3;
-  border-right: none;
-  border-radius: 4px 0px 0px 5px;
-}
-
-#codeEditor {
-  padding-left: calc(3.5rem + 5px);
-  width: 100%;
-  background-color: #ffffdd;
-  border-color: #272822;
-  color: #080808;
-  border-left: none !important;
-  border: 0.0625rem solid #c0c2c3;
-  border-radius: 0px 8px 9px 0px;
-
-}
-
-input{
-  text-transform: uppercase;
-}
-select{
-  text-transform: uppercase;
-}
-textarea {
-  text-transform: uppercase;
-}
-
-.seleccion{
-  display: flex;
-  z-index: 1;
-}
-.custom-dialog-container {
-  overflow: hidden;
-}
-
-mat-form-field  {
-  width: 100%;
-}
-
-.boton-buscar {
-  width: 100%;
-  color: white;
-  height: 50px;
-}
-
-.div-interno{
-  padding-top: 4px;
-}
-
-.div-interno-superior{
-  margin-right: 10px;
-}
-
-.formulario{
-  margin-left: 5px;
-}
-
-.seleccionar{
-  margin-right: 40px;
-}
-
-.boton-buscar-principal{
-  width: 100%; 
-  padding-top: 9px;
-}
-
-.nabvar{
-  padding: 0 25px 0 0;
-}
-
-.dropdown-item{
-  cursor: pointer;
-}
-
-.logo-buscar{
-  padding-right: 10px;
-}
-
-.texto-detalle-pdf{
-  color: rgb(0, 0, 0);
-  font-size: 12px;
-  font-weight: normal;
-}
-
-.imagen-pdf{
-  width: 12px; 
-  margin-top: -3px;
-}
-
-.contenedor-documento{
-  margin-top: -4px;
-}
-
-.fecha-documento{
-  margin-top: -10px;
-}
-
-.boton-avanzado{
-  margin-bottom: 0px; 
-  padding-bottom: 0px;
-}
-
-.modal-avanzado{
-  padding: 0 24px;
-}
-
-.fechas-avanzado{
-  display: inline-block;
-  text-align: center;
-  padding-top: 4px;
-  width: 100%;
-}
-
-.div-radio-avanzado{
-  display: inline-block;
-  text-align: center;
-  padding-top: 22px;
-  color: gray;
-  width: 100%;
-}
-
-.mat-radio{
-  display: flex;
-  justify-content: start;
+  justify-content: flex-start; // CORRECCIÓN DEL WARNING
   gap: 40px;
   padding-left: 3px;
 }
 
-.div-contenido-oficio{
-  margin-bottom: 5px; 
-  padding-right: 5px;
+/* 6. Botones Pastel (Personalizados) */
+.btn-pastel {
+  background-color: #5e72e4;
+  color: #fff;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  
+  &:hover {
+    background-color: #324cdd;
+  }
 }
 
-.div-instrucciones-general{
-  margin-bottom: 5px; 
-  padding-left: 7px;
+
+.texto-detalle-pdf{
+  color: #6d6969;
+  font-size: 15px;
+  font-weight: normal;
 }
 
-.boton-mostrar-mas-avanzado{
-  text-align: end;
-  width: 100%;
-  display: block;
-  cursor: pointer;
-  padding-right: 0;
-  padding-bottom: 20px;
-}
-
-.div-modal-footer{
-  text-align: end;
-  padding-right: 0;
-}
-.boton-buscar-avanzado{
-  width: 150px;
-}
-.boton-cancelar-avanzado{
-margin-left: 5px; 
-width: 100px;
-}
-
-.template-avanzado{
- z-index: 2;
+.imagen-pdf{
+  width: 15px; 
+  margin-top: -3px;
 }

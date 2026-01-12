@@ -78,6 +78,14 @@ export class SessionService implements OnDestroy {
     return this.http.post<string[]>(this.apiUrl, data);
   }
 
+  private getDomain(): string {
+    let hostname = window.location.hostname;
+    if (hostname.startsWith('gdoc.')) {
+      hostname = hostname.replace('gdoc.', '');
+    }
+    return hostname;
+  }
+
   public connect(userId: string, userName: string): void {
     if (sessionStorage.getItem('token') !== undefined) {
       const helper = new JwtHelperService();
@@ -95,8 +103,8 @@ export class SessionService implements OnDestroy {
       this.connectionStatusSubject.next(this.reconnectAttempts === 0 ? ConnectionStatus.CONNECTING : ConnectionStatus.RECONNECTING);
 
       // Tu URL WebSocket, ahora con el userId en la query
-      //const serverUrl = `wss://code-epic.com:8443/sandra_ws?userId=${this.userId}`;
-      const serverUrl = `wss://localhost:8443/sandra_ws?userId=${this.userId}&userName=${this.userName}`;
+      const domain = this.getDomain();
+      const serverUrl = `wss://${domain}:8443/sandra_ws?userId=${this.userId}&userName=${this.userName}`;
 
       // console.log(`WebSocketService: Intentando conectar a ${serverUrl} (Intento ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
 
