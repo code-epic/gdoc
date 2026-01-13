@@ -418,5 +418,21 @@ export class ApiService {
   }
 
 
+  /**
+   * @param tipo png | base64
+   * @returns QR
+   */
+  MakeQR(objeto): Observable<any> {
+    var httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: "Bearer " + this.httpOptions,
+      }),
+    };
+    var url = this.URL + "makeqr"
+    
+    return this.http.post<any>(url, objeto, httpOptions);
+  }
+
+
 
 }

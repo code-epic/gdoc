@@ -27,6 +27,7 @@ export class ConstanciaComponent implements OnInit {
   public estadoOrigen = 1
   public bCuentas: boolean = false
   public nexpediente: string = ''
+  public fecha: Date = new Date();
 
   public Doc: IDocumento = {
     ncontrol: '',
@@ -82,6 +83,8 @@ export class ConstanciaComponent implements OnInit {
   public sNombre: string = 'NOMBRES Y APELLIDOS'
   public sAccion: string = 'ACCION TOMADA'
   public btraza: boolean = false
+  public totpQrCodeUrl : string = ''
+
 
   constructor(
     private apiService: ApiService,
@@ -119,7 +122,6 @@ export class ConstanciaComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       data => {
-        console.log(data)
         data.Cuerpo.forEach(async e => {
           this.Doc = e
           this.Doc.contenido = this.Doc.contenido.toUpperCase()
@@ -189,6 +191,8 @@ export class ConstanciaComponent implements OnInit {
             this.lstTraza.sort((a, b) => b.id - a.id)
           }
 
+          this.getQR(this.Doc.ncontrol)
+
           this.ngxService.stopLoader("loader-aceptar")
         });
       },
@@ -236,5 +240,23 @@ export class ConstanciaComponent implements OnInit {
   }
 
 
+  getQR(id: string) {
+    let obj = {
+      "id": id,
+      "ruta": "string",
+      "tipo": "base64"
+    }
+    this.apiService.MakeQR(obj).subscribe(
+      data => {
+        if(data.contenido != '' ){
+          this.totpQrCodeUrl = data.contenido
+        }
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
+
+  }
 
 }

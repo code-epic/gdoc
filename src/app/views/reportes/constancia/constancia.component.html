@@ -1,4 +1,4 @@
-<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+<div class="header bg-pastel-gradient pb-8 pt-5 pt-md-8">
     <div class="container-fluid">
         <p></p>
     </div>
@@ -182,7 +182,9 @@
                                 <tr>
                                     <th>UBICACIÓN ACTUAL EXPEDIENTE: </th>
                                     <td>{{ nexpediente }}</td>
-                                    <td rowspan="3"></td>
+                                    <td rowspan="4">
+                                        <img [src]="totpQrCodeUrl" alt="Código QR" class="img-fluid">
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>CREADO POR</th>
@@ -190,7 +192,11 @@
                                 </tr>
                                 <tr>
                                     <th>FECHA DE CREACIÓN</th>
-                                    <td>{{Doc.fcreacion}}</td>
+                                    <td>{{Doc.fcreacion | date : "dd/MM/yyyy hh:mm:ss" }}</td>
+                                </tr>
+                                 <tr>
+                                    <th>FECHA DE IMPRESION</th>
+                                    <td>{{ fecha | date:"dd/MM/yyyy hh:mm:ss a" }}</td>
                                 </tr>
                             </tbody>
                         </table>
