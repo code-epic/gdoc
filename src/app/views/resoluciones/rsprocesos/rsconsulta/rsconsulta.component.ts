@@ -383,8 +383,9 @@ export class RsconsultaComponent implements OnInit {
       });
     }
 
-    console.log(this.blDatosBasicos)
+  
 
+    
 
     const datos = this.rsconsultaSessionService.cargarDatosDesdeSession(environment);
     this.Componentes = datos.Componentes;
@@ -401,7 +402,6 @@ export class RsconsultaComponent implements OnInit {
 
     this.tipodocumento = "0"
 
-    // console.log(this.Estados)
 
     const today = new Date();
     const month = today.getMonth();
@@ -431,9 +431,19 @@ export class RsconsultaComponent implements OnInit {
       this.consultarCedula(undefined);
     });
 
-    // console.log(this.loginService.Usuario);
-    this.bEliminarEntrada =
-      this.loginService.Usuario.cargo == "Transcriptor Premium" ? true : false;
+    console.log(this.loginService.Usuario);
+    console.log(this.loginService.Usuario.cargo )
+
+    if(this.loginService.Usuario.cargo == "Transcriptor Premium"){
+        this.bEliminarEntrada = true 
+    }
+
+    if(this.loginService.Usuario.cargo == "Confidencial"){
+        this.bEliminarEntrada = true 
+        this.blConfidencial = true
+    }
+    
+  
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
       var id = this.rutaActiva.snapshot.params.id
@@ -446,6 +456,8 @@ export class RsconsultaComponent implements OnInit {
       }
       this.msj.contenido$.emit(alertas)
     }
+
+    
 
     this.cdr.detectChanges();
   }
@@ -1454,6 +1466,11 @@ export class RsconsultaComponent implements OnInit {
         console.error("Error de conexion a los datos ", error);
       }
     );
+  }
+
+
+  detalleFoto(content, e) {
+    this.modalService.open(content, { windowClass: 'modal-custom', keyboard: true, centered: true });
   }
 
   detalle(content, e) {

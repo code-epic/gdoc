@@ -26,44 +26,57 @@
           </div>
         </div>
         <div class="card-body">
-          <div class="row">
-            <div class="form-group col-md-3">
-              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="areas"
-                value="{{areas}}" style="height: 50px;margin-top: 5px;">
-                <option value="0">TODAS LAS AREAS</option>
-                <option *ngFor="let e of lstAreas;" [value]="e.id">{{e.nomb | uppercase}}
-                </option>
-              </select>
+          <div class="form-row align-items-end">
+            <div class="form-group col-md-4">
+              <label class="form-label-custom">Áreas</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">business</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="areas">
+                  <option value="0">TODAS LAS AREAS</option>
+                  <option *ngFor="let e of lstAreas;" [value]="e.id">{{e.nomb | uppercase}}</option>
+                </select>
+              </div>
             </div>
             <div class="form-group col-md-4">
-              <select style="height: 50px;margin-top: 5px;" 
-              class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="estatus"
-                value="{{estatus}}">
-                <option value="0">SELECCIONAR ESTATUS</option>
-                <option *ngFor="let e of lstEstatus;" [value]="e.id">{{e.id}}
-                </option>
-              </select>
+              <label class="form-label-custom">Estatus</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">rule</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="estatus">
+                  <option value="0">SELECCIONAR ESTATUS</option>
+                  <option *ngFor="let e of lstEstatus;" [value]="e.id">{{e.id}}</option>
+                </select>
+              </div>
             </div>
 
-            <div class="form-group col-md-3">
-              <button class="btn bg-primary text-white "  style="height: 50px;margin-top: 5px;" (click)="Filtrar()">
-                <span class="fa fa-search"></span>&nbsp;&nbsp;Consultar </button>
+            <div class="form-group col-md-4">
+              <button class="btn btn-pastel text-white w-100" (click)="Filtrar()">
+                <span class="d-flex align-items-center justify-content-center">
+                  <mat-icon class="mr-1" style="font-size: 18px; width: 18px; height: 18px;">search</mat-icon> Consultar
+                </span>
+              </button>
             </div>
           </div>
 
-          <div class="row" #pdfTable>
+          <div class="row">
             <div class="col-md-12">
-              <table style="width: 100%;" class="zigzag" border="1">
-                <thead>
-                  <tr style="height: 40px;">
-                    <th style="width: 30px;"> Nº </th>
-                    <th> N&Uacute;MERO</th>
-                    <th> CREACI&Oacute;N</th>
-                    <!-- <th> TIPO DOCUMENTO </th> -->
-                    <th> CONTENDIO </th>
-                    <th> UBICACIÓN </th>
-                    <th> PLAZO </th>
-                    <th> DIAS </th>
+              <table class="sandratbl" style="width: 100%; table-layout: fixed;">
+                <thead style="height: 40px;">
+                  <tr>
+                    <th style="width: 5%;">Nº </th>
+                    <th style="width: 15%;">N&Uacute;MERO</th>
+                    <th style="width: 10%;">CREACI&Oacute;N</th>
+                    <th style="width: 40%;">CONTENDIO </th>
+                    <th style="width: 15%;">UBICACIÓN </th>
+                    <th style="width: 10%;">PLAZO </th>
+                    <th style="width: 5%;">DIAS </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -71,8 +84,7 @@
                     <td>{{ i+1 }}</td>
                     <td>{{ e.numero }}</td>
                     <td>{{ e.creacion | date:"dd/MM/yyyy" }}</td>
-                    <!-- <td>{{ e.tipo | uppercase }}</td> -->
-                    <td [innerHTML]="e.contenido"></td>
+                    <td [innerHTML]="e.contenido" style="word-wrap: break-word;"></td>
                     <td>{{ e.estado_nombre | uppercase }}</td>
                     <td>{{ e.alerta | date:"dd/MM/yyyy" }}</td>
                     <td>{{ e.cant }}</td>
@@ -81,6 +93,7 @@
               </table>
             </div>
           </div>
+
         </div>
       </div>
     </div>

@@ -227,7 +227,7 @@
                                                             <div class="col-lg-3 bg-secondary p-4 border-right d-flex flex-column align-items-center">
                                                                 
                                                                 <!-- Photo with elegant frame and maximize action -->
-                                                                <div class="position-relative mb-3" style="cursor: pointer;" (click)="detalle(fotoModal, IDatosBasicos)">
+                                                                <div class="position-relative mb-3" style="cursor: pointer;" (click)="detalleFoto(fotoModal, IDatosBasicos)">
                                                                     <div class="shadow-lg p-1 bg-white rounded">
                                                                         <img [src]="obtenerFoto(IDatosBasicos.cedula)" class="rounded" 
                                                                              style="width: 100%; max-width: 220px; height: auto; object-fit: cover;" 
@@ -539,19 +539,25 @@
                                                         <tr *ngFor="let e of lstResoluciones; index as i">
                                                             <td valign="center"><b>{{ i + 1 }}</b></td>
                                                             <td>{{ convertirFecha(e.fecha) }}</td>
-                                                            <td><a *ngIf="!validarSeguridad(e)" class="enlace"
+                                                            <td>
+                                                                <a *ngIf="!validarSeguridad(e)" class="enlace"
                                                                     (click)="dwUrl(e)" target="_blank"
                                                                     style="font-weight: bold; color: brown;">
-                                                                    {{e.titulo}} </a> </td>
+                                                                    {{e.titulo}} 
+                                                                </a> 
+                                                                <b *ngIf="validarSeguridad(e)" class="enlace"
+                                                                    href="#" style="font-weight: bold; color: brown;">
+                                                                    {{e.titulo}} 
+                                                                </b> 
+
+                                                            </td>
                                                             <td>
                                                                
                                                                 {{ obtenerTipo(e.tipo) }}
                                                                
                                                             </td>
                                                             <td colspan="2" *ngIf="validarSeguridad(e)" style="color:brown;">
-
-                                                                <b>DEBE CONSULTAR CON EL DEPARTAMENTO DE
-                                                                    RESOLUCIONES</b>
+                                                                DEBE CONSULTAR CON EL DEPARTAMENTO DE RESOLUCIONES
                                                             </td>
                                                             <td *ngIf="e.cod_pais!=66 && !validarSeguridad(e)" colspan="2" 
                                                                 [innerHTML]="e.asunto | uppercase">
@@ -564,9 +570,9 @@
                                                                 </button>
                                                             </td> 
                                                             <td *ngIf="e.cod_pais==66 && !validarSeguridad(e)" 
-                                                            [innerHTML]="e.asunto | uppercase">
+                                                                [innerHTML]="e.asunto | uppercase">
 
-                                                        </td>
+                                                            </td>
                                                             <td>
                                                                 <button mat-icon-button aria-label="Detalle"
                                                                     (click)="detalle( detalles, e)">
@@ -575,9 +581,12 @@
                                                                 </button>
                                                             </td>
                                                             <td style="text-align: center;">
-                                                                <button mat-icon-button aria-label="Editar"
+                                                                <button  *ngIf="!validarSeguridad(e)" mat-icon-button aria-label="Editar"
                                                                     (click)="editar( e )">
                                                                     <mat-icon>edit_note</mat-icon>
+                                                                </button>
+                                                                <button  *ngIf="validarSeguridad(e)" mat-icon-button aria-label="Editar">
+                                                                    <mat-icon>info</mat-icon>
                                                                 </button>
                                                             </td>
                                                         </tr>

@@ -438,6 +438,7 @@ export class RscdatosbasicosComponent implements OnInit {
     }
     this.ngxService.startLoader('loader-basico');
 
+    this.xAPI = {} as IAPICore
     this.DBasico.fecha = this.DBasico.fecha != "" ? this.DBasico.fecha : "1900-01-01";
     this.xAPI.funcion = this.dbActivar ? "MPPD_UDatosBasicos" : "MPPD_IDatosBasicos";
     this.xAPI.parametros = '';

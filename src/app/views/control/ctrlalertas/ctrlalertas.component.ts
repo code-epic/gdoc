@@ -57,7 +57,12 @@ export class CtrlalertasComponent implements OnInit {
     this.xAPI.parametros = '5'
     this.apiService.Ejecutar(this.xAPI).subscribe( 
      async data => {
-        this.lstDocumentos = data.Cuerpo
+        this.lstDocumentos = data.Cuerpo.map(e => {
+          if (e.contenido) {
+            e.contenido = e.contenido.replace(/src=["']file:\/\/\/[^"']*["']/gi, '');
+          }
+          return e;
+        })
         this.lstDocumentosAux = this.lstDocumentos
         
         this.ngxService.stopLoader("loader-estatus");
