@@ -16,7 +16,7 @@
         <div class="d-flex align-items-center px-3 py-2 rounded shadow-sm"
           style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.1);">
           <i class="fa fa-calendar-day text-white mr-2"></i>
-          <span class="text-white font-weight-bold small mr-3">{{ fecha | date:'dd MMM yyyy' }}</span>
+          <span class="text-white font-weight-bold small mr-3">{{ fecha | date:'ddMMMyy':'':'es' | uppercase }}</span>
           <div style="width: 1px; height: 15px; background: rgba(255,255,255,0.4); margin-right: 12px;"></div>
           <i class="fa fa-clock text-white mr-2"></i>
           <span class="text-white font-weight-bold small" style="min-width: 65px;">{{ fecha | date:'h:mm:ss a' }}</span>

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from "@angular/core";
+import { ChangeDetectorRef, Component, Input, OnInit, ViewChild } from "@angular/core";
 import { RsconsultaSessionService } from 'src/app/services/resoluciones/rsconsulta-session.service';
 import { environment } from 'src/environments/environment';
 import { MatSnackBar } from "@angular/material/snack-bar";
@@ -21,17 +21,13 @@ import { UtilService } from "src/app/services/util/util.service";
 import {
   FormGroup,
   FormControl,
-  FormBuilder,
-  FormControlName,
-  Validators,
 } from "@angular/forms";
 import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
-import { MatDialog } from "@angular/material/dialog";
-import Swal from "sweetalert2";
 import { ActivatedRoute, Router } from "@angular/router";
 import { MensajeService } from "src/app/services/util/mensaje.service";
 import { ExcelService } from "src/app/services/util/excel.service";
+import Swal from "sweetalert2";
 import * as moment from 'moment';
 
 interface ITipoResolucion {
@@ -203,7 +199,6 @@ export class RsconsultaComponent implements OnInit {
   public archivos = [];
   public lstCausa = []; //Objeto Comando
   public lstMotivo = []; //Objeto Comando
-  public lstDetalle = []; //Objeto Comando
   public lstRangoCedula = [];
   public lstRangoCedulaFile = [];
   public lstAscenso = [];
@@ -250,7 +245,6 @@ export class RsconsultaComponent implements OnInit {
   public blCategoria: boolean = false;
   public blComponente: boolean = false;
   public blAceptar: boolean = false;
-  public blAlert: boolean = false;
   public blFiltro: boolean = true;
   public blExpandida: boolean = true;
   public blEditor: boolean = false;
@@ -258,7 +252,6 @@ export class RsconsultaComponent implements OnInit {
   public tiponomina: string = "0";
 
   public busqueda: string = "0";
-  public campos: string = "0";
   public dwCedula: string = "";
   public rango_cedula = "";
 
@@ -272,8 +265,6 @@ export class RsconsultaComponent implements OnInit {
 
   public color_acc: string = "transparent";
   public color_texto: string = "black";
-  public icono_dist: string = "public";
-  public instruccion: string = "";
   public observacion: string = "";
   public autor_creador: string = "";
   public fecha_registro: string = "";
@@ -315,14 +306,31 @@ export class RsconsultaComponent implements OnInit {
   tipo_entrada = "";
   asunto_entrada = "";
   observacion_entrada = "";
-  opttodos = "0";
 
-  public bEliminarEntrada: boolean = false;
+  // 1. Definimos las variables con sus valores por defecto
+  public bEliminarEntrada = false;
+  public bEspecifica = false;
+  public bFiltrada = false;
+  public bExpandida = false;
+  public bArchivo = false;
+  public bConfiguraciones = false;
+  public opttodos = "0"
+
+  public mapMetodos: { [key: string]: string } = {
+    'especifica': 'bEspecifica',
+    'filtrada': 'bFiltrada',
+    'expandida': 'bExpandida',
+    'buscararchivo': 'bArchivo',
+    'configuraciones': 'bConfiguraciones',
+    'eliminar': 'bEliminarEntrada' // Asegúrate de que el nombre coincida con el JSON del backend
+  };
+
+
+
+  public privilegios: any
 
   documentoSeleccionado: any;
-  public lstMeses = []
-  public lstYear = []
-  public xyear = '2024'
+  public xyear = '2026'
   public xmeses = ''
   public xdia = ''
   public blAlertas: boolean = false;
@@ -335,13 +343,13 @@ export class RsconsultaComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     private toastrService: ToastrService,
     private modalService: NgbModal,
-    public dialog: MatDialog,
     private rutaActiva: ActivatedRoute,
-    public formatter: NgbDateParserFormatter,
+    private formatter: NgbDateParserFormatter,
     private _snackBar: MatSnackBar,
     private msj: MensajeService,
     private router: Router,
     private excelService: ExcelService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.Estados =
       sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR) != undefined
@@ -354,17 +362,25 @@ export class RsconsultaComponent implements OnInit {
 
 
   ngOnInit(): void {
-
     this.xmeses = new Date().getMonth().toString()
     this.xyear = new Date().getFullYear().toString()
     this.xdia = new Date().getDate().toString()
 
-    if (this.loginService.Usuario.token != undefined) {
-      let tk = this.loginService.Usuario.token;
-      this.blConfidencial =
-        tk == "Confidencial" || tk == "Administrador" ? true : false;
+    this.resetPrivilegios();
+    this.privilegios = this.loginService.obtenerPrivilegiosMenu("/resoluciones", this.router.url);
+
+    if (this.privilegios && Array.isArray(this.privilegios)) {
+      this.privilegios.forEach(p => {
+        if (p.metodo) {
+          const variableName = this.mapMetodos[p.metodo.toLowerCase().trim()]; // Trim para limpiar espacios
+          if (variableName) {
+            (this as any)[variableName] = true;
+          }
+        }
+      });
     }
-    // Usar el servicio para cargar los datos desde sessionStorage
+
+
     const datos = this.rsconsultaSessionService.cargarDatosDesdeSession(environment);
     this.Componentes = datos.Componentes;
     this.Grados = datos.Grados;
@@ -386,8 +402,6 @@ export class RsconsultaComponent implements OnInit {
     const month = today.getMonth();
     const year = today.getFullYear();
 
-    this.opttodos = "0";
-
     this.fechaRango = new FormGroup({
       start: new FormControl({ year: year, month: month + 1, day: 13 }),
       end: new FormControl({ year: year, month: month + 1, day: 16 }),
@@ -405,7 +419,6 @@ export class RsconsultaComponent implements OnInit {
       this.blEspecifico = true;
       this.cedula = e;
       this.dbTools = true;
-      this.opttodos = "0";
 
       this.valEdit = false;
       this.valEditEntrada = false;
@@ -428,6 +441,18 @@ export class RsconsultaComponent implements OnInit {
       }
       this.msj.contenido$.emit(alertas)
     }
+
+    this.cdr.detectChanges();
+  }
+
+
+  private resetPrivilegios() {
+    this.bEspecifica = false;
+    this.bFiltrada = false;
+    this.bExpandida = false;
+    this.bArchivo = false;
+    this.bConfiguraciones = false;
+    this.bEliminarEntrada = false;
   }
 
 
@@ -994,6 +1019,7 @@ export class RsconsultaComponent implements OnInit {
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
           this.lstNombres = data.Cuerpo;
+          console.log(data.Cuerpo)
           this.cantNombre = data.Cuerpo.length;
           this.ngxService.stopLoader("loader-buscar");
           if (data.Cuerpo.length > 0) {
@@ -1407,7 +1433,6 @@ export class RsconsultaComponent implements OnInit {
     this.xAPI.funcion = environment.funcion.RESUELTO_ID;
     this.xAPI.parametros = id.toString();
     this.xAPI.valores = "";
-    this.instruccion = "";
     this.observacion = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(

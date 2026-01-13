@@ -64,8 +64,8 @@ export class ControlComponent implements OnInit {
 
   async ngOnInit() {
     
-    this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
-    let prv = this.loginService.obtenerPrivilegiosMenu(this.ruta.url)
+    
+    let prv = this.loginService.obtenerPrivilegiosMenu("/control", this.ruta.url)
     if (prv != undefined && prv.Privilegios != undefined) {
       prv.Privilegios.forEach(e => {
         if (e.nombre == "configurar") this.Configurar = true

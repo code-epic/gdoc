@@ -148,12 +148,7 @@ export class VisitantedocumentoComponent implements OnInit {
     }
     await this.loginService.Iniciar();
     this.SubMenu = await this.loginService.obtenerSubMenu("/control");
-    let prv = this.loginService.obtenerPrivilegiosMenu("/control");
-    if (prv != undefined && prv.Privilegios != undefined) {
-      prv.Privilegios.forEach((e) => {
-        if (e.nombre == "configurar") this.Configurar = true;
-      });
-    }
+    
   }
 
   iniciarFormulario() {

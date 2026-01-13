@@ -13,6 +13,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from 'src/environments/environment';
 import { WsSandraService } from 'src/app/services/seguridad/ws-sandra.service';
 import { DOCUMENT } from '@angular/common';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+registerLocaleData(localeEs);
 
 
 interface Change {

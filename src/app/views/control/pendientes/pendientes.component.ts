@@ -9,6 +9,7 @@ import { LoginService } from "src/app/services/seguridad/login.service";
 import { UtilService } from "src/app/services/util/util.service";
 import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from "@angular/forms";
 import { PendientesService } from "src/app/core/service/control/pendientes.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-pendientes",
@@ -130,7 +131,8 @@ export class PendientesComponent implements OnInit {
     private ngxService: NgxUiLoaderService,
     public formatter: NgbDateParserFormatter, 
     public pendienteSrv : PendientesService,
-    private fb:FormBuilder
+    private fb:FormBuilder,
+    private ruta: Router
   ) {
 
     this.lstAcciones = this.pendienteSrv.getAction();
@@ -146,7 +148,7 @@ export class PendientesComponent implements OnInit {
   async ngOnInit() {
 
     this.SubMenu = await this.loginService.obtenerSubMenu("/control");
-    let prv = this.loginService.obtenerPrivilegiosMenu("/control");
+    let prv = this.loginService.obtenerPrivilegiosMenu("/control", this.ruta.url);
     if (prv != undefined && prv.Privilegios != undefined) {
       prv.Privilegios.forEach((e) => {
         if (e.nombre == "configurar") this.Configurar = true;

@@ -99,12 +99,6 @@ export class LoginService {
     return this.http.post<any>( url, user );
   }
 
-  // logout() {
-  //   this.router.navigate(['login']);
-  //   sessionStorage.removeItem('token');
-  //   sessionStorage.removeItem('id');
-  // }
-
   public getUserDecrypt(token : string ): any {
     const helper = new JwtHelperService();
     const decodedToken = helper.decodeToken(token);
@@ -119,16 +113,24 @@ export class LoginService {
     return JSON.parse(sessionStorage.getItem('menu'))
   }
 
-  obtenerPrivilegiosMenu(idUrl: string): any {
-    let Menu: any;
-    this.obtenerMenu().forEach(e => {if (e.url == idUrl) { Menu = e; }});
-    return Menu;
-
+  obtenerPrivilegiosMenu(menu : string, subMenu: string): any {
+    let Prv: any;
+    let lst = this.obtenerSubMenu(menu)
+    lst.forEach(e => {
+      if (e.url === subMenu && e.url != '') { 
+        if(e.Privilegios.length>0) Prv = e.Privilegios
+      }
+    });
+    return Prv;
   }
 
-  obtenerSubMenu(idUrl: string): any {
+  obtenerSubMenu(menu: string): any {
     let SubMenu = [];
-    this.obtenerMenu().forEach(e => {if (e.url == idUrl) { SubMenu = e.SubMenu; }});
+    this.obtenerMenu().forEach(e => {
+      if (e.url == menu) { 
+        SubMenu = e.SubMenu; 
+      }
+    })
    
     return SubMenu;
   }

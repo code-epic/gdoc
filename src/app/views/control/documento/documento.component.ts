@@ -282,7 +282,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.limpiarDoc()
     }
     this.SubMenu = await this.loginService.obtenerSubMenu("/control")
-    let prv = this.loginService.obtenerPrivilegiosMenu("/control")
+    let prv = this.loginService.obtenerPrivilegiosMenu("/control", this.ruta.url)
     if (prv != undefined && prv.Privilegios != undefined) {
       prv.Privilegios.forEach(e => {
         if (e.nombre == "configurar") this.Configurar = true

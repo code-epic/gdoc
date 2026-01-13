@@ -243,8 +243,6 @@ export class SnuevoComponent implements OnInit {
 
 
     this.SubMenu = await this.loginService.obtenerSubMenu("/secretaria")
-    let prv = this.loginService.obtenerPrivilegiosMenu("/secretaria")
-    console.log(prv)
 
 
     // Usar el servicio para cargar los datos desde sessionStorage

@@ -19,7 +19,7 @@
               <div class="col-md-1">
                 <div class="media align-items-center">
                   <div class="example-button-row">
-                    <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                    <button mat-icon-button title="Volver Atrás" [routerLink]="['/resoluciones']" >
                       <mat-icon>arrow_back</mat-icon>
                     </button>
                   </div>
@@ -49,33 +49,33 @@
             <ngx-ui-loader [loaderId]="'lbuscar'"></ngx-ui-loader>
             <div  *ngIf="!bmenu"  class="d-flex justify-content-end mb-3 gap-2">
 
-                <button class="btn  bg-primary text-white" (click)="exportExcel()">
+                <button class="btn btn-pastel text-white" (click)="exportExcel()">
                 <i class="fas fa-file-excel mr-1"></i> Exportar Excel
                 </button>
-                <button class="btn  bg-warning text-white" (click)="volver()">
+                <button class="btn btn-pastel-cancel text-white" (click)="volver()">
                     <i class="fas fa-arrow-left mr-1"></i> Mostrar Menu
                 </button>
             </div>
             <div *ngIf="!bmenu" class="row">
-                <div class="col-md-12 text-center col-lg-12">
+                <div class="col-md-12 col-lg-12">
 
-                    <table id="tbl-ejercitos" class="tbl-ejercitos table-container" border="1" style="width: 100%;">
-                        <thead>
-                            <tr class="header-principal">
-                                <th class="celda-grado">#</th>
-                                <th class="bloque ejercito">GRADO</th>
-                                <th class="bloque guardia">COMP.</th>
-                                <th class="celda-total">CEDULA</th>
-                                <th class="celda-total" style="width: 300px;">NOMBRES Y APELLIDO</th>
-                                <th class="celda-total">MOTIVO</th>
+                    <table class="sandratbl">
+                        <thead style="height: 40px;">
+                            <tr >
+                                <th>#</th>
+                                <th>GRADO</th>
+                                <th>COMP.</th>
+                                <th>CEDULA</th>
+                                <th style="width: 300px;">NOMBRES Y APELLIDO</th>
+                                <th>MOTIVO</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let e of lstCodigosRojos; index as i">
-                            <td  style="font-weight: bold;">{{ i+1 }}</td>
-                            <td style="font-weight: bold;">{{e.gnombre}}</td>
-                            <td style="font-weight: bold;">{{e.cnombre}}</td>
-                            <td  style="font-weight: bold;">{{e.cedula}}</td>
+                            <td style="font-weight: bold;">{{ i+1 }}</td>
+                            <td>{{e.gnombre}}</td>
+                            <td>{{e.cnombre}}</td>
+                            <td >{{e.cedula}}</td>
                             <td>{{e.nombres_apellidos | uppercase}}</td>
                             <td >{{ limpiarHtml(e.motivo | uppercase)}}</td>
                             </tr>
