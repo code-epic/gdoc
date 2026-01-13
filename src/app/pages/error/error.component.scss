@@ -1,0 +1,53 @@
+
+
+.drop { filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.7)); }
+
+.btn-whatsapp {
+position: fixed;
+z-index: -1;
+bottom: 20px;
+right: 740px;
+top: 100px;
+}
+
+.btn-whatsapp:before,
+.btn-whatsapp:after {
+content: "";
+position: absolute;
+top: 10px;
+left: 10px;
+width: 180px;
+height: 180px;
+border-radius: 50%;
+background-color: #eda409;
+opacity: 0;
+animation: onda 1s infinite;
+}
+
+.btn-whatsapp:before {
+animation-delay: 0.2s;
+}
+
+.btn-whatsapp:after {
+animation-delay: 0.5s;
+}
+
+.btn-whatsapp img {
+position: relative;
+z-index: 2;
+}
+
+@keyframes onda {
+0% {
+    transform: scale(1);
+}
+
+15%{
+    opacity: 1;
+}
+
+100% {
+    opacity: 0;
+    transform: scale(2.5);
+}
+}

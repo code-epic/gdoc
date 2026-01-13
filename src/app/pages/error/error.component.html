@@ -1,0 +1,81 @@
+
+
+<div class="misc-wrapper d-flex justify-content-center align-items-center">
+  <!-- Animación de fondo -->
+  <div class="background-shapes">
+    <div class="shape shape1"></div>
+    <div class="shape shape2"></div>
+    <div class="shape shape3"></div>
+  </div>
+
+  <!-- Movimos el contenido hacia arriba con justify-content-start y padding -->
+  <div class="misc-inner d-flex flex-column col-lg-12 align-items-center justify-content-center p-4">
+    <div class="w-100 text-center card shadow border-0 bg-secondary p-5" style="max-width: 600px;">
+      <!-- Imagen SVG Animada -->
+      <div class="animated-lock-container mb-4">
+        <i class="fas fa-lock" style="color: #5eaaa8; font-size: 5rem;"></i>
+      </div>
+
+      <h1 class="mb-2 font-weight-bolder text-default">Acceso Restringido</h1>
+      <p class="mb-4 text-muted">
+        No tienes permiso para ver esta página. <br />
+        Serás redirigido automáticamente en <span class="countdown-timer">{{ countdown }}</span> segundos.
+      </p>
+
+      <a class="btn btn-pastel btn-lg mb-2 text-white" (click)="goBack()" rippleEffect>
+        <span>Regresar a la página anterior</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Estilos para la animación y el diseño -->
+<style>
+  .misc-wrapper {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+  }
+  .background-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+  .shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(94, 170, 168, 0.15); /* Color pastel suave */
+    animation: float 20s infinite linear;
+  }
+  .shape1 { width: 200px; height: 200px; top: 5%; left: 10%; animation-duration: 25s; }
+  .shape2 { width: 120px; height: 120px; top: 65%; left: 80%; animation-duration: 18s; }
+  .shape3 { width: 80px; height: 80px; top: 80%; left: 5%; animation-duration: 22s; }
+
+  @keyframes float {
+    0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+    50% { transform: translateY(-30px) translateX(20px) rotate(180deg); }
+    100% { transform: translateY(0px) translateX(0px) rotate(360deg); }
+  }
+
+  .misc-inner {
+    z-index: 1;
+  }
+
+  .animated-lock-container {
+    animation: float-lock 6s ease-in-out infinite;
+  }
+
+  @keyframes float-lock {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  .countdown-timer {
+    font-weight: bold;
+    color: #5eaaa8; /* Coincide con el color del candado */
+    font-size: 1.1em;
+  }
+</style>

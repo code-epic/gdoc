@@ -15,8 +15,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     RouterModule,
     NgbModule,
     MatSidenavModule,
-    FormsModule,           // 2. Agregar aquí
-    ReactiveFormsModule    // 3. Muy importante para el changePasswordForm
+    FormsModule,
+    ReactiveFormsModule 
   ],
   declarations: [
     FooterComponent,

@@ -217,14 +217,14 @@ export class LoginService {
             throw new Error("La respuesta del perfil de usuario no es válida o está vacía.");
           }
 
-
+          console.log('Imprimiendo')
           sessionStorage.setItem("menu", JSON.stringify(data[0].Aplicacion[0].Rol.Menu));
           let texto = Md5.init(JSON.stringify(data[0].Aplicacion[0].Rol.Menu));
 
           this.utils.uuidv4();
 
           sessionStorage.setItem("crypt", texto);
-          this.router.navigate(["dashboard"]).then(() => {
+          this.router.navigate(["/dashboard"]).then(() => {
             window.location.reload();
           });
         } catch (e) {

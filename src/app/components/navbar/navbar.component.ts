@@ -260,13 +260,12 @@ export class NavbarComponent implements OnInit {
 
     this.apiService.Ejecutar(xApi).subscribe(
       (data) => {
-        // console.log(data.ModifiedCount)
+        this.clearModal();
         if (data.ModifiedCount > 0) {
           this.utilservice.AlertMini("top-end", "success", "Contraseña actualizada exitosamente", 3000);
-          window.sessionStorage.clear();
-          this.router.navigate(['/login']);
+          this.cerrar()
         }
-        this.clearModal();
+        
       },
       (error) => {
         // console.log(error)
