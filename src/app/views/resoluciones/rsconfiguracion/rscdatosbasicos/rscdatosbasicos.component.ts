@@ -228,7 +228,7 @@ export class RscdatosbasicosComponent implements OnInit {
   buscarCedula() {
     let cedula = this.DBasico.cedula
     this.dbActivar = false
-    this.ngxService.startLoader("loader-aceptar")
+    this.ngxService.startLoader("loader-basico")
     this.xAPI.funcion = !this.GENERAL ? "MPPD_CDatosBasicos" : "MPPD_CCedulaGenerales"
     this.xAPI.parametros = cedula
     this.xAPI.valores = ""
@@ -264,11 +264,11 @@ export class RscdatosbasicosComponent implements OnInit {
           this.toastrService.info("No se encontraron resultados", "GDoc: Buscar cédula")
         }
 
-        this.ngxService.stopLoader("loader-aceptar")
+        this.ngxService.stopLoader("loader-basico")
       },
       (error) => {
         console.error("Error de conexion a los datos ", error)
-        this.ngxService.stopLoader("loader-aceptar")
+        this.ngxService.stopLoader("loader-basico")
       }
     )
   }
@@ -337,7 +337,7 @@ export class RscdatosbasicosComponent implements OnInit {
       return
     }
 
-    this.ngxService.startLoader("loader-aceptar")
+    this.ngxService.startLoader("loader-basico")
     this.xAPI.funcion = "IPSFA_CMilitarMPPD"
     this.xAPI.parametros = this.DBasico.cedula
     this.xAPI.valores = ""
@@ -389,11 +389,11 @@ export class RscdatosbasicosComponent implements OnInit {
         // this.ipsfa_otros_estudios = ''
 
         this.modalService.open(content);
-        this.ngxService.stopLoader("loader-aceptar");
+        this.ngxService.stopLoader("loader-basico");
       },
       (error) => {
         console.error("Error de conexion a los datos ", error);
-        this.ngxService.stopLoader("loader-aceptar");
+        this.ngxService.stopLoader("loader-basico");
       }
     );
   }
@@ -436,7 +436,7 @@ export class RscdatosbasicosComponent implements OnInit {
       );
       return;
     }
-    this.ngxService.startLoader('loader-aceptar');
+    this.ngxService.startLoader('loader-basico');
 
     this.DBasico.fecha = this.DBasico.fecha != "" ? this.DBasico.fecha : "1900-01-01";
     this.xAPI.funcion = this.dbActivar ? "MPPD_UDatosBasicos" : "MPPD_IDatosBasicos";
@@ -450,13 +450,13 @@ export class RscdatosbasicosComponent implements OnInit {
           "Los datos han sido actualizados exitosamente ",
           `MPPD.DatosBasicos`
         );
-        this.ngxService.stopLoader('loader-aceptar');
+        this.ngxService.stopLoader('loader-basico');
         this.dbActivar = false;
         if (this.EDITOR != '') { this.controlActivo(cedula); }
       },
       (error) => {
         this.toastrService.error(error, `MPPD_DatosBasicos -> Aceptar`);
-        this.ngxService.stopLoader("loader-aceptar");
+        this.ngxService.stopLoader("loader-basico");
       }
     );
   }
@@ -515,13 +515,13 @@ export class RscdatosbasicosComponent implements OnInit {
           "Los datos han sido actualizados exitosamente ",
           `MPPD.DatosBasicos`
         );
-        this.ngxService.stopLoader('loader-aceptar');
+        this.ngxService.stopLoader('loader-basico');
 
 
       },
       (error) => {
         this.toastrService.error(error, `MPPD_DatosBasicos -> Aceptar`);
-        this.ngxService.stopLoader("loader-aceptar");
+        this.ngxService.stopLoader("loader-basico");
       }
     );
   }

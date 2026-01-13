@@ -213,8 +213,7 @@ export class RsconsultaComponent implements OnInit {
   public dbResolucionFil: boolean = false;
   public dbResolucionTipo: boolean = false;
   public dbDatosNombre: boolean = false;
-  public blConfidencial: boolean = false;
-  public blDatosBasicos: boolean = false;
+ 
   public valEdit: boolean = false;
   public valEditEntrada: boolean = false;
   public valEditResolucion: boolean = false;
@@ -314,6 +313,9 @@ export class RsconsultaComponent implements OnInit {
   public bExpandida = false;
   public bArchivo = false;
   public bConfiguraciones = false;
+  public blConfidencial: boolean = false;
+  public blDatosBasicos: boolean = false;
+
   public opttodos = "0"
 
   public mapMetodos: { [key: string]: string } = {
@@ -321,8 +323,9 @@ export class RsconsultaComponent implements OnInit {
     'filtrada': 'bFiltrada',
     'expandida': 'bExpandida',
     'buscararchivo': 'bArchivo',
-    'configuraciones': 'bConfiguraciones',
-    'eliminar': 'bEliminarEntrada' // Asegúrate de que el nombre coincida con el JSON del backend
+    'configuraciones': 'blDatosBasicos',
+    'eliminar': 'bEliminarEntrada', // Asegúrate de que el nombre coincida con el JSON del backend
+    'datosbasicos': 'blDatosBasicos'
   };
 
 
@@ -379,6 +382,8 @@ export class RsconsultaComponent implements OnInit {
         }
       });
     }
+
+    console.log(this.blDatosBasicos)
 
 
     const datos = this.rsconsultaSessionService.cargarDatosDesdeSession(environment);
@@ -575,7 +580,6 @@ export class RsconsultaComponent implements OnInit {
       this.dbResolucion = false;
       this.dbDatosNombre = false;
       this.blResolucionPanel = false;
-      this.blDatosBasicos = false;
       this.lstEntradas = [];
       this.lstAscenso = []
       this.lstResoluciones = [];
@@ -626,8 +630,6 @@ export class RsconsultaComponent implements OnInit {
             this.IDatosBasicos = data.Cuerpo[0];
             this.dbDatos = true;
             this.dbDatosNombre = false;
-
-            this.blDatosBasicos = this.blConfidencial;
 
             this.seleccionColor();
           }
@@ -729,7 +731,6 @@ export class RsconsultaComponent implements OnInit {
       this.dbResolucion = false;
       this.dbDatosNombre = false;
       this.blResolucionPanel = false;
-      this.blDatosBasicos = false;
 
       if (this.IResolucion.numero == "") return false;
       this.ngxService.startLoader("loader-buscar");
@@ -770,7 +771,6 @@ export class RsconsultaComponent implements OnInit {
     this.dbResolucion = false;
     this.dbDatosNombre = false;
     this.blResolucionPanel = false;
-    this.blDatosBasicos = false;
 
     this.ngxService.startLoader("loader-buscar");
 

@@ -193,38 +193,30 @@
 
                                         </div>
 
-                                        <div class="row" style="padding-top: 5px; background-color: #fff;">
-                                            <div class="col-md-10">
-                                                <h2 *ngIf="blDatosBasicos" style="margin-top: 10px; margin-left: -3px">
-                                                    DATOS BASICOS</h2>
+                                        <div class="row align-items-center py-2 bg-white" *ngIf="dbDatos">
+                                            <div class="col-md-9">
+                                                <h2 *ngIf="blDatosBasicos" class="title-elegant mb-0">Datos Básicos</h2>
                                             </div>
-                                            <div class="col-md-2">
-
-                                                <div *ngIf="blResolucionPanel"
-                                                    class="example-button-row text-right text-white">
-                                                    <button style="background-color: #f6f2f1;" mat-icon-button
+                                            <div class="col-md-3">
+                                                <div class="d-flex justify-content-end">
+                                                    <button *ngIf="blResolucionPanel" mat-icon-button class="ml-2 shadow-sm btn-pastel text-white"
                                                         title="Volver Atrás" (click)="volverResolucion()">
                                                         <mat-icon>open_in_browser</mat-icon>
                                                     </button>
-                                                </div>
-                                                <div *ngIf="blDatosBasicos"
-                                                    class="example-button-row text-right text-white">
-                                                    <button style="background-color: #f6f2f1;" mat-icon-button
+                                                    
+                                                    <button *ngIf="blDatosBasicos" mat-icon-button class="ml-2 shadow-sm btn-pastel text-white"
                                                         title="Editar datos Basicos" (click)="editarDatosBasicos()">
                                                         <mat-icon>manage_accounts</mat-icon>
                                                     </button>
-                                                </div>
 
-                                                <div *ngIf="blAlertas"
-                                                    class="example-button-row text-right text-white">
-                                                    <button style="background-color: #f6f2f1;" mat-icon-button
+                                                    <button *ngIf="blAlertas" mat-icon-button class="ml-2 shadow-sm btn-pastel text-white"
                                                         title="Ir a Alertas" (click)="irAlertas()">
                                                         <mat-icon>notifications</mat-icon>
                                                     </button>
                                                 </div>
-
                                             </div>
                                         </div>
+                                        
                                         <div class="row" *ngIf="dbDatos">
 
                                             <div class="col-md-12">
@@ -466,7 +458,7 @@
                                             </div>
                                         </div>
 
-
+                                        <br>
                                         <div class="row" *ngIf="dbDatos">
 
                                             <div class="col-md-12">
@@ -527,7 +519,7 @@
 
                                         </div>
 
-
+                                        <br>
                                         <div class="row" *ngIf="dbDatos">
                                             <div class="col-md-12">
                                                 <h2 class="title-elegant">Resoluciones</h2>
