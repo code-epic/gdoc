@@ -56,7 +56,7 @@ export class AuthGuardGuard implements CanActivate {
     const currentUrl = state.url;
 
     // 3. Definición de Lista Blanca (Hardcoded + Patrones dinámicos)
-    const staticWhitelist = ['/configuracion', '/ctrlalertas','datosbasicos', '/principal', '/dashboard', '/options/upgrade', '/error', '/constancia', '/documento', '/ministerial', '/notaentrega'];
+    const staticWhitelist = ['/mreportes', '/configuracion', '/graedicion', '/ctrlalertas','/datosbasicos', '/principal', '/dashboard', '/options/upgrade', '/error', '/constancia', '/documento', '/ministerial', '/notaentrega'];
     
     // Verificamos si la ruta actual coincide exactamente o empieza con un patrón permitido
     const isWhitelisted = staticWhitelist.some(path => currentUrl.startsWith(path));

@@ -502,7 +502,12 @@ export class DatosbasicosComponent implements OnInit {
     this.xAPI.valores = ''
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
+        // console.log(data)
+        if (data == null) return 
+        if (data.msj === '') {
+          this.toastrService.info('No se encontro la cédula activa','GDoc: Buscar cédula')
+          return
+        }
         let DB = data.Cuerpo[0]
         let nombre = DB.nombre1 + ' ' + DB.nombre2 + ' ' + DB.apellido1 + ' ' + DB.apellido2
         this.DBasico.nombres = nombre.toUpperCase()

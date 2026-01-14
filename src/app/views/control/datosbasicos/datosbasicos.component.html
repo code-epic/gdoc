@@ -1,374 +1,492 @@
-<div class="header bg-gradient-success pb-8 pt-5 pt-md-8">
+<div class="header bg-pastel-gradient pb-8 pt-5 pt-md-8">
   <div class="container-fluid">
-      <p></p>
-  </div>    
+    <p></p>
+  </div>
 </div>
 
 <div class="container-fluid mt--9">
   <div class="row">
     <div class="col-xl-12 col-md-12 col-lg-12">
       <div class="card shadow">
-          <div class="card-header bg-transparent">
-              <div class="row align-items-center">
-                  <div class="col-md-11">
-                      <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
-                      <h2 class="mb-0">Datos Basicos</h2>
-                  </div>
-                  <div class="col-md-1">
-                      <div class="media align-items-center">
-                        <div class="example-button-row">
-                          <button mat-icon-button title="Volver Atrás" onclick="history.back()">
-                            <mat-icon>reply</mat-icon>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-              </div>
-          </div>
-          <div class="card-body bg-transparent">
-            
-
-            <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
-
-<form>
-  <hr class="mb-1">
-  <div class="row">
-    <div class="col-md-9">
-      <h6 *ngIf="blPrincipal" class="text-uppercase text-muted ls-1 mb-4">Datos Personales</h6>
-      <div class="row">
-        <div class="form-group col-md-4">
-          <label> Cédula </label>
-          <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.cedula"
-            value="{{DBasico.cedula}}" (keypress)="consultarCedula($event)" class="form-control">
-        </div>
-        <div class="form-group col-md-8">
-          <label for="cmbUnidad">Nombres y Apellidos</label>
-          <div class="input-group mb-3">
-            <input type="text" class="form-control" [ngModelOptions]="{standalone: true}"
-              [(ngModel)]="DBasico.nombres" value="{{DBasico.nombres}}">
-            <div class="input-group-prepend" *ngIf="!GENERAL">
-              <button type="button" class="btn btn-info" (click)="consultarIPSFA(detalles)" id="agregar">
-                <i class="fa fa-eye" aria-hidden="true"></i>
-              </button>
-              <button type="button" class="btn btn-primary" (click)="consultarSAIME()" id="buscar">
-                <i class="fa fa-file" aria-hidden="true"></i>
-              </button>
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-11">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Control y Gestión</h6>
+              <h2 class="mb-0">Datos Basicos</h2>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="form-group col-md-6">
-          <label for="tmsOrigen">Fecha de Nacimiento</label>
-          <form class="form-inline">
-            <div class="form-group" style="width:100%">
-              <div class="input-group" style="width:100%">
-                <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-                  [(ngModel)]="nacimiento" ngbDatepicker #vi="ngbDatepicker"
-                  [placement]="placement" [positionTarget]="buttonEl">
-                <div class="input-group-append">
-                  <button #buttonEl class="btn calendario" (click)="vi.toggle()" type="button">
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" [routerLink]="['/control']">
+                    <mat-icon>arrow_back</mat-icon>
                   </button>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+        <div class="card-body bg-transparent">
+
+
+          <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
+
+          <form>
+            <div class="row">
+              <div class="col-md-9">
+                <h6 *ngIf="blPrincipal" class="text-uppercase text-muted ls-1 mb-4">Datos Personales</h6>
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <label class="form-label-custom">Cédula</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text icon-box">
+                          <mat-icon class="input-icon">fingerprint</mat-icon>
+                        </span>
+                      </div>
+                      <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="DBasico.cedula" (keypress)="consultarCedula($event)" placeholder="Cédula">
+                    </div>
+                  </div>
+                  <div class="form-group col-md-8">
+                    <label class="form-label-custom">Nombres y Apellidos</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text icon-box">
+                          <mat-icon class="input-icon">person</mat-icon>
+                        </span>
+                      </div>
+                      <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="DBasico.nombres" placeholder="Nombres y Apellidos" style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                      <div class="input-group-append" *ngIf="!GENERAL">
+                        <button class="btn btn-pastel text-white" type="button" (click)="consultarIPSFA(detalles)" title="Consultar IPSFA">
+                          <i class="fa fa-eye"></i>
+                        </button>
+                        <button class="btn btn-pastel-cancel text-white" type="button" (click)="consultarSAIME()" title="Consultar SAIME">
+                          <i class="fa fa-file"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label class="form-label-custom">Fecha de Nacimiento</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text icon-box" (click)="vi.toggle()" style="cursor: pointer;">
+                          <mat-icon class="input-icon">cake</mat-icon>
+                        </span>
+                      </div>
+                      <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="nacimiento" ngbDatepicker #vi="ngbDatepicker" [placement]="placement"
+                        [positionTarget]="buttonEl" readonly (click)="vi.toggle()">
+                      <div class="input-group-append">
+                         <div #buttonEl></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label class="form-label-custom">Sexo</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text icon-box">
+                          <mat-icon class="input-icon">wc</mat-icon>
+                        </span>
+                      </div>
+                      <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.sexo">
+                        <option value="0">Seleccione</option>
+                        <option value="M">MASCULINO</option>
+                        <option value="F">FEMENINO</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-md-12 text-center">
+                    <div class="card shadow-sm border-0" style="width: 160px; margin: 0 auto; margin-top:20px; overflow: hidden; border-radius: 10px;">
+                      <img [src]="foto" style="width: 100%; height: auto; display: block;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mt-3" *ngIf="nombramiento">
+               <div class="col-md-12">
+                 <div class="alert alert-secondary shadow-sm border-0" role="alert">
+                    <h4 class="alert-heading font-weight-bold text-default mb-1">Resolución: {{ nombramiento }}</h4>
+                    <p class="mb-0 text-sm text-muted" [innerHTML]="xasunto.substring(0,220) | uppercase"></p>
+                 </div>
+               </div>
+            </div>
           </form>
-        </div>
-        <div class="form-group col-md-6">
-          <label> Sexo </label>
-          <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.sexo"
-            value="{{DBasico.sexo}}">
-            <option value="0">Seleccione</option>
-            <option value="M">MASCULINO</option>
-            <option value="F">FEMENINO</option>
-          </select>
-        </div>
-      </div>
 
-    </div>
-    <div class="col-md-3">
-      <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-10 text-center">
-          <br><br>
-          <div style="border:1px solid #CCC; padding: 1px;width: 160px">
-            <img src="{{foto}}" style="width: 155px">
-          </div>
-        </div>
-        
-      </div>
-
-    </div>
-  </div>
-
-  <div class="row" style="padding: 18px; margin-top:-12px">
-    <table summary="" class="table table-bordered table-hover mb-3">
-        <thead>
-            <tr>
-                <th> Resolucion: {{ nombramiento }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td [innerHTML]="xasunto.substring(0,220) | uppercase"></td>
-            </tr>
-        </tbody>
-    </table>
-    
-</div>
-</form>
-
-
-
-
-
-
-
-
-<hr class="mb-1">
-<h6 class="text-uppercase text-muted ls-1 mb-4">Datos Militares</h6>
-<div class="form-row">
-  <div class="form-group col-md-4">
-    <label> Fecha de Ingreso a la Fanb </label>
-    <form class="form-inline">
-      <div class="form-group" style="width:100%">
-        <div class="input-group" style="width:100%">
-          <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="ingreso" ngbDatepicker #ingre="ngbDatepicker"  
-            [placement]="placement" [positionTarget]="buttonEle">
-          <div class="input-group-append">
-            <button #buttonEle class="btn calendario" (click)="ingre.toggle()" type="button">
-            </button>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="form-group col-md-4">
-    <label> Componente </label>
-    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.componente"
-      value="{{DBasico.componente}}">
-      <option value="0">Seleccione</option>
-      <option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}
-      </option>
-    </select>
-  </div>
-  <div class="form-group col-md-4">
-    <label> Categoría </label>
-    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.categoria"
-      value="{{DBasico.categoria}}">
-      <option value="0">Seleccione</option>
-      <option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}
-      </option>
-    </select>
-  </div>
-</div>
-
-<div class="form-row">
-  <div class="form-group col-md-3">
-    <label> Clasificación </label>
-    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.clasificacion"
-      value="{{DBasico.clasificacion}}">
-      <option value="0">Seleccione</option>
-      <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion ">
-        {{e.des_clasificacion}}</option>
-    </select>
-  </div>
-  <div class="form-group col-md-3">
-    <label> Grado </label>
-    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.grado"
-      value="{{DBasico.grado}}">
-      <option value="0">Seleccione</option>
-      <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
-    </select>
-  </div>
-  
-
-  <div class="form-group col-md-3">
-    <label> Fecha de Ultimo Ascenso </label>
-    <form class="form-inline">
-      <div class="form-group" style="width:100%">
-        <div class="input-group" style="width:100%">
-          <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="ascenso" ngbDatepicker #crea="ngbDatepicker" 
-            [placement]="placement" [positionTarget]="buttonEle">
-          <div class="input-group-append">
-            <button #buttonEle class="btn calendario" (click)="crea.toggle()" type="button">
-            </button>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="form-group col-md-3">
-    <label> Situación </label>
-    <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.situacion"
-      value="{{DBasico.situacion}}">
-      <option value="0">SELECCIONE</option>
-      <option value="ACT">ACTIVO</option>
-      <option value="RACT">RESERVA ACTIVA</option>
-      <option value="CDEM">CESE DEL EMPLEO</option>
-      <option value="RINC">REINCORPORADO</option>
-      <option value="FALL">FALLECIDO</option>
-<!-- 
-      <option value="RCP">RETIRADO CON PENSION</option>
-      <option value="RSP">RETIRADO SIN PENSION</option>
-      <option value="INV">INVALIDEZ</option> -->
-    </select>
-  </div>
-</div>
-
-
-<div class="form-row">
-  <div class="form-group col-md-6">
-    <label> Especialidad </label>
-    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.especialidad"
-      value="{{DBasico.especialidad}}" class="form-control">
-  </div>
-
-  <div class="form-group col-md-6">
-    <label> Estudios Civiles </label>
-    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.estudios"
-      value="{{DBasico.estudios}}" class="form-control">
-  </div>
-
-</div>
-
-<div class="form-row">
-  <div class="form-group col-md-6">
-    <label> Área </label>
-    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.area"
-      value="{{DBasico.area}}" class="form-control">
-  </div>
-
-  <div class="form-group col-md-6">
-    <label> Condición Especial </label>
-    <select class="form-control" 
-      [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.condicion"
-      value="{{DBasico.condicion}}"
-      (change) ="seleccionColor()"
-      >
-      <option value=0>NO APLICA</option>
-      <option value=1>AZUL</option>
-      <option value=2>AMARILLO</option>
-      <option value=3>ROJO</option>
-    </select>
-  
-  </div>
-
-</div>
-<div class="form-row">
-  <div class="form-group col-md-12" >
-    <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="DBasico.motivo" placeholder="Introduzca el motivo de la condicion especial...'..."
-            style="width: 100%">{{DBasico.motivo}}</textarea>
-  </div>
-</div>
-<div class="form-row">
-  <div class="form-group col-md-12">
-
-     <textarea class="form-control" cols="30" rows="4" [ngModelOptions]="{standalone: true}"
-            [(ngModel)]="DBasico.observacion" placeholder="Introduzca el texto para observaciones..."
-            style="width: 100%">{{DBasico.observacion}}</textarea>
-  </div>
-</div>
-
-
-
-<div class="form-row" *ngIf="GENERAL">
-
-  <div class="form-group col-md-6">
-    <label> Teléfono </label>
-    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.telefono"
-      value="{{DBasico.telefono}}" class="form-control">
-  </div>
-
-  <div class="form-group col-md-6">
-    <label> Correo Electronico </label>
-    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.correo"
-      value="{{DBasico.correo}}" class="form-control">
-  </div>
-  
-
-</div>
-<div class="form-row" *ngIf="GENERAL">
-  
-  <div class="form-group col-md-4">
-    <label> Ubicación </label>
-    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.ubicacion"
-      value="{{DBasico.ubicacion}}" class="form-control">
-  </div>
-
-  <div class="form-group col-md-4">
-    <label> Otros Cargos </label>
-    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.cargo"
-      value="{{DBasico.cargo}}" class="form-control">
-  </div>
-  <div class="form-group col-md-4">
-    <label> Estado Mayor </label>
-    <input type="text" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.estadomayor"
-      value="{{DBasico.estadomayor}}" class="form-control">
-  </div>
-
-</div>
-
-<div class="row">
-  <div class="col-md-6">
-    <div class="text-right">
-      <button class="btn bg-primary text-white" (click)="Aceptar()">Aceptar</button>
-    </div>
-  </div>
-    <div class="col-md-6" *ngIf="SHOWPRINT">
-        <div class="text-left">
-            <button class="btn bg-primary text-white " (click)="print()">
-                <span class="fa fa-print"></span>&nbsp;&nbsp;Imprimir
-            </button>
-        </div>
-    </div>
-</div>
-
-<br><br>
-
-
-
-
+          <hr class="my-4">
+          <h6 class="text-uppercase text-muted ls-1 mb-4">Datos Militares</h6>
           
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label class="form-label-custom">Fecha de Ingreso a la Fanb</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box" (click)="ingre.toggle()" style="cursor: pointer;">
+                    <mat-icon class="input-icon">event_available</mat-icon>
+                  </span>
+                </div>
+                <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                  [(ngModel)]="ingreso" ngbDatepicker #ingre="ngbDatepicker" [placement]="placement"
+                  readonly (click)="ingre.toggle()">
+              </div>
+            </div>
+            <div class="form-group col-md-4">
+              <label class="form-label-custom">Componente</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">security</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.componente">
+                  <option value="0">Seleccione</option>
+                  <option *ngFor="let e of Componentes;" [value]="e.cod_componente">{{e.nombre_componente}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group col-md-4">
+              <label class="form-label-custom">Categoría</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">category</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.categoria">
+                  <option value="0">Seleccione</option>
+                  <option *ngFor="let e of Categorias;" [value]="e.cod_categoria">{{e.nombre_categoria}}</option>
+                </select>
+              </div>
+            </div>
           </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <label class="form-label-custom">Clasificación</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">grade</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.clasificacion">
+                  <option value="0">Seleccione</option>
+                  <option *ngFor="let e of Clasificaciones;" [value]="e.cod_clasificacion">{{e.des_clasificacion}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group col-md-3">
+              <label class="form-label-custom">Grado</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">military_tech</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.grado">
+                  <option value="0">Seleccione</option>
+                  <option *ngFor="let e of Grados;" [value]="e.cod_grado">{{e.nombres_grado}}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-md-3">
+              <label class="form-label-custom">Fecha de Ultimo Ascenso</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box" (click)="crea.toggle()" style="cursor: pointer;">
+                    <mat-icon class="input-icon">stars</mat-icon>
+                  </span>
+                </div>
+                <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+                  [(ngModel)]="ascenso" ngbDatepicker #crea="ngbDatepicker" [placement]="placement"
+                  readonly (click)="crea.toggle()">
+              </div>
+            </div>
+            <div class="form-group col-md-3">
+              <label class="form-label-custom">Situación</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">info</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.situacion">
+                  <option value="0">SELECCIONE</option>
+                  <option value="ACT">ACTIVO</option>
+                  <option value="RACT">RESERVA ACTIVA</option>
+                  <option value="CDEM">CESE DEL EMPLEO</option>
+                  <option value="RINC">REINCORPORADO</option>
+                  <option value="FALL">FALLECIDO</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label class="form-label-custom">Especialidad</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">school</mat-icon>
+                  </span>
+                </div>
+                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                  [(ngModel)]="DBasico.especialidad" placeholder="Especialidad">
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label class="form-label-custom">Estudios Civiles</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">menu_book</mat-icon>
+                  </span>
+                </div>
+                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                  [(ngModel)]="DBasico.estudios" placeholder="Estudios Civiles">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label class="form-label-custom">Área</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">place</mat-icon>
+                  </span>
+                </div>
+                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                  [(ngModel)]="DBasico.area" placeholder="Área">
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label class="form-label-custom">Condición Especial</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">warning</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="DBasico.condicion"
+                  (change)="seleccionColor()">
+                  <option value=0>NO APLICA</option>
+                  <option value=1>AZUL</option>
+                  <option value=2>AMARILLO</option>
+                  <option value=3>ROJO</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label class="form-label-custom">Motivo de Condición Especial</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">description</mat-icon>
+                  </span>
+                </div>
+                <textarea class="input-custom" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+                  [(ngModel)]="DBasico.motivo" placeholder="Introduzca el motivo de la condicion especial..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label class="form-label-custom">Observaciones</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">comment</mat-icon>
+                  </span>
+                </div>
+                <textarea class="input-custom" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+                  [(ngModel)]="DBasico.observacion" placeholder="Introduzca el texto para observaciones..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <hr class="my-4">
+            <h6 class="text-uppercase text-muted ls-1 mb-4">Datos de Contacto y Ubicación</h6>
+            
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label class="form-label-custom">Teléfono</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box">
+                      <mat-icon class="input-icon">phone</mat-icon>
+                    </span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="DBasico.telefono" placeholder="Teléfono">
+                </div>
+              </div>
+              <div class="form-group col-md-6">
+                <label class="form-label-custom">Correo Electrónico</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box">
+                      <mat-icon class="input-icon">email</mat-icon>
+                    </span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="DBasico.correo" placeholder="Correo Electrónico">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label class="form-label-custom">Ubicación</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box">
+                      <mat-icon class="input-icon">location_on</mat-icon>
+                    </span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="DBasico.ubicacion" placeholder="Ubicación">
+                </div>
+              </div>
+              <div class="form-group col-md-4">
+                <label class="form-label-custom">Otros Cargos</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box">
+                      <mat-icon class="input-icon">work</mat-icon>
+                    </span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="DBasico.cargo" placeholder="Otros Cargos">
+                </div>
+              </div>
+              <div class="form-group col-md-4">
+                <label class="form-label-custom">Estado Mayor</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box">
+                      <mat-icon class="input-icon">account_balance</mat-icon>
+                    </span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="DBasico.estadomayor" placeholder="Estado Mayor">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label class="form-label-custom">Merito</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box">
+                      <mat-icon class="input-icon">stars</mat-icon>
+                    </span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="DBasico.merito" placeholder="Mérito">
+                </div>
+              </div>
+              <div class="form-group col-md-4">
+                <label class="form-label-custom">Orden</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box">
+                      <mat-icon class="input-icon">format_list_numbered</mat-icon>
+                    </span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="DBasico.orden" placeholder="Orden de Mérito">
+                </div>
+              </div>
+              <div class="form-group col-md-4">
+                <label class="form-label-custom">Estatura</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text icon-box">
+                      <mat-icon class="input-icon">height</mat-icon>
+                    </span>
+                  </div>
+                  <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="DBasico.estatura" placeholder="Estatura (mts)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-4">
+            <div class="col-md-12 text-right">
+              <button class="btn btn-pastel text-white mr-2" (click)="Aceptar()">
+                <span class="fa fa-save"></span>&nbsp;&nbsp;Guardar Cambios
+              </button>
+              <button *ngIf="SHOWPRINT" class="btn btn-pastel-cancel text-white" (click)="print()">
+                <span class="fa fa-print"></span>&nbsp;&nbsp;Imprimir
+              </button>
+            </div>
+          </div>
+
+          <br><br>
+        </div>
 
       </div>
     </div>
-  </div>    
+  </div>
 </div>
 
 
 
 <!-- Adjuntar Imagenes al Documento -->
 <ng-template #detalles let-c="close" let-d="dismiss">
- 
+  <div class="modal-header bg-pastel-gradient">
+    <h4 class="modal-title text-white" id="modal-basic-title">Datos IPSFA</h4>
+    <button type="button" class="close text-white" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
   <div class="modal-body">
-    <p>
-      Cedula: {{ipsfa_cedula}} <br>
-      Nombre completo: {{ ipsfa_nombres_apellidos }}  <br>
-      Fecha de nacimiento: {{ ipsfa_fechanacimiento }}  <br> 
-      Sexo: {{ipsfa_sexo}} <br>
-    </p>
-    <hr>
-    <p>
-      Componente: {{ipsfa_componente }} <br>
-      Grado: {{ ipsfa_grado }} <br>
-      Clasificacion: {{ipsfa_clasificacion }} <br>
-
-      Categoria: {{ ipsfa_categoria }} <br>
-      Situacion: {{ipsfa_situacion }} <br>
-      Fecha de Ingreso: {{ ipsfa_fechaingreso }}  <br>
-      Fecha de Último Ascenso: {{ ipsfa_fechaultimoascenso }}  <br> 
-    </p>
+    <div class="row">
+      <div class="col-md-12">
+        <p><strong>Cédula:</strong> {{ipsfa_cedula}}</p>
+        <p><strong>Nombre completo:</strong> {{ ipsfa_nombres_apellidos }}</p>
+        <p><strong>Fecha de nacimiento:</strong> {{ ipsfa_fechanacimiento }}</p>
+        <p><strong>Sexo:</strong> {{ipsfa_sexo}}</p>
+        <hr>
+        <p><strong>Componente:</strong> {{ipsfa_componente }}</p>
+        <p><strong>Grado:</strong> {{ ipsfa_grado }}</p>
+        <p><strong>Clasificación:</strong> {{ipsfa_clasificacion }}</p>
+        <p><strong>Categoría:</strong> {{ ipsfa_categoria }}</p>
+        <p><strong>Situación:</strong> {{ipsfa_situacion }}</p>
+        <p><strong>Fecha de Ingreso:</strong> {{ ipsfa_fechaingreso }}</p>
+        <p><strong>Fecha de Último Ascenso:</strong> {{ ipsfa_fechaultimoascenso }}</p>
+      </div>
+    </div>
   </div>
   <div class="modal-footer">
-    <button class="btn bg-primary text-white " (click)="AceptarCambios();c('Save')">
-      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar Cambios </button>
-    <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
-      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+    <button class="btn btn-pastel text-white" (click)="AceptarCambios();c('Save')">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar Cambios
+    </button>
+    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="c('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar
+    </button>
   </div>
 </ng-template>

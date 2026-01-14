@@ -56,8 +56,6 @@ import { RsreportesComponent } from 'src/app/views/resoluciones/rsreportes/rsrep
 import { RsalertasComponent } from 'src/app/views/resoluciones/rsalertas/rsalertas.component';
 import { RsestadisticasComponent } from 'src/app/views/resoluciones/rsestadisticas/rsestadisticas.component';
 import { MreportesComponent } from 'src/app/views/secretaria/mreportes/mreportes.component';
-import { VisitantesComponent } from 'src/app/views/visitantes/visitantes.component';
-import { VisitantedocumentoComponent } from 'src/app/views/visitantes/visitantedocumento/visitantedocumento.component';
 import { PublicarComponent } from 'src/app/views/publicaciones/publicar/publicar.component';
 import { BuzonresueltosComponent } from 'src/app/views/publicaciones/buzonresueltos/buzonresueltos.component';
 import { ChatbotComponent } from 'src/app/views/chatbot/chatbot.component';
@@ -418,16 +416,6 @@ export const AdminLayoutRoutes: Routes = [
             path: 'cargar-archivo',
             canActivate: [AuthGuardGuard]
         }]
-    },
-    {
-        path: 'visitantes',
-        component: VisitantesComponent,
-        canActivate: [AuthGuardGuard]
-    },
-    {
-        path: 'visitantedocumento',
-        component: VisitantedocumentoComponent  ,
-        canActivate: [AuthGuardGuard]
     },
     {
         path: 'codigosrojo',

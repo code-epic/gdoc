@@ -11,16 +11,14 @@
         <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
         <div class="card-header bg-transparent">
           <div class="row align-items-center">
-            <div class="col-md-4">
+            <div class="col-md-10">
               <h6 class="text-uppercase text-muted ls-1 mb-1">Secretaria</h6>
               <h2 class="mb-0">Reportes Generales</h2>
             </div>
-            <div class="col-md-7">
-            </div>
-            <div class="col-md-1">
+            <div class="col-md-2 text-right">
               <div class="media align-items-center">
                 <div class="example-button-row">
-                  <button mat-icon-button title="Volver Atrás" onclick="history.back()">
+                  <button mat-icon-button title="Volver Atrás" [routerLink]="['/secretaria']">
                     <mat-icon>arrow_back</mat-icon>
                   </button>
                 </div>
@@ -31,152 +29,180 @@
 
         <div class="card-body">
          
-          <div class="row" style="padding: -10px;">
+          <div class="form-row align-items-end">
 
-            <div class=" col-md-4">
-              <label for="">Componente</label>
-              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente">
-               
-                <option value="0">TODOS LOS COMPONENTES</option>
-                <option value="EB">EJERCITO</option>
-                <option value="AB">ARMADA</option>
-                <option value="AMB">AVIACION</option>
-                <option value="GNB">GUARDIA NACIONAL BOLIVARIANA</option>
-                <option value="MB">MILICIA</option>
-
-              </select>
+            <div class="form-group col-md-4">
+              <label class="form-label-custom">Componente</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">security</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="componente">
+                  <option value="0">TODOS LOS COMPONENTES</option>
+                  <option value="EB">EJERCITO</option>
+                  <option value="AB">ARMADA</option>
+                  <option value="AMB">AVIACION</option>
+                  <option value="GNB">GUARDIA NACIONAL BOLIVARIANA</option>
+                  <option value="MB">MILICIA</option>
+                </select>
+              </div>
             </div>
 
-
-           
-            <div class="col-md-3">
-              <label for="">Dependencia</label>
-              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="dependencia">
-                <option value="0">SELECCIONE</option>
-                <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
-              </select>
+            <div class="form-group col-md-3">
+              <label class="form-label-custom">Dependencia</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">business</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="dependencia">
+                  <option value="0">SELECCIONE</option>
+                  <option *ngFor="let x of lstC" value="{{x.nomb}}">{{ x.nomb }}</option>
+                </select>
+              </div>
             </div>
 
-            <div class="col-md-2">
-              <label for="">Año</label>
-              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="year">
-                <option value="0">TODOS</option>
-                <option *ngFor="let e of lstYear" value="{{e}}">{{e}}</option>
-
-              </select>
+            <div class="form-group col-md-2">
+              <label class="form-label-custom">Año</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">event</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="year">
+                  <option value="0">TODOS</option>
+                  <option *ngFor="let e of lstYear" value="{{e}}">{{e}}</option>
+                </select>
+              </div>
             </div>
 
-            <div class="col-md-3">
-              <label for="">Número de Cuenta / Oficio</label>
-              <input class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cuenta" />
-
-
-            </div>
-
-            
-        
-           
-          
-          </div>
-          <br>
-          <div class="row">
-            <div class="col-md-6">
-              <label for="">Asunto</label>
-              <input class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="asunto" />
-
-
-            </div>
-
-            <div class="col-md-3">
-              <label for="">Cédula de Identidad</label>
-              <input class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cedula" />
-
-
-            </div>
-
-            <div class="col-md-3">
-              <label for="">Número</label>
-              <input class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="numero" />
-
-
+            <div class="form-group col-md-3">
+              <label class="form-label-custom">Número de Cuenta / Oficio</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">description</mat-icon>
+                  </span>
+                </div>
+                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="cuenta" placeholder="N° Cuenta/Oficio" />
+              </div>
             </div>
           
-
-           
-           
-
           </div>
-          <br>
-          <div class="row">
-            <div class="col-md-4">
-              <label for="">Estatus / Ubicación</label>
-              <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="estatus">
-                <option value="0">TODAS</option>
-                <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
-              </select>
-            </div>
-            <div class=" col-md-4">
-              <label>Decisión</label>
-              <select class="form-control" [ngModelOptions]="{standalone: true}"
-                [(ngModel)]="decision">
-                <option value="0">TODAS</option>
-                <option value="APROBADO">APROBADO</option>
-                <option value="NEGADO">NEGADO</option>
-                <option value="VISTO">VISTO</option>
-                <option value="DIFERIDO">DIFERIDO</option>
-                <option value="OTRO">OTRO</option>
-              </select>
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label class="form-label-custom">Asunto</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">subject</mat-icon>
+                  </span>
+                </div>
+                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="asunto" placeholder="Asunto" />
+              </div>
             </div>
 
-            <div class="col-md-2 text-right pull-rigth">
-              <label for="">&nbsp;</label><br>
-              <button class="btn bg-primary text-white text-right pull-rigth" (click)="buscarDocumento()">
-                <span class="fa fa-search"></span>&nbsp;&nbsp;Generar resultado
+            <div class="form-group col-md-3">
+              <label class="form-label-custom">Cédula de Identidad</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">fingerprint</mat-icon>
+                  </span>
+                </div>
+                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="cedula" placeholder="Cédula" />
+              </div>
+            </div>
+
+            <div class="form-group col-md-3">
+              <label class="form-label-custom">Número</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">tag</mat-icon>
+                  </span>
+                </div>
+                <input type="text" class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="numero" placeholder="Número" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row align-items-end">
+            <div class="form-group col-md-4">
+              <label class="form-label-custom">Estatus / Ubicación</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">place</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="estatus">
+                  <option value="0">TODAS</option>
+                  <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group col-md-4">
+              <label class="form-label-custom">Decisión</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text icon-box">
+                    <mat-icon class="input-icon">gavel</mat-icon>
+                  </span>
+                </div>
+                <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="decision">
+                  <option value="0">TODAS</option>
+                  <option value="APROBADO">APROBADO</option>
+                  <option value="NEGADO">NEGADO</option>
+                  <option value="VISTO">VISTO</option>
+                  <option value="DIFERIDO">DIFERIDO</option>
+                  <option value="OTRO">OTRO</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-md-2">
+              <button class="btn btn-pastel text-white w-100" (click)="buscarDocumento()">
+                <span class="d-flex align-items-center justify-content-center">
+                  <mat-icon class="mr-1" style="font-size: 18px; width: 18px; height: 18px;">search</mat-icon> Buscar
+                </span>
               </button>
             </div>
            
-
-          <div class="col-md-2">
-            <label for="">&nbsp;</label><br>
-            <button class="btn bg-warning text-white " (click)="limpiarBusqueda()">
-              <span class="fa fa-trash"></span>&nbsp;&nbsp;Generar consulta
-            </button>
-          </div>
-
-           
-         
-
-
-
-
-
-
-            
-
-
+            <div class="form-group col-md-2">
+              <button class="btn btn-pastel-cancel text-white w-100" (click)="limpiarBusqueda()">
+                <span class="d-flex align-items-center justify-content-center">
+                  <mat-icon class="mr-1" style="font-size: 18px; width: 18px; height: 18px;">cleaning_services</mat-icon> Limpiar
+                </span>
+              </button>
+            </div>
           </div>
 
           <div *ngIf="vistacontenido">
             <div *ngIf="!cargador">
-              <h3 class="text-center">Cargando información...</h3>
+              <h3 class="text-center text-muted">Cargando información...</h3>
             </div>
             <br>
             <div class="row" *ngIf="cargador">
-             
                 <div class="col-md-12">
-                  <table style="width: 100%;" class="zigzag" border="1">
-                    <thead>
-
+                  <div class="table-responsive">
+                  <table class="sandratbl" style="width: 100%; table-layout: fixed;">
+                    <thead style="height: 40px;">
                       <tr>
-                        <th>#</th>
-                        <th style="text-align: center;">COMPONENTE</th>
-                        <th style="text-align: center;">DEPENDENCIA </th>
-                        <th style="text-align: center;">AÑO</th>
-                        <th style="text-align: center;">N. DE CUENTA</th>
-                        <th style="text-align: center;">FECHA</th>
+                        <th style="width: 40px;">#</th>
+                        <th style="text-align: center; width: 100px;">COMPONENTE</th>
+                        <th style="text-align: center; width: 150px;">DEPENDENCIA </th>
+                        <th style="text-align: center; width: 60px;">AÑO</th>
+                        <th style="text-align: center; width: 100px;">N. DE CUENTA</th>
+                        <th style="text-align: center; width: 90px;">FECHA</th>
                         <th style="text-align: center;">ASUNTO</th>
-                        <th style="text-align: center;" *ngIf="!bdecision">UBICACION</th>
-                        <th style="text-align: center;" *ngIf="bdecision">DECISIÓN DEL MPPD</th>
+                        <th style="text-align: center; width: 120px;" *ngIf="!bdecision">UBICACION</th>
+                        <th style="text-align: center; width: 120px;" *ngIf="bdecision">DECISIÓN</th>
                         <th style="text-align: center;">OBSERVACIONES</th>
                       </tr>
                     </thead>
@@ -188,20 +214,15 @@
                         <td style="text-align: center;"> {{ e.fcre | date : "yyyy" }} </td>
                         <td style="text-align: center;"> {{ e.cuen }} </td>
                         <td style="text-align: center;"> {{ getFecha(e.subdocumento) | date : "dd/MM/yyyy" }} </td>
-                        <td [innerHTML]="e.cont | uppercase" style="text-align: justify;"></td>
+                        <td [innerHTML]="e.cont | uppercase" style="text-align: justify; word-wrap: break-word;"></td>
                         <td *ngIf="!bdecision" style="text-align: center;"> {{ getStatus(e.esta) }} </td>
                         <td *ngIf="bdecision" style="text-align: center;"> {{ e.deci }} </td>
-                        
-                        <td  style="text-align: justify;"> {{ e.acci }} </td>
+                        <td  style="text-align: justify; word-wrap: break-word;"> {{ e.acci }} </td>
                       </tr>
                     </tbody>
-
                   </table>
-
-
+                  </div>
                 </div>
-
-
             </div>
           </div>
         </div>

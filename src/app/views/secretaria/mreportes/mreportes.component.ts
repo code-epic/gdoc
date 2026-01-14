@@ -40,7 +40,7 @@ export class MreportesComponent implements OnInit {
   Componentes = []
   lstDependecia = []
   public lstC = [] //Objeto Comando
-  lstYear = ['2024','2025','2027','2029','2024','2030']
+  lstYear = ['2025','2026','2027']
   public Configuracion: any
 
   componente = '0'
@@ -108,7 +108,7 @@ export class MreportesComponent implements OnInit {
     console.log(this.estatus)
     this.cargador = false
     
-    this.ngxService.startLoader("loader-aceptar")
+    this.ngxService.startLoader("loader-mreporte")
     this.xAPI.funcion = 'WKF_CSecreatariaReportes'
     this.xAPI.parametros = `PUNTO DE CUENTA,${status},${yyyy},${cuent},${unidad},${componente},${decision}`
     this.xAPI.valores = ''
@@ -117,13 +117,13 @@ export class MreportesComponent implements OnInit {
         this.lstDatos = data.Cuerpo
         //onsole.log( JSON.parse( this.lstDatos[0].subdocumento ) )
         console.log(this.lstDatos)
-        this.ngxService.stopLoader("loader-aceptar")
+        this.ngxService.stopLoader("loader-mreporte")
         
         this.cargador = true
       },
       (error) => {
         console.error("No existe la funcion ", error)
-        this.ngxService.stopLoader("loader-aceptar")
+        this.ngxService.stopLoader("loader-mreporte")
       }
 
     )
