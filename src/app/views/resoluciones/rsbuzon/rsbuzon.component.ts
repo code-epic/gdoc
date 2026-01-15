@@ -102,7 +102,7 @@ export class RsbuzonComponent implements OnInit {
     public destino = 14;
     fecha_desde = '-09-01'
     fecha_hasta = '-09-30'
-    xyear = '2024'
+    xyear = '2026'
     public lstMeses = []
     public lstYear = []
     public xmeses = ''
@@ -283,6 +283,12 @@ export class RsbuzonComponent implements OnInit {
     public lstCarpetas = [];
     public lstCarpetasAux = [];
     public codCarpeta = '';
+
+    // New properties for grouping and loading
+    public groupedCarpetas: any[] = [];
+    public componentMap: { [key: number]: string } = {};
+    public displayCounts: { [key: string]: number } = {};
+    public itemsPerLoad: number = 12; // Number of items to load at a time
     public blNavegacion: boolean = false;
     public details: boolean = false;
 
@@ -390,6 +396,11 @@ export class RsbuzonComponent implements OnInit {
             sessionStorage.getItem('MPPD_CComponente') != undefined
                 ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
                 : []
+
+        // Populate componentMap
+        this.Componentes.forEach(c => {
+            this.componentMap[c.cod_componente] = c.nombre_componente;
+        });
         // console.log(this.Componentes)
         this.TipoResoluciones = sessionStorage.getItem("MPPD_CTipoResolucion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion"))) : []
 
@@ -518,11 +529,13 @@ export class RsbuzonComponent implements OnInit {
             case 0:
                 this.cargarAcciones(0);
                 this.xAPI.parametros = this.estadoActual + "," + this.estatusActual + "," + this.fecha_desde + "," + this.fecha_hasta;
+                console.log('0', this.xAPI.parametros)
                 this.listarBuzon(e);
                 break;
             case 1:
                 this.cargarAcciones(1);
                 this.xAPI.parametros = this.estadoActual + ',' + 2 + "," + this.fecha_desde + "," + this.fecha_hasta;
+                console.log('1', this.xAPI.parametros)
                 this.listarBuzon(e);
                 break;
             case 2:
@@ -541,16 +554,16 @@ export class RsbuzonComponent implements OnInit {
 
 
     async listarBuzon(tipo: number) {
-        if (tipo == 0) {
-            if (this.bzRecibido.length > 0) {
-                return;
-            }
+        // if (tipo == 0) {
+        //     if (this.bzRecibido.length > 0) {
+        //         return;
+        //     }
 
-        } else {
-            if (this.bzClasificar.length > 0) {
-                return;
-            }
-        }
+        // } else {
+        //     if (this.bzClasificar.length > 0) {
+        //         return;
+        //     }
+        // }
         // console.log('iniciando');
         this.cargarInformacion(tipo);
     }
@@ -601,7 +614,7 @@ export class RsbuzonComponent implements OnInit {
 
                 this.lstCarpetasRecibido[0].cant = this.maxRecibido - i
                 this.lstCarpetasRecibido[1].cant = i
-
+                console.log('FIN DE PROCESO ', tipo)
 
                 this.ngxService.stopLoader('ldbuzon')
             },
@@ -614,7 +627,8 @@ export class RsbuzonComponent implements OnInit {
 
     async subEntrada() {
 
-        this.lstCarpetas = []
+        this.ngxService.startLoader('ldcarpetas'); // Start loader here
+        this.lstCarpetas = [];
         this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.GRUPO_CARPETA_ENTRADA;
         this.xAPI.parametros = '36'
@@ -622,51 +636,76 @@ export class RsbuzonComponent implements OnInit {
 
         await this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
-                // console.log('subEntrada: ', data);  
                 try {
                     if (data.Cuerpo.length > 0) {
-                        data.Cuerpo.forEach(e => {
-                            let dt = {
-                                'cantidad': e.cantidad,
-                                'llav': e.numero_carpeta,
-                                'usuario': '',
-                                'componente': parseInt(e.cod_componente)
-                            }
-                            this.lstCarpetas.push(dt)
-                        });
-                        this.lstCarpetasAux = this.lstCarpetas
+                        this.lstCarpetas = data.Cuerpo.map(e => ({
+                            'cantidad': e.cantidad,
+                            'llav': e.numero_carpeta,
+                            'usuario': '',
+                            'componente': parseInt(e.cod_componente),
+                            'fecha': e.entrada,
+                            'registro': e.registro
+                        }));
+                        console.log(this.lstCarpetas)
+                        this.lstCarpetasAux = [...this.lstCarpetas];
+                        this.groupAndPrepareFolders(); // Group folders after fetching
                     }
-                    this.ngxService.stopLoader('ldcarpetas')
+                    this.ngxService.stopLoader('ldcarpetas');
                 } catch (error) {
-                    console.log(error)
-                    this.ngxService.stopLoader('ldcarpetas')
+                    console.log(error);
+                    this.ngxService.stopLoader('ldcarpetas');
                 }
-
-
-
-
             },
             (error) => {
+                console.error(error);
+                this.ngxService.stopLoader('ldcarpetas');
             }
         );
     }
     consultarCarpeta(e) {
-        if (e.keyCode == 13) {
-            this.filtrarCarpetas(e.target.value);
-            this.codCarpeta = '';
-        }
+        this.filtrarCarpetas(e.target.value);
     }
 
     filtrarCarpetas(id: string) {
-        if (id == '') {
-            this.lstCarpetas = this.lstCarpetasAux;
+        if (id === '') {
+            this.lstCarpetas = [...this.lstCarpetasAux];
         } else {
             this.lstCarpetas = this.lstCarpetasAux.filter(e => {
-                return e.llav.includes(id);
+                return e.llav.toLowerCase().includes(id.toLowerCase());
             });
         }
+        this.groupAndPrepareFolders(); // Re-group after filtering
+    }
 
+    // New method to group folders
+    groupAndPrepareFolders() {
+        const groups = {};
+        this.lstCarpetas.forEach(folder => {
+            const componentCode = folder.componente;
+            if (!groups[componentCode]) {
+                groups[componentCode] = [];
+            }
+            groups[componentCode].push(folder);
+        });
 
+        this.groupedCarpetas = Object.keys(groups).map(key => {
+            const componentCode = parseInt(key);
+            const componentName = this.componentMap[componentCode] || 'Componente Desconocido';
+            // Initialize display count for this group
+            this.displayCounts[componentName] = this.itemsPerLoad;
+            return {
+                componentCode: componentCode,
+                componentName: componentName,
+                folders: groups[key]
+            };
+        }).sort((a, b) => a.componentCode - b.componentCode); // Sort groups by component code
+    }
+
+    // New method to load more folders
+    loadMore(groupName: string) {
+        if (this.displayCounts[groupName]) {
+            this.displayCounts[groupName] += this.itemsPerLoad;
+        }
     }
 
     filtrarAddElements(filter: any): any {
@@ -1105,6 +1144,7 @@ export class RsbuzonComponent implements OnInit {
     }
 
     toggleSidenav(e: any) {
+
         this.isShowing = !this.isShowing;
         this.formSidenav.reset();
         console.log('ELEMENTO DE LA CARPETA', e);
@@ -1127,7 +1167,7 @@ export class RsbuzonComponent implements OnInit {
     listarCedulasEnCarpeta(e) {
         this.xAPI = {} as IAPICore;
         this.xAPI.funcion = environment.funcion.ENTRADAS_PROCESO
-        this.xAPI.parametros = `${e.llav},${e.componente},36`
+        this.xAPI.parametros = `${e.llav},${e.componente},36,${e.fecha}`
         this.xAPI.valores = null
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -1211,25 +1251,29 @@ export class RsbuzonComponent implements OnInit {
     }
 
     getColor(e): string {
-        let color = '#000011'
+        let color = '#b0bec5'
         // console.log(e)
-        switch (e) {
+        switch (parseInt(e)) {
             case 100:
-                color = '#998877'
+                color = '#7ab47dff'
                 break
             case 200:
-                color = '#abe2fa;'
+                color = '#5699d1ff'
                 break
             case 300:
-                color = '#5582b5'
+                color = '#58c6f8ff'
                 break
             case 400:
-                color = '#A32A24'
+                color = '#916150ff'
+                break
+            case 500:
+                color = '#60523cff'
                 break
             case 602:
-                color = '#6ddf93'
+                color = '#b58e4bff'
                 break
             default:
+                color = '#b0bec5'
                 break;
         }
         return color

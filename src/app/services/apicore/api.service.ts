@@ -374,18 +374,20 @@ export class ApiService {
     return this.http.post<any>(url, {}, this.httpOptions);
   }
 
-  /**
+   /**
   * @param tipo png | base64
   * @returns QR
   */
   Validar_TOTP(codigo: string, tempAuthToken: string): Observable<any> {
-    var httpOptions = {
+    const options = {
       headers: new HttpHeaders({
         Authorization: "Bearer " + tempAuthToken,
+        'X-Skip-Interceptor': 'true' // <--- Nuestra señal secreta
       }),
     };
-    var url = this.URL + "wusuario/vtotp";
-    return this.http.post<any>(url, { "codigo": codigo }, httpOptions);
+
+    const url = this.URL + "wusuario/vtotp";
+    return this.http.post<any>(url, { "codigo": codigo }, options);
   }
 
   /**
@@ -393,15 +395,16 @@ export class ApiService {
    * @returns QR
    */
   MultipleSesion(tempAuthToken: string): Observable<any> {
-    var httpOptions = {
+    const options = {
       headers: new HttpHeaders({
         Authorization: "Bearer " + tempAuthToken,
+        'X-Skip-Interceptor': 'true'
       }),
     };
-    var url = this.URL + "wusuario/multiplesesion";
-    return this.http.post<any>(url, {}, httpOptions);
-  }
 
+    var url = this.URL + "wusuario/multiplesesion";
+    return this.http.post<any>(url, {}, options);
+  }
   /**
    * @param tipo png | base64
    * @returns QR
