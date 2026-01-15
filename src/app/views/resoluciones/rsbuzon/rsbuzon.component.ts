@@ -397,11 +397,9 @@ export class RsbuzonComponent implements OnInit {
                 ? JSON.parse(atob(sessionStorage.getItem('MPPD_CComponente')))
                 : []
 
-        // Populate componentMap
         this.Componentes.forEach(c => {
             this.componentMap[c.cod_componente] = c.nombre_componente;
         });
-        // console.log(this.Componentes)
         this.TipoResoluciones = sessionStorage.getItem("MPPD_CTipoResolucion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion"))) : []
 
         this.listarResponsables()
@@ -417,8 +415,6 @@ export class RsbuzonComponent implements OnInit {
             map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
         )
 
-        //this.listarSubDocumentos(1);
-        // this.blNavegacion = true
     }
 
     get today() {
@@ -529,20 +525,16 @@ export class RsbuzonComponent implements OnInit {
             case 0:
                 this.cargarAcciones(0);
                 this.xAPI.parametros = this.estadoActual + "," + this.estatusActual + "," + this.fecha_desde + "," + this.fecha_hasta;
-                console.log('0', this.xAPI.parametros)
                 this.listarBuzon(e);
                 break;
             case 1:
                 this.cargarAcciones(1);
                 this.xAPI.parametros = this.estadoActual + ',' + 2 + "," + this.fecha_desde + "," + this.fecha_hasta;
-                console.log('1', this.xAPI.parametros)
                 this.listarBuzon(e);
                 break;
             case 2:
-                // this.cargarAcciones(1);
                 this.xAPI.funcion = environment.funcion.GRUPO_CARPETAS;
                 this.xAPI.parametros = '';
-                // this.listarCarpetas();
                 this.subEntrada()
                 break;
 
@@ -564,7 +556,6 @@ export class RsbuzonComponent implements OnInit {
         //         return;
         //     }
         // }
-        // console.log('iniciando');
         this.cargarInformacion(tipo);
     }
 
@@ -572,7 +563,6 @@ export class RsbuzonComponent implements OnInit {
         this.ngxService.startLoader('ldbuzon');
         await this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
-                // console.log(data.Cuerpo)
                 this.lstAll = data.Cuerpo;
                 this.maxRecibido = this.lstAll.length
                 let i = 0
@@ -614,7 +604,6 @@ export class RsbuzonComponent implements OnInit {
 
                 this.lstCarpetasRecibido[0].cant = this.maxRecibido - i
                 this.lstCarpetasRecibido[1].cant = i
-                console.log('FIN DE PROCESO ', tipo)
 
                 this.ngxService.stopLoader('ldbuzon')
             },
@@ -646,7 +635,6 @@ export class RsbuzonComponent implements OnInit {
                             'fecha': e.entrada,
                             'registro': e.registro
                         }));
-                        console.log(this.lstCarpetas)
                         this.lstCarpetasAux = [...this.lstCarpetas];
                         this.groupAndPrepareFolders(); // Group folders after fetching
                     }
@@ -738,7 +726,6 @@ export class RsbuzonComponent implements OnInit {
                     return e;
                 }); //Registros recorridos como elementos
                 this.lengthOfi = data.Cuerpo.length;
-                console.log(this.bzSubDocumentos, 'uff -> ', this.selNav);
                 if (this.selNav == 1) {
                     this.bzRecibido.push(this.bzSubDocumentos);
                 }
@@ -759,16 +746,7 @@ export class RsbuzonComponent implements OnInit {
     }
 
     ConsultarProcesados(id) {
-        console.log(this.bzSubDocumentos, 'uff -> ', id);
-        // if (id == 4) {
-        //   this.bzRecibido = this.bzSubDocumentos
-        // } else {
-        //   console.log(this.bzOriginal, 'xfff -> ', id)
-        //   this.bzRecibido = this.bzOriginal.filter((e) => { return e.ultimo_estado == id })
-        //   console.log( this.bzRecibido )
-        // }
         this.bzRecibido = this.bzSubDocumentos;
-        // this.bzRecibido.push(this.bzOriginal)
     }
 
     updateAllComplete() {
@@ -933,7 +911,6 @@ export class RsbuzonComponent implements OnInit {
 
     reducirVector() {
         this.bzRecibidoResumen.splice(this.posicion, 1);
-        console.log('Control de datos ');
 
     }
 
@@ -988,7 +965,6 @@ export class RsbuzonComponent implements OnInit {
             this.idd +
             ',' +
             this.cuenta;
-        console.log(this.xAPI);
         await this.apiService.Ejecutar(this.xAPI).subscribe(
             async (data) => {
                 this.toastrService.success(
@@ -1045,7 +1021,7 @@ export class RsbuzonComponent implements OnInit {
         this.xAPI.valores = JSON.stringify(this.WAlerta);
         this.apiService.Ejecutar(this.xAPI).subscribe(
             async (alerData) => {
-                console.log(alerData);
+                
             },
             (errot) => {
                 this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
@@ -1098,7 +1074,7 @@ export class RsbuzonComponent implements OnInit {
         this.xAPI.funcion = environment.funcion.ENTRADAS_RESOLUCIONES;
         this.xAPI.parametros =
             `'0',${elementos}cedula##${componente}cedula##${numero}cedula##${tipo}cedula##${estatus}cedula##${clasificacion}cedula##${prioridad}cedula##${observacion}cedula##${usuario}cedula##${idtrans}`;
-        console.log(this.xAPI.parametros)
+
         if (this.numCarpeta == '') {
             this.toastrService.error(
                 'Debe Introducir un numero de carpeta',
@@ -1109,7 +1085,6 @@ export class RsbuzonComponent implements OnInit {
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
-                console.log(data)
                 this.clasificarBuzon()
             },
             (errot) => {
@@ -1147,7 +1122,6 @@ export class RsbuzonComponent implements OnInit {
 
         this.isShowing = !this.isShowing;
         this.formSidenav.reset();
-        console.log('ELEMENTO DE LA CARPETA', e);
         this.formSidenav.patchValue({
             'esta': 1, 'fech': 2, 'id': 3, 'idw': 4,
             'nomb': e.componente,
@@ -1172,7 +1146,6 @@ export class RsbuzonComponent implements OnInit {
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
-                console.log(data)
                 this.lstAllx = data.Cuerpo
                 let arr = this.lstAllx.map((e) => {
                     e.completed = false;
@@ -1180,8 +1153,6 @@ export class RsbuzonComponent implements OnInit {
                     return e;
                 });
                 this.lstCedula = arr
-                console.log(arr)
-                console.log(this.lstDigitalesDevuelto)
             },
             err => { }
         )
@@ -1223,10 +1194,8 @@ export class RsbuzonComponent implements OnInit {
         this.xAPI.funcion = environment.funcion.LISTAR_RESPONSABLES
         this.xAPI.parametros = 'Resoluciones'
         this.xAPI.valores = null
-        // console.log(this.xAPI)
         await this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
-                // console.log(data)
                 if (data.msj == undefined) {
                     data.forEach(e => {
                         this.lstResponsable.push({
@@ -1241,10 +1210,8 @@ export class RsbuzonComponent implements OnInit {
     }
 
     getEstatusMinisterial(e): string {
-        // console.log(e)
         if (e.s_estatus == null) e.s_estatus = 1
         let pos = parseInt(e.s_estatus) - 1;
-        // console.log('CANT: ', pos,    this.lstAccionesMininisterial)
         return this.lstAccionesMininisterial[pos] != undefined ? this.lstAccionesMininisterial[pos].texto : ''
 
 
@@ -1252,7 +1219,6 @@ export class RsbuzonComponent implements OnInit {
 
     getColor(e): string {
         let color = '#b0bec5'
-        // console.log(e)
         switch (parseInt(e)) {
             case 100:
                 color = '#7ab47dff'
@@ -1286,18 +1252,14 @@ export class RsbuzonComponent implements OnInit {
         var llave = ``
         var i = 0
         var estatus = 3 //NOTA DE ENTREGA
-        //Buscar en Wk de acuerdo al usuario y la app activa
-        this.xAPI = {} as IAPICore;
-        this.xAPI.funcion = environment.funcion.UBICACION
-        this.xAPI.valores = ''
-
-
 
         lstBz.forEach(e => {
             i++
             if (e.completed == true) {
-                this.xAPI.parametros = `3,${estatus},${llave},${usuario},${e.idd}`
-                this.apiService.Ejecutar(this.xAPI).subscribe(
+                const xAPix = {} as IAPICore;
+                xAPix.funcion = environment.funcion.UBICACION
+                xAPix.parametros = `3,${estatus},${llave},${usuario},${e.idd}`
+                this.apiService.Ejecutar(xAPix).subscribe(
                     (data) => {
                         this.actualizarBzClasificar(e.numc, 0)
                     },
@@ -1442,12 +1404,8 @@ export class RsbuzonComponent implements OnInit {
 
     async SubirArchivoResoluciones() {
 
-
-        // console.log("R" + this.IResolucion.cedula)
-
         this.ngxService.startLoader("loader-aceptar");
         if (this.archivos.length > 0) {
-            console.log('Existen mas archivos')
 
             var frm = new FormData(document.forms.namedItem("forma"));
             try {
@@ -1486,7 +1444,6 @@ export class RsbuzonComponent implements OnInit {
         this.maxCorregir = '3'
         this.maxExtender = '6'
         this.IResolucion.grado = parseInt(this.Resolucion.grado)
-        console.log(this.tipo)
         switch (parseInt(rs.tipo)) {
             case 1:
                 this.blNombramiento = true
@@ -1503,7 +1460,6 @@ export class RsbuzonComponent implements OnInit {
 
                 break
             case 3:
-                // console.log(this.tipo, this.IResolucion.tipo)
                 this.maxCol = "6"
                 this.blCorregir = true
                 if (this.IResolucion.tipo == 35) {
@@ -1645,12 +1601,9 @@ export class RsbuzonComponent implements OnInit {
 
         this.apiService.Ejecutar(this.xAPI).subscribe(
             (data) => {
-                console.log(data)
                 this.lstCausa = data.Cuerpo
-
                 this.blReserva = true
                 this.ngxService.stopLoader("loader-buscar")
-                //
             },
             (err) => {
                 console.error(err)

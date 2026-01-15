@@ -68,7 +68,6 @@ MPPD_CCarpetasGroup
 
   ngOnChanges(){
     let e = this.formSidenav.value
-    // console.log('Control de SideBar 2... ', this.formSidenav.value)
     this.xcomponente = e.nomb.toString()
     this.xnumCarpeta = e.obse.toString()
 
@@ -79,14 +78,12 @@ MPPD_CCarpetasGroup
 
   }
   async OpcionesCarpetas() {
-    console.log('entrando controles')
     if (this.xnumCarpeta != '' || this.xcomponente != ''){
       this.xAPI.funcion = environment.funcion.CARPETAS_GROUP
       this.xAPI.parametros = `${this.xnumCarpeta},${this.xcomponente}`
       this.xAPI.valores = null
       await this.apiService.Ejecutar(this.xAPI).subscribe(
           (data) => {
-            console.log(data)
               if (data.Cuerpo != undefined ){
                   data.Cuerpo.forEach(e => {
                     let rp = e.responsable.toString()
