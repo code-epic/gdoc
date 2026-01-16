@@ -94,6 +94,9 @@
                     </td>
                     <td class="text-right">
                       <div class="actions-container" *ngIf="!e.statusprogreso">
+                        <button mat-icon-button matTooltip="Recibir" (click)="open(observacion, e.idd)">
+                          <mat-icon class="text-gray">account_tree</mat-icon>
+                        </button>
 
                         <button mat-icon-button aria-label="Adjuntar" (click)="open(adjuntar, e.numc, i)"
                           matTooltip="Adjuntar">
@@ -240,3 +243,89 @@
   </div>
 </ng-template>
 
+
+
+
+
+<ng-template #observacion let-modal>
+  <div class="modal-header bg-pastel-gradient">
+    <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-group col-md-12">
+      <label for="txtobservacion">Observaciones</label>
+      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="Observacion"></textarea>
+    </div>
+    <div class="form-row col-md-12">
+      <div class="form-group col-md-{{tministerial}}">
+        <label>Acción</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text icon-box"><mat-icon class="input-icon">rule</mat-icon></span>
+          </div>
+          <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto" (change)="selAccion()">
+            <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group col-md-4" *ngIf="vministerial">
+        <label>Estatus</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text icon-box"><mat-icon class="input-icon">toggle_on</mat-icon></span>
+          </div>
+          <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbEstatus">
+            <option value="0">SELECCIONE</option>
+            <option *ngFor="let e of lstEstatus" value="{{e.valor}}">{{e.texto}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group col-md-4" *ngIf="vministerial">
+        <label>Decision del Ministro</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text icon-box"><mat-icon class="input-icon">gavel</mat-icon></span>
+          </div>
+          <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDecision">
+            <option value="0">SELECCIONE</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group  col-md-12" *ngIf="clasificacion">
+      <label>Area</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text icon-box"><mat-icon class="input-icon">place</mat-icon></span>
+        </div>
+        <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
+          <option value="0">SELECCIONE</option>
+          <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group  col-md-12" *ngIf="vplazo">
+      <label for="tmsCreacion">Plazo / Alerta</label>
+      <div class="form-group" style="width:100%">
+        <div class="input-group" style="width:100%">
+          <div class="input-group-prepend">
+            <span class="input-group-text icon-box" (click)="fd.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event</mat-icon></span>
+          </div>
+          <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+            [positionTarget]="buttonEl" readonly (click)="fd.toggle()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-pastel text-white " (click)="insertarObservacion();modal.close('Save')">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>

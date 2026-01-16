@@ -24,6 +24,7 @@ export class SpresidencialComponent implements OnInit {
   public estadoActual = 4
   public estadoOrigen = 5
   public estatusAcutal = 6
+  estatusOrigen = 1
   fecha_desde = '-09-01'
   fecha_hasta = '-09-30'
   xyear = '2024'
@@ -87,19 +88,14 @@ export class SpresidencialComponent implements OnInit {
   public lstAcciones = []
 
   public cmbAcciones = [
-    { 'valor': '0', 'texto': 'ACEPTAR', 'visible': '0' },
+    { 'valor': '0', 'texto': 'MINISTERIAL', 'visible': '0' },
     { 'valor': '1', 'texto': 'RECHAZAR', 'visible': '0' },
-    { 'valor': '2', 'texto': 'ANALISTA', 'visible': '1' },
-    { 'valor': '3', 'texto': 'JEFE DE AREA', 'visible': '1' },
-    { 'valor': '4', 'texto': 'BANDEJA DE ESPERA', 'visible': '1' },
-    { 'valor': '5', 'texto': 'PRESIDENCIAL', 'visible': '1' },
-    { 'valor': '6', 'texto': 'ESPERA DE OPINION', 'visible': '1' },
-    { 'valor': '7', 'texto': 'CONSULTORIA JURIDICA', 'visible': '1' },
-    { 'valor': '8', 'texto': 'AREA DE RESOLUCIONES', 'visible': '1' },
-    { 'valor': '9', 'texto': 'SUB-DIRECCION', 'visible': '1' },
-    { 'valor': '9', 'texto': 'DIRECCION GENERAL', 'visible': '1' },
-    { 'valor': '9', 'texto': 'DESPACHO DEL MPPD', 'visible': '1' },
-    { 'valor': '10', 'texto': 'SALIDA', 'visible': '2' }]
+    { 'valor': '2', 'texto': 'ACEPTAR', 'visible': '1' },
+    { 'valor': '3', 'texto': 'TRAMITACION POR ORDEN REGULAR', 'visible': '0' },
+    { 'valor': '4', 'texto': 'OTROS DOCUMENTOS', 'visible': '0' },
+    { 'valor': '5', 'texto': 'OTROS DOCUMENTOS', 'visible': '1' },
+    { 'valor': '6', 'texto': 'REDISTRIBUCION', 'oculto': '1' },
+  ]
 
 
 
@@ -287,6 +283,7 @@ export class SpresidencialComponent implements OnInit {
           e.existe = e.anom != '' ? true : false
           e.privado = e.priv == 1 ? true : false
           e.completed = false
+          console.log(e.accion != null, e.accion)
           e.nombre_accion = e.accion != null ? this.cmbAcciones[e.accion].texto : ''
           e.color = 'warn'
           bz.push(e)
@@ -352,31 +349,21 @@ export class SpresidencialComponent implements OnInit {
       async data => {
         switch (this.AccionTexto) {
           case "0"://Aceptar y promover el documento
-            this.promoverBuzon(0, this.utilService.FechaActual())
+            this.estatusOrigen = 2
+            this.redistribuir(4, this.utilService.FechaActual())
             break;
           case "1"://Rechazar en el estado inicial
             this.rechazarBuzon()
             break;
-          case "2"://Oficio por opinión
-            //this.promoverBuzon()
+          case "3"://Aceptar y promover el documento
+            this.estatusOrigen = 4
+            this.redistribuir(4, this.utilService.FechaActual())
             break;
-          case "3"://Oficio por opinión
-            this.promoverBuzon(1, '')
-            break;
-          case "4"://Oficio por opinión
-            //this.promoverBuzon()
-            break;
-          case "5":// Enviar a Archivo
-            //this.redistribuir(11)
-            break;
-          case "6":// Enviar a otras areas
-            //this.redistribuir(0)
-            break;
-          case "7"://Enviar a salida con bifurcacion
-            //this.redistribuir(9)
+          case "4"://TRAMITE POR ORGANO REGULAR
+            this.estatusOrigen = 5
+            this.redistribuir(4, this.utilService.FechaActual())
             break;
         }
-        //this.promoverBuzon()
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
@@ -410,7 +397,7 @@ export class SpresidencialComponent implements OnInit {
 
     var usuario = this.loginService.Usuario.id
     var i = 0
-    var estatus = 1 //NOTA DE ENTREGA
+    var estatus = this.estatusOrigen //NOTA DE ENTREGA
     //Buscar en Wk de acuerdo al usuario y la app activa
     this.xAPI = {} as IAPICore
     this.xAPI.funcion = 'WKF_APromoverEstatus'
@@ -434,13 +421,16 @@ export class SpresidencialComponent implements OnInit {
 
   }
 
-  async redistribuir(destino: number = 0) {
+  async redistribuir(destino: number = 0, sfecha: string) {
+    const fecha = sfecha == '' ? this.utilService.ConvertirFecha(this.extender_plazo) : sfecha
     var dst = destino != 0 ? destino : this.cmbDestino
+    var estatus = this.estatusOrigen 
 
     this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
-    this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
+    this.xAPI.parametros = `${dst},${dst},${estatus},${this.loginService.Usuario.id},${this.numControl}` 
+                            // dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
@@ -505,7 +495,7 @@ export class SpresidencialComponent implements OnInit {
     this.xAPI.valores = JSON.stringify(this.WAlerta)
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async alerData => {
-        
+
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
@@ -533,7 +523,7 @@ export class SpresidencialComponent implements OnInit {
   }
 
   async SubirArchivo(e, posicion) {
-    
+
     var frm = new FormData(document.forms.namedItem("forma"))
     this.buzon[posicion].statusprogreso = true
     this.btnEnviar = false

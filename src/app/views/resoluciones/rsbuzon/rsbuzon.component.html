@@ -68,10 +68,10 @@
                                                 <ngx-ui-loader [loaderId]="'ldbuzon'"></ngx-ui-loader>
 
                                                 <div class="example-large-box mat-elevation-z4">
-                                                    <mat-selection-list style="padding: 15px; width: 100%;">
-                                                        <mat-list
-                                                            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                                                            <div class="row">
+                                                    <mat-list style="padding: 15px; width: 100%;">
+                                                        <mat-list-item
+                                                            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: auto; padding-top: 10px; padding-bottom: 10px;">
+                                                            <div class="row w-100">
                                                                 <div class="col-md-6">
                                                                     <section>
                                                                         <button mat-flat-button (click)="principal()">
@@ -94,11 +94,11 @@
                                                                 </div>
                                                                 <div class="col-md-6"></div>
                                                             </div>
-                                                        </mat-list>
-                                                        <mat-list
-                                                            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: 55px;"
+                                                        </mat-list-item>
+                                                        <mat-list-item
+                                                            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: 55px; padding-top: 10px;"
                                                             *ngIf="blNavegacion">
-                                                            <div class="row" style="margin-top:10px">
+                                                            <div class="row w-100">
                                                                 <div class="col-md-1 texto-lista text-center">
                                                                     &nbsp;&nbsp;
                                                                 </div>
@@ -120,15 +120,15 @@
 
                                                             </div>
 
-                                                        </mat-list>
-                                                    </mat-selection-list>
+                                                        </mat-list-item>
+                                                    </mat-list>
 
 
-                                                    <mat-selection-list *ngIf="blNavegacion"
+                                                    <mat-list *ngIf="blNavegacion"
                                                         style="margin-top: -10px;padding: 15px; width: 100%;">
-                                                        <mat-list *ngFor="let e of bzRecibidoResumen; let i=index "
-                                                            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid;">
-                                                            <div class="row">
+                                                        <mat-list-item *ngFor="let e of bzRecibidoResumen; let i=index "
+                                                            style="border-bottom: 1px rgba(224, 223, 223, 0.945) solid; height: auto; padding-top: 5px; padding-bottom: 5px;">
+                                                            <div class="row w-100">
                                                                 <div class="col-md-1">
                                                                     &nbsp;&nbsp;<font style="font-weight: bold;"> {{ i +
                                                                         1}} </font>
@@ -173,9 +173,12 @@
                                                             </div>
 
 
-                                                        </mat-list>
-                                                    </mat-selection-list>
-                                                    <!-- (click)="toggleSidenav(e)" -->
+                                                        </mat-list-item>
+                                                    </mat-list>
+                                                   
+
+
+                                                    
                                                     <div class="row" *ngIf="!blNavegacion" style="padding: 20px;">
                                                         <div class="col-md-2 cardround"
                                                             *ngFor="let e of lstCarpetasRecibido">

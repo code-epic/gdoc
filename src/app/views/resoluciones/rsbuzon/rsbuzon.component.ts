@@ -375,7 +375,7 @@ export class RsbuzonComponent implements OnInit {
         private utilService: UtilService,
         private modalService: NgbModal,
         private ngxService: NgxUiLoaderService,
-        public formatter: NgbDateParserFormatter,
+        private formatter: NgbDateParserFormatter,
         private _snackBar: MatSnackBar,
         private ngbCalendar: NgbCalendar,
         private dateAdapter: NgbDateAdapter<string>,
@@ -466,7 +466,6 @@ export class RsbuzonComponent implements OnInit {
     open(content, id, pos) {
         this.numControl = id;
         this.posicion = pos;
-        //this.hashcontrol = btoa( "D" + this.numControl) //Cifrar documentos
         let modalRef = this.modalService.open(content, {
             centered: true,
             windowClass: "my-custom-modal-class",
@@ -1351,11 +1350,6 @@ export class RsbuzonComponent implements OnInit {
             }
         }
 
-
-
-        // let cont = e.split("|")
-        // if (cont.length > 0) text = cont[1]
-
         return text
     }
 
@@ -1366,8 +1360,8 @@ export class RsbuzonComponent implements OnInit {
             text: "¿Está seguro que desea anular la carpeta?",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#5eaaa8',
+            cancelButtonColor: '#ef9a9a',
             confirmButtonText: 'Si'
         }).then((result) => {
             if (result.isConfirmed) {
