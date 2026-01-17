@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <base href="/gdoc/">
@@ -10,19 +11,54 @@
   <!-- Favicon -->
   <link href="./assets/img/brand/favicon.ico" rel="icon" type="image/png">
   <!-- Fonts -->
-<!--  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">-->
+  <!--  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">-->
   <!-- Icons -->
   <link href="./assets/vendor/nucleo/css/nucleo.css" rel="stylesheet">
   <link href="./assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 
 
-<!--  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">-->
-<!--  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
+  <!--  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">-->
+  <!--  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#1976d2">
 <link rel="stylesheet" href="styles.fd6f4dd1a1d31f576629.css"></head>
+
 <body class="mat-typography">
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
-<script src="runtime.797e3ed1c710f40c8ff3.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.643a06fdfb1718e9de22.js" defer></script></body>
+<script src="runtime.797e3ed1c710f40c8ff3.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.430d660333efea0516e3.js" defer></script></body>
+
+<script>
+  /* global __TAURI__ */
+  (function () {
+    'use strict';
+
+    // Solo actúa si la API de Tauri está disponible
+    if (typeof window.__TAURI__ === 'undefined') return;
+
+    const originalLog = console.log;
+
+    /**
+     * Reemplaza console.log para persistir cada mensaje
+     * mediante la función expuesta por Tauri.
+     */
+    console.log = function (...args) {
+      // Delega en el logger original
+      originalLog.apply(console, args);
+
+      // Envía el mensaje al backend
+      window.__TAURI__.invoke('save_app_log', {
+        log: {
+          app_id: 'gdoc', // TODO: obtener dinámicamente
+          log_type: 'LOG',
+          message: args.join(' ')
+        }
+      }).catch(function (err) {
+        // Silencioso: no rompe la app si falla el envío
+        originalLog('[logger] Error al enviar log:', err);
+      });
+    };
+  })();
+</script>
+
 </html>
