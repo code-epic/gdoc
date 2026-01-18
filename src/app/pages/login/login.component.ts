@@ -97,21 +97,11 @@ export class LoginComponent implements OnInit {
     await this.loginService.getLogin(this.usuario, this.clave).subscribe(
       (data) => { // Success
         this.itk  = data;
-        // sessionStorage.setItem("token", this.itk.token);
-        // this.ngxService.stopLoader("loader-login");
-        // this.router.navigate(['/dashboard']);
-
          let tk: any = this.loginService.getUserDecrypt(this.itk.token);
-
-          // MODIFICATION STARTS HERE
-          // console.log(tk.Usuario.token)
           if (tk.Usuario.token !== undefined && tk.Usuario.token !== null) {
-            // 2FA is required, show the TOTP section
-            // this.xWidth = '840px'
             this.showTotpSection = true;
             this.tempAuthToken = this.itk.token; // Store the temporary token
           } else {
-            // No 2FA, proceed with normal login
             this.loginService.IniciarSesion(this.itk.token);
           }
 
@@ -119,6 +109,7 @@ export class LoginComponent implements OnInit {
           this.ngxService.stopLoader("loader-login");
       },
       (e) => {
+        console.log("Error al iniciar sesion desde GDoc")
         this.usuario = ''
         this.clave = ''
         this.ngxService.stopLoader("loader-login");
