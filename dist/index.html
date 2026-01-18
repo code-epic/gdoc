@@ -26,7 +26,7 @@
 <body class="mat-typography">
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
-<script src="runtime.00266adf3067a35e1353.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.67e5dd55ffc0afc51173.js" defer></script></body>
+<script src="runtime.00266adf3067a35e1353.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.92dbfc10b61c56f73904.js" defer></script></body>
 
 <script>
 
@@ -39,7 +39,7 @@
     const originalFetch = window.fetch;
     const OriginalXHR = window.XMLHttpRequest;
 
-    function sendToParent(type, message, details = {}) {
+    function sendToParent(type, message, details = null) {
       if (window.parent) {
         window.parent.postMessage({
           type: 'SDC_LOG',
@@ -47,7 +47,7 @@
             app_id: appId,
             log_type: type, // 'FETCH', 'XHR', 'ERROR', 'INFO'
             message: message,
-            details: details // Objeto extra con status, url, payload, response
+            details: details // Objeto estructurado
           }
         }, '*');
       }
@@ -61,7 +61,6 @@
 
     console.error = function (...args) {
       originalError.apply(console, args);
-      // Convertir Error objects a string si es necesario
       const msg = args.map(a => (a instanceof Error ? a.message + '\n' + a.stack : a)).join(' ');
       sendToParent('ERROR', msg);
     };
@@ -76,35 +75,42 @@
       const [resource, config] = args;
       const url = resource.toString();
       const method = (config && config.method) ? config.method : 'GET';
-
-      // NO reportamos start.
+      // Capturar params/body
+      const requestBody = (config && config.body) ? config.body : null;
 
       try {
         const response = await originalFetch(...args);
 
-        // Solo reportar errores HTTP (400+)
+        // Solo capturamos si hay error o si queremos debug profundo (segun requerimiento "capturar eventos")
+        // El usuario dijo "capturar eventos 403, 404...", pero tambien "mejorar detalles XHR".
+        // Asumimos que para Fetch aplicamos logica similar: reporte completo en error.
+
         if (response.status >= 400) {
           let responseBody = '[No Body]';
           try {
             responseBody = await response.clone().text();
-            // Limit length to avoid massive logs in DB
-            if (responseBody.length > 500) responseBody = responseBody.substring(0, 500) + '...';
+            if (responseBody.length > 5000) responseBody = responseBody.substring(0, 5000) + '... (truncated)';
           } catch (e) { }
 
-          const msg = `HTTP Error ${response.status} [${method}] ${url} | Resp: ${responseBody}`;
-          // Usamos 'ERROR' para asegurar persistencia y visibilidad
-          sendToParent('ERROR', msg, {
-            url: url,
+          const msg = `HTTP Error ${response.status} ${method} ${url}`;
+
+          sendToParent('FETCH', msg, {
+            url: response.url || url,
             method: method,
             status: response.status,
-            payload: config?.body || null,
-            response: responseBody
+            request_headers: (config && config.headers) ? config.headers : {},
+            request_payload: requestBody,
+            response_body: responseBody,
+            source: appId
           });
         }
 
         return response;
       } catch (err) {
-        sendToParent('ERROR', `Fetch Network Exception: ${url} - ${err.message}`);
+        sendToParent('ERROR', `Fetch Exception: ${url} - ${err.message}`, {
+          url: url,
+          error: err.message
+        });
         throw err;
       }
     };
@@ -114,7 +120,8 @@
       const xhr = new OriginalXHR();
       let method = 'GET';
       let url = '';
-      let payload = null;
+      let requestBody = null;
+      const requestHeaders = {};
 
       const originalOpen = xhr.open;
       xhr.open = function (m, u, ...args) {
@@ -123,43 +130,53 @@
         return originalOpen.apply(xhr, [m, u, ...args]);
       };
 
+      const originalSetRequestHeader = xhr.setRequestHeader;
+      xhr.setRequestHeader = function (header, value) {
+        requestHeaders[header] = value;
+        return originalSetRequestHeader.apply(xhr, [header, value]);
+      };
+
       const originalSend = xhr.send;
       xhr.send = function (body) {
-        payload = body;
+        requestBody = body; // Capturamos lo que se envia
         return originalSend.apply(xhr, [body]);
       };
 
       xhr.addEventListener('loadend', function () {
-        // Filtrar solo errores (400+)
         if (xhr.status >= 400) {
           let responseBody = xhr.responseText || '[No Body]';
-          if (responseBody.length > 500) responseBody = responseBody.substring(0, 500) + '...';
+          if (responseBody.length > 5000) responseBody = responseBody.substring(0, 5000) + '... (truncated)';
 
-          const msg = `XHR Error ${xhr.status} [${method}] ${url} | Resp: ${responseBody}`;
+          // Mensaje corto para la lista
+          const msg = `XHR Error ${xhr.status} ${method} ${url}`;
 
-          sendToParent('ERROR', msg, {
-            url: url,
+          // Detalles completos para el modal / guardado
+          sendToParent('FETCH', msg, {
+            url: xhr.responseURL || url,
             method: method,
             status: xhr.status,
-            payload: payload,
-            response: responseBody
+            request_headers: requestHeaders,
+            request_payload: requestBody,
+            response_body: responseBody,
+            source: appId
           });
         }
       });
 
       xhr.addEventListener('error', function () {
-        sendToParent('ERROR', `XHR Network Exception: ${method} ${url}`);
+        sendToParent('ERROR', `XHR Network Exception: ${method} ${url}`, { url: url, method: method });
       });
 
       return xhr;
     };
 
-    // Copiar propiedades estáticas de XHR si las hubiera (constantes, etc)
+    // Copiar propiedades estáticas
     Object.assign(window.XMLHttpRequest, OriginalXHR);
 
     sendToParent('INFO', `Monitor (XHR/Fetch) iniciado para ${appId}`);
 
   })();
+
 
 
 </script>
