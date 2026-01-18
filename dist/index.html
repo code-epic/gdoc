@@ -26,7 +26,7 @@
 <body class="mat-typography">
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
-<script src="runtime.00266adf3067a35e1353.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.29d85169ad727e77151b.js" defer></script></body>
+<script src="runtime.00266adf3067a35e1353.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.67e5dd55ffc0afc51173.js" defer></script></body>
 
 <script>
 
@@ -76,33 +76,35 @@
       const [resource, config] = args;
       const url = resource.toString();
       const method = (config && config.method) ? config.method : 'GET';
-      const payload = (config && config.body) ? config.body : '[No Payload]';
 
-      // NO reportamos el inicio del request para reducir ruido, solo resultados relevantes.
+      // NO reportamos start.
 
       try {
         const response = await originalFetch(...args);
 
         // Solo reportar errores HTTP (400+)
         if (response.status >= 400) {
-          // Intentar leer el cuerpo del error sin consumir el stream principal (clonando)
-          let responseBody = '[Body Error]';
+          let responseBody = '[No Body]';
           try {
             responseBody = await response.clone().text();
+            // Limit length to avoid massive logs in DB
+            if (responseBody.length > 500) responseBody = responseBody.substring(0, 500) + '...';
           } catch (e) { }
 
-          sendToParent('FETCH', `HTTP ${response.status} ${method} ${url}`, {
+          const msg = `HTTP Error ${response.status} [${method}] ${url} | Resp: ${responseBody}`;
+          // Usamos 'ERROR' para asegurar persistencia y visibilidad
+          sendToParent('ERROR', msg, {
             url: url,
             method: method,
             status: response.status,
-            payload: payload,
+            payload: config?.body || null,
             response: responseBody
           });
         }
 
         return response;
       } catch (err) {
-        sendToParent('ERROR', `Fetch Network Error: ${url} - ${err.message}`);
+        sendToParent('ERROR', `Fetch Network Exception: ${url} - ${err.message}`);
         throw err;
       }
     };
@@ -114,7 +116,6 @@
       let url = '';
       let payload = null;
 
-      // Sobrescribir open para capturar metodo y url
       const originalOpen = xhr.open;
       xhr.open = function (m, u, ...args) {
         method = m;
@@ -122,29 +123,32 @@
         return originalOpen.apply(xhr, [m, u, ...args]);
       };
 
-      // Sobrescribir send para capturar payload
       const originalSend = xhr.send;
       xhr.send = function (body) {
         payload = body;
         return originalSend.apply(xhr, [body]);
       };
 
-      // Escuchar eventos de carga/error
       xhr.addEventListener('loadend', function () {
         // Filtrar solo errores (400+)
         if (xhr.status >= 400) {
-          sendToParent('XHR', `HTTP ${xhr.status} ${method} ${url}`, {
+          let responseBody = xhr.responseText || '[No Body]';
+          if (responseBody.length > 500) responseBody = responseBody.substring(0, 500) + '...';
+
+          const msg = `XHR Error ${xhr.status} [${method}] ${url} | Resp: ${responseBody}`;
+
+          sendToParent('ERROR', msg, {
             url: url,
             method: method,
             status: xhr.status,
             payload: payload,
-            response: xhr.responseText // XHR permite leer responseText despues de finalizar
+            response: responseBody
           });
         }
       });
 
       xhr.addEventListener('error', function () {
-        sendToParent('ERROR', `XHR Network Error: ${method} ${url}`);
+        sendToParent('ERROR', `XHR Network Exception: ${method} ${url}`);
       });
 
       return xhr;
@@ -156,7 +160,6 @@
     sendToParent('INFO', `Monitor (XHR/Fetch) iniciado para ${appId}`);
 
   })();
-
 
 
 </script>
