@@ -29,36 +29,80 @@
 </body>
 
 <script>
-  /* global __TAURI__ */
-  (function () {
-    'use strict';
-
-    // Solo actúa si la API de Tauri está disponible
-    if (typeof window.__TAURI__ === 'undefined') return;
-
+  
+  (function() {
+    // Guardamos las referencias originales
     const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+    const originalFetch = window.fetch;
+
+    // Configuración: ID de la app (cambiar según corresponda en cada proyecto)
+    // Puedes intentar obtenerlo dinámicamente si hay alguna variable global, 
+    // sino default a 'external-app'
+    const appId = window.APP_ID || 'external-app'; 
 
     /**
-     * Reemplaza console.log para persistir cada mensaje
-     * mediante la función expuesta por Tauri.
+     * Envía el log al padre (Sandra Desktop container)
      */
-    console.log = function (...args) {
-      // Delega en el logger original
-      originalLog.apply(console, args);
+    function sendToParent(type, message) {
+      if (window.parent) {
+        window.parent.postMessage({
+          type: 'SDC_LOG',
+          payload: {
+            app_id: appId,
+            log_type: type,
+            message: message
+          }
+        }, '*');
+      }
+    }
 
-      // Envía el mensaje al backend
-      window.__TAURI__.invoke('save_app_log', {
-        log: {
-          app_id: 'gdoc', // TODO: obtener dinámicamente
-          log_type: 'LOG',
-          message: args.join(' ')
-        }
-      }).catch(function (err) {
-        // Silencioso: no rompe la app si falla el envío
-        originalLog('[logger] Error al enviar log:', err);
-      });
+    // 1. Interceptar Console
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      sendToParent('INFO', args.join(' '));
     };
-  })();
+
+    console.error = function(...args) {
+      originalError.apply(console, args);
+      sendToParent('ERROR', args.join(' '));
+    };
+    
+    console.warn = function(...args) {
+      originalWarn.apply(console, args);
+      sendToParent('WARN', args.join(' '));
+    };
+
+    // 2. Interceptar Fetch (Red)
+    window.fetch = async function(...args) {
+        const [resource] = args;
+        const url = resource.toString();
+
+        try {
+            const response = await originalFetch(...args);
+            
+            // Lógica de Filtrado Estricta:
+            // Solo reportar errores de servidor o cliente (4xx, 5xx)
+            // Ignorar 200, 201, 204, etc.
+            if (response.status >= 400) {
+                sendToParent('FETCH', `Error HTTP ${response.status} en ${url}`);
+            }
+            
+            return response;
+        } catch (err) {
+            // Si falla la red (offline, cors, dns) -> Reportamos error
+            sendToParent('ERROR', `Fallo de Red: ${url} - ${err.message}`);
+            throw err;
+        }
+    };
+
+    // Notificar inicio
+    sendToParent('INFO', `Monitor iniciado para ${appId}`);
+
+})();
+
+
 </script>
 
 </html>
