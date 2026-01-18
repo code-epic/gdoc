@@ -29,78 +29,134 @@
 </body>
 
 <script>
-  
-  (function() {
-    // Guardamos las referencias originales
+
+  (function () {
+    // Configuración
+    const appId = window.APP_ID || 'external-app';
     const originalLog = console.log;
     const originalError = console.error;
     const originalWarn = console.warn;
     const originalFetch = window.fetch;
+    const OriginalXHR = window.XMLHttpRequest;
 
-    // Configuración: ID de la app (cambiar según corresponda en cada proyecto)
-    // Puedes intentar obtenerlo dinámicamente si hay alguna variable global, 
-    // sino default a 'external-app'
-    const appId = window.APP_ID || 'external-app'; 
-
-    /**
-     * Envía el log al padre (Sandra Desktop container)
-     */
-    function sendToParent(type, message) {
+    function sendToParent(type, message, details = {}) {
       if (window.parent) {
         window.parent.postMessage({
           type: 'SDC_LOG',
           payload: {
             app_id: appId,
-            log_type: type,
-            message: message
+            log_type: type, // 'FETCH', 'XHR', 'ERROR', 'INFO'
+            message: message,
+            details: details // Objeto extra con status, url, payload, response
           }
         }, '*');
       }
     }
 
     // 1. Interceptar Console
-    console.log = function(...args) {
+    console.log = function (...args) {
       originalLog.apply(console, args);
       sendToParent('INFO', args.join(' '));
     };
 
-    console.error = function(...args) {
+    console.error = function (...args) {
       originalError.apply(console, args);
-      sendToParent('ERROR', args.join(' '));
+      // Convertir Error objects a string si es necesario
+      const msg = args.map(a => (a instanceof Error ? a.message + '\n' + a.stack : a)).join(' ');
+      sendToParent('ERROR', msg);
     };
-    
-    console.warn = function(...args) {
+
+    console.warn = function (...args) {
       originalWarn.apply(console, args);
       sendToParent('WARN', args.join(' '));
     };
 
     // 2. Interceptar Fetch (Red)
-    window.fetch = async function(...args) {
-        const [resource] = args;
-        const url = resource.toString();
+    window.fetch = async function (...args) {
+      const [resource, config] = args;
+      const url = resource.toString();
+      const method = (config && config.method) ? config.method : 'GET';
+      const payload = (config && config.body) ? config.body : '[No Payload]';
 
-        try {
-            const response = await originalFetch(...args);
-            
-            // Lógica de Filtrado Estricta:
-            // Solo reportar errores de servidor o cliente (4xx, 5xx)
-            // Ignorar 200, 201, 204, etc.
-            if (response.status >= 400) {
-                sendToParent('FETCH', `Error HTTP ${response.status} en ${url}`);
-            }
-            
-            return response;
-        } catch (err) {
-            // Si falla la red (offline, cors, dns) -> Reportamos error
-            sendToParent('ERROR', `Fallo de Red: ${url} - ${err.message}`);
-            throw err;
+      // NO reportamos el inicio del request para reducir ruido, solo resultados relevantes.
+
+      try {
+        const response = await originalFetch(...args);
+
+        // Solo reportar errores HTTP (400+)
+        if (response.status >= 400) {
+          // Intentar leer el cuerpo del error sin consumir el stream principal (clonando)
+          let responseBody = '[Body Error]';
+          try {
+            responseBody = await response.clone().text();
+          } catch (e) { }
+
+          sendToParent('FETCH', `HTTP ${response.status} ${method} ${url}`, {
+            url: url,
+            method: method,
+            status: response.status,
+            payload: payload,
+            response: responseBody
+          });
         }
+
+        return response;
+      } catch (err) {
+        sendToParent('ERROR', `Fetch Network Error: ${url} - ${err.message}`);
+        throw err;
+      }
     };
 
-    // Notificar inicio
-    sendToParent('INFO', `Monitor iniciado para ${appId}`);
+    // 3. Interceptar XHR (XMLHttpRequest)
+    window.XMLHttpRequest = function () {
+      const xhr = new OriginalXHR();
+      let method = 'GET';
+      let url = '';
+      let payload = null;
 
-})();
+      // Sobrescribir open para capturar metodo y url
+      const originalOpen = xhr.open;
+      xhr.open = function (m, u, ...args) {
+        method = m;
+        url = u;
+        return originalOpen.apply(xhr, [m, u, ...args]);
+      };
+
+      // Sobrescribir send para capturar payload
+      const originalSend = xhr.send;
+      xhr.send = function (body) {
+        payload = body;
+        return originalSend.apply(xhr, [body]);
+      };
+
+      // Escuchar eventos de carga/error
+      xhr.addEventListener('loadend', function () {
+        // Filtrar solo errores (400+)
+        if (xhr.status >= 400) {
+          sendToParent('XHR', `HTTP ${xhr.status} ${method} ${url}`, {
+            url: url,
+            method: method,
+            status: xhr.status,
+            payload: payload,
+            response: xhr.responseText // XHR permite leer responseText despues de finalizar
+          });
+        }
+      });
+
+      xhr.addEventListener('error', function () {
+        sendToParent('ERROR', `XHR Network Error: ${method} ${url}`);
+      });
+
+      return xhr;
+    };
+
+    // Copiar propiedades estáticas de XHR si las hubiera (constantes, etc)
+    Object.assign(window.XMLHttpRequest, OriginalXHR);
+
+    sendToParent('INFO', `Monitor (XHR/Fetch) iniciado para ${appId}`);
+
+  })();
+
 
 
 </script>
