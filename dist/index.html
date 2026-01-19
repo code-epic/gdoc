@@ -26,7 +26,7 @@
 <body class="mat-typography">
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
-<script src="runtime.00266adf3067a35e1353.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.92dbfc10b61c56f73904.js" defer></script></body>
+<script src="runtime.00266adf3067a35e1353.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.88a1f58b33c3c2001e84.js" defer></script></body>
 
 <script>
 
@@ -54,10 +54,10 @@
     }
 
     // 1. Interceptar Console
-    console.log = function (...args) {
-      originalLog.apply(console, args);
-      sendToParent('INFO', args.join(' '));
-    };
+    // console.log = function (...args) {
+    //   originalLog.apply(console, args);
+    //   sendToParent('INFO', args.join(' '));
+    // };
 
     console.error = function (...args) {
       originalError.apply(console, args);
@@ -65,10 +65,10 @@
       sendToParent('ERROR', msg);
     };
 
-    console.warn = function (...args) {
-      originalWarn.apply(console, args);
-      sendToParent('WARN', args.join(' '));
-    };
+    // console.warn = function (...args) {
+    //   originalWarn.apply(console, args);
+    //   sendToParent('WARN', args.join(' '));
+    // };
 
     // 2. Interceptar Fetch (Red)
     window.fetch = async function (...args) {

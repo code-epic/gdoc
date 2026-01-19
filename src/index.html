@@ -54,10 +54,10 @@
     }
 
     // 1. Interceptar Console
-    console.log = function (...args) {
-      originalLog.apply(console, args);
-      sendToParent('INFO', args.join(' '));
-    };
+    // console.log = function (...args) {
+    //   originalLog.apply(console, args);
+    //   sendToParent('INFO', args.join(' '));
+    // };
 
     console.error = function (...args) {
       originalError.apply(console, args);
@@ -65,10 +65,10 @@
       sendToParent('ERROR', msg);
     };
 
-    console.warn = function (...args) {
-      originalWarn.apply(console, args);
-      sendToParent('WARN', args.join(' '));
-    };
+    // console.warn = function (...args) {
+    //   originalWarn.apply(console, args);
+    //   sendToParent('WARN', args.join(' '));
+    // };
 
     // 2. Interceptar Fetch (Red)
     window.fetch = async function (...args) {
