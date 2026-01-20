@@ -32,7 +32,7 @@
 
   (function () {
     // Configuración
-    const appId = window.APP_ID || 'external-app';
+    const appId = 'gedoc';
     const originalLog = console.log;
     const originalError = console.error;
     const originalWarn = console.warn;
@@ -45,6 +45,7 @@
           type: 'SDC_LOG',
           payload: {
             app_id: appId,
+            source: 'external-app',
             log_type: type, // 'FETCH', 'XHR', 'ERROR', 'INFO'
             message: message,
             details: details // Objeto estructurado

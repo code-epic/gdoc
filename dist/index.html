@@ -26,13 +26,13 @@
 <body class="mat-typography">
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
-<script src="runtime.00266adf3067a35e1353.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.88a1f58b33c3c2001e84.js" defer></script></body>
+<script src="runtime.00266adf3067a35e1353.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.c78a4df24b3307f0643d.js" defer></script></body>
 
 <script>
 
   (function () {
     // Configuración
-    const appId = window.APP_ID || 'external-app';
+    const appId = 'gedoc';
     const originalLog = console.log;
     const originalError = console.error;
     const originalWarn = console.warn;
@@ -45,6 +45,7 @@
           type: 'SDC_LOG',
           payload: {
             app_id: appId,
+            source: 'external-app',
             log_type: type, // 'FETCH', 'XHR', 'ERROR', 'INFO'
             message: message,
             details: details // Objeto estructurado
