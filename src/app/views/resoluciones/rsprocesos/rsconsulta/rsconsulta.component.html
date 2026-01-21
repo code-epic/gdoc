@@ -139,7 +139,7 @@
                                                 
                                                 <button class="btn btn-pastel text-white w-100" (click)="verificarNombre()">
                                                     <span class="d-flex align-items-center justify-content-center">
-                                                        <mat-icon class="mr-1" style="font-size: 18px; width: 18px; height: 18px;">search</mat-icon> Consultar
+                                                        <span class="fa fa-search" style="font-size: 18px;"></span>&nbsp;&nbsp;Consultar
                                                     </span>
                                                 </button>
                                             </div>
@@ -186,7 +186,7 @@
                                             <div class="form-group col-md-3">
                                                 <button class="btn btn-pastel text-white w-100" (click)="verificar()">
                                                     <span class="d-flex align-items-center justify-content-center">
-                                                        <mat-icon class="mr-1" style="font-size: 18px; width: 18px; height: 18px;">search</mat-icon> Consultar por caso
+                                                        <span class="fa fa-user" style="font-size: 18px;"></span>&nbsp;&nbsp;Consultar por caso
                                                     </span>
                                                 </button>
                                             </div>
@@ -1150,7 +1150,7 @@
                                                             <label class="form-label-custom">Seleccionar Archivo</label>
                                                             <div class="input-group">
                                                                 <div class="custom-file">
-                                                                    <input type="file" class="custom-file-input" id="archivos" (change)="fileSelected($event)" accept=".csv" lang="es">
+                                                                    <input type="file" class="custom-file-input" name="archivos"  id="archivos" (change)="fileSelected($event)" accept=".csv" lang="es">
                                                                     <label class="custom-file-label" for="archivos" style="border-top-left-radius: 0.375rem; border-bottom-left-radius: 0.375rem;">
                                                                         {{ archivos && archivos.length > 0 ? archivos[archivos.length - 1].name : 'Seleccionar archivo .csv' }}
                                                                     </label>
@@ -1161,16 +1161,16 @@
                                                         <div class="form-group col-md-4">
                                                             <button class="btn btn-pastel text-white w-100" *ngIf="blExpandidaFile" (click)="SubirArchivo($event)">
                                                                 <span class="d-flex align-items-center justify-content-center">
-                                                                    <mat-icon class="mr-1" style="font-size: 18px; width: 18px; height: 18px;">cloud_upload</mat-icon> Procesar
+                                                                    <span class="fa fa-upload" style="font-size: 18px;"></span>&nbsp;&nbsp;Procesar
                                                                 </span>
                                                             </button>
                                                             
-                                                            <div class="btn-group w-100 shadow-sm" *ngIf="!blExpandidaFile" role="group">
-                                                                <button type="button" class="btn btn-pastel text-white" (click)="downloadCSVExFile()" title="Descargar Resultados">
-                                                                    <mat-icon style="font-size: 18px; width: 18px; height: 18px;">download</mat-icon>
+                                                            <div class="btn-group w-100 shadow-sm d-flex" *ngIf="!blExpandidaFile" role="group">
+                                                                <button type="button" class="btn btn-pastel text-white w-100" (click)="downloadCSVExFile()" title="Descargar Resultados">
+                                                                    <span class="fa fa-download" style="font-size: 18px;"></span>
                                                                 </button>
-                                                                <button type="button" class="btn btn-pastel-cancel text-white" (click)="ReveserConsutla()" title="Limpiar Consulta">
-                                                                    <mat-icon style="font-size: 18px; width: 18px; height: 18px;">close</mat-icon>
+                                                                <button type="button" class="btn btn-pastel-cancel text-white w-100" (click)="ReveserConsutla()" title="Limpiar Consulta">
+                                                                    <span class="fa fa-times" style="font-size: 18px;"></span>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -1185,7 +1185,7 @@
                                             <div class="col-md-12">
                                                 <h2 class="title-elegant mb-3">Resultados de la Carga</h2>
                                                 <table class="sandratbl">
-                                                    <thead>
+                                                    <thead style="width: 40px;">
                                                         <tr>
                                                             <th class="text-center" style="width: 60px;">N°</th>
                                                             <th>GRADO</th>

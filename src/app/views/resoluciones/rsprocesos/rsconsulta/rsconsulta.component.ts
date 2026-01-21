@@ -1092,15 +1092,16 @@ export class RsconsultaComponent implements OnInit {
 
   execFnx(data: any) {
     const nameFnx = "Fnx_MYSQLCsvLoad";
+    console.log("Ejecuto la funcion fnx_MYSQLCsvLoad", data);
     const fnx = {
       funcion: nameFnx,
       codigo: environment.Hash,
       basedatos: "mppd",
-      dir: data.msj,
-      file: data.msj[0].split("|")[1],
+      dir: data.msj.split("|")[1],
+      file: data.contenido[0].split("|")[1],
       uuid: this.idTransaccion,
     };
-
+    console.log(fnx);
     this.apiService.ExecFnx(fnx).subscribe(
       (data) => {
         // console.log("Ejecuto la funcion fnx_MYSQLCsvLoad", data);
