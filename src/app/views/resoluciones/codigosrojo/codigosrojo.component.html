@@ -32,16 +32,89 @@
           <div class="card-body">
             <ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
             <br>
-           <div   *ngIf="bmenu"  class="col-md-12 cardround text-center" (click)="ConsultarCodigosRojos()">
+           <!-- <div   *ngIf="bmenu"  class="col-md-12 cardround text-center" (click)="ConsultarCodigosRojos()">
                 <div class="text-center botones">
                     <br>
-                    <h2 class="text-center text-blue"><i class="fa fa-code"
+                    <h2 class="text-center text-red"><i class="fa fa-code"
                             style="font-size: 42px;"></i>
                     </h2>
                     <p>Codigos Rojo</p>
                 </div>
+                 <div class="text-center botones">
+                    <br>
+                    <h2 class="text-center text-blue"><i class="fa fa-code"
+                            style="font-size: 42px;"></i>
+                    </h2>
+                    <p>Codigos Azul</p>
+                </div>
+                 <div class="text-center botones">
+                    <br>
+                    <h2 class="text-center text-yellow"><i class="fa fa-code"
+                            style="font-size: 42px;"></i>
+                    </h2>
+                    <p>Codigos Amarillo</p>
+                </div>
+            </div> -->
+
+
+            <div class="row" >
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4 sub-anim-item"  [style.animation-delay]="(10 * 100) + 'ms'">
+              <a (click)="ConsultarCodigosRojos(3)" class="text-decoration-none">
+                <div class="card submenu-card h-100">
+                  <div class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center">
+                    <div class="sub-icon-container">
+                      <i class="fa fa-code fa-2x text-red"></i>
+                    </div>
+                    <h5 class="text-uppercase font-weight-bold mb-3 sub-text-title">Codigos Rojos</h5>
+                    <div class="mt-auto">
+                      <span class="badge badge-pill badge-secondary text-muted px-3 py-2" 
+                      style="background-color: #f8f9fe; border: 1px solid #f0f2f5;">
+                        <i class="fa fa-chevron-right mr-1" style="font-size: 0.8em;"></i> Acceder
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </a>
             </div>
 
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4 sub-anim-item"  [style.animation-delay]="(10 * 100) + 'ms'">
+              <a (click)="ConsultarCodigosRojos(2)" class="text-decoration-none">
+                <div class="card submenu-card h-100">
+                  <div class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center">
+                    <div class="sub-icon-container">
+                      <i class="fa fa-code fa-2x text-blue"></i>
+                    </div>
+                    <h5 class="text-uppercase font-weight-bold mb-3 sub-text-title">Codigos Azules</h5>
+                    <div class="mt-auto">
+                      <span class="badge badge-pill badge-secondary text-muted px-3 py-2" 
+                      style="background-color: #f8f9fe; border: 1px solid #f0f2f5;">
+                        <i class="fa fa-chevron-right mr-1" style="font-size: 0.8em;"></i> Acceder
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4 sub-anim-item"  [style.animation-delay]="(10 * 100) + 'ms'">
+              <a (click)="ConsultarCodigosRojos(1)" class="text-decoration-none">
+                <div class="card submenu-card h-100">
+                  <div class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center">
+                    <div class="sub-icon-container">
+                      <i class="fa fa-code fa-2x text-yellow"></i>
+                    </div>
+                    <h5 class="text-uppercase font-weight-bold mb-3 sub-text-title">Codigos Amarillos</h5>
+                    <div class="mt-auto">
+                      <span class="badge badge-pill badge-secondary text-muted px-3 py-2" 
+                      style="background-color: #f8f9fe; border: 1px solid #f0f2f5;">
+                        <i class="fa fa-chevron-right mr-1" style="font-size: 0.8em;"></i> Acceder
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
 
 
 

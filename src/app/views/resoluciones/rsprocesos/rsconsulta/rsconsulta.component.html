@@ -16,8 +16,8 @@
                         </div>
                         <div class="col-md-7">
                             <div class="div-radio-avanzado">
-                                <mat-radio-group class="mat-radio" [(ngModel)]="opttodos" color="primary">
-                                    <mat-radio-button value="0" checked="checked"> RESOLUCIONES
+                                <mat-radio-group class="mat-radio" [(ngModel)]="opttodos"  color="primary">
+                                    <mat-radio-button value="0"> RESOLUCIONES
                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </mat-radio-button>
                                     <mat-radio-button value="1"> ENTRADA </mat-radio-button>
                                 </mat-radio-group>
@@ -308,10 +308,10 @@
                                                                             <span class="text-sm text-dark" style="font-size: 0.85rem;"><strong>OBSERVACIONES:</strong> {{ (IDatosBasicos.observaciones | uppercase) || 'NO APLICA' }}</span>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="alert alert-danger shadow-sm border-0 mb-0" *ngIf="IDatosBasicos.condicion != 0">
+                                                                    <div class="alert shadow-sm border-0 mb-0" [ngClass]="{'alert-danger': IDatosBasicos.condicion == 3, 'alert-warning': IDatosBasicos.condicion == 2, 'alert-info': IDatosBasicos.condicion == 1}" *ngIf="IDatosBasicos.condicion != 0">
                                                                         <div class="d-flex align-items-center">
-                                                                            <mat-icon class="mr-2 text-white" style="font-size: 18px; width: 18px; height: 18px;">warning</mat-icon>
-                                                                            <span class="text-sm text-white"><strong>MOTIVO:</strong> {{ (IDatosBasicos.motivo | uppercase) || 'NO APLICA' }}</span>
+                                                                            <mat-icon class="mr-2" [ngClass]="{'text-white': IDatosBasicos.condicion == 3, 'text-dark': IDatosBasicos.condicion != 3}" style="font-size: 18px; width: 18px; height: 18px;">warning</mat-icon>
+                                                                            <span class="text-sm" [ngClass]="{'text-white': IDatosBasicos.condicion == 3, 'text-dark': IDatosBasicos.condicion != 3}"><strong>MOTIVO:</strong> {{ (IDatosBasicos.motivo | uppercase) || 'NO APLICA' }}</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1150,8 +1150,8 @@
                                                             <label class="form-label-custom">Seleccionar Archivo</label>
                                                             <div class="input-group">
                                                                 <div class="custom-file">
-                                                                    <input type="file" class="custom-file-input" id="fileUpload" (change)="fileSelected($event)" accept=".csv" lang="es">
-                                                                    <label class="custom-file-label" for="fileUpload" style="border-top-left-radius: 0.375rem; border-bottom-left-radius: 0.375rem;">
+                                                                    <input type="file" class="custom-file-input" id="archivos" (change)="fileSelected($event)" accept=".csv" lang="es">
+                                                                    <label class="custom-file-label" for="archivos" style="border-top-left-radius: 0.375rem; border-bottom-left-radius: 0.375rem;">
                                                                         {{ archivos && archivos.length > 0 ? archivos[archivos.length - 1].name : 'Seleccionar archivo .csv' }}
                                                                     </label>
                                                                 </div>

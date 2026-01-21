@@ -37,12 +37,12 @@ export class CodigosrojoComponent implements OnInit {
   }
   
 
-  ConsultarCodigosRojos() {
+  ConsultarCodigosRojos(valor: number) {
     this.bmenu = false
     this.ngxService.startLoader('loader-buscar')
     this.xAPI.funcion = environment.funcion.CONSULTAR_CODIGOS_ROJOS
     this.xAPI.valores = ''
-    this.xAPI.parametros = '3,%,%,%,%,%'
+    this.xAPI.parametros = `${valor},%,%,%,%,%`
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data: any) => {
         this.lstCodigosRojos = data.Cuerpo
