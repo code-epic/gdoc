@@ -1076,6 +1076,7 @@ export class RsconsultaComponent implements OnInit {
 
   async SubirArchivo(e) {
     this.ngxService.startLoader("loader-aceptar");
+    // console.log("Subir Archivo", this.idTransaccion);
     var frm = new FormData(document.forms.namedItem("forma"));
     // console.log(frm)
     try {
@@ -1090,18 +1091,19 @@ export class RsconsultaComponent implements OnInit {
   }
 
   execFnx(data: any) {
-    let nameFnx = "Fnx_MYSQLCsvLoad";
-    let fnx = {
+    const nameFnx = "Fnx_MYSQLCsvLoad";
+    const fnx = {
       funcion: nameFnx,
       codigo: environment.Hash,
       basedatos: "mppd",
       dir: data.msj,
-      file: data.contenido[0].split("|")[1],
+      file: data.msj[0].split("|")[1],
       uuid: this.idTransaccion,
     };
 
     this.apiService.ExecFnx(fnx).subscribe(
       (data) => {
+        // console.log("Ejecuto la funcion fnx_MYSQLCsvLoad", data);
         this.ConsultarPidRecursivo(
           data.contenido.id,
           "GDoc/Resoluciones",
@@ -1120,7 +1122,7 @@ export class RsconsultaComponent implements OnInit {
       (data) => {
         setTimeout(() => {
           if (data.documento == "PROCESADO") {
-            console.log(data);
+            // console.log(data);
             this.pID.id = id;
             this.pID.estatus = false;
             this.pID.contenido = paquete;
