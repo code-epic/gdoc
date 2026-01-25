@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { from, Observable, switchMap } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
@@ -9,6 +9,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import Swal from 'sweetalert2';
 import { ApiService, IAPICore } from '../apicore/api.service';
 import { Md5 } from 'md5-typescript';
+import { Sha256Service } from '../util/sha256';
 
 export interface IUsuario {
   nombre: string;
@@ -63,6 +64,7 @@ export class LoginService {
     private utils: UtilService,
     private apiService: ApiService,
     private router: Router, 
+    private sha256: Sha256Service,
     private http: HttpClient) {
 
     this.Id = environment.ID;
@@ -86,12 +88,43 @@ export class LoginService {
     
   }
   getLogin(user: string, clave: string): Observable<IToken> {
-    let usuario = {
-      'nombre' : user,
-      'clave' : clave,
-    };
-    let url = this.URL + 'wusuario/loginV2';
-    return this.http.post<IToken>(url, usuario );
+    const netInfo = sessionStorage.getItem('net_info');
+    let deviceContext = '';
+
+    if (netInfo) {
+      const info = JSON.parse(netInfo);
+      const context = {
+        os_info: info.system?.os_info || 'unknown',
+        mac_address: info.system?.mac_address || 'unknown',
+        network: info.network || 'unknown',
+      };
+      deviceContext = btoa(JSON.stringify(context));
+    }
+    console.log('Device Context:', deviceContext);
+    
+    return from(this.sha256.EncryptDeviceContext(deviceContext, environment.Hash.slice(-32))).pipe(
+      switchMap(encodeDeviceContext => {
+        const timestamp = new Date().getTime().toString();
+        const httpOptions = {
+          headers: new HttpHeaders({
+            'X-Skip-Interceptor': 'true',
+            "Content-Type": "application/json",
+            'X-Device-Context': encodeDeviceContext,
+            'X-Timestamp': timestamp,
+            'Web-API-key': environment.Hash,
+          }),
+        };
+
+        
+
+        var usuario = {
+          "nombre": user,
+          "clave": clave,
+        }
+        var url = this.URL + 'wusuario/loginV2'
+        return this.http.post<IToken>(url, usuario, httpOptions);
+      })
+    );
   }
 
   makeUser(user: IUsuario): Observable<any> {

@@ -91,10 +91,10 @@ export class LoginComponent implements OnInit {
     // Acción para el botón enviar
   }
 
-  async login() {
+  login() {
     this.ngxService.startLoader("loader-login");
 
-    await this.loginService.getLogin(this.usuario, this.clave).subscribe(
+    this.loginService.getLogin(this.usuario, this.clave).subscribe(
       (data) => { // Success
         this.itk  = data;
          let tk: any = this.loginService.getUserDecrypt(this.itk.token);

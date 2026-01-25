@@ -120,4 +120,32 @@ export class Sha256Service {
       .map(b => b.toString(16).padStart(2, '0'))
       .join('');
   }
+    // Usando Web Crypto API para cifrar el contexto antes de enviarlo
+  async EncryptDeviceContext(context: any, secretKey: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(JSON.stringify(context));
+
+    // Generar un IV (Vector de Inicialización) único para esta petición
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+
+    // Importar clave (esto es un ejemplo, la clave debe ser tratada con cuidado)
+    const key = await crypto.subtle.importKey(
+      "raw", encoder.encode(secretKey), "AES-GCM", false, ["encrypt"]
+    );
+
+    const encrypted = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv: iv }, key, data
+    );
+
+    // Unimos IV + Datos Cifrados y pasamos a Base64
+    const combined = new Uint8Array(iv.length + encrypted.byteLength);
+    combined.set(iv);
+    combined.set(new Uint8Array(encrypted), iv.length);
+
+    let binary = '';
+    for (let i = 0; i < combined.length; i++) {
+      binary += String.fromCharCode(combined[i]);
+    }
+    return btoa(binary);
+  }
 }

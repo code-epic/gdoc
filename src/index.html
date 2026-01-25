@@ -39,6 +39,13 @@
     const originalFetch = window.fetch;
     const OriginalXHR = window.XMLHttpRequest;
 
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'NETWORK_CONTEXT') {
+        sessionStorage.setItem('net_info', JSON.stringify(event.data.payload));
+        console.log('Network context updated from parent.', event.data.payload  );
+      }
+    });
+
     function sendToParent(type, message, details = null) {
       if (window.parent) {
         window.parent.postMessage({

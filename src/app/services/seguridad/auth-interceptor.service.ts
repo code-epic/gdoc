@@ -31,23 +31,20 @@ export class AuthInterceptorService implements HttpInterceptor {
       });
       return next.handle(cleanReq); 
     }
-    
 
     if (!req.body || req.method === 'GET') {
       return this.procesarPeticion(req, next);
     }
-    let token: string = sessionStorage.getItem("token")
-
-    if (sessionStorage.getItem("recovery") != undefined)
-      token = sessionStorage.getItem("recovery")
-
+    
+    const token: string = sessionStorage.getItem("token")
+    
     const timestamp = new Date().getTime().toString();
     const payload = JSON.stringify(req.body) + timestamp;
     return from(this.sha256.hmac(payload, this.SECRET_KEY)).pipe(
       switchMap(signature => {
         const secureReq = req.clone({
           setHeaders: {
-            'authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
             'Web-API-key': this.SECRET_KEY,
             'X-Signature': signature,
             'X-Timestamp': timestamp
