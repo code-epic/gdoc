@@ -26,7 +26,7 @@
 <body class="mat-typography">
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
-<script src="runtime.f253b81280eff3ba2b0f.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.51dbfbcec24dba4e0e1f.js" defer></script></body>
+<script src="runtime.f284cb85f8ea9a74b686.js" defer></script><script src="polyfills-es5.cc0b90942d098564df56.js" nomodule defer></script><script src="polyfills.47f7a86c0f02daaea44a.js" defer></script><script src="scripts.4b13bbdd1f5fcd2c3378.js" defer></script><script src="main.70bd0623ee48b4d54782.js" defer></script></body>
 
 <script>
 
@@ -38,6 +38,13 @@
     const originalWarn = console.warn;
     const originalFetch = window.fetch;
     const OriginalXHR = window.XMLHttpRequest;
+
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'NETWORK_CONTEXT') {
+        sessionStorage.setItem('net_info', JSON.stringify(event.data.payload));
+        console.log('Network context updated from parent.', event.data.payload  );
+      }
+    });
 
     function sendToParent(type, message, details = null) {
       if (window.parent) {

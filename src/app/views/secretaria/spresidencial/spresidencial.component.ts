@@ -22,12 +22,12 @@ export class SpresidencialComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef
 
   public estadoActual = 4
-  public estadoOrigen = 5
-  public estatusAcutal = 6
+  public estadoOrigen = 2
+  public estatusAcutal = 3
   estatusOrigen = 1
-  fecha_desde = '-09-01'
-  fecha_hasta = '-09-30'
-  xyear = '2024'
+  fecha_desde = '-01-01'
+  fecha_hasta = '-01-31'
+  xyear = '2026'
   public lstMeses = []
   public lstYear = []
   public xmeses = ''
