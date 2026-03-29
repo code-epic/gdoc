@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
 
 
 
-    public fechafinal
+  public fechafinal
   public fechaX
   public build
 
