@@ -360,7 +360,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       // Simulación con archivo de ejemplo local
       this.pdfUrl =
         this.sanitizer.bypassSecurityTrustResourceUrl("assets/000643.pdf");
-      this.rawPdfUrl = "assets/060642.pdf";
+      this.rawPdfUrl = "assets/000643.pdf";
       this.loadingPdf = false;
       this.changeDetector.detectChanges();
       return;
