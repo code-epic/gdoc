@@ -43,7 +43,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public pdfUrl: SafeResourceUrl | null = null;
   public rawPdfUrl: string | null = null;
   public documentObservations = "";
-  public activar_pdf = true; // Cambiado a true para producción
+  public activar_pdf = false; // Cambiado a true para producción
 
   // Loading flags
   public loadingExplorer = false;
@@ -359,7 +359,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     if (!this.activar_pdf) {
       // Simulación con archivo de ejemplo local
       this.pdfUrl =
-        this.sanitizer.bypassSecurityTrustResourceUrl("assets/060642.pdf");
+        this.sanitizer.bypassSecurityTrustResourceUrl("assets/000643.pdf");
       this.rawPdfUrl = "assets/060642.pdf";
       this.loadingPdf = false;
       this.changeDetector.detectChanges();
