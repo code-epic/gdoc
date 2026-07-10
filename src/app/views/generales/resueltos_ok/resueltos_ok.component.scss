@@ -1,0 +1,810 @@
+/* Componente resueltos_ok - Estilos Adaptativos Tablet-First */
+
+.resueltos-container {
+  font-family: 'Open Sans', 'Roboto', sans-serif;
+  color: #32325d;
+  background-color: #f8f9fe;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+/* Ocultar barra lateral y barra superior de la plantilla */
+::ng-deep {
+  body.immersive-active {
+    .example-sidenav, mat-sidenav {
+      display: none !important;
+      width: 0 !important;
+    }
+    app-navbar {
+      display: none !important;
+    }
+    .main-content {
+      margin-left: 0 !important;
+      padding: 0 !important;
+      width: 100vw !important;
+      max-width: 100vw !important;
+    }
+    app-resueltos-ok {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+/* Header inmersivo del módulo */
+.module-header {
+  background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 15px rgba(94, 170, 168, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  p {
+    font-size: 0.85rem;
+    margin: 0.25rem 0 0 0;
+    opacity: 0.9;
+  }
+}
+
+.btn-close-view {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  border-radius: 30px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+
+  &:hover {
+    background: #f5365c;
+    border-color: #f5365c;
+    transform: translateY(-1px);
+  }
+}
+
+/* --- MASTER-DETAIL LAYOUT (TABLET PHILOSOPHY) --- */
+.tablet-layout {
+  display: flex;
+  gap: 1.5rem;
+  height: calc(100vh - 120px);
+  overflow: hidden;
+}
+
+/* Columna Izquierda: Navegador de Carpetas (Master) */
+.master-panel {
+  flex: 4; /* 40% del ancho */
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(224, 224, 224, 0.4);
+}
+
+/* Columna Derecha: Contenido y Documentos (Detail) */
+.detail-panel {
+  flex: 6; /* 60% del ancho */
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(224, 224, 224, 0.4);
+  overflow-y: auto;
+}
+
+/* --- TABS DE FILTRO DE COMPONENTES --- */
+.component-tabs {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #f0f2f5;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 4px;
+  }
+}
+
+.tab-btn {
+  background: #f8f9fe;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #525f7f;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  &:hover {
+    border-color: #5eaaa8;
+    color: #5eaaa8;
+  }
+
+  &.active {
+    background: #5eaaa8;
+    border-color: #5eaaa8;
+    color: white;
+    box-shadow: 0 4px 10px rgba(94, 170, 168, 0.25);
+  }
+}
+
+/* Buscador de carpetas */
+.search-wrapper {
+  margin-bottom: 1rem;
+  position: relative;
+
+  i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8898aa;
+    font-size: 0.85rem;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.55rem 1rem 0.55rem 2.2rem;
+    border-radius: 25px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.85rem;
+    color: #32325d;
+    background-color: #f8f9fe;
+    transition: all 0.2s ease;
+
+    &:focus {
+      background-color: white;
+      border-color: #5eaaa8;
+      box-shadow: 0 0 0 3px rgba(94, 170, 168, 0.15);
+      outline: none;
+    }
+  }
+}
+
+/* Lista/Cuadrícula de Carpetas Acotada */
+.folders-list-container {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.folder-card-compact {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #f8f9fe;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #f0f2f5;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
+    border-color: rgba(94, 170, 168, 0.3);
+  }
+
+  &.active {
+    background: #e8f4f3;
+    border-color: #5eaaa8;
+    
+    .folder-icon {
+      transform: scale(1.05);
+    }
+  }
+}
+
+.folder-icon-compact {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+  transition: transform 0.2s ease;
+}
+
+.folder-badge-compact {
+  background: #f5365c;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  margin-left: auto;
+}
+
+.folder-info-compact {
+  overflow: hidden;
+  
+  .name {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #32325d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .date {
+    font-size: 0.7rem;
+    color: #8898aa;
+    margin-top: 0.15rem;
+  }
+}
+
+/* Paginación de carpetas */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f0f2f5;
+  margin-top: 0.5rem;
+
+  span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #8898aa;
+  }
+
+  button {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #525f7f;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background: #f8f9fe;
+      border-color: #5eaaa8;
+      color: #5eaaa8;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* --- ESTILOS PANEL DE DETALLES --- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+  color: #8898aa;
+  padding: 2rem;
+
+  i {
+    font-size: 4rem;
+    color: #e2e8f0;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #525f7f;
+  }
+
+  p {
+    font-size: 0.85rem;
+    max-width: 280px;
+    margin: 0.5rem auto 0 auto;
+  }
+}
+
+.detail-header {
+  border-bottom: 1px solid #f0f2f5;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #32325d;
+    margin: 0;
+  }
+  
+  .badge {
+    background-color: #e8f4f3;
+    color: #5eaaa8;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 30px;
+  }
+}
+
+/* Tabla de Documentos */
+.doc-item-row {
+  display: flex;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #f0f2f5;
+  margin-bottom: 0.6rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background-color: #f8f9fe;
+    border-color: rgba(94, 170, 168, 0.2);
+  }
+
+  .number {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #8898aa;
+    width: 24px;
+  }
+
+  .doc-info {
+    flex: 1;
+    min-width: 0;
+    
+    .name {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #32325d;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .meta {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.2rem;
+      font-size: 0.7rem;
+      color: #8898aa;
+      
+      span {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+.btn-doc-pill {
+  border-radius: 30px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  &.btn-view {
+    background: #e8f4f3;
+    color: #5eaaa8;
+    &:hover {
+      background: #5eaaa8;
+      color: white;
+    }
+  }
+
+  &.btn-sign {
+    background: #eafbe7;
+    color: #2dce89;
+    &:hover {
+      background: #2dce89;
+      color: white;
+    }
+  }
+}
+
+/* --- CONTEXT MENU --- */
+.custom-context-menu {
+  position: fixed;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  padding: 0.35rem 0;
+  z-index: 1000;
+  min-width: 160px;
+  border: 1px solid #f0f2f5;
+
+  .context-menu-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #525f7f;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background-color: #f8f9fe;
+      color: #5eaaa8;
+    }
+    
+    &.text-danger:hover {
+      background-color: #fff5f5;
+      color: #f5365c;
+    }
+  }
+}
+
+/* --- VISTA INMERSIVA (TINDER PDF VIEW) --- */
+.immersive-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0b132b;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  overflow: hidden;
+}
+
+/* Navbar inmersivo */
+.immersive-nav {
+  height: 55px;
+  background-color: #1c2541;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+}
+
+.immersive-nav-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #8ecae6;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.immersive-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #f5365c;
+    transform: rotate(90deg);
+  }
+}
+
+/* Área central de Tinder */
+.immersive-main {
+  flex: 1;
+  display: flex;
+  position: relative;
+  height: calc(100vh - 125px);
+}
+
+/* Controles de flecha lateral (premium) */
+.nav-arrow-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(28, 37, 65, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  
+  &:hover {
+    background: #3a86c8;
+    border-color: #3a86c8;
+    color: white;
+  }
+
+  &.arrow-left {
+    left: 1.5rem;
+    &:hover { transform: translateY(-50%) translateX(-3px); }
+  }
+
+  &.arrow-right {
+    right: 1.5rem;
+    &:hover { transform: translateY(-50%) translateX(3px); }
+  }
+  
+  &.disabled {
+    opacity: 0.15;
+    pointer-events: none;
+  }
+}
+
+/* Tinder Card Wrapper (optimizado para Tablet) */
+.tinder-card-wrapper {
+  flex: 1;
+  display: flex;
+  height: calc(100% - 2rem);
+  margin: 1rem 5.5rem; /* Ajustado para flechas */
+  background: #1c2541;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.35s ease;
+  
+  &.swipe-right {
+    transform: translate(120%, 0) rotate(10deg);
+    opacity: 0;
+  }
+  &.swipe-left {
+    transform: translate(-120%, 0) rotate(-10deg);
+    opacity: 0;
+  }
+}
+
+/* Panel PDF */
+.pdf-viewer-pane {
+  flex: 1.8;
+  height: 100%;
+  background: #0b132b;
+  position: relative;
+  
+  object, iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+}
+
+.pdf-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0b132b;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+  gap: 1rem;
+  
+  .spinner-border {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: #8ecae6;
+  }
+}
+
+/* Panel Metadatos */
+.metadata-pane {
+  flex: 1;
+  height: 100%;
+  background: #1c2541;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-y: auto;
+}
+
+.metadata-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  
+  .meta-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #8ecae6;
+    margin: 0;
+  }
+  .meta-subtitle {
+    font-size: 0.75rem;
+    color: #8898aa;
+  }
+}
+
+.meta-group {
+  margin-bottom: 0.85rem;
+  
+  label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #8ecae6;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.15rem;
+    display: block;
+  }
+  
+  .meta-value {
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.45rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+}
+
+.custom-textarea {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  width: 100%;
+  resize: none;
+  
+  &:focus {
+    background-color: rgba(255, 255, 255, 0.06);
+    border-color: #8ecae6;
+    outline: none;
+  }
+}
+
+/* Footer inmersivo (Acciones de Aprobación/Rechazo) */
+.immersive-footer {
+  height: 70px;
+  background-color: #1c2541;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+}
+
+.action-btn {
+  border-radius: 30px;
+  padding: 0.65rem 2rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &.btn-approve {
+    background: linear-gradient(135deg, #2dce89 0%, #2dcecc 100%);
+    color: white;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(45, 206, 137, 0.3);
+    }
+  }
+
+  &.btn-reject {
+    background: linear-gradient(135deg, #f5365c 0%, #f56036 100%);
+    color: white;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(245, 54, 92, 0.3);
+    }
+  }
+}
+
+/* --- TABLET PRIMERO (RESPONSIVIDAD Y OPTIMIZACIONES) --- */
+@media (max-width: 1024px) {
+  .tablet-layout {
+    gap: 1rem;
+  }
+  .master-panel {
+    flex: 4.5;
+    padding: 1rem;
+  }
+  .detail-panel {
+    flex: 5.5;
+    padding: 1rem;
+  }
+  .tinder-card-wrapper {
+    margin: 1rem 4.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .tablet-layout {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+  .master-panel, .detail-panel {
+    flex: none;
+    height: auto;
+  }
+  .tinder-card-wrapper {
+    flex-direction: column;
+    margin: 0.5rem;
+    height: 100%;
+  }
+  .pdf-viewer-pane {
+    flex: 1.3;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .metadata-pane {
+    flex: 0.7;
+  }
+  .nav-arrow-control {
+    display: none; /* Swipe gestures son suficientes en tablets chicas */
+  }
+  .immersive-footer {
+    gap: 1.5rem;
+    .action-btn {
+      padding: 0.6rem 1.5rem;
+      font-size: 0.85rem;
+    }
+  }
+}

@@ -75,6 +75,7 @@ import { GralestadisticasComponent } from './views/generales/gralestadisticas/gr
 import { GraledicionComponent } from './views/generales/graledicion/graledicion.component';
 import { GrallibroComponent } from './views/generales/grallibro/grallibro.component';
 import { TableGrallibroModalComponent } from './views/generales/grallibro/modal/table-grallibro-modal/table-grallibro-modal.component';
+import { ResueltosOkComponent } from './views/generales/resueltos_ok/resueltos_ok.component';
 import {SharedModule} from './shared/shared.module';
 import { RecibidosFieldsNavComponent } from './views/resoluciones/rsbuzon/recibidos-fields-nav/recibidos-fields-nav.component';
 import { RsconsultaentradasComponent } from './views/resoluciones/rsprocesos/rsconsultaentradas/rsconsultaentradas.component';
@@ -186,6 +187,7 @@ const ngWizardConfig: NgWizardConfig = {
     AybuzonComponent,
     AyreportesComponent,
     GeneralesComponent,
+    ResueltosOkComponent,
     ArchivoComponent,
     AycotizacionesComponent,
     // PendientesComponent,

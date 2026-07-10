@@ -82,3 +82,13 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+
+// Polyfill String.prototype.replaceAll for older WebKit / Safari browsers (like older iPads)
+if (!(String.prototype as any).replaceAll) {
+  (String.prototype as any).replaceAll = function(str: any, newStr: any) {
+    if (Object.prototype.toString.call(str) === '[object RegExp]') {
+      return this.replace(str, newStr);
+    }
+    return this.replace(new RegExp(str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), newStr);
+  };
+}

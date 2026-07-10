@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SwPush } from '@angular/service-worker';
-import { Observable, from, throwError, Subject } from 'rxjs';
+import { Observable, from, throwError, Subject, of } from 'rxjs';
 import { tap, switchMap, catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
@@ -54,21 +54,30 @@ export class PushService {
    * @returns Un Observable que emite `true` si el permiso es concedido, `false` en caso contrario.
    */
   requestPermission(): Observable<boolean> {
-    return from(Notification.requestPermission()).pipe(
-      map(permission => {
-        if (permission === 'granted') {
-          console.log('Permiso de notificación concedido.');
-          this.listenForPushNotifications(); // Iniciar la escucha una vez que se concede el permiso
-          return true;
-        }
-        console.warn('El usuario denegó los permisos de notificación.');
-        return false;
-      }),
-      catchError(err => {
-        console.error('Error al solicitar permiso de notificación:', err);
-        return throwError(() => new Error('Error al solicitar permiso de notificación.'));
-      })
-    );
+    if (typeof Notification === 'undefined') {
+      console.warn('La API de Notificaciones no está disponible en este navegador/dispositivo.');
+      return of(false);
+    }
+    try {
+      return from(Notification.requestPermission()).pipe(
+        map(permission => {
+          if (permission === 'granted') {
+            console.log('Permiso de notificación concedido.');
+            this.listenForPushNotifications(); // Iniciar la escucha una vez que se concede el permiso
+            return true;
+          }
+          console.warn('El usuario denegó los permisos de notificación.');
+          return false;
+        }),
+        catchError(err => {
+          console.warn('Error al solicitar permiso de notificación:', err);
+          return of(false);
+        })
+      );
+    } catch (e) {
+      console.warn('Safari bloqueó la solicitud automática de notificaciones por falta de interacción del usuario.');
+      return of(false);
+    }
   }
 
   /**
