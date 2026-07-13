@@ -1,5 +1,16 @@
 /* Componente resueltos_ok - Estilos Adaptativos Tablet-First */
 
+// Paleta verde pastel unificada con resueltos_ios
+$ok-primary:      #5dbe8e;
+$ok-primary-dark: #4aa87a;
+$ok-primary-light:#d4f1e0;
+$ok-bg:           #f4fbf7;
+$ok-surface:      #ffffff;
+$ok-text:         #2d3748;
+$ok-text-muted:   #718096;
+$ok-border:       #e2e8f0;
+$ok-shadow:       rgba(93, 190, 142, 0.12);
+
 .resueltos-root {
   position: relative;
   width: 100%;
@@ -10,9 +21,9 @@
 }
 
 .resueltos-container {
-  font-family: 'Open Sans', 'Roboto', sans-serif;
-  color: #32325d;
-  background-color: #f8f9fe;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: $ok-text;
+  background-color: $ok-bg;
   width: 100%;
   height: 100%;
   padding: 1rem;
@@ -69,11 +80,11 @@
 
 /* Header inmersivo del módulo */
 .module-header {
-  background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);
+  background: linear-gradient(135deg, $ok-primary 0%, $ok-primary-dark 100%);
   padding: 1rem 1.25rem;
-  border-radius: 12px;
+  border-radius: 14px;
   margin-bottom: 1rem;
-  box-shadow: 0 4px 15px rgba(94, 170, 168, 0.2);
+  box-shadow: 0 4px 15px $ok-shadow;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -110,8 +121,8 @@
   cursor: pointer;
 
   &:hover {
-    background: #f5365c;
-    border-color: #f5365c;
+    background: #e07a8e;
+    border-color: #e07a8e;
     transform: translateY(-1px);
   }
 }
@@ -120,42 +131,38 @@
 .tablet-layout {
   flex: 1 1 0%;
   min-height: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
   gap: 1.5rem;
   overflow: hidden;
 }
 
 /* Columna Izquierda: Navegador de Carpetas (Master) */
 .master-panel {
-  flex: 3.5;
-  min-width: 280px;
-  max-width: 380px;
   min-height: 0;
   height: 100%;
-  background: white;
+  background: $ok-surface;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 16px $ok-shadow;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(224, 224, 224, 0.4);
+  border: 1px solid $ok-border;
 }
 
 /* Columna Derecha: Contenido y Documentos (Detail) */
 .detail-panel {
-  flex: 6.5;
-  min-width: 360px;
   min-height: 0;
   height: 100%;
-  background: white;
+  background: $ok-surface;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 16px $ok-shadow;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  border: 1px solid rgba(224, 224, 224, 0.4);
+  border: 1px solid $ok-border;
 }
 
 /* --- TABS DE FILTRO DE COMPONENTES --- */
@@ -166,25 +173,25 @@
   gap: 0.5rem;
   padding-bottom: 0.75rem;
   margin-bottom: 1rem;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid $ok-border;
 
   &::-webkit-scrollbar {
     height: 4px;
   }
   &::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
+    background: $ok-border;
     border-radius: 4px;
   }
 }
 
 .tab-btn {
-  background: #f8f9fe;
-  border: 1px solid #e2e8f0;
+  background: $ok-bg;
+  border: 1px solid $ok-border;
   border-radius: 20px;
   padding: 0.4rem 0.9rem;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #525f7f;
+  color: $ok-text-muted;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
@@ -193,15 +200,15 @@
   gap: 0.35rem;
 
   &:hover {
-    border-color: #5eaaa8;
-    color: #5eaaa8;
+    border-color: $ok-primary;
+    color: $ok-primary;
   }
 
   &.active {
-    background: #5eaaa8;
-    border-color: #5eaaa8;
+    background: $ok-primary;
+    border-color: $ok-primary;
     color: white;
-    box-shadow: 0 4px 10px rgba(94, 170, 168, 0.25);
+    box-shadow: 0 2px 8px rgba(93, 190, 142, 0.35);
   }
 }
 
@@ -216,7 +223,7 @@
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #8898aa;
+    color: $ok-text-muted;
     font-size: 0.85rem;
   }
 
@@ -224,16 +231,16 @@
     width: 100%;
     padding: 0.55rem 1rem 0.55rem 2.2rem;
     border-radius: 25px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid $ok-border;
     font-size: 0.85rem;
-    color: #32325d;
-    background-color: #f8f9fe;
+    color: $ok-text;
+    background-color: $ok-bg;
     transition: all 0.2s ease;
 
     &:focus {
       background-color: white;
-      border-color: #5eaaa8;
-      box-shadow: 0 0 0 3px rgba(94, 170, 168, 0.15);
+      border-color: $ok-primary;
+      box-shadow: 0 0 0 3px $ok-primary-light;
       outline: none;
     }
   }
@@ -253,24 +260,24 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: #f8f9fe;
+  background: $ok-surface;
   border-radius: 12px;
   padding: 0.75rem 1rem;
   margin-bottom: 0.75rem;
-  border: 1px solid #f0f2f5;
+  border: 1px solid $ok-border;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
-    border-color: rgba(94, 170, 168, 0.3);
+    box-shadow: 0 2px 10px $ok-shadow;
+    border-color: $ok-primary;
   }
 
   &.active {
-    background: #e8f4f3;
-    border-color: #5eaaa8;
+    background: $ok-primary-light;
+    border-color: $ok-primary;
 
     .folder-icon-compact {
       transform: scale(1.05);
@@ -279,14 +286,14 @@
 }
 
 .folder-icon-compact {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   flex-shrink: 0;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+  color: $ok-primary;
   transition: transform 0.2s ease;
 }
 
 .folder-badge-compact {
-  background: #f5365c;
+  background: $ok-primary;
   color: white;
   border-radius: 20px;
   font-size: 0.7rem;
@@ -306,7 +313,7 @@
   .name {
     font-weight: 700;
     font-size: 0.85rem;
-    color: #32325d;
+    color: $ok-text;
     line-height: 1.35;
     white-space: nowrap;
     overflow: hidden;
@@ -314,7 +321,7 @@
   }
   .date {
     font-size: 0.7rem;
-    color: #8898aa;
+    color: $ok-text-muted;
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -328,30 +335,30 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 0.75rem;
-  border-top: 1px solid #f0f2f5;
+  border-top: 1px solid $ok-border;
   margin-top: 0.5rem;
 
   span {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #8898aa;
+    color: $ok-text-muted;
   }
 
   button {
-    background: white;
-    border: 1px solid #e2e8f0;
+    background: $ok-surface;
+    border: 1px solid $ok-border;
     border-radius: 8px;
     padding: 0.35rem 0.75rem;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #525f7f;
+    color: $ok-text;
     cursor: pointer;
     transition: all 0.15s ease;
 
     &:hover:not(:disabled) {
-      background: #f8f9fe;
-      border-color: #5eaaa8;
-      color: #5eaaa8;
+      background: $ok-bg;
+      border-color: $ok-primary;
+      color: $ok-primary;
     }
 
     &:disabled {
@@ -369,19 +376,19 @@
   justify-content: center;
   flex: 1;
   text-align: center;
-  color: #8898aa;
+  color: $ok-text-muted;
   padding: 2rem;
 
   i {
     font-size: 4rem;
-    color: #e2e8f0;
+    color: $ok-border;
     margin-bottom: 1.5rem;
   }
 
   h3 {
     font-size: 1.15rem;
     font-weight: 700;
-    color: #525f7f;
+    color: $ok-text;
   }
 
   p {
@@ -392,7 +399,7 @@
 }
 
 .detail-header {
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid $ok-border;
   padding-bottom: 0.75rem;
   margin-bottom: 1rem;
   display: flex;
@@ -403,7 +410,7 @@
   h3 {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #32325d;
+    color: $ok-text;
     margin: 0;
     line-height: 1.3;
     white-space: nowrap;
@@ -413,8 +420,8 @@
   }
 
   .badge {
-    background-color: #e8f4f3;
-    color: #5eaaa8;
+    background-color: $ok-primary-light;
+    color: $ok-primary-dark;
     font-weight: 700;
     font-size: 0.75rem;
     padding: 0.3rem 0.75rem;
@@ -430,26 +437,26 @@
   gap: 0.75rem;
   padding: 0.85rem 1rem;
   border-radius: 10px;
-  border: 1px solid #f0f2f5;
+  border: 1px solid $ok-border;
   margin-bottom: 0.6rem;
   cursor: pointer;
   transition: all 0.15s ease;
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(94, 170, 168, 0.2);
+  -webkit-tap-highlight-color: rgba($ok-primary, 0.2);
 
   &:hover {
-    background-color: #f8f9fe;
-    border-color: rgba(94, 170, 168, 0.2);
+    background-color: $ok-bg;
+    border-color: $ok-primary;
   }
 
   &:active {
-    background-color: rgba(94, 170, 168, 0.1);
+    background-color: $ok-primary-light;
   }
 
   .number {
     font-weight: 700;
     font-size: 0.8rem;
-    color: #8898aa;
+    color: $ok-text-muted;
     width: 24px;
     flex-shrink: 0;
     text-align: center;
@@ -462,7 +469,7 @@
     .name {
       font-weight: 700;
       font-size: 0.85rem;
-      color: #32325d;
+      color: $ok-text;
       line-height: 1.35;
       white-space: nowrap;
       overflow: hidden;
@@ -475,7 +482,7 @@
       gap: 0.35rem 1rem;
       margin-top: 0.2rem;
       font-size: 0.7rem;
-      color: #8898aa;
+      color: $ok-text-muted;
 
       span {
         display: inline-flex;
@@ -506,10 +513,10 @@
   gap: 0.25rem;
 
   &.btn-view {
-    background: #e8f4f3;
-    color: #5eaaa8;
+    background: $ok-primary-light;
+    color: $ok-primary-dark;
     &:hover {
-      background: #5eaaa8;
+      background: $ok-primary;
       color: white;
     }
   }
@@ -527,19 +534,19 @@
 /* --- CONTEXT MENU --- */
 .custom-context-menu {
   position: fixed;
-  background: white;
+  background: $ok-surface;
   border-radius: 8px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.12);
   padding: 0.35rem 0;
   z-index: 1000;
   min-width: 160px;
-  border: 1px solid #f0f2f5;
+  border: 1px solid $ok-border;
 
   .context-menu-item {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #525f7f;
+    color: $ok-text;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -547,8 +554,8 @@
     transition: all 0.15s ease;
 
     &:hover {
-      background-color: #f8f9fe;
-      color: #5eaaa8;
+      background-color: $ok-bg;
+      color: $ok-primary;
     }
     
     &.text-danger:hover {
@@ -567,14 +574,9 @@
 @media (max-width: 1024px) {
   .tablet-layout {
     gap: 1rem;
+    grid-template-columns: minmax(260px, 300px) 1fr;
   }
-  .master-panel {
-    flex: 3;
-    max-width: 320px;
-    padding: 1rem;
-  }
-  .detail-panel {
-    flex: 7;
+  .master-panel, .detail-panel {
     padding: 1rem;
   }
 }
@@ -582,14 +584,12 @@
 /* Tablets pequenas / Landscape phones */
 @media (max-width: 900px) {
   .tablet-layout {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     height: auto;
     overflow: visible;
     gap: 1rem;
   }
   .master-panel, .detail-panel {
-    flex: none;
-    max-width: none;
     width: 100%;
     height: auto;
     min-height: 350px;

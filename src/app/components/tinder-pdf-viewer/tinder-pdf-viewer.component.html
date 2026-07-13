@@ -63,14 +63,6 @@
                   (load)="onObjectLoad()">
           </iframe>
 
-          <!-- Barra flotante Safari siempre visible -->
-          <div class="tpv-safari-float" *ngIf="isSafari && !loadingPdf && !loading">
-            <span>Si el documento no se ve, ábralo en una pestaña:</span>
-            <button type="button" class="tpv-btn tpv-btn-safari" (click)="openPdfInNewTab()">
-              <i class="fas fa-external-link-alt"></i> Ver PDF
-            </button>
-          </div>
-
           <!-- Chrome/Firefox/Edge: <object> con blob URL -->
           <object *ngIf="!isSafari"
                   #pdfObject
@@ -104,20 +96,6 @@
                   (click)="openPdfInNewTab()">
             <i class="fas fa-external-link-alt"></i> Abrir PDF en nueva pestaña
           </button>
-        </div>
-
-        <!-- Barra de descarga / ayuda Safari (siempre visible cuando hay URL) -->
-        <div class="tpv-download-bar" *ngIf="rawPdfUrl && !loadingPdf && !loading">
-          <button type="button"
-                  class="tpv-download-link"
-                  (click)="openPdfInNewTab()"
-                  title="Abrir PDF en nueva pestaña">
-            <i class="fas fa-external-link-alt"></i>
-            Abrir PDF externamente
-          </button>
-          <span *ngIf="isSafari" class="tpv-safari-hint">
-            ¿No ve el documento? Use este botón.
-          </span>
         </div>
 
         <!-- Botón prominente para Safari/iOS -->
