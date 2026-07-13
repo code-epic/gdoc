@@ -76,6 +76,7 @@ import { GraledicionComponent } from './views/generales/graledicion/graledicion.
 import { GrallibroComponent } from './views/generales/grallibro/grallibro.component';
 import { TableGrallibroModalComponent } from './views/generales/grallibro/modal/table-grallibro-modal/table-grallibro-modal.component';
 import { ResueltosOkComponent } from './views/generales/resueltos_ok/resueltos_ok.component';
+import { ResueltosTinderComponent } from './views/generales/resueltos_tinder/resueltos_tinder.component';
 import {SharedModule} from './shared/shared.module';
 import { RecibidosFieldsNavComponent } from './views/resoluciones/rsbuzon/recibidos-fields-nav/recibidos-fields-nav.component';
 import { RsconsultaentradasComponent } from './views/resoluciones/rsprocesos/rsconsultaentradas/rsconsultaentradas.component';
@@ -95,6 +96,7 @@ import { SnuevoComponent } from './views/secretaria/snuevo/snuevo.component';
 import { AdministracionpublicaComponent } from './views/resoluciones/nomina/administracionpublica/administracionpublica.component';
 import { CodigosrojoComponent } from './views/resoluciones/codigosrojo/codigosrojo.component';
 import { ErrorModalComponent } from './components/error-modal/error-modal.component';
+import { TinderPdfViewerComponent } from './components/tinder-pdf-viewer/tinder-pdf-viewer.component';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -188,6 +190,7 @@ const ngWizardConfig: NgWizardConfig = {
     AyreportesComponent,
     GeneralesComponent,
     ResueltosOkComponent,
+    ResueltosTinderComponent,
     ArchivoComponent,
     AycotizacionesComponent,
     // PendientesComponent,
@@ -245,6 +248,7 @@ const ngWizardConfig: NgWizardConfig = {
     AdministracionpublicaComponent,
     CodigosrojoComponent,
     ErrorModalComponent,
+    TinderPdfViewerComponent,
   ],
   providers: [
     {

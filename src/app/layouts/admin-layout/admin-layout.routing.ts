@@ -49,6 +49,7 @@ import { GralestadisticasComponent } from 'src/app/views/generales/gralestadisti
 import { GraledicionComponent } from 'src/app/views/generales/graledicion/graledicion.component';
 import { ListadosComponent } from 'src/app/views/notas/listados/listados.component';
 import { ResueltosOkComponent } from 'src/app/views/generales/resueltos_ok/resueltos_ok.component';
+import { ResueltosTinderComponent } from 'src/app/views/generales/resueltos_tinder/resueltos_tinder.component';
 import { CtrlestadisticasComponent } from 'src/app/views/control/ctrlestadisticas/ctrlestadisticas.component';
 import { CtrlreporteComponent } from 'src/app/views/control/ctrlreporte/ctrlreporte.component';
 import { CtrlalertasComponent } from 'src/app/views/control/ctrlalertas/ctrlalertas.component';
@@ -228,6 +229,11 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'resueltos_ok',
         component: ResueltosOkComponent,
+        canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'resueltos_tinder',
+        component: ResueltosTinderComponent,
         canActivate: [AuthGuardGuard]
     },
     {

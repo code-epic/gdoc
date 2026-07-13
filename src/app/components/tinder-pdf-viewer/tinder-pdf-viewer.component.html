@@ -1,0 +1,216 @@
+<!-- ================================================================
+     TINDER PDF VIEWER - Componente genérico Safari-safe
+     Usa <object> tag en vez de <iframe> para máxima compatibilidad.
+     Sin backdrop-filter, sin 100vw, sin dependencias externas.
+     ================================================================ -->
+<div class="tpv-wrapper"
+     [class.tpv-swipe-left]="swipeDir === 'left'"
+     [class.tpv-swipe-right]="swipeDir === 'right'"
+     (window:keydown)="onKeyDown($event)">
+
+  <!-- ── Navbar ───────────────────────────────────────── -->
+  <div class="tpv-nav">
+    <div class="tpv-nav-left">
+      <i class="fas fa-file-pdf tpv-nav-icon"></i>
+      <span class="tpv-nav-title">Visor PDF</span>
+      <span class="tpv-nav-badge">{{ currentIndex + 1 }} / {{ total }}</span>
+    </div>
+    <div class="tpv-nav-right">
+      <span class="tpv-nav-user" *ngIf="activeDoc">
+        {{ activeDoc.nombres_apellidos | uppercase }}
+        <span class="tpv-nav-cedula">(V-{{ activeDoc.cedula }})</span>
+      </span>
+      <button class="tpv-btn-close" (click)="onClose()" title="Cerrar (Esc)">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Cuerpo central ──────────────────────────────── -->
+  <div class="tpv-body">
+
+    <!-- Flecha izquierda -->
+    <button class="tpv-arrow tpv-arrow-left"
+            [class.tpv-arrow-disabled]="isFirst"
+            [disabled]="isFirst || actionExecuting"
+            (click)="prevDocument()"
+            title="Anterior (←)">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <!-- Card principal -->
+    <div class="tpv-card"
+         (touchstart)="onTouchStart($event)"
+         (touchend)="onTouchEnd($event)">
+
+      <!-- ═══ Panel PDF (izquierda) ═══ -->
+      <div class="tpv-pdf-pane">
+
+        <!-- Loading -->
+        <div class="tpv-pdf-loading" *ngIf="loadingPdf || loading">
+          <div class="tpv-spinner"></div>
+          <span class="tpv-pdf-loading-text">Cargando PDF...</span>
+        </div>
+
+        <!-- Visor PDF nativo: Safari usa <embed>, otros <object> -->
+        <div class="tpv-pdf-object-container" *ngIf="pdfSrc && !pdfError && !objectFailed">
+
+          <!-- Safari / iOS: iframe con data URL (algunas versiones de Safari prefieren iframe) -->
+          <iframe *ngIf="isSafari"
+                  [src]="pdfSrc"
+                  class="tpv-pdf-iframe"
+                  type="application/pdf"
+                  (load)="onObjectLoad()">
+          </iframe>
+
+          <!-- Barra flotante Safari siempre visible -->
+          <div class="tpv-safari-float" *ngIf="isSafari && !loadingPdf && !loading">
+            <span>Si el documento no se ve, ábralo en una pestaña:</span>
+            <button type="button" class="tpv-btn tpv-btn-safari" (click)="openPdfInNewTab()">
+              <i class="fas fa-external-link-alt"></i> Ver PDF
+            </button>
+          </div>
+
+          <!-- Chrome/Firefox/Edge: <object> con blob URL -->
+          <object *ngIf="!isSafari"
+                  #pdfObject
+                  [data]="pdfSrc"
+                  type="application/pdf"
+                  class="tpv-pdf-object"
+                  (load)="onObjectLoad()"
+                  (error)="onObjectError()">
+            <div class="tpv-pdf-object-fallback">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p>Su navegador no puede mostrar PDF embebido.</p>
+            </div>
+          </object>
+        </div>
+
+        <!-- Error / Sin archivo -->
+        <div class="tpv-pdf-error" *ngIf="pdfError && !loadingPdf && !loading">
+          <i class="fas fa-exclamation-triangle tpv-error-icon"></i>
+          <h4 class="tpv-error-title">Archivo no disponible</h4>
+          <p class="tpv-error-msg">{{ pdfErrorMsg || 'No se pudo cargar el documento PDF.' }}</p>
+        </div>
+
+        <!-- Fallback: object/embed falló, ofrecer descarga externa -->
+        <div class="tpv-pdf-fallback" *ngIf="objectFailed && !loadingPdf && !loading">
+          <i class="fas fa-download tpv-fallback-icon"></i>
+          <h4 class="tpv-fallback-title">Visor no disponible</h4>
+          <p class="tpv-fallback-msg">El visor embebido no funciona en este navegador.</p>
+          <button *ngIf="rawPdfUrl"
+                  type="button"
+                  class="tpv-btn tpv-btn-download"
+                  (click)="openPdfInNewTab()">
+            <i class="fas fa-external-link-alt"></i> Abrir PDF en nueva pestaña
+          </button>
+        </div>
+
+        <!-- Barra de descarga / ayuda Safari (siempre visible cuando hay URL) -->
+        <div class="tpv-download-bar" *ngIf="rawPdfUrl && !loadingPdf && !loading">
+          <button type="button"
+                  class="tpv-download-link"
+                  (click)="openPdfInNewTab()"
+                  title="Abrir PDF en nueva pestaña">
+            <i class="fas fa-external-link-alt"></i>
+            Abrir PDF externamente
+          </button>
+          <span *ngIf="isSafari" class="tpv-safari-hint">
+            ¿No ve el documento? Use este botón.
+          </span>
+        </div>
+
+        <!-- Botón prominente para Safari/iOS -->
+        <div class="tpv-safari-bar" *ngIf="isSafari && rawPdfUrl && !loadingPdf && !loading">
+          <button type="button"
+                  class="tpv-btn tpv-btn-safari"
+                  (click)="openPdfInNewTab()">
+            <i class="fas fa-external-link-alt"></i>
+            Abrir PDF en Safari
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ Panel Metadata (derecha) ═══ -->
+      <div class="tpv-meta-pane" *ngIf="activeDoc">
+        <div class="tpv-meta-header">
+          <h4 class="tpv-meta-title">Atributos del Resuelto</h4>
+          <div class="tpv-meta-subtitle">Metadata de Expediente</div>
+        </div>
+
+        <div class="tpv-field">
+          <label>Cédula Identidad</label>
+          <div class="tpv-field-value">{{ activeDoc.cedula }}</div>
+        </div>
+
+        <div class="tpv-field">
+          <label>Nombres y Apellidos</label>
+          <div class="tpv-field-value">{{ activeDoc.nombres_apellidos | uppercase }}</div>
+        </div>
+
+        <div class="tpv-field" *ngIf="activeDoc.ncontrol || activeDoc.numc">
+          <label>Número de Control</label>
+          <div class="tpv-field-value">{{ activeDoc.ncontrol || activeDoc.numc }}</div>
+        </div>
+
+        <div class="tpv-field" *ngIf="activeDoc.digital || activeDoc.anom">
+          <label>Nombre Archivo</label>
+          <div class="tpv-field-value tpv-field-break">{{ activeDoc.digital || activeDoc.anom }}</div>
+        </div>
+
+        <!-- JWT Audit -->
+        <div class="tpv-meta-header tpv-meta-header-sm">
+          <h5 class="tpv-meta-title-sm">Auditoría de Firma (JWT)</h5>
+        </div>
+
+        <div class="tpv-field">
+          <label>Usuario Firmante</label>
+          <div class="tpv-field-value tpv-field-highlight">{{ jwtData.userName | uppercase }}</div>
+        </div>
+
+        <div class="tpv-field">
+          <label>Rol / Privilegios</label>
+          <div class="tpv-field-value tpv-field-highlight">{{ jwtData.userRole | uppercase }}</div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="tpv-field tpv-field-grow">
+          <label class="tpv-label-warn">Observaciones de Revisión</label>
+          <textarea class="tpv-textarea"
+                    rows="3"
+                    [(ngModel)]="observations"
+                    placeholder="Escriba observaciones de aprobación o motivo de rechazo..."
+                    [disabled]="actionExecuting"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flecha derecha -->
+    <button class="tpv-arrow tpv-arrow-right"
+            [class.tpv-arrow-disabled]="isLast"
+            [disabled]="isLast || actionExecuting"
+            (click)="nextDocument()"
+            title="Siguiente (→)">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- ── Footer de acciones ───────────────────────────── -->
+  <div class="tpv-footer">
+    <button class="tpv-btn tpv-btn-reject"
+            [disabled]="actionExecuting"
+            (click)="onReject()">
+      <i [class]="rejectIcon" *ngIf="!actionExecuting || executingType !== 'reject'"></i>
+      <div class="tpv-spinner-sm" *ngIf="actionExecuting && executingType === 'reject'"></div>
+      <span>{{ rejectLabel }}</span>
+    </button>
+
+    <button class="tpv-btn tpv-btn-approve"
+            [disabled]="actionExecuting"
+            (click)="onApprove()">
+      <i [class]="approveIcon" *ngIf="!actionExecuting || executingType !== 'approve'"></i>
+      <div class="tpv-spinner-sm" *ngIf="actionExecuting && executingType === 'approve'"></div>
+      <span>{{ approveLabel }}</span>
+    </button>
+  </div>
+</div>

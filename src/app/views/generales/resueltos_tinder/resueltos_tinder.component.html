@@ -1,0 +1,224 @@
+<!-- ================================================================
+     RESUELTOS TINDER - Nueva versión con visor PDF nativo Safari-safe
+     Estilo verde pastel propio, responsive, sin depender de clases globales
+     ================================================================ -->
+
+<!-- VISTA EXPLORADOR -->
+<div class="rt-container" *ngIf="!immersiveMode" (click)="closeContextMenu()">
+
+  <!-- Header -->
+  <div class="rt-header">
+    <div class="rt-header-info">
+      <h1 class="rt-title">Buzón de Resueltos</h1>
+      <p class="rt-subtitle">Gestión y firma digital de resueltos procesados</p>
+    </div>
+    <button class="rt-btn-close" (click)="exitComponent()">
+      <i class="fas fa-times-circle"></i>
+      <span>Cerrar</span>
+    </button>
+  </div>
+
+  <!-- Layout principal -->
+  <div class="rt-layout">
+
+    <!-- Panel izquierdo: Carpetas -->
+    <div class="rt-panel rt-panel-folders">
+
+      <!-- Filtros por componente -->
+      <div class="rt-tabs">
+        <button class="rt-tab" [class.rt-tab-active]="activeFilter === 'ALL'" (click)="setFilter('ALL')">
+          <i class="fas fa-globe"></i>
+          <span>Todos</span>
+        </button>
+        <button class="rt-tab" [class.rt-tab-active]="activeFilter === '1'" (click)="setFilter('1')">
+          <i class="fas fa-shield-alt"></i>
+          <span>Ejército</span>
+        </button>
+        <button class="rt-tab" [class.rt-tab-active]="activeFilter === '2'" (click)="setFilter('2')">
+          <i class="fas fa-anchor"></i>
+          <span>Armada</span>
+        </button>
+        <button class="rt-tab" [class.rt-tab-active]="activeFilter === '3'" (click)="setFilter('3')">
+          <i class="fas fa-fighter-jet"></i>
+          <span>Aviación</span>
+        </button>
+        <button class="rt-tab" [class.rt-tab-active]="activeFilter === '4'" (click)="setFilter('4')">
+          <i class="fas fa-shield-alt"></i>
+          <span>G.N.</span>
+        </button>
+        <button class="rt-tab" [class.rt-tab-active]="activeFilter === '5'" (click)="setFilter('5')">
+          <i class="fas fa-star"></i>
+          <span>Milicia</span>
+        </button>
+      </div>
+
+      <!-- Buscador -->
+      <div class="rt-search">
+        <i class="fas fa-search"></i>
+        <input type="text"
+               [(ngModel)]="folderSearch"
+               (ngModelChange)="onSearchChange()"
+               placeholder="Buscar carpeta..." />
+      </div>
+
+      <!-- Loading carpetas -->
+      <div class="rt-loading" *ngIf="loadingFolders">
+        <div class="rt-spinner"></div>
+        <span>Cargando carpetas...</span>
+      </div>
+
+      <!-- Lista carpetas -->
+      <div class="rt-folders-list" *ngIf="!loadingFolders">
+        <div class="rt-empty" *ngIf="filteredFolders.length === 0">
+          <i class="fas fa-folder-open"></i>
+          <span>No se encontraron carpetas</span>
+        </div>
+
+        <div class="rt-folder-card"
+             *ngFor="let folder of paginatedFolders"
+             [class.rt-folder-active]="selectedFolder?.llav === folder.llav"
+             (click)="onFolderClick(folder)"
+             (dblclick)="onFolderDblClick(folder)"
+             (contextmenu)="onFolderRightClick($event, folder)">
+          <div class="rt-folder-icon" [style.background-color]="getComponentColor(folder.componente)">
+            <i class="fas fa-folder"></i>
+          </div>
+          <div class="rt-folder-body">
+            <span class="rt-folder-name">{{ folder.llav }}</span>
+            <span class="rt-folder-date">
+              <i class="far fa-calendar-alt"></i>
+              {{ folder.fecha | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+          <span class="rt-folder-count">{{ folder.cantidad || 0 }}</span>
+        </div>
+      </div>
+
+      <!-- Paginador carpetas -->
+      <div class="rt-paginator" *ngIf="!loadingFolders && totalPages > 1">
+        <button class="rt-paginator-btn" [disabled]="folderPage === 1" (click)="prevFolderPage()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <span class="rt-paginator-text">{{ folderPage }} / {{ totalPages }}</span>
+        <button class="rt-paginator-btn" [disabled]="folderPage === totalPages" (click)="nextFolderPage()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Panel derecho: Documentos -->
+    <div class="rt-panel rt-panel-docs">
+
+      <!-- Estado vacío -->
+      <div class="rt-empty-state" *ngIf="!selectedFolder">
+        <div class="rt-empty-icon">
+          <i class="fas fa-copy"></i>
+        </div>
+        <h3>Seleccione una carpeta</h3>
+        <p>Seleccione una carpeta militar para visualizar los resueltos asociados.</p>
+      </div>
+
+      <!-- Contenido de carpeta -->
+      <div class="rt-docs-content" *ngIf="selectedFolder">
+
+        <!-- Cabecera -->
+        <div class="rt-docs-header">
+          <div>
+            <h3>Carpeta: {{ selectedFolder.llav }}</h3>
+            <span>{{ documents.length }} documentos</span>
+          </div>
+          <button class="rt-btn-open-folder" (click)="enterImmersiveFromFolder()">
+            <i class="fas fa-eye"></i>
+            Revisar todo
+          </button>
+        </div>
+
+        <!-- Loading documentos -->
+        <div class="rt-loading" *ngIf="loadingDocuments">
+          <div class="rt-spinner"></div>
+          <span>Cargando documentos...</span>
+        </div>
+
+        <!-- Lista documentos -->
+        <div class="rt-docs-list" *ngIf="!loadingDocuments">
+          <div class="rt-empty" *ngIf="documents.length === 0">
+            <i class="fas fa-info-circle"></i>
+            <span>Esta carpeta está vacía</span>
+          </div>
+
+          <div class="rt-doc-row"
+               *ngFor="let doc of documents; let idx = index"
+               (click)="enterImmersive(idx)"
+               (contextmenu)="onDocumentRightClick($event, doc, idx)">
+            <span class="rt-doc-number">{{ idx + 1 }}</span>
+            <div class="rt-doc-info">
+              <span class="rt-doc-name">{{ doc.nombres_apellidos | uppercase }}</span>
+              <div class="rt-doc-meta">
+                <span><i class="fas fa-id-card"></i> V-{{ doc.cedula }}</span>
+                <span><i class="fas fa-file-alt"></i> {{ doc.digital || doc.anom }}</span>
+              </div>
+            </div>
+            <div class="rt-doc-actions">
+              <button class="rt-btn-action rt-btn-view" (click)="enterImmersive(idx)" title="Ver">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="rt-btn-action rt-btn-approve" (click)="approveFast(doc)" title="Firmar rápido">
+                <i class="fas fa-check-double"></i>
+              </button>
+              <button class="rt-btn-action rt-btn-reject" (click)="promptReject(doc)" title="Rechazar">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menú contextual -->
+  <div class="rt-context-menu"
+       *ngIf="contextMenuVisible"
+       [style.top.px]="contextMenuCoords.y"
+       [style.left.px]="contextMenuCoords.x"
+       (click)="$event.stopPropagation()">
+    <ng-container *ngIf="contextMenuType === 'folder'">
+      <div class="rt-context-item" (click)="openContextFolder()">
+        <i class="fas fa-folder-open text-success"></i>
+        <span>Abrir carpeta</span>
+      </div>
+      <div class="rt-context-item" (click)="enterImmersiveFromFolder()">
+        <i class="fas fa-eye text-primary"></i>
+        <span>Revisar todo</span>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="contextMenuType === 'document'">
+      <div class="rt-context-item" (click)="enterImmersive(contextMenuIndex)">
+        <i class="fas fa-eye text-success"></i>
+        <span>Ver resuelto</span>
+      </div>
+      <div class="rt-context-item" (click)="approveFast(contextMenuData)">
+        <i class="fas fa-signature text-success"></i>
+        <span>Firmar rápido</span>
+      </div>
+      <div class="rt-context-item rt-context-danger" (click)="promptReject(contextMenuData)">
+        <i class="fas fa-times text-danger"></i>
+        <span>Rechazar</span>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<!-- VISTA INMERSIVA -->
+<app-tinder-pdf-viewer
+  *ngIf="immersiveMode"
+  [documents]="documents"
+  [startIndex]="currentDocIndex"
+  [jwtData]="jwtData"
+  [pdfUrlResolver]="resolvePdfUrl"
+  approveLabel="Aprobar y Firmar"
+  rejectLabel="Rechazar"
+  (close)="exitImmersive()"
+  (approve)="onApprove($event)"
+  (reject)="onReject($event)"
+  (navigate)="onNavigate($event)">
+</app-tinder-pdf-viewer>

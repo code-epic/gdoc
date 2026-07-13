@@ -195,145 +195,19 @@
 </div>
 
 <!-- ==================== VISTA INMERSIVA (TINDER-STYLE PDF VIEW) ==================== -->
-<div class="immersive-wrapper" *ngIf="immersiveMode" (window:keydown)="handleKeyboardNav($event)">
-  
-  <!-- Navbar Inmersivo -->
-  <div class="immersive-nav">
-    <div class="immersive-nav-title">
-      <i class="fas fa-signature text-teal"></i>
-      <span>Revisión Tinder-PDF</span>
-      <span class="badge badge-pill badge-primary ml-3" style="font-size: 0.75rem; background-color: #3a86c8;">
-        {{ currentDocIndex + 1 }} / {{ documents.length }}
-      </span>
-    </div>
-    
-    <div class="d-flex align-items-center">
-      <span class="mr-4 text-white font-weight-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">
-        {{ activeDoc?.nombres_apellidos | uppercase }} (V-{{ activeDoc?.cedula }})
-      </span>
-      <button class="immersive-close-btn" (click)="exitImmersiveMode()" title="Cerrar Vista Inmersiva (Esc)">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- Contenido Central Tinder -->
-  <div class="immersive-main">
-    
-    <!-- Flecha Anterior (Izquierda) -->
-    <button class="nav-arrow-control arrow-left" 
-            [class.disabled]="currentDocIndex === 0" 
-            (click)="prevDocument()" 
-            title="Anterior (Flecha Izquierda)">
-      <i class="fas fa-chevron-left"></i>
-    </button>
-
-    <!-- Caja Tinder (PDF + Metadata) -->
-    <div class="tinder-card-wrapper" 
-         [class.swipe-left]="swipeLeftAnim" 
-         [class.swipe-right]="swipeRightAnim"
-         (touchstart)="onTouchStart($event)" 
-         (touchend)="onTouchEnd($event)">
-      
-      <!-- Visor PDF (Izquierda) -->
-      <div class="pdf-viewer-pane" style="display: flex; flex-direction: column;">
-        <div class="pdf-loading-overlay" *ngIf="loadingPdf">
-          <div class="spinner-border" role="status"></div>
-          <span class="text-white font-weight-bold" style="font-size: 0.85rem;">Cargando visor PDF...</span>
-        </div>
-        
-        <div style="flex: 1; width: 100%; height: 100%; position: relative;" *ngIf="pdfUrl">
-          <iframe [src]="pdfUrl" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" (load)="onPdfLoaded()"></iframe>
-        </div>
-
-        <!-- Botón de fallback para tablets/móviles donde el visor falla o no se muestra -->
-        <div class="text-center p-2" style="background-color: #1c2541; border-top: 1px solid rgba(255,255,255,0.1);" *ngIf="rawPdfUrl">
-          <a [href]="rawPdfUrl" target="_blank" class="btn btn-sm btn-info text-white" style="border-radius: 20px;">
-            <i class="fas fa-external-link-alt mr-2"></i>Abrir PDF Externamente (Recomendado en iPad)
-          </a>
-        </div>
-
-        <div class="pdf-loading-overlay text-center p-4" *ngIf="!pdfUrl && !loadingPdf">
-          <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 2.5rem;"></i>
-          <h4 class="text-white">Archivo no disponible</h4>
-          <p class="text-muted" style="font-size: 0.8rem;">No se pudo cargar el documento PDF.</p>
-        </div>
-      </div>
-
-      <!-- Panel Metadatos (Derecha) -->
-      <div class="metadata-pane">
-        <div class="metadata-header">
-          <h4 class="meta-title">Atributos del Resuelto</h4>
-          <div class="meta-subtitle">Metadata de Expediente</div>
-        </div>
-
-        <div class="meta-group">
-          <label>Cédula Identidad</label>
-          <div class="meta-value">{{ activeDoc?.cedula }}</div>
-        </div>
-
-        <div class="meta-group">
-          <label>Nombres y Apellidos</label>
-          <div class="meta-value">{{ activeDoc?.nombres_apellidos | uppercase }}</div>
-        </div>
-
-        <div class="meta-group" *ngIf="activeDoc?.ncontrol || activeDoc?.numc">
-          <label>Número de Control</label>
-          <div class="meta-value">{{ activeDoc?.ncontrol || activeDoc?.numc }}</div>
-        </div>
-
-        <div class="meta-group" *ngIf="activeDoc?.digital || activeDoc?.anom">
-          <label>Nombre Archivo</label>
-          <div class="meta-value" style="font-size: 0.75rem; word-break: break-all;">{{ activeDoc?.digital || activeDoc?.anom }}</div>
-        </div>
-
-        <!-- Metadata Extraída del JWT -->
-        <div class="metadata-header mt-2">
-          <h5 class="meta-title" style="font-size: 0.85rem; color: #8898aa;">Auditoría de Firma (JWT)</h5>
-        </div>
-
-        <div class="meta-group">
-          <label>Usuario Firmante</label>
-          <div class="meta-value" style="font-size: 0.80rem; color: #8ecae6;">{{ jwtData?.userName | uppercase }}</div>
-        </div>
-
-        <div class="meta-group">
-          <label>Rol / Privilegios</label>
-          <div class="meta-value" style="font-size: 0.80rem; color: #8ecae6;">{{ jwtData?.userRole | uppercase }}</div>
-        </div>
-
-        <!-- Observaciones / Comentarios -->
-        <div class="meta-group mt-auto">
-          <label for="txtObservations" style="color: #f5a623;">Observaciones de Revisión</label>
-          <textarea id="txtObservations" 
-                    class="custom-textarea" 
-                    rows="2" 
-                    [(ngModel)]="documentObservations" 
-                    placeholder="Escriba aquí observaciones de aprobación o motivo de rechazo..."></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- Flecha Siguiente (Derecha) -->
-    <button class="nav-arrow-control arrow-right" 
-            [class.disabled]="currentDocIndex === documents.length - 1" 
-            (click)="nextDocument()" 
-            title="Siguiente (Flecha Derecha)">
-      <i class="fas fa-chevron-right"></i>
-    </button>
-  </div>
-
-  <!-- Footer de Acciones Tinder (Aprobar / Rechazar) -->
-  <div class="immersive-footer">
-    <button class="action-btn btn-reject" (click)="rejectDocument()" [disabled]="actionExecuting">
-      <i class="fas fa-times-circle" *ngIf="!actionExecuting"></i>
-      <div class="spinner-border spinner-border-sm text-white" role="status" *ngIf="actionExecuting && executingType==='reject'"></div>
-      <span>Rechazar (V)</span>
-    </button>
-    <button class="action-btn btn-approve" (click)="approveDocument()" [disabled]="actionExecuting">
-      <i class="fas fa-signature" *ngIf="!actionExecuting"></i>
-      <div class="spinner-border spinner-border-sm text-white" role="status" *ngIf="actionExecuting && executingType==='approve'"></div>
-      <span>Aprobar y Firmar (Espacio)</span>
-    </button>
-  </div>
-</div>
+<app-tinder-pdf-viewer
+  *ngIf="immersiveMode"
+  #tinderViewer
+  [documents]="documents"
+  [startIndex]="currentDocIndex"
+  [jwtData]="jwtData"
+  [loading]="loadingDocuments"
+  [pdfUrlResolver]="resolvePdfUrl"
+  approveLabel="Aprobar y Firmar"
+  rejectLabel="Rechazar"
+  (close)="onTinderClose()"
+  (approve)="onTinderApprove($event)"
+  (reject)="onTinderReject($event)"
+  (navigate)="onTinderNavigate($event)"
+  (pdfLoadError)="onTinderPdfError($event)">
+</app-tinder-pdf-viewer>
