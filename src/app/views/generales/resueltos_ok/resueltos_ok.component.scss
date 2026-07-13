@@ -1,16 +1,43 @@
 /* Componente resueltos_ok - Estilos Adaptativos Tablet-First */
 
+.resueltos-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: -webkit-fill-available;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
 .resueltos-container {
   font-family: 'Open Sans', 'Roboto', sans-serif;
   color: #32325d;
   background-color: #f8f9fe;
-  min-height: 100vh;
+  width: 100%;
+  height: 100%;
   padding: 1rem;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* Ocultar barra lateral y barra superior de la plantilla (cross-browser) */
 ::ng-deep {
+  html.immersive-active,
   body.immersive-active {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body.immersive-active {
+    app-root,
+    app-admin-layout,
+    .wrapper,
+    mat-sidenav-container,
+    .example-container {
+      display: block;
+      height: 100%;
+    }
+
     .example-sidenav, mat-sidenav {
       display: none !important;
       width: 0 !important;
@@ -23,9 +50,16 @@
       padding: 0 !important;
       width: 100% !important;  /* 100vw causa scrollbar en Firefox */
       max-width: 100% !important;
-      overflow-x: hidden;
+      height: 100% !important;
+      overflow: hidden;
     }
     app-resueltos-ok {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    app-tinder-pdf-viewer {
       display: block;
       width: 100%;
       height: 100%;
@@ -36,24 +70,28 @@
 /* Header inmersivo del módulo */
 .module-header {
   background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);
-  padding: 1.5rem;
+  padding: 1rem 1.25rem;
   border-radius: 12px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   box-shadow: 0 4px 15px rgba(94, 170, 168, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   color: white;
+  min-height: 0;
 
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.15rem;
     font-weight: 700;
     margin: 0;
+    line-height: 1.3;
   }
   p {
-    font-size: 0.85rem;
-    margin: 0.25rem 0 0 0;
+    font-size: 0.75rem;
+    margin: 0.15rem 0 0 0;
     opacity: 0.9;
+    line-height: 1.3;
   }
 }
 
@@ -80,39 +118,49 @@
 
 /* --- MASTER-DETAIL LAYOUT (TABLET PHILOSOPHY) --- */
 .tablet-layout {
+  flex: 1 1 0%;
+  min-height: 0;
   display: flex;
   gap: 1.5rem;
-  height: calc(100vh - 120px);
   overflow: hidden;
 }
 
 /* Columna Izquierda: Navegador de Carpetas (Master) */
 .master-panel {
-  flex: 4; /* 40% del ancho */
+  flex: 3.5;
+  min-width: 280px;
+  max-width: 380px;
+  min-height: 0;
+  height: 100%;
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   border: 1px solid rgba(224, 224, 224, 0.4);
 }
 
 /* Columna Derecha: Contenido y Documentos (Detail) */
 .detail-panel {
-  flex: 6; /* 60% del ancho */
+  flex: 6.5;
+  min-width: 360px;
+  min-height: 0;
+  height: 100%;
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(224, 224, 224, 0.4);
   overflow-y: auto;
+  border: 1px solid rgba(224, 224, 224, 0.4);
 }
 
 /* --- TABS DE FILTRO DE COMPONENTES --- */
 .component-tabs {
+  flex: 0 0 auto;
   display: flex;
   overflow-x: auto;
   gap: 0.5rem;
@@ -159,6 +207,7 @@
 
 /* Buscador de carpetas */
 .search-wrapper {
+  flex: 0 0 auto;
   margin-bottom: 1rem;
   position: relative;
 
@@ -192,15 +241,18 @@
 
 /* Lista/Cuadrícula de Carpetas Acotada */
 .folders-list-container {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
+  height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding-right: 0.25rem;
 }
 
 .folder-card-compact {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   background: #f8f9fe;
   border-radius: 12px;
   padding: 0.75rem 1rem;
@@ -219,15 +271,16 @@
   &.active {
     background: #e8f4f3;
     border-color: #5eaaa8;
-    
-    .folder-icon {
+
+    .folder-icon-compact {
       transform: scale(1.05);
     }
   }
 }
 
 .folder-icon-compact {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
+  flex-shrink: 0;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
   transition: transform 0.2s ease;
 }
@@ -238,17 +291,23 @@
   border-radius: 20px;
   font-size: 0.7rem;
   font-weight: 700;
-  padding: 0.15rem 0.5rem;
-  margin-left: auto;
+  padding: 0.2rem 0.55rem;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
 }
 
 .folder-info-compact {
-  overflow: hidden;
-  
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+
   .name {
     font-weight: 700;
     font-size: 0.85rem;
     color: #32325d;
+    line-height: 1.35;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -256,12 +315,15 @@
   .date {
     font-size: 0.7rem;
     color: #8898aa;
-    margin-top: 0.15rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
   }
 }
 
 /* Paginación de carpetas */
 .pagination-controls {
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -336,14 +398,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
 
   h3 {
     font-size: 1.1rem;
     font-weight: 700;
     color: #32325d;
     margin: 0;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
   }
-  
+
   .badge {
     background-color: #e8f4f3;
     color: #5eaaa8;
@@ -351,6 +419,7 @@
     font-size: 0.75rem;
     padding: 0.3rem 0.75rem;
     border-radius: 30px;
+    flex-shrink: 0;
   }
 }
 
@@ -358,16 +427,23 @@
 .doc-item-row {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
   padding: 0.85rem 1rem;
   border-radius: 10px;
   border: 1px solid #f0f2f5;
   margin-bottom: 0.6rem;
   cursor: pointer;
   transition: all 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(94, 170, 168, 0.2);
 
   &:hover {
     background-color: #f8f9fe;
     border-color: rgba(94, 170, 168, 0.2);
+  }
+
+  &:active {
+    background-color: rgba(94, 170, 168, 0.1);
   }
 
   .number {
@@ -375,32 +451,37 @@
     font-size: 0.8rem;
     color: #8898aa;
     width: 24px;
+    flex-shrink: 0;
+    text-align: center;
   }
 
   .doc-info {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
-    
+
     .name {
       font-weight: 700;
       font-size: 0.85rem;
       color: #32325d;
+      line-height: 1.35;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    
+
     .meta {
       display: flex;
-      gap: 1rem;
+      flex-wrap: wrap;
+      gap: 0.35rem 1rem;
       margin-top: 0.2rem;
       font-size: 0.7rem;
       color: #8898aa;
-      
+
       span {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 0.25rem;
+        min-width: 0;
       }
     }
   }
@@ -408,6 +489,7 @@
   .actions {
     display: flex;
     gap: 0.5rem;
+    flex-shrink: 0;
   }
 }
 
@@ -487,24 +569,114 @@
     gap: 1rem;
   }
   .master-panel {
-    flex: 4.5;
+    flex: 3;
+    max-width: 320px;
     padding: 1rem;
   }
   .detail-panel {
-    flex: 5.5;
+    flex: 7;
     padding: 1rem;
   }
 }
 
 /* Tablets pequenas / Landscape phones */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .tablet-layout {
     flex-direction: column;
     height: auto;
     overflow: visible;
+    gap: 1rem;
   }
   .master-panel, .detail-panel {
     flex: none;
+    max-width: none;
+    width: 100%;
     height: auto;
+    min-height: 350px;
+  }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+  .module-header {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+
+    h1 { font-size: 1rem; }
+    p { font-size: 0.7rem; }
+  }
+
+  .btn-close-view {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.75rem;
+  }
+
+  .master-panel, .detail-panel {
+    min-height: 300px;
+    padding: 0.85rem;
+  }
+
+  .folder-card-compact {
+    padding: 0.7rem 0.85rem;
+    gap: 0.65rem;
+  }
+
+  .folder-icon-compact {
+    font-size: 1.6rem;
+  }
+
+  .folder-info-compact .name {
+    font-size: 0.82rem;
+  }
+
+  .folder-badge-compact {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.45rem;
+  }
+
+  .doc-item-row {
+    padding: 0.75rem 0.85rem;
+    gap: 0.6rem;
+  }
+
+  .doc-info .name {
+    font-size: 0.82rem;
+  }
+
+  .doc-info .meta {
+    gap: 0.3rem 0.75rem;
+    font-size: 0.68rem;
+  }
+
+  .btn-doc-pill {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.65rem;
+  }
+
+  .detail-header h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  .doc-item-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .doc-info {
+    width: calc(100% - 40px);
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-end;
+    padding-left: 32px;
+  }
+
+  .btn-doc-pill .btn-text {
+    display: none;
   }
 }

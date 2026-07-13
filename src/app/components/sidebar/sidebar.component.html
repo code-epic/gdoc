@@ -6,7 +6,7 @@
       </div>
     </a>
     <div class="collapse navbar-collapse" [ngbCollapse]="isCollapsed" id="sidenav-collapse-main">
-      <ul class="navbar-nav">
+      <ul class="navbar-nav" *ngIf="menuItems?.length; else emptyMenu">
         <li *ngFor="let menuItem of menuItems" class="nav-item">
           <a routerLinkActive="active" [routerLink]="[menuItem.path]" class="nav-link">
             <i class="ni {{ menuItem.icon + ' ' }}"></i>
@@ -14,6 +14,13 @@
           </a>
         </li>
       </ul>
+      <ng-template #emptyMenu>
+        <div class="sidebar-empty">
+          <i class="ni ni-bullet-list-67"></i>
+          <span>No hay menú disponible</span>
+          <small>Cierre sesión e ingrese nuevamente</small>
+        </div>
+      </ng-template>
       <hr class="my-3">
       <ul class="navbar-nav">
       </ul>

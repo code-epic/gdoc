@@ -4,6 +4,14 @@
    Prefijos -webkit- donde Safari los necesita.
    ================================================================ */
 
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 /* ── Paleta local ──────────────────────────────────────── */
 $tpv-bg-dark:    #0b132b;
 $tpv-bg-panel:   #1c2541;
@@ -23,7 +31,8 @@ $tpv-border:     rgba(255, 255, 255, 0.08);
   left: 0;
   width: 100%;            /* No 100vw: Firefox scrollbar */
   height: 100vh;
-  height: 100dvh;         /* Safari dynamic viewport */
+  height: 100dvh;
+  height: -webkit-fill-available;
   background: $tpv-bg-dark;
   z-index: 9999;
   display: flex;
@@ -32,6 +41,8 @@ $tpv-border:     rgba(255, 255, 255, 0.08);
   overflow: hidden;
   isolation: isolate;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 
   /* Swipe animation */
   &.tpv-swipe-left {

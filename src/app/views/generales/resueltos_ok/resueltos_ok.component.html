@@ -1,3 +1,6 @@
+<!-- Wrapper raíz para posicionamiento iOS-safe -->
+<div class="resueltos-root">
+
 <!-- Vista Principal: Explorador Master-Detail (Tablet-First) -->
 <div class="resueltos-container" *ngIf="!immersiveMode" (click)="closeContextMenu()">
   
@@ -151,11 +154,13 @@
             </div>
             
             <div class="actions">
-              <button class="btn-doc-pill btn-view" (click)="startImmersiveMode(idx)" title="Abrir en Tinder">
-                <i class="fas fa-eye"></i> Tinder
+              <button class="btn-doc-pill btn-view" (click)="startImmersiveMode(idx); $event.stopPropagation()" title="Abrir en Tinder">
+                <i class="fas fa-eye"></i>
+                <span class="btn-text">Tinder</span>
               </button>
-              <button class="btn-doc-pill btn-sign" (click)="approveFast(doc)" title="Firmar Rápido">
-                <i class="fas fa-check-double"></i> Firmar
+              <button class="btn-doc-pill btn-sign" (click)="approveFast(doc); $event.stopPropagation()" title="Firmar Rápido">
+                <i class="fas fa-check-double"></i>
+                <span class="btn-text">Firmar</span>
               </button>
             </div>
           </div>
@@ -192,6 +197,9 @@
       </div>
     </ng-container>
   </div>
+</div>
+
+<!-- /resueltos-root -->
 </div>
 
 <!-- ==================== VISTA INMERSIVA (TINDER-STYLE PDF VIEW) ==================== -->

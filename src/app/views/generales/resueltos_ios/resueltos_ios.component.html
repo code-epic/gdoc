@@ -3,6 +3,9 @@
      No embebe PDFs. Muestra tarjetas con metadata y abre PDF en visor nativo.
      ================================================================ -->
 
+<!-- Wrapper raíz para posicionamiento iOS-safe -->
+<div class="rios-root">
+
 <!-- VISTA EXPLORADOR -->
 <div class="rios-container" *ngIf="!cardMode" (click)="closeContextMenu()">
 
@@ -19,7 +22,9 @@
   </div>
 
   <!-- Layout principal -->
-  <div class="rios-layout">
+  <div class="rios-layout"
+       [class.rios-mobile]="isMobile"
+       [class.rios-mobile-docs]="mobileView === 'documents'">
 
     <!-- Panel izquierdo: Carpetas -->
     <div class="rios-panel rios-panel-folders">
@@ -123,13 +128,18 @@
 
         <!-- Cabecera -->
         <div class="rios-docs-header">
-          <div>
+          <button class="rios-mobile-back" *ngIf="isMobile" (click)="backToFolders()">
+            <i class="fas fa-arrow-left"></i>
+            <span>Carpetas</span>
+          </button>
+          <div class="rios-docs-header-info">
             <h3>Carpeta: {{ selectedFolder.llav }}</h3>
             <span>{{ documents.length }} documentos</span>
           </div>
           <button class="rios-btn-open-folder" (click)="enterCardModeFromFolder()">
             <i class="fas fa-clone"></i>
-            Revisar tarjetas
+            <span class="rios-btn-text-full">Revisar tarjetas</span>
+            <span class="rios-btn-text-short">Tarjetas</span>
           </button>
         </div>
 
@@ -159,13 +169,13 @@
               </div>
             </div>
             <div class="rios-doc-actions">
-              <button class="rios-btn-action rios-btn-view" (click)="enterCardMode(idx)" title="Ver tarjeta">
+              <button class="rios-btn-action rios-btn-view" (click)="enterCardMode(idx); $event.stopPropagation()" title="Ver tarjeta">
                 <i class="fas fa-clone"></i>
               </button>
-              <button class="rios-btn-action rios-btn-approve" (click)="approveFast(doc)" title="Firmar rápido">
+              <button class="rios-btn-action rios-btn-approve" (click)="approveFast(doc); $event.stopPropagation()" title="Firmar rápido">
                 <i class="fas fa-check-double"></i>
               </button>
-              <button class="rios-btn-action rios-btn-reject" (click)="promptReject(doc)" title="Rechazar">
+              <button class="rios-btn-action rios-btn-reject" (click)="promptReject(doc); $event.stopPropagation()" title="Rechazar">
                 <i class="fas fa-times"></i>
               </button>
             </div>
@@ -316,8 +326,8 @@
           <div class="rios-card-obs">
             <label>Observaciones</label>
             <textarea [(ngModel)]="observations"
-                      rows="2"
-                      placeholder="Escriba observaciones de aprobación o motivo de rechazo..."
+                      [attr.rows]="isMobile ? 1 : 2"
+                      placeholder="Observaciones..."
                       [disabled]="actionLoading"></textarea>
           </div>
         </div>
@@ -352,4 +362,7 @@
       <span>Aprobar</span>
     </button>
   </div>
+</div>
+
+<!-- /rios-root -->
 </div>

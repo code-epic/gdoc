@@ -109,6 +109,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   /* ── Lifecycle ───────────────────────────────────────── */
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log('[TinderPdfViewer] ngOnChanges', Object.keys(changes), 'docs', this.documents.length, 'startIndex', this.startIndex);
     if (changes.documents || changes.startIndex) {
       if (this.documents.length > 0) {
         const idx = changes.startIndex
@@ -397,6 +398,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   /** <object> disparó load correctamente */
   onObjectLoad(): void {
+    console.log('[TinderPdfViewer] onObjectLoad');
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = null;
@@ -407,6 +409,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   /** <object> falló al renderizar */
   onObjectError(): void {
+    console.log('[TinderPdfViewer] onObjectError');
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = null;

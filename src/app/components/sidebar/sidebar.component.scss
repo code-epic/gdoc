@@ -45,3 +45,29 @@
       border-top: 1px solid rgba(0, 0, 0, 0.05);
       margin: 1rem 0;
   }
+
+  .sidebar-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      text-align: center;
+      color: #8898aa;
+      gap: 0.5rem;
+  }
+
+  .sidebar-empty i {
+      font-size: 1.5rem;
+      opacity: 0.5;
+  }
+
+  .sidebar-empty span {
+      font-size: 0.85rem;
+      font-weight: 600;
+  }
+
+  .sidebar-empty small {
+      font-size: 0.7rem;
+      opacity: 0.8;
+  }

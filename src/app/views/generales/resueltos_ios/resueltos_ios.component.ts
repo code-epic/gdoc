@@ -63,6 +63,11 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
   public observations = "";
   public swipeState: "" | "swiping-right" | "swiping-left" | "approved" | "rejected" = "";
 
+  // Mobile master-detail
+  public mobileView: "folders" | "documents" = "folders";
+  public isMobile = false;
+  private resizeListener: (() => void) | null = null;
+
   // JWT
   public jwtData = { userId: "", userName: "", userRole: "" };
 
@@ -89,6 +94,10 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     document.body.classList.add("immersive-active");
+    document.documentElement.classList.add("immersive-active");
+    this.checkMobile();
+    this.resizeListener = () => this.checkMobile();
+    window.addEventListener("resize", this.resizeListener);
     this.loadComponentMap();
     this.decodeUserToken();
     this.loadFolders();
@@ -96,6 +105,17 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     document.body.classList.remove("immersive-active");
+    document.documentElement.classList.remove("immersive-active");
+    if (this.resizeListener) {
+      window.removeEventListener("resize", this.resizeListener);
+    }
+  }
+
+  private checkMobile(): void {
+    this.isMobile = window.innerWidth < 768;
+    if (!this.isMobile) {
+      this.mobileView = "folders";
+    }
   }
 
   // ── Navegación ────────────────────────────────────────
@@ -246,6 +266,13 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
   public onFolderClick(folder: any): void {
     this.selectedFolder = folder;
     this.loadDocuments(folder);
+    if (this.isMobile) {
+      this.mobileView = "documents";
+    }
+  }
+
+  public backToFolders(): void {
+    this.mobileView = "folders";
   }
 
   public onFolderDblClick(folder: any): void {
@@ -281,11 +308,15 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
   // ── Vista tarjeta ─────────────────────────────────────
   public enterCardMode(index: number): void {
     if (this.documents.length === 0) return;
+    console.log('[resueltos_ios] enterCardMode', index, 'docs', this.documents.length);
     this.currentDocIndex = index;
     this.observations = "";
     this.cardMode = true;
     this.swipeState = "";
     this.cdr.detectChanges();
+    setTimeout(() => {
+      console.log('[resueltos_ios] cardMode after CD', this.cardMode, 'cardView element', document.querySelector('.rios-card-view'));
+    }, 0);
   }
 
   public enterCardModeFromFolder(): void {

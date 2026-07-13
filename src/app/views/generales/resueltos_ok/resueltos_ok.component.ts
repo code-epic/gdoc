@@ -107,8 +107,9 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Activa la clase inmersiva en el body para ocultar sidebar y navbar
+    // Activa la clase inmersiva en el body/html para ocultar sidebar y navbar
     document.body.classList.add('immersive-active');
+    document.documentElement.classList.add('immersive-active');
 
     this.loadComponentMap();
     this.decodeUserToken();
@@ -118,6 +119,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     // Desactiva la clase inmersiva al destruir el componente
     document.body.classList.remove('immersive-active');
+    document.documentElement.classList.remove('immersive-active');
   }
 
   public exitComponent() {
@@ -327,11 +329,15 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     if (this.documents.length === 0) {
       return;
     }
+    console.log('[resueltos_ok] startImmersiveMode', startIndex, 'docs', this.documents.length);
     this.immersiveMode = true;
     this.currentDocIndex = startIndex;
     this.activeDoc = this.documents[this.currentDocIndex];
     this.documentObservations = '';
     this.changeDetector.detectChanges();
+    setTimeout(() => {
+      console.log('[resueltos_ok] immersiveMode after CD', this.immersiveMode, 'tinder element', document.querySelector('app-tinder-pdf-viewer'));
+    }, 0);
   }
 
   public startImmersiveFromFolder() {
