@@ -77,6 +77,7 @@ import { GrallibroComponent } from './views/generales/grallibro/grallibro.compon
 import { TableGrallibroModalComponent } from './views/generales/grallibro/modal/table-grallibro-modal/table-grallibro-modal.component';
 import { ResueltosOkComponent } from './views/generales/resueltos_ok/resueltos_ok.component';
 import { ResueltosTinderComponent } from './views/generales/resueltos_tinder/resueltos_tinder.component';
+import { ResueltosIosComponent } from './views/generales/resueltos_ios/resueltos_ios.component';
 import {SharedModule} from './shared/shared.module';
 import { RecibidosFieldsNavComponent } from './views/resoluciones/rsbuzon/recibidos-fields-nav/recibidos-fields-nav.component';
 import { RsconsultaentradasComponent } from './views/resoluciones/rsprocesos/rsconsultaentradas/rsconsultaentradas.component';
@@ -191,6 +192,7 @@ const ngWizardConfig: NgWizardConfig = {
     GeneralesComponent,
     ResueltosOkComponent,
     ResueltosTinderComponent,
+    ResueltosIosComponent,
     ArchivoComponent,
     AycotizacionesComponent,
     // PendientesComponent,

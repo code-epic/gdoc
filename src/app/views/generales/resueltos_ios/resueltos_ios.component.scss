@@ -1,0 +1,1216 @@
+/* ================================================================
+   RESUELTOS iOS - Modo tarjeta Tinder/Typeless
+   Estilo verde pastel propio, responsive, sin embeber PDFs.
+   ================================================================ */
+
+// ── Paleta ──────────────────────────────────────────────
+$rios-primary:      #5dbe8e;
+$rios-primary-dark: #4aa87a;
+$rios-primary-light:#d4f1e0;
+$rios-bg:           #f4fbf7;
+$rios-surface:      #ffffff;
+$rios-text:         #2d3748;
+$rios-text-muted:   #718096;
+$rios-border:       #e2e8f0;
+$rios-shadow:       rgba(93, 190, 142, 0.12);
+$rios-danger:       #e07a8e;
+$rios-danger-light: #fce8ec;
+$rios-info:         #6dc0d5;
+$rios-warning:      #f5a623;
+
+// ── Base ────────────────────────────────────────────────
+.rios-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: $rios-bg;
+  color: $rios-text;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Ocultar sidebar, navbar y ajustar main-content en modo tarjeta */
+::ng-deep {
+  body.immersive-active {
+    .example-sidenav,
+    mat-sidenav {
+      display: none !important;
+      width: 0 !important;
+    }
+    app-navbar {
+      display: none !important;
+    }
+    .main-content {
+      margin-left: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow-x: hidden;
+    }
+    app-resueltos-ios {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+// ── Header ──────────────────────────────────────────────
+.rios-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: $rios-surface;
+  border-bottom: 2px solid $rios-primary-light;
+  box-shadow: 0 2px 12px $rios-shadow;
+}
+
+.rios-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.rios-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $rios-primary-dark;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rios-badge {
+  font-size: 0.6rem;
+  background: $rios-primary;
+  color: white;
+  padding: 0.15rem 0.4rem;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.rios-subtitle {
+  font-size: 0.8rem;
+  color: $rios-text-muted;
+  margin: 0;
+}
+
+.rios-btn-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid $rios-border;
+  border-radius: 24px;
+  background: $rios-surface;
+  color: $rios-text-muted;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i { font-size: 1rem; }
+
+  &:hover {
+    border-color: $rios-danger;
+    color: $rios-danger;
+    background: $rios-danger-light;
+  }
+}
+
+// ── Layout principal ────────────────────────────────────
+.rios-layout {
+  flex: 1 1 0%;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.rios-panel {
+  background: $rios-surface;
+  border-radius: 14px;
+  border: 1px solid $rios-border;
+  box-shadow: 0 4px 16px $rios-shadow;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rios-panel-folders {
+  flex: 4;
+  min-width: 300px;
+}
+
+.rios-panel-docs {
+  flex: 6;
+  min-width: 400px;
+}
+
+// ── Tabs ────────────────────────────────────────────────
+.rios-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 1rem;
+  border-bottom: 1px solid $rios-border;
+  background: linear-gradient(180deg, #ffffff 0%, #f4fbf7 100%);
+}
+
+.rios-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid $rios-border;
+  border-radius: 20px;
+  background: $rios-surface;
+  color: $rios-text-muted;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i { font-size: 0.7rem; }
+
+  &:hover {
+    border-color: $rios-primary;
+    color: $rios-primary;
+  }
+
+  &.rios-tab-active {
+    background: $rios-primary;
+    border-color: $rios-primary;
+    color: white;
+    box-shadow: 0 2px 8px rgba(93, 190, 142, 0.35);
+  }
+}
+
+// ── Buscador ────────────────────────────────────────────
+.rios-search {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 1rem 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid $rios-border;
+  border-radius: 10px;
+  background: #fafafa;
+
+  i {
+    color: $rios-text-muted;
+    font-size: 0.8rem;
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.8rem;
+    color: $rios-text;
+
+    &::placeholder { color: #a0aec0; }
+  }
+}
+
+// ── Carpetas ────────────────────────────────────────────
+.rios-folders-list {
+  flex: 1 1 0%;
+  overflow-y: auto;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+}
+
+.rios-folder-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid $rios-border;
+  border-radius: 12px;
+  background: $rios-surface;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $rios-primary;
+    box-shadow: 0 2px 8px $rios-shadow;
+    transform: translateY(-1px);
+  }
+
+  &.rios-folder-active {
+    border-color: $rios-primary;
+    background: $rios-primary-light;
+    box-shadow: 0 2px 10px rgba(93, 190, 142, 0.25);
+
+    .rios-folder-name { color: $rios-primary-dark; font-weight: 700; }
+  }
+}
+
+.rios-folder-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.rios-folder-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.rios-folder-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $rios-text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rios-folder-date {
+  font-size: 0.7rem;
+  color: $rios-text-muted;
+
+  i { margin-right: 0.25rem; }
+}
+
+.rios-folder-count {
+  min-width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: $rios-primary-light;
+  color: $rios-primary-dark;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+// ── Paginador ───────────────────────────────────────────
+.rios-paginator {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid $rios-border;
+  background: #fafafa;
+}
+
+.rios-paginator-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid $rios-border;
+  border-radius: 8px;
+  background: $rios-surface;
+  color: $rios-text;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    border-color: $rios-primary;
+    color: $rios-primary;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.rios-paginator-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $rios-text-muted;
+  min-width: 50px;
+  text-align: center;
+}
+
+// ── Panel documentos ────────────────────────────────────
+.rios-docs-content {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.rios-docs-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid $rios-border;
+  background: linear-gradient(180deg, #ffffff 0%, #f4fbf7 100%);
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $rios-text;
+    margin: 0;
+  }
+
+  span {
+    font-size: 0.75rem;
+    color: $rios-text-muted;
+  }
+}
+
+.rios-btn-open-folder {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-radius: 20px;
+  background: $rios-primary;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(93, 190, 142, 0.35);
+
+  &:hover {
+    background: $rios-primary-dark;
+    transform: translateY(-1px);
+  }
+}
+
+.rios-docs-list {
+  flex: 1 1 0%;
+  overflow-y: auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+}
+
+.rios-doc-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid $rios-border;
+  border-radius: 12px;
+  background: $rios-surface;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $rios-primary;
+    box-shadow: 0 2px 10px $rios-shadow;
+  }
+}
+
+.rios-doc-number {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: $rios-primary-light;
+  color: $rios-primary-dark;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rios-doc-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.rios-doc-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $rios-text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rios-doc-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  color: $rios-text-muted;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  i { font-size: 0.65rem; }
+}
+
+.rios-doc-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.rios-btn-action {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.rios-btn-view {
+    background: #e6f4ff;
+    color: #3182ce;
+    &:hover { background: #3182ce; color: white; }
+  }
+
+  &.rios-btn-approve {
+    background: $rios-primary-light;
+    color: $rios-primary-dark;
+    &:hover { background: $rios-primary; color: white; }
+  }
+
+  &.rios-btn-reject {
+    background: $rios-danger-light;
+    color: $rios-danger;
+    &:hover { background: $rios-danger; color: white; }
+  }
+}
+
+// ── Estados vacíos y loading ───────────────────────────
+.rios-empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  color: $rios-text-muted;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $rios-text;
+    margin: 0.75rem 0 0.25rem;
+  }
+
+  p {
+    font-size: 0.8rem;
+    margin: 0;
+    max-width: 300px;
+  }
+}
+
+.rios-empty-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: $rios-primary-light;
+  color: $rios-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.rios-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: $rios-text-muted;
+  text-align: center;
+
+  i { font-size: 2rem; opacity: 0.5; }
+  span { font-size: 0.8rem; }
+}
+
+.rios-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: $rios-text-muted;
+  font-size: 0.8rem;
+}
+
+.rios-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid $rios-primary-light;
+  border-top-color: $rios-primary;
+  border-radius: 50%;
+  animation: rios-spin 0.8s linear infinite;
+}
+
+.rios-spinner-sm {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: rios-spin 0.8s linear infinite;
+}
+
+@keyframes rios-spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── Menú contextual ─────────────────────────────────────
+.rios-context-menu {
+  position: fixed;
+  z-index: 10000;
+  min-width: 160px;
+  background: $rios-surface;
+  border: 1px solid $rios-border;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.rios-context-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: $rios-text;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  i { font-size: 0.8rem; width: 16px; }
+
+  &:hover {
+    background: $rios-primary-light;
+  }
+
+  &.rios-context-danger:hover {
+    background: $rios-danger-light;
+  }
+}
+
+// ================================================================
+// VISTA TARJETA
+// ================================================================
+.rios-card-view {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #0b132b;
+  color: white;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+// ── Navbar tarjeta ──────────────────────────────────────
+.rios-card-nav {
+  flex: 0 0 auto;
+  height: 52px;
+  min-height: 52px;
+  background: #1c2541;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  z-index: 10;
+}
+
+.rios-card-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rios-card-nav-icon {
+  color: #8ecae6;
+  font-size: 1.1rem;
+}
+
+.rios-card-nav-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #8ecae6;
+}
+
+.rios-card-nav-badge {
+  font-size: 0.7rem;
+  background: #3a86c8;
+  color: white;
+  padding: 0.15rem 0.55rem;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.rios-card-nav-close {
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $rios-danger;
+    transform: rotate(90deg);
+  }
+}
+
+// ── Stage de tarjetas ───────────────────────────────────
+.rios-card-stage {
+  flex: 1 1 0%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  min-height: 0;
+  position: relative;
+}
+
+.rios-card-arrow {
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  background: rgba(28, 37, 65, 0.95);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  flex-shrink: 0;
+
+  &:hover:not(.rios-card-arrow-disabled) {
+    background: #3a86c8;
+    border-color: #3a86c8;
+  }
+
+  &.rios-card-arrow-disabled {
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  &:disabled {
+    opacity: 0.15;
+    pointer-events: none;
+  }
+}
+
+.rios-card-stack {
+  flex: 1;
+  max-width: 420px;
+  height: 100%;
+  max-height: 680px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+  touch-action: pan-y;
+}
+
+// ── Tarjetas ────────────────────────────────────────────
+.rios-card {
+  width: 100%;
+  height: 100%;
+  max-width: 420px;
+  max-height: 680px;
+  background: $rios-surface;
+  border-radius: 20px;
+  border: 1px solid $rios-border;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
+  user-select: none;
+}
+
+.rios-card-next {
+  position: absolute;
+  transform: scale(0.92) translateY(-12px);
+  opacity: 0.6;
+  z-index: 1;
+  filter: brightness(0.95);
+  pointer-events: none;
+}
+
+.rios-card-current {
+  position: relative;
+  z-index: 2;
+  transform-origin: center center;
+
+  &.rios-card-approve {
+    transform: translateX(120%) rotate(12deg);
+    opacity: 0;
+  }
+
+  &.rios-card-reject {
+    transform: translateX(-120%) rotate(-12deg);
+    opacity: 0;
+  }
+}
+
+.rios-card-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, $rios-primary 0%, $rios-primary-dark 100%);
+  color: white;
+}
+
+.rios-card-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+
+.rios-card-counter {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+}
+
+.rios-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+  gap: 0.75rem;
+}
+
+.rios-card-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: $rios-primary-light;
+  color: $rios-primary-dark;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.rios-card-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: $rios-text;
+  text-align: center;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.rios-card-cedula {
+  font-size: 0.9rem;
+  color: $rios-text-muted;
+  margin: 0;
+  font-weight: 600;
+}
+
+.rios-card-fields {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rios-card-field {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.5rem 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid $rios-border;
+
+  label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: $rios-primary-dark;
+    letter-spacing: 0.4px;
+  }
+
+  span {
+    font-size: 0.8rem;
+    color: $rios-text;
+    font-weight: 600;
+  }
+
+  .rios-card-break {
+    word-break: break-all;
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+}
+
+// ── Botón Ver PDF ───────────────────────────────────────
+.rios-card-pdf-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.8rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: #1c2541;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #3a86c8;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ── Observaciones ───────────────────────────────────────
+.rios-card-obs {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+
+  label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: $rios-warning;
+    letter-spacing: 0.4px;
+  }
+
+  textarea {
+    width: 100%;
+    border: 1px solid $rios-border;
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    color: $rios-text;
+    resize: none;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: $rios-primary;
+      box-shadow: 0 0 0 3px $rios-primary-light;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ── Stamps de swipe ─────────────────────────────────────
+.rios-card-stamp {
+  position: absolute;
+  top: 1.5rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 10;
+  transform: rotate(-12deg);
+  border: 3px solid;
+
+  i { margin-right: 0.3rem; }
+}
+
+.rios-card-stamp-approve {
+  left: 1rem;
+  color: $rios-primary;
+  border-color: $rios-primary;
+  background: rgba(93, 190, 142, 0.12);
+}
+
+.rios-card-stamp-reject {
+  right: 1rem;
+  color: $rios-danger;
+  border-color: $rios-danger;
+  background: rgba(224, 122, 142, 0.12);
+}
+
+// ── Footer tarjeta ──────────────────────────────────────
+.rios-card-footer {
+  flex: 0 0 auto;
+  height: 70px;
+  min-height: 70px;
+  background: #1c2541;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0 1rem;
+  z-index: 10;
+}
+
+.rios-card-btn {
+  border-radius: 28px;
+  padding: 0.6rem 1.8rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.rios-card-btn-approve {
+  background: $rios-primary;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: $rios-primary-dark;
+    transform: translateY(-1px);
+  }
+}
+
+.rios-card-btn-reject {
+  background: $rios-danger;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: #d65a70;
+    transform: translateY(-1px);
+  }
+}
+
+.rios-card-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #8898aa;
+  font-size: 0.7rem;
+  font-weight: 600;
+
+  i { font-size: 0.8rem; }
+}
+
+// ================================================================
+// RESPONSIVE
+// ================================================================
+
+@media (max-width: 1024px) {
+  .rios-layout {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .rios-panel-folders,
+  .rios-panel-docs {
+    flex: none;
+    min-height: 350px;
+  }
+
+  .rios-card-stage {
+    gap: 0.5rem;
+  }
+
+  .rios-card-arrow {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .rios-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .rios-title {
+    font-size: 1.05rem;
+  }
+
+  .rios-subtitle {
+    display: none;
+  }
+
+  .rios-btn-close span {
+    display: none;
+  }
+
+  .rios-layout {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .rios-panel-folders,
+  .rios-panel-docs {
+    min-height: 300px;
+  }
+
+  .rios-tab span {
+    display: none;
+  }
+
+  .rios-tab {
+    padding: 0.4rem;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    justify-content: center;
+  }
+
+  .rios-card-stage {
+    padding: 0.75rem;
+  }
+
+  .rios-card-arrow {
+    display: none;
+  }
+
+  .rios-card-stack {
+    max-width: 100%;
+    max-height: none;
+  }
+
+  .rios-card {
+    max-width: 100%;
+    max-height: none;
+  }
+
+  .rios-card-footer {
+    gap: 0.75rem;
+    height: 60px;
+    min-height: 60px;
+  }
+
+  .rios-card-btn {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.8rem;
+  }
+
+  .rios-card-hint {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .rios-card-body {
+    padding: 1rem;
+  }
+
+  .rios-card-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+
+  .rios-card-name {
+    font-size: 1rem;
+  }
+
+  .rios-card-field {
+    padding: 0.4rem 0.6rem;
+
+    label { font-size: 0.55rem; }
+    span { font-size: 0.75rem; }
+  }
+
+  .rios-card-footer {
+    gap: 0.5rem;
+  }
+
+  .rios-card-btn {
+    padding: 0.45rem 1rem;
+    font-size: 0.75rem;
+  }
+}

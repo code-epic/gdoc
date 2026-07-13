@@ -1,0 +1,355 @@
+<!-- ================================================================
+     RESUELTOS iOS - Modo tarjeta Tinder/Typeless para iPad/Safari
+     No embebe PDFs. Muestra tarjetas con metadata y abre PDF en visor nativo.
+     ================================================================ -->
+
+<!-- VISTA EXPLORADOR -->
+<div class="rios-container" *ngIf="!cardMode" (click)="closeContextMenu()">
+
+  <!-- Header -->
+  <div class="rios-header">
+    <div class="rios-header-info">
+      <h1 class="rios-title">Buzón de Resueltos <span class="rios-badge">iOS</span></h1>
+      <p class="rios-subtitle">Modo tarjeta para iPad y Safari</p>
+    </div>
+    <button class="rios-btn-close" (click)="exitComponent()">
+      <i class="fas fa-times-circle"></i>
+      <span>Cerrar</span>
+    </button>
+  </div>
+
+  <!-- Layout principal -->
+  <div class="rios-layout">
+
+    <!-- Panel izquierdo: Carpetas -->
+    <div class="rios-panel rios-panel-folders">
+
+      <!-- Filtros por componente -->
+      <div class="rios-tabs">
+        <button class="rios-tab" [class.rios-tab-active]="activeFilter === 'ALL'" (click)="setFilter('ALL')">
+          <i class="fas fa-globe"></i>
+          <span>Todos</span>
+        </button>
+        <button class="rios-tab" [class.rios-tab-active]="activeFilter === '1'" (click)="setFilter('1')">
+          <i class="fas fa-shield-alt"></i>
+          <span>Ejército</span>
+        </button>
+        <button class="rios-tab" [class.rios-tab-active]="activeFilter === '2'" (click)="setFilter('2')">
+          <i class="fas fa-anchor"></i>
+          <span>Armada</span>
+        </button>
+        <button class="rios-tab" [class.rios-tab-active]="activeFilter === '3'" (click)="setFilter('3')">
+          <i class="fas fa-fighter-jet"></i>
+          <span>Aviación</span>
+        </button>
+        <button class="rios-tab" [class.rios-tab-active]="activeFilter === '4'" (click)="setFilter('4')">
+          <i class="fas fa-shield-alt"></i>
+          <span>G.N.</span>
+        </button>
+        <button class="rios-tab" [class.rios-tab-active]="activeFilter === '5'" (click)="setFilter('5')">
+          <i class="fas fa-star"></i>
+          <span>Milicia</span>
+        </button>
+      </div>
+
+      <!-- Buscador -->
+      <div class="rios-search">
+        <i class="fas fa-search"></i>
+        <input type="text"
+               [(ngModel)]="folderSearch"
+               (ngModelChange)="onSearchChange()"
+               placeholder="Buscar carpeta..." />
+      </div>
+
+      <!-- Loading carpetas -->
+      <div class="rios-loading" *ngIf="loadingFolders">
+        <div class="rios-spinner"></div>
+        <span>Cargando carpetas...</span>
+      </div>
+
+      <!-- Lista carpetas -->
+      <div class="rios-folders-list" *ngIf="!loadingFolders">
+        <div class="rios-empty" *ngIf="filteredFolders.length === 0">
+          <i class="fas fa-folder-open"></i>
+          <span>No se encontraron carpetas</span>
+        </div>
+
+        <div class="rios-folder-card"
+             *ngFor="let folder of paginatedFolders"
+             [class.rios-folder-active]="selectedFolder?.llav === folder.llav"
+             (click)="onFolderClick(folder)"
+             (dblclick)="onFolderDblClick(folder)"
+             (contextmenu)="onFolderRightClick($event, folder)">
+          <div class="rios-folder-icon" [style.background-color]="getComponentColor(folder.componente)">
+            <i class="fas fa-folder"></i>
+          </div>
+          <div class="rios-folder-body">
+            <span class="rios-folder-name">{{ folder.llav }}</span>
+            <span class="rios-folder-date">
+              <i class="far fa-calendar-alt"></i>
+              {{ folder.fecha | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+          <span class="rios-folder-count">{{ folder.cantidad || 0 }}</span>
+        </div>
+      </div>
+
+      <!-- Paginador carpetas -->
+      <div class="rios-paginator" *ngIf="!loadingFolders && totalPages > 1">
+        <button class="rios-paginator-btn" [disabled]="folderPage === 1" (click)="prevFolderPage()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <span class="rios-paginator-text">{{ folderPage }} / {{ totalPages }}</span>
+        <button class="rios-paginator-btn" [disabled]="folderPage === totalPages" (click)="nextFolderPage()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Panel derecho: Documentos -->
+    <div class="rios-panel rios-panel-docs">
+
+      <!-- Estado vacío -->
+      <div class="rios-empty-state" *ngIf="!selectedFolder">
+        <div class="rios-empty-icon">
+          <i class="fas fa-copy"></i>
+        </div>
+        <h3>Seleccione una carpeta</h3>
+        <p>Seleccione una carpeta militar para revisar los resueltos en modo tarjeta.</p>
+      </div>
+
+      <!-- Contenido de carpeta -->
+      <div class="rios-docs-content" *ngIf="selectedFolder">
+
+        <!-- Cabecera -->
+        <div class="rios-docs-header">
+          <div>
+            <h3>Carpeta: {{ selectedFolder.llav }}</h3>
+            <span>{{ documents.length }} documentos</span>
+          </div>
+          <button class="rios-btn-open-folder" (click)="enterCardModeFromFolder()">
+            <i class="fas fa-clone"></i>
+            Revisar tarjetas
+          </button>
+        </div>
+
+        <!-- Loading documentos -->
+        <div class="rios-loading" *ngIf="loadingDocuments">
+          <div class="rios-spinner"></div>
+          <span>Cargando documentos...</span>
+        </div>
+
+        <!-- Lista documentos -->
+        <div class="rios-docs-list" *ngIf="!loadingDocuments">
+          <div class="rios-empty" *ngIf="documents.length === 0">
+            <i class="fas fa-info-circle"></i>
+            <span>Esta carpeta está vacía</span>
+          </div>
+
+          <div class="rios-doc-row"
+               *ngFor="let doc of documents; let idx = index"
+               (click)="enterCardMode(idx)"
+               (contextmenu)="onDocumentRightClick($event, doc, idx)">
+            <span class="rios-doc-number">{{ idx + 1 }}</span>
+            <div class="rios-doc-info">
+              <span class="rios-doc-name">{{ doc.nombres_apellidos | uppercase }}</span>
+              <div class="rios-doc-meta">
+                <span><i class="fas fa-id-card"></i> V-{{ doc.cedula }}</span>
+                <span><i class="fas fa-file-alt"></i> {{ doc.digital || doc.anom }}</span>
+              </div>
+            </div>
+            <div class="rios-doc-actions">
+              <button class="rios-btn-action rios-btn-view" (click)="enterCardMode(idx)" title="Ver tarjeta">
+                <i class="fas fa-clone"></i>
+              </button>
+              <button class="rios-btn-action rios-btn-approve" (click)="approveFast(doc)" title="Firmar rápido">
+                <i class="fas fa-check-double"></i>
+              </button>
+              <button class="rios-btn-action rios-btn-reject" (click)="promptReject(doc)" title="Rechazar">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menú contextual -->
+  <div class="rios-context-menu"
+       *ngIf="contextMenuVisible"
+       [style.top.px]="contextMenuCoords.y"
+       [style.left.px]="contextMenuCoords.x"
+       (click)="$event.stopPropagation()">
+    <ng-container *ngIf="contextMenuType === 'folder'">
+      <div class="rios-context-item" (click)="openContextFolder()">
+        <i class="fas fa-folder-open text-success"></i>
+        <span>Abrir carpeta</span>
+      </div>
+      <div class="rios-context-item" (click)="enterCardModeFromFolder()">
+        <i class="fas fa-clone text-primary"></i>
+        <span>Revisar tarjetas</span>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="contextMenuType === 'document'">
+      <div class="rios-context-item" (click)="enterCardMode(contextMenuIndex)">
+        <i class="fas fa-clone text-success"></i>
+        <span>Ver tarjeta</span>
+      </div>
+      <div class="rios-context-item" (click)="approveFast(contextMenuData)">
+        <i class="fas fa-signature text-success"></i>
+        <span>Firmar rápido</span>
+      </div>
+      <div class="rios-context-item rios-context-danger" (click)="promptReject(contextMenuData)">
+        <i class="fas fa-times text-danger"></i>
+        <span>Rechazar</span>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<!-- VISTA TARJETA (modo Tinder/Typeless) -->
+<div class="rios-card-view"
+     *ngIf="cardMode"
+     (window:keydown)="onKeyDown($event)">
+
+  <!-- Navbar -->
+  <div class="rios-card-nav">
+    <div class="rios-card-nav-left">
+      <i class="fas fa-clone rios-card-nav-icon"></i>
+      <span class="rios-card-nav-title">Revisión por Tarjetas</span>
+      <span class="rios-card-nav-badge">{{ currentDocIndex + 1 }} / {{ documents.length }}</span>
+    </div>
+    <button class="rios-card-nav-close" (click)="exitCardMode()" title="Cerrar (Esc)">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Área de tarjetas -->
+  <div class="rios-card-stage">
+
+    <!-- Flecha anterior -->
+    <button class="rios-card-arrow rios-card-arrow-left"
+            [class.rios-card-arrow-disabled]="!hasPrev"
+            [disabled]="!hasPrev || actionLoading"
+            (click)="prevDoc()">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <!-- Contenedor de tarjetas -->
+    <div class="rios-card-stack"
+         (touchstart)="onTouchStart($event)"
+         (touchmove)="onTouchMove($event)"
+         (touchend)="onTouchEnd($event)">
+
+      <!-- Tarjeta siguiente (fondo) -->
+      <div class="rios-card rios-card-next" *ngIf="documents.length > 1">
+        <div class="rios-card-header">
+          <span class="rios-card-label">Siguiente</span>
+        </div>
+        <div class="rios-card-body">
+          <div class="rios-card-avatar">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <h4 class="rios-card-name">
+            {{ documents[currentDocIndex + 1]?.nombres_apellidos | uppercase }}
+          </h4>
+          <p class="rios-card-cedula">
+            V-{{ documents[currentDocIndex + 1]?.cedula }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Tarjeta actual -->
+      <div class="rios-card rios-card-current"
+           [class.rios-card-approve]="swipeState === 'approved' || swipeState === 'swiping-right'"
+           [class.rios-card-reject]="swipeState === 'rejected' || swipeState === 'swiping-left'">
+
+        <!-- Indicadores de swipe -->
+        <div class="rios-card-stamp rios-card-stamp-approve" *ngIf="swipeState === 'swiping-right' || swipeState === 'approved'">
+          <i class="fas fa-check"></i> APROBAR
+        </div>
+        <div class="rios-card-stamp rios-card-stamp-reject" *ngIf="swipeState === 'swiping-left' || swipeState === 'rejected'">
+          <i class="fas fa-times"></i> RECHAZAR
+        </div>
+
+        <div class="rios-card-header">
+          <span class="rios-card-label">Resuelto</span>
+          <span class="rios-card-counter">{{ currentDocIndex + 1 }} / {{ documents.length }}</span>
+        </div>
+
+        <div class="rios-card-body" *ngIf="activeDoc">
+          <div class="rios-card-avatar">
+            <i class="fas fa-file-signature"></i>
+          </div>
+
+          <h4 class="rios-card-name">{{ activeDoc.nombres_apellidos | uppercase }}</h4>
+          <p class="rios-card-cedula">V-{{ activeDoc.cedula }}</p>
+
+          <div class="rios-card-fields">
+            <div class="rios-card-field">
+              <label>Número de Control</label>
+              <span>{{ activeDoc.ncontrol || activeDoc.numc }}</span>
+            </div>
+            <div class="rios-card-field" *ngIf="activeDoc.digital || activeDoc.anom">
+              <label>Archivo</label>
+              <span class="rios-card-break">{{ activeDoc.digital || activeDoc.anom }}</span>
+            </div>
+            <div class="rios-card-field">
+              <label>Usuario Firmante</label>
+              <span>{{ jwtData.userName | uppercase }}</span>
+            </div>
+            <div class="rios-card-field">
+              <label>Rol / Privilegios</label>
+              <span>{{ jwtData.userRole | uppercase }}</span>
+            </div>
+          </div>
+
+          <!-- Botón Ver PDF -->
+          <button class="rios-card-pdf-btn" (click)="openCurrentPdf()" [disabled]="openingPdf">
+            <i class="fas fa-external-link-alt" *ngIf="!openingPdf"></i>
+            <div class="rios-spinner-sm" *ngIf="openingPdf"></div>
+            <span>{{ openingPdf ? 'Abriendo...' : 'Ver PDF' }}</span>
+          </button>
+
+          <!-- Observaciones -->
+          <div class="rios-card-obs">
+            <label>Observaciones</label>
+            <textarea [(ngModel)]="observations"
+                      rows="2"
+                      placeholder="Escriba observaciones de aprobación o motivo de rechazo..."
+                      [disabled]="actionLoading"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flecha siguiente -->
+    <button class="rios-card-arrow rios-card-arrow-right"
+            [class.rios-card-arrow-disabled]="!hasNext"
+            [disabled]="!hasNext || actionLoading"
+            (click)="nextDoc()">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- Footer de acciones -->
+  <div class="rios-card-footer">
+    <button class="rios-card-btn rios-card-btn-reject" (click)="rejectCurrent()" [disabled]="actionLoading">
+      <i class="fas fa-times-circle" *ngIf="!actionLoading"></i>
+      <div class="rios-spinner-sm" *ngIf="actionLoading"></div>
+      <span>Rechazar</span>
+    </button>
+
+    <div class="rios-card-hint">
+      <i class="fas fa-hand-pointer"></i>
+      <span>Deslice para decidir</span>
+    </div>
+
+    <button class="rios-card-btn rios-card-btn-approve" (click)="approveCurrent()" [disabled]="actionLoading">
+      <i class="fas fa-check-circle" *ngIf="!actionLoading"></i>
+      <div class="rios-spinner-sm" *ngIf="actionLoading"></div>
+      <span>Aprobar</span>
+    </button>
+  </div>
+</div>

@@ -59,6 +59,7 @@ export class AuthGuardGuard implements CanActivate {
       // 3. Definición de Lista Blanca (Hardcoded + Patrones dinámicos)
       const staticWhitelist = [
         "/resueltos_tinder",
+        "/resueltos_ios",
         "/resueltos_ok",
         "/mreportes",
         "/pendientes",
