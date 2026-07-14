@@ -7,7 +7,7 @@
 <div class="container-fluid mt--9">
   <div class="row" style="margin-top: 30px;">
 
-    <div class="col-xl-3 col-lg-4 col-md-6 col-6 mb-4 sub-anim-item" *ngFor="let e of Menu; let i = index"
+    <div class="col-xl-3 col-lg-4 col-md-6 d-none d-md-block mb-4 sub-anim-item" *ngFor="let e of Menu; let i = index"
       [style.animation-delay]="(i * 100) + 'ms'">
 
       <a routerLinkActive="active" [routerLink]="[e.url]" id="{{ e.url.replaceAll('/','') }}"
@@ -30,6 +30,58 @@
       </a>
     </div>
 
+
+    <div class="col-12 d-block d-md-none mb-4 sub-anim-item">
+      <div class="card shadow border-0" style="border-radius: 1.2rem; background: linear-gradient(145deg, #ffffff, #f8f9fe);">
+        <div class="card-body p-4">
+          <div class="text-center mb-4">
+            <img src="./assets/img/brand/mppd.png" alt="MPPD" style="width: 80%; max-width: 320px; object-fit: contain;">
+          </div>
+          
+          <!-- Stacked Progress Bar -->
+          <div class="progress mb-4 shadow-sm" style="height: 18px; border-radius: 10px; background-color: #e9ecef;">
+            <div class="progress-bar" role="progressbar" style="width: 88.8%; background-color: #a8e6cf;" title="En Proceso: 120"></div>
+            <div class="progress-bar" role="progressbar" style="width: 3.7%; background-color: #dcedc1;" title="Aprobadas: 5"></div>
+            <div class="progress-bar" role="progressbar" style="width: 7.5%; background-color: #ffb7b2;" title="Rechazadas: 10"></div>
+          </div>
+
+          <!-- Leyenda de Estados -->
+          <div class="row text-center mb-2">
+            <div class="col-4">
+              <div class="d-flex flex-column align-items-center">
+                <div class="rounded-circle mb-1" style="width: 12px; height: 12px; background-color: #a8e6cf;"></div>
+                <span class="text-muted" style="font-size: 0.65rem; font-weight: 700;">EN PROCESO</span>
+                <span class="font-weight-bold text-dark" style="font-size: 1.1rem;">120</span>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="d-flex flex-column align-items-center">
+                <div class="rounded-circle mb-1" style="width: 12px; height: 12px; background-color: #dcedc1;"></div>
+                <span class="text-muted" style="font-size: 0.65rem; font-weight: 700;">APROBADAS</span>
+                <span class="font-weight-bold text-dark" style="font-size: 1.1rem;">5</span>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="d-flex flex-column align-items-center">
+                <div class="rounded-circle mb-1" style="width: 12px; height: 12px; background-color: #ffb7b2;"></div>
+                <span class="text-muted" style="font-size: 0.65rem; font-weight: 700;">RECHAZADAS</span>
+                <span class="font-weight-bold text-dark" style="font-size: 1.1rem;">10</span>
+              </div>
+            </div>
+          </div>
+          
+          <hr class="my-3" style="border-top: 1px solid #e9ecef;">
+          
+          <!-- Total -->
+          <div class="d-flex justify-content-between align-items-center px-2">
+            <span class="text-uppercase text-muted font-weight-bold" style="font-size: 0.8rem;">Totales</span>
+            <span class="h3 mb-0 font-weight-bold" style="color: #32325d;">135</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <div class="col-xl-3 col-lg-4 col-md-6 col-6 mb-4 sub-anim-item">
 
       <a routerLinkActive="active" [routerLink]="['/resueltos_ok']" id="resueltos_ok"
@@ -41,6 +93,28 @@
               <i class="ni ni-check-bold fa-2x"></i>
             </div>
             <h5 class="text-uppercase font-weight-bold mb-3 text-title">Resueltos</h5>
+            <div class="mt-auto">
+              <span class="badge badge-pill badge-secondary text-muted px-3 py-2"
+                style="background-color: #f8f9fe; border: 1px solid #f0f2f5;">
+                <i class="fa fa-chevron-right mr-1" style="font-size: 0.8em;"></i> Acceder
+              </span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-xl-3 col-lg-4 col-md-6 col-6 mb-4 sub-anim-item">
+
+      <a routerLinkActive="active" [routerLink]="['/directorio']" id="directorio"
+        class="text-decoration-none">
+        <div class="menu-card h-100">
+
+          <div class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="icon-container">
+              <i class="ni ni-collection fa-2x"></i>
+            </div>
+            <h5 class="text-uppercase font-weight-bold mb-3 text-title">Directorio</h5>
             <div class="mt-auto">
               <span class="badge badge-pill badge-secondary text-muted px-3 py-2"
                 style="background-color: #f8f9fe; border: 1px solid #f0f2f5;">

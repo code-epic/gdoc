@@ -125,7 +125,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   }
 
   public exitComponent() {
-    this.router.navigate(["/generales"]);
+    this.router.navigate(["/dashboard"]);
   }
 
   // --- CARGA DE METADATOS Y COMPONENTES ---
