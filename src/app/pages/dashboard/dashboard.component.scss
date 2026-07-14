@@ -1,58 +1,35 @@
-// Responsive styles for Dashboard menu items
+// Responsive layout overrides for Dashboard Component across 4 scenarios
 
-@media (max-width: 991.98px) {
+// ==========================================================================
+// SCENARIO 1: Mobile (max-width: 575.98px)
+// ==========================================================================
+@media (max-width: 575.98px) {
   .header {
     padding-top: 4.5rem !important;
     padding-bottom: 5.5rem !important;
   }
 
   .container-fluid.mt--9 {
-    margin-top: -3.5rem !important;
+    margin-top: -4.5rem !important; // Restored overlap with header
   }
 
-  // Tablet styling (and general mobile base overrides)
   .menu-card {
-    border-radius: 14px !important;
-    
-    .card-body {
-      padding: 1rem !important;
-    }
-    
-    .icon-container {
-      width: 58px !important;
-      height: 58px !important;
-      margin: 0 auto 1rem auto !important;
-      
-      i {
-        font-size: 1.4rem !important;
-      }
-    }
-    
-    .text-title {
-      font-size: 0.8rem !important;
-      margin-bottom: 0.75rem !important;
-    }
-    
-    .badge {
-      font-size: 0.75rem !important;
-      padding: 0.4rem 0.8rem !important;
-    }
-  }
-}
-
-@media (max-width: 575.98px) {
-  // Mobile styling
-  .menu-card {
-    border-radius: 12px !important;
+    border: 1px solid rgba(233, 236, 239, 0.8) !important; // Keep original card border
+    border-radius: 16px !important; // Keep original card border-radius
+    background: #ffffff !important; // Keep original card background
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important; // Keep original card shadow
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
     
     .card-body {
       padding: 0.75rem !important;
     }
     
     .icon-container {
-      width: 48px !important;
-      height: 48px !important;
-      margin: 0 auto 0.75rem auto !important;
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 50% !important;
+      background: linear-gradient(145deg, #f6f9fc, #ffffff) !important;
+      margin: 0 auto 0.5rem auto !important;
       box-shadow: 4px 4px 8px #ebeff5, -4px -4px 8px #ffffff !important;
       
       i {
@@ -62,16 +39,130 @@
     
     .text-title {
       font-size: 0.7rem !important;
-      margin-bottom: 0.5rem !important;
+      margin-bottom: 0 !important;
       line-height: 1.2 !important;
-      min-height: 32px; /* Ensure alignment for titles with different lengths */
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-weight: 600 !important;
+      min-height: 34px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    
+    // Hide the "Acceder" badge to maintain a clean icon-button feel
+    .badge {
+      display: none !important;
+    }
+  }
+}
+
+// ==========================================================================
+// SCENARIO 2: Tablet (min-width: 576px) and (max-width: 991.98px)
+// ==========================================================================
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .header {
+    padding-top: 4.5rem !important;
+    padding-bottom: 6rem !important;
+  }
+
+  .container-fluid.mt--9 {
+    margin-top: -4.5rem !important; // Restored overlap with header
+  }
+
+  .menu-card {
+    border: 1px solid rgba(233, 236, 239, 0.8) !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    
+    .card-body {
+      padding: 1.25rem !important;
+    }
+    
+    .icon-container {
+      width: 54px !important;
+      height: 54px !important;
+      border-radius: 50% !important;
+      background: linear-gradient(145deg, #f6f9fc, #ffffff) !important;
+      margin: 0 auto 0.75rem auto !important;
+      box-shadow: 6px 6px 12px #ebeff5, -6px -6px 12px #ffffff !important;
+      
+      i {
+        font-size: 1.3rem !important;
+      }
+    }
+    
+    .text-title {
+      font-size: 0.8rem !important;
+      margin-bottom: 0.75rem !important;
+      font-weight: 600 !important;
     }
     
     .badge {
-      display: none !important; /* Hide badge on mobile to avoid overcrowding */
+      font-size: 0.75rem !important;
+      padding: 0.4rem 0.8rem !important;
+    }
+  }
+}
+
+// ==========================================================================
+// SCENARIO 3: Laptop (min-width: 992px) and (max-width: 1199.98px)
+// ==========================================================================
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .header {
+    padding-top: 6rem !important;
+    padding-bottom: 8rem !important;
+  }
+
+  .container-fluid.mt--9 {
+    margin-top: -5.5rem !important;
+  }
+
+  .menu-card {
+    border: 1px solid rgba(233, 236, 239, 0.8) !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    
+    .card-body {
+      padding: 1.5rem !important;
+    }
+    
+    .icon-container {
+      width: 64px !important;
+      height: 64px !important;
+      border-radius: 50% !important;
+      background: linear-gradient(145deg, #f6f9fc, #ffffff) !important;
+      margin: 0 auto 1rem auto !important;
+      box-shadow: 6px 6px 12px #ebeff5, -6px -6px 12px #ffffff !important;
+      
+      i {
+        font-size: 1.5rem !important;
+      }
+    }
+    
+    .text-title {
+      font-size: 0.85rem !important;
+      margin-bottom: 1rem !important;
+    }
+    
+    .badge {
+      font-size: 0.8rem !important;
+      padding: 0.5rem 1rem !important;
+    }
+  }
+}
+
+// ==========================================================================
+// SCENARIO 4: Desktop (min-width: 1200px)
+// ==========================================================================
+@media (min-width: 1200px) {
+  // Keep original desktop styling intact (inherits from global styles)
+  .menu-card {
+    transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    
+    &:hover {
+      transform: translateY(-4px) !important;
+      box-shadow: 0 15px 35px rgba(50,50,93,0.1), 0 5px 15px rgba(0,0,0,0.07) !important;
     }
   }
 }

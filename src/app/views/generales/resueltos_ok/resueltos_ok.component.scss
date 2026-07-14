@@ -127,6 +127,10 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
   }
 }
 
+.btn-back-master {
+  display: none;
+}
+
 /* --- MASTER-DETAIL LAYOUT (TABLET PHILOSOPHY) --- */
 .tablet-layout {
   display: grid;
@@ -620,6 +624,90 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
 
 /* Móviles */
 @media (max-width: 768px) {
+  // Mobile Master-Detail Drilldown stacked navigation flow using CSS :has()
+  .tablet-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    height: calc(100vh - 130px) !important;
+    height: calc(100dvh - 130px) !important;
+    height: calc(100svh - 130px) !important;
+    overflow: hidden !important;
+    gap: 0 !important;
+  }
+
+  // Base mobile state: Hide detail panel, show master panel
+  .tablet-layout .detail-panel {
+    display: none !important;
+  }
+  .tablet-layout .master-panel {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    flex: 1 1 auto !important;
+  }
+
+  // Active state: If a folder is clicked, hide master panel and show detail panel
+  .tablet-layout:has(.detail-content) {
+    .master-panel {
+      display: none !important;
+    }
+    .detail-panel {
+      display: flex !important;
+      width: 100% !important;
+      height: 100% !important;
+      flex: 1 1 auto !important;
+    }
+  }
+
+  // Back button styling for mobile detail view
+  .btn-back-master {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    background: #eefdf4;
+    border: 1px solid #cbfbdc;
+    color: #15803d;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: all 0.2s ease;
+    
+    i {
+      font-size: 0.85rem;
+    }
+    
+    &:active {
+      background: #cbfbdc;
+      transform: translateY(1px);
+    }
+  }
+
+  // Mobile horizontal tabs scrollbar-free styling with gap spacing and touch feel
+  .component-tabs {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 8px !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 0.75rem !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    
+    &::-webkit-scrollbar {
+      display: none !important;
+    }
+    
+    .tab-btn {
+      flex: 0 0 auto !important;
+      padding: 0.5rem 1rem !important;
+      font-size: 0.75rem !important;
+    }
+  }
+
   .module-header {
     padding: 0.75rem 1rem;
     margin-bottom: 0.75rem;
@@ -628,18 +716,43 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
     p { font-size: 0.7rem; }
   }
 
+  // Close view button becomes a simple circular close icon on mobile
   .btn-close-view {
-    padding: 0.4rem 0.9rem;
-    font-size: 0.75rem;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    width: 36px !important;
+    height: 36px !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    
+    i {
+      font-size: 1.25rem !important;
+      margin: 0 !important;
+    }
+    
+    .btn-text-close {
+      display: none !important;
+    }
   }
 
   .master-panel, .detail-panel {
-    min-height: 300px;
+    min-height: 0 !important;
+    height: 100% !important;
     padding: 0.85rem;
   }
 
+  .folders-list-container, .documents-list-container {
+    padding-top: 4px !important;
+  }
+
   .folder-card-compact {
-    padding: 0.7rem 0.85rem;
+    padding: 12px 14px !important;
+    margin-bottom: 10px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 6px rgba(93, 190, 142, 0.06) !important;
     gap: 0.65rem;
   }
 
@@ -657,7 +770,10 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
   }
 
   .doc-item-row {
-    padding: 0.75rem 0.85rem;
+    padding: 12px 14px !important;
+    margin-bottom: 10px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 6px rgba(93, 190, 142, 0.06) !important;
     gap: 0.6rem;
   }
 

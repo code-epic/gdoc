@@ -14,6 +14,16 @@
       <i class="fas fa-file-pdf tpv-nav-icon"></i>
       <span class="tpv-nav-title">Visor PDF</span>
       <span class="tpv-nav-badge">{{ currentIndex + 1 }} / {{ total }}</span>
+      
+      <!-- Small inline arrows for mobile/general navigation next to the badge -->
+      <div class="tpv-nav-arrows">
+        <button class="tpv-nav-arrow-btn" [disabled]="isFirst || actionExecuting" (click)="prevDocument()" title="Anterior (←)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="tpv-nav-arrow-btn" [disabled]="isLast || actionExecuting" (click)="nextDocument()" title="Siguiente (→)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
     </div>
     <div class="tpv-nav-right">
       <span class="tpv-nav-user" *ngIf="activeDoc">
@@ -181,6 +191,15 @@
       <i [class]="rejectIcon" *ngIf="!actionExecuting || executingType !== 'reject'"></i>
       <div class="tpv-spinner-sm" *ngIf="actionExecuting && executingType === 'reject'"></div>
       <span>{{ rejectLabel }}</span>
+    </button>
+
+    <!-- Explorar button in the middle -->
+    <button class="tpv-btn tpv-btn-explore"
+            [disabled]="loadingPdf || !rawPdfUrl"
+            (click)="openPdfInNewTab()"
+            title="Abrir PDF en nueva pestaña para explorar en detalle">
+      <i class="fas fa-search-plus"></i>
+      <span>Explorar</span>
     </button>
 
     <button class="tpv-btn tpv-btn-approve"

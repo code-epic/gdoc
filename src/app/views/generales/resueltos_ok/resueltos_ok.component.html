@@ -11,7 +11,7 @@
       <p>Seleccione una carpeta militar para gestionar y firmar digitalmente los resueltos aprobados.</p>
     </div>
     <button class="btn-close-view" (click)="exitComponent()" title="Salir del Buzón de Resueltos">
-      <i class="fas fa-times-circle"></i> Cerrar Vista
+      <i class="fas fa-times-circle"></i><span class="btn-text-close"> Cerrar Vista</span>
     </button>
   </div>
 
@@ -72,19 +72,19 @@
         <!-- Tarjetas Compactas de Carpetas -->
         <div class="folder-card-compact animate-fade-in" 
              *ngFor="let folder of paginatedFolders"
-             [class.active]="selectedFolder?.llav === folder.llav"
+             [class.active]="selectedFolder?.codigo === folder.codigo"
              (click)="onFolderClick(folder)"
              (dblclick)="onFolderDblClick(folder)"
              (contextmenu)="onFolderRightClick($event, folder)">
           
-          <i class="fas fa-folder folder-icon-compact" [style.color]="getComponentColor(folder.componente)"></i>
+          <i class="fas fa-folder folder-icon-compact" style="color: #5eaaa8;"></i>
           
           <div class="folder-info-compact">
-            <div class="name">{{ folder.llav }}</div>
+            <div class="name">{{ folder.tipo }}</div>
             <div class="date"><i class="far fa-calendar-alt mr-1"></i>{{ folder.fecha | date:'dd/MM/yyyy' }}</div>
           </div>
           
-          <span class="folder-badge-compact">{{ folder.cantidad || 0 }}</span>
+          <span class="folder-badge-compact">{{ folder.c_tipo || 0 }}</span>
         </div>
       </div>
 
@@ -102,6 +102,10 @@
     
     <!-- COLUMNA DERECHA: Contenido y Listado de Documentos (Detail) -->
     <div class="detail-panel">
+      <!-- Botón Volver (Solo visible en Móvil) -->
+      <button class="btn-back-master" (click)="selectedFolder = null; documents = []">
+        <i class="fas fa-arrow-left"></i> Volver a Carpetas
+      </button>
       
       <!-- Estado Vacío (Sin carpeta seleccionada) -->
       <div class="empty-state" *ngIf="!selectedFolder">
@@ -116,8 +120,7 @@
         <!-- Cabecera del Detalle -->
         <div class="detail-header">
           <div>
-            <h3>Carpeta: {{ selectedFolder.llav }}</h3>
-            <small class="text-muted">Doble clic en un documento para abrir revisión Tinder.</small>
+            <h3>Tipo: {{ selectedFolder.tipo }}</h3>
           </div>
           <span class="badge">{{ documents.length }} Documentos</span>
         </div>
