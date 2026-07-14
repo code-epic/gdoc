@@ -1,6 +1,12 @@
 <!-- Sidenav -->
 <mat-sidenav-container class="example-container" autosize>
   <mat-sidenav #sidenav class="example-sidenav" mode="side" [opened]="opened">
+    <!-- Close button for mobile/tablet -->
+    <div class="d-lg-none text-right p-3" style="position: absolute; right: 0; top: 0; z-index: 1060;">
+      <button type="button" class="btn btn-link text-muted p-0" (click)="onChangeSidenav(false)" style="background: none; border: none; outline: none; cursor: pointer;">
+        <i class="fa fa-times" style="font-size: 1.5rem;"></i>
+      </button>
+    </div>
     <app-sidebar></app-sidebar>
   </mat-sidenav>
 

@@ -111,7 +111,7 @@
       </div>
 
       <!-- Contenido cuando se selecciona carpeta -->
-      <div *ngIf="selectedFolder" style="display: flex; flex-direction: column; height: 100%;">
+      <div class="detail-content" *ngIf="selectedFolder">
         
         <!-- Cabecera del Detalle -->
         <div class="detail-header">
@@ -129,7 +129,7 @@
         </div>
 
         <!-- Listado de Documentos -->
-        <div style="flex: 1; overflow-y: auto; padding-right: 0.25rem;" *ngIf="!loadingDocuments">
+        <div class="documents-list-container" *ngIf="!loadingDocuments">
           
           <!-- Si no hay documentos en la carpeta -->
           <div class="text-center p-4 my-auto text-muted" *ngIf="documents.length === 0">

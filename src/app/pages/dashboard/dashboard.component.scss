@@ -1,2 +1,77 @@
+// Responsive styles for Dashboard menu items
 
- 
+@media (max-width: 991.98px) {
+  .header {
+    padding-top: 4.5rem !important;
+    padding-bottom: 5.5rem !important;
+  }
+
+  .container-fluid.mt--9 {
+    margin-top: -3.5rem !important;
+  }
+
+  // Tablet styling (and general mobile base overrides)
+  .menu-card {
+    border-radius: 14px !important;
+    
+    .card-body {
+      padding: 1rem !important;
+    }
+    
+    .icon-container {
+      width: 58px !important;
+      height: 58px !important;
+      margin: 0 auto 1rem auto !important;
+      
+      i {
+        font-size: 1.4rem !important;
+      }
+    }
+    
+    .text-title {
+      font-size: 0.8rem !important;
+      margin-bottom: 0.75rem !important;
+    }
+    
+    .badge {
+      font-size: 0.75rem !important;
+      padding: 0.4rem 0.8rem !important;
+    }
+  }
+}
+
+@media (max-width: 575.98px) {
+  // Mobile styling
+  .menu-card {
+    border-radius: 12px !important;
+    
+    .card-body {
+      padding: 0.75rem !important;
+    }
+    
+    .icon-container {
+      width: 48px !important;
+      height: 48px !important;
+      margin: 0 auto 0.75rem auto !important;
+      box-shadow: 4px 4px 8px #ebeff5, -4px -4px 8px #ffffff !important;
+      
+      i {
+        font-size: 1.1rem !important;
+      }
+    }
+    
+    .text-title {
+      font-size: 0.7rem !important;
+      margin-bottom: 0.5rem !important;
+      line-height: 1.2 !important;
+      min-height: 32px; /* Ensure alignment for titles with different lengths */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .badge {
+      display: none !important; /* Hide badge on mobile to avoid overcrowding */
+    }
+  }
+}

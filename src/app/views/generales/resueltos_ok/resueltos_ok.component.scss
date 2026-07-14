@@ -129,18 +129,19 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
 
 /* --- MASTER-DETAIL LAYOUT (TABLET PHILOSOPHY) --- */
 .tablet-layout {
-  flex: 1 1 0%;
-  min-height: 0;
   display: grid;
   grid-template-columns: minmax(280px, 380px) 1fr;
   gap: 1.5rem;
+  height: calc(100vh - 100px);
+  height: calc(100dvh - 100px);
+  height: calc(100svh - 100px);
   overflow: hidden;
 }
 
 /* Columna Izquierda: Navegador de Carpetas (Master) */
 .master-panel {
-  min-height: 0;
   height: 100%;
+  min-height: 0;
   background: $ok-surface;
   border-radius: 16px;
   box-shadow: 0 4px 16px $ok-shadow;
@@ -149,20 +150,22 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
   flex-direction: column;
   overflow: hidden;
   border: 1px solid $ok-border;
+  box-sizing: border-box;
 }
 
 /* Columna Derecha: Contenido y Documentos (Detail) */
 .detail-panel {
-  min-height: 0;
   height: 100%;
+  min-height: 0;
   background: $ok-surface;
   border-radius: 16px;
   box-shadow: 0 4px 16px $ok-shadow;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
   border: 1px solid $ok-border;
+  box-sizing: border-box;
 }
 
 /* --- TABS DE FILTRO DE COMPONENTES --- */
@@ -248,9 +251,25 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
 
 /* Lista/Cuadrícula de Carpetas Acotada */
 .folders-list-container {
-  flex: 1 1 0%;
+  flex: 1 1 0px;
   min-height: 0;
-  height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 0.25rem;
+}
+
+/* Contenido del panel de detalle */
+.detail-content {
+  flex: 1 1 0px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Lista de documentos */
+.documents-list-container {
+  flex: 1 1 0px;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-right: 0.25rem;
@@ -575,6 +594,9 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
   .tablet-layout {
     gap: 1rem;
     grid-template-columns: minmax(260px, 300px) 1fr;
+    height: calc(100vh - 130px);
+    height: calc(100dvh - 130px);
+    height: calc(100svh - 130px);
   }
   .master-panel, .detail-panel {
     padding: 1rem;

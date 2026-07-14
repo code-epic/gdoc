@@ -1,5 +1,13 @@
 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
   <div class="container-fluid">
+    <!-- Mobile Hamburger Menu Button & Title -->
+    <div class="d-flex align-items-center d-lg-none">
+      <button class="navbar-toggler text-white px-0 mr-3" type="button" (click)="onChangeSidenav()" style="display: block !important;">
+        <i class="fa fa-bars" style="font-size: 1.25rem;"></i>
+      </button>
+      <a class="h4 mb-0 text-white text-uppercase" [routerLink]="['/dashboard']">{{getTitle()}}</a>
+    </div>
+
     <!-- Brand -->
     <div class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" routerLinkActive="active">
       <a (click)="onChangeSidenav()">

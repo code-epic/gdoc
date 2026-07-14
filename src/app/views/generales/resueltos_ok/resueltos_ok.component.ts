@@ -40,7 +40,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public folderSearchQuery = '';
   public folderPage = 1;
   public totalPages = 1;
-  public folderPageSize = 6;
+  public folderPageSize = 5;
 
   // Tinder View / Immersive View
   public immersiveMode = false;
