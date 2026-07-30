@@ -1,0 +1,79 @@
+<div class="canvas-toolbar">
+  <button class="btn btn-sm btn-outline-secondary" (click)="zoomOut()" title="Alejar"><i class="fas fa-search-minus"></i></button>
+  <span class="zoom-level">{{ (zoomScale * 100) | number:'1.0-0' }}%</span>
+  <button class="btn btn-sm btn-outline-secondary" (click)="zoomIn()" title="Acercar"><i class="fas fa-search-plus"></i></button>
+  <button class="btn btn-sm btn-outline-primary ml-2" (click)="autoFit()" title="Ajustar a pantalla"><i class="fas fa-expand-arrows-alt"></i></button>
+</div>
+
+<div class="a4-canvas-container" #container [style.transform]="'scale(' + zoomScale + ')'">
+  <div class="a4-canvas">
+  
+  <!-- CABECERA -->
+  <header class="doc-header editable-zone" (click)="editMode('header')">
+    <p class="static-text" style="font-weight: bold; text-transform: uppercase;">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
+    <p class="static-text" style="font-weight: bold; text-transform: uppercase;">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
+    <p class="static-text" style="font-weight: bold; text-transform: uppercase;">DESPACHO DEL MINISTRO</p>
+    
+    <!-- 1 línea debajo: Lugar y fecha -->
+    <div class="dynamic-row" style="text-align: left; margin-top: 13pt;">
+      <p style="font-weight: bold;">Caracas,&nbsp;<span class="variable">{{ documentData.header.date | date:'dd MMM yyyy' | uppercase }}</span></p>
+    </div>
+    
+    <!-- Debajo: Data -->
+    <div class="dynamic-row" style="text-align: right;">
+      <p style="font-weight: bold;">{{ documentData.header.anniversaries }}</p>
+    </div>
+
+    <!-- 1 línea debajo: Resolución -->
+    <div class="dynamic-row" style="text-align: center; margin-top: 13pt;">
+      <p style="font-weight: bold; text-transform: uppercase;">RESOLUCIÓN N° <span style="text-decoration: underline;">{{ documentData.header.resolutionNum }}</span></p>
+    </div>
+  </header>
+
+  <!-- CUERPO -->
+  <main class="doc-body editable-zone" (click)="editMode('body')">
+    <p class="preamble">{{ documentData.body.preamble }}</p>
+    
+    <!-- 1 línea debajo del basamento legal: RESUELVE -->
+    <p style="text-align: center; margin-top: 13pt; margin-bottom: 13pt; font-weight: bold; text-transform: uppercase;">{{ documentData.body.action }}</p>
+    
+    <!-- Renderizado de contenido HTML seguro (Angular innerHTML) -->
+    <div class="content-html" [innerHTML]="documentData.body.content"></div>
+  </main>
+
+  <!-- PIE DE PÁGINA Y FIRMAS -->
+  <footer class="doc-footer editable-zone" (click)="editMode('signatures')" style="margin-top: 52pt; /* 4 líneas debajo del cuerpo */">
+    
+    <!-- 1cm (aprox 38px) desde el margen izquierdo -->
+    <p style="margin-left: 1cm; margin-bottom: 13pt;">Comuníquese y publíquese.</p>
+    
+    <!-- 1.5cm desde el margen izquierdo -->
+    <p style="margin-left: 1.5cm; margin-bottom: 26pt; /* 2 líneas debajo para la firma */">Por el Ejecutivo Nacional,</p>
+
+    <!-- Contenedor de firma alineado a la derecha -->
+    <div style="float: right; text-align: center; min-width: 350px; position: relative;">
+      
+      <!-- Z-Index 2: Firma Imagen -->
+      <img *ngIf="documentData.signatures.signatureImageUrl" 
+           [src]="documentData.signatures.signatureImageUrl" 
+           class="signature-layer" alt="Firma Autoridad"
+           style="position: absolute; top: -60px; left: 50%; transform: translateX(-50%); z-index: 2; max-width: 200px;">
+           
+      <!-- Textos de firma -->
+      <div class="signatory-info" style="z-index: 3; position: relative;">
+        <p style="font-weight: bold;">{{ documentData.signatures.mainSignatory }}</p>
+        <p style="font-weight: bold;">{{ documentData.signatures.signatoryTitle }}</p>
+        <p style="font-weight: bold;" [innerHTML]="documentData.signatures.signatoryRole"></p>
+      </div>
+    </div>
+    
+    <div style="clear: both;"></div>
+    
+    <!-- Iniciales Inferior Izquierda -->
+    <div class="initials" style="position: absolute; bottom: 0; left: 0; font-size: 0.8em; z-index: 4;">
+      {{ documentData.signatures.initials }}
+    </div>
+  </footer>
+
+  </div>
+</div>

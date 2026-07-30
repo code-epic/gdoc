@@ -263,6 +263,10 @@ $tpv-border:     rgba(255, 255, 255, 0.08);
                       opacity 0.3s ease;
   transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
               opacity 0.3s ease;
+
+  &.tpv-card-canvas {
+    margin: 0 1rem;
+  }
 }
 
 /* ── PANEL PDF ─────────────────────────────────────────── */

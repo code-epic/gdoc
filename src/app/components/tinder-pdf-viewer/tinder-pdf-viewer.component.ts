@@ -54,6 +54,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   @Input() startIndex = 0;
   @Input() jwtData: JwtUserData = { userId: '', userName: '', userRole: '' };
   @Input() loading = false;
+  @Input() useCanvas = false;
   @Input() approveLabel = 'Aprobar y Firmar';
   @Input() rejectLabel = 'Rechazar';
   @Input() approveIcon = 'fas fa-signature';
@@ -142,6 +143,45 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   get isLast(): boolean {
     return this.currentIndex >= this.documents.length - 1;
+  }
+
+  get canvasData(): any {
+    if (!this.activeDoc) return null;
+    
+    // Texto solicitado por el usuario
+    const preambleText = `El Ministro del Poder Popular para la Defensa, GENERAL EN JEFE GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ, nombrado mediante Decreto Nº 5.277 de fecha 18 de marzo de 2026, publicado en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria Nº 6.999 de fecha 18 de marzo de 2026, en ejercicio de las atribuciones que le confiere el artículo 78 numeral 19 del Decreto N° 1.424 con Rango, Valor y Fuerza de Ley Orgánica de la Administración Pública de fecha 17 de noviembre de 2014, publicado en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria Nº 6.147 de fecha 17 de noviembre de 2014, actuando de conformidad con lo establecido en los artículos 30 y 31 numeral 8 de la Ley Constitucional de la Fuerza Armada Nacional Bolivariana, publicada en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria N° 6.508 de fecha 30 de enero de 2020,`;
+
+    const contentHtml = `
+      <p><strong>ÚNICO:</strong> Efectuar el siguiente nombramiento:</p>
+      <p style="text-align: center;"><strong>DESPACHO DEL VICEMINISTRO DE SERVICIOS PARA LA DEFENSA<br>
+      DIRECCIÓN GENERAL DE SALUD<br>
+      Hospital Militar Universitario “Doctor Carlos Arvelo”<br>
+      Subdirección Administrativa</strong></p>
+      <p style="text-indent: 0; margin-left: 40px; margin-top: 15px;">
+        &mdash; Sargento Mayor de Tercera <strong>${(this.activeDoc.nombres_apellidos || 'ALFREDO JOSÉ CAMPOS ÁLVAREZ').toUpperCase()}</strong>, C.I. N° <strong>${this.activeDoc.cedula || '23.492.919'}</strong>, Documentario, p/v.
+      </p>
+    `;
+
+    return {
+      header: {
+        resolutionNum: this.activeDoc.ncontrol || this.activeDoc.numc || '000643',
+        date: this.activeDoc.fecha_resolucion || new Date().toISOString(),
+        anniversaries: '216°, 167° y 27°'
+      },
+      body: {
+        preamble: preambleText,
+        action: 'RESUELVE',
+        content: contentHtml
+      },
+      signatures: {
+        initials: 'LARM/RMEA/B.O.merb',
+        mainSignatory: 'GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ',
+        signatoryTitle: 'General en Jefe',
+        signatoryRole: 'Ministro del Poder Popular<br>para la Defensa',
+        wetStampImageUrl: '', // Si tienes assets, ponlos aquí, por ahora vacío si no hay
+        signatureImageUrl: '' // Si tienes assets, ponlos aquí
+      }
+    };
   }
 
   /* ── Navegación ──────────────────────────────────────── */

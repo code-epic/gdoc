@@ -98,6 +98,7 @@ import { AdministracionpublicaComponent } from './views/resoluciones/nomina/admi
 import { CodigosrojoComponent } from './views/resoluciones/codigosrojo/codigosrojo.component';
 import { ErrorModalComponent } from './components/error-modal/error-modal.component';
 import { TinderPdfViewerComponent } from './components/tinder-pdf-viewer/tinder-pdf-viewer.component';
+import { ResueltoCanvasComponent } from './views/generales/resuelto_canvas/resuelto_canvas.component';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -195,6 +196,7 @@ const ngWizardConfig: NgWizardConfig = {
     ResueltosIosComponent,
     ArchivoComponent,
     AycotizacionesComponent,
+    ResueltoCanvasComponent,
     // PendientesComponent,
     ProcesosComponent,
     RsprocesosComponent,

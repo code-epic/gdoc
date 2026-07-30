@@ -1,0 +1,118 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+  background-color: transparent;
+}
+
+.canvas-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background: white;
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  
+  .zoom-level {
+    margin: 0 15px;
+    font-weight: 600;
+    min-width: 45px;
+    text-align: center;
+  }
+}
+
+.a4-canvas-container {
+  display: flex;
+  justify-content: center;
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 100%;
+  transform-origin: top center;
+  transition: transform 0.2s ease;
+}
+
+.a4-canvas {
+  width: 210mm;
+  min-height: 297mm;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  /* Márgenes físicos del documento: Arriba, Derecha, Abajo, Izquierda (2.5cm sup) */
+  padding: 25mm 20mm 20mm 20mm; 
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  
+  // Tipografía oficial Tahoma, 13pt
+  font-family: 'Tahoma', sans-serif; 
+  color: #000;
+}
+
+/* Áreas de edición interactiva */
+.editable-zone {
+  border: 1px dashed transparent;
+  transition: border 0.3s;
+  cursor: pointer;
+
+  &:hover {
+    border: 1px dashed #007bff;
+    background-color: rgba(0, 123, 255, 0.02);
+  }
+}
+
+/* Distribución del documento */
+.doc-header {
+  text-align: center;
+  margin-bottom: 0;
+  flex-shrink: 0;
+  line-height: 1; /* interlineado sencillo */
+  
+  p {
+    margin: 0;
+    font-size: 13pt; /* Tamaño N° 13 */
+  }
+}
+
+.doc-body {
+  flex-grow: 1;
+  text-align: justify;
+  line-height: 1.15; /* interlineado 1.15 */
+  font-size: 13pt;
+  
+  .preamble {
+    margin-top: 13pt; /* 1 línea debajo de RESOLUCION */
+    margin-bottom: 13pt;
+  }
+}
+
+.doc-footer {
+  position: relative;
+  margin-top: 20mm;
+  min-height: 50mm;
+  flex-shrink: 0;
+}
+
+/* Capas de Firma y Sello */
+.wet-stamp-layer {
+  position: absolute;
+  left: 10mm;
+  bottom: 10mm;
+  width: 120px;
+  opacity: 0.85; /* Translúcido */
+  z-index: 1;
+}
+
+.signature-layer {
+  position: absolute;
+  left: 45mm;
+  bottom: 20mm;
+  width: 150px;
+  z-index: 2; /* Por encima del sello */
+}
