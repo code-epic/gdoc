@@ -26,14 +26,20 @@ export class AdminLayoutComponent implements OnInit {
     // Escuchar notificaciones tan pronto como la app se inicie
 
     // Comprobar si las notificaciones push están soportadas y si ya hay una suscripción
-    if (this.swPush && this.swPush.isEnabled && this.swPush.subscription) {
-      this.swPush.subscription.subscribe(subscription => {
-        this.isPushEnabled = !!subscription; // True si hay suscripción, False si no
-        console.log('Estado de suscripción push:', subscription ? 'Activa' : 'Inactiva');
-      }, error => {
-        console.error('Error al obtener suscripción push:', error);
-      });
-    } 
+    if (this.swPush && this.swPush.isEnabled) {
+      try {
+        if (this.swPush.subscription) {
+          this.swPush.subscription.subscribe(subscription => {
+            this.isPushEnabled = !!subscription; // True si hay suscripción, False si no
+            console.log('Estado de suscripción push:', subscription ? 'Activa' : 'Inactiva');
+          }, error => {
+            console.error('Error al obtener suscripción push:', error);
+          });
+        }
+      } catch (e) {
+        console.warn('El Service Worker o la suscripción push no están listos:', e);
+      }
+    }
 
     this.inactiveUserService.userInactive.subscribe(isInactive => this.isInactive = isInactive);
   }
