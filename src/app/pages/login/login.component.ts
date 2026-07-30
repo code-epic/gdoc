@@ -119,7 +119,7 @@ export class LoginComponent implements OnInit {
         this.utilservice.AlertMini(
           "top-end",
           "error",
-          e.error.msj || "Error al acceder al sistema",
+          e.error?.msj || "Error al acceder al sistema",
           3000
         );
       }
@@ -268,8 +268,8 @@ export class LoginComponent implements OnInit {
       },
       (e) => {
         this.loading = false;
-        // console.info(e.error.msj)
-        let xdata = e.error
+        // console.info(e.error?.msj)
+        let xdata = e.error || {}
 
         if (xdata.tipo == 99) {
           this.handleOtpError(xdata.msj);

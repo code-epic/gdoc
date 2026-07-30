@@ -66,13 +66,13 @@ export class AuthInterceptorService implements HttpInterceptor {
       catchError((err: HttpErrorResponse) => {
         switch (err.status) {
           case 401:
-            this.cerrar(err.error.msj || 'Sesión expirada');
+            this.cerrar(err.error?.msj || 'Sesión expirada');
             break;
           case 402:
             // this.cerrar('Pago requerido');
             break;
           case 403:
-            if (!err.error.msj) {
+            if (!err.error?.msj) {
               this.cerrar('Acceso denegado');
             } else {
               console.error('Error 403:', err);
