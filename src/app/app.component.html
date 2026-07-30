@@ -1,1 +1,7 @@
 <router-outlet></router-outlet>
+
+<!-- Banner de actualización de PWA -->
+<div *ngIf="updateAvailable" class="pwa-update-banner">
+  <span>¡Hay una nueva actualización disponible!</span>
+  <button (click)="reloadPage()">Actualizar ahora</button>
+</div>
