@@ -276,6 +276,20 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     }
   }
 
+  // --- SELECCIÓN MÚLTIPLE (BULK) ---
+  public getSelectedCount(): number {
+    return this.documents.filter(d => d.selected).length;
+  }
+
+  public isAllSelected(): boolean {
+    return this.documents.length > 0 && this.documents.every(d => d.selected);
+  }
+
+  public toggleSelectAll(event: any) {
+    const checked = event.target.checked;
+    this.documents.forEach(d => d.selected = checked);
+  }
+
   public getComponentColor(code: number): string {
     const colors: { [key: number]: string } = {
       1: "#2dce89", // Ejército - Verde
@@ -324,6 +338,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
                 numero_carpeta: num,
                 asunto: folder.tipo || 'Sin Asunto',
                 cantidad: 0,
+                selected: false,
                 documentos: []
               };
             }
@@ -681,24 +696,31 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     });
   }
 
-  public async approveAllFast() {
+  public approveAllFast() {
     if (!this.documents || this.documents.length === 0) {
-      this.toastrService.warning(
-        "No hay documentos en la lista para firmar.",
-        "Aviso",
-      );
+      this.toastrService.warning("No hay carpetas para firmar.", "Aviso");
       return;
     }
+    // Seleccionar todos y llamar al método masivo
+    this.documents.forEach(d => d.selected = true);
+    this.approveSelectedFast();
+  }
 
-    const total = this.documents.length;
+  public async approveSelectedFast() {
+    const selectedGroups = this.documents.filter(d => d.selected);
+    if (selectedGroups.length === 0) return;
+
+    let totalDocsToSign = 0;
+    selectedGroups.forEach(g => totalDocsToSign += g.documentos.length);
+
     const result = await Swal.fire({
-      title: "Firma Masiva",
-      text: `¿Está seguro de firmar y aprobar ${total} documentos de forma masiva?`,
+      title: "Firma Masiva de Carpetas",
+      text: `¿Está seguro de firmar y aprobar ${totalDocsToSign} casos agrupados en ${selectedGroups.length} carpetas seleccionadas?`,
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#2dce89",
       cancelButtonColor: "#8898aa",
-      confirmButtonText: "Sí, firmar todos",
+      confirmButtonText: "Sí, firmar seleccionados",
       cancelButtonText: "Cancelar",
     });
 
@@ -708,34 +730,36 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       let successCount = 0;
       let errorCount = 0;
 
-      // Procesamiento secuencial para firma masiva
-      for (const doc of this.documents) {
-        const controlId = doc.ncontrol || doc.numc;
-        try {
-          this.xAPI = {} as IAPICore;
-          this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
-          this.xAPI.valores = JSON.stringify({
-            documento: controlId,
-            estado: doc.ultimo_estado || doc.estatus || 36,
-            estatus: 2,
-            observacion: "APROBADO MEDIANTE FIRMA MASIVA",
-            accion: "0",
-            usuario: userDb,
-          });
-          this.xAPI.parametros = "";
+      for (const grupo of selectedGroups) {
+        const docsToSign = grupo.documentos || [];
+        for (const doc of docsToSign) {
+          const controlId = doc.ncontrol || doc.numc;
+          try {
+            this.xAPI = {} as IAPICore;
+            this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
+            this.xAPI.valores = JSON.stringify({
+              documento: controlId,
+              estado: doc.ultimo_estado || doc.estatus || 36,
+              estatus: 2,
+              observacion: "APROBADO MEDIANTE FIRMA MASIVA DE CARPETAS",
+              accion: "0",
+              usuario: userDb,
+            });
+            this.xAPI.parametros = "";
 
-          await this.apiService.Ejecutar(this.xAPI).toPromise();
+            await this.apiService.Ejecutar(this.xAPI).toPromise();
 
-          this.xAPI = {} as IAPICore;
-          this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
-          this.xAPI.valores = "";
-          this.xAPI.parametros = `2,${userDb},${controlId}`;
+            this.xAPI = {} as IAPICore;
+            this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
+            this.xAPI.valores = "";
+            this.xAPI.parametros = `2,${userDb},${controlId}`;
 
-          await this.apiService.Ejecutar(this.xAPI).toPromise();
-          successCount++;
-        } catch (error) {
-          console.error(`Error procesando ${controlId}:`, error);
-          errorCount++;
+            await this.apiService.Ejecutar(this.xAPI).toPromise();
+            successCount++;
+          } catch (error) {
+            console.error(`Error procesando ${controlId}:`, error);
+            errorCount++;
+          }
         }
       }
 
@@ -748,14 +772,107 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         );
       } else {
         this.toastrService.success(
-          `Se firmaron ${successCount} documentos.`,
+          `Se firmaron ${successCount} documentos en total.`,
           "Firma Masiva Exitosa",
         );
       }
 
-      this.selectedFolder = null;
-      this.loadFolders();
+      // Remover carpetas aprobadas
+      this.documents = this.documents.filter(d => !d.selected);
+      if (this.documents.length === 0) {
+        this.selectedFolder = null;
+        if (this.immersiveMode) this.exitImmersiveMode();
+        this.loadFolders();
+      } else {
+        this.changeDetector.detectChanges();
+      }
     }
+  }
+
+  public async cancelSelectedFast() {
+    const selectedGroups = this.documents.filter(d => d.selected);
+    if (selectedGroups.length === 0) return;
+
+    let totalDocsToCancel = 0;
+    selectedGroups.forEach(g => totalDocsToCancel += g.documentos.length);
+
+    Swal.fire({
+      title: "Anulación Masiva de Carpetas",
+      text: `Ingrese el motivo para anular los ${totalDocsToCancel} casos agrupados en ${selectedGroups.length} carpetas seleccionadas:`,
+      input: "textarea",
+      inputPlaceholder: "Escriba las observaciones aquí...",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#f5365c",
+      cancelButtonColor: "#8898aa",
+      confirmButtonText: "Sí, anular seleccionados",
+      cancelButtonText: "Cancelar",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Debe ingresar un motivo!";
+        }
+        return null;
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed && result.value) {
+        this.ngxService.startLoader("ld-fast");
+        
+        const userDb = this.jwtData.userId;
+        const motivo = result.value.toUpperCase();
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const grupo of selectedGroups) {
+          const docsToCancel = grupo.documentos || [];
+          for (const doc of docsToCancel) {
+            const controlId = doc.ncontrol || doc.numc;
+            try {
+              this.xAPI = {} as IAPICore;
+              this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
+              this.xAPI.valores = JSON.stringify({
+                documento: controlId,
+                estado: doc.ultimo_estado || doc.estatus || 36,
+                estatus: doc.ultimo_estado || 36,
+                observacion: motivo,
+                accion: "1",
+                usuario: userDb,
+              });
+              this.xAPI.parametros = "";
+              
+              await this.apiService.Ejecutar(this.xAPI).toPromise();
+
+              this.xAPI = {} as IAPICore;
+              this.xAPI.funcion = environment.funcion.UBICACION_RECHAZO;
+              this.xAPI.valores = "";
+              this.xAPI.parametros = `1,1,1,,${userDb},${controlId}`;
+
+              await this.apiService.Ejecutar(this.xAPI).toPromise();
+              successCount++;
+            } catch (error) {
+              console.error(`Error anulando ${controlId}:`, error);
+              errorCount++;
+            }
+          }
+        }
+
+        this.ngxService.stopLoader("ld-fast");
+
+        if (errorCount > 0) {
+          this.toastrService.warning(`Éxito: ${successCount}, Errores: ${errorCount}`, "Anulación Masiva");
+        } else {
+          this.toastrService.success(`Se anularon ${successCount} casos exitosamente.`, "Carpetas Anuladas");
+        }
+
+        this.documents = this.documents.filter(d => !d.selected);
+        if (this.documents.length === 0) {
+          this.selectedFolder = null;
+          if (this.immersiveMode) this.exitImmersiveMode();
+          this.loadFolders();
+        } else {
+          this.changeDetector.detectChanges();
+        }
+      }
+    });
   }
 
   public promptReject(doc: any) {

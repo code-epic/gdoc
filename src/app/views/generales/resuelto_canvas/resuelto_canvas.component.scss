@@ -42,8 +42,9 @@
 }
 
 .a4-canvas {
-  width: 210mm;
-  min-height: 297mm;
+  width: 215.9mm;
+  height: 355.6mm;
+  overflow: visible;
   background: white;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   /* Márgenes físicos del documento: Arriba, Derecha, Abajo, Izquierda (2.5cm sup) */
@@ -56,6 +57,111 @@
   // Tipografía oficial Tahoma, 13pt
   font-family: 'Tahoma', sans-serif; 
   color: #000;
+
+  .signatory-info p {
+    line-height: 1 !important;
+  }
+
+  ::ng-deep p {
+    margin: 0;
+    padding: 0;
+    font-weight: normal !important; /* Neutraliza el font-weight: 300 global incluso en innerHTML */
+  }
+
+  ::ng-deep strong, ::ng-deep b {
+    font-weight: bold !important; /* Asegura que las negritas funcionen sin importar el padre */
+  }
+
+  /* ==============================================================
+   M. RESOLUCIÓN - NORMAS ESTRICTAS E INQUEBRANTABLES
+   Estas clases usan !important para garantizar inmunidad total
+   ============================================================== */
+
+  .m-resolucion-membrete {
+    font-family: 'Tahoma', sans-serif !important;
+    font-size: 13pt !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    text-align: center !important;
+    line-height: 1.15 !important;
+  }
+
+  .m-resolucion-lugar-fecha {
+    font-family: 'Tahoma', sans-serif !important;
+    font-size: 13pt !important;
+    font-weight: bold !important;
+    text-align: left !important;
+    margin-top: 13pt !important;
+    line-height: 1.15 !important;
+  }
+
+  .m-resolucion-data {
+    font-family: 'Tahoma', sans-serif !important;
+    font-size: 13pt !important;
+    font-weight: bold !important;
+    text-align: right !important;
+    line-height: 1.15 !important;
+  }
+
+  .m-resolucion-denominacion {
+    font-family: 'Tahoma', sans-serif !important;
+    font-size: 13pt !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    text-align: center !important;
+    margin-top: 13pt !important;
+    line-height: 1.15 !important;
+  }
+
+  .m-resolucion-basamento {
+    font-family: 'Tahoma', sans-serif !important;
+    font-size: 13pt !important;
+    text-align: justify !important;
+    line-height: 1.65 !important; /* CSS 1.35 equivale a Word 1.15 */
+    margin-top: 13pt !important;
+  }
+
+  .m-resolucion-resuelve {
+    font-family: 'Tahoma', sans-serif !important;
+    font-size: 13pt !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    text-align: center !important;
+    margin-top: 13pt !important;
+    margin-bottom: 13pt !important;
+    line-height: 1.35 !important;
+  }
+
+  .m-resolucion-comuniquese {
+    font-family: 'Tahoma', sans-serif !important;
+    font-size: 13pt !important;
+    margin-left: 1cm !important;
+    line-height: 1.15 !important;
+  }
+
+  .m-resolucion-ejecutivo {
+    font-family: 'Tahoma', sans-serif !important;
+    font-size: 13pt !important;
+    margin-left: 1.5cm !important;
+    margin-top: 13pt !important; /* 1 linea de bajo */
+    line-height: 1.15 !important;
+  }
+
+  .m-resolucion-firma-container {
+    margin-top: 26pt !important; /* 2 lineas de bajo */
+    margin-left: 50% !important; /* Partiendo del centro de la hoja */
+    width: 50% !important;
+    text-align: center !important;
+    position: relative !important;
+  }
+
+  .m-resolucion-firma-text {
+    font-family: 'Tahoma', sans-serif !important;
+    font-size: 13pt !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+  }
 }
 
 /* Áreas de edición interactiva */
@@ -76,22 +182,27 @@
   margin-bottom: 0;
   flex-shrink: 0;
   line-height: 1; /* interlineado sencillo */
-  
-  p {
-    margin: 0;
-    font-size: 13pt; /* Tamaño N° 13 */
-  }
+
 }
 
 .doc-body {
-  flex-grow: 1;
   text-align: justify;
-  line-height: 1.15; /* interlineado 1.15 */
   font-size: 13pt;
   
-  .preamble {
-    margin-top: 13pt; /* 1 línea debajo de RESOLUCION */
+  p {
+    line-height: 1.15 !important; /* Fuerza Word Sencillo sobre todos los p del cuerpo */
+  }
+
+  .basamento-legal {
+    margin-top: 13pt; 
     margin-bottom: 13pt;
+    text-align: justify;
+  }
+
+  .cases-list {
+    ::ng-deep p {
+      line-height: 1.15 !important; /* Fuerza Word Sencillo sobre lista inyectada */
+    }
   }
 }
 
@@ -100,6 +211,10 @@
   margin-top: 20mm;
   min-height: 50mm;
   flex-shrink: 0;
+
+  p {
+    line-height: 1.15 !important; /* Protege los textos fijos del footer */
+  }
 }
 
 /* Capas de Firma y Sello */

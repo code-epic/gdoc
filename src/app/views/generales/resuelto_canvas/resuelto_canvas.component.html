@@ -10,87 +10,133 @@
   
   <!-- CABECERA -->
   <header class="doc-header editable-zone" (click)="editMode('header')" *ngIf="i === 0">
-    <p class="static-text" style="font-weight: bold; text-transform: uppercase;">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
-    <p class="static-text" style="font-weight: bold; text-transform: uppercase;">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
-    <p class="static-text" style="font-weight: bold; text-transform: uppercase;">DESPACHO DEL MINISTRO</p>
+    <p class="m-resolucion-membrete">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
+    <p class="m-resolucion-membrete">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
+    <p class="m-resolucion-membrete">DESPACHO DEL MINISTRO</p>
     
     <!-- 1 línea debajo: Lugar y fecha -->
-    <div class="dynamic-row" style="text-align: left; margin-top: 13pt;">
-      <p style="font-weight: bold;">Caracas,&nbsp;<span class="variable">{{ documentData.header.date | date:'dd MMM yyyy' | uppercase }}</span></p>
+    <div class="dynamic-row">
+      <p class="m-resolucion-lugar-fecha">Caracas,&nbsp;<span class="variable" contenteditable="true" spellcheck="false" style="outline: none; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="onDateEdit($event)" [innerText]="documentData.header.date"></span></p>
     </div>
     
     <!-- Debajo: Data -->
-    <div class="dynamic-row" style="text-align: right;">
-      <p style="font-weight: bold;">{{ documentData.header.anniversaries }}</p>
+    <div class="dynamic-row">
+      <p class="m-resolucion-data">{{ documentData.header.anniversaries }}</p>
     </div>
 
     <!-- 1 línea debajo: Resolución -->
-    <div class="dynamic-row" style="text-align: center; margin-top: 13pt;">
-      <p style="font-weight: bold; text-transform: uppercase;">RESOLUCIÓN N° <span style="text-decoration: underline;">{{ documentData.header.resolutionNum }}</span></p>
+    <div class="dynamic-row">
+      <p class="m-resolucion-denominacion">RESOLUCIÓN N° <span style="text-decoration: underline; outline: none; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;" contenteditable="true" spellcheck="false" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="onResolutionEdit($event)" [innerText]="documentData.header.resolutionNum"></span></p>
+    </div>
+  </header>
+
+  <!-- CABECERA DE CONTINUACIÓN (Páginas siguientes) -->
+  <header class="doc-header" *ngIf="i > 0">
+    <div class="dynamic-row" style="text-align: center; margin-top: 13pt; margin-bottom: 13pt;">
+      <p class="m-resolucion-denominacion">
+        CONTINUACIÓN DE LA RESOLUCIÓN N° <span style="text-decoration: underline;">{{ documentData.header.resolutionNum }}</span> DE FECHA <span style="text-decoration: underline;">{{ documentData.header.date }}</span>
+      </p>
     </div>
   </header>
 
   <!-- CUERPO -->
   <main class="doc-body editable-zone" (click)="editMode('body')">
     <ng-container *ngIf="i === 0">
-      <p class="preamble"
+      <p class="m-resolucion-basamento"
          contenteditable="true"
          spellcheck="false"
          style="outline: none; transition: background-color 0.2s; padding: 5px; border-radius: 4px;"
-         (input)="onPreambleEdit($event)"
+         (input)="onBasamentoLegalEdit($event)"
          (focus)="onFocusEditable($event)"
          (blur)="onBlurEditable($event)"
          (paste)="onPaste($event)"
-         [innerText]="documentData.body.preamble">
+         [innerText]="documentData.body.basamentoLegal || documentData.body.preamble">
       </p>
       
       <!-- 1 línea debajo del basamento legal: RESUELVE -->
-      <p style="text-align: center; margin-top: 13pt; margin-bottom: 13pt; font-weight: bold; text-transform: uppercase;">{{ documentData.body.action }}</p>
+      <p class="m-resolucion-resuelve">{{ documentData.body.action }}</p>
     </ng-container>
     
-    <!-- Renderizado de contenido HTML (La lista generada por chunk) -->
-    <div class="content-html" [innerHTML]="page.content"></div>
+    <!-- EDICIÓN ESTRUCTURADA: Cabecera Única -->
+    <ng-container *ngIf="i === 0">
+      <div contenteditable="true" 
+           spellcheck="false" 
+           style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" 
+           (focus)="onFocusEditable($event)" 
+           (blur)="onBlurEditable($event)" 
+           (input)="onHeaderHtmlEdit($event)" 
+           [innerHTML]="page.headerHtml">
+      </div>
+    </ng-container>
+
+    <!-- Lista de Casos Editable Continua -->
+    <div class="cases-list" 
+         contenteditable="true" 
+         spellcheck="false"
+         style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
+         (focus)="onFocusEditable($event)" 
+         (blur)="onBlurEditable($event); onCasesListBlur()"
+         (input)="onCasesListInput($event, page.pageIndex)"
+         [innerHTML]="page.casesHtml">
+    </div>
   </main>
 
   <!-- PIE DE PÁGINA Y FIRMAS -->
   <footer class="doc-footer editable-zone" (click)="editMode('signatures')" *ngIf="isLast" style="margin-top: 52pt; /* 4 líneas debajo del cuerpo */">
     
-    <!-- 1cm (aprox 38px) desde el margen izquierdo -->
-    <p style="margin-left: 1cm; margin-bottom: 13pt;">Comuníquese y publíquese.</p>
+    <!-- 1cm desde el margen izquierdo -->
+    <p class="m-resolucion-comuniquese">Comuníquese y publíquese.</p>
     
     <!-- 1.5cm desde el margen izquierdo -->
-    <p style="margin-left: 1.5cm; margin-bottom: 26pt; /* 2 líneas debajo para la firma */">Por el Ejecutivo Nacional,</p>
+    <p class="m-resolucion-ejecutivo">Por el Ejecutivo Nacional,</p>
 
-    <!-- Contenedor de firma alineado a la derecha -->
-    <div style="float: right; text-align: center; min-width: 350px; position: relative;">
+    <!-- Contenedor de firma alineado a la derecha partiendo del centro -->
+    <div class="m-resolucion-firma-container">
       
-      <!-- Z-Index 1: Sello Húmedo (Escudo 3x3 cm, altura intermedia) -->
+      <!-- Z-Index 1: Sello Húmedo (Escudo 5x5 cm) -->
       <img *ngIf="documentData.signatures.wetStampImageUrl" 
            [src]="documentData.signatures.wetStampImageUrl" 
            class="wet-stamp-layer" alt="Sello Húmedo"
-           style="position: absolute; top: -16mm; left: -5%; z-index: 1; opacity: 0.85; width: 30mm; height: 30mm; object-fit: contain;">
+           style="position: absolute; top: -23mm; left: -10%; z-index: 1; opacity: 0.85; width: 50mm; height: 50mm;">
 
       <!-- Z-Index 2: Firma Imagen (Elevada 0.8cm) -->
       <img *ngIf="documentData.signatures.signatureImageUrl" 
            [src]="documentData.signatures.signatureImageUrl" 
            class="signature-layer" alt="Firma Autoridad"
-           style="position: absolute; bottom: calc(85% - 7mm); left: 50%; transform: translateX(-50%); z-index: 2; width: 85mm; max-width: none; object-fit: contain; pointer-events: none;">
+           style="position: absolute; bottom: calc(85% - 7mm); left: 50%; transform: translateX(-50%); z-index: 2; width: 85mm; max-width: none; pointer-events: none;">
            
       <!-- Textos de firma -->
-      <div class="signatory-info" style="z-index: 3; position: relative;">
-        <p style="font-weight: bold;">{{ documentData.signatures.mainSignatory }}</p>
-        <p style="font-weight: bold;">{{ documentData.signatures.signatoryTitle }}</p>
-        <p style="font-weight: bold;" [innerHTML]="documentData.signatures.signatoryRole"></p>
+      <div class="signatory-info">
+        <p class="m-resolucion-firma-text">{{ documentData.signatures.mainSignatory }}</p>
+        <p class="m-resolucion-firma-text">{{ documentData.signatures.signatoryTitle }}</p>
+        <p class="m-resolucion-firma-text" [innerHTML]="documentData.signatures.signatoryRole"></p>
       </div>
     </div>
     
     <div style="clear: both;"></div>
     
-    <!-- Iniciales Inferior Izquierda -->
-    <div class="initials" style="position: absolute; bottom: 0; left: 0; font-size: 0.8em; z-index: 4;">
-      {{ documentData.signatures.initials }}
-    </div>
+    <!-- Iniciales y Página flotantes (solo si es la última página y hay más de una) -->
+    <ng-container *ngIf="i > 0">
+      <div class="initials" style="text-align: left; margin-top: 30pt; font-size: 0.8em; z-index: 4;">
+        {{ documentData.signatures.initials }}
+      </div>
+      <div class="page-number-floating" style="text-align: center; margin-top: 10pt; font-size: 0.85rem; font-weight: bold; color: #555;">
+        Página {{ i + 1 }} de {{ documentData.pages.length }}
+      </div>
+    </ng-container>
+
+    <!-- Iniciales ancladas al fondo (solo si es documento de 1 sola página) -->
+    <ng-container *ngIf="i === 0">
+      <div class="initials" style="position: absolute; bottom: 0; left: 0; font-size: 0.8em; z-index: 4;">
+        {{ documentData.signatures.initials }}
+      </div>
+    </ng-container>
   </footer>
+
+  <!-- NÚMERO DE PÁGINA (Anclado al fondo para página inicial y páginas intermedias) -->
+  <div class="page-number" *ngIf="(!isLast || i === 0) && documentData.pages.length > 1" style="position: absolute; bottom: 10mm; left: 0; right: 0; text-align: center; font-size: 0.85rem; font-weight: bold; color: #555;">
+    Página {{ i + 1 }} de {{ documentData.pages.length }}
+  </div>
 
   </div>
 </div>

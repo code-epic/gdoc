@@ -1,11 +1,13 @@
-import { Component, Input, Output, EventEmitter, OnInit, ElementRef, HostListener, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ElementRef, HostListener, ViewChild, AfterViewInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-resuelto-canvas',
   templateUrl: './resuelto_canvas.component.html',
   styleUrls: ['./resuelto_canvas.component.scss']
 })
-export class ResueltoCanvasComponent implements OnInit, AfterViewInit {
+export class ResueltoCanvasComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('container') containerRef!: ElementRef;
   
   public zoomScale: number = 1.0;
@@ -33,11 +35,23 @@ export class ResueltoCanvasComponent implements OnInit, AfterViewInit {
   };
 
   @Output() zoneSelected = new EventEmitter<string>();
-  @Output() preambleChange = new EventEmitter<string>();
+  @Output() basamentoLegalChange = new EventEmitter<string>();
+  @Output() dateChange = new EventEmitter<string>();
+  @Output() resolutionChange = new EventEmitter<string>();
+  @Output() casesBlur = new EventEmitter<void>();
+
+  private casesInput$ = new Subject<void>();
 
   constructor(private el: ElementRef) { }
 
   ngOnInit(): void {
+    this.casesInput$.pipe(debounceTime(600)).subscribe(() => {
+      this.casesBlur.emit();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.casesInput$.complete();
   }
 
   ngAfterViewInit() {
@@ -83,9 +97,45 @@ export class ResueltoCanvasComponent implements OnInit, AfterViewInit {
     this.zoneSelected.emit(zone);
   }
 
-  onPreambleEdit(event: Event) {
+  onBasamentoLegalEdit(event: Event) {
     const target = event.target as HTMLElement;
-    this.preambleChange.emit(target.innerText || '');
+    this.basamentoLegalChange.emit(target.innerText || '');
+  }
+
+  onDateEdit(event: Event) {
+    if (this.documentData && this.documentData.header) {
+      const text = (event.target as HTMLElement).innerText || '';
+      this.documentData.header.date = text;
+      this.dateChange.emit(text);
+    }
+  }
+
+  onResolutionEdit(event: Event) {
+    if (this.documentData && this.documentData.header) {
+      const text = (event.target as HTMLElement).innerText || '';
+      this.documentData.header.resolutionNum = text;
+      this.resolutionChange.emit(text);
+    }
+  }
+
+  onHeaderHtmlEdit(event: Event) {
+    const target = event.target as HTMLElement;
+    if (this.documentData && this.documentData.bodyData) {
+      this.documentData.bodyData._headerHtml = target.innerHTML;
+    }
+  }
+
+  onCasesListBlur() {
+    // Ya no es estrictamente necesario, pero lo dejamos por si hace blur rápido
+    this.casesBlur.emit();
+  }
+
+  onCasesListInput(event: Event, pageIndex: number) {
+    const target = event.target as HTMLElement;
+    if (this.documentData && this.documentData.bodyData) {
+      this.documentData.bodyData['_pageCasesHtml_' + pageIndex] = target.innerHTML;
+      this.casesInput$.next();
+    }
   }
 
   onFocusEditable(event: Event) {
@@ -110,6 +160,6 @@ export class ResueltoCanvasComponent implements OnInit, AfterViewInit {
     
     // Emitir el cambio hacia arriba
     const target = event.target as HTMLElement;
-    this.preambleChange.emit(target.innerText || '');
+    this.basamentoLegalChange.emit(target.innerText || '');
   }
 }

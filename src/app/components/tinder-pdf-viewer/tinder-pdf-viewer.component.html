@@ -26,6 +26,9 @@
       </div>
     </div>
     <div class="tpv-nav-right">
+      <button class="tpv-btn-print" *ngIf="useCanvas" (click)="printCanvas()" title="Generar PDF" style="margin-right: 15px; background: #2dce89; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+        <i class="fas fa-file-pdf"></i> Generar PDF
+      </button>
       <span class="tpv-nav-user" *ngIf="activeDoc">
         {{ activeDoc.nombres_apellidos | uppercase }}
         <span class="tpv-nav-cedula">(V-{{ activeDoc.cedula }})</span>
@@ -67,7 +70,10 @@
         <app-resuelto-canvas 
           *ngIf="useCanvas" 
           [documentData]="canvasData" 
-          (preambleChange)="activeDoc.preamble = $event"
+          (basamentoLegalChange)="updateActiveDoc('basamentoLegal', $event)"
+          (dateChange)="updateActiveDoc('fecha_resolucion', $event)"
+          (resolutionChange)="updateActiveDoc('numero_carpeta', $event)"
+          (casesBlur)="repaginateCases()"
           style="width: 100%; height: 100%; display: block; overflow: auto; background-color: white;">
         </app-resuelto-canvas>
 

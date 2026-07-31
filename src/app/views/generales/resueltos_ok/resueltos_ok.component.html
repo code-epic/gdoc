@@ -123,11 +123,23 @@
       <div class="detail-content" *ngIf="selectedFolder">
         
         <!-- Cabecera del Detalle -->
-        <div class="detail-header">
+        <div class="detail-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
           <div>
             <h3>Tipo: {{ selectedFolder.tipo }}</h3>
           </div>
-          <span class="badge">{{ documents.length }} Documentos</span>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div class="custom-control custom-checkbox mr-2">
+              <input type="checkbox" class="custom-control-input" id="checkAll" [checked]="isAllSelected()" (change)="toggleSelectAll($event)">
+              <label class="custom-control-label" for="checkAll" style="font-size: 0.8rem; font-weight: 600; cursor: pointer; padding-top: 2px;">Todos</label>
+            </div>
+            <span class="badge">{{ documents.length }} Carpetas</span>
+            <button class="btn btn-sm btn-success" (click)="approveSelectedFast()" [disabled]="getSelectedCount() === 0">
+              <i class="fas fa-check-double"></i> Firmar Seleccionados ({{ getSelectedCount() }})
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="cancelSelectedFast()" [disabled]="getSelectedCount() === 0">
+              <i class="fas fa-ban"></i> Anular Seleccionados ({{ getSelectedCount() }})
+            </button>
+          </div>
         </div>
 
         <!-- Spinner de Documentos -->
@@ -148,31 +160,47 @@
           <!-- Documentos en formato de fila compacta -->
           <div class="doc-item-row animate-fade-in" 
                *ngFor="let doc of documents; let idx = index"
-               (click)="startImmersiveMode(doc)"
-               (contextmenu)="onDocumentRightClick($event, doc, idx)">
+               [style.background-color]="doc.selected ? 'rgba(45, 206, 137, 0.05)' : ''"
+               [style.border-left]="doc.selected ? '4px solid #2dce89' : '4px solid transparent'"
+               (click)="doc.selected = !doc.selected"
+               (contextmenu)="onDocumentRightClick($event, doc, idx)"
+               style="cursor: pointer; transition: all 0.2s; padding: 12px 15px; margin-bottom: 10px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center;">
             
-            <div class="number">{{ idx + 1 }}</div>
+            <div class="checkbox-col" style="padding-right: 15px; display: flex; align-items: center;">
+              <div style="width: 24px; height: 24px; border-radius: 6px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
+                   [style.background-color]="doc.selected ? '#2dce89' : 'transparent'"
+                   [style.border-color]="doc.selected ? '#2dce89' : '#ccc'">
+                <i class="fas fa-check" *ngIf="doc.selected" style="color: white; font-size: 12px;"></i>
+              </div>
+            </div>
+
+            <div class="number" style="font-weight: 700; color: #8898aa; width: 30px; font-size: 1.1rem;">{{ idx + 1 }}</div>
             
-            <div class="doc-info">
-              <div class="name">Carpeta N° {{ doc.numero_carpeta }}</div>
-              <div class="meta">
+            <div class="doc-info" style="flex: 1;">
+              <div class="name" style="font-weight: 600; color: #32325d;">Carpeta N° {{ doc.numero_carpeta }}</div>
+              <div class="meta" style="font-size: 0.85rem; color: #8898aa; display: flex; gap: 15px; margin-top: 4px;">
                 <span><i class="fas fa-layer-group"></i> {{ doc.asunto }}</span>
-                <span><i class="fas fa-users"></i> {{ doc.cantidad }} casos agrupados</span>
+                <span style="color: #5e72e4; font-weight: 600;"><i class="fas fa-users"></i> {{ doc.cantidad }} casos agrupados</span>
               </div>
             </div>
             
-            <div class="actions">
-              <button class="btn-doc-pill btn-view" (click)="startImmersiveMode(doc); $event.stopPropagation()" title="Abrir ">
-                <i class="fas fa-eye"></i>
-                <span class="btn-text">Ver</span>
+            <div class="actions" style="display: flex; gap: 8px;">
+              <button class="btn btn-sm" (click)="startImmersiveMode(doc); $event.stopPropagation()" title="Abrir y Revisar (Modo Tinder)"
+                      style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e0f2f1; color: #00897b; border: none; transition: transform 0.2s;"
+                      onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                <i class="fas fa-eye" style="font-size: 1rem;"></i>
               </button>
-              <button class="btn-doc-pill btn-sign" (click)="approveFast(doc); $event.stopPropagation()" title="Firmar Rápido">
-                <i class="fas fa-check-double"></i>
-                <span class="btn-text">Firmar</span>
+              
+              <button class="btn btn-sm" (click)="approveFast(doc); $event.stopPropagation()" title="Firmar Rápido Carpeta"
+                      style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e8f5e9; color: #43a047; border: none; transition: transform 0.2s;"
+                      onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                <i class="fas fa-signature" style="font-size: 1rem;"></i>
               </button>
-              <button class="btn-doc-pill btn-cancel" (click)="cancelFast(doc); $event.stopPropagation()" style="color: #f5365c; border: 1px solid #f5365c; background: transparent; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-left: 8px; transition: all 0.2s;" title="Anular Resuelto" onmouseover="this.style.background='#f5365c'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='#f5365c'">
-                <i class="fas fa-ban"></i>
-                <span class="btn-text"> Anular</span>
+              
+              <button class="btn btn-sm" (click)="cancelFast(doc); $event.stopPropagation()" title="Anular Carpeta"
+                      style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #ffebee; color: #e53935; border: none; transition: transform 0.2s;"
+                      onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                <i class="fas fa-ban" style="font-size: 1rem;"></i>
               </button>
             </div>
           </div>

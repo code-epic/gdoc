@@ -834,3 +834,62 @@ $tpv-border:     rgba(255, 255, 255, 0.08);
     padding: 0.3rem 0.4rem;
   }
 }
+
+/* ================================================================
+   PRINT STYLES FOR PDF GENERATION
+   ================================================================ */
+@media print {
+  /* Hide the rest of the app */
+  ::ng-deep body > *:not(app-root) {
+    display: none !important;
+  }
+  
+  /* Hide the UI of the viewer */
+  .tpv-nav, 
+  .tpv-sidebar, 
+  .tpv-arrow, 
+  .tpv-footer,
+  .tpv-pdf-loading {
+    display: none !important;
+  }
+
+  /* Make the wrapper static and transparent so it prints nicely */
+  .tpv-wrapper {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    background: transparent !important;
+    overflow: visible !important;
+  }
+
+  .tpv-body, .tpv-card, .tpv-pdf-pane {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    transform: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  ::ng-deep .a4-canvas-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  ::ng-deep .a4-canvas {
+    box-shadow: none !important;
+    margin: 0 !important;
+    page-break-after: always;
+  }
+}
+
+p {
+  line-height: 1;
+}

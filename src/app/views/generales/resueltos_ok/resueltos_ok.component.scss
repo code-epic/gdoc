@@ -98,12 +98,7 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
     margin: 0;
     line-height: 1.3;
   }
-  p {
-    font-size: 0.75rem;
-    margin: 0.15rem 0 0 0;
-    opacity: 0.9;
-    line-height: 1.3;
-  }
+
 }
 
 .btn-close-view {
@@ -713,7 +708,6 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
     margin-bottom: 0.75rem;
 
     h1 { font-size: 1rem; }
-    p { font-size: 0.7rem; }
   }
 
   // Close view button becomes a simple circular close icon on mobile
