@@ -145,41 +145,69 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     return this.currentIndex >= this.documents.length - 1;
   }
 
-  get canvasData(): any {
-    if (!this.activeDoc) return null;
+  public defaultPreamble = `El Ministro del Poder Popular para la Defensa, GENERAL EN JEFE GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ, nombrado mediante Decreto Nº 5.277 de fecha 18 de marzo de 2026, publicado en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria Nº 6.999 de fecha 18 de marzo de 2026, en ejercicio de las atribuciones que le confiere el artículo 78 numeral 19 del Decreto N° 1.424 con Rango, Valor y Fuerza de Ley Orgánica de la Administración Pública de fecha 17 de noviembre de 2014, publicado en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria Nº 6.147 de fecha 17 de noviembre de 2014, actuando de conformidad con lo establecido en los artículos 30 y 31 numeral 8 de la Ley Constitucional de la Fuerza Armada Nacional Bolivariana, publicada en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria N° 6.508 de fecha 30 de enero de 2020,`;
+
+  public canvasData: any = null;
+
+  public updateCanvasData() {
+    if (!this.activeDoc) {
+      this.canvasData = null;
+      return;
+    }
     
-    // Texto solicitado por el usuario
-    const preambleText = `El Ministro del Poder Popular para la Defensa, GENERAL EN JEFE GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ, nombrado mediante Decreto Nº 5.277 de fecha 18 de marzo de 2026, publicado en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria Nº 6.999 de fecha 18 de marzo de 2026, en ejercicio de las atribuciones que le confiere el artículo 78 numeral 19 del Decreto N° 1.424 con Rango, Valor y Fuerza de Ley Orgánica de la Administración Pública de fecha 17 de noviembre de 2014, publicado en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria Nº 6.147 de fecha 17 de noviembre de 2014, actuando de conformidad con lo establecido en los artículos 30 y 31 numeral 8 de la Ley Constitucional de la Fuerza Armada Nacional Bolivariana, publicada en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria N° 6.508 de fecha 30 de enero de 2020,`;
+    const preambleText = this.activeDoc.preamble || this.defaultPreamble;
+    const cases = this.activeDoc.documentos || [];
+    const pages = [];
+    
+    // Configuración de paginación
+    const MAX_CASES_FIRST_PAGE = 8;
+    const MAX_CASES_OTHER_PAGE = 22;
+    
+    let currentCaseIndex = 0;
+    let isFirstPage = true;
+    
+    // Generar páginas hasta que no queden casos
+    while (currentCaseIndex < cases.length || isFirstPage) {
+      const limit = isFirstPage ? MAX_CASES_FIRST_PAGE : MAX_CASES_OTHER_PAGE;
+      const pageCases = cases.slice(currentCaseIndex, currentCaseIndex + limit);
+      currentCaseIndex += limit;
+      
+      let html = '';
+      if (isFirstPage) {
+        html += `<p><strong>ÚNICO:</strong> ${this.activeDoc.asunto || 'Efectuar los siguientes nombramientos:'}</p>`;
+        html += `<p style="text-align: center;"><strong>HOSPITAL MILITAR UNIVERSITARIO "DOCTOR CARLOS ARVELO"<br>
+      SUBDIRECCIÓN ADMINISTRATIVA</strong></p>`;
+      }
+      
+      pageCases.forEach((persona: any) => {
+        html += `
+        <p style="text-indent: 0; margin-left: 40px; margin-top: 15px;">
+          &mdash; ${persona.grado || 'Ciudadano(a)'} <strong>${(persona.nombres_apellidos || persona.nombres + ' ' + persona.apellidos).toUpperCase()}</strong>, C.I. N° <strong>${persona.cedula}</strong>
+        </p>`;
+      });
+      
+      pages.push({ content: html });
+      isFirstPage = false;
+    }
 
-    const contentHtml = `
-      <p><strong>ÚNICO:</strong> Efectuar el siguiente nombramiento:</p>
-      <p style="text-align: center;"><strong>DESPACHO DEL VICEMINISTRO DE SERVICIOS PARA LA DEFENSA<br>
-      DIRECCIÓN GENERAL DE SALUD<br>
-      Hospital Militar Universitario “Doctor Carlos Arvelo”<br>
-      Subdirección Administrativa</strong></p>
-      <p style="text-indent: 0; margin-left: 40px; margin-top: 15px;">
-        &mdash; Sargento Mayor de Tercera <strong>${(this.activeDoc.nombres_apellidos || 'ALFREDO JOSÉ CAMPOS ÁLVAREZ').toUpperCase()}</strong>, C.I. N° <strong>${this.activeDoc.cedula || '23.492.919'}</strong>, Documentario, p/v.
-      </p>
-    `;
-
-    return {
+    this.canvasData = {
       header: {
-        resolutionNum: this.activeDoc.ncontrol || this.activeDoc.numc || '000643',
-        date: this.activeDoc.fecha_resolucion || new Date().toISOString(),
+        resolutionNum: this.activeDoc.numero_carpeta || '000000',
+        date: new Date().toISOString(),
         anniversaries: '216°, 167° y 27°'
       },
       body: {
         preamble: preambleText,
-        action: 'RESUELVE',
-        content: contentHtml
+        action: 'RESUELVE'
       },
+      pages: pages,
       signatures: {
         initials: 'LARM/RMEA/B.O.merb',
         mainSignatory: 'GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ',
         signatoryTitle: 'General en Jefe',
         signatoryRole: 'Ministro del Poder Popular<br>para la Defensa',
-        wetStampImageUrl: '', // Si tienes assets, ponlos aquí, por ahora vacío si no hay
-        signatureImageUrl: '' // Si tienes assets, ponlos aquí
+        wetStampImageUrl: 'assets/img/mppd/sello_mppd.png',
+        signatureImageUrl: 'assets/img/mppd/firma_mppd.png'
       }
     };
   }
@@ -462,10 +490,15 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   /* ── Helpers internos ────────────────────────────────── */
 
   private loadCurrentPdf(): void {
+    const doc = this.activeDoc;
+    if (!doc) return;
+
+    this.updateCanvasData();
+
+    this.loadingPdf = true;
     this.pdfError = false;
     this.pdfErrorMsg = '';
     this.objectFailed = false;
-    this.loadingPdf = true;
     this.revokeAll();
 
     if (!this.activeDoc) {

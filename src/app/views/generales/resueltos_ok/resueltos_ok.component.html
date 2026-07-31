@@ -10,9 +10,14 @@
       <h1>Buzón de Resueltos Procesados</h1>
       <p>Seleccione una carpeta militar para gestionar y firmar digitalmente los resueltos aprobados.</p>
     </div>
-    <button class="btn-close-view" (click)="exitComponent()" title="Salir del Buzón de Resueltos">
-      <i class="fas fa-times-circle"></i><span class="btn-text-close"> Cerrar Vista</span>
-    </button>
+    <div style="display: flex; gap: 10px;">
+      <button class="btn-close-view" (click)="approveAllFast()" style="background: #2dce89; color: white; border-color: #2dce89;" title="Firmar Todos los Documentos de esta Lista">
+        <i class="fas fa-signature"></i><span class="btn-text-close"> Firmar Todas</span>
+      </button>
+      <button class="btn-close-view" (click)="exitComponent()" title="Salir del Buzón de Resueltos">
+        <i class="fas fa-times-circle"></i><span class="btn-text-close"> Cerrar Vista</span>
+      </button>
+    </div>
   </div>
 
   <!-- Contenedor Master-Detail -->
@@ -143,27 +148,31 @@
           <!-- Documentos en formato de fila compacta -->
           <div class="doc-item-row animate-fade-in" 
                *ngFor="let doc of documents; let idx = index"
-               (click)="startImmersiveMode(idx)"
+               (click)="startImmersiveMode(doc)"
                (contextmenu)="onDocumentRightClick($event, doc, idx)">
             
             <div class="number">{{ idx + 1 }}</div>
             
             <div class="doc-info">
-              <div class="name">{{ doc.nombres_apellidos | uppercase }}</div>
+              <div class="name">Carpeta N° {{ doc.numero_carpeta }}</div>
               <div class="meta">
-                <span><i class="fas fa-id-card"></i> V-{{ doc.cedula }}</span>
-                <span><i class="fas fa-file-alt"></i> {{ doc.digital || doc.anom }}</span>
+                <span><i class="fas fa-layer-group"></i> {{ doc.asunto }}</span>
+                <span><i class="fas fa-users"></i> {{ doc.cantidad }} casos agrupados</span>
               </div>
             </div>
             
             <div class="actions">
-              <button class="btn-doc-pill btn-view" (click)="startImmersiveMode(idx); $event.stopPropagation()" title="Abrir ">
+              <button class="btn-doc-pill btn-view" (click)="startImmersiveMode(doc); $event.stopPropagation()" title="Abrir ">
                 <i class="fas fa-eye"></i>
                 <span class="btn-text">Ver</span>
               </button>
               <button class="btn-doc-pill btn-sign" (click)="approveFast(doc); $event.stopPropagation()" title="Firmar Rápido">
                 <i class="fas fa-check-double"></i>
                 <span class="btn-text">Firmar</span>
+              </button>
+              <button class="btn-doc-pill btn-cancel" (click)="cancelFast(doc); $event.stopPropagation()" style="color: #f5365c; border: 1px solid #f5365c; background: transparent; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-left: 8px; transition: all 0.2s;" title="Anular Resuelto" onmouseover="this.style.background='#f5365c'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='#f5365c'">
+                <i class="fas fa-ban"></i>
+                <span class="btn-text"> Anular</span>
               </button>
             </div>
           </div>
@@ -195,8 +204,8 @@
       <div class="context-menu-item" (click)="approveFast(contextMenuData)">
         <i class="fas fa-signature text-success"></i> Firmar Rápido
       </div>
-      <div class="context-menu-item text-danger" (click)="promptReject(contextMenuData)">
-        <i class="fas fa-times text-danger"></i> Rechazar
+      <div class="context-menu-item text-danger" (click)="cancelFast(contextMenuData)">
+        <i class="fas fa-times text-danger"></i> Anular Carpeta
       </div>
     </ng-container>
   </div>

@@ -39,8 +39,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public activeComponentFilter = "ALL";
   public folderSearchQuery = "";
   public folderPage = 1;
-  public totalPages = 1;
   public folderPageSize = 5;
+  public totalPages = 1;
 
   // Tinder View / Immersive View
   public immersiveMode = false;
@@ -310,10 +310,28 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data && data.Cuerpo) {
-          this.documents = data.Cuerpo.map((e) => {
+          const rawDocs = data.Cuerpo.map((e) => {
             e.completed = false;
             return e;
           });
+          
+          // Agrupar por numero_carpeta
+          const grupos: { [key: string]: any } = {};
+          rawDocs.forEach((doc: any) => {
+            const num = doc.numero_carpeta || doc.ncontrol || doc.numc || 'SIN_CARPETA';
+            if (!grupos[num]) {
+              grupos[num] = {
+                numero_carpeta: num,
+                asunto: folder.tipo || 'Sin Asunto',
+                cantidad: 0,
+                documentos: []
+              };
+            }
+            grupos[num].cantidad++;
+            grupos[num].documentos.push(doc);
+          });
+          
+          this.documents = Object.values(grupos);
         }
         this.loadingDocuments = false;
         this.changeDetector.detectChanges();
@@ -330,35 +348,22 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   }
 
   // --- LOGICA VISTA INMERSIVA (TINDER-STYLE) ---
-  public startImmersiveMode(startIndex: number) {
-    if (this.documents.length === 0) {
-      return;
-    }
-    console.log(
-      "[resueltos_ok] startImmersiveMode",
-      startIndex,
-      "docs",
-      this.documents.length,
-    );
+  public startImmersiveMode(grupo: any) {
     this.immersiveMode = true;
-    this.currentDocIndex = startIndex;
-    this.activeDoc = this.documents[this.currentDocIndex];
+    this.currentDocIndex = this.documents.indexOf(grupo);
+    if (this.currentDocIndex === -1) this.currentDocIndex = 0;
+    this.activeDoc = grupo;
     this.documentObservations = "";
     this.changeDetector.detectChanges();
     setTimeout(() => {
-      console.log(
-        "[resueltos_ok] immersiveMode after CD",
-        this.immersiveMode,
-        "tinder element",
-        document.querySelector("app-tinder-pdf-viewer"),
-      );
+      this.loadActivePdf();
     }, 0);
   }
 
   public startImmersiveFromFolder() {
     if (this.selectedFolder) {
       if (this.documents.length > 0) {
-        this.startImmersiveMode(0);
+        this.startImmersiveMode(this.documents[0]);
       } else {
         this.toastrService.warning(
           "La carpeta seleccionada no tiene documentos.",
@@ -382,18 +387,19 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public onTinderNavigate(event: { doc: any; index: number }) {
     this.currentDocIndex = event.index;
     this.activeDoc = event.doc;
+    this.loadActivePdf();
   }
 
   /** Cuando el hijo emite approve */
   public onTinderApprove(action: PdfAction) {
     this.documentObservations = action.observations;
-    this.approveDocument(action.doc);
+    this.approveFast(action.doc);
   }
 
   /** Cuando el hijo emite reject */
   public onTinderReject(action: PdfAction) {
     this.documentObservations = action.observations;
-    this.rejectDocument(action.doc);
+    this.cancelFast(action.doc);
   }
 
   /** Cuando el hijo emite close */
@@ -505,270 +511,251 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.changeDetector.detectChanges();
   }
 
-  // Desplazamiento Tinder (padre sincroniza estado con el hijo)
-  public async nextDocument() {
-    if (this.currentDocIndex < this.documents.length - 1) {
-      this.currentDocIndex++;
-      this.activeDoc = this.documents[this.currentDocIndex];
-      this.documentObservations = "";
-    }
-  }
-
-  public async prevDocument() {
-    if (this.currentDocIndex > 0) {
-      this.currentDocIndex--;
-      this.activeDoc = this.documents[this.currentDocIndex];
-      this.documentObservations = "";
-    }
-  }
-
-  // --- ACCIONES TINDER (APROBAR / RECHAZAR) ---
-  public async approveDocument(docOverride?: any) {
-    const doc = docOverride || this.activeDoc;
-    if (!doc || this.actionExecuting) {
-      return;
-    }
-
-    this.actionExecuting = true;
-    this.executingType = "approve";
-    this.ngxService.startLoader("ld-approve");
-
-    const controlId = doc.ncontrol || doc.numc;
+  public async approveFast(grupo: any) {
+    const numCarpeta = grupo.numero_carpeta;
+    const docsToSign = grupo.documentos || [];
     const userDb = this.jwtData.userId;
-    const comment =
-      this.documentObservations.trim() !== ""
-        ? this.documentObservations.toUpperCase()
-        : "APROBADO E INYECTADO CON FIRMA Y SELLO DIGITAL";
 
-    // 1. Guardar Observación
-    this.xAPI = {} as IAPICore;
-    this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
-    this.xAPI.valores = JSON.stringify({
-      documento: controlId,
-      estado: doc.ultimo_estado || doc.estatus || 36,
-      estatus: 2,
-      observacion: comment,
-      accion: "0",
-      usuario: userDb,
-    });
-    this.xAPI.parametros = "";
-
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (obsRes) => {
-        // 2. Promover Estatus (Inyección Firma y Sello backend)
-        this.xAPI = {} as IAPICore;
-        this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
-        this.xAPI.valores = "";
-        this.xAPI.parametros = `2,${userDb},${controlId}`;
-
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          (promoRes) => {
-            this.toastrService.success(
-              `Documento ${controlId} firmado y aprobado con éxito`,
-              "Resoluciones",
-            );
-            this.removeApprovedDocFromVector();
-
-            this.actionExecuting = false;
-            this.executingType = "";
-            this.ngxService.stopLoader("ld-approve");
-
-            if (this.documents.length > 0) {
-              if (this.currentDocIndex >= this.documents.length) {
-                this.currentDocIndex = this.documents.length - 1;
-              }
-              this.activeDoc = this.documents[this.currentDocIndex];
-              this.loadActivePdf();
-            } else {
-              this.exitImmersiveMode();
-              this.selectedFolder = null;
-              this.loadFolders();
-            }
-          },
-          (promoError) => {
-            console.error("Error al promover estatus:", promoError);
-            this.toastrService.error("Error al aplicar firma/sello digital");
-            this.actionExecuting = false;
-            this.executingType = "";
-            this.ngxService.stopLoader("ld-approve");
-            this.changeDetector.detectChanges();
-          },
-        );
-      },
-      (obsError) => {
-        console.error("Error al guardar la observación:", obsError);
-        this.toastrService.error("No se pudo registrar la aprobación.");
-        this.actionExecuting = false;
-        this.executingType = "";
-        this.ngxService.stopLoader("ld-approve");
-        this.changeDetector.detectChanges();
-      },
-    );
-  }
-
-  public async rejectDocument(docOverride?: any) {
-    const doc = docOverride || this.activeDoc;
-    if (!doc || this.actionExecuting) {
-      return;
-    }
-
-    if (this.documentObservations.trim() === "") {
-      Swal.fire({
-        title: "Motivo de Rechazo Requerido",
-        text: "Debe ingresar una observación que justifique el rechazo en el panel de la derecha.",
-        icon: "warning",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "Aceptar",
-      });
-      return;
-    }
-
-    this.actionExecuting = true;
-    this.executingType = "reject";
-    this.ngxService.startLoader("ld-reject");
-
-    const controlId = doc.ncontrol || doc.numc;
-    const userDb = this.jwtData.userId;
-    const comment = this.documentObservations.toUpperCase();
-
-    // 1. Guardar Observación con acción '1' (Rechazo)
-    this.xAPI = {} as IAPICore;
-    this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
-    this.xAPI.valores = JSON.stringify({
-      documento: controlId,
-      estado: doc.ultimo_estado || doc.estatus || 36,
-      estatus: doc.ultimo_estado || 36,
-      observacion: comment,
-      accion: "1",
-      usuario: userDb,
-    });
-    this.xAPI.parametros = "";
-
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (obsRes) => {
-        // 2. Retorno de Ubicación / Rechazo
-        this.xAPI = {} as IAPICore;
-        this.xAPI.funcion = environment.funcion.UBICACION_RECHAZO;
-        this.xAPI.valores = "";
-        this.xAPI.parametros = `1,1,1,,${userDb},${controlId}`;
-
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          (rejectRes) => {
-            this.toastrService.success(
-              `Documento ${controlId} rechazado y devuelto a origen`,
-              "Resoluciones",
-            );
-            this.removeApprovedDocFromVector();
-
-            this.actionExecuting = false;
-            this.executingType = "";
-            this.ngxService.stopLoader("ld-reject");
-
-            if (this.documents.length > 0) {
-              if (this.currentDocIndex >= this.documents.length) {
-                this.currentDocIndex = this.documents.length - 1;
-              }
-              this.activeDoc = this.documents[this.currentDocIndex];
-              this.loadActivePdf();
-            } else {
-              this.exitImmersiveMode();
-              this.selectedFolder = null;
-              this.loadFolders();
-            }
-          },
-          (rejectError) => {
-            console.error("Error en rechazo/retorno:", rejectError);
-            this.toastrService.error("Error al devolver el documento.");
-            this.actionExecuting = false;
-            this.executingType = "";
-            this.ngxService.stopLoader("ld-reject");
-            this.changeDetector.detectChanges();
-          },
-        );
-      },
-      (obsError) => {
-        console.error("Error al registrar observación de rechazo:", obsError);
-        this.toastrService.error("Error al procesar la observación.");
-        this.actionExecuting = false;
-        this.executingType = "";
-        this.ngxService.stopLoader("ld-reject");
-        this.changeDetector.detectChanges();
-      },
-    );
-  }
-
-  public async approveFast(doc: any) {
-    const controlId = doc.ncontrol || doc.numc;
-    const userDb = this.jwtData.userId;
+    if (docsToSign.length === 0) return;
 
     Swal.fire({
-      title: "Aprobación Rápida",
-      text: `¿Está seguro de firmar y aprobar el documento ${controlId} directamente?`,
+      title: "Firma Rápida de Carpeta",
+      text: `¿Está seguro de firmar los ${docsToSign.length} casos de la carpeta N° ${numCarpeta}?`,
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#2dce89",
       cancelButtonColor: "#8898aa",
-      confirmButtonText: "Sí, firmar",
+      confirmButtonText: "Sí, firmar todo",
       cancelButtonText: "Cancelar",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
         this.ngxService.startLoader("ld-fast");
 
-        // Guardar Obs
-        this.xAPI = {} as IAPICore;
-        this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
-        this.xAPI.valores = JSON.stringify({
-          documento: controlId,
-          estado: doc.ultimo_estado || doc.estatus || 36,
-          estatus: 2,
-          observacion: "APROBADO E INYECTADO MEDIANTE ACCIÓN RÁPIDA",
-          accion: "0",
-          usuario: userDb,
-        });
-        this.xAPI.parametros = "";
+        let successCount = 0;
+        let errorCount = 0;
 
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          () => {
-            // Promover
+        for (const doc of docsToSign) {
+          const controlId = doc.ncontrol || doc.numc;
+          try {
+            this.xAPI = {} as IAPICore;
+            this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
+            this.xAPI.valores = JSON.stringify({
+              documento: controlId,
+              estado: doc.ultimo_estado || doc.estatus || 36,
+              estatus: 2,
+              observacion: "APROBADO MEDIANTE ACCIÓN RÁPIDA DE CARPETA",
+              accion: "0",
+              usuario: userDb,
+            });
+            this.xAPI.parametros = "";
+            
+            await this.apiService.Ejecutar(this.xAPI).toPromise();
+
             this.xAPI = {} as IAPICore;
             this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
             this.xAPI.valores = "";
             this.xAPI.parametros = `2,${userDb},${controlId}`;
 
-            this.apiService.Ejecutar(this.xAPI).subscribe(
-              () => {
-                this.toastrService.success(
-                  `Documento ${controlId} firmado con éxito`,
-                );
-                this.documents = this.documents.filter(
-                  (d) => (d.ncontrol || d.numc) !== controlId,
-                );
-                this.ngxService.stopLoader("ld-fast");
+            await this.apiService.Ejecutar(this.xAPI).toPromise();
+            successCount++;
+          } catch (error) {
+            console.error(`Error firmando ${controlId}:`, error);
+            errorCount++;
+          }
+        }
 
-                if (this.documents.length === 0) {
-                  this.selectedFolder = null;
-                  this.loadFolders();
-                } else {
-                  this.changeDetector.detectChanges();
-                }
-              },
-              (err) => {
-                console.error(err);
-                this.toastrService.error("Error al promover estado.");
-                this.ngxService.stopLoader("ld-fast");
-                this.changeDetector.detectChanges();
-              },
-            );
-          },
-          (err) => {
-            console.error(err);
-            this.toastrService.error("Error al registrar aprobación.");
-            this.ngxService.stopLoader("ld-fast");
-            this.changeDetector.detectChanges();
-          },
-        );
+        this.ngxService.stopLoader("ld-fast");
+
+        if (errorCount > 0) {
+          this.toastrService.warning(`Éxito: ${successCount}, Errores: ${errorCount}`, "Firma de Carpeta");
+        } else {
+          this.toastrService.success(`Se firmaron ${successCount} casos exitosamente.`, "Carpeta Firmada");
+        }
+
+        this.documents = this.documents.filter((d) => d.numero_carpeta !== numCarpeta);
+        
+        if (this.documents.length === 0) {
+          this.selectedFolder = null;
+          if (this.immersiveMode) this.exitImmersiveMode();
+          this.loadFolders();
+        } else {
+          if (this.immersiveMode) {
+            if (this.currentDocIndex >= this.documents.length) {
+              this.currentDocIndex = this.documents.length - 1;
+            }
+            this.activeDoc = this.documents[this.currentDocIndex];
+            this.loadActivePdf();
+          }
+          this.changeDetector.detectChanges();
+        }
       }
     });
+  }
+
+  public async cancelFast(grupo: any) {
+    const numCarpeta = grupo.numero_carpeta;
+    const docsToCancel = grupo.documentos || [];
+    const userDb = this.jwtData.userId;
+
+    if (docsToCancel.length === 0) return;
+
+    Swal.fire({
+      title: "Anular Carpeta",
+      text: `Ingrese el motivo para anular los ${docsToCancel.length} casos de la carpeta N° ${numCarpeta}:`,
+      input: "textarea",
+      inputPlaceholder: "Escriba las observaciones aquí...",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#f5365c",
+      cancelButtonColor: "#8898aa",
+      confirmButtonText: "Sí, anular todo",
+      cancelButtonText: "Cancelar",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Debe ingresar un motivo!";
+        }
+        return null;
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed && result.value) {
+        this.ngxService.startLoader("ld-fast");
+        
+        const motivo = result.value.toUpperCase();
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const doc of docsToCancel) {
+          const controlId = doc.ncontrol || doc.numc;
+          try {
+            this.xAPI = {} as IAPICore;
+            this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
+            this.xAPI.valores = JSON.stringify({
+              documento: controlId,
+              estado: doc.ultimo_estado || doc.estatus || 36,
+              estatus: doc.ultimo_estado || 36,
+              observacion: motivo,
+              accion: "1",
+              usuario: userDb,
+            });
+            this.xAPI.parametros = "";
+            
+            await this.apiService.Ejecutar(this.xAPI).toPromise();
+
+            this.xAPI = {} as IAPICore;
+            this.xAPI.funcion = environment.funcion.UBICACION_RECHAZO;
+            this.xAPI.valores = "";
+            this.xAPI.parametros = `1,1,1,,${userDb},${controlId}`;
+
+            await this.apiService.Ejecutar(this.xAPI).toPromise();
+            successCount++;
+          } catch (error) {
+            console.error(`Error anulando ${controlId}:`, error);
+            errorCount++;
+          }
+        }
+
+        this.ngxService.stopLoader("ld-fast");
+
+        if (errorCount > 0) {
+          this.toastrService.warning(`Éxito: ${successCount}, Errores: ${errorCount}`, "Anulación de Carpeta");
+        } else {
+          this.toastrService.success(`Se anularon ${successCount} casos exitosamente.`, "Carpeta Anulada");
+        }
+
+        this.documents = this.documents.filter((d) => d.numero_carpeta !== numCarpeta);
+        if (this.documents.length === 0) {
+          this.selectedFolder = null;
+          if (this.immersiveMode) this.exitImmersiveMode();
+          this.loadFolders();
+        } else {
+          if (this.immersiveMode) {
+            if (this.currentDocIndex >= this.documents.length) {
+              this.currentDocIndex = this.documents.length - 1;
+            }
+            this.activeDoc = this.documents[this.currentDocIndex];
+            this.loadActivePdf();
+          }
+          this.changeDetector.detectChanges();
+        }
+      }
+    });
+  }
+
+  public async approveAllFast() {
+    if (!this.documents || this.documents.length === 0) {
+      this.toastrService.warning(
+        "No hay documentos en la lista para firmar.",
+        "Aviso",
+      );
+      return;
+    }
+
+    const total = this.documents.length;
+    const result = await Swal.fire({
+      title: "Firma Masiva",
+      text: `¿Está seguro de firmar y aprobar ${total} documentos de forma masiva?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#2dce89",
+      cancelButtonColor: "#8898aa",
+      confirmButtonText: "Sí, firmar todos",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      this.ngxService.startLoader("ld-fast");
+      const userDb = this.jwtData.userId;
+      let successCount = 0;
+      let errorCount = 0;
+
+      // Procesamiento secuencial para firma masiva
+      for (const doc of this.documents) {
+        const controlId = doc.ncontrol || doc.numc;
+        try {
+          this.xAPI = {} as IAPICore;
+          this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
+          this.xAPI.valores = JSON.stringify({
+            documento: controlId,
+            estado: doc.ultimo_estado || doc.estatus || 36,
+            estatus: 2,
+            observacion: "APROBADO MEDIANTE FIRMA MASIVA",
+            accion: "0",
+            usuario: userDb,
+          });
+          this.xAPI.parametros = "";
+
+          await this.apiService.Ejecutar(this.xAPI).toPromise();
+
+          this.xAPI = {} as IAPICore;
+          this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
+          this.xAPI.valores = "";
+          this.xAPI.parametros = `2,${userDb},${controlId}`;
+
+          await this.apiService.Ejecutar(this.xAPI).toPromise();
+          successCount++;
+        } catch (error) {
+          console.error(`Error procesando ${controlId}:`, error);
+          errorCount++;
+        }
+      }
+
+      this.ngxService.stopLoader("ld-fast");
+
+      if (errorCount > 0) {
+        this.toastrService.warning(
+          `Éxito: ${successCount}, Errores: ${errorCount}`,
+          "Firma Masiva",
+        );
+      } else {
+        this.toastrService.success(
+          `Se firmaron ${successCount} documentos.`,
+          "Firma Masiva Exitosa",
+        );
+      }
+
+      this.selectedFolder = null;
+      this.loadFolders();
+    }
   }
 
   public promptReject(doc: any) {

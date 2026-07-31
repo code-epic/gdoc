@@ -6,10 +6,10 @@
 </div>
 
 <div class="a4-canvas-container" #container [style.transform]="'scale(' + zoomScale + ')'">
-  <div class="a4-canvas">
+  <div class="a4-canvas" *ngFor="let page of documentData.pages; let i = index; let isLast = last" style="margin-bottom: 20px;">
   
   <!-- CABECERA -->
-  <header class="doc-header editable-zone" (click)="editMode('header')">
+  <header class="doc-header editable-zone" (click)="editMode('header')" *ngIf="i === 0">
     <p class="static-text" style="font-weight: bold; text-transform: uppercase;">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
     <p class="static-text" style="font-weight: bold; text-transform: uppercase;">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
     <p class="static-text" style="font-weight: bold; text-transform: uppercase;">DESPACHO DEL MINISTRO</p>
@@ -32,17 +32,28 @@
 
   <!-- CUERPO -->
   <main class="doc-body editable-zone" (click)="editMode('body')">
-    <p class="preamble">{{ documentData.body.preamble }}</p>
+    <ng-container *ngIf="i === 0">
+      <p class="preamble"
+         contenteditable="true"
+         spellcheck="false"
+         style="outline: none; transition: background-color 0.2s; padding: 5px; border-radius: 4px;"
+         (input)="onPreambleEdit($event)"
+         (focus)="onFocusEditable($event)"
+         (blur)="onBlurEditable($event)"
+         (paste)="onPaste($event)"
+         [innerText]="documentData.body.preamble">
+      </p>
+      
+      <!-- 1 línea debajo del basamento legal: RESUELVE -->
+      <p style="text-align: center; margin-top: 13pt; margin-bottom: 13pt; font-weight: bold; text-transform: uppercase;">{{ documentData.body.action }}</p>
+    </ng-container>
     
-    <!-- 1 línea debajo del basamento legal: RESUELVE -->
-    <p style="text-align: center; margin-top: 13pt; margin-bottom: 13pt; font-weight: bold; text-transform: uppercase;">{{ documentData.body.action }}</p>
-    
-    <!-- Renderizado de contenido HTML seguro (Angular innerHTML) -->
-    <div class="content-html" [innerHTML]="documentData.body.content"></div>
+    <!-- Renderizado de contenido HTML (La lista generada por chunk) -->
+    <div class="content-html" [innerHTML]="page.content"></div>
   </main>
 
   <!-- PIE DE PÁGINA Y FIRMAS -->
-  <footer class="doc-footer editable-zone" (click)="editMode('signatures')" style="margin-top: 52pt; /* 4 líneas debajo del cuerpo */">
+  <footer class="doc-footer editable-zone" (click)="editMode('signatures')" *ngIf="isLast" style="margin-top: 52pt; /* 4 líneas debajo del cuerpo */">
     
     <!-- 1cm (aprox 38px) desde el margen izquierdo -->
     <p style="margin-left: 1cm; margin-bottom: 13pt;">Comuníquese y publíquese.</p>
@@ -53,11 +64,17 @@
     <!-- Contenedor de firma alineado a la derecha -->
     <div style="float: right; text-align: center; min-width: 350px; position: relative;">
       
-      <!-- Z-Index 2: Firma Imagen -->
+      <!-- Z-Index 1: Sello Húmedo (Escudo 3x3 cm, altura intermedia) -->
+      <img *ngIf="documentData.signatures.wetStampImageUrl" 
+           [src]="documentData.signatures.wetStampImageUrl" 
+           class="wet-stamp-layer" alt="Sello Húmedo"
+           style="position: absolute; top: -16mm; left: -5%; z-index: 1; opacity: 0.85; width: 30mm; height: 30mm; object-fit: contain;">
+
+      <!-- Z-Index 2: Firma Imagen (Elevada 0.8cm) -->
       <img *ngIf="documentData.signatures.signatureImageUrl" 
            [src]="documentData.signatures.signatureImageUrl" 
            class="signature-layer" alt="Firma Autoridad"
-           style="position: absolute; top: -60px; left: 50%; transform: translateX(-50%); z-index: 2; max-width: 200px;">
+           style="position: absolute; bottom: calc(85% - 7mm); left: 50%; transform: translateX(-50%); z-index: 2; width: 85mm; max-width: none; object-fit: contain; pointer-events: none;">
            
       <!-- Textos de firma -->
       <div class="signatory-info" style="z-index: 3; position: relative;">

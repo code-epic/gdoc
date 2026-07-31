@@ -33,6 +33,7 @@ export class ResueltoCanvasComponent implements OnInit, AfterViewInit {
   };
 
   @Output() zoneSelected = new EventEmitter<string>();
+  @Output() preambleChange = new EventEmitter<string>();
 
   constructor(private el: ElementRef) { }
 
@@ -80,5 +81,35 @@ export class ResueltoCanvasComponent implements OnInit, AfterViewInit {
   // Función para activar el panel de edición lateral según el área clickeada
   editMode(zone: string) {
     this.zoneSelected.emit(zone);
+  }
+
+  onPreambleEdit(event: Event) {
+    const target = event.target as HTMLElement;
+    this.preambleChange.emit(target.innerText || '');
+  }
+
+  onFocusEditable(event: Event) {
+    const target = event.target as HTMLElement;
+    target.style.backgroundColor = 'rgba(142, 202, 230, 0.15)'; // Un azul muy suave
+  }
+
+  onBlurEditable(event: Event) {
+    const target = event.target as HTMLElement;
+    target.style.backgroundColor = 'transparent';
+  }
+
+  onPaste(event: ClipboardEvent) {
+    // Evitar que el navegador pegue HTML con estilos (colores, fuentes, etc)
+    event.preventDefault();
+    
+    // Extraer solo texto plano del portapapeles
+    const text = event.clipboardData?.getData('text/plain') || '';
+    
+    // Insertarlo en el cursor usando execCommand para mantener el historial de Deshacer
+    document.execCommand('insertText', false, text);
+    
+    // Emitir el cambio hacia arriba
+    const target = event.target as HTMLElement;
+    this.preambleChange.emit(target.innerText || '');
   }
 }
