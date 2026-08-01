@@ -112,30 +112,44 @@
         <p class="m-resolucion-firma-text" [innerHTML]="documentData.signatures.signatoryRole"></p>
       </div>
     </div>
-    
-    <div style="clear: both;"></div>
-    
-    <!-- Iniciales y Página flotantes (solo si es la última página y hay más de una) -->
-    <ng-container *ngIf="i > 0">
-      <div class="initials" style="text-align: left; margin-top: 30pt; font-size: 0.8em; z-index: 4;">
-        {{ documentData.signatures.initials }}
-      </div>
-      <div class="page-number-floating" style="text-align: center; margin-top: 10pt; font-size: 0.85rem; font-weight: bold; color: #555;">
-        Página {{ i + 1 }} de {{ documentData.pages.length }}
-      </div>
-    </ng-container>
 
-    <!-- Iniciales ancladas al fondo (solo si es documento de 1 sola página) -->
-    <ng-container *ngIf="i === 0">
-      <div class="initials" style="position: absolute; bottom: 0; left: 0; font-size: 0.8em; z-index: 4;">
-        {{ documentData.signatures.initials }}
+    <div style="clear: both;"></div>
+
+    <!-- PIE DE PÁGINA ADHERIDO A LA FIRMA (Solo en la última página) -->
+    <div class="relative-page-footer" style="margin-top: 30pt; font-family: 'Tahoma', sans-serif; text-align: left;">
+      <!-- Iniciales (Media firma): 1 línea antes que la paginación -->
+      <div class="initials" style="font-size: 8pt; color: #000; margin-bottom: 13pt; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
+           contenteditable="true" spellcheck="false"
+           (click)="$event.stopPropagation()"
+           (focus)="onFocusEditable($event)"
+           (blur)="onBlurEditable($event); onInitialsEdit($event)"
+           [textContent]="documentData.signatures.initials">
       </div>
-    </ng-container>
+      
+      <!-- Número de página: Centrado -->
+      <div class="page-number" *ngIf="documentData.pages.length > 1" style="text-align: center; font-size: 9pt; font-weight: bold; color: #555;">
+        {{ i + 1 }} de {{ documentData.pages.length }}
+      </div>
+    </div>
   </footer>
 
-  <!-- NÚMERO DE PÁGINA (Anclado al fondo para página inicial y páginas intermedias) -->
-  <div class="page-number" *ngIf="(!isLast || i === 0) && documentData.pages.length > 1" style="position: absolute; bottom: 10mm; left: 0; right: 0; text-align: center; font-size: 0.85rem; font-weight: bold; color: #555;">
-    Página {{ i + 1 }} de {{ documentData.pages.length }}
+  <!-- ============================================================== -->
+  <!-- PIE DE PÁGINA ABSOLUTO (Páginas intermedias)                   -->
+  <!-- ============================================================== -->
+  <div class="absolute-page-footer" *ngIf="!isLast" style="position: absolute; bottom: 10mm; left: 20mm; right: 20mm; z-index: 10; font-family: 'Tahoma', sans-serif; text-align: left;">
+    <!-- Iniciales (Media firma): 1 línea antes que la paginación -->
+    <div class="initials" style="font-size: 8pt; color: #000; margin-bottom: 13pt; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
+         contenteditable="true" spellcheck="false"
+         (click)="$event.stopPropagation()"
+         (focus)="onFocusEditable($event)"
+         (blur)="onBlurEditable($event); onInitialsEdit($event)"
+         [textContent]="documentData.signatures.initials">
+    </div>
+    
+    <!-- Número de página: Centrado -->
+    <div class="page-number" *ngIf="documentData.pages.length > 1" style="text-align: center; font-size: 9pt; font-weight: bold; color: #555;">
+      {{ i + 1 }} de {{ documentData.pages.length }}
+    </div>
   </div>
 
   </div>

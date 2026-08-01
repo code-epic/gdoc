@@ -587,6 +587,143 @@ $tpv-border:     rgba(255, 255, 255, 0.08);
   }
 }
 
+/* ── TABS Y EXPLORADOR ─────────────────────────────────── */
+.tpv-meta-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 15px;
+  background: rgba(0,0,0,0.2);
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.tpv-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  padding: 8px 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  
+  &.active {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  &:hover:not(.active) {
+    background: rgba(255,255,255,0.05);
+    color: white;
+  }
+}
+
+.tpv-tab-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.tpv-explorador-tab {
+  overflow: hidden;
+}
+
+.explorador-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 4px;
+  
+  /* Scrollbar custom */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+  }
+}
+
+.explorador-item {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: 10px;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+  
+  .ei-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #00897b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  
+  .ei-content {
+    flex-grow: 1;
+    overflow: hidden;
+    
+    .ei-name {
+      font-weight: bold;
+      color: white;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.8rem;
+    }
+    
+    .ei-details {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.75rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+  }
+  
+  .ei-actions {
+    flex-shrink: 0;
+    
+    .ei-download-btn {
+      background: rgba(128, 203, 196, 0.1);
+      border: 1px solid rgba(128, 203, 196, 0.3);
+      color: #80cbc4;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: #80cbc4;
+        color: #1a233a;
+      }
+    }
+  }
+}
+
 /* ── FOOTER ────────────────────────────────────────────── */
 .tpv-footer {
   flex: 0 0 auto;

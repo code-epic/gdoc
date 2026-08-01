@@ -92,6 +92,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public swipeDir: "" | "left" | "right" = "";
   public isSafari = false;
   public objectFailed = false;
+  
+  public activeTab: 'explorador' | 'metadata' = 'explorador';
 
   private touchX = 0;
   private touchY = 0;
@@ -205,10 +207,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     const charsPerLine = 85; // Aprox caracteres por línea en Tahoma 13pt (Oficio)
     const basamentoLines = Math.ceil(basamentoLegalText.length / charsPerLine);
     
-    const firstPageHeaderLines = 15 + basamentoLines; // Membrete + Fechas + Resolución + Basamento + Resuelve + Asunto
+    // Ajustes más precisos y permisivos tras análisis visual
+    const firstPageHeaderLines = 14 + basamentoLines; // Membrete + Fechas + Resolución + Basamento + Resuelve + Asunto
     const otherPageHeaderLines = 4; // CONTINUACIÓN DE LA RESOLUCIÓN...
-    const footerLines = 19; // Firmas, sellos, iniciales, "Comuníquese"
-    const totalLinesPerPage = 48; // Total de líneas utilizables en Oficio (355mm - márgenes) con line-height 1.35
+    const footerLines = 15; // Firmas, sellos, iniciales, "Comuníquese". Reducido para no romper antes de tiempo
+    const totalLinesPerPage = 52; // Total real matemático en hoja Oficio con line-height 1.35 y fuente 13pt
 
     let currentCaseIndex = 0;
 

@@ -278,16 +278,16 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
   // --- SELECCIÓN MÚLTIPLE (BULK) ---
   public getSelectedCount(): number {
-    return this.documents.filter(d => d.selected).length;
+    return this.documents.filter((d) => d.selected).length;
   }
 
   public isAllSelected(): boolean {
-    return this.documents.length > 0 && this.documents.every(d => d.selected);
+    return this.documents.length > 0 && this.documents.every((d) => d.selected);
   }
 
   public toggleSelectAll(event: any) {
     const checked = event.target.checked;
-    this.documents.forEach(d => d.selected = checked);
+    this.documents.forEach((d) => (d.selected = checked));
   }
 
   public getComponentColor(code: number): string {
@@ -303,6 +303,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
   public onFolderClick(folder: any) {
     this.selectedFolder = folder;
+    this.ListarActosAdministrativos(folder.tipo);
     this.loadFolderDocuments(folder);
   }
 
@@ -328,24 +329,25 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             e.completed = false;
             return e;
           });
-          
+
           // Agrupar por numero_carpeta
           const grupos: { [key: string]: any } = {};
           rawDocs.forEach((doc: any) => {
-            const num = doc.numero_carpeta || doc.ncontrol || doc.numc || 'SIN_CARPETA';
+            const num =
+              doc.numero_carpeta || doc.ncontrol || doc.numc || "SIN_CARPETA";
             if (!grupos[num]) {
               grupos[num] = {
                 numero_carpeta: num,
-                asunto: folder.tipo || 'Sin Asunto',
+                asunto: folder.tipo || "Sin Asunto",
                 cantidad: 0,
                 selected: false,
-                documentos: []
+                documentos: [],
               };
             }
             grupos[num].cantidad++;
             grupos[num].documentos.push(doc);
           });
-          
+
           this.documents = Object.values(grupos);
         }
         this.loadingDocuments = false;
@@ -373,6 +375,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.loadActivePdf();
     }, 0);
+    console.log(this.activeDoc);
   }
 
   public startImmersiveFromFolder() {
@@ -563,7 +566,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               usuario: userDb,
             });
             this.xAPI.parametros = "";
-            
+
             await this.apiService.Ejecutar(this.xAPI).toPromise();
 
             this.xAPI = {} as IAPICore;
@@ -582,13 +585,21 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         this.ngxService.stopLoader("ld-fast");
 
         if (errorCount > 0) {
-          this.toastrService.warning(`Éxito: ${successCount}, Errores: ${errorCount}`, "Firma de Carpeta");
+          this.toastrService.warning(
+            `Éxito: ${successCount}, Errores: ${errorCount}`,
+            "Firma de Carpeta",
+          );
         } else {
-          this.toastrService.success(`Se firmaron ${successCount} casos exitosamente.`, "Carpeta Firmada");
+          this.toastrService.success(
+            `Se firmaron ${successCount} casos exitosamente.`,
+            "Carpeta Firmada",
+          );
         }
 
-        this.documents = this.documents.filter((d) => d.numero_carpeta !== numCarpeta);
-        
+        this.documents = this.documents.filter(
+          (d) => d.numero_carpeta !== numCarpeta,
+        );
+
         if (this.documents.length === 0) {
           this.selectedFolder = null;
           if (this.immersiveMode) this.exitImmersiveMode();
@@ -634,7 +645,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     }).then(async (result) => {
       if (result.isConfirmed && result.value) {
         this.ngxService.startLoader("ld-fast");
-        
+
         const motivo = result.value.toUpperCase();
         let successCount = 0;
         let errorCount = 0;
@@ -653,7 +664,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               usuario: userDb,
             });
             this.xAPI.parametros = "";
-            
+
             await this.apiService.Ejecutar(this.xAPI).toPromise();
 
             this.xAPI = {} as IAPICore;
@@ -672,12 +683,20 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         this.ngxService.stopLoader("ld-fast");
 
         if (errorCount > 0) {
-          this.toastrService.warning(`Éxito: ${successCount}, Errores: ${errorCount}`, "Anulación de Carpeta");
+          this.toastrService.warning(
+            `Éxito: ${successCount}, Errores: ${errorCount}`,
+            "Anulación de Carpeta",
+          );
         } else {
-          this.toastrService.success(`Se anularon ${successCount} casos exitosamente.`, "Carpeta Anulada");
+          this.toastrService.success(
+            `Se anularon ${successCount} casos exitosamente.`,
+            "Carpeta Anulada",
+          );
         }
 
-        this.documents = this.documents.filter((d) => d.numero_carpeta !== numCarpeta);
+        this.documents = this.documents.filter(
+          (d) => d.numero_carpeta !== numCarpeta,
+        );
         if (this.documents.length === 0) {
           this.selectedFolder = null;
           if (this.immersiveMode) this.exitImmersiveMode();
@@ -702,16 +721,16 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       return;
     }
     // Seleccionar todos y llamar al método masivo
-    this.documents.forEach(d => d.selected = true);
+    this.documents.forEach((d) => (d.selected = true));
     this.approveSelectedFast();
   }
 
   public async approveSelectedFast() {
-    const selectedGroups = this.documents.filter(d => d.selected);
+    const selectedGroups = this.documents.filter((d) => d.selected);
     if (selectedGroups.length === 0) return;
 
     let totalDocsToSign = 0;
-    selectedGroups.forEach(g => totalDocsToSign += g.documentos.length);
+    selectedGroups.forEach((g) => (totalDocsToSign += g.documentos.length));
 
     const result = await Swal.fire({
       title: "Firma Masiva de Carpetas",
@@ -778,7 +797,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       }
 
       // Remover carpetas aprobadas
-      this.documents = this.documents.filter(d => !d.selected);
+      this.documents = this.documents.filter((d) => !d.selected);
       if (this.documents.length === 0) {
         this.selectedFolder = null;
         if (this.immersiveMode) this.exitImmersiveMode();
@@ -790,11 +809,11 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   }
 
   public async cancelSelectedFast() {
-    const selectedGroups = this.documents.filter(d => d.selected);
+    const selectedGroups = this.documents.filter((d) => d.selected);
     if (selectedGroups.length === 0) return;
 
     let totalDocsToCancel = 0;
-    selectedGroups.forEach(g => totalDocsToCancel += g.documentos.length);
+    selectedGroups.forEach((g) => (totalDocsToCancel += g.documentos.length));
 
     Swal.fire({
       title: "Anulación Masiva de Carpetas",
@@ -816,7 +835,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     }).then(async (result) => {
       if (result.isConfirmed && result.value) {
         this.ngxService.startLoader("ld-fast");
-        
+
         const userDb = this.jwtData.userId;
         const motivo = result.value.toUpperCase();
         let successCount = 0;
@@ -838,7 +857,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
                 usuario: userDb,
               });
               this.xAPI.parametros = "";
-              
+
               await this.apiService.Ejecutar(this.xAPI).toPromise();
 
               this.xAPI = {} as IAPICore;
@@ -858,12 +877,18 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         this.ngxService.stopLoader("ld-fast");
 
         if (errorCount > 0) {
-          this.toastrService.warning(`Éxito: ${successCount}, Errores: ${errorCount}`, "Anulación Masiva");
+          this.toastrService.warning(
+            `Éxito: ${successCount}, Errores: ${errorCount}`,
+            "Anulación Masiva",
+          );
         } else {
-          this.toastrService.success(`Se anularon ${successCount} casos exitosamente.`, "Carpetas Anuladas");
+          this.toastrService.success(
+            `Se anularon ${successCount} casos exitosamente.`,
+            "Carpetas Anuladas",
+          );
         }
 
-        this.documents = this.documents.filter(d => !d.selected);
+        this.documents = this.documents.filter((d) => !d.selected);
         if (this.documents.length === 0) {
           this.selectedFolder = null;
           if (this.immersiveMode) this.exitImmersiveMode();
@@ -1001,5 +1026,28 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       this.onFolderClick(this.contextMenuData);
     }
     this.closeContextMenu();
+  }
+
+  public ListarActosAdministrativos(tipo: string) {
+    // Limpiar ruido: saltos de línea (\r, \n), tabulaciones y espacios al inicio/final
+    const cleanTipo = tipo ? tipo.replace(/[\r\n\t]+/g, "").trim() : "";
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = environment.funcion.CONSULTAR_ACTOS_ADMINISTRATIVOS;
+    this.xAPI.parametros = `${cleanTipo}`;
+
+    console.log(this.xAPI);
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        // Ubicación Rechazo
+        console.log(data);
+      },
+      (err) => {
+        console.error(err);
+        this.toastrService.error("Error al registrar rechazo.");
+        this.ngxService.stopLoader("ld-fast-reject");
+        this.changeDetector.detectChanges();
+      },
+    );
   }
 }

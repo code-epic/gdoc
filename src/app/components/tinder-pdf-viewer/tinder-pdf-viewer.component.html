@@ -136,68 +136,118 @@
 
       <!-- ═══ Panel Metadata (derecha) ═══ -->
       <div class="tpv-meta-pane" *ngIf="activeDoc">
-        <div class="tpv-meta-header">
+        <div class="tpv-meta-header" style="padding-bottom: 5px;">
           <h4 class="tpv-meta-title">Atributos del Resuelto</h4>
-          <div class="tpv-meta-subtitle">Metadata de Expediente</div>
+          <div class="tpv-meta-subtitle">Revisión de Expediente</div>
         </div>
 
-        <div class="tpv-field">
-          <label>Cédula Identidad</label>
-          <div class="tpv-field-value">{{ activeDoc.cedula }}</div>
+        <!-- ═══ Tabs Nav ═══ -->
+        <div class="tpv-meta-tabs">
+          <button type="button" class="tpv-tab-btn" [class.active]="activeTab === 'explorador'" (click)="activeTab = 'explorador'">Explorador</button>
+          <button type="button" class="tpv-tab-btn" [class.active]="activeTab === 'metadata'" (click)="activeTab = 'metadata'">Atributos</button>
         </div>
 
-        <div class="tpv-field">
-          <label>Nombres y Apellidos</label>
-          <div class="tpv-field-value">{{ activeDoc.nombres_apellidos | uppercase }}</div>
+        <!-- ═══ Tab: Explorador (Casos) ═══ -->
+        <div class="tpv-tab-content tpv-explorador-tab" *ngIf="activeTab === 'explorador'">
+          <!-- Si hay múltiples documentos agrupados -->
+          <ng-container *ngIf="activeDoc.documentos && activeDoc.documentos.length > 0">
+            <div class="explorador-list">
+              <div class="explorador-item" *ngFor="let caso of activeDoc.documentos">
+                <div class="ei-avatar">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div class="ei-content">
+                  <div class="ei-name">{{ (caso.nombres_apellidos || caso.nombres + ' ' + caso.apellidos) | uppercase }}</div>
+                  <div class="ei-details">C.I: {{ caso.cedula }}</div>
+                  <div class="ei-details" style="font-size: 0.75rem;">{{ caso.grado || 'S/G' }} - {{ caso.componente || 'S/C' }}</div>
+                  <div class="ei-details" *ngIf="caso.digital || caso.anom" style="font-size: 0.75rem; color: #80cbc4;">
+                    <i class="fas fa-file-pdf"></i> {{ caso.digital || caso.anom }}
+                  </div>
+                </div>
+                <!-- Botón descargar PDF individual -->
+                <div class="ei-actions" *ngIf="caso.digital || caso.anom || caso.archivo">
+                  <a [href]="pdfUrlResolver ? pdfUrlResolver(caso) : '#'" target="_blank" class="ei-download-btn" title="Descargar PDF">
+                    <i class="fas fa-cloud-download-alt"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          
+          <!-- Si es un solo documento (sin agrupar) -->
+          <ng-container *ngIf="!activeDoc.documentos || activeDoc.documentos.length === 0">
+            <div class="explorador-list">
+              <div class="explorador-item">
+                <div class="ei-avatar">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div class="ei-content">
+                  <div class="ei-name">{{ (activeDoc.nombres_apellidos || activeDoc.nombres + ' ' + activeDoc.apellidos) | uppercase }}</div>
+                  <div class="ei-details">C.I: {{ activeDoc.cedula }}</div>
+                  <div class="ei-details" style="font-size: 0.75rem;">{{ activeDoc.grado || 'S/G' }} - {{ activeDoc.componente || 'S/C' }}</div>
+                  <div class="ei-details" *ngIf="activeDoc.digital || activeDoc.anom" style="font-size: 0.75rem; color: #80cbc4;">
+                    <i class="fas fa-file-pdf"></i> {{ activeDoc.digital || activeDoc.anom }}
+                  </div>
+                </div>
+                <div class="ei-actions" *ngIf="activeDoc.digital || activeDoc.anom || activeDoc.archivo">
+                  <a [href]="pdfUrlResolver ? pdfUrlResolver(activeDoc) : '#'" target="_blank" class="ei-download-btn" title="Descargar PDF">
+                    <i class="fas fa-cloud-download-alt"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </ng-container>
         </div>
 
-        <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+        <!-- ═══ Tab: Metadata (Sin Cédula ni Nombres) ═══ -->
+        <div class="tpv-tab-content tpv-metadata-tab" *ngIf="activeTab === 'metadata'" style="display: flex; flex-direction: column; flex-grow: 1;">
+          <!-- Inputs interactivos para asignar Resolución y Fecha -->
+          <div class="tpv-field" *ngIf="useCanvas">
+            <label>Asignar N° Resolución</label>
+            <input type="text" class="form-control" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);"
+                   [value]="activeDoc.numc || activeDoc.ncontrol || ''"
+                   (input)="activeDoc.numc = $any($event.target).value; activeDoc.ncontrol = $any($event.target).value; updateCanvasData()"
+                   placeholder="Ej: 000643">
+          </div>
 
-        <!-- Inputs interactivos para asignar Resolución y Fecha -->
-        <div class="tpv-field" *ngIf="useCanvas">
-          <label>Asignar N° Resolución</label>
-          <input type="text" class="form-control" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);"
-                 [value]="activeDoc.numc || activeDoc.ncontrol || ''"
-                 (input)="activeDoc.numc = $any($event.target).value; activeDoc.ncontrol = $any($event.target).value; updateCanvasData()"
-                 placeholder="Ej: 000643">
+          <div class="tpv-field" *ngIf="useCanvas">
+            <label>Asignar Fecha de Resolución</label>
+            <input type="date" class="form-control" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);"
+                   [value]="activeDoc.fecha_resolucion || ''"
+                   (change)="activeDoc.fecha_resolucion = $any($event.target).value; updateCanvasData()">
+          </div>
+
+          <div class="tpv-field" *ngIf="activeDoc.ncontrol || activeDoc.numc || activeDoc.numero_carpeta">
+            <label>Número de Control / Carpeta</label>
+            <div class="tpv-field-value">{{ activeDoc.numero_carpeta || activeDoc.ncontrol || activeDoc.numc }}</div>
+          </div>
+
+          <div class="tpv-field" *ngIf="activeDoc.asunto">
+            <label>Asunto</label>
+            <div class="tpv-field-value tpv-field-break">{{ activeDoc.asunto }}</div>
+          </div>
+
+          <!-- JWT Audit -->
+          <div class="tpv-meta-header tpv-meta-header-sm" style="margin-top: 15px;">
+            <h5 class="tpv-meta-title-sm">Auditoría de Firma (JWT)</h5>
+          </div>
+
+          <div class="tpv-field">
+            <label>Usuario Firmante</label>
+            <div class="tpv-field-value tpv-field-highlight">{{ jwtData.userName | uppercase }}</div>
+          </div>
+
+          <div class="tpv-field">
+            <label>Rol / Privilegios</label>
+            <div class="tpv-field-value tpv-field-highlight">{{ jwtData.userRole | uppercase }}</div>
+          </div>
         </div>
 
-        <div class="tpv-field" *ngIf="useCanvas">
-          <label>Asignar Fecha de Resolución</label>
-          <input type="date" class="form-control" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);"
-                 [value]="activeDoc.fecha_resolucion || ''"
-                 (change)="activeDoc.fecha_resolucion = $any($event.target).value; updateCanvasData()">
-        </div>
-
-        <div class="tpv-field" *ngIf="activeDoc.ncontrol || activeDoc.numc">
-          <label>Número de Control</label>
-          <div class="tpv-field-value">{{ activeDoc.ncontrol || activeDoc.numc }}</div>
-        </div>
-
-        <div class="tpv-field" *ngIf="activeDoc.digital || activeDoc.anom">
-          <label>Nombre Archivo</label>
-          <div class="tpv-field-value tpv-field-break">{{ activeDoc.digital || activeDoc.anom }}</div>
-        </div>
-
-        <!-- JWT Audit -->
-        <div class="tpv-meta-header tpv-meta-header-sm">
-          <h5 class="tpv-meta-title-sm">Auditoría de Firma (JWT)</h5>
-        </div>
-
-        <div class="tpv-field">
-          <label>Usuario Firmante</label>
-          <div class="tpv-field-value tpv-field-highlight">{{ jwtData.userName | uppercase }}</div>
-        </div>
-
-        <div class="tpv-field">
-          <label>Rol / Privilegios</label>
-          <div class="tpv-field-value tpv-field-highlight">{{ jwtData.userRole | uppercase }}</div>
-        </div>
-
-        <!-- Observaciones -->
-        <div class="tpv-field tpv-field-grow">
+        <!-- Observaciones y Acciones (Siempre Visibles abajo) -->
+        <div class="tpv-field tpv-field-grow" style="margin-top: 15px; flex-grow: 1; display: flex; flex-direction: column;">
           <label class="tpv-label-warn">Observaciones de Revisión</label>
           <textarea class="tpv-textarea"
+                    style="flex-grow: 1; min-height: 80px;"
                     rows="3"
                     [(ngModel)]="observations"
                     placeholder="Escriba observaciones de aprobación o motivo de rechazo..."

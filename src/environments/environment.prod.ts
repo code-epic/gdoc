@@ -70,5 +70,6 @@ export const environment = {
     CONSULTAR_CODIGOS_ROJOS: "MPPD_CCodigosRojos",
     ACTUALIZAR_CLAVE_USUARIO: "_SYS_UUserPanel",
     ACTUALIZAR_TOTP: "_SYS_UUserTOTP",
+    CONSULTAR_ACTOS_ADMINISTRATIVOS: "MPPD_CActosAdministrativos",
   },
 };
