@@ -12,7 +12,7 @@
   <div class="tpv-nav">
     <div class="tpv-nav-left">
       <i class="fas fa-file-pdf tpv-nav-icon"></i>
-      <span class="tpv-nav-title">Visor PDF</span>
+      <span class="tpv-nav-title">{{ activeDoc?.asunto || 'Visor PDF' }}</span>
       <span class="tpv-nav-badge">{{ currentIndex + 1 }} / {{ total }}</span>
       
       <!-- Small inline arrows for mobile/general navigation next to the badge -->

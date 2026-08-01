@@ -23,10 +23,10 @@ export class PendientesComponent implements OnInit {
   mostrarBotonOcultar: boolean = false;
   fechaRango: FormGroup;
 
-  public bzBusqueda = [];
+  public bzBusqueda: any[] = [];
   public numeroPlaceholder: string = "NÚMERO";
-  public bzSeguimientoO = [];
-  public bzSeguimiento = [];
+  public bzSeguimientoO: any[] = [];
+  public bzSeguimiento: any[] = [];
 
   // public fplazo: any;
   public cargador: boolean = true;

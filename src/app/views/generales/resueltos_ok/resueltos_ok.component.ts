@@ -58,6 +58,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public actionExecuting = false;
   public executingType: "approve" | "reject" | "" = "";
 
+  public fundamentoGlobal: string = "";
+
   // Mappings and config
   public Componentes: any[] = [];
   public componentMap: { [key: number]: string } = {};
@@ -1036,11 +1038,11 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.xAPI.funcion = environment.funcion.CONSULTAR_ACTOS_ADMINISTRATIVOS;
     this.xAPI.parametros = `${cleanTipo}`;
 
-    console.log(this.xAPI);
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        // Ubicación Rechazo
-        console.log(data);
+        if (data && data.length > 0) {
+          this.fundamentoGlobal = data[0].fundamento || "";
+        }
       },
       (err) => {
         console.error(err);
