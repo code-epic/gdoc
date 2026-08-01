@@ -29,9 +29,8 @@
       <button class="tpv-btn-print" *ngIf="useCanvas" (click)="printCanvas()" title="Generar PDF" style="margin-right: 15px; background: #2dce89; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
         <i class="fas fa-file-pdf"></i> Generar PDF
       </button>
-      <span class="tpv-nav-user" *ngIf="activeDoc">
-        {{ activeDoc.nombres_apellidos | uppercase }}
-        <span class="tpv-nav-cedula">(V-{{ activeDoc.cedula }})</span>
+      <span class="tpv-nav-user" *ngIf="activeDoc" style="font-weight: 600; font-size: 1rem;">
+        Carpeta N°: <span class="tpv-nav-cedula" style="font-weight: bold; color: white;">{{ activeDoc.numero_carpeta || activeDoc.ncontrol || activeDoc.numc }}</span>
       </span>
       <button class="tpv-btn-close" (click)="onClose()" title="Cerrar (Esc)">
         <i class="fas fa-times"></i>
@@ -241,17 +240,17 @@
             <label>Rol / Privilegios</label>
             <div class="tpv-field-value tpv-field-highlight">{{ jwtData.userRole | uppercase }}</div>
           </div>
-        </div>
 
-        <!-- Observaciones y Acciones (Siempre Visibles abajo) -->
-        <div class="tpv-field tpv-field-grow" style="margin-top: 15px; flex-grow: 1; display: flex; flex-direction: column;">
-          <label class="tpv-label-warn">Observaciones de Revisión</label>
-          <textarea class="tpv-textarea"
-                    style="flex-grow: 1; min-height: 80px;"
-                    rows="3"
-                    [(ngModel)]="observations"
-                    placeholder="Escriba observaciones de aprobación o motivo de rechazo..."
-                    [disabled]="actionExecuting"></textarea>
+          <!-- Observaciones y Acciones (Ahora dentro de Atributos) -->
+          <div class="tpv-field tpv-field-grow" style="margin-top: 15px; flex-grow: 1; display: flex; flex-direction: column;">
+            <label class="tpv-label-warn">Observaciones de Revisión</label>
+            <textarea class="tpv-textarea"
+                      style="flex-grow: 1; min-height: 80px;"
+                      rows="3"
+                      [(ngModel)]="observations"
+                      placeholder="Escriba observaciones de aprobación o motivo de rechazo..."
+                      [disabled]="actionExecuting"></textarea>
+          </div>
         </div>
       </div>
     </div>
@@ -276,14 +275,7 @@
       <span>{{ rejectLabel }}</span>
     </button>
 
-    <!-- Explorar button in the middle -->
-    <button class="tpv-btn tpv-btn-explore"
-            [disabled]="loadingPdf || !rawPdfUrl"
-            (click)="openPdfInNewTab()"
-            title="Abrir PDF en nueva pestaña para explorar en detalle">
-      <i class="fas fa-search-plus"></i>
-      <span>Explorar</span>
-    </button>
+    
 
     <button class="tpv-btn tpv-btn-approve"
             [disabled]="actionExecuting"
