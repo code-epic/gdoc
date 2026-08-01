@@ -353,9 +353,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         initials: "LARM/RMEA/B.O.merb",
         mainSignatory: "GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ",
         signatoryTitle: "General en Jefe",
-        signatoryRole: "Ministro del Poder Popular<br>para la Defensa",
-        wetStampImageUrl: "assets/img/mppd/sello_mppd.png",
-        signatureImageUrl: "assets/img/mppd/firma_mppd.png",
+        signatoryRole: `MINISTRO DEL PODER POPULAR<br>PARA LA DEFENSA`,
+        wetStampImageUrl: "./assets/img/mppd/sello_mppd.png",
+        signatureImageUrl: "./assets/img/mppd/firma_mppd.png",
       },
     };
   }

@@ -43,8 +43,8 @@ export class ResueltoCanvasComponent
       mainSignatory: "VLADÍMIR PADRINO LÓPEZ",
       signatoryTitle: "General en Jefe",
       signatoryRole: "Ministro del Poder Popular para la Defensa",
-      wetStampImageUrl: "assets/stamps/min-defensa-stamp.png",
-      signatureImageUrl: "assets/signatures/vp-firma.png",
+      wetStampImageUrl: "./assets/stamps/min-defensa-stamp.png",
+      signatureImageUrl: "./assets/signatures/vp-firma.png",
     },
   };
 
