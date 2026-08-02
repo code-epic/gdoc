@@ -58,6 +58,7 @@ export class ResueltoCanvasComponent
   @Output() zoneSelected = new EventEmitter<string>();
   @Output() basamentoLegalChange = new EventEmitter<string>();
   @Output() dateChange = new EventEmitter<string>();
+  @Output() unicoParrafoChange = new EventEmitter<string>();
   @Output() resolutionChange = new EventEmitter<string>();
   @Output() initialsChange = new EventEmitter<string>();
   @Output() casesBlur = new EventEmitter<void>();
@@ -124,6 +125,11 @@ export class ResueltoCanvasComponent
   onBasamentoLegalEdit(event: Event) {
     const target = event.target as HTMLElement;
     this.basamentoLegalChange.emit(target.innerText || "");
+  }
+
+  onUnicoParrafoEdit(event: Event) {
+    const target = event.target as HTMLElement;
+    this.unicoParrafoChange.emit(target.innerHTML || "");
   }
 
   onDateEdit(event: Event) {

@@ -47,6 +47,17 @@
       
       <!-- 1 línea debajo del basamento legal: RESUELVE -->
       <p class="m-resolucion-resuelve">{{ documentData.body.action }}</p>
+
+      <!-- Único Párrafo (Asunto / Nombramientos) -->
+      <p class="m-resolucion-unico" 
+         contenteditable="true" 
+         spellcheck="false"
+         style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s; margin-top: 13pt;"
+         (focus)="onFocusEditable($event)" 
+         (blur)="onBlurEditable($event)" 
+         (input)="onUnicoParrafoEdit($event)"
+         [innerHTML]="documentData.body.unicoParrafo">
+      </p>
     </ng-container>
     
     <div class="cases-list" 

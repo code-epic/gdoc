@@ -83,7 +83,8 @@
     font-weight: bold !important;
     text-transform: uppercase !important;
     text-align: center !important;
-    line-height: 1.15 !important;
+    line-height: 1.75 !important; /* Word 1.75 */
+    margin: 0 !important;
   }
 
   .m-resolucion-lugar-fecha {
@@ -117,7 +118,15 @@
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
     text-align: justify !important;
-    line-height: 1.65 !important; /* CSS 1.35 equivale a Word 1.15 */
+    line-height: 1.75 !important; /* Word 1.75 */
+    margin-top: 13pt !important;
+  }
+
+  .m-resolucion-unico {
+    font-family: 'Tahoma', sans-serif !important;
+    font-size: 13pt !important;
+    text-align: justify !important;
+    line-height: 1.35 !important; /* Word 1.15 */
     margin-top: 13pt !important;
   }
 
@@ -201,7 +210,7 @@
 
   .cases-list {
     ::ng-deep p {
-      line-height: 1.65 !important; /* Fuerza Word Sencillo sobre lista inyectada */
+      line-height: 1.35 !important; /* Fuerza Word 1.15 sobre lista inyectada */
     }
   }
 }

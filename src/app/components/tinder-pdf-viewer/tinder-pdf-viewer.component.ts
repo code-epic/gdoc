@@ -233,7 +233,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     const pages = [];
 
     // --- HOJA ÚNICA CONTINUA ---
-    let headerHtml = this.generateHeaderHtml(true);
+    let headerHtml =
+      this.activeDoc._headerHtml || this.generateHeaderHtml(true);
     let formattedCases = cases.map((persona: any) => {
       const cedulaFormateada = String(persona.cedula || "").replace(
         /\B(?=(\d{3})+(?!\d))/g,
@@ -244,7 +245,26 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     let casesHtml = this.activeDoc["_pageCasesHtml_0"];
     if (!casesHtml) {
-      casesHtml = headerHtml + formattedCases.join("\n");
+      casesHtml = formattedCases.join("\n");
+    } else {
+      // Si el html guardado contiene el encabezado anterior de forma redundante,
+      // lo limpiamos para evitar duplicación, ya que ahora unico_parrafo se renderiza por separado.
+      if (
+        casesHtml.includes("ÚNICO:") ||
+        casesHtml.includes("unico") ||
+        casesHtml.includes("Unico") ||
+        casesHtml.includes("nombramiento")
+      ) {
+        const matchIdx = casesHtml.indexOf("&mdash;");
+        if (matchIdx !== -1) {
+          casesHtml = casesHtml.substring(matchIdx);
+        } else {
+          const matchIdx2 = casesHtml.indexOf("—");
+          if (matchIdx2 !== -1) {
+            casesHtml = casesHtml.substring(matchIdx2);
+          }
+        }
+      }
     }
 
     pages.push({
@@ -315,6 +335,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       bodyData: this.activeDoc, // Referencia para mutar estado directamente desde canvas
       body: {
         basamentoLegal: basamentoLegalText,
+        unicoParrafo: headerHtml,
         action: "RESUELVE",
       },
       pages: pages,
@@ -858,11 +879,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       const xAPI = {} as IAPICore;
       xAPI.funcion = environment.funcion.OBTENER_RESUELTO;
       xAPI.parametros = `${cleanNumeroCarpeta}`;
-
       this.apiService.Ejecutar(xAPI).subscribe(
         (data: any) => {
           resolve(data && data.length > 0 ? data[0] : null);
-          console.log(data);
         },
         (err: any) => {
           console.error("Error al obtener resuelto desde PostgreSQL:", err);
@@ -894,32 +913,33 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       const pgTemplate = await this.ObtenerResuelto(numero_carpeta, resolucion);
       if (pgTemplate) {
         console.log(
-          "[TinderPdfViewer] Datos base recuperados de PG para carpeta:",
-          numero_carpeta,
+          "[TinderPdfViewer] pgTemplate de PostgreSQL recuperado:",
           pgTemplate,
         );
-        if (pgTemplate.fundamento) {
-          doc.basamentoLegal = pgTemplate.fundamento;
+
+        // Cargar basamento legal, unico parrafo y lista de casos desde pgTemplate.task si existe
+        if (pgTemplate.task) {
+          if (pgTemplate.task.basamento_legal) {
+            doc.basamentoLegal = pgTemplate.task.basamento_legal;
+          }
+          if (pgTemplate.task.unico_parrafo) {
+            doc._headerHtml = pgTemplate.task.unico_parrafo;
+          }
+          if (pgTemplate.task.lista_casos) {
+            doc["_pageCasesHtml_0"] = pgTemplate.task.lista_casos;
+          }
         }
-        
-        // Asociar número de resolución si ya existe en PG
-        const resNum =
-          pgTemplate.numero_resolucion ||
-          pgTemplate.numero ||
-          pgTemplate.resolucion ||
-          pgTemplate.num_resolucion ||
-          pgTemplate.numres;
+
+        // Asociar número de resolución de PG si existe
+        const resNum = pgTemplate.task.numero_resolucion;
         if (resNum) {
           doc.numc = resNum;
           doc.ncontrol = resNum;
+          doc.numero_resolucion = resNum;
         }
 
-        // Asociar fecha de resolución si ya existe en PG
-        const resFecha =
-          pgTemplate.fecha_resolucion ||
-          pgTemplate.fecha ||
-          pgTemplate.fecha_res ||
-          pgTemplate.fecres;
+        // Asociar fecha de resolución de PG si existe
+        const resFecha = pgTemplate.task.fecha_resolucion;
         if (resFecha) {
           doc.fecha_resolucion = resFecha;
         }
@@ -932,13 +952,13 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         numero_resolucion: `${resolucion}`,
         driver: environment.driver.PRINCIPAL,
         donde:
-          '{"usuario":"' +
+          '{\"usuario\":\"' +
           idUser +
-          '", "numero_carpeta":"' +
+          '\", \"numero_carpeta\":\"' +
           numero_carpeta +
-          '"}',
+          '\"}',
+        upsert: true,
       };
-      console.log(cl);
 
       this.apiService.ExecColeccion(cl).subscribe(
         (res: any) => {
@@ -972,6 +992,17 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
                 doc.fecha_resolucion = saved.task.fecha_resolucion;
               }
 
+              // Cargar número de carpeta
+              if (saved.task.numero_carpeta) {
+                doc.numero_carpeta = saved.task.numero_carpeta;
+              }
+
+              // Cargar número de resolución
+              if (saved.task.numero_resolucion) {
+                doc.numc = saved.task.numero_resolucion;
+                doc.ncontrol = saved.task.numero_resolucion;
+              }
+
               // Cargar documentos originales si existen
               if (
                 saved.task.documentos_originales &&
@@ -979,6 +1010,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
               ) {
                 doc.documentos = saved.task.documentos_originales;
               }
+              // los cambios no se ven reflejados en el documento
+              console.log("estamos trabajando", doc);
             }
           }
           resolve();
@@ -1017,6 +1050,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     await this.loadSavedState();
 
     this.updateCanvasData();
+    this.cdr.detectChanges();
 
     if (!doc) {
       this.loadingPdf = false;
