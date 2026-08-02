@@ -31,10 +31,10 @@
         <span style="color: white; font-size: 0.85rem; font-weight: bold; width: 35px; text-align: center;">{{ lineSpacing }}</span>
         <button (click)="increaseLineSpacing()" title="Aumentar Interlineado" style="background: transparent; border: none; color: white; cursor: pointer; padding: 4px 8px;"><i class="fas fa-plus"></i></button>
       </div>
-      <button class="tpv-btn-print" *ngIf="useCanvas" (click)="saveDocumentState()" title="Guardar Progreso" style="margin-right: 10px; background: #5e72e4; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+      <button class="tpv-btn-print" *ngIf="useCanvas && profile === 'Edicion'" (click)="saveDocumentState()" title="Guardar Progreso" style="margin-right: 10px; background: #5e72e4; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
         <i class="fas fa-save"></i> Guardar
       </button>
-      <button class="tpv-btn-print" *ngIf="useCanvas" (click)="printCanvas()" title="Generar PDF" style="margin-right: 15px; background: #2dce89; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+      <button class="tpv-btn-print" *ngIf="useCanvas && profile === 'Revision'" (click)="printCanvas()" title="Generar PDF" style="margin-right: 15px; background: #2dce89; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
         <i class="fas fa-file-pdf"></i> Generar PDF
       </button>
       <span class="tpv-nav-user" *ngIf="activeDoc" style="font-weight: 600; font-size: 1rem;">
@@ -78,6 +78,7 @@
           *ngIf="useCanvas" 
           [documentData]="canvasData" 
           [lineSpacing]="lineSpacing"
+          [profile]="profile"
           (basamentoLegalChange)="updateActiveDoc('basamentoLegal', $event)"
           (dateChange)="updateActiveDoc('fecha_resolucion', $event)"
           (unicoParrafoChange)="updateActiveDoc('_headerHtml', $event)"
@@ -275,8 +276,9 @@
   </div>
 
   <div class="tpv-footer" style="gap: 0.75rem; flex-wrap: wrap; height: auto; min-height: 65px; padding: 10px 1.25rem;">
-    <!-- Botón Rechazar (Existente) -->
+    <!-- Botón Rechazar (Solo para Revisión y Aprobador) -->
     <button class="tpv-btn tpv-btn-reject"
+            *ngIf="profile === 'Revision' || profile === 'Aprobador'"
             [disabled]="actionExecuting"
             (click)="onReject()">
       <i [class]="rejectIcon" *ngIf="!actionExecuting || executingType !== 'reject'"></i>
@@ -284,9 +286,9 @@
       <span>{{ rejectLabel }}</span>
     </button>
 
-    <!-- 1. Enviar a Revisión (Solo si está guardado en Mongo) -->
+    <!-- 1. Enviar a Revisión (Solo para Edición y si está guardado en Mongo) -->
     <button class="tpv-btn"
-            *ngIf="hasSavedState"
+            *ngIf="profile === 'Edicion' && hasSavedState"
             style="background: #11cdef; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToReview()"
@@ -296,8 +298,9 @@
       <span>Enviar a Revisión</span>
     </button>
 
-    <!-- 2. Enviar a Secretaría -->
+    <!-- 2. Enviar a Secretaría (Solo para Revisión) -->
     <button class="tpv-btn"
+            *ngIf="profile === 'Revision'"
             style="background: #fb6340; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToSecretariat()"
@@ -307,8 +310,9 @@
       <span>Enviar a Secretaría</span>
     </button>
 
-    <!-- 3. Enviar a Dirección -->
+    <!-- 3. Enviar a Dirección (Solo para Revisión) -->
     <button class="tpv-btn"
+            *ngIf="profile === 'Revision'"
             style="background: #8965e0; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToDirection()"
@@ -318,8 +322,9 @@
       <span>Enviar a Dirección</span>
     </button>
 
-    <!-- 4. Enviar al Ministro -->
+    <!-- 4. Enviar al Ministro (Solo para Revisión) -->
     <button class="tpv-btn"
+            *ngIf="profile === 'Revision'"
             style="background: #f5365c; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToMinister()"
@@ -329,8 +334,9 @@
       <span>Enviar al Ministro</span>
     </button>
 
-    <!-- 5. Aprobado y firmado (Existente) -->
+    <!-- 5. Aprobado y firmado (Solo para Aprobador) -->
     <button class="tpv-btn tpv-btn-approve"
+            *ngIf="profile === 'Aprobador'"
             [disabled]="actionExecuting"
             (click)="onApprove()">
       <i [class]="approveIcon" *ngIf="!actionExecuting || executingType !== 'approve'"></i>

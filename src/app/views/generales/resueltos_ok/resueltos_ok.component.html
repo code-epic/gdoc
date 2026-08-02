@@ -10,7 +10,22 @@
       <h1>Buzón de Resueltos Procesados</h1>
       <p>Seleccione una carpeta militar para gestionar y firmar digitalmente los resueltos aprobados.</p>
     </div>
-    <div style="display: flex; gap: 10px;">
+    <div style="display: flex; gap: 15px; align-items: center;">
+      <!-- Selector de Perfil Dinámico (Bajo Demanda) -->
+      <div class="profile-selector-container" style="display: flex; align-items: center; gap: 8px;">
+        <label style="margin: 0; font-weight: bold; font-size: 0.85rem; color: #a8b2c1;">
+          <i class="fas fa-user-shield"></i> Perfil:
+        </label>
+        <select class="form-control" 
+                style="background: #1c2541; color: #a8b2c1; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 4px 8px; font-size: 0.85rem; width: auto;"
+                [(ngModel)]="currentProfile"
+                (change)="onProfileChange()">
+          <option value="Edicion">Edición (Redactor)</option>
+          <option value="Revision">Revisión (Secretaría/Dirección)</option>
+          <option value="Aprobador">Aprobador y Firmante</option>
+        </select>
+      </div>
+
       <button class="btn-close-view" (click)="exitComponent()" title="Salir del Buzón de Resueltos">
         <i class="fas fa-times-circle"></i><span class="btn-text-close"> Cerrar Vista</span>
       </button>
@@ -125,17 +140,33 @@
             <h3>Tipo: {{ selectedFolder.tipo }}</h3>
           </div>
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <div class="custom-control custom-checkbox mr-2">
+            <!-- Checkbox de Selección Masiva (Oculto en Edicion) -->
+            <div class="custom-control custom-checkbox mr-2" *ngIf="currentProfile !== 'Edicion'">
               <input type="checkbox" class="custom-control-input" id="checkAll" [checked]="isAllSelected()" (change)="toggleSelectAll($event)">
               <label class="custom-control-label" for="checkAll" style="font-size: 0.8rem; font-weight: 600; cursor: pointer; padding-top: 2px;">Todos</label>
             </div>
+            
             <span class="badge">{{ documents.length }} Carpetas</span>
-            <button class="btn btn-sm btn-success" (click)="approveSelectedFast()" [disabled]="getSelectedCount() === 0">
-              <i class="fas fa-check-double"></i> Firmar Seleccionados ({{ getSelectedCount() }})
-            </button>
-            <button class="btn btn-sm btn-danger" (click)="cancelSelectedFast()" [disabled]="getSelectedCount() === 0">
-              <i class="fas fa-ban"></i> Anular Seleccionados ({{ getSelectedCount() }})
-            </button>
+
+            <!-- Botones para Aprobador -->
+            <ng-container *ngIf="currentProfile === 'Aprobador'">
+              <button class="btn btn-sm btn-success" (click)="approveSelectedFast()" [disabled]="getSelectedCount() === 0">
+                <i class="fas fa-check-double"></i> Firmar Seleccionados ({{ getSelectedCount() }})
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="cancelSelectedFast()" [disabled]="getSelectedCount() === 0">
+                <i class="fas fa-ban"></i> Anular Seleccionados ({{ getSelectedCount() }})
+              </button>
+            </ng-container>
+
+            <!-- Botones para Revisión -->
+            <ng-container *ngIf="currentProfile === 'Revision'">
+              <button class="btn btn-sm btn-success" (click)="approveSelectedFast()" [disabled]="getSelectedCount() === 0">
+                <i class="fas fa-check"></i> Aprobar Seleccionados ({{ getSelectedCount() }})
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="cancelSelectedFast()" [disabled]="getSelectedCount() === 0">
+                <i class="fas fa-times-circle"></i> Rechazar Seleccionados ({{ getSelectedCount() }})
+              </button>
+            </ng-container>
           </div>
         </div>
 
@@ -159,11 +190,11 @@
                *ngFor="let doc of documents; let idx = index"
                [style.background-color]="doc.selected ? 'rgba(45, 206, 137, 0.05)' : ''"
                [style.border-left]="doc.selected ? '4px solid #2dce89' : '4px solid transparent'"
-               (click)="doc.selected = !doc.selected"
+               (click)="currentProfile !== 'Edicion' ? (doc.selected = !doc.selected) : null"
                (contextmenu)="onDocumentRightClick($event, doc, idx)"
                style="cursor: pointer; transition: all 0.2s; padding: 12px 15px; margin-bottom: 10px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center;">
             
-            <div class="checkbox-col" style="padding-right: 15px; display: flex; align-items: center;">
+            <div class="checkbox-col" *ngIf="currentProfile !== 'Edicion'" style="padding-right: 15px; display: flex; align-items: center;">
               <div style="width: 24px; height: 24px; border-radius: 6px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
                    [style.background-color]="doc.selected ? '#2dce89' : 'transparent'"
                    [style.border-color]="doc.selected ? '#2dce89' : '#ccc'">
@@ -182,19 +213,40 @@
             </div>
             
             <div class="actions" style="display: flex; gap: 8px;">
-              <button class="btn btn-sm" (click)="startImmersiveMode(doc); $event.stopPropagation()" title="Abrir y Revisar"
+              <!-- Botón Editar (Lápiz): Solo visible para Edición -->
+              <button class="btn btn-sm" 
+                      *ngIf="currentProfile === 'Edicion'"
+                      (click)="startImmersiveMode(doc, 'Edicion'); $event.stopPropagation()" 
+                      title="Editar y Redactar"
                       style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e0f2f1; color: #00897b; border: none; transition: transform 0.2s;"
+                      onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                <i class="fas fa-pencil-alt" style="font-size: 1rem;"></i>
+              </button>
+
+              <!-- Botón Visualizar (Ojo): Visible en todos los modos, pero abre como Revisión si el perfil principal es Revisión, o abre como Aprobador si el perfil principal es Aprobador -->
+              <button class="btn btn-sm" 
+                      (click)="startImmersiveMode(doc, currentProfile === 'Edicion' ? 'Revision' : currentProfile); $event.stopPropagation()" 
+                      title="Visualizar Documento"
+                      style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e3f2fd; color: #1e88e5; border: none; transition: transform 0.2s;"
                       onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                 <i class="fas fa-eye" style="font-size: 1rem;"></i>
               </button>
               
-              <button class="btn btn-sm" (click)="approveFast(doc); $event.stopPropagation()" title="Firmar Rápido Carpeta"
+              <!-- Botón Firmar Rápido: Solo visible para Aprobador -->
+              <button class="btn btn-sm" 
+                      *ngIf="currentProfile === 'Aprobador'"
+                      (click)="approveFast(doc); $event.stopPropagation()" 
+                      title="Firmar Rápido Carpeta"
                       style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e8f5e9; color: #43a047; border: none; transition: transform 0.2s;"
                       onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                 <i class="fas fa-signature" style="font-size: 1rem;"></i>
               </button>
               
-              <button class="btn btn-sm" (click)="cancelFast(doc); $event.stopPropagation()" title="Anular Carpeta"
+              <!-- Botón Anular: Solo visible para Aprobador -->
+              <button class="btn btn-sm" 
+                      *ngIf="currentProfile === 'Aprobador'"
+                      (click)="cancelFast(doc); $event.stopPropagation()" 
+                      title="Anular Carpeta"
                       style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #ffebee; color: #e53935; border: none; transition: transform 0.2s;"
                       onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                 <i class="fas fa-ban" style="font-size: 1rem;"></i>
@@ -247,6 +299,7 @@
   [useCanvas]="true"
   [startIndex]="currentDocIndex"
   [jwtData]="jwtData"
+  [profile]="viewerProfile"
   [loading]="loadingDocuments"
   [pdfUrlResolver]="resolvePdfUrl"
   [defaultBasamentoLegal]="fundamentoGlobal"

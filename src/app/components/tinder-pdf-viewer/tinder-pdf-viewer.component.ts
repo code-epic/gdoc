@@ -58,6 +58,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   @Input() jwtData: JwtUserData = { userId: "", userName: "", userRole: "" };
   @Input() loading = false;
   @Input() useCanvas = false;
+  @Input() profile: "Edicion" | "Revision" | "Aprobador" = "Edicion";
   @Input() approveLabel = "Aprobar y Firmar";
   @Input() rejectLabel = "Rechazar";
   @Input() approveIcon = "fas fa-signature";

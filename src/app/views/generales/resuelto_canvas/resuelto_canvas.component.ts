@@ -54,6 +54,7 @@ export class ResueltoCanvasComponent
   };
 
   @Input() lineSpacing: number = 1.15;
+  @Input() profile: "Edicion" | "Revision" | "Aprobador" = "Edicion";
 
   @Output() zoneSelected = new EventEmitter<string>();
   @Output() basamentoLegalChange = new EventEmitter<string>();

@@ -71,13 +71,16 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public contextMenuType: "folder" | "document" | "" = "";
   public contextMenuData: any = null;
   public contextMenuIndex = -1;
-
   // JWT Metadata
   public jwtData: { userId: string; userName: string; userRole: string } = {
     userId: "",
     userName: "",
     userRole: "",
   };
+
+  // Perfil dinámico de seguridad
+  public currentProfile: "Edicion" | "Revision" | "Aprobador" = "Edicion";
+  public viewerProfile: "Edicion" | "Revision" | "Aprobador" = "Edicion";
 
   // API core object
   public xAPI: IAPICore = {
@@ -174,9 +177,42 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
           userRole: this.loginService.Usuario.tipo || "",
         };
       }
+
+      // Mapear rol de usuario inicial al perfil dinámico
+      const roleStr = (this.jwtData.userRole || "").toUpperCase();
+      if (
+        roleStr.includes("REV") ||
+        roleStr.includes("SEC") ||
+        roleStr.includes("REVISION") ||
+        roleStr.includes("SECRETARIA")
+      ) {
+        this.currentProfile = "Revision";
+      } else if (
+        roleStr.includes("APROB") ||
+        roleStr.includes("DIR") ||
+        roleStr.includes("MIN") ||
+        roleStr.includes("ADMIN") ||
+        roleStr.includes("FIRMAN")
+      ) {
+        this.currentProfile = "Aprobador";
+      } else {
+        this.currentProfile = "Edicion";
+      }
+      console.log(
+        "[ResueltosOk] Perfil inicial asignado por rol JWT:",
+        this.currentProfile,
+        "Rol:",
+        this.jwtData.userRole,
+      );
     } catch (e) {
       console.error("Error al decodificar JWT:", e);
     }
+  }
+
+  public onProfileChange() {
+    this.selectedFolder = null;
+    this.documents = [];
+    this.loadFolders();
   }
 
   // --- LOGICA EXPLORADOR (CARPETAS Y DOCUMENTOS) ---
@@ -186,8 +222,24 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = environment.funcion.CONSULTAR_ENTRADAS_TIPO;
-    this.xAPI.parametros = "36"; // Resoluciones procesadas
+    let paramVal = "36";
+    if (this.currentProfile === "Aprobador") {
+      paramVal = "88";
+    } else if (this.currentProfile === "Revision") {
+      const roleStr = (this.jwtData.userRole || "").toUpperCase();
+      if (roleStr.includes("SEC") || roleStr.includes("SECRETARIA")) {
+        paramVal = "93";
+      } else if (roleStr.includes("DIR") || roleStr.includes("DIRECCION")) {
+        paramVal = "34";
+      } else {
+        paramVal = "99";
+      }
+    }
+
+    this.xAPI.parametros = paramVal;
     this.xAPI.valores = "";
+
+    console.log(this.xAPI);
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -367,17 +419,27 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   }
 
   // --- LOGICA VISTA INMERSIVA (TINDER-STYLE) ---
-  public startImmersiveMode(grupo: any) {
+  public startImmersiveMode(
+    grupo: any,
+    forcedProfile?: "Edicion" | "Revision" | "Aprobador",
+  ) {
     this.immersiveMode = true;
     this.currentDocIndex = this.documents.indexOf(grupo);
     if (this.currentDocIndex === -1) this.currentDocIndex = 0;
     this.activeDoc = grupo;
     this.documentObservations = "";
+
+    if (forcedProfile) {
+      this.viewerProfile = forcedProfile;
+    } else {
+      this.viewerProfile = this.currentProfile;
+    }
+
     this.changeDetector.detectChanges();
     setTimeout(() => {
       this.loadActivePdf();
     }, 0);
-    console.log(this.activeDoc);
+    console.log(this.activeDoc, "Viewer Profile:", this.viewerProfile);
   }
 
   public startImmersiveFromFolder() {

@@ -16,7 +16,7 @@
     
     <!-- 1 línea debajo: Lugar y fecha -->
     <div class="dynamic-row">
-      <p class="m-resolucion-lugar-fecha">Caracas,&nbsp;<span class="variable" contenteditable="true" spellcheck="false" style="outline: none; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="onDateEdit($event)" [innerText]="documentData.header.date"></span></p>
+      <p class="m-resolucion-lugar-fecha">Caracas,&nbsp;<span class="variable" [attr.contenteditable]="profile !== 'Revision' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="onDateEdit($event)" [innerText]="documentData.header.date"></span></p>
     </div>
     
     <!-- Debajo: Data -->
@@ -26,7 +26,7 @@
 
     <!-- 1 línea debajo: Resolución -->
     <div class="dynamic-row">
-      <p class="m-resolucion-denominacion">RESOLUCIÓN N° <span style="text-decoration: underline; outline: none; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;" contenteditable="true" spellcheck="false" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="onResolutionEdit($event)" [innerText]="documentData.header.resolutionNum"></span></p>
+      <p class="m-resolucion-denominacion">RESOLUCIÓN N° <span style="text-decoration: underline; outline: none; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;" [attr.contenteditable]="profile !== 'Revision' ? 'true' : 'false'" spellcheck="false" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="onResolutionEdit($event)" [innerText]="documentData.header.resolutionNum"></span></p>
     </div>
   </header>
 
@@ -35,7 +35,7 @@
     <ng-container>
       <!-- 1 línea debajo del título (13pt aprox) -->
       <p class="m-resolucion-basamento" 
-         contenteditable="true" 
+         [attr.contenteditable]="profile !== 'Revision' ? 'true' : 'false'" 
          spellcheck="false"
          style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
          (focus)="onFocusEditable($event)" 
@@ -50,7 +50,7 @@
 
       <!-- Único Párrafo (Asunto / Nombramientos) -->
       <p class="m-resolucion-unico" 
-         contenteditable="true" 
+         [attr.contenteditable]="profile !== 'Revision' ? 'true' : 'false'" 
          spellcheck="false"
          style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s; margin-top: 13pt;"
          (focus)="onFocusEditable($event)" 
@@ -61,7 +61,7 @@
     </ng-container>
     
     <div class="cases-list" 
-         contenteditable="true" 
+         [attr.contenteditable]="profile !== 'Revision' ? 'true' : 'false'" 
          spellcheck="false"
          [style.line-height]="lineSpacing"
          style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
@@ -111,7 +111,7 @@
     <div class="relative-page-footer" style="margin-top: 30pt; font-family: 'Tahoma', sans-serif; text-align: left;">
       <!-- Iniciales (Media firma): 1 línea antes que la paginación -->
       <div class="initials" style="font-size: 8pt; color: #000; margin-bottom: 13pt; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
-           contenteditable="true" spellcheck="false"
+           [attr.contenteditable]="profile !== 'Revision' ? 'true' : 'false'" spellcheck="false"
            (click)="$event.stopPropagation()"
            (focus)="onFocusEditable($event)"
            (blur)="onBlurEditable($event); onInitialsEdit($event)"
