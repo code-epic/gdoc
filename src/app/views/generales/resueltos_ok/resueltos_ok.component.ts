@@ -79,8 +79,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   };
 
   // Perfil dinámico de seguridad
-  public currentProfile: "Edicion" | "Revision" | "Aprobador" = "Edicion";
-  public viewerProfile: "Edicion" | "Revision" | "Aprobador" = "Edicion";
+  public currentProfile: "Edicion" | "Revision" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
+  public viewerProfile: "Edicion" | "Revision" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
 
   // API core object
   public xAPI: IAPICore = {
@@ -180,21 +180,14 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
       // Mapear rol de usuario inicial al perfil dinámico
       const roleStr = (this.jwtData.userRole || "").toUpperCase();
-      if (
-        roleStr.includes("REV") ||
-        roleStr.includes("SEC") ||
-        roleStr.includes("REVISION") ||
-        roleStr.includes("SECRETARIA")
-      ) {
-        this.currentProfile = "Revision";
-      } else if (
-        roleStr.includes("APROB") ||
-        roleStr.includes("DIR") ||
-        roleStr.includes("MIN") ||
-        roleStr.includes("ADMIN") ||
-        roleStr.includes("FIRMAN")
-      ) {
+      if (roleStr.includes("SEC") || roleStr.includes("SECRETARIA")) {
+        this.currentProfile = "Secretaria";
+      } else if (roleStr.includes("DIR") || roleStr.includes("DIRECCION")) {
+        this.currentProfile = "Direccion";
+      } else if (roleStr.includes("APROB") || roleStr.includes("MIN") || roleStr.includes("FIRMAN")) {
         this.currentProfile = "Aprobador";
+      } else if (roleStr.includes("REV") || roleStr.includes("REVISION")) {
+        this.currentProfile = "Revision";
       } else {
         this.currentProfile = "Edicion";
       }
@@ -224,16 +217,13 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.xAPI.funcion = environment.funcion.CONSULTAR_ENTRADAS_TIPO;
     let paramVal = "36";
     if (this.currentProfile === "Aprobador") {
-      paramVal = "88";
+      paramVal = "880";
+    } else if (this.currentProfile === "Secretaria") {
+      paramVal = "930";
+    } else if (this.currentProfile === "Direccion") {
+      paramVal = "340";
     } else if (this.currentProfile === "Revision") {
-      const roleStr = (this.jwtData.userRole || "").toUpperCase();
-      if (roleStr.includes("SEC") || roleStr.includes("SECRETARIA")) {
-        paramVal = "93";
-      } else if (roleStr.includes("DIR") || roleStr.includes("DIRECCION")) {
-        paramVal = "34";
-      } else {
-        paramVal = "99";
-      }
+      paramVal = "990";
     }
 
     this.xAPI.parametros = paramVal;
@@ -371,9 +361,19 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = environment.funcion.ENTRADAS_PROCESO_TIPO;
-    // Se envía el código del tipo y estatus 36.
-    // NOTA: Ajustar parámetros según lo que requiera la API ahora.
-    this.xAPI.parametros = `${folder.codigo}`;
+    
+    let paramVal = "36";
+    if (this.currentProfile === "Aprobador") {
+      paramVal = "880";
+    } else if (this.currentProfile === "Secretaria") {
+      paramVal = "930";
+    } else if (this.currentProfile === "Direccion") {
+      paramVal = "340";
+    } else if (this.currentProfile === "Revision") {
+      paramVal = "990";
+    }
+
+    this.xAPI.parametros = `${folder.codigo},${paramVal}`;
     this.xAPI.valores = null;
 
     this.apiService.Ejecutar(this.xAPI).subscribe(

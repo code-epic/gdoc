@@ -58,7 +58,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   @Input() jwtData: JwtUserData = { userId: "", userName: "", userRole: "" };
   @Input() loading = false;
   @Input() useCanvas = false;
-  @Input() profile: "Edicion" | "Revision" | "Aprobador" = "Edicion";
+  @Input() profile: "Edicion" | "Revision" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
   @Input() approveLabel = "Aprobar y Firmar";
   @Input() rejectLabel = "Rechazar";
   @Input() approveIcon = "fas fa-signature";
@@ -114,6 +114,13 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   private touchY = 0;
   private timer: any = null;
   private blobs: string[] = [];
+  // API core object
+
+  public xAPI: IAPICore = {
+    funcion: "",
+    parametros: "",
+    valores: "",
+  };
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -450,11 +457,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       driver: environment.driver.PRINCIPAL,
       objeto: obj,
       donde:
-        '{"usuario":"' +
+        '{\"usuario\":\"' +
         idUser +
-        '", "numero_carpeta":"' +
+        '\", \"numero_carpeta\":\"' +
         numeroCarpeta +
-        '"}',
+        '\"}',
       upsert: true,
     };
 
@@ -608,10 +615,37 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     });
   }
 
-  onSendToReview(): void {
+  private async actualizarEstatusFirma(estatus: string): Promise<void> {
+    if (!this.activeDoc) return;
+    const targetDocs = this.activeDoc.documentos && this.activeDoc.documentos.length > 0
+      ? this.activeDoc.documentos
+      : [this.activeDoc];
+      
+    const numero_carpeta = this.activeDoc.numero_carpeta || "000000";
+
+    for (const doc of targetDocs) {
+      const cedulaVal = doc.cedula || doc.persona?.cedula || "";
+      if (!cedulaVal) continue;
+
+      const xAPI = {} as IAPICore;
+      xAPI.funcion = environment.funcion.ACTUALIZAR_ESTATUS_FIRMA;
+      xAPI.parametros = `${estatus},${cedulaVal},${numero_carpeta}`;
+      xAPI.valores = null;
+
+      try {
+        await this.apiService.Ejecutar(xAPI).toPromise();
+        console.log(`[TinderPdfViewer] Estatus de firma actualizado a ${estatus} para C.I. ${cedulaVal} en carpeta ${numero_carpeta}`);
+      } catch (err) {
+        console.error(`[TinderPdfViewer] Error actualizando estatus para C.I. ${cedulaVal}:`, err);
+      }
+    }
+  }
+
+  async onSendToReview(): Promise<void> {
     if (this.actionExecuting || !this.activeDoc) return;
     this.actionExecuting = true;
     this.executingType = "sendToReview";
+    await this.actualizarEstatusFirma("990");
     this.sendToReview.emit({
       doc: this.activeDoc,
       observations: this.observations.trim(),
@@ -619,10 +653,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     });
   }
 
-  onSendToSecretariat(): void {
+  async onSendToSecretariat(): Promise<void> {
     if (this.actionExecuting || !this.activeDoc) return;
     this.actionExecuting = true;
     this.executingType = "sendToSecretariat";
+    await this.actualizarEstatusFirma("930");
     this.sendToSecretariat.emit({
       doc: this.activeDoc,
       observations: this.observations.trim(),
@@ -630,10 +665,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     });
   }
 
-  onSendToDirection(): void {
+  async onSendToDirection(): Promise<void> {
     if (this.actionExecuting || !this.activeDoc) return;
     this.actionExecuting = true;
     this.executingType = "sendToDirection";
+    await this.actualizarEstatusFirma("340");
     this.sendToDirection.emit({
       doc: this.activeDoc,
       observations: this.observations.trim(),
@@ -641,10 +677,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     });
   }
 
-  onSendToMinister(): void {
+  async onSendToMinister(): Promise<void> {
     if (this.actionExecuting || !this.activeDoc) return;
     this.actionExecuting = true;
     this.executingType = "sendToMinister";
+    await this.actualizarEstatusFirma("880");
     this.sendToMinister.emit({
       doc: this.activeDoc,
       observations: this.observations.trim(),
@@ -913,6 +950,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       );
       const pgTemplate = await this.ObtenerResuelto(numero_carpeta, resolucion);
       if (pgTemplate) {
+        this.hasSavedState = true;
         console.log(
           "[TinderPdfViewer] pgTemplate de PostgreSQL recuperado:",
           pgTemplate,
@@ -946,12 +984,34 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         }
       }
 
+      // Objeto task (lst) con todos los elementos de la resolución
+      const lst = {
+        fecha_resolucion: this.activeDoc.fecha_resolucion,
+        numero_carpeta: numero_carpeta,
+        numero_resolucion: resolucion,
+        basamento_legal:
+          this.activeDoc.basamentoLegal || this.defaultBasamentoLegal,
+        unico_parrafo:
+          this.activeDoc._headerHtml || this.generateHeaderHtml(true),
+        lista_casos: this.activeDoc["_pageCasesHtml_0"] || "",
+        documentos_originales: this.activeDoc.documentos || [],
+      };
+
+      let obj = {
+        usuario: idUser,
+        numero_carpeta: numero_carpeta,
+        numero_resolucion: resolucion,
+        task: lst,
+        fecha: new Date(),
+      };
+
       // 2. Buscar si hay estado/borrador previo en MongoDB
       let cl = {
         coleccion: "estatus_resolucion",
         numero_carpeta: `${numero_carpeta}`,
         numero_resolucion: `${resolucion}`,
         driver: environment.driver.PRINCIPAL,
+        objeto: obj,
         donde:
           '{\"usuario\":\"' +
           idUser +

@@ -13,7 +13,6 @@ import {
 import { Subject } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 
-
 @Component({
   selector: "app-resuelto-canvas",
   templateUrl: "./resuelto_canvas.component.html",
@@ -44,17 +43,17 @@ export class ResueltoCanvasComponent
       ],
       signatures: {
         initials: "LARM/RMRA/b.l.s.",
-        mainSignatory: "VLADÍMIR PADRINO LÓPEZ",
+        mainSignatory: "GONZALES",
         signatoryTitle: "General en Jefe",
         signatoryRole: "Ministro del Poder Popular para la Defensa",
-        wetStampImageUrl: "./assets/stamps/min-defensa-stamp.png",
-        signatureImageUrl: "./assets/signatures/vp-firma.png",
+        wetStampImageUrl: "assets/img/mppd/sello_mppd.png",
+        signatureImageUrl: "assets/img/mppd/firma_mppd.png",
       },
     },
   };
 
   @Input() lineSpacing: number = 1.15;
-  @Input() profile: "Edicion" | "Revision" | "Aprobador" = "Edicion";
+  @Input() profile: "Edicion" | "Revision" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
 
   @Output() zoneSelected = new EventEmitter<string>();
   @Output() basamentoLegalChange = new EventEmitter<string>();
@@ -66,9 +65,7 @@ export class ResueltoCanvasComponent
 
   private casesInput$ = new Subject<void>();
 
-  constructor(
-    private el: ElementRef
-  ) {}
+  constructor(private el: ElementRef) {}
 
   ngOnInit(): void {
     this.casesInput$.pipe(debounceTime(600)).subscribe(() => {

@@ -278,7 +278,7 @@
   <div class="tpv-footer" style="gap: 0.75rem; flex-wrap: wrap; height: auto; min-height: 65px; padding: 10px 1.25rem;">
     <!-- Botón Rechazar (Solo para Revisión y Aprobador) -->
     <button class="tpv-btn tpv-btn-reject"
-            *ngIf="profile === 'Revision' || profile === 'Aprobador'"
+            *ngIf="profile !== 'Edicion'"
             [disabled]="actionExecuting"
             (click)="onReject()">
       <i [class]="rejectIcon" *ngIf="!actionExecuting || executingType !== 'reject'"></i>
@@ -298,7 +298,7 @@
       <span>Enviar a Revisión</span>
     </button>
 
-    <!-- 2. Enviar a Secretaría (Solo para Revisión) -->
+    <!-- 2. Enviar a Secretaría (Solo para Revisión de Resolución) -->
     <button class="tpv-btn"
             *ngIf="profile === 'Revision'"
             style="background: #fb6340; color: white;"
@@ -310,9 +310,9 @@
       <span>Enviar a Secretaría</span>
     </button>
 
-    <!-- 3. Enviar a Dirección (Solo para Revisión) -->
+    <!-- 3. Enviar a Dirección (Para Revisión y Secretaría) -->
     <button class="tpv-btn"
-            *ngIf="profile === 'Revision'"
+            *ngIf="profile === 'Revision' || profile === 'Secretaria'"
             style="background: #8965e0; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToDirection()"
@@ -322,9 +322,9 @@
       <span>Enviar a Dirección</span>
     </button>
 
-    <!-- 4. Enviar al Ministro (Solo para Revisión) -->
+    <!-- 4. Enviar al Ministro (Para Revisión, Secretaría y Dirección) -->
     <button class="tpv-btn"
-            *ngIf="profile === 'Revision'"
+            *ngIf="profile === 'Revision' || profile === 'Secretaria' || profile === 'Direccion'"
             style="background: #f5365c; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToMinister()"
