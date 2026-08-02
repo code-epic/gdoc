@@ -6,10 +6,10 @@
 </div>
 
 <div class="a4-canvas-container" #container [style.transform]="'scale(' + zoomScale + ')'">
-  <div class="a4-canvas" *ngFor="let page of documentData.pages; let i = index; let isLast = last" style="margin-bottom: 20px;">
+  <div class="a4-canvas" *ngIf="documentData && documentData.pages && documentData.pages[0] as page" style="margin-bottom: 20px; min-height: 355.6mm; height: auto;">
   
   <!-- CABECERA -->
-  <header class="doc-header editable-zone" (click)="editMode('header')" *ngIf="i === 0">
+  <header class="doc-header editable-zone" (click)="editMode('header')">
     <p class="m-resolucion-membrete">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
     <p class="m-resolucion-membrete">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
     <p class="m-resolucion-membrete">DESPACHO DEL MINISTRO</p>
@@ -30,25 +30,17 @@
     </div>
   </header>
 
-  <!-- CABECERA DE CONTINUACIÓN (Páginas siguientes) -->
-  <header class="doc-header" *ngIf="i > 0">
-    <div class="dynamic-row" style="text-align: center; margin-top: 13pt; margin-bottom: 13pt;">
-      <p class="m-resolucion-denominacion">
-        CONTINUACIÓN DE LA RESOLUCIÓN N° <span style="text-decoration: underline;">{{ documentData.header.resolutionNum }}</span> DE FECHA <span style="text-decoration: underline;">{{ documentData.header.date }}</span>
-      </p>
-    </div>
-  </header>
-
-  <!-- CUERPO -->
+  <!-- CUERPO DEL DOCUMENTO -->
   <main class="doc-body editable-zone" (click)="editMode('body')">
-    <ng-container *ngIf="i === 0">
-      <p class="m-resolucion-basamento"
-         contenteditable="true"
+    <ng-container>
+      <!-- 1 línea debajo del título (13pt aprox) -->
+      <p class="m-resolucion-basamento" 
+         contenteditable="true" 
          spellcheck="false"
-         style="outline: none; transition: background-color 0.2s; padding: 5px; border-radius: 4px;"
+         style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
+         (focus)="onFocusEditable($event)" 
+         (blur)="onBlurEditable($event)" 
          (input)="onBasamentoLegalEdit($event)"
-         (focus)="onFocusEditable($event)"
-         (blur)="onBlurEditable($event)"
          (paste)="onPaste($event)"
          [innerText]="documentData.body.basamentoLegal || documentData.body.preamble">
       </p>
@@ -57,32 +49,21 @@
       <p class="m-resolucion-resuelve">{{ documentData.body.action }}</p>
     </ng-container>
     
-    <!-- EDICIÓN ESTRUCTURADA: Cabecera Única -->
-    <ng-container *ngIf="i === 0">
-      <div contenteditable="true" 
-           spellcheck="false" 
-           style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" 
-           (focus)="onFocusEditable($event)" 
-           (blur)="onBlurEditable($event)" 
-           (input)="onHeaderHtmlEdit($event)" 
-           [innerHTML]="page.headerHtml">
-      </div>
-    </ng-container>
-
-    <!-- Lista de Casos Editable Continua -->
     <div class="cases-list" 
          contenteditable="true" 
          spellcheck="false"
+         [style.line-height]="lineSpacing"
          style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
          (focus)="onFocusEditable($event)" 
          (blur)="onBlurEditable($event); onCasesListBlur()"
          (input)="onCasesListInput($event, page.pageIndex)"
+         (paste)="onPasteCases($event, page.pageIndex)"
          [innerHTML]="page.casesHtml">
     </div>
   </main>
 
   <!-- PIE DE PÁGINA Y FIRMAS -->
-  <footer class="doc-footer editable-zone" (click)="editMode('signatures')" *ngIf="isLast" style="margin-top: 52pt; /* 4 líneas debajo del cuerpo */">
+  <footer class="doc-footer editable-zone" (click)="editMode('signatures')" style="margin-top: 52pt; /* 4 líneas debajo del cuerpo */">
     
     <!-- 1cm desde el margen izquierdo -->
     <p class="m-resolucion-comuniquese">Comuníquese y publíquese.</p>
@@ -125,32 +106,8 @@
            (blur)="onBlurEditable($event); onInitialsEdit($event)"
            [textContent]="documentData.signatures.initials">
       </div>
-      
-      <!-- Número de página: Centrado -->
-      <div class="page-number" *ngIf="documentData.pages.length > 1" style="text-align: center; font-size: 9pt; font-weight: bold; color: #555;">
-        {{ i + 1 }} de {{ documentData.pages.length }}
-      </div>
     </div>
   </footer>
-
-  <!-- ============================================================== -->
-  <!-- PIE DE PÁGINA ABSOLUTO (Páginas intermedias)                   -->
-  <!-- ============================================================== -->
-  <div class="absolute-page-footer" *ngIf="!isLast" style="position: absolute; bottom: 10mm; left: 20mm; right: 20mm; z-index: 10; font-family: 'Tahoma', sans-serif; text-align: left;">
-    <!-- Iniciales (Media firma): 1 línea antes que la paginación -->
-    <div class="initials" style="font-size: 8pt; color: #000; margin-bottom: 13pt; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
-         contenteditable="true" spellcheck="false"
-         (click)="$event.stopPropagation()"
-         (focus)="onFocusEditable($event)"
-         (blur)="onBlurEditable($event); onInitialsEdit($event)"
-         [textContent]="documentData.signatures.initials">
-    </div>
-    
-    <!-- Número de página: Centrado -->
-    <div class="page-number" *ngIf="documentData.pages.length > 1" style="text-align: center; font-size: 9pt; font-weight: bold; color: #555;">
-      {{ i + 1 }} de {{ documentData.pages.length }}
-    </div>
-  </div>
 
   </div>
 </div>

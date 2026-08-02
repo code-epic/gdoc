@@ -11,6 +11,13 @@ export const environment = {
   coleciones: {
     CONTADORES: "wkf_mppd_2026",
   },
+  BD: "code-epic",
+  driver: {
+    PRINCIPAL: "MGDBA",
+    DATA_BASE: "code-epic",
+    API_CORE_ZIP: "apicore.zip",
+    SYS_FUNCION_ZIP: "sys-function.zip",
+  },
   funcion: {
     CONSULTAR_USUARIO_PERFIL: "_SYS_CUsuarioPerfil",
     COMPONENTE_CONSULTAR: "MPPD_CComponente",
@@ -71,5 +78,6 @@ export const environment = {
     ACTUALIZAR_CLAVE_USUARIO: "_SYS_UUserPanel",
     ACTUALIZAR_TOTP: "_SYS_UUserTOTP",
     CONSULTAR_ACTOS_ADMINISTRATIVOS: "MPPD_CActosAdministrativos",
+    OBTENER_RESUELTO: "MPPD_CResueltos",
   },
 };

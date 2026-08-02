@@ -11,6 +11,8 @@ import {
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
+import { environment } from "src/environments/environment";
 
 /* ─── Interfaces públicas ─────────────────────────────── */
 
@@ -78,6 +80,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     index: number;
   }>();
   @Output() pdfLoadError = new EventEmitter<string>();
+  @Output() sendToReview = new EventEmitter<PdfAction>();
+  @Output() sendToSecretariat = new EventEmitter<PdfAction>();
+  @Output() sendToDirection = new EventEmitter<PdfAction>();
+  @Output() sendToMinister = new EventEmitter<PdfAction>();
 
   /* ── Estado interno ──────────────────────────────────── */
   public currentIndex = 0;
@@ -85,15 +91,23 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public rawPdfUrl: string | null = null;
   public loadingPdf = false;
   public actionExecuting = false;
-  public executingType: "approve" | "reject" | "" = "";
+  public executingType:
+    | "approve"
+    | "reject"
+    | "sendToReview"
+    | "sendToSecretariat"
+    | "sendToDirection"
+    | "sendToMinister"
+    | "" = "";
   public observations = "";
+  public hasSavedState = false;
   public pdfError = false;
   public pdfErrorMsg = "";
   public swipeDir: "" | "left" | "right" = "";
   public isSafari = false;
   public objectFailed = false;
-  
-  public activeTab: 'explorador' | 'metadata' = 'explorador';
+
+  public activeTab: "explorador" | "metadata" = "explorador";
 
   private touchX = 0;
   private touchY = 0;
@@ -103,6 +117,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   constructor(
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
+    private apiService: ApiService,
   ) {
     // Detección robusta de Safari (desktop + iOS)
     const ua = navigator.userAgent.toLowerCase();
@@ -171,9 +186,22 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     return this.currentIndex >= this.documents.length - 1;
   }
 
-  @Input() defaultBasamentoLegal = `El Ministro del Poder Popular para la Defensa, GENERAL EN JEFE GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ, nombrado mediante Decreto Nº 5.277 de fecha 18 de marzo de 2026, publicado en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria Nº 6.999 de fecha 18 de marzo de 2026, en ejercicio de las atribuciones que le confiere el artículo 78 numeral 19 del Decreto N° 1.424 con Rango, Valor y Fuerza de Ley Orgánica de la Administración Pública de fecha 17 de noviembre de 2014, publicado en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria Nº 6.147 de fecha 17 de noviembre de 2014, actuando de conformidad con lo establecido en los artículos 30 y 31 numeral 8 de la Ley Constitucional de la Fuerza Armada Nacional Bolivariana, publicada en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria N° 6.508 de fecha 30 de enero de 2020,`;
+  @Input() defaultBasamentoLegal =
+    `El Ministro del Poder Popular para la Defensa, GENERAL EN JEFE GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ, nombrado mediante Decreto Nº 5.277 de fecha 18 de marzo de 2026, publicado en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria Nº 6.999 de fecha 18 de marzo de 2026, en ejercicio de las atribuciones que le confiere el artículo 78 numeral 19 del Decreto N° 1.424 con Rango, Valor y Fuerza de Ley Orgánica de la Administración Pública de fecha 17 de noviembre de 2014, publicado en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria Nº 6.147 de fecha 17 de noviembre de 2014, actuando de conformidad con lo establecido en los artículos 30 y 31 numeral 8 de la Ley Constitucional de la Fuerza Armada Nacional Bolivariana, publicada en la Gaceta Oficial de la República Bolivariana de Venezuela Extraordinaria N° 6.508 de fecha 30 de enero de 2020,`;
 
   public canvasData: any = null;
+
+  public lineSpacing = 1.15;
+
+  public increaseLineSpacing() {
+    this.lineSpacing = parseFloat((this.lineSpacing + 0.05).toFixed(2));
+  }
+
+  public decreaseLineSpacing() {
+    this.lineSpacing = parseFloat(
+      Math.max(0.5, this.lineSpacing - 0.05).toFixed(2),
+    );
+  }
 
   generateHeaderHtml(isFirstPage: boolean): string {
     if (!isFirstPage) return "";
@@ -181,8 +209,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       return this.activeDoc._headerHtml;
     }
     const superiorUnit = "ÚNICO:";
-    const asunto = this.activeDoc?.asunto || "Efectuar los siguientes nombramientos:";
-    const subordinateUnit = 'HOSPITAL MILITAR UNIVERSITARIO "DOCTOR CARLOS ARVELO"<br>SUBDIRECCIÓN ADMINISTRATIVA';
+    const asunto =
+      this.activeDoc?.asunto || "Efectuar los siguientes nombramientos:";
+    const subordinateUnit = "";
 
     return `
       <p style="margin-top: 13pt;"><strong>${superiorUnit}</strong> ${asunto}</p>
@@ -203,86 +232,26 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     const cases = this.activeDoc.documentos || [];
     const pages = [];
 
-    // --- ALGORITMO DE PAGINACIÓN DINÁMICA ---
-    const charsPerLine = 85; // Aprox caracteres por línea en Tahoma 13pt (Oficio)
-    const basamentoLines = Math.ceil(basamentoLegalText.length / charsPerLine);
-    
-    // Ajustes más precisos y permisivos tras análisis visual
-    const firstPageHeaderLines = 14 + basamentoLines; // Membrete + Fechas + Resolución + Basamento + Resuelve + Asunto
-    const otherPageHeaderLines = 4; // CONTINUACIÓN DE LA RESOLUCIÓN...
-    const footerLines = 15; // Firmas, sellos, iniciales, "Comuníquese". Reducido para no romper antes de tiempo
-    const totalLinesPerPage = 52; // Total real matemático en hoja Oficio con line-height 1.35 y fuente 13pt
+    // --- HOJA ÚNICA CONTINUA ---
+    let headerHtml = this.generateHeaderHtml(true);
+    let formattedCases = cases.map((persona: any) => {
+      const cedulaFormateada = String(persona.cedula || "").replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        ".",
+      );
+      return `<p style="text-indent: 0; margin-left: 40px; margin-top: 0; margin-bottom: 6pt;">&mdash; ${persona.grado || "Ciudadano(a)"} <strong>${(persona.nombres_apellidos || persona.nombres + " " + persona.apellidos).toUpperCase()}</strong>, C.I. N° <strong>${cedulaFormateada}</strong></p>`;
+    });
 
-    let currentCaseIndex = 0;
-
-    // Generar páginas hasta que no queden casos (o al menos 1 página si no hay casos)
-    if (cases.length === 0) {
-      // Manejo de documento vacío
-      pages.push({
-        pageIndex: 0,
-        headerHtml: this.generateHeaderHtml(true),
-        casesHtml: ""
-      });
+    let casesHtml = this.activeDoc["_pageCasesHtml_0"];
+    if (!casesHtml) {
+      casesHtml = headerHtml + formattedCases.join("\n");
     }
 
-    while (currentCaseIndex < cases.length) {
-      let isFirstPage = pages.length === 0;
-      let availableLines = totalLinesPerPage - (isFirstPage ? firstPageHeaderLines : otherPageHeaderLines);
-      
-      let pageCases = [];
-      let linesUsed = 0;
-      let tempIndex = currentCaseIndex;
-
-      while (tempIndex < cases.length) {
-        let persona = cases[tempIndex];
-        let caseText = (persona.grado || "Ciudadano(a)") + " " + (persona.nombres_apellidos || persona.nombres + " " + persona.apellidos) + ", C.I. N° " + persona.cedula;
-        let caseLines = Math.ceil(caseText.length / charsPerLine) + 0.4; // 0.4 es el margen inferior (6pt)
-        
-        let isLastAbsoluteCase = (tempIndex === cases.length - 1);
-
-        if (isLastAbsoluteCase) {
-           // Si es el último caso del documento, TIENE que caber la firma en esta misma página.
-           if (linesUsed + caseLines + footerLines > availableLines) {
-              // No caben el caso y la firma juntos.
-              if (pageCases.length > 0) {
-                  // Mandamos el caso a la siguiente página para que acompañe la firma
-                  break; 
-              }
-           }
-        } else {
-           // Si no es el último caso, solo verificamos que el caso quepa
-           if (linesUsed + caseLines > availableLines) {
-              if (pageCases.length > 0) {
-                  break; // Se llenó la página
-              }
-           }
-        }
-
-        pageCases.push(persona);
-        linesUsed += caseLines;
-        tempIndex++;
-      }
-
-      let headerHtml = isFirstPage ? this.generateHeaderHtml(isFirstPage) : "";
-
-      const formattedCases = pageCases.map((persona: any) => {
-        return `<p style="text-indent: 0; margin-left: 40px; margin-top: 0; margin-bottom: 6pt;">&mdash; ${persona.grado || "Ciudadano(a)"} <strong>${(persona.nombres_apellidos || persona.nombres + " " + persona.apellidos).toUpperCase()}</strong>, C.I. N° <strong>${persona.cedula}</strong></p>`;
-      });
-
-      const pageIdx = pages.length;
-      let casesHtml = this.activeDoc["_pageCasesHtml_" + pageIdx];
-      if (!casesHtml) {
-        casesHtml = formattedCases.join("\n");
-      }
-
-      pages.push({
-        pageIndex: pageIdx,
-        headerHtml: headerHtml,
-        casesHtml: casesHtml,
-      });
-      
-      currentCaseIndex = tempIndex;
-    }
+    pages.push({
+      pageIndex: 0,
+      headerHtml: "",
+      casesHtml: casesHtml,
+    });
 
     const rawDateStr = this.activeDoc.fecha_resolucion;
     let formattedDate = "";
@@ -372,13 +341,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       });
 
       const canvases = document.querySelectorAll(".a4-canvas");
+      if (canvases.length > 0) {
+        const canvasElement = canvases[0] as HTMLElement;
 
-      for (let i = 0; i < canvases.length; i++) {
-        const canvasElement = canvases[i] as HTMLElement;
-
-        // Renderizar canvas con alta fidelidad
         const htmlCanvas = await html2canvas(canvasElement, {
-          scale: 2, // 2x escala para evitar bordes borrosos
+          scale: 2,
           useCORS: true,
           logging: false,
           allowTaint: true,
@@ -387,11 +354,24 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
         const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
 
-        if (i > 0) {
-          pdf.addPage();
-        }
+        const pageWidth = 215.9;
+        const pageHeight = 355.6;
 
-        pdf.addImage(imgData, "JPEG", 0, 0, 215.9, 355.6);
+        const imgWidth = pageWidth;
+        const imgHeight = (htmlCanvas.height * pageWidth) / htmlCanvas.width;
+
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
       }
 
       const filename = this.activeDoc?.numc
@@ -408,258 +388,71 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     }
   }
 
-  public repaginateCases() {
+  public saveDocumentState() {
     if (!this.activeDoc) return;
 
-    const globalOffset = this.getGlobalCaretOffset();
-
-    // 1. Concatenate all current HTML pages
-    let fullHtml = "";
-    let i = 0;
-    while (this.activeDoc["_pageCasesHtml_" + i] !== undefined) {
-      fullHtml += this.activeDoc["_pageCasesHtml_" + i] + "\n";
-      delete this.activeDoc["_pageCasesHtml_" + i];
-      i++;
-    }
-
-    if (!fullHtml.trim()) {
-      this.activeDoc["_pageCasesHtml_0"] = "";
-      this.updateCanvasData();
-      return;
-    }
-
-    // 2. Parse the HTML to extract individual block-level elements (cases)
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(fullHtml, "text/html");
-
-    // We assume each top-level child of body is a case.
-    const casesHtmlArray = Array.from(doc.body.childNodes)
-      .map((node) => {
-        if (node.nodeType === 1) return (node as Element).outerHTML;
-        if (node.nodeType === 3 && node.textContent?.trim())
-          return `<div>${node.textContent}</div>`;
-        return null;
-      })
-      .filter((html) => html !== null) as string[];
-
-    // 3. Redistribute cases to pages using DOM height measurement
-    const measureCanvas = document.createElement("div");
-    measureCanvas.style.width = "215.9mm";
-    measureCanvas.style.height = "355.6mm";
-    measureCanvas.style.padding = "25mm 20mm 20mm 20mm";
-    measureCanvas.style.boxSizing = "border-box";
-    measureCanvas.style.fontFamily = "Tahoma, sans-serif";
-    measureCanvas.style.fontSize = "13pt";
-    measureCanvas.style.lineHeight = "1.15"; /* Equivalente a Word Sencillo */
-    measureCanvas.style.position = "absolute";
-    measureCanvas.style.visibility = "hidden";
-    measureCanvas.style.top = "-9999px";
-    document.body.appendChild(measureCanvas);
-
-    let currentCaseIndex = 0;
-    let pageIdx = 0;
-
-    while (currentCaseIndex < casesHtmlArray.length) {
-      measureCanvas.innerHTML = "";
-
-      const contentWrapper = document.createElement("div");
-      contentWrapper.style.display = "flex";
-      contentWrapper.style.flexDirection = "column";
-      // NOT setting height: 100% so we can measure its natural height
-      measureCanvas.appendChild(contentWrapper);
-
-      const bodyWrapper = document.createElement("div");
-      bodyWrapper.style.flexGrow = "1";
-      contentWrapper.appendChild(bodyWrapper);
-
-      if (pageIdx === 0) {
-        const basamentoLegal =
-          this.activeDoc.basamentoLegal ||
-          this.activeDoc.preamble ||
-          "Por disposición del Ciudadano Presidente de la República Bolivariana de Venezuela, de conformidad con lo establecido en el artículo 78 numeral 19...";
-        const action = this.activeDoc.accion || "RESUELVE";
-        const page0StaticHtml = `
-          <div style="text-align: center; font-weight: bold; text-transform: uppercase;">REPÚBLICA BOLIVARIANA DE VENEZUELA</div>
-          <div style="text-align: center; font-weight: bold; text-transform: uppercase;">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</div>
-          <div style="text-align: center; font-weight: bold; text-transform: uppercase;">DESPACHO DEL MINISTRO</div>
-          <div style="text-align: left; margin-top: 13pt; font-weight: bold;">Caracas, ${this.activeDoc.fecha_resolucion || ""}</div>
-          <div style="text-align: right; font-weight: bold;">215°, 166° y 26°</div>
-          <div style="text-align: center; margin-top: 13pt; font-weight: bold; text-transform: uppercase;">
-            RESOLUCIÓN N° <span style="text-decoration: underline;">${this.activeDoc.numero_carpeta || ""}</span>
-          </div>
-          <div style="margin-top: 13pt; line-height: 1.35; text-align: justify;">${basamentoLegal}</div>
-          <div style="text-align: center; margin-top: 13pt; margin-bottom: 13pt; font-weight: bold; text-transform: uppercase;">${action}</div>
-        `;
-        const staticNode = document.createElement("div");
-        staticNode.innerHTML = page0StaticHtml;
-        bodyWrapper.appendChild(staticNode);
-
-        let headerHtml = this.activeDoc._headerHtml;
-        if (!headerHtml) {
-          const superiorUnit = "ÚNICO:";
-          const asunto =
-            this.activeDoc.asunto || "Efectuar los siguientes nombramientos:";
-          const subordinateUnit =
-            'HOSPITAL MILITAR UNIVERSITARIO "DOCTOR CARLOS ARVELO"<br>SUBDIRECCIÓN ADMINISTRATIVA';
-          headerHtml = `<div style="margin-top: 13pt;"><strong>${superiorUnit}</strong> ${asunto}</div><div style="text-align: center;"><strong>${subordinateUnit}</strong></div>`;
-        }
-        const headerNode = document.createElement("div");
-        headerNode.innerHTML = headerHtml;
-        bodyWrapper.appendChild(headerNode);
-      } else {
-        const contHeader = document.createElement("p");
-        contHeader.style.textAlign = "center";
-        contHeader.style.fontWeight = "bold";
-        contHeader.style.marginTop = "13pt";
-        contHeader.style.marginBottom = "13pt";
-        contHeader.innerText =
-          "CONTINUACIÓN DE LA RESOLUCIÓN N° 00000 DE FECHA 01 ENE 2026";
-        bodyWrapper.appendChild(contHeader);
-      }
-
-      const casesContainer = document.createElement("div");
-      bodyWrapper.appendChild(casesContainer);
-
-      const signatureSpace = 180; // Espacio conservador para firmas e iniciales
-      let pageCases = [];
-
-      while (currentCaseIndex < casesHtmlArray.length) {
-        const caseHtml = casesHtmlArray[currentCaseIndex];
-        const tempNode = document.createElement("div");
-        tempNode.innerHTML = caseHtml;
-        casesContainer.appendChild(tempNode);
-
-        const isLastItem = currentCaseIndex === casesHtmlArray.length - 1;
-        const currentHeight = contentWrapper.offsetHeight;
-        // Restar el padding top+bottom (~170px) del clientHeight para obtener el espacio real
-        const availableSpace = measureCanvas.clientHeight - 170;
-        const limitHeight = availableSpace - (isLastItem ? signatureSpace : 0);
-
-        if (currentHeight > limitHeight && pageCases.length > 0) {
-          casesContainer.removeChild(tempNode);
-          break; // Salta a la siguiente página
-        }
-
-        pageCases.push(caseHtml);
-        currentCaseIndex++;
-      }
-
-      this.activeDoc["_pageCasesHtml_" + pageIdx] = pageCases.join("\n");
-      pageIdx++;
-    }
-
-    if (pageIdx === 0) {
-      this.activeDoc["_pageCasesHtml_0"] = "";
-    }
-
-    document.body.removeChild(measureCanvas);
+    // Asegurarnos de que tenemos los datos más recientes del canvas
     this.updateCanvasData();
 
-    if (globalOffset >= 0) {
-      setTimeout(() => {
-        this.restoreGlobalCaretOffset(globalOffset);
-      }, 10);
-    }
-  }
+    const idUser =
+      this.jwtData?.userId || sessionStorage.getItem("id") || "Desconocido";
+    const numeroCarpeta = this.activeDoc.numero_carpeta || "000000";
+    const numeroResolucion =
+      this.activeDoc.numc || this.activeDoc.ncontrol || "";
 
-  /* ─── Caret Tracking Utilities ────────────────────────── */
-
-  private getGlobalCaretOffset(): number {
-    const activeElement = document.activeElement as HTMLElement;
-    if (!activeElement || !activeElement.classList.contains("cases-list")) {
-      return -1;
-    }
-
-    // Get offset within the active page
-    let localOffset = 0;
-    const win = window;
-    const sel = win.getSelection();
-    if (sel && sel.rangeCount > 0) {
-      const range = sel.getRangeAt(0);
-      const preCaretRange = range.cloneRange();
-      preCaretRange.selectNodeContents(activeElement);
-      preCaretRange.setEnd(range.endContainer, range.endOffset);
-      localOffset = preCaretRange.toString().length;
-    }
-
-    // Add text lengths of preceding pages
-    let globalOffset = localOffset;
-    const allCasesLists = document.querySelectorAll(".cases-list");
-    for (let i = 0; i < allCasesLists.length; i++) {
-      if (allCasesLists[i] === activeElement) {
-        break;
-      }
-      globalOffset += (allCasesLists[i] as HTMLElement).innerText.length;
-    }
-
-    return globalOffset;
-  }
-
-  private restoreGlobalCaretOffset(globalOffset: number) {
-    if (globalOffset < 0) return;
-
-    const allCasesLists = document.querySelectorAll(".cases-list");
-    let remainingOffset = globalOffset;
-
-    for (let i = 0; i < allCasesLists.length; i++) {
-      const el = allCasesLists[i] as HTMLElement;
-      const textLen = el.innerText.length;
-
-      if (remainingOffset <= textLen || i === allCasesLists.length - 1) {
-        // Restore caret here
-        this.setCaretPosition(el, remainingOffset);
-        el.focus();
-        break;
-      } else {
-        remainingOffset -= textLen;
-      }
-    }
-  }
-
-  private setCaretPosition(element: HTMLElement, offset: number) {
-    const doc = element.ownerDocument || document;
-    const win = doc.defaultView || window;
-    const createRange = function (
-      node: Node,
-      chars: { count: number },
-      range?: Range,
-    ): Range {
-      if (!range) {
-        range = doc.createRange();
-        range.selectNode(node);
-        range.setStart(node, 0);
-      }
-      if (chars.count === 0) {
-        range.setEnd(node, chars.count);
-      } else if (node && chars.count > 0) {
-        if (node.nodeType === Node.TEXT_NODE) {
-          if (node.textContent!.length < chars.count) {
-            chars.count -= node.textContent!.length;
-          } else {
-            range.setEnd(node, chars.count);
-            chars.count = 0;
-          }
-        } else {
-          for (let lp = 0; lp < node.childNodes.length; lp++) {
-            range = createRange(node.childNodes[lp], chars, range);
-            if (chars.count === 0) {
-              break;
-            }
-          }
-        }
-      }
-      return range!;
+    // Objeto task (lst) con todos los elementos de la resolución
+    const lst = {
+      fecha_resolucion: this.activeDoc.fecha_resolucion,
+      numero_carpeta: numeroCarpeta,
+      numero_resolucion: numeroResolucion,
+      basamento_legal:
+        this.activeDoc.basamentoLegal || this.defaultBasamentoLegal,
+      unico_parrafo:
+        this.activeDoc._headerHtml || this.generateHeaderHtml(true),
+      lista_casos: this.activeDoc["_pageCasesHtml_0"] || "",
+      documentos_originales: this.activeDoc.documentos || [],
     };
 
-    if (offset >= 0 && win) {
-      const sel = win.getSelection();
-      const range = createRange(element, { count: offset });
-      if (range) {
-        range.collapse(false);
-        sel?.removeAllRanges();
-        sel?.addRange(range);
-      }
-    }
+    let obj = {
+      usuario: idUser,
+      numero_carpeta: numeroCarpeta,
+      numero_resolucion: numeroResolucion,
+      task: lst,
+      fecha: new Date(),
+    };
+
+    let cl = {
+      coleccion: "estatus_resolucion",
+      numero_carpeta: `${numeroCarpeta}`,
+      numero_resolucion: `${numeroResolucion}`,
+      driver: environment.driver.PRINCIPAL,
+      objeto: obj,
+      donde:
+        '{"usuario":"' +
+        idUser +
+        '", "numero_carpeta":"' +
+        numeroCarpeta +
+        '"}',
+      upsert: true,
+    };
+
+    this.apiService.ExecColeccion(cl).subscribe(
+      (res: any) => {
+        console.log("Estado de resolución guardado con éxito", res);
+        this.hasSavedState = true;
+        alert("Estado del documento guardado exitosamente.");
+      },
+      (err: any) => {
+        console.error("Error al guardar estado de resolución", err);
+        alert("Error al intentar guardar el estado del documento.");
+      },
+    );
+  }
+
+  public onResolutionChange(value: string) {
+    this.updateActiveDoc("numc", value);
+    this.updateActiveDoc("ncontrol", value);
+    this.updateCanvasData();
   }
 
   public updateActiveDoc(field: string, value: string) {
@@ -793,6 +586,50 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     });
   }
 
+  onSendToReview(): void {
+    if (this.actionExecuting || !this.activeDoc) return;
+    this.actionExecuting = true;
+    this.executingType = "sendToReview";
+    this.sendToReview.emit({
+      doc: this.activeDoc,
+      observations: this.observations.trim(),
+      index: this.currentIndex,
+    });
+  }
+
+  onSendToSecretariat(): void {
+    if (this.actionExecuting || !this.activeDoc) return;
+    this.actionExecuting = true;
+    this.executingType = "sendToSecretariat";
+    this.sendToSecretariat.emit({
+      doc: this.activeDoc,
+      observations: this.observations.trim(),
+      index: this.currentIndex,
+    });
+  }
+
+  onSendToDirection(): void {
+    if (this.actionExecuting || !this.activeDoc) return;
+    this.actionExecuting = true;
+    this.executingType = "sendToDirection";
+    this.sendToDirection.emit({
+      doc: this.activeDoc,
+      observations: this.observations.trim(),
+      index: this.currentIndex,
+    });
+  }
+
+  onSendToMinister(): void {
+    if (this.actionExecuting || !this.activeDoc) return;
+    this.actionExecuting = true;
+    this.executingType = "sendToMinister";
+    this.sendToMinister.emit({
+      doc: this.activeDoc,
+      observations: this.observations.trim(),
+      index: this.currentIndex,
+    });
+  }
+
   /** El padre llama esto cuando la acción termina (éxito o error) */
   resetAction(): void {
     this.actionExecuting = false;
@@ -848,18 +685,6 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     }
 
     switch (event.key) {
-      case "ArrowLeft":
-        this.prevDocument();
-        event.preventDefault();
-        break;
-      case "ArrowRight":
-        this.nextDocument();
-        event.preventDefault();
-        break;
-      case " ":
-        this.onApprove();
-        event.preventDefault();
-        break;
       case "Escape":
         this.onClose();
         event.preventDefault();
@@ -1019,19 +844,181 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   /* ── Helpers internos ────────────────────────────────── */
 
-  private loadCurrentPdf(): void {
+  public ObtenerResuelto(
+    numero_carpeta: string,
+    numero_resolucion: string,
+  ): Promise<any> {
+    return new Promise((resolve) => {
+      const cleanNumeroResolucion = numero_resolucion
+        ? numero_resolucion.replace(/[\r\n\t]+/g, "").trim()
+        : "";
+      const cleanNumeroCarpeta = numero_carpeta
+        ? numero_carpeta.replace(/[\r\n\t]+/g, "").trim()
+        : "";
+      const xAPI = {} as IAPICore;
+      xAPI.funcion = environment.funcion.OBTENER_RESUELTO;
+      xAPI.parametros = `${cleanNumeroCarpeta}`;
+
+      this.apiService.Ejecutar(xAPI).subscribe(
+        (data: any) => {
+          resolve(data && data.length > 0 ? data[0] : null);
+          console.log(data);
+        },
+        (err: any) => {
+          console.error("Error al obtener resuelto desde PostgreSQL:", err);
+          resolve(null);
+        },
+      );
+    });
+  }
+
+  private loadSavedState(): Promise<void> {
+    return new Promise(async (resolve) => {
+      const doc = this.activeDoc;
+      if (!doc) {
+        resolve();
+        return;
+      }
+
+      this.hasSavedState = false;
+      const idUser =
+        this.jwtData?.userId || sessionStorage.getItem("id") || "Desconocido";
+      const numero_carpeta = doc.numero_carpeta || "000000";
+      const resolucion = doc.ncontrol || doc.numc || "";
+
+      // 1. Iniciar buscando la plantilla base por número de carpeta en PostgreSQL
+      console.log(
+        "[TinderPdfViewer] Buscando plantilla base en PG para la carpeta:",
+        numero_carpeta,
+      );
+      const pgTemplate = await this.ObtenerResuelto(numero_carpeta, resolucion);
+      if (pgTemplate) {
+        console.log(
+          "[TinderPdfViewer] Datos base recuperados de PG para carpeta:",
+          numero_carpeta,
+          pgTemplate,
+        );
+        if (pgTemplate.fundamento) {
+          doc.basamentoLegal = pgTemplate.fundamento;
+        }
+        
+        // Asociar número de resolución si ya existe en PG
+        const resNum =
+          pgTemplate.numero_resolucion ||
+          pgTemplate.numero ||
+          pgTemplate.resolucion ||
+          pgTemplate.num_resolucion ||
+          pgTemplate.numres;
+        if (resNum) {
+          doc.numc = resNum;
+          doc.ncontrol = resNum;
+        }
+
+        // Asociar fecha de resolución si ya existe en PG
+        const resFecha =
+          pgTemplate.fecha_resolucion ||
+          pgTemplate.fecha ||
+          pgTemplate.fecha_res ||
+          pgTemplate.fecres;
+        if (resFecha) {
+          doc.fecha_resolucion = resFecha;
+        }
+      }
+
+      // 2. Buscar si hay estado/borrador previo en MongoDB
+      let cl = {
+        coleccion: "estatus_resolucion",
+        numero_carpeta: `${numero_carpeta}`,
+        numero_resolucion: `${resolucion}`,
+        driver: environment.driver.PRINCIPAL,
+        donde:
+          '{"usuario":"' +
+          idUser +
+          '", "numero_carpeta":"' +
+          numero_carpeta +
+          '"}',
+      };
+      console.log(cl);
+
+      this.apiService.ExecColeccion(cl).subscribe(
+        (res: any) => {
+          if (res && res.length > 0) {
+            const saved = res[0];
+            if (saved && saved.task) {
+              this.hasSavedState = true;
+              console.log(
+                "[TinderPdfViewer] Borrador recuperado de MongoDB para la carpeta:",
+                numero_carpeta,
+                saved,
+              );
+
+              // Cargar basamento legal modificado
+              if (saved.task.basamento_legal) {
+                doc.basamentoLegal = saved.task.basamento_legal;
+              }
+
+              // Cargar único párrafo (membrete / asunto)
+              if (saved.task.unico_parrafo) {
+                doc._headerHtml = saved.task.unico_parrafo;
+              }
+
+              // Cargar lista de casos redactados
+              if (saved.task.lista_casos) {
+                doc["_pageCasesHtml_0"] = saved.task.lista_casos;
+              }
+
+              // Cargar fecha de resolución
+              if (saved.task.fecha_resolucion) {
+                doc.fecha_resolucion = saved.task.fecha_resolucion;
+              }
+
+              // Cargar documentos originales si existen
+              if (
+                saved.task.documentos_originales &&
+                saved.task.documentos_originales.length > 0
+              ) {
+                doc.documentos = saved.task.documentos_originales;
+              }
+            }
+          }
+          resolve();
+        },
+        async (err: any) => {
+          console.error(
+            "[TinderPdfViewer] Error recuperando estado de DB:",
+            err,
+          );
+          // Fallback a PostgreSQL incluso si falla ExecColeccion
+          const pgTemplate = await this.ObtenerResuelto(
+            numero_carpeta,
+            resolucion,
+          );
+          if (pgTemplate && pgTemplate.fundamento) {
+            doc.basamentoLegal = pgTemplate.fundamento;
+          }
+          resolve();
+        },
+      );
+    });
+  }
+
+  private async loadCurrentPdf(): Promise<void> {
     const doc = this.activeDoc;
     if (!doc) return;
-
-    this.updateCanvasData();
 
     this.loadingPdf = true;
     this.pdfError = false;
     this.pdfErrorMsg = "";
     this.objectFailed = false;
     this.revokeAll();
+    this.cdr.detectChanges();
 
-    if (!this.activeDoc) {
+    // Intentar recuperar el estado de base de datos antes de pintar
+    await this.loadSavedState();
+
+    this.updateCanvasData();
+
+    if (!doc) {
       this.loadingPdf = false;
       this.cdr.detectChanges();
       return;
@@ -1039,7 +1026,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     if (this.pdfUrlResolver) {
       try {
-        const url = this.pdfUrlResolver(this.activeDoc);
+        const url = this.pdfUrlResolver(doc);
         if (url) {
           this.loadPdfFromUrl(url);
         } else {
