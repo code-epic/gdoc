@@ -72,15 +72,31 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public contextMenuData: any = null;
   public contextMenuIndex = -1;
   // JWT Metadata
-  public jwtData: { userId: string; userName: string; userRole: string } = {
+  public jwtData: {
+    userId: string;
+    userName: string;
+    userRole: string;
+    perfil: string;
+  } = {
     userId: "",
     userName: "",
     userRole: "",
+    perfil: "",
   };
 
   // Perfil dinámico de seguridad
-  public currentProfile: "Edicion" | "Revision" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
-  public viewerProfile: "Edicion" | "Revision" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
+  public currentProfile:
+    | "Edicion"
+    | "Revision"
+    | "Secretaria"
+    | "Direccion"
+    | "Aprobador" = "Edicion";
+  public viewerProfile:
+    | "Edicion"
+    | "Revision"
+    | "Secretaria"
+    | "Direccion"
+    | "Aprobador" = "Edicion";
 
   // API core object
   public xAPI: IAPICore = {
@@ -162,11 +178,13 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       if (token) {
         const helper = new JwtHelperService();
         const decoded = helper.decodeToken(token);
+        console.log(decoded);
         if (decoded && decoded.Usuario) {
           this.jwtData = {
             userId: decoded.Usuario.id || "",
             userName: decoded.Usuario.nombre || decoded.Usuario.usuario || "",
             userRole: decoded.Usuario.tipo || "Usuario",
+            perfil: decoded.Usuario.descripcion || "",
           };
         }
       }
@@ -175,16 +193,21 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
           userId: this.loginService.Usuario.id || "",
           userName: this.loginService.Usuario.nombre || "",
           userRole: this.loginService.Usuario.tipo || "",
+          perfil: this.loginService.Usuario.descripcion || "",
         };
       }
-
+      console.log(this.jwtData);
       // Mapear rol de usuario inicial al perfil dinámico
       const roleStr = (this.jwtData.userRole || "").toUpperCase();
       if (roleStr.includes("SEC") || roleStr.includes("SECRETARIA")) {
         this.currentProfile = "Secretaria";
       } else if (roleStr.includes("DIR") || roleStr.includes("DIRECCION")) {
         this.currentProfile = "Direccion";
-      } else if (roleStr.includes("APROB") || roleStr.includes("MIN") || roleStr.includes("FIRMAN")) {
+      } else if (
+        roleStr.includes("APROB") ||
+        roleStr.includes("MIN") ||
+        roleStr.includes("FIRMAN")
+      ) {
         this.currentProfile = "Aprobador";
       } else if (roleStr.includes("REV") || roleStr.includes("REVISION")) {
         this.currentProfile = "Revision";
@@ -361,7 +384,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = environment.funcion.ENTRADAS_PROCESO_TIPO;
-    
+
     let paramVal = "36";
     if (this.currentProfile === "Aprobador") {
       paramVal = "880";
@@ -421,7 +444,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   // --- LOGICA VISTA INMERSIVA (TINDER-STYLE) ---
   public startImmersiveMode(
     grupo: any,
-    forcedProfile?: "Edicion" | "Revision" | "Aprobador",
+    forcedProfile?:
+      | "Edicion"
+      | "Revision"
+      | "Secretaria"
+      | "Direccion"
+      | "Aprobador",
   ) {
     this.immersiveMode = true;
     this.currentDocIndex = this.documents.indexOf(grupo);
@@ -487,6 +515,38 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   /** Cuando el hijo emite close */
   public onTinderClose() {
     this.exitImmersiveMode();
+  }
+
+  /** Cuando el hijo emite el evento de envío / ruteo */
+  public onTinderDocumentRouted(action: PdfAction, targetRoleName: string) {
+    this.toastrService.success(
+      `El caso de la carpeta N° ${action.doc.numero_carpeta} fue enviado a ${targetRoleName} exitosamente.`,
+      "Caso Enviado"
+    );
+
+    if (this.tinderViewer) {
+      this.tinderViewer.resetAction();
+    }
+
+    const numCarpeta = action.doc.numero_carpeta;
+    this.documents = this.documents.filter(
+      (d) => d.numero_carpeta !== numCarpeta
+    );
+
+    if (this.documents.length === 0) {
+      this.selectedFolder = null;
+      if (this.immersiveMode) this.exitImmersiveMode();
+      this.loadFolders();
+    } else {
+      if (this.immersiveMode) {
+        if (this.currentDocIndex >= this.documents.length) {
+          this.currentDocIndex = this.documents.length - 1;
+        }
+        this.activeDoc = this.documents[this.currentDocIndex];
+        this.loadActivePdf();
+      }
+      this.changeDetector.detectChanges();
+    }
   }
 
   /** Cuando el hijo tiene error de carga PDF */

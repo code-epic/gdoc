@@ -13,6 +13,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { environment } from "src/environments/environment";
+import Swal from "sweetalert2";
 
 /* ─── Interfaces públicas ─────────────────────────────── */
 
@@ -58,7 +59,12 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   @Input() jwtData: JwtUserData = { userId: "", userName: "", userRole: "" };
   @Input() loading = false;
   @Input() useCanvas = false;
-  @Input() profile: "Edicion" | "Revision" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
+  @Input() profile:
+    | "Edicion"
+    | "Revision"
+    | "Secretaria"
+    | "Direccion"
+    | "Aprobador" = "Edicion";
   @Input() approveLabel = "Aprobar y Firmar";
   @Input() rejectLabel = "Rechazar";
   @Input() approveIcon = "fas fa-signature";
@@ -617,10 +623,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   private async actualizarEstatusFirma(estatus: string): Promise<void> {
     if (!this.activeDoc) return;
-    const targetDocs = this.activeDoc.documentos && this.activeDoc.documentos.length > 0
-      ? this.activeDoc.documentos
-      : [this.activeDoc];
-      
+    const targetDocs =
+      this.activeDoc.documentos && this.activeDoc.documentos.length > 0
+        ? this.activeDoc.documentos
+        : [this.activeDoc];
+
     const numero_carpeta = this.activeDoc.numero_carpeta || "000000";
 
     for (const doc of targetDocs) {
@@ -631,18 +638,75 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       xAPI.funcion = environment.funcion.ACTUALIZAR_ESTATUS_FIRMA;
       xAPI.parametros = `${estatus},${cedulaVal},${numero_carpeta}`;
       xAPI.valores = null;
-
+      console.log(this.xAPI);
       try {
         await this.apiService.Ejecutar(xAPI).toPromise();
-        console.log(`[TinderPdfViewer] Estatus de firma actualizado a ${estatus} para C.I. ${cedulaVal} en carpeta ${numero_carpeta}`);
+        console.log(
+          `[TinderPdfViewer] Estatus de firma actualizado a ${estatus} para C.I. ${cedulaVal} en carpeta ${numero_carpeta}`,
+        );
       } catch (err) {
-        console.error(`[TinderPdfViewer] Error actualizando estatus para C.I. ${cedulaVal}:`, err);
+        console.error(
+          `[TinderPdfViewer] Error actualizando estatus para C.I. ${cedulaVal}:`,
+          err,
+        );
       }
     }
   }
 
+  private validarResolucionYFecha(): boolean {
+    if (!this.activeDoc) return false;
+
+    const numRes = (
+      this.activeDoc.numc ||
+      this.activeDoc.ncontrol ||
+      this.activeDoc.numero_resolucion ||
+      ""
+    )
+      .toString()
+      .trim();
+
+    const fechaRes = (this.activeDoc.fecha_resolucion || "").toString().trim();
+
+    if (!numRes) {
+      Swal.fire({
+        title: "Campo Requerido",
+        text: "Por favor, ingrese el número de resolución en el lienzo antes de enviar.",
+        icon: "warning",
+        confirmButtonColor: "#fb6340",
+      });
+      return false;
+    }
+
+    if (!fechaRes) {
+      Swal.fire({
+        title: "Campo Requerido",
+        text: "Por favor, ingrese la fecha de resolución en el lienzo antes de enviar.",
+        icon: "warning",
+        confirmButtonColor: "#fb6340",
+      });
+      return false;
+    }
+
+    return true;
+  }
+
   async onSendToReview(): Promise<void> {
     if (this.actionExecuting || !this.activeDoc) return;
+    if (!this.validarResolucionYFecha()) return;
+
+    const result = await Swal.fire({
+      title: "¿Está seguro?",
+      text: `¿Está seguro de enviar este caso a Revisión (Resolución)?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, enviar",
+      cancelButtonText: "No",
+      confirmButtonColor: "#11cdef",
+      cancelButtonColor: "#8898aa",
+    });
+
+    if (!result.isConfirmed) return;
+
     this.actionExecuting = true;
     this.executingType = "sendToReview";
     await this.actualizarEstatusFirma("990");
@@ -655,6 +719,21 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   async onSendToSecretariat(): Promise<void> {
     if (this.actionExecuting || !this.activeDoc) return;
+    if (!this.validarResolucionYFecha()) return;
+
+    const result = await Swal.fire({
+      title: "¿Está seguro?",
+      text: `¿Está seguro de enviar este caso a Revisión (Secretaría)?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, enviar",
+      cancelButtonText: "No",
+      confirmButtonColor: "#fb6340",
+      cancelButtonColor: "#8898aa",
+    });
+
+    if (!result.isConfirmed) return;
+
     this.actionExecuting = true;
     this.executingType = "sendToSecretariat";
     await this.actualizarEstatusFirma("930");
@@ -667,6 +746,21 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   async onSendToDirection(): Promise<void> {
     if (this.actionExecuting || !this.activeDoc) return;
+    if (!this.validarResolucionYFecha()) return;
+
+    const result = await Swal.fire({
+      title: "¿Está seguro?",
+      text: `¿Está seguro de enviar este caso a Revisión (Dirección)?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, enviar",
+      cancelButtonText: "No",
+      confirmButtonColor: "#8965e0",
+      cancelButtonColor: "#8898aa",
+    });
+
+    if (!result.isConfirmed) return;
+
     this.actionExecuting = true;
     this.executingType = "sendToDirection";
     await this.actualizarEstatusFirma("340");
@@ -679,6 +773,21 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   async onSendToMinister(): Promise<void> {
     if (this.actionExecuting || !this.activeDoc) return;
+    if (!this.validarResolucionYFecha()) return;
+
+    const result = await Swal.fire({
+      title: "¿Está seguro?",
+      text: `¿Está seguro de enviar este caso al Aprobador (Ministro)?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, enviar",
+      cancelButtonText: "No",
+      confirmButtonColor: "#f5365c",
+      cancelButtonColor: "#8898aa",
+    });
+
+    if (!result.isConfirmed) return;
+
     this.actionExecuting = true;
     this.executingType = "sendToMinister";
     await this.actualizarEstatusFirma("880");
@@ -1005,13 +1114,12 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         fecha: new Date(),
       };
 
-      // 2. Buscar si hay estado/borrador previo en MongoDB
+      // 2. Buscar si hay estado/borrador previo en MongoDB (Consulta pura sin escritura)
       let cl = {
         coleccion: "estatus_resolucion",
         numero_carpeta: `${numero_carpeta}`,
         numero_resolucion: `${resolucion}`,
         driver: environment.driver.PRINCIPAL,
-        objeto: obj,
         donde:
           '{\"usuario\":\"' +
           idUser +

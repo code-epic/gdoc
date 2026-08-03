@@ -311,5 +311,9 @@
   (approve)="onTinderApprove($event)"
   (reject)="onTinderReject($event)"
   (navigate)="onTinderNavigate($event)"
-  (pdfLoadError)="onTinderPdfError($event)">
+  (pdfLoadError)="onTinderPdfError($event)"
+  (sendToReview)="onTinderDocumentRouted($event, 'Revisión (Resolución)')"
+  (sendToSecretariat)="onTinderDocumentRouted($event, 'Revisión (Secretaría)')"
+  (sendToDirection)="onTinderDocumentRouted($event, 'Revisión (Dirección)')"
+  (sendToMinister)="onTinderDocumentRouted($event, 'Aprobador (Ministro)')">
 </app-tinder-pdf-viewer>
