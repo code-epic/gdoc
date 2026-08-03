@@ -14,6 +14,8 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { environment } from "src/environments/environment";
+import { FileService } from "src/app/services/apicore/file.service";
+import { HttpEventType } from "@angular/common/http";
 import Swal from "sweetalert2";
 
 /* ─── Interfaces públicas ─────────────────────────────── */
@@ -108,7 +110,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     | "sendToMinister"
     | "" = "";
   public observations = "";
-  @ViewChild('resueltoCanvas') resueltoCanvas: any;
+  @ViewChild("resueltoCanvas") resueltoCanvas: any;
 
   public hasSavedState = false;
   public printModeActive = false;
@@ -136,6 +138,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
     private apiService: ApiService,
+    private fileService: FileService,
   ) {
     // Detección robusta de Safari (desktop + iOS)
     const ua = navigator.userAgent.toLowerCase();
@@ -369,14 +372,15 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   }
 
   public async printCanvas() {
-    // 1. Mostrar modal de carga
+    // 1. Mostrar modal de carga inicial
     Swal.fire({
       title: "Generando PDF...",
       text: "Por favor espere mientras se procesa el documento.",
       allowOutsideClick: false,
+      showConfirmButton: false,
       didOpen: () => {
         Swal.showLoading();
-      }
+      },
     });
 
     this.printModeActive = true;
@@ -435,21 +439,97 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         }
       }
 
-      const filename = this.activeDoc?.numc
-        ? `Resolucion_${this.activeDoc.numc}.pdf`
-        : `Resuelto_${new Date().getTime()}.pdf`;
+      const cleanNumc = (
+        this.activeDoc?.numc ||
+        this.activeDoc?.ncontrol ||
+        this.canvasData?.header?.resolutionNum ||
+        ""
+      )
+        .toString()
+        .replace(/[\r\n\t]+/g, "")
+        .trim();
+      const filename = cleanNumc
+        ? `${cleanNumc}.pdf`
+        : `${new Date().getTime()}.pdf`;
 
-      pdf.save(filename);
-      
+      // Generar el blob del PDF local original
+      const pdfBlob = pdf.output("blob");
+
+      // Construir formulario multipart
+      const formData = new FormData();
+      formData.append("archivos", pdfBlob, filename);
+      formData.append(
+        "nombre",
+        this.activeDoc?.signatures?.mainSignatory || "MINISTRO DE LA DEFENSA",
+      );
+      formData.append("locacion", "Caracas, Venezuela");
+      formData.append("razon", "Firma de Resolución Ministerial");
+      formData.append("contacto", "MPPD");
+      formData.append("codigo", filename);
+      formData.append("return", "true"); // <-- Solicitar retorno de archivo PDF firmado directamente
+
+      // Consumir servicio Go de firma con barras de progreso de subida
+      const signedPdfBlob = await new Promise<Blob>(
+        (resolvePromise, rejectPromise) => {
+          this.fileService.FirmarPDFProgress(formData).subscribe(
+            (event: any) => {
+              if (event.type === HttpEventType.UploadProgress) {
+                const progress = Math.round(100 * (event.loaded / event.total));
+                Swal.update({
+                  title: "Enviando al servidor...",
+                  html: `Progreso de subida: <b>${progress}%</b><br><div style="width: 100%; background: #e9ecef; border-radius: 4px; overflow: hidden; margin-top: 10px;"><div style="width: ${progress}%; height: 8px; background: #2dce89; transition: width 0.1s ease;"></div></div>`,
+                });
+              } else if (event.type === HttpEventType.Response) {
+                if (event.body) {
+                  resolvePromise(event.body);
+                } else {
+                  rejectPromise(
+                    new Error(
+                      "No se recibieron datos en la respuesta del servidor.",
+                    ),
+                  );
+                }
+              }
+            },
+            (err: any) => {
+              rejectPromise(err);
+            },
+          );
+        },
+      );
+
       // Cerrar modal de carga con éxito
       Swal.close();
+
+      // Ofrecer la opción de ver/descargar el documento firmado devuelto por Go
+      Swal.fire({
+        title: "Proceso Completado",
+        text: "El documento ha sido firmado digitalmente y guardado con éxito. ¿Desea descargar una copia firmada para verla?",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "Sí, descargar",
+        cancelButtonText: "No, continuar",
+        confirmButtonColor: "#2dce89",
+        cancelButtonColor: "#8898aa",
+      }).then((resAlert) => {
+        if (resAlert.isConfirmed) {
+          const downloadUrl = window.URL.createObjectURL(signedPdfBlob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        }
+      });
     } catch (err) {
-      console.error("Error generando PDF: ", err);
+      console.error("Error generando/firmando PDF: ", err);
       Swal.fire({
         title: "Error",
-        text: "Ocurrió un error al generar el documento PDF.",
+        text: "Ocurrió un error al generar o firmar el documento PDF.",
         icon: "error",
-        confirmButtonColor: "#f5365c"
+        confirmButtonColor: "#f5365c",
       });
     } finally {
       // 3. Restaurar zoom original y apagar modo de impresión

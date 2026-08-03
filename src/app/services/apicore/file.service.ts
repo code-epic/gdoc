@@ -77,7 +77,24 @@ httpOptions = {
       );
     }
   
+  FirmarPDF(frm: FormData): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+      })
+    };
+    return this.http.post<any>(environment.API + 'firmarpdf', frm, httpOptions);
+  }
 
-
-  
+  FirmarPDFProgress(frm: FormData): Observable<HttpEvent<any>> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+      }),
+      reportProgress: true,
+      observe: 'events' as 'body',
+      responseType: 'blob' as 'json'
+    };
+    return this.http.post<any>(environment.API + 'firmarpdf', frm, httpOptions);
+  }
 }
