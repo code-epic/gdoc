@@ -109,10 +109,10 @@ export class ResueltoCanvasComponent
     // Dejar un margen (ej. 40px)
     const targetWidth = availableWidth - 40;
 
-    if (targetWidth < a4WidthPx) {
-      this.zoomScale = targetWidth / a4WidthPx;
+    if (targetWidth > 400 && targetWidth < a4WidthPx) {
+      this.zoomScale = Math.max(0.5, targetWidth / a4WidthPx);
     } else {
-      this.zoomScale = 1; // Tamaño natural
+      this.zoomScale = 1; // Tamaño natural o fallback seguro
     }
   }
 

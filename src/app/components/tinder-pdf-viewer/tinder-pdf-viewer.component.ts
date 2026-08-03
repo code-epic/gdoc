@@ -372,6 +372,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         signatureImageUrl: "./assets/img/mppd/firma_mppd.png",
       },
     };
+    console.log("[TinderPdfViewer] canvasData:", this.canvasData);
   }
 
   public async printCanvas() {
@@ -455,6 +456,19 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         ? `${cleanNumc}.pdf`
         : `${new Date().getTime()}.pdf`;
 
+      // Dibujar "M P P D" verticalmente en la esquina superior derecha y en la esquina inferior izquierda
+      // usando jsPDF antes de exportar el Blob.
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 0, 128); // Azul oscuro (opcional, ajusta a tu preferencia)
+      
+      // Arriba a la derecha (coordenadas en mm para jsPDF)
+      pdf.text("M\nP\nP\nD", 195, 20);
+      
+      // Abajo a la izquierda (coordenadas en mm para jsPDF)
+      // Ajustamos 'y' para que esté al final de la página (la página mide 355.6mm de alto)
+      pdf.text("M\nP\nP\nD", 20, 320);
+
       // Generar el blob del PDF local original
       const pdfBlob = pdf.output("blob");
 
@@ -470,6 +484,20 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       formData.append("contacto", "MPPD");
       formData.append("codigo", filename);
       formData.append("return", "true"); // <-- Solicitar retorno de archivo PDF firmado directamente
+
+      // Firma digital visible en cabecera (esquina superior derecha, sutil ~2cm)
+      formData.append("visible", "true");
+      
+      // --- NUEVOS PARÁMETROS PARA EL BACKEND EN GO ---
+      formData.append("transparente", "true"); // El Widget Annotation será INVISIBLE
+      formData.append("page", "1");            // Página donde se ubicará el Widget interactivo
+      
+      // Coordenadas PDF (en puntos, no mm) para colocar el Widget Annotation
+      // Arriba a la derecha: x ~ 195mm (550pts), y ~ 20mm desde arriba (930pts desde abajo)
+      formData.append("llx", "540"); // Margen izquierdo
+      formData.append("lly", "910"); // Margen inferior
+      formData.append("urx", "580"); // Margen derecho
+      formData.append("ury", "970"); // Margen superior
 
       // Consumir servicio Go de firma con barras de progreso de subida
       const signedPdfBlob = await new Promise<Blob>(
@@ -621,17 +649,32 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public onCanvasDateChange(dateStr: string) {
     if (!this.activeDoc) return;
     try {
-      const cleanStr = dateStr.replace(/de/gi, "").replace(/del/gi, "").replace(/,/g, "").replace(/\s+/g, " ").trim();
+      const cleanStr = dateStr
+        .replace(/de/gi, "")
+        .replace(/del/gi, "")
+        .replace(/,/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
       const parts = cleanStr.split(" ");
       if (parts.length >= 3) {
         const day = parts[0].padStart(2, "0");
         const monthStr = parts[1].toUpperCase().substring(0, 3);
         const year = parts[2];
         const months = [
-          "ENE", "FEB", "MAR", "ABR", "MAY", "JUN",
-          "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"
+          "ENE",
+          "FEB",
+          "MAR",
+          "ABR",
+          "MAY",
+          "JUN",
+          "JUL",
+          "AGO",
+          "SEP",
+          "OCT",
+          "NOV",
+          "DIC",
         ];
-        const monthIdx = months.findIndex(m => monthStr.startsWith(m)) + 1;
+        const monthIdx = months.findIndex((m) => monthStr.startsWith(m)) + 1;
         if (monthIdx > 0 && year.length === 4) {
           this.activeDoc.fecha_resolucion = `${year}-${String(monthIdx).padStart(2, "0")}-${day}`;
           this.updateCanvasData();
