@@ -7,12 +7,13 @@
   <!-- Encabezado del Módulo -->
   <div class="module-header shadow">
     <div>
-      <h1>Buzón de Resueltos Procesados</h1>
+      <h1>Buzón de Resueltos Procesados en ({{ currentProfile === 'Edicion' ? 'Edición' : currentProfile === 'Revision' ? 'Revisión' : currentProfile === 'Secretaria' ? 'Secretaría' : currentProfile === 'Direccion' ? 'Dirección' : currentProfile === 'Aprobador' ? 'Aprobador' : currentProfile }})</h1>
       <p>Seleccione una carpeta militar para gestionar y firmar digitalmente los resueltos aprobados.</p>
     </div>
     <div style="display: flex; gap: 15px; align-items: center;">
       <!-- Selector de Perfil Dinámico (Bajo Demanda) -->
-      <div class="profile-selector-container" style="display: flex; align-items: center; gap: 8px;">
+      <!-- Selector de Perfil Dinámico (Bajo Demanda - Solo Admins) -->
+      <div *ngIf="isAdmin()" class="profile-selector-container" style="display: flex; align-items: center; gap: 8px;">
         <label style="margin: 0; font-weight: bold; font-size: 0.85rem; color: #a8b2c1;">
           <i class="fas fa-user-shield"></i> Perfil:
         </label>
@@ -22,6 +23,7 @@
                 (change)="onProfileChange()">
           <option value="Edicion">Edición (Redactor)</option>
           <option value="Revision">Revisión (Resolución)</option>
+          <option value="Jefe">Revisión (Jefe)</option>
           <option value="Secretaria">Revisión (Secretaría)</option>
           <option value="Direccion">Revisión (Dirección)</option>
           <option value="Aprobador">Aprobador y Firmante</option>
@@ -313,6 +315,7 @@
   (navigate)="onTinderNavigate($event)"
   (pdfLoadError)="onTinderPdfError($event)"
   (sendToReview)="onTinderDocumentRouted($event, 'Revisión (Resolución)')"
+  (sendToBoss)="onTinderDocumentRouted($event, 'Revisión (Jefe)')"
   (sendToSecretariat)="onTinderDocumentRouted($event, 'Revisión (Secretaría)')"
   (sendToDirection)="onTinderDocumentRouted($event, 'Revisión (Dirección)')"
   (sendToMinister)="onTinderDocumentRouted($event, 'Aprobador (Ministro)')">

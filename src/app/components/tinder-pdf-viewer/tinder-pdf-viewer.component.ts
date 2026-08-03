@@ -65,6 +65,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   @Input() profile:
     | "Edicion"
     | "Revision"
+    | "Jefe"
     | "Secretaria"
     | "Direccion"
     | "Aprobador" = "Edicion";
@@ -91,6 +92,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   }>();
   @Output() pdfLoadError = new EventEmitter<string>();
   @Output() sendToReview = new EventEmitter<PdfAction>();
+  @Output() sendToBoss = new EventEmitter<PdfAction>();
   @Output() sendToSecretariat = new EventEmitter<PdfAction>();
   @Output() sendToDirection = new EventEmitter<PdfAction>();
   @Output() sendToMinister = new EventEmitter<PdfAction>();
@@ -105,6 +107,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     | "approve"
     | "reject"
     | "sendToReview"
+    | "sendToBoss"
     | "sendToSecretariat"
     | "sendToDirection"
     | "sendToMinister"
@@ -618,33 +621,26 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public onCanvasDateChange(dateStr: string) {
     if (!this.activeDoc) return;
     try {
-      const parts = dateStr.trim().split(" ");
+      const cleanStr = dateStr.replace(/de/gi, "").replace(/del/gi, "").replace(/,/g, "").replace(/\s+/g, " ").trim();
+      const parts = cleanStr.split(" ");
       if (parts.length >= 3) {
         const day = parts[0].padStart(2, "0");
-        const monthStr = parts[1].toUpperCase();
+        const monthStr = parts[1].toUpperCase().substring(0, 3);
         const year = parts[2];
         const months = [
-          "ENE",
-          "FEB",
-          "MAR",
-          "ABR",
-          "MAY",
-          "JUN",
-          "JUL",
-          "AGO",
-          "SEP",
-          "OCT",
-          "NOV",
-          "DIC",
+          "ENE", "FEB", "MAR", "ABR", "MAY", "JUN",
+          "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"
         ];
-        const monthIdx = months.indexOf(monthStr) + 1;
+        const monthIdx = months.findIndex(m => monthStr.startsWith(m)) + 1;
         if (monthIdx > 0 && year.length === 4) {
           this.activeDoc.fecha_resolucion = `${year}-${String(monthIdx).padStart(2, "0")}-${day}`;
+          this.updateCanvasData();
           return;
         }
       }
     } catch (e) {}
     this.activeDoc.fecha_resolucion = dateStr;
+    this.updateCanvasData();
   }
 
   /* ── Navegación ──────────────────────────────────────── */
@@ -830,6 +826,33 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     this.executingType = "sendToReview";
     await this.actualizarEstatusFirma("990");
     this.sendToReview.emit({
+      doc: this.activeDoc,
+      observations: this.observations.trim(),
+      index: this.currentIndex,
+    });
+  }
+
+  async onSendToBoss(): Promise<void> {
+    if (this.actionExecuting || !this.activeDoc) return;
+    if (!this.validarResolucionYFecha()) return;
+
+    const result = await Swal.fire({
+      title: "¿Está seguro?",
+      text: `¿Está seguro de enviar este caso a Revisión (Jefe)?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, enviar",
+      cancelButtonText: "No",
+      confirmButtonColor: "#172b4d",
+      cancelButtonColor: "#8898aa",
+    });
+
+    if (!result.isConfirmed) return;
+
+    this.actionExecuting = true;
+    this.executingType = "sendToBoss";
+    await this.actualizarEstatusFirma("991");
+    this.sendToBoss.emit({
       doc: this.activeDoc,
       observations: this.observations.trim(),
       index: this.currentIndex,
@@ -1212,6 +1235,27 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         }
       }
 
+      // Asegurar valores por defecto inicializados para evitar conflictos y campos en blanco
+      if (!doc.numc) {
+        doc.numc = doc.ncontrol || doc.numero_carpeta || "000000";
+      }
+      if (!doc.ncontrol) {
+        doc.ncontrol = doc.numc;
+      }
+      if (!doc.fecha_resolucion) {
+        let defDate = "";
+        if (doc.fecha) {
+          const d = new Date(doc.fecha);
+          if (!isNaN(d.getTime())) {
+            defDate = d.toISOString().substring(0, 10);
+          }
+        }
+        if (!defDate) {
+          defDate = new Date().toISOString().substring(0, 10);
+        }
+        doc.fecha_resolucion = defDate;
+      }
+
       // Objeto task (lst) con todos los elementos de la resolución
       const lst = {
         fecha_resolucion: this.activeDoc.fecha_resolucion,
@@ -1239,6 +1283,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         numero_carpeta: `${numero_carpeta}`,
         numero_resolucion: `${resolucion}`,
         driver: environment.driver.PRINCIPAL,
+        objeto: obj,
         donde:
           '{\"usuario\":\"' +
           idUser +

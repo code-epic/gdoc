@@ -300,9 +300,21 @@
       <span>Enviar a Revisión</span>
     </button>
 
-    <!-- 2. Enviar a Secretaría (Solo para Revisión de Resolución) -->
+    <!-- 2. Enviar a Jefe (Solo para Revisión de Resolución) -->
     <button class="tpv-btn"
             *ngIf="profile === 'Revision'"
+            style="background: #172b4d; color: white;"
+            [disabled]="actionExecuting"
+            (click)="onSendToBoss()"
+            title="Enviar a Jefe">
+      <i class="fas fa-user-tie" *ngIf="!actionExecuting || executingType !== 'sendToBoss'"></i>
+      <div class="tpv-spinner-sm" *ngIf="actionExecuting && executingType === 'sendToBoss'"></div>
+      <span>Enviar a Jefe</span>
+    </button>
+
+    <!-- 3. Enviar a Secretaría (Para Revisión y Jefe) -->
+    <button class="tpv-btn"
+            *ngIf="profile === 'Revision' || profile === 'Jefe'"
             style="background: #fb6340; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToSecretariat()"
@@ -312,9 +324,9 @@
       <span>Enviar a Secretaría</span>
     </button>
 
-    <!-- 3. Enviar a Dirección (Para Revisión y Secretaría) -->
+    <!-- 4. Enviar a Dirección (Para Revisión, Jefe y Secretaría) -->
     <button class="tpv-btn"
-            *ngIf="profile === 'Revision' || profile === 'Secretaria'"
+            *ngIf="profile === 'Revision' || profile === 'Jefe' || profile === 'Secretaria'"
             style="background: #8965e0; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToDirection()"
@@ -324,9 +336,9 @@
       <span>Enviar a Dirección</span>
     </button>
 
-    <!-- 4. Enviar al Ministro (Para Revisión, Secretaría y Dirección) -->
+    <!-- 5. Enviar al Ministro (Para Revisión, Jefe, Secretaría y Dirección) -->
     <button class="tpv-btn"
-            *ngIf="profile === 'Revision' || profile === 'Secretaria' || profile === 'Direccion'"
+            *ngIf="profile === 'Revision' || profile === 'Jefe' || profile === 'Secretaria' || profile === 'Direccion'"
             style="background: #f5365c; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToMinister()"

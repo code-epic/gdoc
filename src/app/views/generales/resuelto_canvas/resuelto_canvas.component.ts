@@ -53,7 +53,7 @@ export class ResueltoCanvasComponent
   };
 
   @Input() lineSpacing: number = 1.15;
-  @Input() profile: "Edicion" | "Revision" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
+  @Input() profile: "Edicion" | "Revision" | "Jefe" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
   @Input() showSignaturesForPrint: boolean = false;
 
   @Output() zoneSelected = new EventEmitter<string>();

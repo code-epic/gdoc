@@ -88,12 +88,14 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public currentProfile:
     | "Edicion"
     | "Revision"
+    | "Jefe"
     | "Secretaria"
     | "Direccion"
     | "Aprobador" = "Edicion";
   public viewerProfile:
     | "Edicion"
     | "Revision"
+    | "Jefe"
     | "Secretaria"
     | "Direccion"
     | "Aprobador" = "Edicion";
@@ -184,7 +186,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             userId: decoded.Usuario.id || "",
             userName: decoded.Usuario.nombre || decoded.Usuario.usuario || "",
             userRole: decoded.Usuario.tipo || "Usuario",
-            perfil: decoded.Usuario.descripcion || "",
+            perfil: sessionStorage.getItem("perfil") || decoded.Usuario.descripcion || "",
           };
         }
       }
@@ -193,36 +195,111 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
           userId: this.loginService.Usuario.id || "",
           userName: this.loginService.Usuario.nombre || "",
           userRole: this.loginService.Usuario.tipo || "",
-          perfil: this.loginService.Usuario.descripcion || "",
+          perfil: sessionStorage.getItem("perfil") || this.loginService.Usuario.descripcion || "",
         };
       }
-      console.log(this.jwtData);
-      // Mapear rol de usuario inicial al perfil dinámico
+
+      // Intentar mapear perfil de forma síncrona usando caché o rol
+      const perfilStr = (sessionStorage.getItem("perfil") || this.jwtData.perfil || "").toUpperCase();
       const roleStr = (this.jwtData.userRole || "").toUpperCase();
-      if (roleStr.includes("SEC") || roleStr.includes("SECRETARIA")) {
-        this.currentProfile = "Secretaria";
-      } else if (roleStr.includes("DIR") || roleStr.includes("DIRECCION")) {
-        this.currentProfile = "Direccion";
-      } else if (
-        roleStr.includes("APROB") ||
-        roleStr.includes("MIN") ||
-        roleStr.includes("FIRMAN")
-      ) {
-        this.currentProfile = "Aprobador";
-      } else if (roleStr.includes("REV") || roleStr.includes("REVISION")) {
-        this.currentProfile = "Revision";
+
+      if (perfilStr && perfilStr !== "") {
+        this.mapProfile(perfilStr);
+      } else if (roleStr && roleStr !== "USUARIO") {
+        this.mapProfile(roleStr);
       } else {
-        this.currentProfile = "Edicion";
+        // Fallback asíncrono para usuarios ya logueados
+        const token = sessionStorage.getItem("token");
+        if (token) {
+          const helper = new JwtHelperService();
+          const decoded = helper.decodeToken(token);
+          if (decoded && decoded.Usuario) {
+            const cedula = decoded.Usuario.cedula || "";
+            const sistema = decoded.Usuario.sistema || environment.ID || "";
+            const correo = decoded.Usuario.correo || "";
+
+            const userApi = {
+              funcion: environment.funcion.CONSULTAR_USUARIO_PERFIL,
+              parametros: `${cedula},${sistema},${correo}`,
+              valores: ""
+            } as IAPICore;
+
+            this.apiService.Ejecutar(userApi).subscribe(
+              (res: any) => {
+                try {
+                  if (res && res.length > 0 && res[0].Aplicacion && res[0].Aplicacion.length > 0 && res[0].Aplicacion[0].Rol) {
+                    const rolDesc = res[0].Aplicacion[0].Rol.descripcion || res[0].Aplicacion[0].Rol.nombre || "";
+                    sessionStorage.setItem("perfil", rolDesc);
+                    this.jwtData.perfil = rolDesc;
+                    this.mapProfile(rolDesc);
+                    this.loadFolders(); // Recargar carpetas ahora con el perfil correcto
+                  }
+                } catch (e) {
+                  console.error("Error procesando perfil de DB:", e);
+                }
+              }
+            );
+          }
+        }
       }
+
       console.log(
-        "[ResueltosOk] Perfil inicial asignado por rol JWT:",
+        "[ResueltosOk] Perfil inicial asignado por rol/DB:",
         this.currentProfile,
         "Rol:",
         this.jwtData.userRole,
+        "Perfil Cache/JWT:",
+        perfilStr || this.jwtData.perfil,
       );
     } catch (e) {
       console.error("Error al decodificar JWT:", e);
     }
+  }
+
+  private mapProfile(perfilVal: string) {
+    const perfilStr = (perfilVal || "").toUpperCase();
+    const roleStr = (this.jwtData.userRole || "").toUpperCase();
+
+    if (perfilStr.includes("REDACTOR") || perfilStr === "RESOLUCION REDACTOR") {
+      this.currentProfile = "Edicion";
+    } else if (perfilStr.includes("JEFE") || perfilStr === "RESOLUCION JEFE") {
+      this.currentProfile = "Jefe";
+    } else if (
+      perfilStr.includes("SECRETARIA") ||
+      perfilStr.includes("SECREATARIA") ||
+      perfilStr.includes("SEC") ||
+      roleStr.includes("SEC")
+    ) {
+      this.currentProfile = "Secretaria";
+    } else if (
+      perfilStr.includes("DIRECCION") ||
+      perfilStr === "DIRECCION" ||
+      roleStr.includes("DIR")
+    ) {
+      this.currentProfile = "Direccion";
+    } else if (
+      perfilStr.includes("MINISTRO") ||
+      perfilStr === "MINISTRO" ||
+      roleStr.includes("APROB") ||
+      roleStr.includes("MIN") ||
+      roleStr.includes("FIRMAN")
+    ) {
+      this.currentProfile = "Aprobador";
+    } else if (
+      perfilStr.includes("REVISION") ||
+      perfilStr === "RESOLUCION REVISION" ||
+      roleStr.includes("REV")
+    ) {
+      this.currentProfile = "Revision";
+    } else {
+      this.currentProfile = "Edicion";
+    }
+  }
+
+  public isAdmin(): boolean {
+    const role = (this.jwtData.userRole || "").toUpperCase();
+    const perfil = (this.jwtData.perfil || sessionStorage.getItem("perfil") || "").toUpperCase();
+    return role.includes("ADMIN") || perfil.includes("ADMIN");
   }
 
   public onProfileChange() {
@@ -245,6 +322,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       paramVal = "930";
     } else if (this.currentProfile === "Direccion") {
       paramVal = "340";
+    } else if (this.currentProfile === "Jefe") {
+      paramVal = "991";
     } else if (this.currentProfile === "Revision") {
       paramVal = "990";
     }
@@ -392,6 +471,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       paramVal = "930";
     } else if (this.currentProfile === "Direccion") {
       paramVal = "340";
+    } else if (this.currentProfile === "Jefe") {
+      paramVal = "991";
     } else if (this.currentProfile === "Revision") {
       paramVal = "990";
     }
@@ -447,6 +528,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     forcedProfile?:
       | "Edicion"
       | "Revision"
+      | "Jefe"
       | "Secretaria"
       | "Direccion"
       | "Aprobador",
@@ -521,7 +603,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public onTinderDocumentRouted(action: PdfAction, targetRoleName: string) {
     this.toastrService.success(
       `El caso de la carpeta N° ${action.doc.numero_carpeta} fue enviado a ${targetRoleName} exitosamente.`,
-      "Caso Enviado"
+      "Caso Enviado",
     );
 
     if (this.tinderViewer) {
@@ -530,7 +612,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
     const numCarpeta = action.doc.numero_carpeta;
     this.documents = this.documents.filter(
-      (d) => d.numero_carpeta !== numCarpeta
+      (d) => d.numero_carpeta !== numCarpeta,
     );
 
     if (this.documents.length === 0) {
