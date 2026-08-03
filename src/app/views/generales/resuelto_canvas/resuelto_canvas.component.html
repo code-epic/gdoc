@@ -85,14 +85,14 @@
     <!-- Contenedor de firma alineado a la derecha partiendo del centro -->
     <div class="m-resolucion-firma-container">
       
-      <!-- Z-Index 1: Sello Húmedo (Escudo 5x5 cm) - Oculto en pantalla para todos los perfiles -->
-      <img *ngIf="false" 
+      <!-- Z-Index 1: Sello Húmedo (Escudo 5x5 cm) - Oculto en pantalla para todos los perfiles, visible solo para imprenta/PDF -->
+      <img *ngIf="showSignaturesForPrint" 
            [src]="documentData.signatures.wetStampImageUrl" 
            class="wet-stamp-layer" alt="Sello Húmedo"
            style="position: absolute; top: -23mm; left: -10%; z-index: 1; opacity: 0.85; width: 50mm; height: 50mm;">
 
-      <!-- Z-Index 2: Firma Imagen (Elevada 0.8cm) - Oculto en pantalla para todos los perfiles -->
-      <img *ngIf="false" 
+      <!-- Z-Index 2: Firma Imagen (Elevada 0.8cm) - Oculto en pantalla para todos los perfiles, visible solo para imprenta/PDF -->
+      <img *ngIf="showSignaturesForPrint" 
            [src]="documentData.signatures.signatureImageUrl" 
            class="signature-layer" alt="Firma Autoridad"
            style="position: absolute; bottom: calc(85% - 7mm); left: 50%; transform: translateX(-50%); z-index: 2; width: 85mm; max-width: none; pointer-events: none;">

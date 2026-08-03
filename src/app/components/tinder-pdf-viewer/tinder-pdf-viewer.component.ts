@@ -7,6 +7,7 @@ import {
   OnDestroy,
   SimpleChanges,
   ChangeDetectorRef,
+  ViewChild,
 } from "@angular/core";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import jsPDF from "jspdf";
@@ -107,7 +108,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     | "sendToMinister"
     | "" = "";
   public observations = "";
+  @ViewChild('resueltoCanvas') resueltoCanvas: any;
+
   public hasSavedState = false;
+  public printModeActive = false;
   public pdfError = false;
   public pdfErrorMsg = "";
   public swipeDir: "" | "left" | "right" = "";
@@ -365,8 +369,30 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   }
 
   public async printCanvas() {
+    // 1. Mostrar modal de carga
+    Swal.fire({
+      title: "Generando PDF...",
+      text: "Por favor espere mientras se procesa el documento.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    this.printModeActive = true;
     this.loadingPdf = true;
     this.cdr.detectChanges();
+
+    // 2. Guardar y temporalmente resetear el zoom a 1.0 para evitar distorsión de escala
+    let originalZoom = 1.0;
+    if (this.resueltoCanvas) {
+      originalZoom = this.resueltoCanvas.zoomScale || 1.0;
+      this.resueltoCanvas.zoomScale = 1.0;
+      this.cdr.detectChanges();
+    }
+
+    // Pequeño retardo para permitir que las firmas, sellos y el zoom se rendericen en el DOM
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     try {
       const pdf = new jsPDF({
@@ -414,10 +440,23 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         : `Resuelto_${new Date().getTime()}.pdf`;
 
       pdf.save(filename);
+      
+      // Cerrar modal de carga con éxito
+      Swal.close();
     } catch (err) {
       console.error("Error generando PDF: ", err);
-      alert("Ocurrió un error al generar el documento PDF.");
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al generar el documento PDF.",
+        icon: "error",
+        confirmButtonColor: "#f5365c"
+      });
     } finally {
+      // 3. Restaurar zoom original y apagar modo de impresión
+      if (this.resueltoCanvas) {
+        this.resueltoCanvas.zoomScale = originalZoom;
+      }
+      this.printModeActive = false;
       this.loadingPdf = false;
       this.cdr.detectChanges();
     }

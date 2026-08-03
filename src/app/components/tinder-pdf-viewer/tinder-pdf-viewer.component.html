@@ -76,9 +76,11 @@
         <!-- Canvas Continuo (Nuevo Componente) -->
         <app-resuelto-canvas 
           *ngIf="useCanvas" 
+          #resueltoCanvas
           [documentData]="canvasData" 
           [lineSpacing]="lineSpacing"
           [profile]="profile"
+          [showSignaturesForPrint]="printModeActive"
           (basamentoLegalChange)="updateActiveDoc('basamentoLegal', $event)"
           (dateChange)="updateActiveDoc('fecha_resolucion', $event)"
           (unicoParrafoChange)="updateActiveDoc('_headerHtml', $event)"
