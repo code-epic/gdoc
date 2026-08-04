@@ -83,6 +83,13 @@ export class ResueltoCanvasComponent
     this.lineSpacingChange.emit(this.currentLineSpacing);
   }
 
+  formatText(command: string) {
+    document.execCommand(command, false, "");
+    
+    // Disparar paginación después de aplicar el formato, ya que el tamaño del texto puede cambiar (ej. negritas)
+    this.casesInput$.next();
+  }
+
   private applyLineSpacing() {
     if (this.activeElement) {
       this.activeElement.style.setProperty('line-height', this.currentLineSpacing.toString(), 'important');

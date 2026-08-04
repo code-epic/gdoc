@@ -10,6 +10,13 @@
     <!-- Separator -->
     <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
 
+    <!-- Text Formatting -->
+    <button class="btn btn-sm btn-outline-light mr-1" (click)="formatText('bold')" title="Negrita (Ctrl+B)"><i class="fas fa-bold"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (click)="formatText('underline')" title="Subrayado (Ctrl+U)"><i class="fas fa-underline"></i></button>
+
+    <!-- Separator -->
+    <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
+
     <button class="btn btn-sm btn-outline-light" (click)="decreaseLineSpacing()" title="Reducir Interlineado"><i class="fas fa-minus"></i></button>
     <span class="zoom-level px-2" title="Interlineado actual"><i class="fas fa-align-justify mr-1"></i> {{ currentLineSpacing }}</span>
     <button class="btn btn-sm btn-outline-light" (click)="increaseLineSpacing()" title="Aumentar Interlineado"><i class="fas fa-plus"></i></button>
@@ -86,13 +93,13 @@
   </main>
 
   <!-- PIE DE PÁGINA Y FIRMAS -->
-  <footer class="doc-footer editable-zone" *ngIf="i === documentData.pages.length - 1" (click)="editMode('signatures')" style="margin-top: 26pt; /* 2 líneas debajo del cuerpo */">
+  <footer class="doc-footer editable-zone" *ngIf="i === documentData.pages.length - 1" (click)="editMode('signatures')" style="margin-top: 0; /* Sin margen para ajustarse al máximo al texto anterior */">
     
     <!-- 1cm desde el margen izquierdo -->
-    <p class="m-resolucion-comuniquese">Comuníquese y publíquese.</p>
+    <p class="m-resolucion-comuniquese" [style.line-height]="lineSpacing">Comuníquese y publíquese.</p>
     
-    <!-- 1.5cm desde el margen izquierdo -->
-    <p class="m-resolucion-ejecutivo">Por el Ejecutivo Nacional,</p>
+    <!-- 1cm desde el margen izquierdo -->
+    <p class="m-resolucion-ejecutivo" [style.line-height]="lineSpacing">Por el Ejecutivo Nacional,</p>
 
     <!-- Contenedor de firma alineado a la derecha partiendo del centro -->
     <div class="m-resolucion-firma-container">
@@ -107,7 +114,7 @@
       <img *ngIf="showSignaturesForPrint" 
            [src]="documentData.signatures.signatureImageUrl" 
            class="signature-layer" alt="Firma Autoridad"
-           style="position: absolute; bottom: calc(85% - 7mm); left: 50%; transform: translateX(-50%); z-index: 2; width: 85mm; max-width: none; pointer-events: none;">
+           style="position: absolute; bottom: calc(100% - 5mm); left: 50%; transform: translateX(-50%); z-index: 2; width: 85mm; max-width: none; pointer-events: none;">
            
       <!-- Textos de firma -->
       <div class="signatory-info">
@@ -120,7 +127,7 @@
     <div style="clear: both;"></div>
 
     <!-- PIE DE PÁGINA ADHERIDO A LA FIRMA (Solo en la última página) -->
-    <div class="relative-page-footer" style="margin-top: 30pt; font-family: 'Tahoma', sans-serif; text-align: left;">
+    <div class="relative-page-footer" style="margin-top: 5pt; font-family: 'Tahoma', sans-serif; text-align: left;">
       <!-- Iniciales (Media firma): 1 línea antes que la paginación -->
       <div class="initials" style="font-size: 8pt; color: #000; margin-bottom: 13pt; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
            [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false"

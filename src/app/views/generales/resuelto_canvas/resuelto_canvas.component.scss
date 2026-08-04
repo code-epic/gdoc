@@ -147,15 +147,12 @@
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
     margin-left: 1cm !important;
-    line-height: 1.15 !important;
   }
 
   .m-resolucion-ejecutivo {
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
-    margin-left: 1.5cm !important;
-    margin-top: 13pt !important; /* 1 linea de bajo */
-    line-height: 1.15 !important;
+    margin-left: 1cm !important;
   }
 
   .m-resolucion-firma-container {
@@ -234,10 +231,6 @@
   margin-top: 10mm;
   min-height: 35mm;
   flex-shrink: 0;
-
-  p {
-    line-height: 1.15 !important; /* Protege los textos fijos del footer */
-  }
 }
 
 /* Capas de Firma y Sello */
