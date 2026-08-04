@@ -199,6 +199,7 @@
 .doc-body {
   text-align: justify;
   font-size: 13pt;
+  flex: 1 0 auto;
   
   p {
     line-height: 1.15 !important; /* Fuerza Word Sencillo sobre todos los p del cuerpo */
