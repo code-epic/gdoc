@@ -418,15 +418,9 @@ export class ResueltoCanvasComponent
         el.parentNode?.replaceChild(fragment, el);
       } else {
         // Capturar estilos seguros
-        const fontFamily = el.style.fontFamily;
-        const fontSize = el.style.fontSize;
-        const color = el.style.color;
-        const backgroundColor = el.style.backgroundColor;
         const textAlign = el.style.textAlign;
         const textIndent = el.style.textIndent;
         const marginLeft = el.style.marginLeft;
-        const marginTop = el.style.marginTop;
-        const marginBottom = el.style.marginBottom;
 
         const isUnderline = el.style.textDecoration.includes("underline");
         const isBold =
@@ -438,16 +432,10 @@ export class ResueltoCanvasComponent
           el.removeAttribute(el.attributes[0].name);
         }
 
-        // Re-aplicar estilos
-        if (fontFamily) el.style.fontFamily = fontFamily;
-        if (fontSize) el.style.fontSize = fontSize;
-        if (color) el.style.color = color;
-        if (backgroundColor) el.style.backgroundColor = backgroundColor;
+        // Re-aplicar estilos básicos estructurales (Ignoramos fuentes, tamaños y colores para forzar Tahoma)
         if (textAlign) el.style.textAlign = textAlign;
         if (textIndent) el.style.textIndent = textIndent;
         if (marginLeft) el.style.marginLeft = marginLeft;
-        if (marginTop) el.style.marginTop = marginTop;
-        if (marginBottom) el.style.marginBottom = marginBottom;
 
         if (isUnderline || el.tagName === "U")
           el.style.textDecoration = "underline";

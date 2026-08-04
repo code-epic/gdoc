@@ -364,7 +364,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       },
       pages: pages,
       signatures: {
-        initials: "LARM/RMEA/B.O.merb",
+        initials: "LARM/JAOG/B.O.merb",
         mainSignatory: "GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ",
         signatoryTitle: "General en Jefe",
         signatoryRole: `MINISTRO DEL PODER POPULAR<br>PARA LA DEFENSA`,
@@ -372,7 +372,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         signatureImageUrl: "./assets/img/mppd/firma_mppd.png",
       },
     };
-    console.log("[TinderPdfViewer] canvasData:", this.canvasData);
+    // console.log("[TinderPdfViewer] canvasData:", this.canvasData);
   }
 
   public async printCanvas() {
@@ -584,11 +584,18 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public syncFromCanvas() {
     if (this.resueltoCanvas && this.resueltoCanvas.documentData) {
       // Sincronizar todos los cambios del canvas a activeDoc
-      this.activeDoc.basamentoLegal = this.resueltoCanvas.documentData.body?.basamentoLegal || this.activeDoc.basamentoLegal;
-      this.activeDoc._headerHtml = this.resueltoCanvas.documentData.body?.unicoParrafo || this.activeDoc._headerHtml;
-      
+      this.activeDoc.basamentoLegal =
+        this.resueltoCanvas.documentData.body?.basamentoLegal ||
+        this.activeDoc.basamentoLegal;
+      this.activeDoc._headerHtml =
+        this.resueltoCanvas.documentData.body?.unicoParrafo ||
+        this.activeDoc._headerHtml;
+
       let allCasesHtml = "";
-      if (this.resueltoCanvas.documentData.pages && this.resueltoCanvas.documentData.pages.length > 0) {
+      if (
+        this.resueltoCanvas.documentData.pages &&
+        this.resueltoCanvas.documentData.pages.length > 0
+      ) {
         this.resueltoCanvas.documentData.pages.forEach((p: any) => {
           allCasesHtml += p.casesHtml || "";
         });
@@ -1329,7 +1336,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         }
         doc.fecha_resolucion = defDate;
       }
-      
+
       resolve();
     });
   }
