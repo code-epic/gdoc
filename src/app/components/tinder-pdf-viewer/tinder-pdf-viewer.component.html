@@ -26,11 +26,6 @@
       </div>
     </div>
     <div class="tpv-nav-right">
-      <div class="tpv-nav-spacing" *ngIf="useCanvas" style="display: inline-flex; align-items: center; margin-right: 15px; background: rgba(255,255,255,0.1); border-radius: 4px; padding: 2px;">
-        <button (click)="decreaseLineSpacing()" title="Reducir Interlineado" style="background: transparent; border: none; color: white; cursor: pointer; padding: 4px 8px;"><i class="fas fa-minus"></i></button>
-        <span style="color: white; font-size: 0.85rem; font-weight: bold; width: 35px; text-align: center;">{{ lineSpacing }}</span>
-        <button (click)="increaseLineSpacing()" title="Aumentar Interlineado" style="background: transparent; border: none; color: white; cursor: pointer; padding: 4px 8px;"><i class="fas fa-plus"></i></button>
-      </div>
       <button class="tpv-btn-print" *ngIf="useCanvas && profile === 'Edicion'" (click)="confirmSaveDocumentState()" title="Guardar Progreso" style="margin-right: 10px; background: #5e72e4; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
         <i class="fas fa-save"></i> Guardar
       </button>
@@ -78,7 +73,7 @@
           *ngIf="useCanvas" 
           #resueltoCanvas
           [documentData]="canvasData" 
-          [lineSpacing]="lineSpacing"
+          [(lineSpacing)]="lineSpacing"
           [profile]="profile"
           [showSignaturesForPrint]="printModeActive"
           (basamentoLegalChange)="updateActiveDoc('basamentoLegal', $event)"

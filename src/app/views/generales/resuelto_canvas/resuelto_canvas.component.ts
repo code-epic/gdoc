@@ -9,6 +9,7 @@ import {
   HostListener,
   ViewChild,
   AfterViewInit,
+  ChangeDetectorRef
 } from "@angular/core";
 import { Subject } from "rxjs";
 import { debounceTime } from "rxjs/operators";
@@ -56,6 +57,9 @@ export class ResueltoCanvasComponent
   @Input() profile: "Edicion" | "Revision" | "Jefe" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
   @Input() showSignaturesForPrint: boolean = false;
 
+  @Output() lineSpacingChange = new EventEmitter<number>();
+  @Output() profileChange = new EventEmitter<string>();
+
   @Output() zoneSelected = new EventEmitter<string>();
   @Output() basamentoLegalChange = new EventEmitter<string>();
   @Output() dateChange = new EventEmitter<string>();
@@ -64,13 +68,45 @@ export class ResueltoCanvasComponent
   @Output() initialsChange = new EventEmitter<string>();
   @Output() casesBlur = new EventEmitter<void>();
 
+  public currentLineSpacing: number = 1.15;
+  private activeElement: HTMLElement | null = null;
+
+  decreaseLineSpacing() {
+    this.currentLineSpacing = parseFloat(Math.max(0.5, this.currentLineSpacing - 0.05).toFixed(2));
+    this.applyLineSpacing();
+    this.lineSpacingChange.emit(this.currentLineSpacing);
+  }
+
+  increaseLineSpacing() {
+    this.currentLineSpacing = parseFloat((this.currentLineSpacing + 0.05).toFixed(2));
+    this.applyLineSpacing();
+    this.lineSpacingChange.emit(this.currentLineSpacing);
+  }
+
+  private applyLineSpacing() {
+    if (this.activeElement) {
+      this.activeElement.style.setProperty('line-height', this.currentLineSpacing.toString(), 'important');
+      const children = this.activeElement.querySelectorAll('p, span, div');
+      children.forEach(child => {
+        (child as HTMLElement).style.setProperty('line-height', this.currentLineSpacing.toString(), 'important');
+      });
+      
+      // Forzar actualización en el modelo de datos si es necesario (el HTML reflejará el inline style)
+      // Especialmente útil para .cases-list
+      if (this.activeElement.classList.contains('cases-list')) {
+        this.casesInput$.next();
+      }
+    }
+  }
+
   private casesInput$ = new Subject<void>();
 
-  constructor(private el: ElementRef) {}
+  constructor(private el: ElementRef, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.casesInput$.pipe(debounceTime(600)).subscribe(() => {
       this.casesBlur.emit();
+      this.paginateDOM();
     });
   }
 
@@ -80,7 +116,10 @@ export class ResueltoCanvasComponent
 
   ngAfterViewInit() {
     // Retardo mínimo para asegurar que el DOM está renderizado
-    setTimeout(() => this.autoFit(), 100);
+    setTimeout(() => {
+      this.autoFit();
+      this.paginateDOM();
+    }, 100);
   }
 
   @HostListener("window:resize")
@@ -214,10 +253,51 @@ export class ResueltoCanvasComponent
       this.casesInput$.next();
     }
 
-    // Forzar repaginación ya no es necesario, pero emitimos input para guardar
     setTimeout(() => {
       this.casesInput$.next();
     }, 100);
+  }
+
+  paginateDOM() {
+    if (!this.documentData || !this.documentData.pages) return;
+
+    let allCasesHtml = '';
+    this.documentData.pages.forEach((p: any) => allCasesHtml += (p.casesHtml || ''));
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(allCasesHtml, 'text/html');
+    const nodes = Array.from(doc.body.childNodes).filter(n => n.nodeName !== '#text' || n.textContent!.trim() !== '');
+    const paragraphs = nodes.map(n => (n as HTMLElement).outerHTML || n.textContent || '');
+
+    // Resetear a una sola página limpia
+    this.documentData.pages = [{
+      pageIndex: 0,
+      headerHtml: "",
+      casesHtml: ""
+    }];
+
+    for (let p of paragraphs) {
+      let currentPageIdx = this.documentData.pages.length - 1;
+      this.documentData.pages[currentPageIdx].casesHtml += p;
+
+      this.cdr.detectChanges(); 
+
+      const canvases = this.el.nativeElement.querySelectorAll('.a4-canvas');
+      const currentCanvas = canvases[currentPageIdx] as HTMLElement;
+
+      // Si se desborda, mover este nodo a una página nueva
+      if (currentCanvas && currentCanvas.scrollHeight > currentCanvas.clientHeight + 2) {
+        const currentHtml = this.documentData.pages[currentPageIdx].casesHtml;
+        this.documentData.pages[currentPageIdx].casesHtml = currentHtml.substring(0, currentHtml.length - p.length);
+        
+        this.documentData.pages.push({
+          pageIndex: currentPageIdx + 1,
+          headerHtml: "",
+          casesHtml: p
+        });
+        this.cdr.detectChanges();
+      }
+    }
   }
 
   private cleanHtmlNodes(node: Node) {
@@ -320,6 +400,13 @@ export class ResueltoCanvasComponent
   onFocusEditable(event: Event) {
     const target = event.target as HTMLElement;
     target.style.backgroundColor = "rgba(142, 202, 230, 0.15)"; // Un azul muy suave
+    
+    this.activeElement = target;
+    
+    const inlineLh = target.style.lineHeight;
+    if (inlineLh && !isNaN(parseFloat(inlineLh))) {
+       this.currentLineSpacing = parseFloat(inlineLh);
+    }
   }
 
   onBlurEditable(event: Event) {

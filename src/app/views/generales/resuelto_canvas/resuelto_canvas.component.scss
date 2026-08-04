@@ -13,9 +13,10 @@
   justify-content: center;
   align-items: center;
   padding: 10px;
-  background: white;
-  border-bottom: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background: #172b4d;
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -25,6 +26,7 @@
     font-weight: 600;
     min-width: 45px;
     text-align: center;
+    color: white;
   }
 }
 
@@ -44,7 +46,7 @@
 .a4-canvas {
   width: 215.9mm;
   height: 355.6mm;
-  overflow: visible;
+  overflow: hidden;
   background: white;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   /* Márgenes físicos del documento: Arriba, Derecha, Abajo, Izquierda (2.5cm sup) */
@@ -242,4 +244,14 @@
   bottom: 20mm;
   width: 150px;
   z-index: 2; /* Por encima del sello */
+}
+
+/* Contador de páginas */
+.page-counter {
+  position: absolute;
+  bottom: 15mm;
+  right: 20mm;
+  font-family: 'Tahoma', sans-serif;
+  font-size: 10pt;
+  color: #333;
 }

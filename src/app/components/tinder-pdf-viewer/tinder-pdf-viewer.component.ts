@@ -411,35 +411,26 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
       const canvases = document.querySelectorAll(".a4-canvas");
       if (canvases.length > 0) {
-        const canvasElement = canvases[0] as HTMLElement;
+        for (let i = 0; i < canvases.length; i++) {
+          const canvasElement = canvases[i] as HTMLElement;
 
-        const htmlCanvas = await html2canvas(canvasElement, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          allowTaint: true,
-          backgroundColor: "#ffffff",
-        });
+          const htmlCanvas = await html2canvas(canvasElement, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            allowTaint: true,
+            backgroundColor: "#ffffff",
+          });
 
-        const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
+          const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
 
-        const pageWidth = 215.9;
-        const pageHeight = 355.6;
+          const pageWidth = 215.9;
+          const pageHeight = 355.6;
 
-        const imgWidth = pageWidth;
-        const imgHeight = (htmlCanvas.height * pageWidth) / htmlCanvas.width;
-
-        let heightLeft = imgHeight;
-        let position = 0;
-
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-
-        while (heightLeft > 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
+          if (i > 0) {
+            pdf.addPage();
+          }
+          pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, pageHeight);
         }
       }
 

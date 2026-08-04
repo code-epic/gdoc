@@ -1,15 +1,27 @@
 <div class="canvas-toolbar">
-  <button class="btn btn-sm btn-outline-secondary" (click)="zoomOut()" title="Alejar"><i class="fas fa-search-minus"></i></button>
+  <!-- Zoom Controls -->
+  <button class="btn btn-sm btn-outline-light" (click)="zoomOut()" title="Alejar"><i class="fas fa-search-minus"></i></button>
   <span class="zoom-level">{{ (zoomScale * 100) | number:'1.0-0' }}%</span>
-  <button class="btn btn-sm btn-outline-secondary" (click)="zoomIn()" title="Acercar"><i class="fas fa-search-plus"></i></button>
-  <button class="btn btn-sm btn-outline-primary ml-2" (click)="autoFit()" title="Ajustar a pantalla"><i class="fas fa-expand-arrows-alt"></i></button>
+  <button class="btn btn-sm btn-outline-light" (click)="zoomIn()" title="Acercar"><i class="fas fa-search-plus"></i></button>
+  <button class="btn btn-sm btn-outline-light ml-2" (click)="autoFit()" title="Ajustar a pantalla"><i class="fas fa-expand-arrows-alt"></i></button>
+  
+  <!-- Line Spacing Controls (Only for Edicion) -->
+  <ng-container *ngIf="profile === 'Edicion'">
+    <!-- Separator -->
+    <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
+
+    <button class="btn btn-sm btn-outline-light" (click)="decreaseLineSpacing()" title="Reducir Interlineado"><i class="fas fa-minus"></i></button>
+    <span class="zoom-level px-2" title="Interlineado actual"><i class="fas fa-align-justify mr-1"></i> {{ currentLineSpacing }}</span>
+    <button class="btn btn-sm btn-outline-light" (click)="increaseLineSpacing()" title="Aumentar Interlineado"><i class="fas fa-plus"></i></button>
+  </ng-container>
 </div>
 
 <div class="a4-canvas-container" #container [style.transform]="'scale(' + zoomScale + ')'">
-  <div class="a4-canvas" *ngIf="documentData && documentData.pages && documentData.pages[0] as page" style="margin-bottom: 20px; min-height: 355.6mm; height: auto;">
+  <ng-container *ngIf="documentData && documentData.pages">
+    <div class="a4-canvas" *ngFor="let page of documentData.pages; let i = index" style="margin-bottom: 20px; position: relative;">
   
   <!-- CABECERA -->
-  <header class="doc-header editable-zone" (click)="editMode('header')">
+  <header class="doc-header editable-zone" *ngIf="i === 0" (click)="editMode('header')">
     <p class="m-resolucion-membrete">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
     <p class="m-resolucion-membrete">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
     <p class="m-resolucion-membrete">DESPACHO DEL MINISTRO</p>
@@ -32,7 +44,7 @@
 
   <!-- CUERPO DEL DOCUMENTO -->
   <main class="doc-body editable-zone" (click)="editMode('body')">
-    <ng-container>
+    <ng-container *ngIf="i === 0">
       <!-- 1 línea debajo del título (13pt aprox) -->
       <p class="m-resolucion-basamento" 
          [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" 
@@ -74,7 +86,7 @@
   </main>
 
   <!-- PIE DE PÁGINA Y FIRMAS -->
-  <footer class="doc-footer editable-zone" (click)="editMode('signatures')" style="margin-top: 52pt; /* 4 líneas debajo del cuerpo */">
+  <footer class="doc-footer editable-zone" *ngIf="i === documentData.pages.length - 1" (click)="editMode('signatures')" style="margin-top: 52pt; /* 4 líneas debajo del cuerpo */">
     
     <!-- 1cm desde el margen izquierdo -->
     <p class="m-resolucion-comuniquese">Comuníquese y publíquese.</p>
@@ -119,6 +131,11 @@
       </div>
     </div>
   </footer>
-
+  <!-- CONTADOR DE PÁGINAS -->
+  <div class="page-counter" *ngIf="documentData.pages.length > 1">
+    Página {{ i + 1 }} de {{ documentData.pages.length }}
   </div>
+
+    </div>
+  </ng-container>
 </div>
