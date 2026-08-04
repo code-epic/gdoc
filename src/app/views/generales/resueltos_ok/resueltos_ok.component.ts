@@ -34,6 +34,23 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public paginatedFolders: any[] = [];
   public selectedFolder: any = null;
   public documents: any[] = [];
+  public documentSearchQuery = "";
+
+  get filteredDocumentsList() {
+    if (!this.documentSearchQuery) return this.documents;
+    const query = this.documentSearchQuery.toLowerCase().trim();
+    return this.documents.filter((doc) => {
+      if (doc.numero_carpeta && doc.numero_carpeta.toLowerCase().includes(query)) return true;
+      
+      if (doc.documentos && Array.isArray(doc.documentos)) {
+        for (const item of doc.documentos) {
+          if (item.cedula && item.cedula.toLowerCase().includes(query)) return true;
+          if (item.nombres_apellidos && item.nombres_apellidos.toLowerCase().includes(query)) return true;
+        }
+      }
+      return false;
+    });
+  }
 
   // Paginación y Filtros de Carpetas
   public activeComponentFilter = "ALL";
