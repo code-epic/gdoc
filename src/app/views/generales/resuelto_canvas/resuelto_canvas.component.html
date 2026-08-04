@@ -78,7 +78,7 @@
          [style.line-height]="lineSpacing"
          style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
          (focus)="onFocusEditable($event)" 
-         (blur)="onBlurEditable($event); onCasesListBlur()"
+         (blur)="onBlurEditable($event); onCasesListBlur($event, page.pageIndex)"
          (input)="onCasesListInput($event, page.pageIndex)"
          (paste)="onPasteCases($event, page.pageIndex)"
          [innerHTML]="page.casesHtml">

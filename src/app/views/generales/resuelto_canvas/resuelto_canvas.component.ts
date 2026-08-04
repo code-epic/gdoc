@@ -194,26 +194,42 @@ export class ResueltoCanvasComponent
     }
   }
 
-  onCasesListBlur() {
-    // Ya no es estrictamente necesario, pero lo dejamos por si hace blur rápido
-    this.casesBlur.emit();
-  }
-
   onCasesListInput(event: Event, pageIndex: number) {
     const target = event.target as HTMLElement;
+    
     if (this.documentData && this.documentData.bodyData) {
-      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] =
-        target.innerHTML;
-      this.casesInput$.next();
-    } else if (
-      this.documentData &&
-      this.documentData.body &&
-      this.documentData.body.pages
-    ) {
-      // Dummy data fallback
-      this.documentData.body.pages[pageIndex].casesHtml = target.innerHTML;
-      this.casesInput$.next();
+      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] = target.innerHTML;
     }
+
+    // Auto-paginación inteligente tipo Google Docs:
+    // Solo repaginamos si el texto excede el tamaño de la hoja (empuja la firma/contenido fuera)
+    // o si se borró suficiente texto y hay páginas siguientes de las cuales "halar" contenido.
+    const currentCanvas = target.closest('.a4-canvas') as HTMLElement;
+    if (currentCanvas) {
+      const isOverflowing = currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
+      const isUnderflowing = (currentCanvas.clientHeight - currentCanvas.scrollHeight > 30) && (pageIndex < this.documentData.pages.length - 1);
+      
+      if (isOverflowing || isUnderflowing) {
+        if (this.documentData && this.documentData.pages && this.documentData.pages[pageIndex]) {
+          this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
+        }
+        this.paginateDOM();
+      }
+    }
+  }
+
+  onCasesListBlur(event: Event, pageIndex: number) {
+    const target = event.target as HTMLElement;
+    const html = target.innerHTML;
+
+    // Al salir del input (blur), SÍ guardamos los cambios en el modelo de datos
+    if (this.documentData && this.documentData.pages && this.documentData.pages[pageIndex]) {
+      this.documentData.pages[pageIndex].casesHtml = html;
+    }
+
+    // Y luego disparamos la paginación dinámica, ya que el usuario dejó de escribir
+    this.casesInput$.next();
+    this.casesBlur.emit();
   }
 
   onPasteCases(event: ClipboardEvent, pageIndex: number) {
@@ -242,24 +258,77 @@ export class ResueltoCanvasComponent
 
     document.execCommand("insertHTML", false, cleanHtml);
 
-    // Guardar cambios manualmente
+    // Guardar cambios manualmente (al pegar sí queremos repintar/paginar)
     const target = event.target as HTMLElement;
-    if (this.documentData && this.documentData.bodyData) {
-      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] =
-        target.innerHTML;
-      this.casesInput$.next();
-    } else if (this.documentData?.body?.pages) {
-      this.documentData.body.pages[pageIndex].casesHtml = target.innerHTML;
-      this.casesInput$.next();
+    if (this.documentData && this.documentData.pages && this.documentData.pages[pageIndex]) {
+      this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
     }
+    
+    if (this.documentData && this.documentData.bodyData) {
+      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] = target.innerHTML;
+    } 
+
+    this.casesInput$.next();
 
     setTimeout(() => {
       this.casesInput$.next();
     }, 100);
   }
 
+  // --- SISTEMA DE RESTAURACIÓN DE PUNTERO (CARET) ---
+  savedCaretPosition: any = null;
+
+  saveCaret() {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      const preCaretRange = range.cloneRange();
+      preCaretRange.selectNodeContents(this.el.nativeElement);
+      preCaretRange.setEnd(range.startContainer, range.startOffset);
+      this.savedCaretPosition = preCaretRange.toString().length;
+    }
+  }
+
+  restoreCaret() {
+    if (this.savedCaretPosition !== null) {
+      const el = this.el.nativeElement;
+      let charIndex = 0;
+      const range = document.createRange();
+      range.setStart(el, 0);
+      range.collapse(true);
+      const nodeStack = [el];
+      let node, foundStart = false;
+
+      while (!foundStart && (node = nodeStack.pop())) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const nextCharIndex = charIndex + (node.textContent?.length || 0);
+          if (!foundStart && this.savedCaretPosition >= charIndex && this.savedCaretPosition <= nextCharIndex) {
+            range.setStart(node, this.savedCaretPosition - charIndex);
+            foundStart = true;
+          }
+          charIndex = nextCharIndex;
+        } else {
+          let i = node.childNodes.length;
+          while (i--) {
+            nodeStack.push(node.childNodes[i]);
+          }
+        }
+      }
+
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      this.savedCaretPosition = null;
+    }
+  }
+
   paginateDOM() {
     if (!this.documentData || !this.documentData.pages) return;
+
+    // Guardar el cursor antes de destruir las páginas
+    this.saveCaret();
 
     let allCasesHtml = '';
     this.documentData.pages.forEach((p: any) => allCasesHtml += (p.casesHtml || ''));
@@ -298,6 +367,11 @@ export class ResueltoCanvasComponent
         this.cdr.detectChanges();
       }
     }
+
+    // Restaurar el cursor después de renderizar las nuevas páginas
+    setTimeout(() => {
+      this.restoreCaret();
+    }, 0);
   }
 
   private cleanHtmlNodes(node: Node) {
@@ -412,6 +486,21 @@ export class ResueltoCanvasComponent
   onBlurEditable(event: Event) {
     const target = event.target as HTMLElement;
     target.style.backgroundColor = "transparent";
+
+    // Consolidar los datos locales al hacer blur para que no se reinicien
+    if (target.classList.contains('m-resolucion-unico')) {
+      if (this.documentData && this.documentData.body) {
+         this.documentData.body.unicoParrafo = target.innerHTML;
+      }
+    }
+    
+    if (target.classList.contains('m-resolucion-basamento')) {
+      if (this.documentData && this.documentData.body) {
+         const text = target.innerText;
+         this.documentData.body.basamentoLegal = text;
+         this.documentData.body.preamble = text;
+      }
+    }
   }
 
   onPaste(event: ClipboardEvent) {
