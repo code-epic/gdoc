@@ -264,11 +264,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         /\B(?=(\d{3})+(?!\d))/g,
         ".",
       );
-      return `<p style="text-indent: 0; margin-left: 40px; margin-top: 0; margin-bottom: 6pt;">&mdash; ${persona.grado || "Ciudadano(a)"} <strong>${(persona.nombres_apellidos || persona.nombres + " " + persona.apellidos).toUpperCase()}</strong>, C.I. N° <strong>${cedulaFormateada}</strong></p>`;
+      return `<p style="text-indent: 0; margin-left: 40px; margin-top: 0; margin-bottom: 6pt;">- ${persona.grado || "Ciudadano(a)"} <strong>${(persona.nombres_apellidos || persona.nombres + " " + persona.apellidos).toUpperCase()}</strong>, C.I. N° <strong>${cedulaFormateada}</strong></p>`;
     });
 
     let casesHtml = this.activeDoc["_pageCasesHtml_0"];
-    if (!casesHtml) {
+    if (casesHtml === undefined || casesHtml === null) {
       casesHtml = formattedCases.join("\n");
     } else {
       // Si el html guardado contiene el encabezado anterior de forma redundante,
@@ -581,11 +581,27 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     });
   }
 
+  public syncFromCanvas() {
+    if (this.resueltoCanvas && this.resueltoCanvas.documentData) {
+      // Sincronizar todos los cambios del canvas a activeDoc
+      this.activeDoc.basamentoLegal = this.resueltoCanvas.documentData.body?.basamentoLegal || this.activeDoc.basamentoLegal;
+      this.activeDoc._headerHtml = this.resueltoCanvas.documentData.body?.unicoParrafo || this.activeDoc._headerHtml;
+      
+      let allCasesHtml = "";
+      if (this.resueltoCanvas.documentData.pages && this.resueltoCanvas.documentData.pages.length > 0) {
+        this.resueltoCanvas.documentData.pages.forEach((p: any) => {
+          allCasesHtml += p.casesHtml || "";
+        });
+        this.activeDoc["_pageCasesHtml_0"] = allCasesHtml;
+      }
+    }
+  }
+
   public saveDocumentState() {
     if (!this.activeDoc) return;
 
-    // Asegurarnos de que tenemos los datos más recientes del canvas
-    this.updateCanvasData();
+    // Asegurarnos de que tenemos los datos más recientes SIN destruir el estado actual del canvas
+    this.syncFromCanvas();
 
     const idUser =
       this.jwtData?.userId || sessionStorage.getItem("id") || "Desconocido";
@@ -1257,11 +1273,6 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       const numero_carpeta = doc.numero_carpeta || "000000";
       const resolucion = doc.ncontrol || doc.numc || "";
 
-      // 1. Iniciar buscando la plantilla base por número de carpeta en PostgreSQL
-      console.log(
-        "[TinderPdfViewer] Buscando plantilla base en PG para la carpeta:",
-        numero_carpeta,
-      );
       const pgTemplate = await this.ObtenerResuelto(numero_carpeta, resolucion);
       if (pgTemplate) {
         this.hasSavedState = true;
@@ -1318,116 +1329,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         }
         doc.fecha_resolucion = defDate;
       }
-
-      // Objeto task (lst) con todos los elementos de la resolución
-      const lst = {
-        fecha_resolucion: this.activeDoc.fecha_resolucion,
-        numero_carpeta: numero_carpeta,
-        numero_resolucion: resolucion,
-        basamento_legal:
-          this.activeDoc.basamentoLegal || this.defaultBasamentoLegal,
-        unico_parrafo:
-          this.activeDoc._headerHtml || this.generateHeaderHtml(true),
-        lista_casos: this.activeDoc["_pageCasesHtml_0"] || "",
-        documentos_originales: this.activeDoc.documentos || [],
-      };
-
-      let obj = {
-        usuario: idUser,
-        numero_carpeta: numero_carpeta,
-        numero_resolucion: resolucion,
-        task: lst,
-        fecha: new Date(),
-      };
-
-      // 2. Buscar si hay estado/borrador previo en MongoDB (Consulta pura sin escritura)
-      let cl = {
-        coleccion: "estatus_resolucion",
-        numero_carpeta: `${numero_carpeta}`,
-        numero_resolucion: `${resolucion}`,
-        driver: environment.driver.PRINCIPAL,
-        objeto: obj,
-        donde:
-          '{\"usuario\":\"' +
-          idUser +
-          '\", \"numero_carpeta\":\"' +
-          numero_carpeta +
-          '\"}',
-        upsert: true,
-      };
-
-      this.apiService.ExecColeccion(cl).subscribe(
-        (res: any) => {
-          if (res && res.length > 0) {
-            const saved = res[0];
-            if (saved && saved.task) {
-              this.hasSavedState = true;
-              console.log(
-                "[TinderPdfViewer] Borrador recuperado de MongoDB para la carpeta:",
-                numero_carpeta,
-                saved,
-              );
-
-              // Cargar basamento legal modificado
-              if (saved.task.basamento_legal) {
-                doc.basamentoLegal = saved.task.basamento_legal;
-              }
-
-              // Cargar único párrafo (membrete / asunto)
-              if (saved.task.unico_parrafo) {
-                doc._headerHtml = saved.task.unico_parrafo;
-              }
-
-              // Cargar lista de casos redactados
-              if (saved.task.lista_casos) {
-                doc["_pageCasesHtml_0"] = saved.task.lista_casos;
-              }
-
-              // Cargar fecha de resolución
-              if (saved.task.fecha_resolucion) {
-                doc.fecha_resolucion = saved.task.fecha_resolucion;
-              }
-
-              // Cargar número de carpeta
-              if (saved.task.numero_carpeta) {
-                doc.numero_carpeta = saved.task.numero_carpeta;
-              }
-
-              // Cargar número de resolución
-              if (saved.task.numero_resolucion) {
-                doc.numc = saved.task.numero_resolucion;
-                doc.ncontrol = saved.task.numero_resolucion;
-              }
-
-              // Cargar documentos originales si existen
-              if (
-                saved.task.documentos_originales &&
-                saved.task.documentos_originales.length > 0
-              ) {
-                doc.documentos = saved.task.documentos_originales;
-              }
-              // los cambios no se ven reflejados en el documento
-              console.log("estamos trabajando", doc);
-            }
-          }
-          resolve();
-        },
-        async (err: any) => {
-          console.error(
-            "[TinderPdfViewer] Error recuperando estado de DB:",
-            err,
-          );
-          // Fallback a PostgreSQL incluso si falla ExecColeccion
-          const pgTemplate = await this.ObtenerResuelto(
-            numero_carpeta,
-            resolucion,
-          );
-          if (pgTemplate && pgTemplate.fundamento) {
-            doc.basamentoLegal = pgTemplate.fundamento;
-          }
-          resolve();
-        },
-      );
+      
+      resolve();
     });
   }
 

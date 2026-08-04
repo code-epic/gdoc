@@ -202,18 +202,28 @@ export class ResueltoCanvasComponent
     }
 
     // Auto-paginación inteligente tipo Google Docs:
-    // Solo repaginamos si el texto excede el tamaño de la hoja (empuja la firma/contenido fuera)
-    // o si se borró suficiente texto y hay páginas siguientes de las cuales "halar" contenido.
     const currentCanvas = target.closest('.a4-canvas') as HTMLElement;
     if (currentCanvas) {
       const isOverflowing = currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
-      const isUnderflowing = (currentCanvas.clientHeight - currentCanvas.scrollHeight > 30) && (pageIndex < this.documentData.pages.length - 1);
       
-      if (isOverflowing || isUnderflowing) {
+      if (isOverflowing) {
         if (this.documentData && this.documentData.pages && this.documentData.pages[pageIndex]) {
           this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
         }
+        // Desbordamiento = repaginamos inmediatamente para empujar el texto a la página siguiente
         this.paginateDOM();
+      } else {
+        const inputEvent = event as InputEvent;
+        // Si el usuario está borrando texto, puede haber espacio de sobra (Underflow)
+        const isDeleting = inputEvent.inputType && inputEvent.inputType.startsWith('delete');
+        if (isDeleting && (pageIndex < this.documentData.pages.length - 1)) {
+          if (this.documentData && this.documentData.pages && this.documentData.pages[pageIndex]) {
+            this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
+          }
+          // Llamamos al subject que dispara paginateDOM con debounce (600ms)
+          // Así evitamos interrumpir al usuario si mantiene presionado Backspace
+          this.casesInput$.next();
+        }
       }
     }
   }

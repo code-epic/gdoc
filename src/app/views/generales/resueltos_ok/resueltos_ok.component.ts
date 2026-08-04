@@ -183,24 +183,34 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         console.log(decoded);
         if (decoded && decoded.Usuario) {
           this.jwtData = {
-            userId: decoded.Usuario.id || "",
+            userId: decoded.Usuario.usuario || "",
             userName: decoded.Usuario.nombre || decoded.Usuario.usuario || "",
             userRole: decoded.Usuario.tipo || "Usuario",
-            perfil: sessionStorage.getItem("perfil") || decoded.Usuario.descripcion || "",
+            perfil:
+              sessionStorage.getItem("perfil") ||
+              decoded.Usuario.descripcion ||
+              "",
           };
         }
       }
       if (!this.jwtData.userId && this.loginService.Usuario) {
         this.jwtData = {
-          userId: this.loginService.Usuario.id || "",
+          userId: this.loginService.Usuario.usuario || "",
           userName: this.loginService.Usuario.nombre || "",
           userRole: this.loginService.Usuario.tipo || "",
-          perfil: sessionStorage.getItem("perfil") || this.loginService.Usuario.descripcion || "",
+          perfil:
+            sessionStorage.getItem("perfil") ||
+            this.loginService.Usuario.descripcion ||
+            "",
         };
       }
 
       // Intentar mapear perfil de forma síncrona usando caché o rol
-      const perfilStr = (sessionStorage.getItem("perfil") || this.jwtData.perfil || "").toUpperCase();
+      const perfilStr = (
+        sessionStorage.getItem("perfil") ||
+        this.jwtData.perfil ||
+        ""
+      ).toUpperCase();
       const roleStr = (this.jwtData.userRole || "").toUpperCase();
 
       if (perfilStr && perfilStr !== "") {
@@ -221,24 +231,31 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             const userApi = {
               funcion: environment.funcion.CONSULTAR_USUARIO_PERFIL,
               parametros: `${cedula},${sistema},${correo}`,
-              valores: ""
+              valores: "",
             } as IAPICore;
 
-            this.apiService.Ejecutar(userApi).subscribe(
-              (res: any) => {
-                try {
-                  if (res && res.length > 0 && res[0].Aplicacion && res[0].Aplicacion.length > 0 && res[0].Aplicacion[0].Rol) {
-                    const rolDesc = res[0].Aplicacion[0].Rol.descripcion || res[0].Aplicacion[0].Rol.nombre || "";
-                    sessionStorage.setItem("perfil", rolDesc);
-                    this.jwtData.perfil = rolDesc;
-                    this.mapProfile(rolDesc);
-                    this.loadFolders(); // Recargar carpetas ahora con el perfil correcto
-                  }
-                } catch (e) {
-                  console.error("Error procesando perfil de DB:", e);
+            this.apiService.Ejecutar(userApi).subscribe((res: any) => {
+              try {
+                if (
+                  res &&
+                  res.length > 0 &&
+                  res[0].Aplicacion &&
+                  res[0].Aplicacion.length > 0 &&
+                  res[0].Aplicacion[0].Rol
+                ) {
+                  const rolDesc =
+                    res[0].Aplicacion[0].Rol.descripcion ||
+                    res[0].Aplicacion[0].Rol.nombre ||
+                    "";
+                  sessionStorage.setItem("perfil", rolDesc);
+                  this.jwtData.perfil = rolDesc;
+                  this.mapProfile(rolDesc);
+                  this.loadFolders(); // Recargar carpetas ahora con el perfil correcto
                 }
+              } catch (e) {
+                console.error("Error procesando perfil de DB:", e);
               }
-            );
+            });
           }
         }
       }
@@ -298,7 +315,11 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
   public isAdmin(): boolean {
     const role = (this.jwtData.userRole || "").toUpperCase();
-    const perfil = (this.jwtData.perfil || sessionStorage.getItem("perfil") || "").toUpperCase();
+    const perfil = (
+      this.jwtData.perfil ||
+      sessionStorage.getItem("perfil") ||
+      ""
+    ).toUpperCase();
     return role.includes("ADMIN") || perfil.includes("ADMIN");
   }
 
@@ -637,97 +658,10 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   }
 
   private loadActivePdf() {
-    if (!this.activeDoc) {
-      return;
-    }
-    this.loadingPdf = true;
+    this.loadingPdf = false;
     this.pdfUrl = null;
     this.rawPdfUrl = null;
-
-    if (!this.activar_pdf) {
-      // Simulación con archivo de ejemplo local
-      this.pdfUrl =
-        this.sanitizer.bypassSecurityTrustResourceUrl("assets/000643.pdf");
-      this.rawPdfUrl = "assets/000643.pdf";
-      this.loadingPdf = false;
-      this.changeDetector.detectChanges();
-      return;
-    }
-
-    const ncontrol = this.activeDoc.ncontrol || this.activeDoc.numc || "0";
-    const archivo = this.activeDoc.archivo || this.activeDoc.anom || "";
-
-    if (archivo === "") {
-      Swal.fire(
-        "Atención",
-        "Este documento no posee un archivo PDF asociado.",
-        "warning",
-      );
-      this.loadingPdf = false;
-      this.changeDetector.detectChanges();
-      return;
-    }
-
-    const peticion = btoa("D" + ncontrol) + "/" + archivo;
-    const url = this.apiService.URL + "dws/" + peticion;
-    const downloadUrl = this.apiService.Dws(peticion);
-
-    // Detección de iOS / iPadOS Safari
-    const isIOS =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-    if (isIOS) {
-      // En iOS Safari / iPad, usamos directamente la URL de descarga para evitar
-      // el bloqueo de URLs tipo blob: en iframes.
-      this.rawPdfUrl = downloadUrl;
-      this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(downloadUrl);
-      setTimeout(() => {
-        this.loadingPdf = false;
-        this.changeDetector.detectChanges();
-      }, 800);
-      return;
-    }
-
-    const headers = new Headers({
-      Authorization: "Bearer " + sessionStorage.getItem("token"),
-    });
-
-    fetch(url, { headers })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(
-            "HTTP status " + response.status + " - " + response.statusText,
-          );
-        }
-        return response.blob();
-      })
-      .then((blob) => {
-        if (blob.size === 0) {
-          throw new Error("El PDF recibido está vacío (0 bytes).");
-        }
-        const pdfBlob = new Blob([blob], { type: "application/pdf" });
-        const blobUrl = URL.createObjectURL(pdfBlob);
-        this.rawPdfUrl = blobUrl;
-        this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
-        setTimeout(() => {
-          this.loadingPdf = false;
-          this.changeDetector.detectChanges();
-        }, 800);
-      })
-      .catch((error) => {
-        console.error("Error fetching PDF blob:", error);
-        Swal.fire({
-          title: "Error cargando PDF",
-          text: `Se produjo un error al descargar el PDF: ${error.message || error}\nLa aplicación intentará usar el enlace directo de descarga.`,
-          icon: "error",
-        });
-        this.rawPdfUrl = downloadUrl;
-        this.pdfUrl =
-          this.sanitizer.bypassSecurityTrustResourceUrl(downloadUrl);
-        this.loadingPdf = false;
-        this.changeDetector.detectChanges();
-      });
+    this.changeDetector.detectChanges();
   }
 
   public onPdfLoaded() {

@@ -49,8 +49,8 @@
   overflow: hidden;
   background: white;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  /* Márgenes físicos del documento: Arriba, Derecha, Abajo, Izquierda (2.5cm sup) */
-  padding: 25mm 20mm 20mm 20mm; 
+  /* Márgenes físicos del documento: Arriba, Derecha, Abajo (0.5cm), Izquierda (2.5cm sup) */
+  padding: 25mm 20mm 5mm 20mm; 
   box-sizing: border-box;
   position: relative;
   display: flex;
@@ -199,7 +199,7 @@
 .doc-body {
   text-align: justify;
   font-size: 13pt;
-  flex: 1 0 auto;
+  flex: 0 0 auto;
   
   p {
     line-height: 1.15 !important; /* Fuerza Word Sencillo sobre todos los p del cuerpo */
@@ -212,6 +212,17 @@
   }
 
   .cases-list {
+    min-height: 20px;
+    
+    &:empty {
+      position: relative;
+    }
+    
+    &:empty::before {
+      content: " ";
+      display: inline-block;
+    }
+
     ::ng-deep p {
       line-height: 1.35 !important; /* Fuerza Word 1.15 sobre lista inyectada */
     }
@@ -220,8 +231,8 @@
 
 .doc-footer {
   position: relative;
-  margin-top: 20mm;
-  min-height: 50mm;
+  margin-top: 10mm;
+  min-height: 35mm;
   flex-shrink: 0;
 
   p {
