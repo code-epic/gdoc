@@ -461,10 +461,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(0, 0, 128); // Azul oscuro (opcional, ajusta a tu preferencia)
-      
+
       // Arriba a la derecha (coordenadas en mm para jsPDF)
       pdf.text("M\nP\nP\nD", 195, 20);
-      
+
       // Abajo a la izquierda (coordenadas en mm para jsPDF)
       // Ajustamos 'y' para que esté al final de la página (la página mide 355.6mm de alto)
       pdf.text("M\nP\nP\nD", 20, 320);
@@ -487,11 +487,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
       // Firma digital visible en cabecera (esquina superior derecha, sutil ~2cm)
       formData.append("visible", "true");
-      
+
       // --- NUEVOS PARÁMETROS PARA EL BACKEND EN GO ---
       formData.append("transparente", "true"); // El Widget Annotation será INVISIBLE
-      formData.append("page", "1");            // Página donde se ubicará el Widget interactivo
-      
+      formData.append("page", "1"); // Página donde se ubicará el Widget interactivo
+
       // Coordenadas PDF (en puntos, no mm) para colocar el Widget Annotation
       // Arriba a la derecha: x ~ 195mm (550pts), y ~ 20mm desde arriba (930pts desde abajo)
       formData.append("llx", "540"); // Margen izquierdo
@@ -573,6 +573,23 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     }
   }
 
+  public confirmSaveDocumentState() {
+    Swal.fire({
+      title: "¿Guardar Cambios?",
+      text: "¿Está seguro que desea guardar el progreso actual de la resolución?",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#5e72e4",
+      cancelButtonColor: "#8898aa",
+      confirmButtonText: "Sí, guardar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.saveDocumentState();
+      }
+    });
+  }
+
   public saveDocumentState() {
     if (!this.activeDoc) return;
 
@@ -625,11 +642,23 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       (res: any) => {
         console.log("Estado de resolución guardado con éxito", res);
         this.hasSavedState = true;
-        alert("Estado del documento guardado exitosamente.");
+        Swal.fire({
+          title: "¡Guardado!",
+          text: "El estado del documento se ha guardado exitosamente.",
+          icon: "success",
+          confirmButtonColor: "#2dce89",
+          confirmButtonText: "Aceptar",
+        });
       },
       (err: any) => {
         console.error("Error al guardar estado de resolución", err);
-        alert("Error al intentar guardar el estado del documento.");
+        Swal.fire({
+          title: "Error",
+          text: "Ocurrió un error al intentar guardar el estado del documento.",
+          icon: "error",
+          confirmButtonColor: "#f5365c",
+          confirmButtonText: "Aceptar",
+        });
       },
     );
   }

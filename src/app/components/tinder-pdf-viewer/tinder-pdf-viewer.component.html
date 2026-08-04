@@ -31,7 +31,7 @@
         <span style="color: white; font-size: 0.85rem; font-weight: bold; width: 35px; text-align: center;">{{ lineSpacing }}</span>
         <button (click)="increaseLineSpacing()" title="Aumentar Interlineado" style="background: transparent; border: none; color: white; cursor: pointer; padding: 4px 8px;"><i class="fas fa-plus"></i></button>
       </div>
-      <button class="tpv-btn-print" *ngIf="useCanvas && profile === 'Edicion'" (click)="saveDocumentState()" title="Guardar Progreso" style="margin-right: 10px; background: #5e72e4; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+      <button class="tpv-btn-print" *ngIf="useCanvas && profile === 'Edicion'" (click)="confirmSaveDocumentState()" title="Guardar Progreso" style="margin-right: 10px; background: #5e72e4; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
         <i class="fas fa-save"></i> Guardar
       </button>
       <button class="tpv-btn-print" *ngIf="useCanvas && profile === 'Revision'" (click)="printCanvas()" title="Generar PDF" style="margin-right: 15px; background: #2dce89; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
