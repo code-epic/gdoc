@@ -49,6 +49,7 @@
   overflow: hidden;
   background: white;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 1px dashed #ced4da; /* Línea de corte sutil */
   /* Márgenes físicos del documento: Arriba, Derecha, Abajo (0.5cm), Izquierda (2.5cm sup) */
   padding: 25mm 20mm 5mm 20mm; 
   box-sizing: border-box;
@@ -147,6 +148,7 @@
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
     margin-left: 1cm !important;
+    margin-bottom: 13pt !important;
   }
 
   .m-resolucion-ejecutivo {

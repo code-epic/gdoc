@@ -96,6 +96,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   @Output() sendToSecretariat = new EventEmitter<PdfAction>();
   @Output() sendToDirection = new EventEmitter<PdfAction>();
   @Output() sendToMinister = new EventEmitter<PdfAction>();
+  @Output() approvedAndSigned = new EventEmitter<PdfAction>();
 
   /* ── Estado interno ──────────────────────────────────── */
   public currentIndex = 0;
@@ -524,7 +525,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       Swal.close();
 
       // Ofrecer la opción de ver/descargar el documento firmado devuelto por Go
-      Swal.fire({
+      await Swal.fire({
         title: "Proceso Completado",
         text: "El documento ha sido firmado digitalmente y guardado con éxito. ¿Desea descargar una copia firmada para verla?",
         icon: "success",
@@ -793,17 +794,31 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   /* ── Acciones ────────────────────────────────────────── */
 
-  onApprove(): void {
+  async onApprove(): Promise<void> {
     if (this.actionExecuting || !this.activeDoc) {
       return;
     }
     this.actionExecuting = true;
     this.executingType = "approve";
-    this.approve.emit({
-      doc: this.activeDoc,
-      observations: this.observations.trim(),
-      index: this.currentIndex,
-    });
+
+    try {
+      // 1. Comportarse como "Guardar PDF": Generar, subir y firmar
+      await this.printCanvas();
+
+      // 2. Pasar al siguiente paso: FIRMADO POR MINISTRO 7766
+      await this.actualizarEstatusFirma("7766");
+
+      // 3. Emitir el ruteo para avanzar el visor al siguiente documento
+      this.approvedAndSigned.emit({
+        doc: this.activeDoc,
+        observations: this.observations.trim(),
+        index: this.currentIndex,
+      });
+    } catch (e) {
+      console.error("[TinderPdfViewer] Error en onApprove:", e);
+    } finally {
+      this.actionExecuting = false;
+    }
   }
 
   onReject(): void {
@@ -1290,13 +1305,22 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
         // Cargar basamento legal, unico parrafo y lista de casos desde pgTemplate.task si existe
         if (pgTemplate.task) {
-          if (pgTemplate.task.basamento_legal) {
+          if (
+            pgTemplate.task.basamento_legal !== undefined &&
+            pgTemplate.task.basamento_legal !== null
+          ) {
             doc.basamentoLegal = pgTemplate.task.basamento_legal;
           }
-          if (pgTemplate.task.unico_parrafo) {
+          if (
+            pgTemplate.task.unico_parrafo !== undefined &&
+            pgTemplate.task.unico_parrafo !== null
+          ) {
             doc._headerHtml = pgTemplate.task.unico_parrafo;
           }
-          if (pgTemplate.task.lista_casos) {
+          if (
+            pgTemplate.task.lista_casos !== undefined &&
+            pgTemplate.task.lista_casos !== null
+          ) {
             doc["_pageCasesHtml_0"] = pgTemplate.task.lista_casos;
           }
         }
@@ -1408,5 +1432,52 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   trackByIndex(i: number): number {
     return i;
+  }
+
+  //001260
+
+  crearSemillero(numero: string) {
+    //Buscar numero de Resuelto
+    const xAPI = {} as IAPICore;
+    xAPI.funcion = environment.funcion.OBTENER_NUMERO_RESUELTO;
+    xAPI.parametros = ``;
+    this.apiService.Ejecutar(xAPI).subscribe(
+      (data: any) => {},
+      (err: any) => {
+        console.error("Error al obtener resuelto desde PostgreSQL:", err);
+      },
+    );
+  }
+
+  obtenernurmero(numero) {
+    let cl = {
+      coleccion: "numero_resueltos",
+      numero_resuelto: `${numero}`,
+      upsert: true,
+    };
+
+    this.apiService.ExecColeccion(cl).subscribe(
+      (res: any) => {
+        console.log("Estado de resolución guardado con éxito", res);
+        this.hasSavedState = true;
+        Swal.fire({
+          title: "¡Exito!",
+          text: "Fin del proceso.",
+          icon: "success",
+          confirmButtonColor: "#2dce89",
+          confirmButtonText: "Aceptar",
+        });
+      },
+      (err: any) => {
+        console.error("Error al guardar estado de resolución", err);
+        Swal.fire({
+          title: "Error",
+          text: "Ocurrió un error al intentar guardar el estado del documento.",
+          icon: "error",
+          confirmButtonColor: "#f5365c",
+          confirmButtonText: "Aceptar",
+        });
+      },
+    );
   }
 }

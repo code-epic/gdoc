@@ -322,6 +322,7 @@
   (close)="onTinderClose()"
   (approve)="onTinderApprove($event)"
   (reject)="onTinderReject($event)"
+  (approvedAndSigned)="onTinderDocumentRouted($event, 'Firmado por Ministro')"
   (navigate)="onTinderNavigate($event)"
   (pdfLoadError)="onTinderPdfError($event)"
   (sendToReview)="onTinderDocumentRouted($event, 'Revisión (Resolución)')"
