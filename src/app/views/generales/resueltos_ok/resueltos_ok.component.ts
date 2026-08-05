@@ -40,12 +40,21 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     if (!this.documentSearchQuery) return this.documents;
     const query = this.documentSearchQuery.toLowerCase().trim();
     return this.documents.filter((doc) => {
-      if (doc.numero_carpeta && doc.numero_carpeta.toLowerCase().includes(query)) return true;
-      
+      if (
+        doc.numero_carpeta &&
+        doc.numero_carpeta.toLowerCase().includes(query)
+      )
+        return true;
+
       if (doc.documentos && Array.isArray(doc.documentos)) {
         for (const item of doc.documentos) {
-          if (item.cedula && item.cedula.toLowerCase().includes(query)) return true;
-          if (item.nombres_apellidos && item.nombres_apellidos.toLowerCase().includes(query)) return true;
+          if (item.cedula && item.cedula.toLowerCase().includes(query))
+            return true;
+          if (
+            item.nombres_apellidos &&
+            item.nombres_apellidos.toLowerCase().includes(query)
+          )
+            return true;
         }
       }
       return false;
@@ -393,10 +402,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       },
       (error) => {
         console.error("Error cargando carpetas del buzón:", error);
-        this.toastrService.error(
-          "Error de conexión al cargar carpetas",
-          "Buzón Resueltos",
-        );
+        // REVISAR URGENTE PARA EJECUCION DEL MINISTRO
+        //this.toastrService.error("Error de conexión al cargar carpetas", "Buzón Resueltos");
         this.loadingExplorer = false;
         this.ngxService.stopLoader("ld-folders-ok");
         this.changeDetector.detectChanges();
