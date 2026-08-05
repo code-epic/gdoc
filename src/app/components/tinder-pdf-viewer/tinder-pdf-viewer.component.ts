@@ -138,6 +138,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     valores: "",
   };
 
+  public nuevo_numero_resuelto: string = "";
+
   constructor(
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
@@ -402,6 +404,19 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     // Pequeño retardo para permitir que las firmas, sellos y el zoom se rendericen en el DOM
     await new Promise((resolve) => setTimeout(resolve, 300));
+
+    try {
+      // 0. Asignar nuevo numero de resolucion antes de inyectar firma y generar PDF
+      await this.crearSemillero();
+    } catch (e) {
+      // Si falla, detenemos el flujo de firmado
+      this.actionExecuting = false;
+      this.printModeActive = false;
+      this.loadingPdf = false;
+      Swal.close();
+      this.cdr.detectChanges();
+      return;
+    }
 
     try {
       const pdf = new jsPDF({
@@ -1442,48 +1457,68 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   //001260
 
-  crearSemillero(numero: string) {
-    //Buscar numero de Resuelto
+  async crearSemillero(): Promise<void> {
     const xAPI = {} as IAPICore;
     xAPI.funcion = environment.funcion.OBTENER_NUMERO_RESUELTO;
     xAPI.parametros = ``;
-    this.apiService.Ejecutar(xAPI).subscribe(
-      (data: any) => {},
-      (err: any) => {
-        console.error("Error al obtener resuelto desde PostgreSQL:", err);
-      },
-    );
+    try {
+      const data: any = await this.apiService.Ejecutar(xAPI).toPromise();
+      if (data && data.Cuerpo && data.Cuerpo.length) {
+        const numeroActual = parseInt(data.Cuerpo[0].numero, 10) || 0;
+        const nuevoNumero = numeroActual + 1;
+        const cleanNumero = nuevoNumero.toString().padStart(6, "0");
+        this.nuevo_numero_resuelto = cleanNumero;
+
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+        const month = months[today.getMonth()];
+        const year = today.getFullYear();
+        const dateStr = `${day} ${month} ${year}`;
+
+        if (this.canvasData && this.canvasData.header) {
+          this.canvasData.header.resolutionNum = cleanNumero;
+          this.canvasData.header.date = dateStr;
+        }
+        if (this.activeDoc) {
+          this.activeDoc.numc = cleanNumero;
+          this.activeDoc.fecha_resolucion = dateStr;
+        }
+        this.cdr.detectChanges();
+
+        await this.grabarResuelto(cleanNumero);
+      } else {
+        throw new Error("Respuesta inválida del servidor");
+      }
+    } catch (err) {
+      console.error("Error al obtener resuelto:", err);
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al intentar obtener el número de resolución.",
+        icon: "error",
+        confirmButtonColor: "#f5365c",
+        confirmButtonText: "Aceptar",
+      });
+      throw err;
+    }
   }
 
-  obtenernurmero(numero) {
-    let cl = {
-      coleccion: "numero_resueltos",
-      numero_resuelto: `${numero}`,
-      upsert: true,
-    };
-
-    this.apiService.ExecColeccion(cl).subscribe(
-      (res: any) => {
-        console.log("Estado de resolución guardado con éxito", res);
-        this.hasSavedState = true;
-        Swal.fire({
-          title: "¡Exito!",
-          text: "Fin del proceso.",
-          icon: "success",
-          confirmButtonColor: "#2dce89",
-          confirmButtonText: "Aceptar",
-        });
-      },
-      (err: any) => {
-        console.error("Error al guardar estado de resolución", err);
-        Swal.fire({
-          title: "Error",
-          text: "Ocurrió un error al intentar guardar el estado del documento.",
-          icon: "error",
-          confirmButtonColor: "#f5365c",
-          confirmButtonText: "Aceptar",
-        });
-      },
-    );
+  async grabarResuelto(numero: any): Promise<void> {
+    let xAPI = {} as IAPICore;
+    xAPI.funcion = environment.funcion.INSERTAR_NUMERO_RESUELTO;
+    xAPI.parametros = `${numero},RESOLUCION,NUEVO,${this.jwtData?.userName}`;
+    try {
+      await this.apiService.Ejecutar(xAPI).toPromise();
+    } catch (err) {
+      console.error("Error al grabar resuelto:", err);
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al intentar guardar el número de resolución.",
+        icon: "error",
+        confirmButtonColor: "#f5365c",
+        confirmButtonText: "Aceptar",
+      });
+      throw err;
+    }
   }
 }
