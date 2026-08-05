@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1785943221771,
+  "timestamp": 1785944245444,
   "index": "/gdoc/index.html",
   "assetGroups": [
     {
@@ -19,7 +19,7 @@
         "/gdoc/75.2c38d7956a25fc420b63.js",
         "/gdoc/favicon.ico",
         "/gdoc/index.html",
-        "/gdoc/main.f2652779cf83ba931181.js",
+        "/gdoc/main.8bb2d4c48ae3abdad867.js",
         "/gdoc/manifest.webmanifest",
         "/gdoc/polyfills-es5.68417ea4e8329902221b.js",
         "/gdoc/polyfills.ea1caa5e5d0e7112f329.js",
@@ -3256,8 +3256,8 @@
     "/gdoc/assets/vendor/nucleo/fonts/nucleo-icons.woff2": "64baa3293e90631d5257d6056b089ba11510d0f4",
     "/gdoc/favicon.ico": "84161b857f5c547e3699ddfbffc6d8d737542e01",
     "/gdoc/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.c5371cfb9f9e3d6db4f9.woff2": "aaae93b146d97737fabe87a6bc741113e6899ad3",
-    "/gdoc/index.html": "0c68c4af32e405b309d0a91959a4463a304fec7b",
-    "/gdoc/main.f2652779cf83ba931181.js": "38bb5999217c93d7c11058a856a84313ab3da959",
+    "/gdoc/index.html": "f4e079d53715203c224ede7c3815278a246c996b",
+    "/gdoc/main.8bb2d4c48ae3abdad867.js": "ad9b7fcbf29612c0cd19e3d6b421a607148674f5",
     "/gdoc/manifest.webmanifest": "7480e57c0bcee230727203ee03f0ecefc0e3b86d",
     "/gdoc/polyfills-es5.68417ea4e8329902221b.js": "fe8f4066405229af4bc7ae836eb5666325025b6c",
     "/gdoc/polyfills.ea1caa5e5d0e7112f329.js": "d6e95920d8a5e933f5d516fbac2a52502ec3aaa3",
