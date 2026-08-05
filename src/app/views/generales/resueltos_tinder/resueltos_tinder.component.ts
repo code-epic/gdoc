@@ -319,7 +319,7 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
   };
 
   // ── Acciones ──────────────────────────────────────────
-  public onApprove(action: PdfAction): void {
+  public async onApprove(action: PdfAction): Promise<void> {
     const doc = action.doc;
     if (this.actionLoading) return;
 
@@ -345,41 +345,52 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
       }),
     };
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      () => {
-        this.xAPI = {
-          funcion: environment.funcion.PROMOVER_ESTATUS,
-          parametros: `2,${userDb},${controlId}`,
-          valores: "",
-        };
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          () => {
-            this.toastrService.success(
-              `Documento ${controlId} firmado y aprobado`,
-              "Resoluciones",
-            );
-            this.removeDoc(this.currentDocIndex);
-            this.actionLoading = false;
-            this.ngxService.stopLoader("ld-approve-tinder");
-            this.adjustAfterRemoval();
-          },
-          (err) => {
-            console.error("Error promoviendo estatus:", err);
-            this.toastrService.error("Error al aplicar firma/sello digital");
-            this.actionLoading = false;
-            this.ngxService.stopLoader("ld-approve-tinder");
-            this.cdr.detectChanges();
-          },
-        );
-      },
-      (err) => {
-        console.error("Error guardando observación:", err);
-        this.toastrService.error("No se pudo registrar la aprobación");
-        this.actionLoading = false;
-        this.ngxService.stopLoader("ld-approve-tinder");
-        this.cdr.detectChanges();
-      },
-    );
+    try {
+      await this.apiService.Ejecutar(this.xAPI).toPromise();
+
+      this.xAPI = {
+        funcion: environment.funcion.PROMOVER_ESTATUS,
+        parametros: `2,${userDb},${controlId}`,
+        valores: "",
+      };
+      await this.apiService.Ejecutar(this.xAPI).toPromise();
+
+      // Actualizar estatus de firma a 9977
+      const targetDocs =
+        doc.documentos && doc.documentos.length > 0 ? doc.documentos : [doc];
+      const numero_carpeta = doc.numero_carpeta || "000000";
+
+      for (const d of targetDocs) {
+        const cedulaVal = d.cedula || d.persona?.cedula || "";
+        if (!cedulaVal) continue;
+
+        const xAPIFirma = {
+          funcion: environment.funcion.ACTUALIZAR_ESTATUS_FIRMA,
+          parametros: `9977,${cedulaVal},${numero_carpeta}`,
+          valores: null,
+        } as any;
+        
+        try {
+          await this.apiService.Ejecutar(xAPIFirma).toPromise();
+        } catch (errFirma) {
+          console.error(`Error actualizando estatus de firma para C.I. ${cedulaVal}:`, errFirma);
+        }
+      }
+
+      this.toastrService.success(
+        `Documento ${controlId} firmado y aprobado`,
+        "Resoluciones",
+      );
+      this.removeDoc(this.currentDocIndex);
+      this.adjustAfterRemoval();
+    } catch (err) {
+      console.error("Error en onApprove:", err);
+      this.toastrService.error("Ocurrió un error al aprobar y firmar el documento");
+    } finally {
+      this.actionLoading = false;
+      this.ngxService.stopLoader("ld-approve-tinder");
+      this.cdr.detectChanges();
+    }
   }
 
   public onReject(action: PdfAction): void {
