@@ -1,9 +1,4 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ChangeDetectorRef,
-} from "@angular/core";
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
@@ -159,7 +154,11 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
   public loadFolders(): void {
     this.loadingFolders = true;
     this.ngxService.startLoader("ld-folders-tinder");
-    this.xAPI = { funcion: environment.funcion.GRUPO_CARPETA_ENTRADA, parametros: "36", valores: "" };
+    this.xAPI = {
+      funcion: environment.funcion.GRUPO_CARPETA_ENTRADA,
+      parametros: "36",
+      valores: "",
+    };
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -178,8 +177,8 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       (error) => {
-        console.error("Error cargando carpetas:", error);
-        this.toastrService.error("Error de conexión al cargar carpetas", "Buzón Resueltos");
+        // REVISAR URGENTE PARA EJECUCION DEL MINISTRO
+        //this.toastrService.error("Error de conexión al cargar carpetas", "Buzón Resueltos");
         this.loadingFolders = false;
         this.ngxService.stopLoader("ld-folders-tinder");
         this.cdr.detectChanges();
@@ -212,11 +211,17 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
     }
 
     this.filteredFolders = result;
-    this.totalPages = Math.max(1, Math.ceil(this.filteredFolders.length / this.pageSize));
+    this.totalPages = Math.max(
+      1,
+      Math.ceil(this.filteredFolders.length / this.pageSize),
+    );
     if (this.folderPage > this.totalPages) this.folderPage = this.totalPages;
 
     const start = (this.folderPage - 1) * this.pageSize;
-    this.paginatedFolders = this.filteredFolders.slice(start, start + this.pageSize);
+    this.paginatedFolders = this.filteredFolders.slice(
+      start,
+      start + this.pageSize,
+    );
     this.cdr.detectChanges();
   }
 
@@ -256,7 +261,10 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data?.Cuerpo) {
-          this.documents = data.Cuerpo.map((e: any) => ({ ...e, completed: false }));
+          this.documents = data.Cuerpo.map((e: any) => ({
+            ...e,
+            completed: false,
+          }));
         }
         this.loadingDocuments = false;
         this.cdr.detectChanges();
@@ -282,7 +290,9 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
     if (this.documents.length > 0) {
       this.enterImmersive(0);
     } else {
-      this.toastrService.warning("La carpeta seleccionada no tiene documentos.");
+      this.toastrService.warning(
+        "La carpeta seleccionada no tiene documentos.",
+      );
     }
   }
 
@@ -344,7 +354,10 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
         };
         this.apiService.Ejecutar(this.xAPI).subscribe(
           () => {
-            this.toastrService.success(`Documento ${controlId} firmado y aprobado`, "Resoluciones");
+            this.toastrService.success(
+              `Documento ${controlId} firmado y aprobado`,
+              "Resoluciones",
+            );
             this.removeDoc(this.currentDocIndex);
             this.actionLoading = false;
             this.ngxService.stopLoader("ld-approve-tinder");
@@ -413,7 +426,10 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
         };
         this.apiService.Ejecutar(this.xAPI).subscribe(
           () => {
-            this.toastrService.success(`Documento ${controlId} rechazado y devuelto`, "Resoluciones");
+            this.toastrService.success(
+              `Documento ${controlId} rechazado y devuelto`,
+              "Resoluciones",
+            );
             this.removeDoc(this.currentDocIndex);
             this.actionLoading = false;
             this.ngxService.stopLoader("ld-reject-tinder");
@@ -475,7 +491,12 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
       if (!result.isConfirmed) return;
 
       this.ngxService.startLoader("ld-fast-tinder");
-      this.saveObservationAndPromote(doc, userDb, "APROBADO MEDIANTE ACCIÓN RÁPIDA", "ld-fast-tinder");
+      this.saveObservationAndPromote(
+        doc,
+        userDb,
+        "APROBADO MEDIANTE ACCIÓN RÁPIDA",
+        "ld-fast-tinder",
+      );
     });
   }
 
@@ -499,11 +520,21 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
       if (!result.isConfirmed || !result.value) return;
 
       this.ngxService.startLoader("ld-fast-reject-tinder");
-      this.saveObservationAndReject(doc, userDb, result.value.toUpperCase(), "ld-fast-reject-tinder");
+      this.saveObservationAndReject(
+        doc,
+        userDb,
+        result.value.toUpperCase(),
+        "ld-fast-reject-tinder",
+      );
     });
   }
 
-  private saveObservationAndPromote(doc: any, userDb: string, comment: string, loaderId: string): void {
+  private saveObservationAndPromote(
+    doc: any,
+    userDb: string,
+    comment: string,
+    loaderId: string,
+  ): void {
     this.xAPI = {
       funcion: environment.funcion.DOCUMENTO_OBSERVACION,
       parametros: "",
@@ -526,7 +557,9 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
         };
         this.apiService.Ejecutar(this.xAPI).subscribe(
           () => {
-            this.toastrService.success(`Documento ${doc.ncontrol || doc.numc} firmado`);
+            this.toastrService.success(
+              `Documento ${doc.ncontrol || doc.numc} firmado`,
+            );
             this.documents = this.documents.filter(
               (d) => (d.ncontrol || d.numc) !== (doc.ncontrol || doc.numc),
             );
@@ -555,7 +588,12 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
     );
   }
 
-  private saveObservationAndReject(doc: any, userDb: string, comment: string, loaderId: string): void {
+  private saveObservationAndReject(
+    doc: any,
+    userDb: string,
+    comment: string,
+    loaderId: string,
+  ): void {
     this.xAPI = {
       funcion: environment.funcion.DOCUMENTO_OBSERVACION,
       parametros: "",
@@ -578,7 +616,9 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
         };
         this.apiService.Ejecutar(this.xAPI).subscribe(
           () => {
-            this.toastrService.success(`Documento ${doc.ncontrol || doc.numc} devuelto`);
+            this.toastrService.success(
+              `Documento ${doc.ncontrol || doc.numc} devuelto`,
+            );
             this.documents = this.documents.filter(
               (d) => (d.ncontrol || d.numc) !== (doc.ncontrol || doc.numc),
             );
@@ -616,7 +656,11 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
     this.contextMenuData = folder;
   }
 
-  public onDocumentRightClick(event: MouseEvent, doc: any, index: number): void {
+  public onDocumentRightClick(
+    event: MouseEvent,
+    doc: any,
+    index: number,
+  ): void {
     event.preventDefault();
     this.contextMenuVisible = true;
     this.contextMenuCoords = { x: event.clientX, y: event.clientY };
