@@ -128,13 +128,22 @@
 
     <!-- PIE DE PÁGINA ADHERIDO A LA FIRMA (Solo en la última página) -->
     <div class="relative-page-footer" style="margin-top: 5pt; font-family: 'Tahoma', sans-serif; text-align: left;">
-      <!-- Iniciales (Media firma): 1 línea antes que la paginación -->
-      <div class="initials" style="font-size: 8pt; color: #000; margin-bottom: 13pt; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
-           [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false"
-           (click)="$event.stopPropagation()"
-           (focus)="onFocusEditable($event)"
-           (blur)="onBlurEditable($event); onInitialsEdit($event)"
-           [textContent]="documentData.signatures.initials">
+      <!-- Contenedor para Iniciales y Media Firma -->
+      <div style="position: relative; display: inline-block;">
+        <!-- Media firma del director (MG.png) -->
+        <img *ngIf="profile === 'Aprobador'" 
+             src="assets/img/mppd/mg.png" 
+             alt="Media Firma Director"
+             style="position: absolute; bottom: 6px; left: 2px; width: 15mm; z-index: 1; pointer-events: none;">
+
+        <!-- Iniciales (Media firma): 1 línea antes que la paginación -->
+        <div class="initials" style="position: relative; z-index: 2; font-size: 8pt; color: #000; margin-bottom: 13pt; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
+             [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false"
+             (click)="$event.stopPropagation()"
+             (focus)="onFocusEditable($event)"
+             (blur)="onBlurEditable($event); onInitialsEdit($event)"
+             [textContent]="documentData.signatures.initials">
+        </div>
       </div>
     </div>
   </footer>
