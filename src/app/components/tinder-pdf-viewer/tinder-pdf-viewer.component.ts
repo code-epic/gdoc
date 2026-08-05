@@ -370,7 +370,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         initials: "LARM/JAOG/B.O.merb",
         mainSignatory: "GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ",
         signatoryTitle: "General en Jefe",
-        signatoryRole: `MINISTRO DEL PODER POPULAR<br>PARA LA DEFENSA`,
+        signatoryRole: `Ministro del Poder Popular<br>para la Defensa`,
         wetStampImageUrl: "./assets/img/mppd/sello_mppd.png",
         signatureImageUrl: "./assets/img/mppd/firma_mppd.png",
       },
@@ -422,7 +422,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       const pdf = new jsPDF({
         orientation: "p",
         unit: "mm",
-        format: [215.9, 355.6],
+        format: [215.9, 330.2], // Oficio (8.5 x 13 pulgadas)
       });
 
       const canvases = document.querySelectorAll(".a4-canvas");
@@ -441,7 +441,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
 
           const pageWidth = 215.9;
-          const pageHeight = 355.6;
+          const pageHeight = 330.2; // Oficio
 
           if (i > 0) {
             pdf.addPage();
@@ -463,18 +463,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         ? `${cleanNumc}.pdf`
         : `${new Date().getTime()}.pdf`;
 
-      // Dibujar "M P P D" verticalmente en la esquina superior derecha y en la esquina inferior izquierda
-      // usando jsPDF antes de exportar el Blob.
+      // Dibujar "M P P D" verticalmente en la esquina superior derecha
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
-      pdf.setTextColor(0, 0, 128); // Azul oscuro (opcional, ajusta a tu preferencia)
-
-      // Arriba a la derecha (coordenadas en mm para jsPDF)
+      pdf.setTextColor(0, 0, 128);
       pdf.text("M\nP\nP\nD", 195, 20);
-
-      // Abajo a la izquierda (coordenadas en mm para jsPDF)
-      // Ajustamos 'y' para que esté al final de la página (la página mide 355.6mm de alto)
-      pdf.text("M\nP\nP\nD", 20, 320);
 
       // Generar el blob del PDF local original
       const pdfBlob = pdf.output("blob");

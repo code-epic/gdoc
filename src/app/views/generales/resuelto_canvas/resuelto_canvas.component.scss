@@ -62,7 +62,7 @@
   color: #000;
 
   .signatory-info p {
-    line-height: 1 !important;
+    line-height: 1.5 !important;
   }
 
   ::ng-deep p {
@@ -159,8 +159,8 @@
 
   .m-resolucion-firma-container {
     margin-top: 26pt !important; /* 2 lineas de bajo */
-    margin-left: 50% !important; /* Partiendo del centro de la hoja */
-    width: 50% !important;
+    margin-left: 45% !important; /* Desplazado ligeramente a la izquierda */
+    width: 55% !important;
     text-align: center !important;
     position: relative !important;
   }
@@ -169,8 +169,7 @@
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
     font-weight: bold !important;
-    text-transform: uppercase !important;
-    line-height: 1 !important;
+    line-height: 1.5 !important;
   }
 }
 

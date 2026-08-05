@@ -93,7 +93,7 @@
   </main>
 
   <!-- PIE DE PÁGINA Y FIRMAS -->
-  <footer class="doc-footer editable-zone" *ngIf="i === documentData.pages.length - 1" (click)="editMode('signatures')" style="margin-top: 0; /* Sin margen para ajustarse al máximo al texto anterior */">
+  <footer class="doc-footer editable-zone" *ngIf="i === documentData.pages.length - 1" (click)="editMode('signatures')" style="margin-top: 0.5cm;">
     
     <!-- 1cm desde el margen izquierdo -->
     <p class="m-resolucion-comuniquese" [style.line-height]="lineSpacing">Comuníquese y publíquese.</p>
@@ -114,7 +114,7 @@
       <img *ngIf="showSignaturesForPrint" 
            [src]="documentData.signatures.signatureImageUrl" 
            class="signature-layer" alt="Firma Autoridad"
-           style="position: absolute; bottom: calc(100% - 5mm); left: 50%; transform: translateX(-50%); z-index: 2; width: 85mm; max-width: none; pointer-events: none;">
+           style="position: absolute; bottom: calc(100% - 15mm); left: 45%; transform: translateX(-50%); z-index: 2; width: 125mm; max-width: none; pointer-events: none;">
            
       <!-- Textos de firma -->
       <div class="signatory-info">

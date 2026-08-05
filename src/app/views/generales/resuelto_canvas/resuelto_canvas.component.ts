@@ -9,7 +9,7 @@ import {
   HostListener,
   ViewChild,
   AfterViewInit,
-  ChangeDetectorRef
+  ChangeDetectorRef,
 } from "@angular/core";
 import { Subject } from "rxjs";
 import { debounceTime } from "rxjs/operators";
@@ -44,9 +44,9 @@ export class ResueltoCanvasComponent
       ],
       signatures: {
         initials: "LARM/RMRA/b.l.s.",
-        mainSignatory: "GONZALES",
+        mainSignatory: "GUSTAVO ENRIQUE GONZÁLEZ LOPÉZ",
         signatoryTitle: "General en Jefe",
-        signatoryRole: "Ministro del Poder Popular para la Defensa",
+        signatoryRole: "Ministro del Poder Popular<br>para la Defensa",
         wetStampImageUrl: "assets/img/mppd/sello_mppd.png",
         signatureImageUrl: "assets/img/mppd/firma_mppd.png",
       },
@@ -54,7 +54,13 @@ export class ResueltoCanvasComponent
   };
 
   @Input() lineSpacing: number = 1.15;
-  @Input() profile: "Edicion" | "Revision" | "Jefe" | "Secretaria" | "Direccion" | "Aprobador" = "Edicion";
+  @Input() profile:
+    | "Edicion"
+    | "Revision"
+    | "Jefe"
+    | "Secretaria"
+    | "Direccion"
+    | "Aprobador" = "Edicion";
   @Input() showSignaturesForPrint: boolean = false;
 
   @Output() lineSpacingChange = new EventEmitter<number>();
@@ -72,35 +78,47 @@ export class ResueltoCanvasComponent
   private activeElement: HTMLElement | null = null;
 
   decreaseLineSpacing() {
-    this.currentLineSpacing = parseFloat(Math.max(0.5, this.currentLineSpacing - 0.05).toFixed(2));
+    this.currentLineSpacing = parseFloat(
+      Math.max(0.5, this.currentLineSpacing - 0.05).toFixed(2),
+    );
     this.applyLineSpacing();
     this.lineSpacingChange.emit(this.currentLineSpacing);
   }
 
   increaseLineSpacing() {
-    this.currentLineSpacing = parseFloat((this.currentLineSpacing + 0.05).toFixed(2));
+    this.currentLineSpacing = parseFloat(
+      (this.currentLineSpacing + 0.05).toFixed(2),
+    );
     this.applyLineSpacing();
     this.lineSpacingChange.emit(this.currentLineSpacing);
   }
 
   formatText(command: string) {
     document.execCommand(command, false, "");
-    
+
     // Disparar paginación después de aplicar el formato, ya que el tamaño del texto puede cambiar (ej. negritas)
     this.casesInput$.next();
   }
 
   private applyLineSpacing() {
     if (this.activeElement) {
-      this.activeElement.style.setProperty('line-height', this.currentLineSpacing.toString(), 'important');
-      const children = this.activeElement.querySelectorAll('p, span, div');
-      children.forEach(child => {
-        (child as HTMLElement).style.setProperty('line-height', this.currentLineSpacing.toString(), 'important');
+      this.activeElement.style.setProperty(
+        "line-height",
+        this.currentLineSpacing.toString(),
+        "important",
+      );
+      const children = this.activeElement.querySelectorAll("p, span, div");
+      children.forEach((child) => {
+        (child as HTMLElement).style.setProperty(
+          "line-height",
+          this.currentLineSpacing.toString(),
+          "important",
+        );
       });
-      
+
       // Forzar actualización en el modelo de datos si es necesario (el HTML reflejará el inline style)
       // Especialmente útil para .cases-list
-      if (this.activeElement.classList.contains('cases-list')) {
+      if (this.activeElement.classList.contains("cases-list")) {
         this.casesInput$.next();
       }
     }
@@ -108,7 +126,10 @@ export class ResueltoCanvasComponent
 
   private casesInput$ = new Subject<void>();
 
-  constructor(private el: ElementRef, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private el: ElementRef,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.casesInput$.pipe(debounceTime(600)).subscribe(() => {
@@ -203,18 +224,24 @@ export class ResueltoCanvasComponent
 
   onCasesListInput(event: Event, pageIndex: number) {
     const target = event.target as HTMLElement;
-    
+
     if (this.documentData && this.documentData.bodyData) {
-      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] = target.innerHTML;
+      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] =
+        target.innerHTML;
     }
 
     // Auto-paginación inteligente tipo Google Docs:
-    const currentCanvas = target.closest('.a4-canvas') as HTMLElement;
+    const currentCanvas = target.closest(".a4-canvas") as HTMLElement;
     if (currentCanvas) {
-      const isOverflowing = currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
-      
+      const isOverflowing =
+        currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
+
       if (isOverflowing) {
-        if (this.documentData && this.documentData.pages && this.documentData.pages[pageIndex]) {
+        if (
+          this.documentData &&
+          this.documentData.pages &&
+          this.documentData.pages[pageIndex]
+        ) {
           this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
         }
         // Desbordamiento = repaginamos inmediatamente para empujar el texto a la página siguiente
@@ -222,9 +249,14 @@ export class ResueltoCanvasComponent
       } else {
         const inputEvent = event as InputEvent;
         // Si el usuario está borrando texto, puede haber espacio de sobra (Underflow)
-        const isDeleting = inputEvent.inputType && inputEvent.inputType.startsWith('delete');
-        if (isDeleting && (pageIndex < this.documentData.pages.length - 1)) {
-          if (this.documentData && this.documentData.pages && this.documentData.pages[pageIndex]) {
+        const isDeleting =
+          inputEvent.inputType && inputEvent.inputType.startsWith("delete");
+        if (isDeleting && pageIndex < this.documentData.pages.length - 1) {
+          if (
+            this.documentData &&
+            this.documentData.pages &&
+            this.documentData.pages[pageIndex]
+          ) {
             this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
           }
           // Llamamos al subject que dispara paginateDOM con debounce (600ms)
@@ -240,7 +272,11 @@ export class ResueltoCanvasComponent
     const html = target.innerHTML;
 
     // Al salir del input (blur), SÍ guardamos los cambios en el modelo de datos
-    if (this.documentData && this.documentData.pages && this.documentData.pages[pageIndex]) {
+    if (
+      this.documentData &&
+      this.documentData.pages &&
+      this.documentData.pages[pageIndex]
+    ) {
       this.documentData.pages[pageIndex].casesHtml = html;
     }
 
@@ -277,13 +313,18 @@ export class ResueltoCanvasComponent
 
     // Guardar cambios manualmente (al pegar sí queremos repintar/paginar)
     const target = event.target as HTMLElement;
-    if (this.documentData && this.documentData.pages && this.documentData.pages[pageIndex]) {
+    if (
+      this.documentData &&
+      this.documentData.pages &&
+      this.documentData.pages[pageIndex]
+    ) {
       this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
     }
-    
+
     if (this.documentData && this.documentData.bodyData) {
-      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] = target.innerHTML;
-    } 
+      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] =
+        target.innerHTML;
+    }
 
     this.casesInput$.next();
 
@@ -314,12 +355,17 @@ export class ResueltoCanvasComponent
       range.setStart(el, 0);
       range.collapse(true);
       const nodeStack = [el];
-      let node, foundStart = false;
+      let node,
+        foundStart = false;
 
       while (!foundStart && (node = nodeStack.pop())) {
         if (node.nodeType === Node.TEXT_NODE) {
           const nextCharIndex = charIndex + (node.textContent?.length || 0);
-          if (!foundStart && this.savedCaretPosition >= charIndex && this.savedCaretPosition <= nextCharIndex) {
+          if (
+            !foundStart &&
+            this.savedCaretPosition >= charIndex &&
+            this.savedCaretPosition <= nextCharIndex
+          ) {
             range.setStart(node, this.savedCaretPosition - charIndex);
             foundStart = true;
           }
@@ -347,39 +393,51 @@ export class ResueltoCanvasComponent
     // Guardar el cursor antes de destruir las páginas
     this.saveCaret();
 
-    let allCasesHtml = '';
-    this.documentData.pages.forEach((p: any) => allCasesHtml += (p.casesHtml || ''));
+    let allCasesHtml = "";
+    this.documentData.pages.forEach(
+      (p: any) => (allCasesHtml += p.casesHtml || ""),
+    );
 
     const parser = new DOMParser();
-    const doc = parser.parseFromString(allCasesHtml, 'text/html');
-    const nodes = Array.from(doc.body.childNodes).filter(n => n.nodeName !== '#text' || n.textContent!.trim() !== '');
-    const paragraphs = nodes.map(n => (n as HTMLElement).outerHTML || n.textContent || '');
+    const doc = parser.parseFromString(allCasesHtml, "text/html");
+    const nodes = Array.from(doc.body.childNodes).filter(
+      (n) => n.nodeName !== "#text" || n.textContent!.trim() !== "",
+    );
+    const paragraphs = nodes.map(
+      (n) => (n as HTMLElement).outerHTML || n.textContent || "",
+    );
 
     // Resetear a una sola página limpia
-    this.documentData.pages = [{
-      pageIndex: 0,
-      headerHtml: "",
-      casesHtml: ""
-    }];
+    this.documentData.pages = [
+      {
+        pageIndex: 0,
+        headerHtml: "",
+        casesHtml: "",
+      },
+    ];
 
     for (let p of paragraphs) {
       let currentPageIdx = this.documentData.pages.length - 1;
       this.documentData.pages[currentPageIdx].casesHtml += p;
 
-      this.cdr.detectChanges(); 
+      this.cdr.detectChanges();
 
-      const canvases = this.el.nativeElement.querySelectorAll('.a4-canvas');
+      const canvases = this.el.nativeElement.querySelectorAll(".a4-canvas");
       const currentCanvas = canvases[currentPageIdx] as HTMLElement;
 
       // Si se desborda, mover este nodo a una página nueva
-      if (currentCanvas && currentCanvas.scrollHeight > currentCanvas.clientHeight + 2) {
+      if (
+        currentCanvas &&
+        currentCanvas.scrollHeight > currentCanvas.clientHeight + 2
+      ) {
         const currentHtml = this.documentData.pages[currentPageIdx].casesHtml;
-        this.documentData.pages[currentPageIdx].casesHtml = currentHtml.substring(0, currentHtml.length - p.length);
-        
+        this.documentData.pages[currentPageIdx].casesHtml =
+          currentHtml.substring(0, currentHtml.length - p.length);
+
         this.documentData.pages.push({
           pageIndex: currentPageIdx + 1,
           headerHtml: "",
-          casesHtml: p
+          casesHtml: p,
         });
         this.cdr.detectChanges();
       }
@@ -479,12 +537,12 @@ export class ResueltoCanvasComponent
   onFocusEditable(event: Event) {
     const target = event.target as HTMLElement;
     target.style.backgroundColor = "rgba(142, 202, 230, 0.15)"; // Un azul muy suave
-    
+
     this.activeElement = target;
-    
+
     const inlineLh = target.style.lineHeight;
     if (inlineLh && !isNaN(parseFloat(inlineLh))) {
-       this.currentLineSpacing = parseFloat(inlineLh);
+      this.currentLineSpacing = parseFloat(inlineLh);
     }
   }
 
@@ -493,17 +551,17 @@ export class ResueltoCanvasComponent
     target.style.backgroundColor = "transparent";
 
     // Consolidar los datos locales al hacer blur para que no se reinicien
-    if (target.classList.contains('m-resolucion-unico')) {
+    if (target.classList.contains("m-resolucion-unico")) {
       if (this.documentData && this.documentData.body) {
-         this.documentData.body.unicoParrafo = target.innerHTML;
+        this.documentData.body.unicoParrafo = target.innerHTML;
       }
     }
-    
-    if (target.classList.contains('m-resolucion-basamento')) {
+
+    if (target.classList.contains("m-resolucion-basamento")) {
       if (this.documentData && this.documentData.body) {
-         const text = target.innerText;
-         this.documentData.body.basamentoLegal = text;
-         this.documentData.body.preamble = text;
+        const text = target.innerText;
+        this.documentData.body.basamentoLegal = text;
+        this.documentData.body.preamble = text;
       }
     }
   }
