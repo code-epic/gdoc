@@ -153,14 +153,14 @@
             <span class="badge">{{ documents.length }} Carpetas</span>
 
             <!-- Botones para Aprobador -->
-            <ng-container *ngIf="currentProfile === 'Aprobador'">
+            <!-- <ng-container *ngIf="currentProfile === 'Aprobador'">
               <button class="btn btn-sm btn-success" (click)="approveSelectedFast()" [disabled]="getSelectedCount() === 0">
                 <i class="fas fa-check-double"></i> Firmar Seleccionados ({{ getSelectedCount() }})
               </button>
               <button class="btn btn-sm btn-danger" (click)="cancelSelectedFast()" [disabled]="getSelectedCount() === 0">
                 <i class="fas fa-ban"></i> Anular Seleccionados ({{ getSelectedCount() }})
               </button>
-            </ng-container>
+            </ng-container> -->
 
             <!-- Botones para Revisión -->
             <ng-container *ngIf="currentProfile === 'Revision'">
@@ -247,24 +247,24 @@
               </button>
               
               <!-- Botón Firmar Rápido: Solo visible para Aprobador -->
-              <button class="btn btn-sm" 
+              <!-- <button class="btn btn-sm" 
                       *ngIf="currentProfile === 'Aprobador'"
                       (click)="approveFast(doc); $event.stopPropagation()" 
                       title="Firmar Rápido Carpeta"
                       style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e8f5e9; color: #43a047; border: none; transition: transform 0.2s;"
                       onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                 <i class="fas fa-signature" style="font-size: 1rem;"></i>
-              </button>
+              </button> -->
               
               <!-- Botón Anular: Solo visible para Aprobador -->
-              <button class="btn btn-sm" 
+              <!-- <button class="btn btn-sm" 
                       *ngIf="currentProfile === 'Aprobador'"
                       (click)="cancelFast(doc); $event.stopPropagation()" 
                       title="Anular Carpeta"
                       style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #ffebee; color: #e53935; border: none; transition: transform 0.2s;"
                       onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                 <i class="fas fa-ban" style="font-size: 1rem;"></i>
-              </button>
+              </button> -->
             </div>
           </div>
         </div>
