@@ -1,9 +1,4 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ChangeDetectorRef,
-} from "@angular/core";
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
@@ -61,7 +56,12 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
   public cardMode = false;
   public currentDocIndex = -1;
   public observations = "";
-  public swipeState: "" | "swiping-right" | "swiping-left" | "approved" | "rejected" = "";
+  public swipeState:
+    | ""
+    | "swiping-right"
+    | "swiping-left"
+    | "approved"
+    | "rejected" = "";
 
   // Mobile master-detail
   public mobileView: "folders" | "documents" = "folders";
@@ -187,7 +187,11 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
   public loadFolders(): void {
     this.loadingFolders = true;
     this.ngxService.startLoader("ld-folders-ios");
-    this.xAPI = { funcion: environment.funcion.GRUPO_CARPETA_ENTRADA, parametros: "36", valores: "" };
+    this.xAPI = {
+      funcion: environment.funcion.GRUPO_CARPETA_ENTRADA,
+      parametros: "36",
+      valores: "",
+    };
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
@@ -207,7 +211,8 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
       },
       (error) => {
         console.error("Error cargando carpetas:", error);
-        this.toastrService.error("Error de conexión al cargar carpetas", "Buzón Resueltos");
+        // REVISAR URGENTE PARA EJECUCION DEL MINISTRO
+        //this.toastrService.error("Error de conexión al cargar carpetas", "Buzón Resueltos");
         this.loadingFolders = false;
         this.ngxService.stopLoader("ld-folders-ios");
         this.cdr.detectChanges();
@@ -240,11 +245,17 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
     }
 
     this.filteredFolders = result;
-    this.totalPages = Math.max(1, Math.ceil(this.filteredFolders.length / this.pageSize));
+    this.totalPages = Math.max(
+      1,
+      Math.ceil(this.filteredFolders.length / this.pageSize),
+    );
     if (this.folderPage > this.totalPages) this.folderPage = this.totalPages;
 
     const start = (this.folderPage - 1) * this.pageSize;
-    this.paginatedFolders = this.filteredFolders.slice(start, start + this.pageSize);
+    this.paginatedFolders = this.filteredFolders.slice(
+      start,
+      start + this.pageSize,
+    );
     this.cdr.detectChanges();
   }
 
@@ -291,7 +302,10 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data?.Cuerpo) {
-          this.documents = data.Cuerpo.map((e: any) => ({ ...e, completed: false }));
+          this.documents = data.Cuerpo.map((e: any) => ({
+            ...e,
+            completed: false,
+          }));
         }
         this.loadingDocuments = false;
         this.cdr.detectChanges();
@@ -308,14 +322,24 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
   // ── Vista tarjeta ─────────────────────────────────────
   public enterCardMode(index: number): void {
     if (this.documents.length === 0) return;
-    console.log('[resueltos_ios] enterCardMode', index, 'docs', this.documents.length);
+    console.log(
+      "[resueltos_ios] enterCardMode",
+      index,
+      "docs",
+      this.documents.length,
+    );
     this.currentDocIndex = index;
     this.observations = "";
     this.cardMode = true;
     this.swipeState = "";
     this.cdr.detectChanges();
     setTimeout(() => {
-      console.log('[resueltos_ios] cardMode after CD', this.cardMode, 'cardView element', document.querySelector('.rios-card-view'));
+      console.log(
+        "[resueltos_ios] cardMode after CD",
+        this.cardMode,
+        "cardView element",
+        document.querySelector(".rios-card-view"),
+      );
     }, 0);
   }
 
@@ -323,7 +347,9 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
     if (this.documents.length > 0) {
       this.enterCardMode(0);
     } else {
-      this.toastrService.warning("La carpeta seleccionada no tiene documentos.");
+      this.toastrService.warning(
+        "La carpeta seleccionada no tiene documentos.",
+      );
     }
   }
 
@@ -507,7 +533,10 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
         };
         this.apiService.Ejecutar(this.xAPI).subscribe(
           () => {
-            this.toastrService.success(`Documento ${controlId} firmado y aprobado`, "Resoluciones");
+            this.toastrService.success(
+              `Documento ${controlId} firmado y aprobado`,
+              "Resoluciones",
+            );
             this.removeCurrentDoc();
             this.actionLoading = false;
             this.ngxService.stopLoader("ld-approve-ios");
@@ -583,7 +612,10 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
         };
         this.apiService.Ejecutar(this.xAPI).subscribe(
           () => {
-            this.toastrService.success(`Documento ${controlId} rechazado y devuelto`, "Resoluciones");
+            this.toastrService.success(
+              `Documento ${controlId} rechazado y devuelto`,
+              "Resoluciones",
+            );
             this.removeCurrentDoc();
             this.actionLoading = false;
             this.ngxService.stopLoader("ld-reject-ios");
@@ -611,7 +643,10 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
   }
 
   private removeCurrentDoc(): void {
-    if (this.currentDocIndex > -1 && this.currentDocIndex < this.documents.length) {
+    if (
+      this.currentDocIndex > -1 &&
+      this.currentDocIndex < this.documents.length
+    ) {
       this.documents.splice(this.currentDocIndex, 1);
     }
   }
@@ -666,7 +701,12 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (!result.isConfirmed) return;
       this.ngxService.startLoader("ld-fast-ios");
-      this.saveObservationAndPromote(doc, userDb, "APROBADO MEDIANTE ACCIÓN RÁPIDA", "ld-fast-ios");
+      this.saveObservationAndPromote(
+        doc,
+        userDb,
+        "APROBADO MEDIANTE ACCIÓN RÁPIDA",
+        "ld-fast-ios",
+      );
     });
   }
 
@@ -689,11 +729,21 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (!result.isConfirmed || !result.value) return;
       this.ngxService.startLoader("ld-fast-reject-ios");
-      this.saveObservationAndReject(doc, userDb, result.value.toUpperCase(), "ld-fast-reject-ios");
+      this.saveObservationAndReject(
+        doc,
+        userDb,
+        result.value.toUpperCase(),
+        "ld-fast-reject-ios",
+      );
     });
   }
 
-  private saveObservationAndPromote(doc: any, userDb: string, comment: string, loaderId: string): void {
+  private saveObservationAndPromote(
+    doc: any,
+    userDb: string,
+    comment: string,
+    loaderId: string,
+  ): void {
     this.xAPI = {
       funcion: environment.funcion.DOCUMENTO_OBSERVACION,
       parametros: "",
@@ -716,7 +766,9 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
         };
         this.apiService.Ejecutar(this.xAPI).subscribe(
           () => {
-            this.toastrService.success(`Documento ${doc.ncontrol || doc.numc} firmado`);
+            this.toastrService.success(
+              `Documento ${doc.ncontrol || doc.numc} firmado`,
+            );
             this.documents = this.documents.filter(
               (d) => (d.ncontrol || d.numc) !== (doc.ncontrol || doc.numc),
             );
@@ -745,7 +797,12 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
     );
   }
 
-  private saveObservationAndReject(doc: any, userDb: string, comment: string, loaderId: string): void {
+  private saveObservationAndReject(
+    doc: any,
+    userDb: string,
+    comment: string,
+    loaderId: string,
+  ): void {
     this.xAPI = {
       funcion: environment.funcion.DOCUMENTO_OBSERVACION,
       parametros: "",
@@ -768,7 +825,9 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
         };
         this.apiService.Ejecutar(this.xAPI).subscribe(
           () => {
-            this.toastrService.success(`Documento ${doc.ncontrol || doc.numc} devuelto`);
+            this.toastrService.success(
+              `Documento ${doc.ncontrol || doc.numc} devuelto`,
+            );
             this.documents = this.documents.filter(
               (d) => (d.ncontrol || d.numc) !== (doc.ncontrol || doc.numc),
             );
@@ -806,7 +865,11 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
     this.contextMenuData = folder;
   }
 
-  public onDocumentRightClick(event: MouseEvent, doc: any, index: number): void {
+  public onDocumentRightClick(
+    event: MouseEvent,
+    doc: any,
+    index: number,
+  ): void {
     event.preventDefault();
     this.contextMenuVisible = true;
     this.contextMenuCoords = { x: event.clientX, y: event.clientY };
