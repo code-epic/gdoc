@@ -544,6 +544,12 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           link.click();
           document.body.removeChild(link);
           window.URL.revokeObjectURL(downloadUrl);
+          if (this.resueltoCanvas) {
+            this.resueltoCanvas.zoomScale = originalZoom;
+          }
+          this.printModeActive = false;
+          this.loadingPdf = false;
+          this.cdr.detectChanges();
         }
       });
     } catch (err) {
