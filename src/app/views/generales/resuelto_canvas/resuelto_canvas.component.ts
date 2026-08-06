@@ -13,8 +13,10 @@ import {
   SimpleChanges,
   ChangeDetectorRef,
 } from "@angular/core";
+import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 import { Subject } from "rxjs";
 import { debounceTime } from "rxjs/operators";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-resuelto-canvas",
@@ -64,6 +66,7 @@ export class ResueltoCanvasComponent
     | "Direccion"
     | "Aprobador" = "Edicion";
   @Input() showSignaturesForPrint: boolean = false;
+  @Input() jwtData: any;
 
   @Output() lineSpacingChange = new EventEmitter<number>();
   @Output() profileChange = new EventEmitter<string>();
@@ -75,10 +78,40 @@ export class ResueltoCanvasComponent
   @Output() resolutionChange = new EventEmitter<string>();
   @Output() initialsChange = new EventEmitter<string>();
   @Output() casesBlur = new EventEmitter<void>();
+  @Output() commentAdded = new EventEmitter<void>();
 
   public currentLineSpacing: number = 1.15;
   private activeElement: HTMLElement | null = null;
   public activeSection: string = '';
+
+  public showFloatingCommentBtn = false;
+  public floatingBtnPos = { x: 0, y: 0 };
+
+  @HostListener('document:selectionchange')
+  onSelectionChange() {
+    if (this.profile !== 'Revision') {
+      this.showFloatingCommentBtn = false;
+      return;
+    }
+    
+    const sel = window.getSelection();
+    if (sel && !sel.isCollapsed && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      
+      if (rect.width > 0 && rect.height > 0) {
+        this.floatingBtnPos = {
+          x: rect.left + rect.width / 2 - 40,
+          y: rect.top - 45
+        };
+        this.showFloatingCommentBtn = true;
+      } else {
+        this.showFloatingCommentBtn = false;
+      }
+    } else {
+      this.showFloatingCommentBtn = false;
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['documentData'] && this.documentData) {
@@ -124,7 +157,118 @@ export class ResueltoCanvasComponent
 
   formatText(command: string) {
     document.execCommand(command, false, "");
-    this.casesInput$.next();
+    // NOTA: No llamamos a this.casesInput$.next() aquí para evitar que el canvas
+    // se repagine y elimine la selección visual del usuario.
+    // Los cambios en el DOM se guardarán cuando se dispare el evento blur.
+  }
+
+  public async addComment() {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
+      Swal.fire('Selección vacía', 'Por favor, selecciona un texto para añadir un comentario.', 'warning');
+      return;
+    }
+
+    const { value: text } = await Swal.fire({
+      title: 'Añadir comentario',
+      input: 'textarea',
+      inputLabel: 'Escribe tu observación:',
+      inputPlaceholder: 'Ej. Revisar este nombre...',
+      showCancelButton: true,
+      confirmButtonColor: '#f5365c',
+      cancelButtonColor: '#8898aa',
+      confirmButtonText: 'Guardar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (text) {
+      const commentId = 'cmt_' + new Date().getTime();
+      const range = sel.getRangeAt(0);
+      const span = document.createElement('span');
+      span.className = 'resuelto-comment pending';
+      span.style.backgroundColor = '#ffe066';
+      span.style.color = '#333';
+      span.dataset['commentId'] = commentId;
+      
+      try {
+        span.appendChild(range.extractContents());
+        range.insertNode(span);
+        
+        // Sync the modified DOM back to the model immediately
+        const container = span.closest('.cases-list') || span.closest('[data-section]');
+        if (container) {
+          const section = container.getAttribute('data-section');
+          if (section === 'cases') {
+            const currentCanvas = container.closest('.a4-canvas');
+            if (currentCanvas) {
+              const canvases = Array.from(this.el.nativeElement.querySelectorAll('.a4-canvas'));
+              const pageIdx = canvases.indexOf(currentCanvas);
+              if (pageIdx !== -1 && this.documentData && this.documentData.pages) {
+                this.documentData.pages[pageIdx].casesHtml = container.innerHTML;
+                this.documentData.pages[pageIdx].casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(container.innerHTML || '');
+              }
+            }
+          } else if (section === 'unico') {
+             this.documentData.body.unicoParrafo = container.innerHTML;
+             this.unicoParrafoChange.emit(container.innerHTML);
+          } else if (section === 'basamento') {
+             this.documentData.body.basamentoLegal = container.innerHTML;
+             this.basamentoLegalChange.emit(container.innerHTML);
+          }
+        }
+        
+        if (!this.documentData.comentarios) {
+          this.documentData.comentarios = [];
+        }
+        this.documentData.comentarios.push({
+          id: commentId,
+          text: text,
+          status: 'pending',
+          author: `${this.jwtData?.userName || 'Usuario'} (${this.jwtData?.userRole || 'Revisión'})`,
+          date: new Date().toLocaleString('es-VE')
+        });
+        
+        this.commentAdded.emit();
+      } catch (e) {
+        console.error(e);
+        Swal.fire('Error', 'No se puede añadir el comentario en esta selección (no cruces párrafos).', 'error');
+      }
+    }
+  }
+
+  public removeHighlight(id: string) {
+    const spans = this.el.nativeElement.querySelectorAll(`span[data-comment-id="${id}"]`);
+    spans.forEach((span: HTMLElement) => {
+      span.style.backgroundColor = 'transparent';
+      span.style.color = 'inherit';
+      span.classList.remove('pending');
+      span.classList.add('resolved');
+      
+      // Sync the modified DOM back to the model
+      const container = span.closest('.cases-list') || span.closest('[data-section]');
+      if (container) {
+        const section = container.getAttribute('data-section');
+        if (section === 'cases') {
+          const currentCanvas = container.closest('.a4-canvas');
+          if (currentCanvas) {
+            const canvases = Array.from(this.el.nativeElement.querySelectorAll('.a4-canvas'));
+            const pageIdx = canvases.indexOf(currentCanvas);
+            if (pageIdx !== -1 && this.documentData && this.documentData.pages) {
+              this.documentData.pages[pageIdx].casesHtml = container.innerHTML;
+              this.documentData.pages[pageIdx].casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(container.innerHTML || '');
+            }
+          }
+        } else if (section === 'unico') {
+           this.documentData.body.unicoParrafo = container.innerHTML;
+           this.unicoParrafoChange.emit(container.innerHTML);
+        } else if (section === 'basamento') {
+           this.documentData.body.basamentoLegal = container.innerHTML;
+           this.basamentoLegalChange.emit(container.innerHTML);
+        }
+      }
+    });
+    // En lugar de casesInput$.next(), emitimos casesBlur si es necesario,
+    // o simplemente dejamos que el visor lo detecte.
   }
 
   private applyLineSpacing() {
@@ -160,7 +304,12 @@ export class ResueltoCanvasComponent
   constructor(
     private el: ElementRef,
     private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) {}
+
+  public getSafeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html || "");
+  }
 
   ngOnInit(): void {
     if (this.documentData && !this.documentData.styles) {
@@ -185,6 +334,14 @@ export class ResueltoCanvasComponent
 
   ngOnDestroy(): void {
     this.casesInput$.complete();
+  }
+
+  private updateSafeHtmls() {
+    if (this.documentData && this.documentData.pages) {
+      this.documentData.pages.forEach((p: any) => {
+        p.casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(p.casesHtml || '');
+      });
+    }
   }
 
   ngAfterViewInit() {
@@ -323,6 +480,7 @@ export class ResueltoCanvasComponent
       this.documentData.pages[pageIndex]
     ) {
       this.documentData.pages[pageIndex].casesHtml = html;
+      this.documentData.pages[pageIndex].casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(html || '');
     }
 
     // Y luego disparamos la paginación dinámica, ya que el usuario dejó de escribir
@@ -379,7 +537,7 @@ export class ResueltoCanvasComponent
   }
 
   // --- SISTEMA DE RESTAURACIÓN DE PUNTERO (CARET) ---
-  savedCaretPosition: any = null;
+  savedCaretPosition: { start: number, end: number } | null = null;
 
   saveCaret() {
     const sel = window.getSelection();
@@ -388,7 +546,12 @@ export class ResueltoCanvasComponent
       const preCaretRange = range.cloneRange();
       preCaretRange.selectNodeContents(this.el.nativeElement);
       preCaretRange.setEnd(range.startContainer, range.startOffset);
-      this.savedCaretPosition = preCaretRange.toString().length;
+      const start = preCaretRange.toString().length;
+
+      preCaretRange.setEnd(range.endContainer, range.endOffset);
+      const end = preCaretRange.toString().length;
+      
+      this.savedCaretPosition = { start, end };
     }
   }
 
@@ -401,18 +564,27 @@ export class ResueltoCanvasComponent
       range.collapse(true);
       const nodeStack = [el];
       let node,
-        foundStart = false;
+        foundStart = false,
+        foundEnd = false;
 
-      while (!foundStart && (node = nodeStack.pop())) {
+      while (!foundEnd && (node = nodeStack.pop())) {
         if (node.nodeType === Node.TEXT_NODE) {
           const nextCharIndex = charIndex + (node.textContent?.length || 0);
           if (
             !foundStart &&
-            this.savedCaretPosition >= charIndex &&
-            this.savedCaretPosition <= nextCharIndex
+            this.savedCaretPosition.start >= charIndex &&
+            this.savedCaretPosition.start <= nextCharIndex
           ) {
-            range.setStart(node, this.savedCaretPosition - charIndex);
+            range.setStart(node, this.savedCaretPosition.start - charIndex);
             foundStart = true;
+          }
+          if (
+            !foundEnd &&
+            this.savedCaretPosition.end >= charIndex &&
+            this.savedCaretPosition.end <= nextCharIndex
+          ) {
+            range.setEnd(node, this.savedCaretPosition.end - charIndex);
+            foundEnd = true;
           }
           charIndex = nextCharIndex;
         } else {
@@ -487,6 +659,9 @@ export class ResueltoCanvasComponent
         this.cdr.detectChanges();
       }
     }
+
+    this.updateSafeHtmls();
+    this.cdr.detectChanges();
 
     // Restaurar el cursor después de renderizar las nuevas páginas
     setTimeout(() => {

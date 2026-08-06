@@ -103,10 +103,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     userName: string;
     userRole: string;
     perfil: string;
+    userCedula: string;
   } = {
     userId: "",
     userName: "",
     userRole: "",
+    userCedula: "",
     perfil: "",
   };
 
@@ -212,6 +214,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             userId: decoded.Usuario.usuario || "",
             userName: decoded.Usuario.nombre || decoded.Usuario.usuario || "",
             userRole: decoded.Usuario.tipo || "Usuario",
+            userCedula: this.loginService.Usuario.cedula || "",
             perfil:
               sessionStorage.getItem("perfil") ||
               decoded.Usuario.descripcion ||
@@ -223,6 +226,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         this.jwtData = {
           userId: this.loginService.Usuario.usuario || "",
           userName: this.loginService.Usuario.nombre || "",
+          userCedula: this.loginService.Usuario.cedula || "",
           userRole: this.loginService.Usuario.tipo || "",
           perfil:
             sessionStorage.getItem("perfil") ||
@@ -629,14 +633,118 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
   /** Cuando el hijo emite approve */
   public onTinderApprove(action: PdfAction) {
-    this.documentObservations = action.observations;
-    this.approveFast(action.doc);
+    this.ngxService.startLoader("ld-fast");
+    const doc = action.doc;
+    const userDb = this.jwtData.userId;
+    const controlId = doc.ncontrol || doc.numc;
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
+    this.xAPI.valores = JSON.stringify({
+      documento: controlId,
+      estado: doc.ultimo_estado || doc.estatus || 36,
+      estatus: 2,
+      observacion: action.observations || "APROBADO MEDIANTE VISOR",
+      accion: "0",
+      usuario: userDb,
+    });
+    this.xAPI.parametros = "";
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      () => {
+        this.xAPI = {} as IAPICore;
+        this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
+        this.xAPI.valores = "";
+        this.xAPI.parametros = `2,${userDb},${controlId}`;
+
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          () => {
+            this.toastrService.success(
+              `Documento ${controlId} firmado`,
+              "Éxito",
+            );
+            this.removeDocFromViewer(doc);
+            this.ngxService.stopLoader("ld-fast");
+            if (this.tinderViewer) this.tinderViewer.resetAction();
+          },
+          (err) => {
+            console.error(err);
+            this.toastrService.error("Error al firmar documento");
+            this.ngxService.stopLoader("ld-fast");
+            if (this.tinderViewer) this.tinderViewer.resetAction();
+          },
+        );
+      },
+      (err) => {
+        console.error(err);
+        this.toastrService.error("Error al observar documento");
+        this.ngxService.stopLoader("ld-fast");
+        if (this.tinderViewer) this.tinderViewer.resetAction();
+      },
+    );
   }
 
   /** Cuando el hijo emite reject */
-  public onTinderReject(action: PdfAction) {
-    this.documentObservations = action.observations;
-    this.cancelFast(action.doc);
+  public async onTinderReject(action: PdfAction) {
+    console.log("uff control reject");
+    this.ngxService.startLoader("ld-fast");
+    const doc = action.doc;
+    const userDb = this.jwtData.userId;
+    const controlId = doc.ncontrol || doc.numc;
+
+    const previousState = "36";
+    const targetDocs =
+      doc.documentos && doc.documentos.length > 0 ? doc.documentos : [doc];
+    const numero_carpeta = doc.numero_carpeta || "000000";
+
+    for (const d of targetDocs) {
+      const cedulaVal = d.cedula || d.persona?.cedula || "";
+      if (!cedulaVal) continue;
+
+      const xAPIFirma = {
+        funcion: environment.funcion.ACTUALIZAR_ESTATUS_FIRMA,
+        parametros: `${previousState},${cedulaVal},${numero_carpeta}`,
+        valores: null,
+      } as any;
+
+      try {
+        await this.apiService.Ejecutar(xAPIFirma).toPromise();
+      } catch (errFirma) {
+        console.error(
+          `Error actualizando estatus de firma para C.I. ${cedulaVal}:`,
+          errFirma,
+        );
+      }
+    }
+
+    this.toastrService.success(`Documento ${controlId} devuelto`, "Éxito");
+    this.removeDocFromViewer(doc);
+    this.ngxService.stopLoader("ld-fast");
+    if (this.tinderViewer) {
+      this.tinderViewer.resetAction();
+    }
+  }
+
+  private removeDocFromViewer(doc: any) {
+    const numCarpeta = doc.numero_carpeta;
+    this.documents = this.documents.filter(
+      (d) => (d.ncontrol || d.numc) !== (doc.ncontrol || doc.numc),
+    );
+
+    if (this.documents.length === 0) {
+      this.selectedFolder = null;
+      if (this.immersiveMode) this.exitImmersiveMode();
+      this.loadFolders();
+    } else {
+      if (this.immersiveMode) {
+        if (this.currentDocIndex >= this.documents.length) {
+          this.currentDocIndex = this.documents.length - 1;
+        }
+        this.activeDoc = this.documents[this.currentDocIndex];
+        this.loadActivePdf();
+      }
+      this.changeDetector.detectChanges();
+    }
   }
 
   /** Cuando el hijo emite close */
@@ -822,7 +930,10 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             this.xAPI.valores = JSON.stringify({
               documento: controlId,
               estado: doc.ultimo_estado || doc.estatus || 36,
-              estatus: doc.ultimo_estado || 36,
+              estatus: Math.max(
+                1,
+                (doc.ultimo_estado || doc.estatus || 36) - 1,
+              ),
               observacion: motivo,
               accion: "1",
               usuario: userDb,
@@ -831,10 +942,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
             await this.apiService.Ejecutar(this.xAPI).toPromise();
 
+            const currentState = doc.ultimo_estado || doc.estatus || 36;
+            const previousState = Math.max(1, currentState - 1);
             this.xAPI = {} as IAPICore;
-            this.xAPI.funcion = environment.funcion.UBICACION_RECHAZO;
+            this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
             this.xAPI.valores = "";
-            this.xAPI.parametros = `1,1,1,,${userDb},${controlId}`;
+            this.xAPI.parametros = `${previousState},${userDb},${controlId}`;
 
             await this.apiService.Ejecutar(this.xAPI).toPromise();
             successCount++;
@@ -1015,7 +1128,10 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               this.xAPI.valores = JSON.stringify({
                 documento: controlId,
                 estado: doc.ultimo_estado || doc.estatus || 36,
-                estatus: doc.ultimo_estado || 36,
+                estatus: Math.max(
+                  1,
+                  (doc.ultimo_estado || doc.estatus || 36) - 1,
+                ),
                 observacion: motivo,
                 accion: "1",
                 usuario: userDb,
@@ -1024,10 +1140,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
               await this.apiService.Ejecutar(this.xAPI).toPromise();
 
+              const currentState = doc.ultimo_estado || doc.estatus || 36;
+              const previousState = Math.max(1, currentState - 1);
               this.xAPI = {} as IAPICore;
-              this.xAPI.funcion = environment.funcion.UBICACION_RECHAZO;
+              this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
               this.xAPI.valores = "";
-              this.xAPI.parametros = `1,1,1,,${userDb},${controlId}`;
+              this.xAPI.parametros = `${previousState},${userDb},${controlId}`;
 
               await this.apiService.Ejecutar(this.xAPI).toPromise();
               successCount++;
@@ -1068,6 +1186,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     const controlId = doc.ncontrol || doc.numc;
     const userDb = this.jwtData.userId;
 
+    console.log("Alta seleccion de datos y control II");
+
     Swal.fire({
       title: "Rechazar Documento",
       text: "Ingrese el motivo del rechazo del resuelto:",
@@ -1095,7 +1215,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         this.xAPI.valores = JSON.stringify({
           documento: controlId,
           estado: doc.ultimo_estado || doc.estatus || 36,
-          estatus: doc.ultimo_estado || 36,
+          estatus: Math.max(1, (doc.ultimo_estado || doc.estatus || 36) - 1),
           observacion: result.value.toUpperCase(),
           accion: "1",
           usuario: userDb,
@@ -1105,10 +1225,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         this.apiService.Ejecutar(this.xAPI).subscribe(
           () => {
             // Ubicación Rechazo
+            const currentState = doc.ultimo_estado || doc.estatus || 36;
+            const previousState = Math.max(1, currentState - 1);
             this.xAPI = {} as IAPICore;
-            this.xAPI.funcion = environment.funcion.UBICACION_RECHAZO;
+            this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
             this.xAPI.valores = "";
-            this.xAPI.parametros = `1,1,1,,${userDb},${controlId}`;
+            this.xAPI.parametros = `${previousState},${userDb},${controlId}`;
 
             this.apiService.Ejecutar(this.xAPI).subscribe(
               () => {

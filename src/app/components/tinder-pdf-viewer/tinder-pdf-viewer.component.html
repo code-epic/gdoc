@@ -75,11 +75,13 @@
           [documentData]="canvasData" 
           [(lineSpacing)]="lineSpacing"
           [profile]="profile"
+          [jwtData]="jwtData"
           [showSignaturesForPrint]="printModeActive"
           (basamentoLegalChange)="updateActiveDoc('basamentoLegal', $event)"
           (dateChange)="updateActiveDoc('fecha_resolucion', $event)"
           (unicoParrafoChange)="updateActiveDoc('_headerHtml', $event)"
           (resolutionChange)="onResolutionChange($event)"
+          (commentAdded)="onCommentAdded()"
           style="width: 100%; height: 100%; display: block; overflow: auto; background-color: white;">
         </app-resuelto-canvas>
 
@@ -151,6 +153,10 @@
         <div class="tpv-meta-tabs">
           <button type="button" class="tpv-tab-btn" [class.active]="activeTab === 'explorador'" (click)="activeTab = 'explorador'">Explorador</button>
           <button type="button" class="tpv-tab-btn" [class.active]="activeTab === 'metadata'" (click)="activeTab = 'metadata'">Atributos</button>
+          <button type="button" class="tpv-tab-btn position-relative" [class.active]="activeTab === 'comments'" (click)="activeTab = 'comments'" title="Comentarios">
+            <i class="fas fa-comments"></i>
+            <span *ngIf="pendingCommentsCount > 0" class="badge badge-danger position-absolute" style="top: 0; right: 0; font-size: 0.6rem; padding: 2px 4px; border-radius: 50%;">{{ pendingCommentsCount }}</span>
+          </button>
         </div>
 
         <!-- ═══ Tab: Explorador (Casos) ═══ -->
@@ -233,20 +239,7 @@
             <div class="tpv-field-value tpv-field-break">{{ activeDoc.asunto }}</div>
           </div>
 
-          <!-- JWT Audit -->
-          <div class="tpv-meta-header tpv-meta-header-sm" style="margin-top: 15px;">
-            <h5 class="tpv-meta-title-sm">Auditoría de Firma (JWT)</h5>
-          </div>
 
-          <div class="tpv-field">
-            <label>Usuario Firmante</label>
-            <div class="tpv-field-value tpv-field-highlight">{{ jwtData.userName | uppercase }}</div>
-          </div>
-
-          <div class="tpv-field">
-            <label>Rol / Privilegios</label>
-            <div class="tpv-field-value tpv-field-highlight">{{ jwtData.userRole | uppercase }}</div>
-          </div>
 
           <!-- Historial de Edición -->
           <div class="tpv-meta-header tpv-meta-header-sm" style="margin-top: 15px;" *ngIf="activeDoc.ediciones && activeDoc.ediciones.length > 0">
@@ -255,12 +248,49 @@
           <div class="tpv-field" *ngIf="activeDoc.ediciones && activeDoc.ediciones.length > 0">
             <ul style="list-style: none; padding-left: 0; margin-bottom: 0; font-size: 0.8rem; color: #ced4da;">
               <li *ngFor="let edicion of activeDoc.ediciones" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 4px 0;">
-                <strong>{{ edicion.fecha }}</strong> - {{ edicion.nombre | uppercase }}
+                <strong>{{ edicion.fecha }}</strong> - {{ edicion.nombre | uppercase }} (C.I: {{ edicion.usuario }})
               </li>
             </ul>
           </div>
 
-          <!-- Observaciones y Acciones (Ahora dentro de Atributos) -->
+          <div style="margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div class="tpv-field" style="margin-bottom: 10px;">
+              <textarea class="form-control text-observaciones" rows="3" placeholder="Añadir observación general..." [(ngModel)]="observations"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ Tab: Comentarios ═══ -->
+        <div class="tpv-tab-content tpv-comments-tab" *ngIf="activeTab === 'comments'" style="display: flex; flex-direction: column; flex-grow: 1;">
+          <div class="tpv-meta-header tpv-meta-header-sm">
+            <h5 class="tpv-meta-title-sm">Comentarios de Revisión</h5>
+          </div>
+
+          <div *ngIf="!activeDoc.comentarios || activeDoc.comentarios.length === 0" style="padding: 20px; text-align: center; color: #ced4da; font-size: 0.85rem;">
+            No hay comentarios en este documento.
+          </div>
+
+          <div class="comments-list" *ngIf="activeDoc.comentarios && activeDoc.comentarios.length > 0" style="overflow-y: auto; flex-grow: 1; padding-right: 5px;">
+            <div class="comment-card" *ngFor="let comment of activeDoc.comentarios" 
+                 [class.resolved]="comment.status === 'resolved'">
+              <div class="comment-header">
+                <strong>{{ comment.author | uppercase }}</strong>
+                <span>{{ comment.date }}</span>
+              </div>
+              <div class="comment-body">
+                {{ comment.text }}
+              </div>
+              <div class="comment-footer" *ngIf="comment.status === 'pending' && profile === 'Edicion'">
+                <button class="btn btn-sm btn-success w-100" (click)="resolveComment(comment.id)">
+                  <i class="fas fa-check"></i> Marcar como Resuelto
+                </button>
+              </div>
+              <div class="comment-footer text-center" *ngIf="comment.status === 'resolved'">
+                <span class="badge badge-success w-100 py-2"><i class="fas fa-check-double"></i> Atendido</span>
+              </div>
+            </div>
+          </div>
+
           <div class="tpv-field tpv-field-grow" style="margin-top: 15px; flex-grow: 1; display: flex; flex-direction: column;">
             <label class="tpv-label-warn">Observaciones de Revisión</label>
             <textarea class="tpv-textarea"

@@ -20,6 +20,14 @@ import Swal from "sweetalert2";
 
 /* ─── Interfaces públicas ─────────────────────────────── */
 
+export interface DocumentComment {
+  id: string;
+  text: string;
+  status: "pending" | "resolved";
+  author: string;
+  date: string;
+}
+
 export interface TinderDocument {
   cedula?: string;
   nombres_apellidos?: string;
@@ -28,6 +36,7 @@ export interface TinderDocument {
   digital?: string;
   anom?: string;
   archivo?: string;
+  comentarios?: DocumentComment[];
   [key: string]: any;
 }
 
@@ -35,6 +44,8 @@ export interface JwtUserData {
   userId: string;
   userName: string;
   userRole: string;
+  userLogin?: string;
+  userCedula?: string;
 }
 
 export interface PdfAction {
@@ -59,7 +70,13 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   /* ── Inputs ──────────────────────────────────────────── */
   @Input() documents: TinderDocument[] = [];
   @Input() startIndex = 0;
-  @Input() jwtData: JwtUserData = { userId: "", userName: "", userRole: "" };
+  @Input() jwtData: JwtUserData = {
+    userId: "",
+    userName: "",
+    userRole: "",
+    userLogin: "",
+    userCedula: "",
+  };
   @Input() loading = false;
   @Input() useCanvas = false;
   @Input() profile:
@@ -124,7 +141,32 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public isSafari = false;
   public objectFailed = false;
 
-  public activeTab: "explorador" | "metadata" = "explorador";
+  public activeTab: "explorador" | "metadata" | "comments" = "explorador";
+
+  get pendingCommentsCount(): number {
+    if (!this.activeDoc || !this.activeDoc.comentarios) return 0;
+    return this.activeDoc.comentarios.filter((c) => c.status === "pending")
+      .length;
+  }
+
+  public resolveComment(id: string) {
+    if (!this.activeDoc || !this.activeDoc.comentarios) return;
+    const comment = this.activeDoc.comentarios.find((c) => c.id === id);
+    if (comment) {
+      comment.status = "resolved";
+      // Also notify the canvas to remove the yellow highlight if it's currently showing
+      if (this.resueltoCanvas) {
+        this.resueltoCanvas.removeHighlight(id);
+      }
+      this.saveDocumentState();
+      this.cdr.detectChanges();
+    }
+  }
+
+  public onCommentAdded() {
+    this.syncFromCanvas();
+    this.saveDocumentState();
+  }
 
   private touchX = 0;
   private touchY = 0;
@@ -367,6 +409,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       },
       pages: pages,
       styles: this.activeDoc.styles || null,
+      comentarios: this.activeDoc.comentarios || [],
       signatures: {
         initials: "LARM/JAOG/B.O.merb",
         mainSignatory: "GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ",
@@ -598,6 +641,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   }
 
   public syncFromCanvas() {
+    console.log("uff control");
     if (this.resueltoCanvas && this.resueltoCanvas.documentData) {
       // Sincronizar todos los cambios del canvas a activeDoc
       this.activeDoc.basamentoLegal =
@@ -608,7 +652,15 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         this.activeDoc._headerHtml;
 
       if (this.resueltoCanvas.documentData.styles) {
-        this.activeDoc.styles = JSON.parse(JSON.stringify(this.resueltoCanvas.documentData.styles));
+        this.activeDoc.styles = JSON.parse(
+          JSON.stringify(this.resueltoCanvas.documentData.styles),
+        );
+      }
+
+      if (this.resueltoCanvas.documentData.comentarios) {
+        this.activeDoc.comentarios = JSON.parse(
+          JSON.stringify(this.resueltoCanvas.documentData.comentarios),
+        );
       }
 
       let allCasesHtml = "";
@@ -630,17 +682,19 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     // Asegurarnos de que tenemos los datos más recientes SIN destruir el estado actual del canvas
     this.syncFromCanvas();
 
-    const idUser =
-      this.jwtData?.userId || sessionStorage.getItem("id") || "Desconocido";
+    const userCed = this.jwtData?.userCedula;
     const numeroCarpeta = this.activeDoc.numero_carpeta || "000000";
     const numeroResolucion =
       this.activeDoc.numc || this.activeDoc.ncontrol || "";
 
+    console.log(this.jwtData);
+
     const now = new Date();
     const editRecord = {
-      usuario: idUser,
-      fecha: now.toLocaleString('es-VE'),
-      nombre: this.jwtData?.userName || "Usuario"
+      usuario: userCed,
+      fecha: now.toLocaleString("es-VE"),
+      nombre: this.jwtData?.userName || "Usuario",
+      login: this.jwtData?.userLogin || "",
     };
 
     if (!this.activeDoc.ediciones) {
@@ -660,11 +714,12 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       lista_casos: this.activeDoc["_pageCasesHtml_0"] || "",
       documentos_originales: this.activeDoc.documentos || [],
       styles: this.activeDoc.styles || null,
-      ediciones: this.activeDoc.ediciones
+      ediciones: this.activeDoc.ediciones,
+      comentarios: this.activeDoc.comentarios || [],
     };
 
     let obj = {
-      usuario: idUser,
+      usuario: this.jwtData?.userId,
       numero_carpeta: numeroCarpeta,
       numero_resolucion: numeroResolucion,
       task: lst,
@@ -679,7 +734,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       objeto: obj,
       donde:
         '{\"usuario\":\"' +
-        idUser +
+        this.jwtData?.userId +
         '\", \"numero_carpeta\":\"' +
         numeroCarpeta +
         '\"}',
@@ -855,22 +910,64 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   }
 
   onReject(): void {
+    console.log("estece quieto");
     if (this.actionExecuting || !this.activeDoc) {
       return;
     }
-    if (this.observations.trim() === "") {
-      return;
-    }
-    this.actionExecuting = true;
-    this.executingType = "reject";
-    this.reject.emit({
-      doc: this.activeDoc,
-      observations: this.observations.trim(),
-      index: this.currentIndex,
+
+    const isFirstReject = this.profile === "Revision"; // Primer rechazo hacia Edición
+    const hasComments =
+      this.activeDoc.comentarios && this.activeDoc.comentarios.length > 0;
+    const prefilledObservation =
+      this.observations.trim() !== ""
+        ? this.observations.trim()
+        : isFirstReject && hasComments
+          ? "DOCUMENTO CON COMENTARIOS/OBSERVACIONES EN EL TEXTO"
+          : "";
+
+    Swal.fire({
+      title: "¿Rechazar Documento?",
+      text: "Por favor confirme el rechazo y verifique el motivo:",
+      input: "textarea",
+      inputValue: prefilledObservation,
+      inputPlaceholder:
+        "Escriba las observaciones o motivos del rechazo aquí...",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#e07a8e",
+      cancelButtonColor: "#8898aa",
+      confirmButtonText: "Sí, rechazar",
+      cancelButtonText: "Cancelar",
+      inputValidator: (value) => {
+        if (!value || value.trim() === "") {
+          if (isFirstReject && hasComments) {
+            return null; // Permitido si es Revisión y hay comentarios
+          }
+          return "Debe ingresar una observación que justifique el rechazo.";
+        }
+        return null;
+      },
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      this.observations = result.value
+        ? result.value.trim().toUpperCase()
+        : "DOCUMENTO CON COMENTARIOS EN EL TEXTO";
+
+      this.actionExecuting = true;
+      this.executingType = "reject";
+      this.syncFromCanvas();
+      // aqui debemos implementar el metodo de rechazo para mover y actualizar el estatus
+      this.reject.emit({
+        doc: this.activeDoc,
+        observations: this.observations.trim(),
+        index: this.currentIndex,
+      });
     });
   }
 
   private async actualizarEstatusFirma(estatus: string): Promise<void> {
+    console.log("Alta seleccion de datos y control");
     if (!this.activeDoc) return;
     const targetDocs =
       this.activeDoc.documentos && this.activeDoc.documentos.length > 0
@@ -1362,6 +1459,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           if (pgTemplate.task.ediciones) {
             doc.ediciones = pgTemplate.task.ediciones;
           }
+          if (pgTemplate.task.comentarios) {
+            doc.comentarios = pgTemplate.task.comentarios;
+          }
         }
 
         // Asociar número de resolución de PG si existe
@@ -1488,8 +1588,21 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         this.nuevo_numero_resuelto = cleanNumero;
 
         const today = new Date();
-        const day = String(today.getDate()).padStart(2, '0');
-        const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+        const day = String(today.getDate()).padStart(2, "0");
+        const months = [
+          "ENE",
+          "FEB",
+          "MAR",
+          "ABR",
+          "MAY",
+          "JUN",
+          "JUL",
+          "AGO",
+          "SEP",
+          "OCT",
+          "NOV",
+          "DIC",
+        ];
         const month = months[today.getMonth()];
         const year = today.getFullYear();
         const dateStr = `${day} ${month} ${year}`;
@@ -1524,7 +1637,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   async grabarResuelto(numero: any): Promise<void> {
     let xAPI = {} as IAPICore;
     xAPI.funcion = environment.funcion.INSERTAR_NUMERO_RESUELTO;
-    xAPI.parametros = `${numero},RESOLUCION,NUEVO,${this.jwtData?.userName}`;
+    xAPI.parametros = `${numero},RESOLUCION,NUEVO,${this.jwtData?.userId}`;
     try {
       await this.apiService.Ejecutar(xAPI).toPromise();
     } catch (err) {

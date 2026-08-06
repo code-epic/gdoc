@@ -1030,3 +1030,161 @@ $tpv-border:     rgba(255, 255, 255, 0.08);
 p {
   line-height: 1;
 }
+
+/* ================================================================
+   COMMENTS TAB AESTHETICS (GLASSMORPHISM & PREMIUM DESIGN)
+   ================================================================ */
+.comments-list {
+  padding: 10px 5px;
+  
+  .comment-card {
+    background: rgba(17, 28, 67, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(22, 36, 82, 0.75);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    }
+    
+    &.resolved {
+      opacity: 0.6;
+      background: rgba(20, 20, 20, 0.4);
+      border-color: rgba(255, 255, 255, 0.05);
+      
+      .comment-header strong {
+        background: none;
+        -webkit-text-fill-color: rgba(255, 255, 255, 0.6);
+        color: rgba(255, 255, 255, 0.6);
+      }
+      
+      &:hover {
+        opacity: 0.8;
+        transform: none;
+      }
+    }
+    
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+      
+      strong {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        background: linear-gradient(90deg, #11cdef, #1171ef);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      
+      span {
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: 500;
+      }
+    }
+    
+    .comment-body {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 16px;
+      font-weight: 400;
+    }
+    
+    .comment-footer {
+      button {
+        background: linear-gradient(135deg, #2dce89 0%, #2dcecc 100%);
+        border: none;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        color: #ffffff;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px rgba(45, 206, 137, 0.3);
+        width: 100%;
+        
+        i {
+          margin-right: 6px;
+        }
+        
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(45, 206, 137, 0.45);
+          filter: brightness(1.1);
+        }
+        
+        &:active {
+          transform: translateY(1px);
+        }
+      }
+      
+      .comment-resolved-badge {
+        display: inline-block;
+        background: rgba(45, 206, 137, 0.15);
+        color: #2dce89;
+        border: 1px solid rgba(45, 206, 137, 0.3);
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        width: 100%;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.comments-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  
+  .empty-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    
+    i {
+      font-size: 1.5rem;
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+  
+  p {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  small {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+}

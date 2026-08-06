@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectorRef,
+  ViewChild,
+  Input,
+} from "@angular/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
@@ -8,7 +15,10 @@ import { UtilService } from "src/app/services/util/util.service";
 import { environment } from "src/environments/environment";
 import { JwtHelperService } from "@auth0/angular-jwt";
 import Swal from "sweetalert2";
-import { PdfAction } from "src/app/components/tinder-pdf-viewer/tinder-pdf-viewer.component";
+import {
+  PdfAction,
+  TinderPdfViewerComponent,
+} from "src/app/components/tinder-pdf-viewer/tinder-pdf-viewer.component";
 
 /**
  * ResueltosTinderComponent
@@ -22,6 +32,11 @@ import { PdfAction } from "src/app/components/tinder-pdf-viewer/tinder-pdf-viewe
   styleUrls: ["./resueltos_tinder.component.scss"],
 })
 export class ResueltosTinderComponent implements OnInit, OnDestroy {
+  @ViewChild(TinderPdfViewerComponent) tinderViewer!: TinderPdfViewerComponent;
+
+  // -- Componente inyectado desde el padre (Buzon) --
+  @Input() componente: string = "";
+
   // ── Estado del explorador ─────────────────────────────
   public allFolders: any[] = [];
   public filteredFolders: any[] = [];
@@ -56,7 +71,13 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
   public currentDocIndex = -1;
 
   // JWT
-  public jwtData = { userId: "", userName: "", userRole: "" };
+  public jwtData = {
+    userId: "",
+    userLogin: "",
+    userName: "",
+    userRole: "",
+    userCedula: "",
+  };
 
   // API
   public xAPI: IAPICore = { funcion: "", parametros: "", valores: "" };
@@ -133,7 +154,9 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
         if (decoded?.Usuario) {
           this.jwtData = {
             userId: decoded.Usuario.id || "",
-            userName: decoded.Usuario.nombre || decoded.Usuario.usuario || "",
+            userCedula: decoded.Usuario.cedula || "",
+            userLogin: decoded.Usuario.usuario || "",
+            userName: decoded.Usuario.nombre || "",
             userRole: decoded.Usuario.tipo || "Usuario",
           };
         }
@@ -141,6 +164,8 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
       if (!this.jwtData.userId && this.loginService.Usuario) {
         this.jwtData = {
           userId: this.loginService.Usuario.id || "",
+          userCedula: this.loginService.Usuario.cedula || "",
+          userLogin: this.loginService.Usuario.login || "",
           userName: this.loginService.Usuario.nombre || "",
           userRole: this.loginService.Usuario.tipo || "",
         };
@@ -369,11 +394,14 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
           parametros: `9977,${cedulaVal},${numero_carpeta}`,
           valores: null,
         } as any;
-        
+
         try {
           await this.apiService.Ejecutar(xAPIFirma).toPromise();
         } catch (errFirma) {
-          console.error(`Error actualizando estatus de firma para C.I. ${cedulaVal}:`, errFirma);
+          console.error(
+            `Error actualizando estatus de firma para C.I. ${cedulaVal}:`,
+            errFirma,
+          );
         }
       }
 
@@ -385,15 +413,21 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
       this.adjustAfterRemoval();
     } catch (err) {
       console.error("Error en onApprove:", err);
-      this.toastrService.error("Ocurrió un error al aprobar y firmar el documento");
+      this.toastrService.error(
+        "Ocurrió un error al aprobar y firmar el documento",
+      );
     } finally {
       this.actionLoading = false;
       this.ngxService.stopLoader("ld-approve-tinder");
+      if (this.tinderViewer) {
+        this.tinderViewer.resetAction();
+      }
       this.cdr.detectChanges();
     }
   }
 
-  public onReject(action: PdfAction): void {
+  public async onReject(action: PdfAction): Promise<void> {
+    console.log("entrando en canal de rechazo");
     const doc = action.doc;
     if (this.actionLoading) return;
 
@@ -414,55 +448,44 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
     const controlId = doc.ncontrol || doc.numc;
     const userDb = this.jwtData.userId;
     const comment = action.observations.toUpperCase();
+    const previousState = "36";
 
-    this.xAPI = {
-      funcion: environment.funcion.DOCUMENTO_OBSERVACION,
-      parametros: "",
-      valores: JSON.stringify({
-        documento: controlId,
-        estado: doc.ultimo_estado || doc.estatus || 36,
-        estatus: doc.ultimo_estado || 36,
-        observacion: comment,
-        accion: "1",
-        usuario: userDb,
-      }),
-    };
+    const targetDocs =
+      doc.documentos && doc.documentos.length > 0 ? doc.documentos : [doc];
+    const numero_carpeta = doc.numero_carpeta || "000000";
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      () => {
-        this.xAPI = {
-          funcion: environment.funcion.UBICACION_RECHAZO,
-          parametros: `1,1,1,,${userDb},${controlId}`,
-          valores: "",
-        };
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          () => {
-            this.toastrService.success(
-              `Documento ${controlId} rechazado y devuelto`,
-              "Resoluciones",
-            );
-            this.removeDoc(this.currentDocIndex);
-            this.actionLoading = false;
-            this.ngxService.stopLoader("ld-reject-tinder");
-            this.adjustAfterRemoval();
-          },
-          (err) => {
-            console.error("Error en rechazo:", err);
-            this.toastrService.error("Error al devolver el documento");
-            this.actionLoading = false;
-            this.ngxService.stopLoader("ld-reject-tinder");
-            this.cdr.detectChanges();
-          },
+    for (const d of targetDocs) {
+      const cedulaVal = d.cedula || d.persona?.cedula || "";
+      if (!cedulaVal) continue;
+
+      const xAPIFirma = {
+        funcion: environment.funcion.ACTUALIZAR_ESTATUS_FIRMA,
+        parametros: `${previousState},${cedulaVal},${numero_carpeta}`,
+        valores: null,
+      } as any;
+
+      try {
+        await this.apiService.Ejecutar(xAPIFirma).toPromise();
+      } catch (errFirma) {
+        console.error(
+          `Error actualizando estatus de firma para C.I. ${cedulaVal}:`,
+          errFirma,
         );
-      },
-      (err) => {
-        console.error("Error registrando observación:", err);
-        this.toastrService.error("Error al procesar la observación");
-        this.actionLoading = false;
-        this.ngxService.stopLoader("ld-reject-tinder");
-        this.cdr.detectChanges();
-      },
+      }
+    }
+
+    this.toastrService.success(
+      `Documento ${controlId} rechazado y devuelto`,
+      "Resoluciones",
     );
+    this.removeDoc(this.currentDocIndex);
+    this.adjustAfterRemoval();
+    this.actionLoading = false;
+    this.ngxService.stopLoader("ld-reject-tinder");
+    if (this.tinderViewer) {
+      this.tinderViewer.resetAction();
+    }
+    this.cdr.detectChanges();
   }
 
   private removeDoc(index: number): void {
@@ -512,6 +535,7 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
   }
 
   public promptReject(doc: any): void {
+    console.log("Alta seleccion de datos y control III");
     const controlId = doc.ncontrol || doc.numc;
     const userDb = this.jwtData.userId;
 
@@ -605,13 +629,14 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
     comment: string,
     loaderId: string,
   ): void {
+    console.log("Alta seleccion de datos y control IV");
     this.xAPI = {
       funcion: environment.funcion.DOCUMENTO_OBSERVACION,
       parametros: "",
       valores: JSON.stringify({
         documento: doc.ncontrol || doc.numc,
         estado: doc.ultimo_estado || doc.estatus || 36,
-        estatus: doc.ultimo_estado || 36,
+        estatus: Math.max(1, (doc.ultimo_estado || doc.estatus || 36) - 1),
         observacion: comment,
         accion: "1",
         usuario: userDb,
@@ -620,9 +645,11 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       () => {
+        const currentState = doc.ultimo_estado || doc.estatus || 36;
+        const previousState = Math.max(1, currentState - 1);
         this.xAPI = {
-          funcion: environment.funcion.UBICACION_RECHAZO,
-          parametros: `1,1,1,,${userDb},${doc.ncontrol || doc.numc}`,
+          funcion: environment.funcion.PROMOVER_ESTATUS,
+          parametros: `${previousState},${userDb},${doc.ncontrol || doc.numc}`,
           valores: "",
         };
         this.apiService.Ejecutar(this.xAPI).subscribe(

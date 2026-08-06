@@ -11,18 +11,23 @@
     <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
 
     <!-- Text Formatting -->
-    <!-- Text Formatting -->
     <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('bold')" title="Negrita (Ctrl+B)"><i class="fas fa-bold"></i></button>
-    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('italic')" title="Cursiva (Ctrl+I)"><i class="fas fa-italic"></i></button>
     <button class="btn btn-sm btn-outline-light mr-2" (mousedown)="$event.preventDefault(); formatText('underline')" title="Subrayado (Ctrl+U)"><i class="fas fa-underline"></i></button>
 
-    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('justifyLeft')" title="Alinear Izquierda"><i class="fas fa-align-left"></i></button>
-    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('justifyCenter')" title="Centrar"><i class="fas fa-align-center"></i></button>
-    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('justifyRight')" title="Alinear Derecha"><i class="fas fa-align-right"></i></button>
-    <button class="btn btn-sm btn-outline-light mr-2" (mousedown)="$event.preventDefault(); formatText('justifyFull')" title="Justificar"><i class="fas fa-align-justify"></i></button>
+    <!-- Dropdown Alineación -->
+    <div class="dropdown d-inline-block mr-2" style="position: relative;">
+      <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="alignDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Alineación" (mousedown)="$event.preventDefault();">
+        <i class="fas fa-align-left"></i>
+      </button>
+      <div class="dropdown-menu shadow-sm" aria-labelledby="alignDropdown" style="min-width: auto; padding: 4px;">
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyLeft')" title="Alinear Izquierda"><i class="fas fa-align-left"></i> Izquierda</button>
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyCenter')" title="Centrar"><i class="fas fa-align-center"></i> Centrar</button>
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyRight')" title="Alinear Derecha"><i class="fas fa-align-right"></i> Derecha</button>
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyFull')" title="Justificar"><i class="fas fa-align-justify"></i> Justificar</button>
+      </div>
+    </div>
 
     <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('insertUnorderedList')" title="Lista Viñetas"><i class="fas fa-list-ul"></i></button>
-    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('insertOrderedList')" title="Lista Numerada"><i class="fas fa-list-ol"></i></button>
 
     <!-- Separator -->
     <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
@@ -41,6 +46,12 @@
       <input type="number" class="form-control form-control-sm mx-1 text-center" style="width: 50px; background: rgba(0,0,0,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);" [value]="documentData?.styles?.margins?.left ? documentData.styles.margins.left : 20" (input)="updateMargin('left', $event)" title="Margen Izquierdo (mm)" step="1">
       <input type="number" class="form-control form-control-sm mx-1 text-center" style="width: 50px; background: rgba(0,0,0,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);" [value]="documentData?.styles?.margins?.right ? documentData.styles.margins.right : 20" (input)="updateMargin('right', $event)" title="Margen Derecho (mm)" step="1">
     </div>
+  </ng-container>
+
+  <ng-container *ngIf="profile === 'Revision'">
+    <button class="btn btn-sm btn-warning font-weight-bold shadow-sm" (mousedown)="$event.preventDefault(); addComment()" title="Añadir Comentario al texto seleccionado">
+      <i class="fas fa-comment-dots"></i> Comentar
+    </button>
   </ng-container>
 </div>
 
@@ -119,7 +130,7 @@
          (blur)="onBlurEditable($event); onCasesListBlur($event, page.pageIndex)"
          (input)="onCasesListInput($event, page.pageIndex)"
          (paste)="onPasteCases($event, page.pageIndex)"
-         [innerHTML]="page.casesHtml">
+         [innerHTML]="page.casesHtmlSafe">
     </div>
   </main>
 
@@ -185,4 +196,13 @@
 
     </div>
   </ng-container>
+</div>
+
+<!-- Floating Comment Button -->
+<div class="floating-comment-btn shadow-sm" 
+     *ngIf="showFloatingCommentBtn && profile === 'Revision'"
+     [style.top.px]="floatingBtnPos.y"
+     [style.left.px]="floatingBtnPos.x"
+     (mousedown)="$event.preventDefault(); addComment(); showFloatingCommentBtn = false">
+  <i class="fas fa-comment-dots"></i> Comentar
 </div>

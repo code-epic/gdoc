@@ -226,6 +226,22 @@
     ::ng-deep p {
       line-height: inherit; /* Allow parent line-height to cascade */
     }
+
+    ::ng-deep ul {
+      list-style-type: none;
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    ::ng-deep ul li {
+      position: relative;
+    }
+
+    ::ng-deep ul li::before {
+      content: "-";
+      position: absolute;
+      left: -15px;
+    }
   }
 }
 
@@ -262,4 +278,40 @@
   font-family: 'Tahoma', sans-serif;
   font-size: 10pt;
   color: #333;
+}
+
+/* ── Estilos para los comentarios en el Canvas ── */
+::ng-deep .resuelto-comment {
+  border-radius: 2px;
+  padding: 0 2px;
+  transition: all 0.3s ease;
+}
+::ng-deep .resuelto-comment.pending {
+  background-color: #ffe066 !important;
+  color: #333 !important;
+  cursor: help;
+  border-bottom: 2px solid #f59f00;
+}
+::ng-deep .resuelto-comment.resolved {
+  background-color: transparent !important;
+  color: inherit !important;
+  border-bottom: none;
+}
+
+/* Floating Comment Button */
+.floating-comment-btn {
+  position: fixed;
+  background-color: #212529;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  z-index: 9999;
+  transition: opacity 0.2s;
+  pointer-events: auto;
+}
+.floating-comment-btn:hover {
+  background-color: #343a40;
 }
