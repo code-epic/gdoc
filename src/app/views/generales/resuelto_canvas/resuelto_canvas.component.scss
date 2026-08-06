@@ -12,6 +12,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   padding: 10px;
   background: #172b4d;
   color: white;
@@ -86,7 +88,7 @@
     font-weight: bold !important;
     text-transform: uppercase !important;
     text-align: center !important;
-    line-height: 1.75 !important; /* Word 1.75 */
+    line-height: 1.75; /* Word 1.75 */
     margin: 0 !important;
   }
 
@@ -121,7 +123,7 @@
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
     text-align: justify !important;
-    line-height: 1.75 !important; /* Word 1.75 */
+    line-height: 1.75; /* Word 1.75 */
     margin-top: 13pt !important;
   }
 
@@ -129,7 +131,7 @@
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
     text-align: justify !important;
-    line-height: 1.35 !important; /* Word 1.15 */
+    line-height: 1.35; /* Word 1.15 */
     margin-top: 13pt !important;
   }
 
@@ -169,7 +171,7 @@
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
     font-weight: bold !important;
-    line-height: 1.5 !important;
+    line-height: 1.5;
   }
 }
 
@@ -200,7 +202,7 @@
   flex: 0 0 auto;
   
   p {
-    line-height: 1.15 !important; /* Fuerza Word Sencillo sobre todos los p del cuerpo */
+    line-height: 1.15; /* Fuerza Word Sencillo sobre todos los p del cuerpo */
   }
 
   .basamento-legal {
@@ -222,7 +224,7 @@
     }
 
     ::ng-deep p {
-      line-height: 1.35 !important; /* Fuerza Word 1.15 sobre lista inyectada */
+      line-height: inherit; /* Allow parent line-height to cascade */
     }
   }
 }

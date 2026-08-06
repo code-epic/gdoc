@@ -248,6 +248,18 @@
             <div class="tpv-field-value tpv-field-highlight">{{ jwtData.userRole | uppercase }}</div>
           </div>
 
+          <!-- Historial de Edición -->
+          <div class="tpv-meta-header tpv-meta-header-sm" style="margin-top: 15px;" *ngIf="activeDoc.ediciones && activeDoc.ediciones.length > 0">
+            <h5 class="tpv-meta-title-sm">Historial de Edición</h5>
+          </div>
+          <div class="tpv-field" *ngIf="activeDoc.ediciones && activeDoc.ediciones.length > 0">
+            <ul style="list-style: none; padding-left: 0; margin-bottom: 0; font-size: 0.8rem; color: #ced4da;">
+              <li *ngFor="let edicion of activeDoc.ediciones" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 4px 0;">
+                <strong>{{ edicion.fecha }}</strong> - {{ edicion.nombre | uppercase }}
+              </li>
+            </ul>
+          </div>
+
           <!-- Observaciones y Acciones (Ahora dentro de Atributos) -->
           <div class="tpv-field tpv-field-grow" style="margin-top: 15px; flex-grow: 1; display: flex; flex-direction: column;">
             <label class="tpv-label-warn">Observaciones de Revisión</label>

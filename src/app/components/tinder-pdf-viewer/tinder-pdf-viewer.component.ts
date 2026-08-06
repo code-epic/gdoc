@@ -322,7 +322,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           "NOV",
           "DIC",
         ];
-        formattedDate = `${day} ${months[monthNum - 1]} ${year}`;
+        formattedDate = `${day}${months[monthNum - 1]}${year}`;
       } else {
         formattedDate = rawDateStr;
       }
@@ -344,7 +344,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         "NOV",
         "DIC",
       ];
-      formattedDate = `${String(rawDate.getDate()).padStart(2, "0")} ${months[rawDate.getMonth()]} ${rawDate.getFullYear()}`;
+      formattedDate = `${String(rawDate.getDate()).padStart(2, "0")}${months[rawDate.getMonth()]}${rawDate.getFullYear()}`;
     }
 
     const resNum =
@@ -366,6 +366,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         action: "RESUELVE",
       },
       pages: pages,
+      styles: this.activeDoc.styles || null,
       signatures: {
         initials: "LARM/JAOG/B.O.merb",
         mainSignatory: "GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ",
@@ -606,6 +607,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         this.resueltoCanvas.documentData.body?.unicoParrafo ||
         this.activeDoc._headerHtml;
 
+      if (this.resueltoCanvas.documentData.styles) {
+        this.activeDoc.styles = JSON.parse(JSON.stringify(this.resueltoCanvas.documentData.styles));
+      }
+
       let allCasesHtml = "";
       if (
         this.resueltoCanvas.documentData.pages &&
@@ -631,6 +636,18 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     const numeroResolucion =
       this.activeDoc.numc || this.activeDoc.ncontrol || "";
 
+    const now = new Date();
+    const editRecord = {
+      usuario: idUser,
+      fecha: now.toLocaleString('es-VE'),
+      nombre: this.jwtData?.userName || "Usuario"
+    };
+
+    if (!this.activeDoc.ediciones) {
+      this.activeDoc.ediciones = [];
+    }
+    this.activeDoc.ediciones.push(editRecord);
+
     // Objeto task (lst) con todos los elementos de la resolución
     const lst = {
       fecha_resolucion: this.activeDoc.fecha_resolucion,
@@ -642,6 +659,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         this.activeDoc._headerHtml || this.generateHeaderHtml(true),
       lista_casos: this.activeDoc["_pageCasesHtml_0"] || "",
       documentos_originales: this.activeDoc.documentos || [],
+      styles: this.activeDoc.styles || null,
+      ediciones: this.activeDoc.ediciones
     };
 
     let obj = {
@@ -1336,6 +1355,12 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
             pgTemplate.task.lista_casos !== null
           ) {
             doc["_pageCasesHtml_0"] = pgTemplate.task.lista_casos;
+          }
+          if (pgTemplate.task.styles) {
+            doc.styles = pgTemplate.task.styles;
+          }
+          if (pgTemplate.task.ediciones) {
+            doc.ediciones = pgTemplate.task.ediciones;
           }
         }
 

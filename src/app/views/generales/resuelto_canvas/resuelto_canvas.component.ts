@@ -9,6 +9,8 @@ import {
   HostListener,
   ViewChild,
   AfterViewInit,
+  OnChanges,
+  SimpleChanges,
   ChangeDetectorRef,
 } from "@angular/core";
 import { Subject } from "rxjs";
@@ -20,7 +22,7 @@ import { debounceTime } from "rxjs/operators";
   styleUrls: ["./resuelto_canvas.component.scss"],
 })
 export class ResueltoCanvasComponent
-  implements OnInit, OnDestroy, AfterViewInit
+  implements OnInit, OnDestroy, AfterViewInit, OnChanges
 {
   @ViewChild("container") containerRef!: ElementRef;
 
@@ -76,6 +78,33 @@ export class ResueltoCanvasComponent
 
   public currentLineSpacing: number = 1.15;
   private activeElement: HTMLElement | null = null;
+  public activeSection: string = '';
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['documentData'] && this.documentData) {
+      if (!this.documentData.styles) {
+        this.documentData.styles = {
+          margins: { top: 25, right: 20, bottom: 5, left: 20 },
+          lineHeights: {
+             header: 1.75,
+             basamento: 1.75,
+             unico: 1.35,
+             cases: 1.35,
+             footer: 1.15,
+             firma: 1.5
+          }
+        };
+      }
+    }
+  }
+
+  updateMargin(side: string, event: Event) {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    if (!isNaN(val) && this.documentData?.styles?.margins) {
+      this.documentData.styles.margins[side] = val;
+      this.paginateDOM();
+    }
+  }
 
   decreaseLineSpacing() {
     this.currentLineSpacing = parseFloat(
@@ -95,13 +124,17 @@ export class ResueltoCanvasComponent
 
   formatText(command: string) {
     document.execCommand(command, false, "");
-
-    // Disparar paginación después de aplicar el formato, ya que el tamaño del texto puede cambiar (ej. negritas)
     this.casesInput$.next();
   }
 
   private applyLineSpacing() {
-    if (this.activeElement) {
+    if (this.activeSection && this.documentData?.styles?.lineHeights) {
+      this.documentData.styles.lineHeights[this.activeSection] = this.currentLineSpacing;
+      
+      if (this.activeSection === 'cases' || (this.activeElement && this.activeElement.classList.contains("cases-list"))) {
+        this.casesInput$.next();
+      }
+    } else if (this.activeElement) {
       this.activeElement.style.setProperty(
         "line-height",
         this.currentLineSpacing.toString(),
@@ -116,8 +149,6 @@ export class ResueltoCanvasComponent
         );
       });
 
-      // Forzar actualización en el modelo de datos si es necesario (el HTML reflejará el inline style)
-      // Especialmente útil para .cases-list
       if (this.activeElement.classList.contains("cases-list")) {
         this.casesInput$.next();
       }
@@ -132,6 +163,20 @@ export class ResueltoCanvasComponent
   ) {}
 
   ngOnInit(): void {
+    if (this.documentData && !this.documentData.styles) {
+      this.documentData.styles = {
+        margins: { top: 25, right: 20, bottom: 5, left: 20 },
+        lineHeights: {
+           header: 1.75,
+           basamento: 1.75,
+           unico: 1.35,
+           cases: 1.35,
+           footer: 1.15,
+           firma: 1.5
+        }
+      };
+    }
+
     this.casesInput$.pipe(debounceTime(600)).subscribe(() => {
       this.casesBlur.emit();
       this.paginateDOM();
@@ -486,6 +531,8 @@ export class ResueltoCanvasComponent
         const textAlign = el.style.textAlign;
         const textIndent = el.style.textIndent;
         const marginLeft = el.style.marginLeft;
+        const fontFamily = el.style.fontFamily;
+        const fontSize = el.style.fontSize;
 
         const isUnderline = el.style.textDecoration.includes("underline");
         const isBold =
@@ -497,10 +544,12 @@ export class ResueltoCanvasComponent
           el.removeAttribute(el.attributes[0].name);
         }
 
-        // Re-aplicar estilos básicos estructurales (Ignoramos fuentes, tamaños y colores para forzar Tahoma)
+        // Re-aplicar estilos básicos estructurales
         if (textAlign) el.style.textAlign = textAlign;
         if (textIndent) el.style.textIndent = textIndent;
         if (marginLeft) el.style.marginLeft = marginLeft;
+        if (fontFamily) el.style.fontFamily = fontFamily;
+        if (fontSize) el.style.fontSize = fontSize;
 
         if (isUnderline || el.tagName === "U")
           el.style.textDecoration = "underline";
@@ -539,10 +588,15 @@ export class ResueltoCanvasComponent
     target.style.backgroundColor = "rgba(142, 202, 230, 0.15)"; // Un azul muy suave
 
     this.activeElement = target;
+    this.activeSection = target.getAttribute('data-section') || '';
 
-    const inlineLh = target.style.lineHeight;
-    if (inlineLh && !isNaN(parseFloat(inlineLh))) {
-      this.currentLineSpacing = parseFloat(inlineLh);
+    if (this.activeSection && this.documentData?.styles?.lineHeights?.[this.activeSection]) {
+      this.currentLineSpacing = this.documentData.styles.lineHeights[this.activeSection];
+    } else {
+      const inlineLh = target.style.lineHeight;
+      if (inlineLh && !isNaN(parseFloat(inlineLh))) {
+        this.currentLineSpacing = parseFloat(inlineLh);
+      }
     }
   }
 

@@ -11,27 +11,53 @@
     <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
 
     <!-- Text Formatting -->
-    <button class="btn btn-sm btn-outline-light mr-1" (click)="formatText('bold')" title="Negrita (Ctrl+B)"><i class="fas fa-bold"></i></button>
-    <button class="btn btn-sm btn-outline-light mr-1" (click)="formatText('underline')" title="Subrayado (Ctrl+U)"><i class="fas fa-underline"></i></button>
+    <!-- Text Formatting -->
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('bold')" title="Negrita (Ctrl+B)"><i class="fas fa-bold"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('italic')" title="Cursiva (Ctrl+I)"><i class="fas fa-italic"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-2" (mousedown)="$event.preventDefault(); formatText('underline')" title="Subrayado (Ctrl+U)"><i class="fas fa-underline"></i></button>
+
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('justifyLeft')" title="Alinear Izquierda"><i class="fas fa-align-left"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('justifyCenter')" title="Centrar"><i class="fas fa-align-center"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('justifyRight')" title="Alinear Derecha"><i class="fas fa-align-right"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-2" (mousedown)="$event.preventDefault(); formatText('justifyFull')" title="Justificar"><i class="fas fa-align-justify"></i></button>
+
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('insertUnorderedList')" title="Lista Viñetas"><i class="fas fa-list-ul"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('insertOrderedList')" title="Lista Numerada"><i class="fas fa-list-ol"></i></button>
 
     <!-- Separator -->
     <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
 
-    <button class="btn btn-sm btn-outline-light" (click)="decreaseLineSpacing()" title="Reducir Interlineado"><i class="fas fa-minus"></i></button>
+    <button class="btn btn-sm btn-outline-light" (mousedown)="$event.preventDefault(); decreaseLineSpacing()" title="Reducir Interlineado"><i class="fas fa-minus"></i></button>
     <span class="zoom-level px-2" title="Interlineado actual"><i class="fas fa-align-justify mr-1"></i> {{ currentLineSpacing }}</span>
-    <button class="btn btn-sm btn-outline-light" (click)="increaseLineSpacing()" title="Aumentar Interlineado"><i class="fas fa-plus"></i></button>
+    <button class="btn btn-sm btn-outline-light" (mousedown)="$event.preventDefault(); increaseLineSpacing()" title="Aumentar Interlineado"><i class="fas fa-plus"></i></button>
+
+    <!-- Separator -->
+    <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
+    
+    <div class="margin-controls d-flex align-items-center" title="Márgenes (Arriba, Abajo, Izquierda, Derecha)">
+      <i class="fas fa-crop-alt mx-1" title="Ajuste de Márgenes"></i>
+      <input type="number" class="form-control form-control-sm mx-1 text-center" style="width: 50px; background: rgba(0,0,0,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);" [value]="documentData?.styles?.margins?.top ? documentData.styles.margins.top : 25" (input)="updateMargin('top', $event)" title="Margen Superior (mm)" step="1">
+      <input type="number" class="form-control form-control-sm mx-1 text-center" style="width: 50px; background: rgba(0,0,0,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);" [value]="documentData?.styles?.margins?.bottom ? documentData.styles.margins.bottom : 5" (input)="updateMargin('bottom', $event)" title="Margen Inferior (mm)" step="1">
+      <input type="number" class="form-control form-control-sm mx-1 text-center" style="width: 50px; background: rgba(0,0,0,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);" [value]="documentData?.styles?.margins?.left ? documentData.styles.margins.left : 20" (input)="updateMargin('left', $event)" title="Margen Izquierdo (mm)" step="1">
+      <input type="number" class="form-control form-control-sm mx-1 text-center" style="width: 50px; background: rgba(0,0,0,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);" [value]="documentData?.styles?.margins?.right ? documentData.styles.margins.right : 20" (input)="updateMargin('right', $event)" title="Margen Derecho (mm)" step="1">
+    </div>
   </ng-container>
 </div>
 
 <div class="a4-canvas-container" #container [style.transform]="'scale(' + zoomScale + ')'">
   <ng-container *ngIf="documentData && documentData.pages">
-    <div class="a4-canvas" *ngFor="let page of documentData.pages; let i = index" style="margin-bottom: 20px; position: relative;">
+    <div class="a4-canvas" *ngFor="let page of documentData.pages; let i = index" 
+         [style.padding-top.mm]="documentData?.styles?.margins?.top ? documentData.styles.margins.top : 25"
+         [style.padding-right.mm]="documentData?.styles?.margins?.right ? documentData.styles.margins.right : 20"
+         [style.padding-bottom.mm]="documentData?.styles?.margins?.bottom ? documentData.styles.margins.bottom : 5"
+         [style.padding-left.mm]="documentData?.styles?.margins?.left ? documentData.styles.margins.left : 20"
+         style="margin-bottom: 20px; position: relative;">
   
   <!-- CABECERA -->
   <header class="doc-header editable-zone" *ngIf="i === 0" (click)="editMode('header')">
-    <p class="m-resolucion-membrete">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
-    <p class="m-resolucion-membrete">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
-    <p class="m-resolucion-membrete">DESPACHO DEL MINISTRO</p>
+    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
+    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
+    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">DESPACHO DEL MINISTRO</p>
     
     <!-- 1 línea debajo: Lugar y fecha -->
     <div class="dynamic-row">
@@ -54,6 +80,8 @@
     <ng-container *ngIf="i === 0">
       <!-- 1 línea debajo del título (13pt aprox) -->
       <p class="m-resolucion-basamento" 
+         data-section="basamento"
+         [style.line-height]="documentData?.styles?.lineHeights?.basamento ? documentData.styles.lineHeights.basamento.toString() : '1.75'"
          [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" 
          spellcheck="false"
          style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
@@ -69,6 +97,8 @@
 
       <!-- Único Párrafo (Asunto / Nombramientos) -->
       <p class="m-resolucion-unico" 
+         data-section="unico"
+         [style.line-height]="documentData?.styles?.lineHeights?.unico ? documentData.styles.lineHeights.unico.toString() : '1.35'"
          [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" 
          spellcheck="false"
          style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s; margin-top: 13pt;"
@@ -80,9 +110,10 @@
     </ng-container>
     
     <div class="cases-list" 
+         data-section="cases"
          [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" 
          spellcheck="false"
-         [style.line-height]="lineSpacing"
+         [style.line-height]="documentData?.styles?.lineHeights?.cases ? documentData.styles.lineHeights.cases.toString() : '1.35'"
          style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
          (focus)="onFocusEditable($event)" 
          (blur)="onBlurEditable($event); onCasesListBlur($event, page.pageIndex)"
@@ -96,10 +127,10 @@
   <footer class="doc-footer editable-zone" *ngIf="i === documentData.pages.length - 1" (click)="editMode('signatures')" style="margin-top: 0.5cm;">
     
     <!-- 1cm desde el margen izquierdo -->
-    <p class="m-resolucion-comuniquese" [style.line-height]="lineSpacing">Comuníquese y publíquese.</p>
+    <p class="m-resolucion-comuniquese" data-section="footer" [style.line-height]="documentData?.styles?.lineHeights?.footer ? documentData.styles.lineHeights.footer.toString() : '1.15'">Comuníquese y publíquese.</p>
     
     <!-- 1cm desde el margen izquierdo -->
-    <p class="m-resolucion-ejecutivo" [style.line-height]="lineSpacing">Por el Ejecutivo Nacional,</p>
+    <p class="m-resolucion-ejecutivo" data-section="footer" [style.line-height]="documentData?.styles?.lineHeights?.footer ? documentData.styles.lineHeights.footer.toString() : '1.15'">Por el Ejecutivo Nacional,</p>
 
     <!-- Contenedor de firma alineado a la derecha partiendo del centro -->
     <div class="m-resolucion-firma-container">
@@ -118,9 +149,9 @@
            
       <!-- Textos de firma -->
       <div class="signatory-info">
-        <p class="m-resolucion-firma-text">{{ documentData.signatures.mainSignatory }}</p>
-        <p class="m-resolucion-firma-text">{{ documentData.signatures.signatoryTitle }}</p>
-        <p class="m-resolucion-firma-text" [innerHTML]="documentData.signatures.signatoryRole"></p>
+        <p class="m-resolucion-firma-text" data-section="firma" [style.line-height]="documentData?.styles?.lineHeights?.firma ? documentData.styles.lineHeights.firma.toString() : '1.5'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="documentData.signatures.mainSignatory = $any($event.target).innerText" [innerText]="documentData.signatures.mainSignatory"></p>
+        <p class="m-resolucion-firma-text" data-section="firma" [style.line-height]="documentData?.styles?.lineHeights?.firma ? documentData.styles.lineHeights.firma.toString() : '1.5'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="documentData.signatures.signatoryTitle = $any($event.target).innerText" [innerText]="documentData.signatures.signatoryTitle"></p>
+        <p class="m-resolucion-firma-text" data-section="firma" [style.line-height]="documentData?.styles?.lineHeights?.firma ? documentData.styles.lineHeights.firma.toString() : '1.5'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="documentData.signatures.signatoryRole = $any($event.target).innerHTML" [innerHTML]="documentData.signatures.signatoryRole"></p>
       </div>
     </div>
 
