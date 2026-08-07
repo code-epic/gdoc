@@ -16,13 +16,31 @@
       <span class="tpv-nav-badge">{{ currentIndex + 1 }} / {{ total }}</span>
       
       <!-- Small inline arrows for mobile/general navigation next to the badge -->
-      <div class="tpv-nav-arrows">
+      <div class="tpv-nav-arrows" style="display: flex; align-items: center;">
         <button class="tpv-nav-arrow-btn" [disabled]="isFirst || actionExecuting" (click)="prevDocument()" title="Anterior (←)">
           <i class="fas fa-chevron-left"></i>
         </button>
         <button class="tpv-nav-arrow-btn" [disabled]="isLast || actionExecuting" (click)="nextDocument()" title="Siguiente (→)">
           <i class="fas fa-chevron-right"></i>
         </button>
+        
+        <!-- Buscador de Carpetas / Autocomplete -->
+        <div class="tpv-nav-search" style="margin-left: 10px; position: relative; display: flex; align-items: center;" *ngIf="uniqueCarpetas.length > 1">
+          <!-- Ícono de lupa centrado y superpuesto en el input -->
+          <i class="fas fa-search" style="position: absolute; left: 8px; color: rgba(255,255,255,0.6); font-size: 0.75rem; pointer-events: none;"></i>
+          
+          <input type="text" class="form-control form-control-sm" 
+                 placeholder="N° Carpeta..." 
+                 [(ngModel)]="searchCarpeta" 
+                 (change)="goToCarpeta(searchCarpeta)"
+                 list="carpeta-list"
+                 title="Busca o selecciona una carpeta para ir a ella"
+                 style="width: 140px; background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; padding: 2px 8px 2px 24px; font-size: 0.8rem; height: 28px; transition: all 0.2s ease;">
+                 
+          <datalist id="carpeta-list">
+            <option *ngFor="let c of uniqueCarpetas" [value]="c"></option>
+          </datalist>
+        </div>
       </div>
     </div>
     <div class="tpv-nav-right">

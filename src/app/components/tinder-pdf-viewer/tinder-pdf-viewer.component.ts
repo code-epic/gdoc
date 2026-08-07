@@ -141,6 +141,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public isSafari = false;
   public objectFailed = false;
 
+  public searchCarpeta = "";
+  public uniqueCarpetas: string[] = [];
+
   public activeTab: "explorador" | "metadata" | "comments" = "explorador";
 
   get pendingCommentsCount(): number {
@@ -217,6 +220,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       this.startIndex,
     );
     if (changes.documents || changes.startIndex) {
+      if (changes.documents && this.documents) {
+        this.extractUniqueCarpetas();
+      }
+
       if (this.documents.length > 0) {
         const idx = changes.startIndex
           ? changes.startIndex.currentValue
@@ -227,6 +234,54 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         );
         this.loadCurrentPdf();
       }
+    }
+  }
+
+  private extractUniqueCarpetas() {
+    const set = new Set<string>();
+    if (this.documents && this.documents.length > 0) {
+      this.documents.forEach((d: any) => {
+        const num = (d.numero_carpeta || d.numc || d.ncontrol || "")
+          .toString()
+          .trim();
+        if (num && num !== "000000") {
+          set.add(num);
+        }
+      });
+    }
+    this.uniqueCarpetas = Array.from(set).sort();
+  }
+
+  public goToCarpeta(folderStr: string) {
+    if (!folderStr || this.actionExecuting) return;
+
+    // Primero buscar coincidencia exacta
+    const query = folderStr.trim().toLowerCase();
+    let index = this.documents.findIndex((d: any) => {
+      const numC = (d.numero_carpeta || d.numc || d.ncontrol || "")
+        .toString()
+        .toLowerCase()
+        .trim();
+      return numC === query;
+    });
+
+    // Si no hay exacta, buscar que lo contenga
+    if (index === -1) {
+      index = this.documents.findIndex((d: any) => {
+        const numC = (d.numero_carpeta || d.numc || d.ncontrol || "")
+          .toString()
+          .toLowerCase();
+        return numC.includes(query);
+      });
+    }
+
+    if (index !== -1) {
+      this.currentIndex = index;
+      this.loadCurrentPdf();
+      this.navigate.emit({ doc: this.activeDoc, index: this.currentIndex });
+      this.searchCarpeta = ""; // limpiar tras selección
+    } else {
+      console.warn("Carpeta no encontrada:", folderStr);
     }
   }
 
@@ -732,12 +787,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       numero_resolucion: `${numeroResolucion}`,
       driver: environment.driver.PRINCIPAL,
       objeto: obj,
-      donde:
-        '{\"usuario\":\"' +
-        this.jwtData?.userId +
-        '\", \"numero_carpeta\":\"' +
-        numeroCarpeta +
-        '\"}',
+      donde: '{\"numero_carpeta\":\"' + numeroCarpeta + '\"}',
       upsert: true,
     };
 

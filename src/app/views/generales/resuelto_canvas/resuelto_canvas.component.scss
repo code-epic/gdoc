@@ -125,6 +125,7 @@
     text-align: justify !important;
     line-height: 1.75; /* Word 1.75 */
     margin-top: 13pt !important;
+    text-indent: 1cm !important;
   }
 
   .m-resolucion-unico {
@@ -160,9 +161,9 @@
   }
 
   .m-resolucion-firma-container {
-    margin-top: 26pt !important; /* 2 lineas de bajo */
-    margin-left: 45% !important; /* Desplazado ligeramente a la izquierda */
-    width: 55% !important;
+    margin-top: 20pt !important; /* Ligeramente menos margen superior */
+    margin-left: 35% !important; /* Margen izquierdo un poco menor */
+    width: 65% !important;
     text-align: center !important;
     position: relative !important;
   }
@@ -171,7 +172,7 @@
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
     font-weight: bold !important;
-    line-height: 1.5;
+    line-height: 2.05 !important; /* Interlineado más compacto */
   }
 }
 

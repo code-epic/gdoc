@@ -120,11 +120,14 @@ export class ResueltoCanvasComponent
           margins: { top: 25, right: 20, bottom: 5, left: 20 },
           lineHeights: {
              header: 1.75,
+             resolucion: 1.15,
              basamento: 1.75,
+             resuelve: 1.15,
              unico: 1.35,
              cases: 1.35,
+             comuniquese: 1.15,
              footer: 1.15,
-             firma: 1.5
+             firma: 1.15
           }
         };
       }
@@ -317,11 +320,14 @@ export class ResueltoCanvasComponent
         margins: { top: 25, right: 20, bottom: 5, left: 20 },
         lineHeights: {
            header: 1.75,
+           resolucion: 1.15,
            basamento: 1.75,
+           resuelve: 1.15,
            unico: 1.35,
            cases: 1.35,
+           comuniquese: 1.15,
            footer: 1.15,
-           firma: 1.5
+           firma: 1.15
         }
       };
     }
