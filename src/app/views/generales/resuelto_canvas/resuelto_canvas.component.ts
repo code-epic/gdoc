@@ -82,27 +82,27 @@ export class ResueltoCanvasComponent
 
   public currentLineSpacing: number = 1.15;
   private activeElement: HTMLElement | null = null;
-  public activeSection: string = '';
+  public activeSection: string = "";
 
   public showFloatingCommentBtn = false;
   public floatingBtnPos = { x: 0, y: 0 };
 
-  @HostListener('document:selectionchange')
+  @HostListener("document:selectionchange")
   onSelectionChange() {
-    if (this.profile !== 'Revision') {
+    if (this.profile !== "Revision") {
       this.showFloatingCommentBtn = false;
       return;
     }
-    
+
     const sel = window.getSelection();
     if (sel && !sel.isCollapsed && sel.rangeCount > 0) {
       const range = sel.getRangeAt(0);
       const rect = range.getBoundingClientRect();
-      
+
       if (rect.width > 0 && rect.height > 0) {
         this.floatingBtnPos = {
           x: rect.left + rect.width / 2 - 40,
-          y: rect.top - 45
+          y: rect.top - 45,
         };
         this.showFloatingCommentBtn = true;
       } else {
@@ -114,21 +114,21 @@ export class ResueltoCanvasComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['documentData'] && this.documentData) {
+    if (changes["documentData"] && this.documentData) {
       if (!this.documentData.styles) {
         this.documentData.styles = {
           margins: { top: 25, right: 20, bottom: 5, left: 20 },
           lineHeights: {
-             header: 1.75,
-             resolucion: 1.15,
-             basamento: 1.75,
-             resuelve: 1.15,
-             unico: 1.35,
-             cases: 1.35,
-             comuniquese: 1.15,
-             footer: 1.15,
-             firma: 1.15
-          }
+            header: 1.75,
+            resolucion: 1.15,
+            basamento: 1.75,
+            resuelve: 1.15,
+            unico: 1.35,
+            cases: 1.35,
+            comuniquese: 1.15,
+            footer: 1.15,
+            firma: 1.15,
+          },
         };
       }
     }
@@ -168,105 +168,136 @@ export class ResueltoCanvasComponent
   public async addComment() {
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
-      Swal.fire('Selección vacía', 'Por favor, selecciona un texto para añadir un comentario.', 'warning');
+      Swal.fire(
+        "Selección vacía",
+        "Por favor, selecciona un texto para añadir un comentario.",
+        "warning",
+      );
       return;
     }
 
     const { value: text } = await Swal.fire({
-      title: 'Añadir comentario',
-      input: 'textarea',
-      inputLabel: 'Escribe tu observación:',
-      inputPlaceholder: 'Ej. Revisar este nombre...',
+      title: "Añadir comentario",
+      input: "textarea",
+      inputLabel: "Escribe tu observación:",
+      inputPlaceholder: "Ej. Revisar este nombre...",
       showCancelButton: true,
-      confirmButtonColor: '#f5365c',
-      cancelButtonColor: '#8898aa',
-      confirmButtonText: 'Guardar',
-      cancelButtonText: 'Cancelar'
+      confirmButtonColor: "#f5365c",
+      cancelButtonColor: "#8898aa",
+      confirmButtonText: "Guardar",
+      cancelButtonText: "Cancelar",
     });
 
     if (text) {
-      const commentId = 'cmt_' + new Date().getTime();
+      const commentId = "cmt_" + new Date().getTime();
       const range = sel.getRangeAt(0);
-      const span = document.createElement('span');
-      span.className = 'resuelto-comment pending';
-      span.style.backgroundColor = '#ffe066';
-      span.style.color = '#333';
-      span.dataset['commentId'] = commentId;
-      
+      const span = document.createElement("span");
+      span.className = "resuelto-comment pending";
+      span.style.backgroundColor = "#ffe066";
+      span.style.color = "#333";
+      span.dataset["commentId"] = commentId;
+
       try {
         span.appendChild(range.extractContents());
         range.insertNode(span);
-        
+
         // Sync the modified DOM back to the model immediately
-        const container = span.closest('.cases-list') || span.closest('[data-section]');
+        const container =
+          span.closest(".cases-list") || span.closest("[data-section]");
         if (container) {
-          const section = container.getAttribute('data-section');
-          if (section === 'cases') {
-            const currentCanvas = container.closest('.a4-canvas');
+          const section = container.getAttribute("data-section");
+          if (section === "cases") {
+            const currentCanvas = container.closest(".a4-canvas");
             if (currentCanvas) {
-              const canvases = Array.from(this.el.nativeElement.querySelectorAll('.a4-canvas'));
+              const canvases = Array.from(
+                this.el.nativeElement.querySelectorAll(".a4-canvas"),
+              );
               const pageIdx = canvases.indexOf(currentCanvas);
-              if (pageIdx !== -1 && this.documentData && this.documentData.pages) {
-                this.documentData.pages[pageIdx].casesHtml = container.innerHTML;
-                this.documentData.pages[pageIdx].casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(container.innerHTML || '');
+              if (
+                pageIdx !== -1 &&
+                this.documentData &&
+                this.documentData.pages
+              ) {
+                this.documentData.pages[pageIdx].casesHtml =
+                  container.innerHTML;
+                this.documentData.pages[pageIdx].casesHtmlSafe =
+                  this.sanitizer.bypassSecurityTrustHtml(
+                    container.innerHTML || "",
+                  );
               }
             }
-          } else if (section === 'unico') {
-             this.documentData.body.unicoParrafo = container.innerHTML;
-             this.unicoParrafoChange.emit(container.innerHTML);
-          } else if (section === 'basamento') {
-             this.documentData.body.basamentoLegal = container.innerHTML;
-             this.basamentoLegalChange.emit(container.innerHTML);
+          } else if (section === "unico") {
+            this.documentData.body.unicoParrafo = container.innerHTML;
+            this.unicoParrafoChange.emit(container.innerHTML);
+          } else if (section === "basamento") {
+            this.documentData.body.basamentoLegal = container.innerHTML;
+            this.basamentoLegalChange.emit(container.innerHTML);
           }
         }
-        
+
         if (!this.documentData.comentarios) {
           this.documentData.comentarios = [];
         }
         this.documentData.comentarios.push({
           id: commentId,
           text: text,
-          status: 'pending',
-          author: `${this.jwtData?.userName || 'Usuario'} (${this.jwtData?.userRole || 'Revisión'})`,
-          date: new Date().toLocaleString('es-VE')
+          status: "pending",
+          author: `${this.jwtData?.userName || "Usuario"} (${this.jwtData?.userRole || "Revisión"})`,
+          date: new Date().toLocaleString("es-VE"),
         });
-        
+
         this.commentAdded.emit();
       } catch (e) {
         console.error(e);
-        Swal.fire('Error', 'No se puede añadir el comentario en esta selección (no cruces párrafos).', 'error');
+        Swal.fire(
+          "Error",
+          "No se puede añadir el comentario en esta selección (no cruces párrafos).",
+          "error",
+        );
       }
     }
   }
 
   public removeHighlight(id: string) {
-    const spans = this.el.nativeElement.querySelectorAll(`span[data-comment-id="${id}"]`);
+    const spans = this.el.nativeElement.querySelectorAll(
+      `span[data-comment-id="${id}"]`,
+    );
     spans.forEach((span: HTMLElement) => {
-      span.style.backgroundColor = 'transparent';
-      span.style.color = 'inherit';
-      span.classList.remove('pending');
-      span.classList.add('resolved');
-      
+      span.style.backgroundColor = "transparent";
+      span.style.color = "inherit";
+      span.classList.remove("pending");
+      span.classList.add("resolved");
+
       // Sync the modified DOM back to the model
-      const container = span.closest('.cases-list') || span.closest('[data-section]');
+      const container =
+        span.closest(".cases-list") || span.closest("[data-section]");
       if (container) {
-        const section = container.getAttribute('data-section');
-        if (section === 'cases') {
-          const currentCanvas = container.closest('.a4-canvas');
+        const section = container.getAttribute("data-section");
+        if (section === "cases") {
+          const currentCanvas = container.closest(".a4-canvas");
           if (currentCanvas) {
-            const canvases = Array.from(this.el.nativeElement.querySelectorAll('.a4-canvas'));
+            const canvases = Array.from(
+              this.el.nativeElement.querySelectorAll(".a4-canvas"),
+            );
             const pageIdx = canvases.indexOf(currentCanvas);
-            if (pageIdx !== -1 && this.documentData && this.documentData.pages) {
+            if (
+              pageIdx !== -1 &&
+              this.documentData &&
+              this.documentData.pages
+            ) {
               this.documentData.pages[pageIdx].casesHtml = container.innerHTML;
-              this.documentData.pages[pageIdx].casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(container.innerHTML || '');
+              this.documentData.pages[pageIdx].casesHtmlSafe =
+                this.sanitizer.bypassSecurityTrustHtml(
+                  container.innerHTML || "",
+                );
             }
           }
-        } else if (section === 'unico') {
-           this.documentData.body.unicoParrafo = container.innerHTML;
-           this.unicoParrafoChange.emit(container.innerHTML);
-        } else if (section === 'basamento') {
-           this.documentData.body.basamentoLegal = container.innerHTML;
-           this.basamentoLegalChange.emit(container.innerHTML);
+        } else if (section === "unico") {
+          this.documentData.body.unicoParrafo = container.innerHTML;
+          this.unicoParrafoChange.emit(container.innerHTML);
+        } else if (section === "basamento") {
+          this.documentData.body.basamentoLegal = container.innerHTML;
+          this.basamentoLegalChange.emit(container.innerHTML);
         }
       }
     });
@@ -276,9 +307,14 @@ export class ResueltoCanvasComponent
 
   private applyLineSpacing() {
     if (this.activeSection && this.documentData?.styles?.lineHeights) {
-      this.documentData.styles.lineHeights[this.activeSection] = this.currentLineSpacing;
-      
-      if (this.activeSection === 'cases' || (this.activeElement && this.activeElement.classList.contains("cases-list"))) {
+      this.documentData.styles.lineHeights[this.activeSection] =
+        this.currentLineSpacing;
+
+      if (
+        this.activeSection === "cases" ||
+        (this.activeElement &&
+          this.activeElement.classList.contains("cases-list"))
+      ) {
         this.casesInput$.next();
       }
     } else if (this.activeElement) {
@@ -307,7 +343,7 @@ export class ResueltoCanvasComponent
   constructor(
     private el: ElementRef,
     private cdr: ChangeDetectorRef,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {}
 
   public getSafeHtml(html: string): SafeHtml {
@@ -319,16 +355,16 @@ export class ResueltoCanvasComponent
       this.documentData.styles = {
         margins: { top: 25, right: 20, bottom: 5, left: 20 },
         lineHeights: {
-           header: 1.75,
-           resolucion: 1.15,
-           basamento: 1.75,
-           resuelve: 1.15,
-           unico: 1.35,
-           cases: 1.35,
-           comuniquese: 1.15,
-           footer: 1.15,
-           firma: 1.15
-        }
+          header: 1.75,
+          resolucion: 1.15,
+          basamento: 1.75,
+          resuelve: 1.15,
+          unico: 1.35,
+          cases: 1.35,
+          comuniquese: 1.15,
+          footer: 1.15,
+          firma: 1.15,
+        },
       };
     }
 
@@ -345,7 +381,9 @@ export class ResueltoCanvasComponent
   private updateSafeHtmls() {
     if (this.documentData && this.documentData.pages) {
       this.documentData.pages.forEach((p: any) => {
-        p.casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(p.casesHtml || '');
+        p.casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(
+          p.casesHtml || "",
+        );
       });
     }
   }
@@ -398,7 +436,7 @@ export class ResueltoCanvasComponent
 
   onBasamentoLegalEdit(event: Event) {
     const target = event.target as HTMLElement;
-    this.basamentoLegalChange.emit(target.innerText || "");
+    this.basamentoLegalChange.emit(target.innerHTML || "");
   }
 
   onUnicoParrafoEdit(event: Event) {
@@ -486,7 +524,8 @@ export class ResueltoCanvasComponent
       this.documentData.pages[pageIndex]
     ) {
       this.documentData.pages[pageIndex].casesHtml = html;
-      this.documentData.pages[pageIndex].casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(html || '');
+      this.documentData.pages[pageIndex].casesHtmlSafe =
+        this.sanitizer.bypassSecurityTrustHtml(html || "");
     }
 
     // Y luego disparamos la paginación dinámica, ya que el usuario dejó de escribir
@@ -543,7 +582,7 @@ export class ResueltoCanvasComponent
   }
 
   // --- SISTEMA DE RESTAURACIÓN DE PUNTERO (CARET) ---
-  savedCaretPosition: { start: number, end: number } | null = null;
+  savedCaretPosition: { start: number; end: number } | null = null;
 
   saveCaret() {
     const sel = window.getSelection();
@@ -556,7 +595,7 @@ export class ResueltoCanvasComponent
 
       preCaretRange.setEnd(range.endContainer, range.endOffset);
       const end = preCaretRange.toString().length;
-      
+
       this.savedCaretPosition = { start, end };
     }
   }
@@ -769,10 +808,14 @@ export class ResueltoCanvasComponent
     target.style.backgroundColor = "rgba(142, 202, 230, 0.15)"; // Un azul muy suave
 
     this.activeElement = target;
-    this.activeSection = target.getAttribute('data-section') || '';
+    this.activeSection = target.getAttribute("data-section") || "";
 
-    if (this.activeSection && this.documentData?.styles?.lineHeights?.[this.activeSection]) {
-      this.currentLineSpacing = this.documentData.styles.lineHeights[this.activeSection];
+    if (
+      this.activeSection &&
+      this.documentData?.styles?.lineHeights?.[this.activeSection]
+    ) {
+      this.currentLineSpacing =
+        this.documentData.styles.lineHeights[this.activeSection];
     } else {
       const inlineLh = target.style.lineHeight;
       if (inlineLh && !isNaN(parseFloat(inlineLh))) {
@@ -789,14 +832,16 @@ export class ResueltoCanvasComponent
     if (target.classList.contains("m-resolucion-unico")) {
       if (this.documentData && this.documentData.body) {
         this.documentData.body.unicoParrafo = target.innerHTML;
+        this.unicoParrafoChange.emit(target.innerHTML || "");
       }
     }
 
     if (target.classList.contains("m-resolucion-basamento")) {
       if (this.documentData && this.documentData.body) {
-        const text = target.innerText;
+        const text = target.innerHTML;
         this.documentData.body.basamentoLegal = text;
         this.documentData.body.preamble = text;
+        this.basamentoLegalChange.emit(text || "");
       }
     }
   }
