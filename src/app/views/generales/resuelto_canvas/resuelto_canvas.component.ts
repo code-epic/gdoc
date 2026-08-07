@@ -84,6 +84,9 @@ export class ResueltoCanvasComponent
   private activeElement: HTMLElement | null = null;
   public activeSection: string = "";
 
+  public basamentoLegalSafe: SafeHtml = "";
+  public unicoParrafoSafe: SafeHtml = "";
+
   public showFloatingCommentBtn = false;
   public floatingBtnPos = { x: 0, y: 0 };
 
@@ -131,6 +134,7 @@ export class ResueltoCanvasComponent
           },
         };
       }
+      this.updateSafeHtmls();
     }
   }
 
@@ -176,6 +180,8 @@ export class ResueltoCanvasComponent
       return;
     }
 
+    const range = sel.getRangeAt(0).cloneRange(); // Guardar el rango ANTES de abrir Swal
+
     const { value: text } = await Swal.fire({
       title: "Añadir comentario",
       input: "textarea",
@@ -190,7 +196,6 @@ export class ResueltoCanvasComponent
 
     if (text) {
       const commentId = "cmt_" + new Date().getTime();
-      const range = sel.getRangeAt(0);
       const span = document.createElement("span");
       span.className = "resuelto-comment pending";
       span.style.backgroundColor = "#ffe066";
@@ -263,14 +268,20 @@ export class ResueltoCanvasComponent
       `span[data-comment-id="${id}"]`,
     );
     spans.forEach((span: HTMLElement) => {
-      span.style.backgroundColor = "transparent";
-      span.style.color = "inherit";
-      span.classList.remove("pending");
-      span.classList.add("resolved");
-
-      // Sync the modified DOM back to the model
+      // Save reference to container BEFORE detaching span from DOM
       const container =
         span.closest(".cases-list") || span.closest("[data-section]");
+
+      // Unwrap the span to remove it completely from the HTML
+      const parent = span.parentNode;
+      if (parent) {
+        while (span.firstChild) {
+          parent.insertBefore(span.firstChild, span);
+        }
+        parent.removeChild(span);
+      }
+
+      // Sync the modified DOM back to the model
       if (container) {
         const section = container.getAttribute("data-section");
         if (section === "cases") {
@@ -379,12 +390,22 @@ export class ResueltoCanvasComponent
   }
 
   private updateSafeHtmls() {
-    if (this.documentData && this.documentData.pages) {
-      this.documentData.pages.forEach((p: any) => {
-        p.casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(
-          p.casesHtml || "",
+    if (this.documentData) {
+      if (this.documentData.body) {
+        this.basamentoLegalSafe = this.sanitizer.bypassSecurityTrustHtml(
+          this.documentData.body.basamentoLegal || this.documentData.body.preamble || ""
         );
-      });
+        this.unicoParrafoSafe = this.sanitizer.bypassSecurityTrustHtml(
+          this.documentData.body.unicoParrafo || ""
+        );
+      }
+      if (this.documentData.pages) {
+        this.documentData.pages.forEach((p: any) => {
+          p.casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(
+            p.casesHtml || "",
+          );
+        });
+      }
     }
   }
 

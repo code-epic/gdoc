@@ -100,7 +100,7 @@
          (blur)="onBlurEditable($event)" 
          (input)="onBasamentoLegalEdit($event)"
          (paste)="onPaste($event)"
-         [innerText]="documentData.body.basamentoLegal || documentData.body.preamble">
+         [innerHTML]="basamentoLegalSafe">
       </p>
       
       <!-- 1 línea debajo del basamento legal: RESUELVE -->
@@ -116,7 +116,7 @@
          (focus)="onFocusEditable($event)" 
          (blur)="onBlurEditable($event)" 
          (input)="onUnicoParrafoEdit($event)"
-         [innerHTML]="documentData.body.unicoParrafo">
+         [innerHTML]="unicoParrafoSafe">
       </p>
     </ng-container>
     
