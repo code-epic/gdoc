@@ -122,7 +122,7 @@ export class TableGrallibroModalComponent implements OnInit {
   }
 
   filtrarNombramiento(e): string {
-    if (e.otro_cargo == "PRIVADO DE LIBERTAD") {
+    if (e.otros_cargos == "PRIVADO DE LIBERTAD") {
       return "PRIVADO DE LIBERTAD <br> " + e.observacion;
     }
 
