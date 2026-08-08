@@ -463,6 +463,21 @@ export class ResueltoCanvasComponent
   onUnicoParrafoEdit(event: Event) {
     const target = event.target as HTMLElement;
     this.unicoParrafoChange.emit(target.innerHTML || "");
+
+    const currentCanvas = target.closest(".a4-canvas") as HTMLElement;
+    if (currentCanvas) {
+      let isOverflowing = false;
+      const casesList = currentCanvas.querySelector(".cases-list");
+      if (casesList) {
+        const canvasRect = currentCanvas.getBoundingClientRect();
+        const listRect = casesList.getBoundingClientRect();
+        isOverflowing = (canvasRect.bottom - listRect.bottom) < 76;
+      }
+
+      if (isOverflowing) {
+        this.paginateDOM();
+      }
+    }
   }
 
   onDateEdit(event: Event) {
@@ -514,7 +529,7 @@ export class ResueltoCanvasComponent
       if (casesList) {
         const canvasRect = currentCanvas.getBoundingClientRect();
         const listRect = casesList.getBoundingClientRect();
-        isOverflowing = (canvasRect.bottom - listRect.bottom) < 60;
+        isOverflowing = (canvasRect.bottom - listRect.bottom) < 76;
       } else {
         isOverflowing = currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
       }
@@ -740,9 +755,9 @@ export class ResueltoCanvasComponent
         if (casesList) {
           const canvasRect = currentCanvas.getBoundingClientRect();
           const listRect = casesList.getBoundingClientRect();
-          // Cortar cuando el texto esté a 60 píxeles del borde inferior físico de la hoja
-          // (aprox 3-4 líneas de margen inferior)
-          isOverflow = (canvasRect.bottom - listRect.bottom) < 60;
+          // Cortar cuando el texto esté a 76 píxeles del borde inferior físico de la hoja
+          // (aprox 0.5cm antes del paginador que está a 15mm)
+          isOverflow = (canvasRect.bottom - listRect.bottom) < 76;
         } else {
           isOverflow = currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
         }

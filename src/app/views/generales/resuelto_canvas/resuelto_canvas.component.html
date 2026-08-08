@@ -187,7 +187,7 @@
              style="position: absolute; bottom: 6px; left: 2px; width: 15mm; z-index: 1; pointer-events: none;">
 
         <!-- Iniciales (Media firma): 1 línea antes que la paginación -->
-        <div class="initials" style="position: relative; z-index: 2; font-size: 8pt; color: #000; margin-bottom: 13pt; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
+        <div class="initials" style="position: relative; z-index: 2; font-size: 8pt; color: #000; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
              [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false"
              (click)="$event.stopPropagation()"
              (focus)="onFocusEditable($event)"
@@ -195,11 +195,19 @@
              [textContent]="documentData.signatures.initials">
         </div>
       </div>
+      
+      <!-- CONTADOR DE PÁGINAS (Solo Última Página, anclado a la firma) -->
+      <div *ngIf="documentData.pages.length > 1" style="text-align: center; font-size: 10pt; margin-top: 5mm;">
+        {{ i + 1 }} de {{ documentData.pages.length }}
+      </div>
     </div>
   </footer>
-  <!-- CONTADOR DE PÁGINAS -->
-  <div class="page-counter" *ngIf="documentData.pages.length > 1">
-    {{ i + 1 }} de {{ documentData.pages.length }}
+
+  <!-- CONTADOR DE PÁGINAS (Páginas Intermedias) -->
+  <div class="page-counter-container" *ngIf="documentData.pages.length > 1 && i < documentData.pages.length - 1">
+    <div class="footer-left">{{ documentData.signatures.initials }}</div>
+    <div class="footer-center">{{ i + 1 }} de {{ documentData.pages.length }}</div>
+    <div class="footer-right">.../...</div>
   </div>
 
     </div>
