@@ -86,6 +86,13 @@
     </div>
   </header>
 
+  <!-- CABECERA DE CONTINUACIÓN (Para páginas subsecuentes) -->
+  <header class="doc-header" *ngIf="i > 0" style="margin-bottom: 20px;">
+    <p class="m-resolucion-membrete">
+      CONTINUACIÓN DE LA RESOLUCIÓN N° <u>{{ documentData.header.resolutionNum }}</u> DE FECHA <u>{{ documentData.header.date }}</u>
+    </p>
+  </header>
+
   <!-- CUERPO DEL DOCUMENTO -->
   <main class="doc-body editable-zone" (click)="editMode('body')">
     <ng-container *ngIf="i === 0">
@@ -128,6 +135,7 @@
          style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
          (focus)="onFocusEditable($event)" 
          (blur)="onBlurEditable($event); onCasesListBlur($event, page.pageIndex)"
+         (keydown)="onKeydownCases($event, page.pageIndex)"
          (input)="onCasesListInput($event, page.pageIndex)"
          (paste)="onPasteCases($event, page.pageIndex)"
          [innerHTML]="page.casesHtmlSafe">
@@ -135,7 +143,7 @@
   </main>
 
   <!-- PIE DE PÁGINA Y FIRMAS -->
-  <footer class="doc-footer editable-zone" *ngIf="i === documentData.pages.length - 1" (click)="editMode('signatures')" style="margin-top: 0.5cm;">
+  <footer class="doc-footer editable-zone" *ngIf="i === documentData.pages.length - 1 && !isPaginating" (click)="editMode('signatures')" style="margin-top: 0.5cm;">
     
     <!-- 1cm desde el margen izquierdo -->
     <p class="m-resolucion-comuniquese" data-section="footer" [style.line-height]="documentData?.styles?.lineHeights?.footer ? documentData.styles.lineHeights.footer.toString() : '1.15'">Comuníquese y publíquese.</p>
@@ -191,7 +199,7 @@
   </footer>
   <!-- CONTADOR DE PÁGINAS -->
   <div class="page-counter" *ngIf="documentData.pages.length > 1">
-    Página {{ i + 1 }} de {{ documentData.pages.length }}
+    {{ i + 1 }} de {{ documentData.pages.length }}
   </div>
 
     </div>

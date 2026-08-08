@@ -492,6 +492,15 @@ export class ResueltoCanvasComponent
   onCasesListInput(event: Event, pageIndex: number) {
     const target = event.target as HTMLElement;
 
+    // Guardar SIEMPRE el html crudo en el modelo para no perder tabulaciones o contenido tipeado
+    if (
+      this.documentData &&
+      this.documentData.pages &&
+      this.documentData.pages[pageIndex]
+    ) {
+      this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
+    }
+
     if (this.documentData && this.documentData.bodyData) {
       this.documentData.bodyData["_pageCasesHtml_" + pageIndex] =
         target.innerHTML;
@@ -500,32 +509,25 @@ export class ResueltoCanvasComponent
     // Auto-paginación inteligente tipo Google Docs:
     const currentCanvas = target.closest(".a4-canvas") as HTMLElement;
     if (currentCanvas) {
-      const isOverflowing =
-        currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
+      let isOverflowing = false;
+      const casesList = currentCanvas.querySelector(".cases-list");
+      if (casesList) {
+        const canvasRect = currentCanvas.getBoundingClientRect();
+        const listRect = casesList.getBoundingClientRect();
+        isOverflowing = (canvasRect.bottom - listRect.bottom) < 60;
+      } else {
+        isOverflowing = currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
+      }
 
       if (isOverflowing) {
-        if (
-          this.documentData &&
-          this.documentData.pages &&
-          this.documentData.pages[pageIndex]
-        ) {
-          this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
-        }
         // Desbordamiento = repaginamos inmediatamente para empujar el texto a la página siguiente
         this.paginateDOM();
       } else {
         const inputEvent = event as InputEvent;
         // Si el usuario está borrando texto, puede haber espacio de sobra (Underflow)
         const isDeleting =
-          inputEvent.inputType && inputEvent.inputType.startsWith("delete");
+          inputEvent && inputEvent.inputType && inputEvent.inputType.startsWith("delete");
         if (isDeleting && pageIndex < this.documentData.pages.length - 1) {
-          if (
-            this.documentData &&
-            this.documentData.pages &&
-            this.documentData.pages[pageIndex]
-          ) {
-            this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
-          }
           // Llamamos al subject que dispara paginateDOM con debounce (600ms)
           // Así evitamos interrumpir al usuario si mantiene presionado Backspace
           this.casesInput$.next();
@@ -552,6 +554,25 @@ export class ResueltoCanvasComponent
     // Y luego disparamos la paginación dinámica, ya que el usuario dejó de escribir
     this.casesInput$.next();
     this.casesBlur.emit();
+  }
+
+  onKeydownCases(event: KeyboardEvent, pageIndex: number) {
+    if (event.key === "Tab") {
+      event.preventDefault();
+      
+      const inList = document.queryCommandState('insertUnorderedList') || document.queryCommandState('insertOrderedList');
+      if (inList) {
+        if (event.shiftKey) {
+          document.execCommand('outdent', false, "");
+        } else {
+          document.execCommand('indent', false, "");
+        }
+      } else {
+        document.execCommand("insertText", false, "\t");
+      }
+      
+      this.onCasesListInput(event, pageIndex);
+    }
   }
 
   onPasteCases(event: ClipboardEvent, pageIndex: number) {
@@ -670,8 +691,12 @@ export class ResueltoCanvasComponent
     }
   }
 
+  isPaginating = false;
+
   paginateDOM() {
     if (!this.documentData || !this.documentData.pages) return;
+
+    this.isPaginating = true;
 
     // Guardar el cursor antes de destruir las páginas
     this.saveCaret();
@@ -702,32 +727,63 @@ export class ResueltoCanvasComponent
     for (let p of paragraphs) {
       let currentPageIdx = this.documentData.pages.length - 1;
       this.documentData.pages[currentPageIdx].casesHtml += p;
+      this.documentData.pages[currentPageIdx].casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(this.documentData.pages[currentPageIdx].casesHtml);
 
       this.cdr.detectChanges();
 
       const canvases = this.el.nativeElement.querySelectorAll(".a4-canvas");
       const currentCanvas = canvases[currentPageIdx] as HTMLElement;
 
-      // Si se desborda, mover este nodo a una página nueva
-      if (
-        currentCanvas &&
-        currentCanvas.scrollHeight > currentCanvas.clientHeight + 2
-      ) {
+      let isOverflow = false;
+      if (currentCanvas) {
+        const casesList = currentCanvas.querySelector(".cases-list");
+        if (casesList) {
+          const canvasRect = currentCanvas.getBoundingClientRect();
+          const listRect = casesList.getBoundingClientRect();
+          // Cortar cuando el texto esté a 60 píxeles del borde inferior físico de la hoja
+          // (aprox 3-4 líneas de margen inferior)
+          isOverflow = (canvasRect.bottom - listRect.bottom) < 60;
+        } else {
+          isOverflow = currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
+        }
+      }
+
+      // Si se desborda, crear nueva página
+      if (isOverflow) {
         const currentHtml = this.documentData.pages[currentPageIdx].casesHtml;
         this.documentData.pages[currentPageIdx].casesHtml =
           currentHtml.substring(0, currentHtml.length - p.length);
+        this.documentData.pages[currentPageIdx].casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(this.documentData.pages[currentPageIdx].casesHtml);
 
         this.documentData.pages.push({
           pageIndex: currentPageIdx + 1,
           headerHtml: "",
           casesHtml: p,
+          casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(p)
         });
         this.cdr.detectChanges();
       }
     }
 
+    this.isPaginating = false;
     this.updateSafeHtmls();
     this.cdr.detectChanges();
+
+    // Check if the final page overflows because of the newly restored footer
+    const finalCanvases = this.el.nativeElement.querySelectorAll(".a4-canvas");
+    const finalCanvas = finalCanvases[finalCanvases.length - 1] as HTMLElement;
+    if (
+      finalCanvas &&
+      finalCanvas.scrollHeight > finalCanvas.clientHeight + 2
+    ) {
+      this.documentData.pages.push({
+        pageIndex: this.documentData.pages.length,
+        headerHtml: "",
+        casesHtml: "",
+        casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml("")
+      });
+      this.cdr.detectChanges();
+    }
 
     // Restaurar el cursor después de renderizar las nuevas páginas
     setTimeout(() => {

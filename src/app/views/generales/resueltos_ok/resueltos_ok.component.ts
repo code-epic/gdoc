@@ -365,7 +365,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.ngxService.startLoader("ld-folders-ok");
 
     this.xAPI = {} as IAPICore;
-    this.xAPI.funcion = environment.funcion.CONSULTAR_ENTRADAS_TIPO;
+    this.xAPI.funcion = environment.funcion.ENTRADAS_PROCESO_TIPO_TOTAL;
     let paramVal = "36";
     if (this.currentProfile === "Aprobador") {
       paramVal = "880";
