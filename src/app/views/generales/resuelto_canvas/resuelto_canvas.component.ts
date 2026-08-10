@@ -135,6 +135,13 @@ export class ResueltoCanvasComponent
         };
       }
       this.updateSafeHtmls();
+      
+      // Forzar repaginación automática tras cargar los datos y renderizar el DOM
+      setTimeout(() => {
+        if (!this.isPaginating) {
+          this.paginateDOM();
+        }
+      }, 200);
     }
   }
 
@@ -504,6 +511,15 @@ export class ResueltoCanvasComponent
     }
   }
 
+  getFirstInitial(): string {
+    const initials = this.documentData?.signatures?.initials || "";
+    if (initials.includes("/")) {
+      const parts = initials.split("/");
+      return parts[0] + "/";
+    }
+    return initials;
+  }
+
   onCasesListInput(event: Event, pageIndex: number) {
     const target = event.target as HTMLElement;
 
@@ -542,7 +558,13 @@ export class ResueltoCanvasComponent
         // Si el usuario está borrando texto, puede haber espacio de sobra (Underflow)
         const isDeleting =
           inputEvent && inputEvent.inputType && inputEvent.inputType.startsWith("delete");
-        if (isDeleting && pageIndex < this.documentData.pages.length - 1) {
+        const isEnter = 
+          inputEvent && inputEvent.inputType && (inputEvent.inputType === "insertParagraph" || inputEvent.inputType === "insertLineBreak");
+          
+        if (isEnter) {
+          // Si presiona enter, forzamos repaginar por si el cálculo de height falló
+          setTimeout(() => this.paginateDOM(), 10);
+        } else if (isDeleting && pageIndex < this.documentData.pages.length - 1) {
           // Llamamos al subject que dispara paginateDOM con debounce (600ms)
           // Así evitamos interrumpir al usuario si mantiene presionado Backspace
           this.casesInput$.next();
