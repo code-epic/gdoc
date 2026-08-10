@@ -462,7 +462,7 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
 
       const xAPIFirma = {
         funcion: environment.funcion.ACTUALIZAR_ESTATUS_FIRMA,
-        parametros: `${previousState},${cedulaVal},${numero_carpeta}`,
+        parametros: `${previousState},${cedulaVal},${numero_carpeta},REJECTED,REJECTED`,
         valores: null,
       } as any;
 

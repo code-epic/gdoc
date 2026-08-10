@@ -497,9 +497,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     // Limpiar espacios en blanco de la fecha de resolución antes de generar
     if (this.activeDoc?.fecha_resolucion) {
-      this.activeDoc.fecha_resolucion = this.activeDoc.fecha_resolucion.toString().replace(/\s+/g, "");
+      this.activeDoc.fecha_resolucion = this.activeDoc.fecha_resolucion
+        .toString()
+        .replace(/\s+/g, "");
     }
-    
+
     // Asignar un nuevo objeto para forzar la detección de cambios en Angular (@Input)
     if (this.canvasData?.header?.date) {
       this.canvasData = {
@@ -507,16 +509,22 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         header: {
           ...this.canvasData.header,
           date: this.canvasData.header.date.toString().replace(/\s+/g, ""),
-        }
+        },
       };
     }
 
     this.cdr.detectChanges();
 
     // LIMPIEZA FORZADA DEL DOM (Anula el caché visual de contenteditable)
-    const dateSpans = document.querySelectorAll(".a4-canvas .m-resolucion-lugar-fecha .variable, .a4-canvas .doc-header u");
-    dateSpans.forEach(span => {
-      if (span.textContent && span.textContent.match(/[A-Z]/i) && span.textContent.match(/[0-9]/)) {
+    const dateSpans = document.querySelectorAll(
+      ".a4-canvas .m-resolucion-lugar-fecha .variable, .a4-canvas .doc-header u",
+    );
+    dateSpans.forEach((span) => {
+      if (
+        span.textContent &&
+        span.textContent.match(/[A-Z]/i) &&
+        span.textContent.match(/[0-9]/)
+      ) {
         span.textContent = span.textContent.replace(/\s+/g, "");
       }
     });
@@ -896,7 +904,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         }
       }
     } catch (e) {}
-    this.activeDoc.fecha_resolucion = dateStr ? dateStr.toString().replace(/\s+/g, "") : dateStr;
+    this.activeDoc.fecha_resolucion = dateStr
+      ? dateStr.toString().replace(/\s+/g, "")
+      : dateStr;
     this.updateCanvasData();
   }
 
@@ -1029,7 +1039,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         }
         return null;
       },
-    }).then((result) => {
+    }).then(async (result) => {
       if (!result.isConfirmed) return;
 
       this.observations = result.value
@@ -1040,6 +1050,43 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       this.executingType = "reject";
       this.syncFromCanvas();
       // aqui debemos implementar el metodo de rechazo para mover y actualizar el estatus
+      // hacer un regitro de rechazo a:
+      console.log("----------");
+      console.log(this.activeDoc);
+      let rechazoTTL = {
+        funcion: "rechazos_resolucion",
+      };
+      let obj = {
+        usuario: this.jwtData?.userId,
+        numero_carpeta: this.activeDoc.numero_carpeta,
+        ncontrol_documento: this.activeDoc.ncontrol_documento,
+        cedula: this.activeDoc.cedula,
+        fecha_resolucion: this.activeDoc.fecha_resolucion,
+        responsable: this.jwtData.userName,
+        observacion: this.observations.trim(),
+        // transcriptor: this.activeDoc.transcriptor,
+        fecha: new Date(),
+      };
+
+      let cl = {
+        coleccion: "rechazos_resolucion",
+        numero_carpeta: `${this.activeDoc.numero_carpeta}`,
+        numero_resolucion: `${this.activeDoc.numc}`,
+        driver: environment.driver.PRINCIPAL,
+        objeto: obj,
+        donde: `{"numero_carpeta":"${this.activeDoc.numero_carpeta}"}`,
+        upsert: true,
+      };
+      await this.apiService.ExecColeccion(cl).subscribe(
+        (response) => {
+          console.log("Se registro el rechazo a: " + this.activeDoc.ncontrol);
+          console.log(response);
+        },
+        (error) => {
+          console.error(error);
+        },
+      );
+
       this.reject.emit({
         doc: this.activeDoc,
         observations: this.observations.trim(),
