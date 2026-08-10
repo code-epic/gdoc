@@ -66,9 +66,9 @@
   
   <!-- CABECERA -->
   <header class="doc-header editable-zone" *ngIf="i === 0" (click)="editMode('header')">
-    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
-    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
-    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">DESPACHO DEL MINISTRO</p>
+    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 4px 12px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
+    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 4px 12px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
+    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 4px 12px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">DESPACHO DEL MINISTRO</p>
     
     <!-- 1 línea debajo: Lugar y fecha -->
     <div class="dynamic-row">
@@ -102,7 +102,7 @@
          [style.line-height]="documentData?.styles?.lineHeights?.basamento ? documentData.styles.lineHeights.basamento.toString() : '1.75'"
          [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" 
          spellcheck="false"
-         style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
+         style="outline: none; padding: 4px 12px; border-radius: 4px; transition: background-color 0.2s;"
          (focus)="onFocusEditable($event)" 
          (blur)="onBlurEditable($event)" 
          (input)="onBasamentoLegalEdit($event)"
@@ -119,7 +119,7 @@
          [style.line-height]="documentData?.styles?.lineHeights?.unico ? documentData.styles.lineHeights.unico.toString() : '1.35'"
          [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" 
          spellcheck="false"
-         style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s; margin-top: 13pt;"
+         style="outline: none; padding: 4px 12px; border-radius: 4px; transition: background-color 0.2s; margin-top: 13pt;"
          (focus)="onFocusEditable($event)" 
          (blur)="onBlurEditable($event)" 
          (input)="onUnicoParrafoEdit($event)"
@@ -132,7 +132,7 @@
          [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" 
          spellcheck="false"
          [style.line-height]="documentData?.styles?.lineHeights?.cases ? documentData.styles.lineHeights.cases.toString() : '1.35'"
-         style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;"
+         style="outline: none; padding: 4px 12px; border-radius: 4px; transition: background-color 0.2s;"
          (focus)="onFocusEditable($event)" 
          (blur)="onBlurEditable($event); onCasesListBlur($event, page.pageIndex)"
          (keydown)="onKeydownCases($event, page.pageIndex)"

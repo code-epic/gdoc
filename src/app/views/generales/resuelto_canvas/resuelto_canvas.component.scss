@@ -69,7 +69,7 @@
 
   ::ng-deep p {
     margin: 0;
-    padding: 0;
+    padding: 2px 8px 2px 4px; /* 2px vertical, 8px derecha, 4px izquierda para asegurar margen derecho extra */
     font-weight: normal !important; /* Neutraliza el font-weight: 300 global incluso en innerHTML */
   }
 
