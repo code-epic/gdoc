@@ -353,6 +353,7 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
   justify-content: space-between;
   align-items: center;
   padding-top: 0.75rem;
+  padding-bottom: 2rem; /* Eleva el paginador para evitar bordes en Android/Tablets */
   border-top: 1px solid $ok-border;
   margin-top: 0.5rem;
 
