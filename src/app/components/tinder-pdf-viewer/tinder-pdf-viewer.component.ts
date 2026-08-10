@@ -1051,8 +1051,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       this.syncFromCanvas();
       // aqui debemos implementar el metodo de rechazo para mover y actualizar el estatus
       // hacer un regitro de rechazo a:
-      console.log("----------");
-      console.log(this.activeDoc);
+      // console.log("----------");
+      // console.log(this.activeDoc);
       let rechazoTTL = {
         funcion: "rechazos_resolucion",
       };
