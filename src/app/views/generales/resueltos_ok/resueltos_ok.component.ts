@@ -364,6 +364,11 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.loadingExplorer = true;
     this.ngxService.startLoader("ld-folders-ok");
 
+    // Limpiar buzón de documentos (sección derecha)
+    this.selectedFolder = null;
+    this.documents = [];
+    this.documentSearchQuery = "";
+
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = environment.funcion.ENTRADAS_PROCESO_TIPO_TOTAL;
     let paramVal = "36";
@@ -582,6 +587,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       | "Direccion"
       | "Aprobador",
   ) {
+    this.documentSearchQuery = "";
     this.immersiveMode = true;
     this.currentDocIndex = this.documents.indexOf(grupo);
     if (this.currentDocIndex === -1) this.currentDocIndex = 0;

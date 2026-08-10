@@ -64,13 +64,21 @@
         </button>
       </div> -->
 
-      <!-- Buscador de Carpetas -->
-      <div class="search-wrapper">
-        <i class="fas fa-search"></i>
-        <input type="text" 
-               [(ngModel)]="folderSearchQuery" 
-               (ngModelChange)="filterAndPaginateFolders()" 
-               placeholder="Buscar carpeta por número o etiqueta..." />
+      <!-- Buscador de Carpetas y Botón Actualizar -->
+      <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-sm btn-outline-secondary mr-2" 
+                (click)="loadFolders()" 
+                title="Actualizar carpetas"
+                style="height: 42px; width: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+        <div class="search-wrapper flex-grow-1 mb-0">
+          <i class="fas fa-search"></i>
+          <input type="text" 
+                 [(ngModel)]="folderSearchQuery" 
+                 (ngModelChange)="filterAndPaginateFolders()" 
+                 placeholder="Buscar carpeta por número o etiqueta..." />
+        </div>
       </div>
 
       <!-- Spinner de Carpetas -->
