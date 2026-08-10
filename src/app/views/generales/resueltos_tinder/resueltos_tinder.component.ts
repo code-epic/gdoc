@@ -333,9 +333,9 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
 
   // ── Resolvedor de PDF ─────────────────────────────────
   public resolvePdfUrl = (doc: any): string => {
-    if (!this.activar_pdf) {
-      return "assets/000643.pdf";
-    }
+    // if (!this.activar_pdf) {
+    //   return "assets/000643.pdf";
+    // }
     const ncontrol = doc.ncontrol || doc.numc || "0";
     const archivo = doc.archivo || doc.anom || "";
     if (!archivo) return "";
@@ -380,18 +380,20 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
       };
       await this.apiService.Ejecutar(this.xAPI).toPromise();
 
-      // Actualizar estatus de firma a 9977
+      // Actualizar estatus de firma a 7766
       const targetDocs =
         doc.documentos && doc.documentos.length > 0 ? doc.documentos : [doc];
       const numero_carpeta = doc.numero_carpeta || "000000";
-
+      console.log("Imprimiendo documentos en lista resueltos_tinder");
+      console.log(doc);
+      console.log("FINALIZANDO ");
       for (const d of targetDocs) {
         const cedulaVal = d.cedula || d.persona?.cedula || "";
         if (!cedulaVal) continue;
 
         const xAPIFirma = {
           funcion: environment.funcion.ACTUALIZAR_ESTATUS_FIRMA,
-          parametros: `9977,${cedulaVal},${numero_carpeta}`,
+          parametros: `7766,${cedulaVal},${numero_carpeta},${doc.numc},${doc.fecha_resolucion}`,
           valores: null,
         } as any;
 

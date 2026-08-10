@@ -444,6 +444,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       formattedDate = `${String(rawDate.getDate()).padStart(2, "0")}${months[rawDate.getMonth()]}${rawDate.getFullYear()}`;
     }
 
+    // Asegurarse de que no queden espacios (e.g., "08 AGO 2026" -> "08AGO2026")
+    formattedDate = formattedDate.replace(/\s+/g, "");
+
     const resNum =
       this.activeDoc.numc ||
       this.activeDoc.ncontrol ||
@@ -491,7 +494,32 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     this.printModeActive = true;
     this.loadingPdf = true;
+
+    // Limpiar espacios en blanco de la fecha de resolución antes de generar
+    if (this.activeDoc?.fecha_resolucion) {
+      this.activeDoc.fecha_resolucion = this.activeDoc.fecha_resolucion.toString().replace(/\s+/g, "");
+    }
+    
+    // Asignar un nuevo objeto para forzar la detección de cambios en Angular (@Input)
+    if (this.canvasData?.header?.date) {
+      this.canvasData = {
+        ...this.canvasData,
+        header: {
+          ...this.canvasData.header,
+          date: this.canvasData.header.date.toString().replace(/\s+/g, ""),
+        }
+      };
+    }
+
     this.cdr.detectChanges();
+
+    // LIMPIEZA FORZADA DEL DOM (Anula el caché visual de contenteditable)
+    const dateSpans = document.querySelectorAll(".a4-canvas .m-resolucion-lugar-fecha .variable, .a4-canvas .doc-header u");
+    dateSpans.forEach(span => {
+      if (span.textContent && span.textContent.match(/[A-Z]/i) && span.textContent.match(/[0-9]/)) {
+        span.textContent = span.textContent.replace(/\s+/g, "");
+      }
+    });
 
     // 2. Guardar y temporalmente resetear el zoom a 1.0 para evitar distorsión de escala
     let originalZoom = 1.0;
@@ -824,7 +852,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   public updateActiveDoc(field: string, value: string) {
     if (this.activeDoc) {
-      this.activeDoc[field] = value;
+      if (field === "fecha_resolucion" && value) {
+        this.activeDoc[field] = value.toString().replace(/\s+/g, "");
+      } else {
+        this.activeDoc[field] = value;
+      }
     }
   }
 
@@ -864,7 +896,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         }
       }
     } catch (e) {}
-    this.activeDoc.fecha_resolucion = dateStr;
+    this.activeDoc.fecha_resolucion = dateStr ? dateStr.toString().replace(/\s+/g, "") : dateStr;
     this.updateCanvasData();
   }
 
@@ -1032,9 +1064,13 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
       const xAPI = {} as IAPICore;
       xAPI.funcion = environment.funcion.ACTUALIZAR_ESTATUS_FIRMA;
-      xAPI.parametros = `${estatus},${cedulaVal},${numero_carpeta}`;
+      xAPI.parametros = `${estatus},${cedulaVal},${numero_carpeta},${this.activeDoc.numc},${this.activeDoc.fecha_resolucion}`;
       xAPI.valores = null;
-      console.log(this.xAPI);
+      console.log("Imprimiendo documentos en lista");
+
+      console.log(this.activeDoc);
+
+      console.log("FINALIZANDO ");
       try {
         await this.apiService.Ejecutar(xAPI).toPromise();
         console.log(
@@ -1525,7 +1561,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         // Asociar fecha de resolución de PG si existe
         const resFecha = pgTemplate.task.fecha_resolucion;
         if (resFecha) {
-          doc.fecha_resolucion = resFecha;
+          doc.fecha_resolucion = resFecha.toString().replace(/\s+/g, "");
         }
       }
 
