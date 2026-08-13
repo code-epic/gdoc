@@ -8,6 +8,7 @@ import { PendientesComponent } from './pendientes/pendientes.component';
 import { RegistrarComponent } from './registrar/registrar.component';
 import { SalidasComponent } from './salidas/salidas.component';
 import { CtrlestadisticasComponent } from './ctrlestadisticas/ctrlestadisticas.component';
+import { TinderDocumentsComponent } from './tinder-documents/tinder-documents.component';
 
 const routes: Routes = [
   {
@@ -37,8 +38,12 @@ const routes: Routes = [
   {
     path: 'salidas',
     component : SalidasComponent
+  },
+  {
+    path: 'tinder-documents',
+    component: TinderDocumentsComponent
   }
-]
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

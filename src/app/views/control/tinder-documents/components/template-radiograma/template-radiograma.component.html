@@ -1,0 +1,125 @@
+<div class="radiograma-container" [attr.contenteditable]="profile === 'TRANSCRIPTOR' ? 'true' : 'false'">
+  <!-- Cabecera -->
+  <div class="header-grid">
+    <div class="mppd-info text-center font-weight-bold">
+      <p>REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
+      <p>MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
+      <p class="h5">DESPACHO DEL MINISTRO</p>
+      <p class="mt-2">FORMA DE MENSAJE CONJUNTO</p>
+    </div>
+    <div class="security-info text-center">
+      <p>CLASIFICACIÓN DE SEGURIDAD</p>
+      <p class="h4 font-weight-bold mt-2">NO CLASIFICADO</p>
+    </div>
+  </div>
+
+  <div class="communication-space text-uppercase">
+    ESPACIO PARA EL USO DEL CENTRO DE COMUNICACIONES Y ELECTRÓNICA
+  </div>
+
+  <!-- Grid Principal -->
+  <div class="main-grid text-center font-weight-bold">
+    <div class="grid-item">PRECEDENCIA:</div>
+    <div class="grid-item">TIPO DE MENSAJE</div>
+    <div class="grid-item">SÍMBOLO DE CONTABILIDAD</div>
+    <div class="grid-item">ORIG. O REFIÉRASE A:</div>
+    <div class="grid-item">CLASIFICACIÓN DE LA REFERENCIA</div>
+    
+    <div class="grid-item d-flex align-items-center">
+      ACCIÓN: <span class="ml-2">PRIORIDAD</span>
+    </div>
+    <div class="grid-item grid-sub">
+      <div>INDIV.</div>
+      <div>MULTI.</div>
+      <div>SIMPL</div>
+    </div>
+    <div class="grid-item d-flex align-items-center justify-content-center" rowspan="2">MPPD</div>
+    <div class="grid-item d-flex align-items-center justify-content-center" rowspan="2">ORIGINAL</div>
+    <div class="grid-item d-flex align-items-center justify-content-center" rowspan="2">NOCLAS</div>
+
+    <div class="grid-item d-flex align-items-center">INFORMACIÓN:</div>
+    <div class="grid-item grid-sub border-top-0">
+      <div></div>
+      <div>X</div>
+      <div></div>
+    </div>
+  </div>
+
+  <div class="de-para-section font-weight-bold p-1">
+    <p>DE: GENERAL EN JEFE MINISTRO DEL PODER POPULAR PARA LA DEFENSA</p>
+  </div>
+  <div class="de-para-section font-weight-bold p-1 border-top-0">
+    <p>PARA: DISTRIBUCIÓN "A".</p>
+  </div>
+  <div class="de-para-section font-weight-bold p-1 border-top-0">
+    <p>RAD. N° <span style="display:inline-block; width: 100px; border-bottom: 1px solid black;"></span></p>
+  </div>
+
+  <!-- Contenido Libre -->
+  <div class="message-content text-center font-weight-bold">
+    <div class="quotes-area">
+      <p>"CHÁVEZ VIVE LA PATRIA SIGUE"</p>
+      <p>"INDEPENDENCIA Y PATRIA SOCIALISTA... VIVIREMOS Y VENCEREMOS"</p>
+      <p>"EL SOL DE VENEZUELA NACE EN EL ESEQUIBO"</p>
+      <p>"INDEPENDENCIA O NADA"</p>
+      <p>"LEALES SIEMPRE... TRAIDORES NUNCA"</p>
+    </div>
+  </div>
+
+  <!-- Instrucciones y Fecha -->
+  <div class="instructions-grid font-weight-bold">
+    <div class="instructions-col p-1">INSTRUCCIONES ESPECIALES:</div>
+    <div class="date-col">
+      <div class="date-header">DÍA</div>
+      <div class="date-value text-center">05</div>
+      <div class="date-header">MES</div>
+      <div class="date-value text-center">08</div>
+    </div>
+    <div class="time-col">
+      <div class="time-header">HORA</div>
+      <div class="time-value text-center">12:00</div>
+      <div class="time-header">AÑO</div>
+      <div class="time-value text-center">2026</div>
+    </div>
+  </div>
+
+  <!-- Simbolo / Firma -->
+  <div class="bottom-grid font-weight-bold">
+    <!-- Columna Redactado -->
+    <div class="vertical-text-col vertical-text border-right-0">REDACTADO</div>
+    
+    <div class="symbol-col border-right-0">
+      <div class="border-bottom p-1">SÍMBOLO: <span class="d-block text-center mt-2">MPPD</span></div>
+      <div class="p-1" style="height: 120px;">
+        NOMBRE Y CARGO:
+        <div class="text-center mt-4">
+          <p>LUÍS ADOLFO ROSALES MOLINA</p>
+          <p>MAYOR GENERAL</p>
+          <p>DIRECTOR GENERAL DEL DESPACHO DEL MPPD</p>
+        </div>
+      </div>
+      <div class="d-flex border-top">
+        <div class="border-right p-1" style="width: 50%;">TELEF.: <br>(0212) 607-15-91</div>
+        <div class="border-right p-1 text-center" style="width: 25%;">PAG N° <br>01</div>
+        <div class="p-1 text-center" style="width: 25%;">NOS.PÁG. <br>01</div>
+      </div>
+      <div class="border-top p-1 text-center">
+        CLASIFICACIÓN DE SEGURIDAD.
+        <p class="h5 font-weight-bold mt-1">NOCLAS</p>
+        <p class="small font-weight-normal">(SECRETO, CONFIDENCIAL, NOCLAS, ETC.)</p>
+      </div>
+    </div>
+
+    <!-- Columna Expedido -->
+    <div class="vertical-text-col vertical-text border-right-0">EXPEDIDO</div>
+
+    <!-- Columna Firma Autoridad -->
+    <div class="firma-col p-1">
+      FIRMA
+      <div class="mt-2 border-top-0 pt-2">
+        NOMBRE Y CARGO:
+      </div>
+    </div>
+  </div>
+
+</div>

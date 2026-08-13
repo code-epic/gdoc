@@ -1,0 +1,154 @@
+.radiograma-container {
+  border: 1px solid black;
+  width: 100%;
+  font-family: Arial, sans-serif;
+  font-size: 10pt;
+}
+
+.header-grid {
+  display: flex;
+  border-bottom: 1px solid black;
+}
+
+.mppd-info {
+  flex: 3;
+  border-right: 1px solid black;
+  padding: 5px;
+  
+  p { margin: 0; }
+}
+
+.security-info {
+  flex: 1;
+  padding: 5px;
+  
+  p { margin: 0; }
+}
+
+.communication-space {
+  text-align: center;
+  font-size: 9pt;
+  padding: 8px;
+  border-bottom: 1px solid black;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-bottom: 1px solid black;
+}
+
+.grid-item {
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  padding: 4px;
+  min-height: 25px;
+  display: flex;
+  align-items: center;
+  
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.grid-sub {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  
+  div {
+    flex: 1;
+    border-right: 1px solid black;
+    text-align: center;
+    padding: 2px 0;
+    
+    &:last-child { border-right: none; }
+  }
+}
+
+.de-para-section {
+  border-bottom: 1px solid black;
+  p { margin: 0; }
+}
+
+.message-content {
+  padding: 20px 10px;
+  min-height: 150px;
+  border-bottom: 1px solid black;
+  
+  .quotes-area p { margin: 5px 0; }
+}
+
+.instructions-grid {
+  display: flex;
+  border-bottom: 1px solid black;
+}
+
+.instructions-col {
+  flex: 3;
+  border-right: 1px solid black;
+}
+
+.date-col, .time-col {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  border-right: 1px solid black;
+}
+
+.time-col {
+  border-right: none;
+}
+
+.date-header, .time-header {
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+  text-align: center;
+  font-size: 8pt;
+  padding: 2px;
+}
+
+.date-header:nth-child(2n), .time-header:nth-child(2n) {
+  border-right: none;
+}
+
+.date-value, .time-value {
+  padding: 4px;
+  border-right: 1px solid black;
+}
+.date-value:nth-child(even), .time-value:nth-child(even) {
+  border-right: none;
+}
+
+.bottom-grid {
+  display: flex;
+  min-height: 150px;
+}
+
+.vertical-text-col {
+  width: 30px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: center;
+  border-right: 1px solid black;
+  padding: 10px 0;
+  letter-spacing: 5px;
+}
+
+.symbol-col {
+  flex: 2;
+  border-right: 1px solid black;
+  display: flex;
+  flex-direction: column;
+}
+
+.firma-col {
+  flex: 2;
+}
+
+.border-right-0 { border-right: 0 !important; }
+.border-top-0 { border-top: 0 !important; }
+.border-bottom { border-bottom: 1px solid black; }
+.border-top { border-top: 1px solid black; }
+.border-right { border-right: 1px solid black; }

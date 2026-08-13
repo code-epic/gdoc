@@ -26,6 +26,44 @@ import Swal from "sweetalert2";
 export class ResueltoCanvasComponent
   implements OnInit, OnDestroy, AfterViewInit, OnChanges
 {
+  // Historial para deshacer/rehacer (Undo/Redo)
+  private undoStack: string[] = [];
+  private redoStack: string[] = [];
+  private maxHistorySize = 50;
+  private isApplyingHistory = false;
+
+  @HostListener('window:keydown', ['$event'])
+  onWindowKeyDown(event: KeyboardEvent) {
+    const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+    
+    // 1. Bloquear Zoom
+    if (isCtrlOrCmd && (event.key === '-' || event.key === '+' || event.key === '=' || event.key === '0')) {
+      event.preventDefault();
+      return;
+    }
+
+    // 2. Control Z / Undo
+    if (isCtrlOrCmd && !event.shiftKey && event.key.toLowerCase() === 'z') {
+      event.preventDefault();
+      this.undo();
+      return;
+    }
+
+    // 3. Control Shift Z / Redo
+    if (isCtrlOrCmd && event.shiftKey && event.key.toLowerCase() === 'z') {
+      event.preventDefault();
+      this.redo();
+      return;
+    }
+
+    // 4. Control Y / Redo (Alternativo Windows)
+    if (isCtrlOrCmd && event.key.toLowerCase() === 'y') {
+      event.preventDefault();
+      this.redo();
+      return;
+    }
+  }
+
   @ViewChild("container") containerRef!: ElementRef;
 
   public zoomScale: number = 1.0;
@@ -89,6 +127,25 @@ export class ResueltoCanvasComponent
 
   public showFloatingCommentBtn = false;
   public floatingBtnPos = { x: 0, y: 0 };
+
+  public activeDropdown: string = "";
+
+  toggleDropdown(dropdownName: string, event: Event) {
+    event.stopPropagation();
+    if (this.activeDropdown === dropdownName) {
+      this.activeDropdown = "";
+    } else {
+      this.activeDropdown = dropdownName;
+    }
+  }
+
+  @HostListener("document:mousedown", ["$event"])
+  onDocumentMousedown(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest(".dropdown")) {
+      this.activeDropdown = "";
+    }
+  }
 
   @HostListener("document:selectionchange")
   onSelectionChange() {
@@ -174,6 +231,427 @@ export class ResueltoCanvasComponent
     // NOTA: No llamamos a this.casesInput$.next() aquí para evitar que el canvas
     // se repagine y elimine la selección visual del usuario.
     // Los cambios en el DOM se guardarán cuando se dispare el evento blur.
+  }
+
+  getSelectedBlocks(): HTMLElement[] {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return [];
+
+    const range = selection.getRangeAt(0);
+    const blocks: HTMLElement[] = [];
+
+    // Encontrar el contenedor editable raíz
+    const container = range.commonAncestorContainer;
+    let rootEditable: HTMLElement | null = null;
+    let node: Node | null = container;
+    while (node) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as HTMLElement;
+        if (el.hasAttribute('contenteditable') || el.classList.contains('cases-list')) {
+          rootEditable = el;
+          break;
+        }
+      }
+      node = node.parentNode;
+    }
+
+    if (!rootEditable) return [];
+
+    // Solo apuntamos a elementos de bloque específicos (excluimos divs y spans contenedores)
+    const allBlocks = Array.from(rootEditable.querySelectorAll('p, li, h1, h2, h3')) as HTMLElement[];
+    
+    // Filtrar bloques que intersectan con el rango de selección
+    allBlocks.forEach((block) => {
+      if (selection.containsNode(block, true)) {
+        blocks.push(block);
+      }
+    });
+
+    // Fallback: si no se encontró ningún bloque (por ejemplo, la selección está completamente dentro de un solo párrafo)
+    if (blocks.length === 0) {
+      let node: Node | null = range.startContainer;
+      while (node) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node as HTMLElement;
+          if (['p', 'li', 'h1', 'h2', 'h3'].includes(el.tagName.toLowerCase())) {
+            blocks.push(el);
+            break;
+          }
+        }
+        if (node === rootEditable) break;
+        node = node.parentNode;
+      }
+    }
+
+    return blocks;
+  }
+
+  cleanAndConsolidateDOM(element: HTMLElement) {
+    if (!element) return;
+
+    // 1. Limpiar spans vacíos o redundantes
+    const spans = Array.from(element.querySelectorAll('span')) as HTMLElement[];
+    spans.forEach((span) => {
+      // Si el span no tiene contenido ni hijos, removerlo
+      if (span.childNodes.length === 0 || (span.textContent === '' && span.querySelectorAll('*').length === 0)) {
+        span.parentNode?.removeChild(span);
+        return;
+      }
+
+      // Si el span no tiene estilos aplicados y no tiene clase, desenvolverlo
+      if (!span.style.cssText && !span.className) {
+        const parent = span.parentNode;
+        if (parent) {
+          while (span.firstChild) {
+            parent.insertBefore(span.firstChild, span);
+          }
+          parent.removeChild(span);
+        }
+      }
+    });
+
+    // 2. Normalizar el elemento para unir nodos de texto adyacentes
+    element.normalize();
+
+    // 3. Fusionar spans adyacentes que tengan exactamente el mismo estilo
+    const containers = Array.from(element.querySelectorAll('p, li, h1, h2, h3')) as HTMLElement[];
+    if (['p', 'li', 'h1', 'h2', 'h3'].includes(element.tagName.toLowerCase())) {
+      containers.push(element);
+    }
+
+    containers.forEach((container) => {
+      let child = container.firstChild;
+      while (child) {
+        let next = child.nextSibling;
+        if (child.nodeType === Node.ELEMENT_NODE && next && next.nodeType === Node.ELEMENT_NODE) {
+          const el1 = child as HTMLElement;
+          const el2 = next as HTMLElement;
+
+          if (
+            el1.tagName.toLowerCase() === 'span' &&
+            el2.tagName.toLowerCase() === 'span' &&
+            el1.style.cssText === el2.style.cssText &&
+            !el1.className &&
+            !el2.className
+          ) {
+            // Fusionar el contenido de el2 en el1
+            while (el2.firstChild) {
+              el1.appendChild(el2.firstChild);
+            }
+            el2.parentNode?.removeChild(el2);
+            // Re-evaluar el nuevo nodo adyacente
+            next = el1.nextSibling;
+            continue;
+          }
+        }
+        child = next;
+      }
+    });
+
+    // Normalizar text nodes finales generados por la fusión
+    element.normalize();
+  }
+
+  applySelectionStyle(property: string, value: string) {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    let targetEditable: HTMLElement | null = null;
+
+    // Caso 1: Hay texto seleccionado
+    if (!selection.isCollapsed) {
+      const range = selection.getRangeAt(0);
+      
+      const startContainer = range.startContainer;
+      const startOffset = range.startOffset;
+      const endContainer = range.endContainer;
+      const endOffset = range.endOffset;
+
+      const textNodes: Text[] = [];
+      const commonAncestor = range.commonAncestorContainer;
+      
+      // Encontrar el contenedor contenteditable
+      let node: Node | null = commonAncestor;
+      while (node) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node as HTMLElement;
+          if (el.hasAttribute('contenteditable') || el.classList.contains('cases-list')) {
+            targetEditable = el;
+            break;
+          }
+        }
+        node = node.parentNode;
+      }
+
+      // Crear TreeWalker para recolectar todos los nodos de texto en el rango
+      const walker = document.createTreeWalker(
+        commonAncestor,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: (node) => {
+            if (range.intersectsNode(node)) {
+              return NodeFilter.FILTER_ACCEPT;
+            }
+            return NodeFilter.FILTER_REJECT;
+          }
+        }
+      );
+
+      if (commonAncestor.nodeType === Node.TEXT_NODE) {
+        textNodes.push(commonAncestor as Text);
+      } else {
+        let currentNode = walker.nextNode();
+        while (currentNode) {
+          textNodes.push(currentNode as Text);
+          currentNode = walker.nextNode();
+        }
+      }
+
+      if (textNodes.length > 0) {
+        // Guardar posiciones para no alterarlas al dividir los nodos
+        const nodesToProcess: { node: Text; start: number; end: number }[] = [];
+        textNodes.forEach((node) => {
+          let start = 0;
+          let end = node.length;
+
+          if (node === startContainer) {
+            start = startOffset;
+          }
+          if (node === endContainer) {
+            end = endOffset;
+          }
+
+          if (start < end) {
+            nodesToProcess.push({ node, start, end });
+          }
+        });
+
+        // Procesar de atrás hacia adelante para mantener los offsets válidos
+        for (let i = nodesToProcess.length - 1; i >= 0; i--) {
+          const { node, start, end } = nodesToProcess[i];
+          let targetNode = node;
+
+          if (end < node.length) {
+            targetNode.splitText(end);
+          }
+          if (start > 0) {
+            targetNode = targetNode.splitText(start);
+          }
+
+          const parent = targetNode.parentNode as HTMLElement;
+          if (parent && parent.tagName.toLowerCase() === 'span' && parent.childNodes.length === 1 && !parent.className) {
+            parent.style[property as any] = value;
+          } else {
+            const span = document.createElement('span');
+            span.style[property as any] = value;
+            parent.insertBefore(span, targetNode);
+            span.appendChild(targetNode);
+          }
+        }
+
+        // Limpiar selección para asegurar consistencia
+        selection.removeAllRanges();
+      }
+    } 
+    // Caso 2: Cursor colapsado, aplicamos al bloque específico más cercano
+    else {
+      let node: Node | null = selection.anchorNode;
+      while (node) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node as HTMLElement;
+          const tagName = el.tagName.toLowerCase();
+          // Solo aplicar a elementos de bloque reales, no a divs contenedores generales
+          if (['p', 'li', 'h1', 'h2', 'h3'].includes(tagName)) {
+            el.style[property as any] = value;
+            targetEditable = el;
+            break;
+          }
+        }
+        node = node.parentNode;
+      }
+    }
+
+    // Consolidar y limpiar el DOM del editable que fue modificado
+    if (targetEditable) {
+      this.cleanAndConsolidateDOM(targetEditable);
+    }
+
+    // Sincronizar el DOM al modelo para que no se pierda el cambio al repaginar
+    this.syncDOMToModel();
+    this.casesInput$.next();
+  }
+
+  applyBlockStyle(property: string, value: string) {
+    const blocks = this.getSelectedBlocks();
+    blocks.forEach((block) => {
+      block.style[property as any] = value;
+    });
+
+    this.syncDOMToModel();
+    this.casesInput$.next();
+  }
+
+  /**
+   * Lee el contenido actual de cada .cases-list del DOM y lo persiste en el modelo
+   * (documentData.pages[i].casesHtml). También captura basamento y unico.
+   * Debe llamarse ANTES de casesInput$.next() cuando se aplican estilos directamente al DOM.
+   */
+  syncDOMToModel() {
+    if (!this.documentData || !this.documentData.pages) return;
+    const canvases = this.el.nativeElement.querySelectorAll('.a4-canvas');
+    canvases.forEach((canvas: HTMLElement, idx: number) => {
+      if (!this.documentData.pages[idx]) return;
+      const casesList = canvas.querySelector('.cases-list') as HTMLElement;
+      if (casesList) {
+        this.cleanAndConsolidateDOM(casesList);
+        const html = casesList.innerHTML;
+        this.documentData.pages[idx].casesHtml = html;
+        this.documentData.pages[idx].casesHtmlSafe =
+          this.sanitizer.bypassSecurityTrustHtml(html);
+      }
+    });
+
+    // También capturar basamento y unico del primer canvas (solo aparecen en página 0)
+    const firstCanvas = this.el.nativeElement.querySelector('.a4-canvas') as HTMLElement | null;
+    if (firstCanvas && this.documentData.body) {
+      const basamentoEl = firstCanvas.querySelector('[data-section="basamento"]') as HTMLElement | null;
+      if (basamentoEl) {
+        this.cleanAndConsolidateDOM(basamentoEl);
+        const html = basamentoEl.innerHTML;
+        this.documentData.body.basamentoLegal = html;
+        this.basamentoLegalSafe = this.sanitizer.bypassSecurityTrustHtml(html);
+        this.basamentoLegalChange.emit(html);
+      }
+
+      const unicoEl = firstCanvas.querySelector('[data-section="unico"]') as HTMLElement | null;
+      if (unicoEl) {
+        this.cleanAndConsolidateDOM(unicoEl);
+        const html = unicoEl.innerHTML;
+        this.documentData.body.unicoParrafo = html;
+        this.unicoParrafoSafe = this.sanitizer.bypassSecurityTrustHtml(html);
+        this.unicoParrafoChange.emit(html);
+      }
+    }
+  }
+
+  applyFontSizeSelection(size: string) {
+    this.applySelectionStyle('fontSize', size);
+  }
+
+  applyLineSpacingSelection(spacing: string) {
+    // El interlineado (lineHeight) es un estilo a nivel de párrafo/bloque.
+    // Lo aplicamos directamente a los bloques seleccionados para un resultado óptimo.
+    this.applyBlockStyle('lineHeight', spacing);
+  }
+
+  applyLetterSpacingSelection(spacing: string) {
+    this.applySelectionStyle('letterSpacing', spacing);
+  }
+
+  adjustBlockPadding(property: 'paddingLeft' | 'paddingRight', delta: number, skipEmit = false) {
+    const blocks = this.getSelectedBlocks();
+    
+    blocks.forEach((el) => {
+      const currentVal = parseFloat(window.getComputedStyle(el)[property as any]) || 0;
+      const inlineStyle = el.style[property as any];
+      let val = 0;
+      if (inlineStyle.endsWith('mm')) {
+        val = parseFloat(inlineStyle);
+      } else if (inlineStyle.endsWith('px')) {
+        val = parseFloat(inlineStyle) * 0.264583;
+      } else {
+        val = currentVal * 0.264583;
+      }
+      
+      const newVal = Math.max(0, val + delta);
+      el.style[property as any] = newVal === 0 ? '' : `${newVal}mm`;
+    });
+
+    if (!skipEmit) {
+      this.syncDOMToModel();
+      this.casesInput$.next();
+    }
+  }
+
+  increaseIndentLeft() { this.adjustBlockPadding('paddingLeft', 5); }
+  decreaseIndentLeft() { this.adjustBlockPadding('paddingLeft', -5); }
+  increaseIndentRight() { this.adjustBlockPadding('paddingRight', 5); }
+  decreaseIndentRight() { this.adjustBlockPadding('paddingRight', -5); }
+
+  widenLine() {
+    this.adjustBlockPadding('paddingLeft', -5, true);
+    this.adjustBlockPadding('paddingRight', -5, true);
+    this.syncDOMToModel();
+    this.saveHistoryState();
+    this.casesInput$.next();
+  }
+
+  narrowLine() {
+    this.adjustBlockPadding('paddingLeft', 5, true);
+    this.adjustBlockPadding('paddingRight', 5, true);
+    this.syncDOMToModel();
+    this.saveHistoryState();
+    this.casesInput$.next();
+  }
+
+  saveHistoryState() {
+    if (this.isApplyingHistory) return;
+    if (!this.documentData || !this.documentData.pages) return;
+
+    const state = JSON.stringify(this.documentData.pages.map((p: any) => ({
+      pageIndex: p.pageIndex,
+      casesHtml: p.casesHtml
+    })));
+
+    if (this.undoStack.length > 0 && this.undoStack[this.undoStack.length - 1] === state) {
+      return;
+    }
+
+    this.undoStack.push(state);
+    if (this.undoStack.length > this.maxHistorySize) {
+      this.undoStack.shift();
+    }
+    this.redoStack = [];
+  }
+
+  undo() {
+    if (this.undoStack.length <= 1) return;
+    this.isApplyingHistory = true;
+    const currentState = this.undoStack.pop()!;
+    this.redoStack.push(currentState);
+    const prevState = this.undoStack[this.undoStack.length - 1];
+    this.applyHistoryState(prevState);
+  }
+
+  redo() {
+    if (this.redoStack.length === 0) return;
+    this.isApplyingHistory = true;
+    const nextState = this.redoStack.pop()!;
+    this.undoStack.push(nextState);
+    this.applyHistoryState(nextState);
+  }
+
+  private applyHistoryState(stateJson: string) {
+    try {
+      const pagesData = JSON.parse(stateJson);
+      this.saveCaret();
+      
+      this.documentData.pages = pagesData.map((p: any) => ({
+        pageIndex: p.pageIndex,
+        casesHtml: p.casesHtml,
+        casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(p.casesHtml || "")
+      }));
+
+      this.cdr.detectChanges();
+      
+      setTimeout(() => {
+        this.restoreCaret();
+        this.isApplyingHistory = false;
+      }, 50);
+    } catch (e) {
+      console.error("Error al aplicar estado del historial:", e);
+      this.isApplyingHistory = false;
+    }
   }
 
   public async addComment() {
@@ -389,7 +867,12 @@ export class ResueltoCanvasComponent
     this.casesInput$.pipe(debounceTime(600)).subscribe(() => {
       this.casesBlur.emit();
       this.paginateDOM();
+      this.saveHistoryState();
     });
+
+    setTimeout(() => {
+      this.saveHistoryState();
+    }, 1000);
   }
 
   ngOnDestroy(): void {
@@ -522,6 +1005,8 @@ export class ResueltoCanvasComponent
 
   onCasesListInput(event: Event, pageIndex: number) {
     const target = event.target as HTMLElement;
+    const casesListEl = target.closest('.cases-list') as HTMLElement || target;
+    const html = casesListEl.innerHTML;
 
     // Guardar SIEMPRE el html crudo en el modelo para no perder tabulaciones o contenido tipeado
     if (
@@ -529,12 +1014,11 @@ export class ResueltoCanvasComponent
       this.documentData.pages &&
       this.documentData.pages[pageIndex]
     ) {
-      this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
+      this.documentData.pages[pageIndex].casesHtml = html;
     }
 
     if (this.documentData && this.documentData.bodyData) {
-      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] =
-        target.innerHTML;
+      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] = html;
     }
 
     // Auto-paginación inteligente tipo Google Docs:
@@ -552,7 +1036,14 @@ export class ResueltoCanvasComponent
 
       if (isOverflowing) {
         // Desbordamiento = repaginamos inmediatamente para empujar el texto a la página siguiente
-        this.paginateDOM();
+        // Excepción: Evitamos repaginación síncrona inmediata en espacios para no romper la edición fluida
+        const inputEvent = event as InputEvent;
+        const isSpace = inputEvent && (inputEvent.data === " " || (inputEvent.inputType === "insertText" && !inputEvent.data));
+        if (isSpace) {
+          this.casesInput$.next();
+        } else {
+          this.paginateDOM();
+        }
       } else {
         const inputEvent = event as InputEvent;
         // Si el usuario está borrando texto, puede haber espacio de sobra (Underflow)
@@ -562,8 +1053,8 @@ export class ResueltoCanvasComponent
           inputEvent && inputEvent.inputType && (inputEvent.inputType === "insertParagraph" || inputEvent.inputType === "insertLineBreak");
           
         if (isEnter) {
-          // Si presiona enter, forzamos repaginar por si el cálculo de height falló
-          setTimeout(() => this.paginateDOM(), 10);
+          // Si presiona enter, repaginamos de forma debouncada (600ms) para no interrumpir el flujo del retorno del carro
+          this.casesInput$.next();
         } else if (isDeleting && pageIndex < this.documentData.pages.length - 1) {
           // Llamamos al subject que dispara paginateDOM con debounce (600ms)
           // Así evitamos interrumpir al usuario si mantiene presionado Backspace
@@ -575,7 +1066,8 @@ export class ResueltoCanvasComponent
 
   onCasesListBlur(event: Event, pageIndex: number) {
     const target = event.target as HTMLElement;
-    const html = target.innerHTML;
+    const casesListEl = target.closest('.cases-list') as HTMLElement || target;
+    const html = casesListEl.innerHTML;
 
     // Al salir del input (blur), SÍ guardamos los cambios en el modelo de datos
     if (
@@ -605,7 +1097,8 @@ export class ResueltoCanvasComponent
           document.execCommand('indent', false, "");
         }
       } else {
-        document.execCommand("insertText", false, "\t");
+        // Insertar espacios non-breaking en lugar de \t para que se rendericen visualmente en el HTML sin colapsar el puntero
+        document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
       }
       
       this.onCasesListInput(event, pageIndex);
@@ -633,98 +1126,229 @@ export class ResueltoCanvasComponent
       this.cleanHtmlNodes(node),
     );
 
-    // Formatear cédulas
     const cleanHtml = this.formatCedulasInHtml(doc.body.innerHTML);
+    const target = event.currentTarget as HTMLElement || event.target as HTMLElement;
+    const casesListEl = target.closest('.cases-list') as HTMLElement || target;
 
-    document.execCommand("insertHTML", false, cleanHtml);
+    // Intentar insertar en la selección usando Range API para evitar duplicados y fallos en vacíos
+    const sel = window.getSelection();
+    let inserted = false;
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      if (casesListEl.contains(range.commonAncestorContainer)) {
+        try {
+          range.deleteContents();
+          const el = document.createElement("div");
+          el.innerHTML = cleanHtml;
+          const frag = document.createDocumentFragment();
+          let node;
+          while ((node = el.firstChild)) {
+            frag.appendChild(node);
+          }
+          range.insertNode(frag);
+          inserted = true;
+          // Mover cursor al final de lo insertado
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        } catch (e) {
+          console.warn("Fallo insertNode manual en pegar, usando execCommand:", e);
+        }
+      }
+    }
 
-    // Guardar cambios manualmente (al pegar sí queremos repintar/paginar)
-    const target = event.target as HTMLElement;
+    if (!inserted) {
+      // Fallback si no hay selección válida o está vacío
+      if (casesListEl.innerHTML.trim() === "" || casesListEl.innerHTML === "<br>") {
+        casesListEl.innerHTML = cleanHtml;
+      } else {
+        const el = document.createElement("div");
+        el.innerHTML = cleanHtml;
+        while (el.firstChild) {
+          casesListEl.appendChild(el.firstChild);
+        }
+      }
+    }
+
+    // Guardar cambios manualmente
     if (
       this.documentData &&
       this.documentData.pages &&
       this.documentData.pages[pageIndex]
     ) {
-      this.documentData.pages[pageIndex].casesHtml = target.innerHTML;
+      this.documentData.pages[pageIndex].casesHtml = casesListEl.innerHTML;
     }
 
     if (this.documentData && this.documentData.bodyData) {
-      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] =
-        target.innerHTML;
+      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] = casesListEl.innerHTML;
     }
 
+    this.saveHistoryState();
     this.casesInput$.next();
-
-    setTimeout(() => {
-      this.casesInput$.next();
-    }, 100);
   }
 
   // --- SISTEMA DE RESTAURACIÓN DE PUNTERO (CARET) ---
-  savedCaretPosition: { start: number; end: number } | null = null;
+  // --- SISTEMA DE RESTAURACIÓN DE PUNTERO (CARET) ---
+  savedCaretPosition: { section: string; start: number; end: number } | null = null;
 
   saveCaret() {
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) {
       const range = sel.getRangeAt(0);
-      const preCaretRange = range.cloneRange();
-      preCaretRange.selectNodeContents(this.el.nativeElement);
-      preCaretRange.setEnd(range.startContainer, range.startOffset);
-      const start = preCaretRange.toString().length;
-
-      preCaretRange.setEnd(range.endContainer, range.endOffset);
-      const end = preCaretRange.toString().length;
-
-      this.savedCaretPosition = { start, end };
+      
+      // Encontrar el contenedor contenteditable más cercano
+      let editableEl: HTMLElement | null = null;
+      let node: Node | null = range.startContainer;
+      while (node) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node as HTMLElement;
+          if (el.hasAttribute('contenteditable') || el.classList.contains('cases-list')) {
+            editableEl = el;
+            break;
+          }
+        }
+        node = node.parentNode;
+      }
+      
+      if (editableEl) {
+        const section = editableEl.getAttribute('data-section') || 'cases';
+        let start = 0;
+        let end = 0;
+        
+        if (section === 'cases') {
+          // Si es cases, sumamos los textos de todos los cases-list anteriores en el DOM
+          const allCasesLists = Array.from(this.el.nativeElement.querySelectorAll('.cases-list')) as HTMLElement[];
+          const activeListIdx = allCasesLists.indexOf(editableEl);
+          
+          for (let i = 0; i < activeListIdx; i++) {
+            start += allCasesLists[i].textContent?.length || 0;
+          }
+          
+          const preCaretRange = range.cloneRange();
+          preCaretRange.selectNodeContents(editableEl);
+          preCaretRange.setEnd(range.startContainer, range.startOffset);
+          start += preCaretRange.toString().length;
+          end = start + range.toString().length;
+        } else {
+          // Si es otra sección, calculamos relativo a ese elemento individual
+          const preCaretRange = range.cloneRange();
+          preCaretRange.selectNodeContents(editableEl);
+          preCaretRange.setEnd(range.startContainer, range.startOffset);
+          start = preCaretRange.toString().length;
+          end = start + range.toString().length;
+        }
+        
+        this.savedCaretPosition = { section, start, end };
+      }
     }
   }
 
   restoreCaret() {
     if (this.savedCaretPosition !== null) {
-      const el = this.el.nativeElement;
-      let charIndex = 0;
-      const range = document.createRange();
-      range.setStart(el, 0);
-      range.collapse(true);
-      const nodeStack = [el];
-      let node,
-        foundStart = false,
-        foundEnd = false;
+      const saved = this.savedCaretPosition;
+      const section = saved.section;
+      let targetEl: HTMLElement | null = null;
+      
+      if (section === 'cases') {
+        const allCasesLists = Array.from(this.el.nativeElement.querySelectorAll('.cases-list')) as HTMLElement[];
+        let totalTextLen = 0;
+        allCasesLists.forEach(list => totalTextLen += list.textContent?.length || 0);
 
-      while (!foundEnd && (node = nodeStack.pop())) {
-        if (node.nodeType === Node.TEXT_NODE) {
-          const nextCharIndex = charIndex + (node.textContent?.length || 0);
-          if (
-            !foundStart &&
-            this.savedCaretPosition.start >= charIndex &&
-            this.savedCaretPosition.start <= nextCharIndex
-          ) {
-            range.setStart(node, this.savedCaretPosition.start - charIndex);
-            foundStart = true;
+        // Clampear offsets para evitar problemas con espacios colapsados por render de innerHTML
+        const clampedStart = Math.min(saved.start, totalTextLen);
+        const clampedEnd = Math.min(saved.end, totalTextLen);
+
+        let remainingStart = clampedStart;
+        let remainingEnd = clampedEnd;
+        
+        for (const list of allCasesLists) {
+          const textLen = list.textContent?.length || 0;
+          if (remainingStart <= textLen) {
+            targetEl = list;
+            break;
           }
-          if (
-            !foundEnd &&
-            this.savedCaretPosition.end >= charIndex &&
-            this.savedCaretPosition.end <= nextCharIndex
-          ) {
-            range.setEnd(node, this.savedCaretPosition.end - charIndex);
-            foundEnd = true;
-          }
-          charIndex = nextCharIndex;
-        } else {
-          let i = node.childNodes.length;
-          while (i--) {
-            nodeStack.push(node.childNodes[i]);
-          }
+          remainingStart -= textLen;
+          remainingEnd -= textLen;
+        }
+        
+        if (!targetEl && allCasesLists.length > 0) {
+          targetEl = allCasesLists[allCasesLists.length - 1];
+          remainingStart = targetEl.textContent?.length || 0;
+          remainingEnd = remainingStart;
+        }
+        
+        if (targetEl) {
+          this.restoreCaretInElement(targetEl, remainingStart, remainingEnd);
+        }
+      } else {
+        targetEl = this.el.nativeElement.querySelector(`[data-section="${section}"]`) as HTMLElement;
+        if (targetEl) {
+          const textLen = targetEl.textContent?.length || 0;
+          const clampedStart = Math.min(saved.start, textLen);
+          const clampedEnd = Math.min(saved.end, textLen);
+          this.restoreCaretInElement(targetEl, clampedStart, clampedEnd);
         }
       }
-
-      const sel = window.getSelection();
-      if (sel) {
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
+      
       this.savedCaretPosition = null;
+    }
+  }
+
+  private restoreCaretInElement(el: HTMLElement, start: number, end: number) {
+    let charIndex = 0;
+    const range = document.createRange();
+    range.setStart(el, 0);
+    range.collapse(true);
+    const nodeStack = [el];
+    let node,
+      foundStart = false,
+      foundEnd = false;
+
+    while (!foundEnd && (node = nodeStack.pop())) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const nextCharIndex = charIndex + (node.textContent?.length || 0);
+        if (
+          !foundStart &&
+          start >= charIndex &&
+          start <= nextCharIndex
+        ) {
+          range.setStart(node, start - charIndex);
+          foundStart = true;
+        }
+        if (
+          !foundEnd &&
+          end >= charIndex &&
+          end <= nextCharIndex
+        ) {
+          range.setEnd(node, end - charIndex);
+          foundEnd = true;
+        }
+        charIndex = nextCharIndex;
+      } else {
+        let i = node.childNodes.length;
+        while (i--) {
+          nodeStack.push(node.childNodes[i]);
+        }
+      }
+    }
+
+    // Fallback: Si no se encontró un nodo de texto pero el elemento tiene nodos hijos (ej. <p><br></p>)
+    if (!foundStart) {
+      const editables = el.querySelectorAll('p, li, div, span');
+      if (editables.length > 0) {
+        const lastEditable = editables[editables.length - 1] as HTMLElement;
+        range.setStart(lastEditable, 0);
+        range.collapse(true);
+      } else {
+        range.setStart(el, el.childNodes.length);
+        range.collapse(true);
+      }
+    }
+
+    const sel = window.getSelection();
+    if (sel) {
+      sel.removeAllRanges();
+      sel.addRange(range);
     }
   }
 
@@ -923,6 +1547,9 @@ export class ResueltoCanvasComponent
 
     this.activeElement = target;
     this.activeSection = target.getAttribute("data-section") || "";
+    
+    // Registrar estado antes de que el usuario comience a editar
+    this.saveHistoryState();
 
     if (
       this.activeSection &&
@@ -958,20 +1585,44 @@ export class ResueltoCanvasComponent
         this.basamentoLegalChange.emit(text || "");
       }
     }
+
+    // Registrar estado al perder foco para almacenar los cambios realizados
+    this.saveHistoryState();
   }
 
   onPaste(event: ClipboardEvent) {
-    // Evitar que el navegador pegue HTML con estilos (colores, fuentes, etc)
     event.preventDefault();
-
-    // Extraer solo texto plano del portapapeles
     const text = event.clipboardData?.getData("text/plain") || "";
-
-    // Insertarlo en el cursor usando execCommand para mantener el historial de Deshacer
-    document.execCommand("insertText", false, text);
-
-    // Emitir el cambio hacia arriba
     const target = event.target as HTMLElement;
-    this.basamentoLegalChange.emit(target.innerText || "");
+
+    // Insertar en la selección activa con Range API para evitar duplicados
+    const sel = window.getSelection();
+    let inserted = false;
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      if (target.contains(range.commonAncestorContainer)) {
+        range.deleteContents();
+        range.insertNode(document.createTextNode(text));
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        inserted = true;
+      }
+    }
+
+    if (!inserted) {
+      target.innerText = text;
+    }
+
+    if (target.classList.contains("m-resolucion-basamento")) {
+      if (this.documentData && this.documentData.body) {
+        const html = target.innerHTML;
+        this.documentData.body.basamentoLegal = html;
+        this.documentData.body.preamble = html;
+        this.basamentoLegalChange.emit(html || "");
+      }
+    }
+
+    this.saveHistoryState();
   }
 }

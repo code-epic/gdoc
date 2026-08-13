@@ -15,19 +15,77 @@
     <button class="btn btn-sm btn-outline-light mr-2" (mousedown)="$event.preventDefault(); formatText('underline')" title="Subrayado (Ctrl+U)"><i class="fas fa-underline"></i></button>
 
     <!-- Dropdown Alineación -->
-    <div class="dropdown d-inline-block mr-2" style="position: relative;">
-      <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="alignDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Alineación" (mousedown)="$event.preventDefault();">
+    <div class="dropdown d-inline-block mr-2" [class.show]="activeDropdown === 'align'" style="position: relative;">
+      <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="alignDropdown" aria-haspopup="true" aria-expanded="false" title="Alineación" (mousedown)="$event.preventDefault(); toggleDropdown('align', $event)">
         <i class="fas fa-align-left"></i>
       </button>
-      <div class="dropdown-menu shadow-sm" aria-labelledby="alignDropdown" style="min-width: auto; padding: 4px;">
-        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyLeft')" title="Alinear Izquierda"><i class="fas fa-align-left"></i> Izquierda</button>
-        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyCenter')" title="Centrar"><i class="fas fa-align-center"></i> Centrar</button>
-        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyRight')" title="Alinear Derecha"><i class="fas fa-align-right"></i> Derecha</button>
-        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyFull')" title="Justificar"><i class="fas fa-align-justify"></i> Justificar</button>
+      <div class="dropdown-menu shadow-sm" [class.show]="activeDropdown === 'align'" aria-labelledby="alignDropdown" style="min-width: auto; padding: 4px;">
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyLeft'); activeDropdown = ''" title="Alinear Izquierda"><i class="fas fa-align-left"></i> Izquierda</button>
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyCenter'); activeDropdown = ''" title="Centrar"><i class="fas fa-align-center"></i> Centrar</button>
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyRight'); activeDropdown = ''" title="Alinear Derecha"><i class="fas fa-align-right"></i> Derecha</button>
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyFull'); activeDropdown = ''" title="Justificar"><i class="fas fa-align-justify"></i> Justificar</button>
       </div>
     </div>
 
     <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('insertUnorderedList')" title="Lista Viñetas"><i class="fas fa-list-ul"></i></button>
+
+    <!-- Separator -->
+    <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
+
+    <!-- Dropdown Tamaño de Fuente por Selección -->
+    <div class="dropdown d-inline-block mr-2" [class.show]="activeDropdown === 'fontSize'" style="position: relative;">
+      <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="fontSizeDropdown" aria-haspopup="true" aria-expanded="false" title="Tamaño de Fuente por Selección" (mousedown)="$event.preventDefault(); toggleDropdown('fontSize', $event)">
+        <i class="fas fa-text-height"></i>
+      </button>
+      <div class="dropdown-menu shadow-sm" [class.show]="activeDropdown === 'fontSize'" aria-labelledby="fontSizeDropdown" style="min-width: auto; padding: 4px; z-index: 1050;">
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('9pt'); activeDropdown = ''">9pt</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('10pt'); activeDropdown = ''">10pt</button>
+        <button class="dropdown-item py-1 px-3 font-weight-bold" (mousedown)="$event.preventDefault(); applyFontSizeSelection('11pt'); activeDropdown = ''">11pt (Defecto)</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('12pt'); activeDropdown = ''">12pt</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('13pt'); activeDropdown = ''">13pt</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('14pt'); activeDropdown = ''">14pt</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('16pt'); activeDropdown = ''">16pt</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('18pt'); activeDropdown = ''">18pt</button>
+      </div>
+    </div>
+
+    <!-- Dropdown Interlineado por Selección -->
+    <div class="dropdown d-inline-block mr-2" [class.show]="activeDropdown === 'lineHeight'" style="position: relative;">
+      <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="lineHeightDropdownSel" aria-haspopup="true" aria-expanded="false" title="Interlineado por Selección" (mousedown)="$event.preventDefault(); toggleDropdown('lineHeight', $event)">
+        <i class="fas fa-arrows-alt-v"></i>
+      </button>
+      <div class="dropdown-menu shadow-sm" [class.show]="activeDropdown === 'lineHeight'" aria-labelledby="lineHeightDropdownSel" style="min-width: auto; padding: 4px; z-index: 1050;">
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('0.2'); activeDropdown = ''">0.2</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('0.5'); activeDropdown = ''">0.5</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('0.8'); activeDropdown = ''">0.8</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('1.0'); activeDropdown = ''">1.0 (Sencillo)</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('1.15'); activeDropdown = ''">1.15</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('1.3'); activeDropdown = ''">1.3</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('1.5'); activeDropdown = ''">1.5</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('2.0'); activeDropdown = ''">2.0 (Doble)</button>
+      </div>
+    </div>
+
+    <!-- Dropdown Ancho de Línea (Letter Spacing) por Selección -->
+    <div class="dropdown d-inline-block mr-2" [class.show]="activeDropdown === 'letterSpacing'" style="position: relative;">
+      <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="letterSpacingDropdown" aria-haspopup="true" aria-expanded="false" title="Ancho de Línea por Selección" (mousedown)="$event.preventDefault(); toggleDropdown('letterSpacing', $event)">
+        <i class="fas fa-arrows-alt-h"></i>
+      </button>
+      <div class="dropdown-menu shadow-sm" [class.show]="activeDropdown === 'letterSpacing'" aria-labelledby="letterSpacingDropdown" style="min-width: auto; padding: 4px; z-index: 1050;">
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('-0.5px'); activeDropdown = ''">Estrecho (-0.5px)</button>
+        <button class="dropdown-item py-1 px-3 font-weight-bold" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('normal'); activeDropdown = ''">Normal</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('0.5px'); activeDropdown = ''">Expandido (+0.5px)</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('1px'); activeDropdown = ''">Expandido (+1.0px)</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('1.5px'); activeDropdown = ''">Expandido (+1.5px)</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('2px'); activeDropdown = ''">Expandido (+2.0px)</button>
+      </div>
+    </div>
+
+    <!-- Controles de Sangría / Ancho de Fila o Línea -->
+    <button class="btn btn-sm btn-outline-light ml-2 mr-1" (mousedown)="$event.preventDefault(); widenLine()" title="Ampliar Ancho de Fila (Más Ancho)"><i class="fas fa-expand"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); narrowLine()" title="Disminuir Ancho de Fila (Más Estrecho)"><i class="fas fa-compress"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); decreaseIndentLeft()" title="Reducir Sangría Izquierda (Mover Izquierda)"><i class="fas fa-outdent"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); increaseIndentLeft()" title="Aumentar Sangría Izquierda (Mover Derecha)"><i class="fas fa-indent"></i></button>
 
     <!-- Separator -->
     <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
@@ -187,7 +245,7 @@
              style="position: absolute; bottom: 6px; left: 2px; width: 15mm; z-index: 1; pointer-events: none;">
 
         <!-- Iniciales (Media firma): 1 línea antes que la paginación -->
-        <div class="initials" style="position: relative; z-index: 2; font-size: 8pt; color: #000; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
+        <div class="initials" data-section="initials" style="position: relative; z-index: 2; font-size: 8pt; color: #000; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
              [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false"
              (click)="$event.stopPropagation()"
              (focus)="onFocusEditable($event)"

@@ -1,0 +1,97 @@
+<div class="rt-container" *ngIf="!activeDocument">
+  <!-- Header -->
+  <div class="rt-header">
+    <div class="rt-header-info">
+      <h1 class="rt-title">Buzón de Oficios</h1>
+      <p class="rt-subtitle">Gestor de Oficios y Radiogramas</p>
+    </div>
+    <div class="d-flex align-items-center">
+      <button class="rt-btn-close mr-3" (click)="nuevoDocumento()">
+        <i class="fas fa-plus"></i>
+        <span>Nuevo Documento</span>
+      </button>
+      <button class="rt-btn-close" (click)="exitComponent()">
+        <i class="fas fa-times-circle"></i>
+        <span>Cerrar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Layout principal -->
+  <div class="rt-layout">
+    <!-- Panel único: Documentos -->
+    <div class="rt-panel rt-panel-docs" style="flex: 1;">
+      
+      <div class="rt-docs-content">
+        <!-- Cabecera -->
+        <div class="rt-docs-header">
+          <div>
+            <h3>Oficios y Radiogramas</h3>
+            <span>{{ listadoDocumentos.length }} documentos</span>
+          </div>
+        </div>
+
+        <!-- Lista documentos -->
+        <div class="rt-docs-list" *ngIf="!loading">
+          <div class="rt-empty" *ngIf="listadoDocumentos.length === 0">
+            <i class="fas fa-info-circle"></i>
+            <span>El buzón está vacío</span>
+          </div>
+
+          <div class="rt-doc-row"
+               *ngFor="let doc of listadoDocumentos; let idx = index"
+               (click)="abrirDocumento(doc)">
+            <span class="rt-doc-number">{{ idx + 1 }}</span>
+            <div class="rt-doc-info">
+              <span class="rt-doc-name">Documento: {{ doc.numero_control }}</span>
+              <div class="rt-doc-meta">
+                <span><i class="fas fa-file-alt"></i> {{ doc.tipo }}</span>
+                <span><i class="fas fa-calendar-alt"></i> {{ doc.fecha_creacion | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+            <div class="rt-doc-actions">
+              <span class="badge" [ngClass]="{'badge-success': doc.estatus === 'MINISTRO', 'badge-info': doc.estatus !== 'MINISTRO'}">
+                {{ doc.estatus }}
+              </span>
+              <button class="rt-btn-action rt-btn-view" style="margin-left: 10px;" (click)="abrirDocumento(doc)" title="Ver / Editar">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VISTA EDITOR / INMERSIVA -->
+<div class="tinder-editor-container" *ngIf="activeDocument">
+  <div class="bg-white p-2 border-bottom d-flex justify-content-between align-items-center">
+    <div>
+      <button class="btn btn-sm btn-outline-secondary mr-3" (click)="cerrarDocumento()">
+        <i class="fas fa-arrow-left"></i> Volver al Buzón
+      </button>
+      <span class="font-weight-bold">{{ activeDocument.numero_control || 'Nuevo Documento' }}</span>
+      <span class="badge badge-primary ml-2">{{ activeDocument.tipo }}</span>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-sm" [class.btn-primary]="activeDocument.tipo === 'RADIOGRAMA'" [class.btn-outline-primary]="activeDocument.tipo !== 'RADIOGRAMA'" (click)="cambiarTipo('RADIOGRAMA')">Radiograma</button>
+      <button class="btn btn-sm" [class.btn-primary]="activeDocument.tipo === 'NORMAL'" [class.btn-outline-primary]="activeDocument.tipo !== 'NORMAL'" (click)="cambiarTipo('NORMAL')">Normal</button>
+    </div>
+  </div>
+
+  <div class="d-flex" style="height: calc(100vh - 60px); overflow: hidden;">
+    <!-- Lienzo -->
+    <div class="flex-grow-1" style="overflow-y: auto; background-color: #f5f6f8;">
+       <app-canvas-letter [documentData]="activeDocument" [profile]="activeDocument.estatus" [showSignaturesForPrint]="true">
+          <app-template-radiograma *ngIf="activeDocument.tipo === 'RADIOGRAMA'" [profile]="activeDocument.estatus" [documentData]="activeDocument"></app-template-radiograma>
+          <app-template-normal *ngIf="activeDocument.tipo === 'NORMAL'" [profile]="activeDocument.estatus" [documentData]="activeDocument"></app-template-normal>
+       </app-canvas-letter>
+    </div>
+    
+    <!-- Workflow Panel -->
+    <div class="workflow-sidebar" style="width: 350px; background: white; border-left: 1px solid #e9ecef; overflow-y: auto;">
+       <app-workflow-panel [document]="activeDocument"></app-workflow-panel>
+    </div>
+  </div>
+</div>
