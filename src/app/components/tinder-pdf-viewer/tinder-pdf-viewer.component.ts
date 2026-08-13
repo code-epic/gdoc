@@ -8,6 +8,7 @@ import {
   SimpleChanges,
   ChangeDetectorRef,
   ViewChild,
+  HostListener,
 } from "@angular/core";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import jsPDF from "jspdf";
@@ -67,6 +68,13 @@ export interface PdfAction {
   styleUrls: ["./tinder-pdf-viewer.component.scss"],
 })
 export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
+  @HostListener('window:keydown', ['$event'])
+  onWindowKeyDown(event: KeyboardEvent) {
+    const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+    if (isCtrlOrCmd && (event.key === '-' || event.key === '+' || event.key === '=' || event.key === '0')) {
+      event.preventDefault();
+    }
+  }
   /* ── Inputs ──────────────────────────────────────────── */
   @Input() documents: TinderDocument[] = [];
   @Input() startIndex = 0;

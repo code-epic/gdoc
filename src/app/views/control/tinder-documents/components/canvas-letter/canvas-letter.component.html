@@ -1,0 +1,157 @@
+<div class="canvas-toolbar">
+  <!-- Controles de Zoom -->
+  <button class="btn btn-sm btn-outline-light" (click)="zoomOut()" title="Alejar"><i class="fas fa-search-minus"></i></button>
+  <span class="zoom-level">{{ (zoomScale * 100) | number:'1.0-0' }}%</span>
+  <button class="btn btn-sm btn-outline-light" (click)="zoomIn()" title="Acercar"><i class="fas fa-search-plus"></i></button>
+  <button class="btn btn-sm btn-outline-light ml-2" (click)="autoFit()" title="Ajustar a pantalla"><i class="fas fa-expand-arrows-alt"></i></button>
+  
+  <!-- Separador y Controles de Edición/Formato (Solo TRANSCRIPTOR) -->
+  <ng-container *ngIf="profile === 'TRANSCRIPTOR'">
+    <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
+    
+    <!-- Formato de texto básico -->
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('bold')" title="Negrita (Ctrl+B)"><i class="fas fa-bold"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); formatText('italic')" title="Cursiva (Ctrl+I)"><i class="fas fa-italic"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-2" (mousedown)="$event.preventDefault(); formatText('underline')" title="Subrayado (Ctrl+U)"><i class="fas fa-underline"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-2" (mousedown)="$event.preventDefault(); textTransformUppercase()" title="Mayúsculas"><i class="fas fa-font"></i></button>
+
+    <!-- Dropdown de Alineación -->
+    <div class="dropdown d-inline-block mr-2" style="position: relative;">
+      <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="alignDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Alineación" (mousedown)="$event.preventDefault();">
+        <i class="fas fa-align-left"></i>
+      </button>
+      <div class="dropdown-menu shadow-sm" aria-labelledby="alignDropdown" style="min-width: auto; padding: 4px; z-index: 1050;">
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyLeft')" title="Alinear Izquierda"><i class="fas fa-align-left"></i> Izquierda</button>
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyCenter')" title="Centrar"><i class="fas fa-align-center"></i> Centrar</button>
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyRight')" title="Alinear Derecha"><i class="fas fa-align-right"></i> Derecha</button>
+        <button class="dropdown-item py-2 px-3" (mousedown)="$event.preventDefault(); formatText('justifyFull')" title="Justificar"><i class="fas fa-align-justify"></i> Justificar</button>
+      </div>
+    </div>
+
+    <!-- Dropdown de Tamaño de Fuente por Selección -->
+    <div class="dropdown d-inline-block mr-2" style="position: relative;">
+      <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="fontSizeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Tamaño de Fuente" (mousedown)="$event.preventDefault();">
+        <i class="fas fa-text-height"></i>
+      </button>
+      <div class="dropdown-menu shadow-sm" aria-labelledby="fontSizeDropdown" style="min-width: auto; padding: 4px; z-index: 1050;">
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('9pt')">9pt</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('10pt')">10pt</button>
+        <button class="dropdown-item py-1 px-3 font-weight-bold" (mousedown)="$event.preventDefault(); applyFontSizeSelection('11pt')">11pt (Defecto)</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('12pt')">12pt</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('14pt')">14pt</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('16pt')">16pt</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyFontSizeSelection('18pt')">18pt</button>
+      </div>
+    </div>
+
+    <!-- Dropdown de Interlineado por Selección -->
+    <div class="dropdown d-inline-block mr-2" style="position: relative;">
+      <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="lineHeightDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Interlineado por Selección" (mousedown)="$event.preventDefault();">
+        <i class="fas fa-arrows-alt-v"></i>
+      </button>
+      <div class="dropdown-menu shadow-sm" aria-labelledby="lineHeightDropdown" style="min-width: auto; padding: 4px; z-index: 1050;">
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('1.0')">1.0 (Sencillo)</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('1.15')">1.15</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('1.3')">1.3</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('1.5')">1.5</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLineSpacingSelection('2.0')">2.0 (Doble)</button>
+      </div>
+    </div>
+
+    <!-- Dropdown de Ancho de Línea (Letter Spacing) por Selección -->
+    <div class="dropdown d-inline-block mr-2" style="position: relative;">
+      <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="letterSpacingDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Ancho de Línea por Selección" (mousedown)="$event.preventDefault();">
+        <i class="fas fa-arrows-alt-h"></i>
+      </button>
+      <div class="dropdown-menu shadow-sm" aria-labelledby="letterSpacingDropdown" style="min-width: auto; padding: 4px; z-index: 1050;">
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('-0.5px')">Estrecho (-0.5px)</button>
+        <button class="dropdown-item py-1 px-3 font-weight-bold" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('normal')">Normal</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('0.5px')">Expandido (+0.5px)</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('1px')">Expandido (+1.0px)</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('1.5px')">Expandido (+1.5px)</button>
+        <button class="dropdown-item py-1 px-3" (mousedown)="$event.preventDefault(); applyLetterSpacingSelection('2px')">Expandido (+2.0px)</button>
+      </div>
+    </div>
+
+    <!-- Controles de Sangría / Ancho de Fila o Línea -->
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); widenLine()" title="Ampliar Ancho de Fila (Más Ancho)"><i class="fas fa-expand"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); narrowLine()" title="Disminuir Ancho de Fila (Más Estrecho)"><i class="fas fa-compress"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); decreaseIndentLeft()" title="Reducir Sangría Izquierda (Mover Izquierda)"><i class="fas fa-outdent"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-2" (mousedown)="$event.preventDefault(); increaseIndentLeft()" title="Aumentar Sangría Izquierda (Mover Derecha)"><i class="fas fa-indent"></i></button>
+
+    <!-- Lista de viñetas -->
+    <button class="btn btn-sm btn-outline-light mr-2" (mousedown)="$event.preventDefault(); formatText('insertUnorderedList')" title="Lista Viñetas"><i class="fas fa-list-ul"></i></button>
+
+    <!-- Separador y Márgenes -->
+    <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
+    
+    <div class="margin-controls d-flex align-items-center" title="Márgenes (Arriba, Abajo, Izquierda, Derecha) en mm">
+      <i class="fas fa-crop-alt mx-1" title="Ajuste de Márgenes"></i>
+      <input type="number" class="form-control form-control-sm mx-1 text-center font-weight-bold" style="width: 55px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3);" [value]="documentData?.margins?.top || 10" (input)="updateMargin('top', $event)" title="Margen Superior (mm)" step="1">
+      <input type="number" class="form-control form-control-sm mx-1 text-center font-weight-bold" style="width: 55px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3);" [value]="documentData?.margins?.bottom || 10" (input)="updateMargin('bottom', $event)" title="Margen Inferior (mm)" step="1">
+      <input type="number" class="form-control form-control-sm mx-1 text-center font-weight-bold" style="width: 55px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3);" [value]="documentData?.margins?.left || 10" (input)="updateMargin('left', $event)" title="Margen Izquierdo (mm)" step="1">
+      <input type="number" class="form-control form-control-sm mx-1 text-center font-weight-bold" style="width: 55px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3);" [value]="documentData?.margins?.right || 10" (input)="updateMargin('right', $event)" title="Margen Derecho (mm)" step="1">
+    </div>
+  </ng-container>
+
+  <!-- Botones de Impresión y Exportación -->
+  <div class="ml-auto d-flex align-items-center">
+    <button class="btn btn-sm btn-primary mr-2 shadow-sm font-weight-bold" (click)="exportPDF()" title="Descargar PDF">
+      <i class="fas fa-file-pdf"></i> Descargar PDF
+    </button>
+    <button class="btn btn-sm btn-success shadow-sm font-weight-bold" (click)="printPDF()" title="Imprimir documento">
+      <i class="fas fa-print"></i> Imprimir
+    </button>
+  </div>
+</div>
+
+<div class="letter-canvas-container" [style.transform]="'scale(' + zoomScale + ')'">
+  <div class="letter-canvas" 
+       [style.padding-top.mm]="documentData?.margins?.top || 10"
+       [style.padding-right.mm]="documentData?.margins?.right || 10"
+       [style.padding-bottom.mm]="documentData?.margins?.bottom || 10"
+       [style.padding-left.mm]="documentData?.margins?.left || 10"
+       [style.line-height]="documentData?.lineSpacing || 1.15">
+    
+    <!-- Contenido Dinámico (Radiograma o Normal) -->
+    <div class="doc-content">
+      <ng-content></ng-content>
+    </div>
+
+    <!-- Footer Fijo: Firma Centrada y Datos Fecha/Hora -->
+    <div class="relative-page-footer">
+      <!-- Firma Centrada -->
+      <div class="firma-centrada-container">
+        <!-- Z-Index 1: Sello Húmedo -->
+        <img *ngIf="showSignaturesForPrint && documentData?.signatures?.wetStampImageUrl" 
+             [src]="documentData.signatures.wetStampImageUrl" 
+             class="wet-stamp-layer" alt="Sello Húmedo">
+
+        <!-- Z-Index 2: Firma Imagen -->
+        <img *ngIf="showSignaturesForPrint && documentData?.signatures?.signatureImageUrl" 
+             [src]="documentData.signatures.signatureImageUrl" 
+             class="signature-layer" alt="Firma Autoridad">
+             
+        <!-- Textos de firma -->
+        <div class="signatory-info" *ngIf="documentData?.signatures">
+          <p [attr.contenteditable]="profile === 'TRANSCRIPTOR' ? 'true' : 'false'" spellcheck="false" 
+             (input)="documentData.signatures.mainSignatory = $any($event.target).innerText" 
+             [innerText]="documentData.signatures.mainSignatory || 'GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ'"></p>
+          <p [attr.contenteditable]="profile === 'TRANSCRIPTOR' ? 'true' : 'false'" spellcheck="false" 
+             (input)="documentData.signatures.signatoryTitle = $any($event.target).innerText" 
+             [innerText]="documentData.signatures.signatoryTitle || 'GENERAL EN JEFE'"></p>
+          <p [attr.contenteditable]="profile === 'TRANSCRIPTOR' ? 'true' : 'false'" spellcheck="false" 
+             (input)="documentData.signatures.signatoryRole = $any($event.target).innerHTML" 
+             [innerHTML]="documentData.signatures.signatoryRole || 'MINISTRO DEL PODER POPULAR PARA LA DEFENSA'"></p>
+        </div>
+      </div>
+
+      <!-- Pie de página de información (Paginador y Fecha/Hora) -->
+      <div class="page-footer-info">
+        <span class="page-number">Página 1 de 1</span>
+        <span class="print-date">{{ currentDateTime | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+      </div>
+    </div>
+
+  </div>
+</div>

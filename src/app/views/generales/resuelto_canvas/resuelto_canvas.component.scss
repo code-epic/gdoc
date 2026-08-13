@@ -70,11 +70,27 @@
   ::ng-deep p {
     margin: 0;
     padding: 0 6px 0 0; /* 0 vertical, 6px derecha, 0 izquierda para no dañar los saltos de página ni la altura */
-    font-weight: normal !important; /* Neutraliza el font-weight: 300 global incluso en innerHTML */
+    /* font-weight se gestiona en cada sección individual para no bloquear spans inline */
+  }
+
+  /* Regla base para fuente normal en secciones de documento (no !important para permitir herencia) */
+  ::ng-deep .m-resolucion-basamento p,
+  ::ng-deep .m-resolucion-unico p,
+  ::ng-deep .cases-list p {
+    font-weight: normal;
   }
 
   ::ng-deep strong, ::ng-deep b {
     font-weight: bold !important; /* Asegura que las negritas funcionen sin importar el padre */
+  }
+
+  /* Spans inline de selección: permiten sobreescribir line-height y font-size libremente */
+  ::ng-deep .m-resolucion-basamento span,
+  ::ng-deep .m-resolucion-unico span,
+  ::ng-deep .cases-list span {
+    /* Sin !important para que el style="line-height:X; font-size:Y" inline tenga prioridad */
+    line-height: inherit;
+    font-size: inherit;
   }
 
   /* ==============================================================
@@ -123,12 +139,18 @@
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
     text-align: justify !important;
-    line-height: 1.75; /* Word 1.75 */
+    line-height: 1.75; /* Word 1.75 — valor por defecto, sobreescribible por selección */
     margin-top: 13pt !important;
     text-indent: 1cm !important;
     
-    ::ng-deep p, ::ng-deep div, ::ng-deep span {
+    /* Permitir que los spans de selección hereden y sobreescriban */
+    ::ng-deep p, ::ng-deep div {
       line-height: inherit;
+      font-size: inherit;
+    }
+    /* Los spans creados por applySelectionStyle aplican style inline — no bloquear */
+    ::ng-deep span {
+      /* line-height y font-size se leen del atributo style inline */
     }
   }
 
@@ -136,11 +158,16 @@
     font-family: 'Tahoma', sans-serif !important;
     font-size: 13pt !important;
     text-align: justify !important;
-    line-height: 1.35; /* Word 1.15 */
+    line-height: 1.35; /* valor por defecto, sobreescribible por selección */
     margin-top: 13pt !important;
     
-    ::ng-deep p, ::ng-deep div, ::ng-deep span {
+    /* Permitir que los spans de selección hereden y sobreescriban */
+    ::ng-deep p, ::ng-deep div {
       line-height: inherit;
+      font-size: inherit;
+    }
+    ::ng-deep span {
+      /* line-height y font-size se leen del atributo style inline */
     }
   }
 
@@ -234,8 +261,15 @@
       display: inline-block;
     }
 
+    /* Los <p> heredan el line-height del contenedor; los <span> de selección aplican el suyo propio */
     ::ng-deep p {
-      line-height: inherit; /* Allow parent line-height to cascade */
+      line-height: inherit;
+      font-size: inherit;
+    }
+
+    /* Spans de selección: sus estilos inline (line-height, font-size) tienen prioridad total */
+    ::ng-deep span {
+      /* No se fuerza nada aquí — el style inline del span ganará sobre inherit */
     }
 
     ::ng-deep ul {

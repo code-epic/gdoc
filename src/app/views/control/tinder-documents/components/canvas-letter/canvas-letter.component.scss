@@ -1,0 +1,132 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+  background-color: transparent;
+}
+
+.canvas-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  background: #172b4d;
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  
+  .zoom-level {
+    margin: 0 15px;
+    font-weight: 600;
+    min-width: 45px;
+    text-align: center;
+    color: white;
+  }
+}
+
+.letter-canvas-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  min-height: 100%;
+  transform-origin: top center;
+  transition: transform 0.2s ease;
+}
+
+.letter-canvas {
+  width: 215.9mm;
+  min-height: 279.4mm; /* Carta */
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 1px dashed #ced4da;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  
+  font-family: 'Bookman Old Style', serif;
+  color: #000;
+
+  .doc-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Footer pegado abajo */
+.relative-page-footer {
+  margin-top: auto;
+  padding-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.firma-centrada-container {
+  position: relative;
+  text-align: center;
+  margin-bottom: 20px;
+  width: 100%;
+
+  .wet-stamp-layer {
+    position: absolute;
+    top: -20mm;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    opacity: 0.85;
+    width: 50mm;
+    height: 50mm;
+  }
+
+  .signature-layer {
+    position: absolute;
+    bottom: calc(100% - 15mm);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    width: 120mm;
+    max-width: none;
+    pointer-events: none;
+  }
+
+  .signatory-info {
+    position: relative;
+    z-index: 3;
+    p {
+      margin: 0;
+      font-size: 11pt;
+      line-height: 1.15;
+      font-weight: bold;
+      outline: none;
+      
+      &:first-child {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.page-footer-info {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 8pt;
+  color: #8898aa;
+  border-top: 1px solid #e9ecef;
+  padding-top: 5px;
+}

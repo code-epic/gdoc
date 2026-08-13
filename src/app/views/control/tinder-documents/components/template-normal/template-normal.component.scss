@@ -1,0 +1,18 @@
+.normal-template-container {
+  width: 100%;
+  font-family: 'Bookman Old Style', serif;
+  outline: none;
+}
+
+.fixed-fields {
+  font-size: 11pt;
+  .border-bottom {
+    border-bottom: 1px solid #000 !important;
+  }
+}
+
+.content-area {
+  p {
+    margin-bottom: 10px;
+  }
+}
