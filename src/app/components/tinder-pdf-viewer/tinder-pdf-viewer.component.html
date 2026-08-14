@@ -182,9 +182,8 @@
           <!-- Si hay múltiples documentos agrupados -->
           <ng-container *ngIf="activeDoc.documentos && activeDoc.documentos.length > 0">
             <div class="explorador-list">
-              <div class="explorador-item" *ngFor="let caso of activeDoc.documentos"
-                   [class.clickable]="caso.digital || caso.anom"
-                   (click)="(caso.digital || caso.anom) ? obtenerWFD(caso) : null">
+              <div class="explorador-item clickable" *ngFor="let caso of activeDoc.documentos"
+                   (click)="obtenerWFD(caso)">
                 <div class="ei-avatar">
                   <i class="fas fa-user"></i>
                 </div>
@@ -192,9 +191,9 @@
                   <div class="ei-name">{{ (caso.nombres_apellidos || caso.nombres + ' ' + caso.apellidos) | uppercase }}</div>
                   <div class="ei-details">C.I: {{ caso.cedula }}</div>
                   <div class="ei-details" style="font-size: 0.75rem;">{{ caso.grado || 'S/G' }} - {{ caso.componente || 'S/C' }}</div>
-                  <div class="ei-details" *ngIf="caso.digital || caso.anom" style="font-size: 0.75rem; color: #80cbc4;">
+                  <!-- <div class="ei-details" *ngIf="caso.digital || caso.anom" style="font-size: 0.75rem; color: #80cbc4;">
                     <i class="fas fa-file-pdf"></i> {{  caso.anom }}
-                  </div>
+                  </div> -->
                 </div>
                 <div class="ei-actions" *ngIf="caso.digital || caso.anom">
                   <button type="button" class="ei-view-details-btn" title="Ver Detalles y PDF">
@@ -208,9 +207,8 @@
           <!-- Si es un solo documento (sin agrupar) -->
           <ng-container *ngIf="!activeDoc.documentos || activeDoc.documentos.length === 0">
             <div class="explorador-list">
-              <div class="explorador-item"
-                   [class.clickable]="activeDoc.digital || activeDoc.anom"
-                   (click)="(activeDoc.digital || activeDoc.anom) ? obtenerWFD(activeDoc) : null">
+              <div class="explorador-item clickable"
+                   (click)="obtenerWFD(activeDoc)">
                 <div class="ei-avatar">
                   <i class="fas fa-user"></i>
                 </div>
@@ -506,12 +504,11 @@
       <button type="button" class="btn btn-secondary shadow-sm" (click)="closeDetailsModal()">Cerrar</button>
       
       <!-- Option to view/download PDF -->
-      <a *ngIf="selectedCase && (selectedCase.anom || selectedCase.digital)"
-         [href]="getCasePdfUrl(selectedCase)" 
-         target="_blank" 
+      <button *ngIf="selectedCase"
+         (click)="verPdf(selectedCase)" 
          class="btn btn-success ml-2 tpv-btn-pdf-view shadow-sm">
         <i class="fas fa-file-pdf mr-1"></i> Ver PDF en Nueva Pestaña
-      </a>
+      </button>
     </div>
   </div>
 </div>

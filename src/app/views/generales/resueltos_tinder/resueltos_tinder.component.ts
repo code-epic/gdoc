@@ -333,11 +333,8 @@ export class ResueltosTinderComponent implements OnInit, OnDestroy {
 
   // ── Resolvedor de PDF ─────────────────────────────────
   public resolvePdfUrl = (doc: any): string => {
-    // if (!this.activar_pdf) {
-    //   return "assets/000643.pdf";
-    // }
-    const ncontrol = doc.ncontrol || doc.numc || "0";
-    const archivo = doc.archivo || doc.anom || "";
+    const ncontrol = doc.ncontrol;
+    const archivo = doc.anom;
     if (!archivo) return "";
     const peticion = btoa("D" + ncontrol) + "/" + archivo;
     return this.apiService.URL + "dws/" + peticion;

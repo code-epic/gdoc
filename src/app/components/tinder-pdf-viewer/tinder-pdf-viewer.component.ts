@@ -1909,37 +1909,28 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   }
 
   public getCasePdfUrl(caso: any): string {
-    if (!caso) return "";
-
-    if (this.pdfUrlResolver) {
-      const tempDoc: any = {
-        ncontrol:
-          caso.ncontrol ||
-          caso.numc ||
-          this.activeDoc?.ncontrol ||
-          this.activeDoc?.numc ||
-          "0",
-        numc:
-          caso.numc ||
-          caso.ncontrol ||
-          this.activeDoc?.numc ||
-          this.activeDoc?.ncontrol ||
-          "0",
-        archivo: caso.anom || caso.digital || caso.archivo || "",
-        anom: caso.anom || caso.digital || caso.archivo || "",
-      };
-      return this.pdfUrlResolver(tempDoc);
-    }
-
-    const ncontrol =
-      caso.ncontrol ||
-      caso.numc ||
-      this.activeDoc?.ncontrol ||
-      this.activeDoc?.numc ||
-      "0";
-    const archivo = caso.anom || caso.digital || caso.archivo || "";
+    const ncontrol = caso.ncontrol;
+    const archivo = caso.anom;
     if (!archivo) return "";
     return this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
+  }
+
+  public verPdf(caso: any) {
+    if (!caso) return;
+    const archivo = caso.anom;
+    if (!archivo || archivo.trim() === "") {
+      Swal.fire({
+        title: "Atención",
+        text: "El documento digital PDF no ha sido cargado en el sistema.",
+        icon: "warning",
+        confirmButtonColor: "#3a86c8",
+        confirmButtonText: "Aceptar",
+      });
+      return;
+    }
+    const ncontrol = caso.ncontrol;
+    const url = this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
+    window.open(url, "_blank");
   }
 
   get pendingCommentsCount(): number {

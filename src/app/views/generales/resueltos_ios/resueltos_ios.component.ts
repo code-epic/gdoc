@@ -1,4 +1,10 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectorRef,
+  HostListener,
+} from "@angular/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
@@ -22,10 +28,16 @@ import Swal from "sweetalert2";
   styleUrls: ["./resueltos_ios.component.scss"],
 })
 export class ResueltosIosComponent implements OnInit, OnDestroy {
-  @HostListener('window:keydown', ['$event'])
+  @HostListener("window:keydown", ["$event"])
   onWindowKeyDown(event: KeyboardEvent) {
     const isCtrlOrCmd = event.ctrlKey || event.metaKey;
-    if (isCtrlOrCmd && (event.key === '-' || event.key === '+' || event.key === '=' || event.key === '0')) {
+    if (
+      isCtrlOrCmd &&
+      (event.key === "-" ||
+        event.key === "+" ||
+        event.key === "=" ||
+        event.key === "0")
+    ) {
       event.preventDefault();
     }
   }
@@ -447,9 +459,6 @@ export class ResueltosIosComponent implements OnInit, OnDestroy {
   }
 
   private resolvePdfUrl(doc: any): string {
-    if (!this.activar_pdf) {
-      return "assets/000643.pdf";
-    }
     const ncontrol = doc.ncontrol || doc.numc || "0";
     const archivo = doc.archivo || doc.anom || "";
     if (!archivo) return "";

@@ -27,10 +27,16 @@ import {
   styleUrls: ["./resueltos_ok.component.scss"],
 })
 export class ResueltosOkComponent implements OnInit, OnDestroy {
-  @HostListener('window:keydown', ['$event'])
+  @HostListener("window:keydown", ["$event"])
   onWindowKeyDown(event: KeyboardEvent) {
     const isCtrlOrCmd = event.ctrlKey || event.metaKey;
-    if (isCtrlOrCmd && (event.key === '-' || event.key === '+' || event.key === '=' || event.key === '0')) {
+    if (
+      isCtrlOrCmd &&
+      (event.key === "-" ||
+        event.key === "+" ||
+        event.key === "=" ||
+        event.key === "0")
+    ) {
       event.preventDefault();
     }
   }
@@ -145,10 +151,9 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   };
 
   public resolvePdfUrl = (doc: any): string => {
-    const activar_pdf = (this as any).activar_pdf;
-    if (!activar_pdf) {
-      return "assets/000643.pdf";
-    }
+    // const activar_pdf = (this as any).activar_pdf;
+    // if (!activar_pdf) {
+    // }
     const ncontrol = doc.ncontrol || doc.numc || "0";
     const archivo = doc.archivo || doc.anom || "";
     if (!archivo) {
