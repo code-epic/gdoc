@@ -182,6 +182,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   public nuevo_numero_resuelto: string = "";
 
+  public NombreArchivo: string = "";
+
   constructor(
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
@@ -1806,19 +1808,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       (data) => {
         if (data && data.Cuerpo && data.Cuerpo.length > 0) {
           const e = data.Cuerpo[0];
-          this.openDetailsModal(caso, e.wfd);
-        } else {
-          console.warn(
-            "No se encontró wfd en WKF_CObtenerWFD, usando identificador directo...",
-          );
-          const directId =
-            caso.documento ||
-            caso.idd ||
-            caso.id ||
-            caso.numc ||
-            caso.ncontrol ||
-            "0";
-          this.openDetailsModal(caso, directId);
+          this.NombreArchivo = e.anom;
+          this.openDetailsModal(caso, e.wfd, this.NombreArchivo);
         }
       },
       (error) => {
@@ -1826,19 +1817,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           "Error al consultar obtenerWFD, intentando con identificador directo:",
           error,
         );
-        const directId =
-          caso.documento ||
-          caso.idd ||
-          caso.id ||
-          caso.numc ||
-          caso.ncontrol ||
-          "0";
-        this.openDetailsModal(caso, directId);
       },
     );
   }
 
-  public openDetailsModal(caso: any, idwkf: string) {
+  public openDetailsModal(caso: any, idwkf: string, archivo: string) {
     this.selectedCase = caso;
     this.showDetailsModal = true;
     this.loadingDetails = true;
@@ -1908,16 +1891,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  public getCasePdfUrl(caso: any): string {
-    const ncontrol = caso.ncontrol;
-    const archivo = caso.anom;
-    if (!archivo) return "";
-    return this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
-  }
-
   public verPdf(caso: any) {
     if (!caso) return;
-    const archivo = caso.anom;
+    const archivo = this.NombreArchivo;
     if (!archivo || archivo.trim() === "") {
       Swal.fire({
         title: "Atención",
@@ -1928,6 +1904,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       });
       return;
     }
+    console.log(this.NombreArchivo);
     const ncontrol = caso.ncontrol;
     const url = this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
     window.open(url, "_blank");
