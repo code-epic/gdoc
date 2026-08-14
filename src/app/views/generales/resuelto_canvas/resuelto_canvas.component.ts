@@ -32,32 +32,38 @@ export class ResueltoCanvasComponent
   private maxHistorySize = 50;
   private isApplyingHistory = false;
 
-  @HostListener('window:keydown', ['$event'])
+  @HostListener("window:keydown", ["$event"])
   onWindowKeyDown(event: KeyboardEvent) {
     const isCtrlOrCmd = event.ctrlKey || event.metaKey;
-    
+
     // 1. Bloquear Zoom
-    if (isCtrlOrCmd && (event.key === '-' || event.key === '+' || event.key === '=' || event.key === '0')) {
+    if (
+      isCtrlOrCmd &&
+      (event.key === "-" ||
+        event.key === "+" ||
+        event.key === "=" ||
+        event.key === "0")
+    ) {
       event.preventDefault();
       return;
     }
 
     // 2. Control Z / Undo
-    if (isCtrlOrCmd && !event.shiftKey && event.key.toLowerCase() === 'z') {
+    if (isCtrlOrCmd && !event.shiftKey && event.key.toLowerCase() === "z") {
       event.preventDefault();
       this.undo();
       return;
     }
 
     // 3. Control Shift Z / Redo
-    if (isCtrlOrCmd && event.shiftKey && event.key.toLowerCase() === 'z') {
+    if (isCtrlOrCmd && event.shiftKey && event.key.toLowerCase() === "z") {
       event.preventDefault();
       this.redo();
       return;
     }
 
     // 4. Control Y / Redo (Alternativo Windows)
-    if (isCtrlOrCmd && event.key.toLowerCase() === 'y') {
+    if (isCtrlOrCmd && event.key.toLowerCase() === "y") {
       event.preventDefault();
       this.redo();
       return;
@@ -192,7 +198,7 @@ export class ResueltoCanvasComponent
         };
       }
       this.updateSafeHtmls();
-      
+
       // Forzar repaginación automática tras cargar los datos y renderizar el DOM
       setTimeout(() => {
         if (!this.isPaginating) {
@@ -247,7 +253,10 @@ export class ResueltoCanvasComponent
     while (node) {
       if (node.nodeType === Node.ELEMENT_NODE) {
         const el = node as HTMLElement;
-        if (el.hasAttribute('contenteditable') || el.classList.contains('cases-list')) {
+        if (
+          el.hasAttribute("contenteditable") ||
+          el.classList.contains("cases-list")
+        ) {
           rootEditable = el;
           break;
         }
@@ -258,8 +267,10 @@ export class ResueltoCanvasComponent
     if (!rootEditable) return [];
 
     // Solo apuntamos a elementos de bloque específicos (excluimos divs y spans contenedores)
-    const allBlocks = Array.from(rootEditable.querySelectorAll('p, li, h1, h2, h3')) as HTMLElement[];
-    
+    const allBlocks = Array.from(
+      rootEditable.querySelectorAll("p, li, h1, h2, h3"),
+    ) as HTMLElement[];
+
     // Filtrar bloques que intersectan con el rango de selección
     allBlocks.forEach((block) => {
       if (selection.containsNode(block, true)) {
@@ -273,7 +284,9 @@ export class ResueltoCanvasComponent
       while (node) {
         if (node.nodeType === Node.ELEMENT_NODE) {
           const el = node as HTMLElement;
-          if (['p', 'li', 'h1', 'h2', 'h3'].includes(el.tagName.toLowerCase())) {
+          if (
+            ["p", "li", "h1", "h2", "h3"].includes(el.tagName.toLowerCase())
+          ) {
             blocks.push(el);
             break;
           }
@@ -290,10 +303,13 @@ export class ResueltoCanvasComponent
     if (!element) return;
 
     // 1. Limpiar spans vacíos o redundantes
-    const spans = Array.from(element.querySelectorAll('span')) as HTMLElement[];
+    const spans = Array.from(element.querySelectorAll("span")) as HTMLElement[];
     spans.forEach((span) => {
       // Si el span no tiene contenido ni hijos, removerlo
-      if (span.childNodes.length === 0 || (span.textContent === '' && span.querySelectorAll('*').length === 0)) {
+      if (
+        span.childNodes.length === 0 ||
+        (span.textContent === "" && span.querySelectorAll("*").length === 0)
+      ) {
         span.parentNode?.removeChild(span);
         return;
       }
@@ -314,8 +330,10 @@ export class ResueltoCanvasComponent
     element.normalize();
 
     // 3. Fusionar spans adyacentes que tengan exactamente el mismo estilo
-    const containers = Array.from(element.querySelectorAll('p, li, h1, h2, h3')) as HTMLElement[];
-    if (['p', 'li', 'h1', 'h2', 'h3'].includes(element.tagName.toLowerCase())) {
+    const containers = Array.from(
+      element.querySelectorAll("p, li, h1, h2, h3"),
+    ) as HTMLElement[];
+    if (["p", "li", "h1", "h2", "h3"].includes(element.tagName.toLowerCase())) {
       containers.push(element);
     }
 
@@ -323,13 +341,17 @@ export class ResueltoCanvasComponent
       let child = container.firstChild;
       while (child) {
         let next = child.nextSibling;
-        if (child.nodeType === Node.ELEMENT_NODE && next && next.nodeType === Node.ELEMENT_NODE) {
+        if (
+          child.nodeType === Node.ELEMENT_NODE &&
+          next &&
+          next.nodeType === Node.ELEMENT_NODE
+        ) {
           const el1 = child as HTMLElement;
           const el2 = next as HTMLElement;
 
           if (
-            el1.tagName.toLowerCase() === 'span' &&
-            el2.tagName.toLowerCase() === 'span' &&
+            el1.tagName.toLowerCase() === "span" &&
+            el2.tagName.toLowerCase() === "span" &&
             el1.style.cssText === el2.style.cssText &&
             !el1.className &&
             !el2.className
@@ -361,7 +383,7 @@ export class ResueltoCanvasComponent
     // Caso 1: Hay texto seleccionado
     if (!selection.isCollapsed) {
       const range = selection.getRangeAt(0);
-      
+
       const startContainer = range.startContainer;
       const startOffset = range.startOffset;
       const endContainer = range.endContainer;
@@ -369,13 +391,16 @@ export class ResueltoCanvasComponent
 
       const textNodes: Text[] = [];
       const commonAncestor = range.commonAncestorContainer;
-      
+
       // Encontrar el contenedor contenteditable
       let node: Node | null = commonAncestor;
       while (node) {
         if (node.nodeType === Node.ELEMENT_NODE) {
           const el = node as HTMLElement;
-          if (el.hasAttribute('contenteditable') || el.classList.contains('cases-list')) {
+          if (
+            el.hasAttribute("contenteditable") ||
+            el.classList.contains("cases-list")
+          ) {
             targetEditable = el;
             break;
           }
@@ -393,8 +418,8 @@ export class ResueltoCanvasComponent
               return NodeFilter.FILTER_ACCEPT;
             }
             return NodeFilter.FILTER_REJECT;
-          }
-        }
+          },
+        },
       );
 
       if (commonAncestor.nodeType === Node.TEXT_NODE) {
@@ -439,10 +464,15 @@ export class ResueltoCanvasComponent
           }
 
           const parent = targetNode.parentNode as HTMLElement;
-          if (parent && parent.tagName.toLowerCase() === 'span' && parent.childNodes.length === 1 && !parent.className) {
+          if (
+            parent &&
+            parent.tagName.toLowerCase() === "span" &&
+            parent.childNodes.length === 1 &&
+            !parent.className
+          ) {
             parent.style[property as any] = value;
           } else {
-            const span = document.createElement('span');
+            const span = document.createElement("span");
             span.style[property as any] = value;
             parent.insertBefore(span, targetNode);
             span.appendChild(targetNode);
@@ -452,7 +482,7 @@ export class ResueltoCanvasComponent
         // Limpiar selección para asegurar consistencia
         selection.removeAllRanges();
       }
-    } 
+    }
     // Caso 2: Cursor colapsado, aplicamos al bloque específico más cercano
     else {
       let node: Node | null = selection.anchorNode;
@@ -461,7 +491,7 @@ export class ResueltoCanvasComponent
           const el = node as HTMLElement;
           const tagName = el.tagName.toLowerCase();
           // Solo aplicar a elementos de bloque reales, no a divs contenedores generales
-          if (['p', 'li', 'h1', 'h2', 'h3'].includes(tagName)) {
+          if (["p", "li", "h1", "h2", "h3"].includes(tagName)) {
             el.style[property as any] = value;
             targetEditable = el;
             break;
@@ -498,10 +528,10 @@ export class ResueltoCanvasComponent
    */
   syncDOMToModel() {
     if (!this.documentData || !this.documentData.pages) return;
-    const canvases = this.el.nativeElement.querySelectorAll('.a4-canvas');
+    const canvases = this.el.nativeElement.querySelectorAll(".a4-canvas");
     canvases.forEach((canvas: HTMLElement, idx: number) => {
       if (!this.documentData.pages[idx]) return;
-      const casesList = canvas.querySelector('.cases-list') as HTMLElement;
+      const casesList = canvas.querySelector(".cases-list") as HTMLElement;
       if (casesList) {
         this.cleanAndConsolidateDOM(casesList);
         const html = casesList.innerHTML;
@@ -512,9 +542,13 @@ export class ResueltoCanvasComponent
     });
 
     // También capturar basamento y unico del primer canvas (solo aparecen en página 0)
-    const firstCanvas = this.el.nativeElement.querySelector('.a4-canvas') as HTMLElement | null;
+    const firstCanvas = this.el.nativeElement.querySelector(
+      ".a4-canvas",
+    ) as HTMLElement | null;
     if (firstCanvas && this.documentData.body) {
-      const basamentoEl = firstCanvas.querySelector('[data-section="basamento"]') as HTMLElement | null;
+      const basamentoEl = firstCanvas.querySelector(
+        '[data-section="basamento"]',
+      ) as HTMLElement | null;
       if (basamentoEl) {
         this.cleanAndConsolidateDOM(basamentoEl);
         const html = basamentoEl.innerHTML;
@@ -523,7 +557,9 @@ export class ResueltoCanvasComponent
         this.basamentoLegalChange.emit(html);
       }
 
-      const unicoEl = firstCanvas.querySelector('[data-section="unico"]') as HTMLElement | null;
+      const unicoEl = firstCanvas.querySelector(
+        '[data-section="unico"]',
+      ) as HTMLElement | null;
       if (unicoEl) {
         this.cleanAndConsolidateDOM(unicoEl);
         const html = unicoEl.innerHTML;
@@ -535,36 +571,41 @@ export class ResueltoCanvasComponent
   }
 
   applyFontSizeSelection(size: string) {
-    this.applySelectionStyle('fontSize', size);
+    this.applySelectionStyle("fontSize", size);
   }
 
   applyLineSpacingSelection(spacing: string) {
     // El interlineado (lineHeight) es un estilo a nivel de párrafo/bloque.
     // Lo aplicamos directamente a los bloques seleccionados para un resultado óptimo.
-    this.applyBlockStyle('lineHeight', spacing);
+    this.applyBlockStyle("lineHeight", spacing);
   }
 
   applyLetterSpacingSelection(spacing: string) {
-    this.applySelectionStyle('letterSpacing', spacing);
+    this.applySelectionStyle("letterSpacing", spacing);
   }
 
-  adjustBlockPadding(property: 'paddingLeft' | 'paddingRight', delta: number, skipEmit = false) {
+  adjustBlockPadding(
+    property: "paddingLeft" | "paddingRight",
+    delta: number,
+    skipEmit = false,
+  ) {
     const blocks = this.getSelectedBlocks();
-    
+
     blocks.forEach((el) => {
-      const currentVal = parseFloat(window.getComputedStyle(el)[property as any]) || 0;
+      const currentVal =
+        parseFloat(window.getComputedStyle(el)[property as any]) || 0;
       const inlineStyle = el.style[property as any];
       let val = 0;
-      if (inlineStyle.endsWith('mm')) {
+      if (inlineStyle.endsWith("mm")) {
         val = parseFloat(inlineStyle);
-      } else if (inlineStyle.endsWith('px')) {
+      } else if (inlineStyle.endsWith("px")) {
         val = parseFloat(inlineStyle) * 0.264583;
       } else {
         val = currentVal * 0.264583;
       }
-      
+
       const newVal = Math.max(0, val + delta);
-      el.style[property as any] = newVal === 0 ? '' : `${newVal}mm`;
+      el.style[property as any] = newVal === 0 ? "" : `${newVal}mm`;
     });
 
     if (!skipEmit) {
@@ -573,22 +614,30 @@ export class ResueltoCanvasComponent
     }
   }
 
-  increaseIndentLeft() { this.adjustBlockPadding('paddingLeft', 5); }
-  decreaseIndentLeft() { this.adjustBlockPadding('paddingLeft', -5); }
-  increaseIndentRight() { this.adjustBlockPadding('paddingRight', 5); }
-  decreaseIndentRight() { this.adjustBlockPadding('paddingRight', -5); }
+  increaseIndentLeft() {
+    this.adjustBlockPadding("paddingLeft", 5);
+  }
+  decreaseIndentLeft() {
+    this.adjustBlockPadding("paddingLeft", -5);
+  }
+  increaseIndentRight() {
+    this.adjustBlockPadding("paddingRight", 5);
+  }
+  decreaseIndentRight() {
+    this.adjustBlockPadding("paddingRight", -5);
+  }
 
   widenLine() {
-    this.adjustBlockPadding('paddingLeft', -5, true);
-    this.adjustBlockPadding('paddingRight', -5, true);
+    this.adjustBlockPadding("paddingLeft", -5, true);
+    this.adjustBlockPadding("paddingRight", -5, true);
     this.syncDOMToModel();
     this.saveHistoryState();
     this.casesInput$.next();
   }
 
   narrowLine() {
-    this.adjustBlockPadding('paddingLeft', 5, true);
-    this.adjustBlockPadding('paddingRight', 5, true);
+    this.adjustBlockPadding("paddingLeft", 5, true);
+    this.adjustBlockPadding("paddingRight", 5, true);
     this.syncDOMToModel();
     this.saveHistoryState();
     this.casesInput$.next();
@@ -598,12 +647,17 @@ export class ResueltoCanvasComponent
     if (this.isApplyingHistory) return;
     if (!this.documentData || !this.documentData.pages) return;
 
-    const state = JSON.stringify(this.documentData.pages.map((p: any) => ({
-      pageIndex: p.pageIndex,
-      casesHtml: p.casesHtml
-    })));
+    const state = JSON.stringify(
+      this.documentData.pages.map((p: any) => ({
+        pageIndex: p.pageIndex,
+        casesHtml: p.casesHtml,
+      })),
+    );
 
-    if (this.undoStack.length > 0 && this.undoStack[this.undoStack.length - 1] === state) {
+    if (
+      this.undoStack.length > 0 &&
+      this.undoStack[this.undoStack.length - 1] === state
+    ) {
       return;
     }
 
@@ -635,15 +689,17 @@ export class ResueltoCanvasComponent
     try {
       const pagesData = JSON.parse(stateJson);
       this.saveCaret();
-      
+
       this.documentData.pages = pagesData.map((p: any) => ({
         pageIndex: p.pageIndex,
         casesHtml: p.casesHtml,
-        casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(p.casesHtml || "")
+        casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(
+          p.casesHtml || "",
+        ),
       }));
 
       this.cdr.detectChanges();
-      
+
       setTimeout(() => {
         this.restoreCaret();
         this.isApplyingHistory = false;
@@ -883,10 +939,12 @@ export class ResueltoCanvasComponent
     if (this.documentData) {
       if (this.documentData.body) {
         this.basamentoLegalSafe = this.sanitizer.bypassSecurityTrustHtml(
-          this.documentData.body.basamentoLegal || this.documentData.body.preamble || ""
+          this.documentData.body.basamentoLegal ||
+            this.documentData.body.preamble ||
+            "",
         );
         this.unicoParrafoSafe = this.sanitizer.bypassSecurityTrustHtml(
-          this.documentData.body.unicoParrafo || ""
+          this.documentData.body.unicoParrafo || "",
         );
       }
       if (this.documentData.pages) {
@@ -961,7 +1019,7 @@ export class ResueltoCanvasComponent
       if (casesList) {
         const canvasRect = currentCanvas.getBoundingClientRect();
         const listRect = casesList.getBoundingClientRect();
-        isOverflowing = (canvasRect.bottom - listRect.bottom) < 76;
+        isOverflowing = canvasRect.bottom - listRect.bottom < 76;
       }
 
       if (isOverflowing) {
@@ -1005,7 +1063,8 @@ export class ResueltoCanvasComponent
 
   onCasesListInput(event: Event, pageIndex: number) {
     const target = event.target as HTMLElement;
-    const casesListEl = target.closest('.cases-list') as HTMLElement || target;
+    const casesListEl =
+      (target.closest(".cases-list") as HTMLElement) || target;
     const html = casesListEl.innerHTML;
 
     // Guardar SIEMPRE el html crudo en el modelo para no perder tabulaciones o contenido tipeado
@@ -1029,16 +1088,20 @@ export class ResueltoCanvasComponent
       if (casesList) {
         const canvasRect = currentCanvas.getBoundingClientRect();
         const listRect = casesList.getBoundingClientRect();
-        isOverflowing = (canvasRect.bottom - listRect.bottom) < 76;
+        isOverflowing = canvasRect.bottom - listRect.bottom < 76;
       } else {
-        isOverflowing = currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
+        isOverflowing =
+          currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
       }
 
       if (isOverflowing) {
         // Desbordamiento = repaginamos inmediatamente para empujar el texto a la página siguiente
         // Excepción: Evitamos repaginación síncrona inmediata en espacios para no romper la edición fluida
         const inputEvent = event as InputEvent;
-        const isSpace = inputEvent && (inputEvent.data === " " || (inputEvent.inputType === "insertText" && !inputEvent.data));
+        const isSpace =
+          inputEvent &&
+          (inputEvent.data === " " ||
+            (inputEvent.inputType === "insertText" && !inputEvent.data));
         if (isSpace) {
           this.casesInput$.next();
         } else {
@@ -1048,14 +1111,22 @@ export class ResueltoCanvasComponent
         const inputEvent = event as InputEvent;
         // Si el usuario está borrando texto, puede haber espacio de sobra (Underflow)
         const isDeleting =
-          inputEvent && inputEvent.inputType && inputEvent.inputType.startsWith("delete");
-        const isEnter = 
-          inputEvent && inputEvent.inputType && (inputEvent.inputType === "insertParagraph" || inputEvent.inputType === "insertLineBreak");
-          
+          inputEvent &&
+          inputEvent.inputType &&
+          inputEvent.inputType.startsWith("delete");
+        const isEnter =
+          inputEvent &&
+          inputEvent.inputType &&
+          (inputEvent.inputType === "insertParagraph" ||
+            inputEvent.inputType === "insertLineBreak");
+
         if (isEnter) {
           // Si presiona enter, repaginamos de forma debouncada (600ms) para no interrumpir el flujo del retorno del carro
           this.casesInput$.next();
-        } else if (isDeleting && pageIndex < this.documentData.pages.length - 1) {
+        } else if (
+          isDeleting &&
+          pageIndex < this.documentData.pages.length - 1
+        ) {
           // Llamamos al subject que dispara paginateDOM con debounce (600ms)
           // Así evitamos interrumpir al usuario si mantiene presionado Backspace
           this.casesInput$.next();
@@ -1066,7 +1137,8 @@ export class ResueltoCanvasComponent
 
   onCasesListBlur(event: Event, pageIndex: number) {
     const target = event.target as HTMLElement;
-    const casesListEl = target.closest('.cases-list') as HTMLElement || target;
+    const casesListEl =
+      (target.closest(".cases-list") as HTMLElement) || target;
     const html = casesListEl.innerHTML;
 
     // Al salir del input (blur), SÍ guardamos los cambios en el modelo de datos
@@ -1088,19 +1160,21 @@ export class ResueltoCanvasComponent
   onKeydownCases(event: KeyboardEvent, pageIndex: number) {
     if (event.key === "Tab") {
       event.preventDefault();
-      
-      const inList = document.queryCommandState('insertUnorderedList') || document.queryCommandState('insertOrderedList');
+
+      const inList =
+        document.queryCommandState("insertUnorderedList") ||
+        document.queryCommandState("insertOrderedList");
       if (inList) {
         if (event.shiftKey) {
-          document.execCommand('outdent', false, "");
+          document.execCommand("outdent", false, "");
         } else {
-          document.execCommand('indent', false, "");
+          document.execCommand("indent", false, "");
         }
       } else {
         // Insertar espacios non-breaking en lugar de \t para que se rendericen visualmente en el HTML sin colapsar el puntero
         document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
       }
-      
+
       this.onCasesListInput(event, pageIndex);
     }
   }
@@ -1127,8 +1201,10 @@ export class ResueltoCanvasComponent
     );
 
     const cleanHtml = this.formatCedulasInHtml(doc.body.innerHTML);
-    const target = event.currentTarget as HTMLElement || event.target as HTMLElement;
-    const casesListEl = target.closest('.cases-list') as HTMLElement || target;
+    const target =
+      (event.currentTarget as HTMLElement) || (event.target as HTMLElement);
+    const casesListEl =
+      (target.closest(".cases-list") as HTMLElement) || target;
 
     // Intentar insertar en la selección usando Range API para evitar duplicados y fallos en vacíos
     const sel = window.getSelection();
@@ -1152,14 +1228,20 @@ export class ResueltoCanvasComponent
           sel.removeAllRanges();
           sel.addRange(range);
         } catch (e) {
-          console.warn("Fallo insertNode manual en pegar, usando execCommand:", e);
+          console.warn(
+            "Fallo insertNode manual en pegar, usando execCommand:",
+            e,
+          );
         }
       }
     }
 
     if (!inserted) {
       // Fallback si no hay selección válida o está vacío
-      if (casesListEl.innerHTML.trim() === "" || casesListEl.innerHTML === "<br>") {
+      if (
+        casesListEl.innerHTML.trim() === "" ||
+        casesListEl.innerHTML === "<br>"
+      ) {
         casesListEl.innerHTML = cleanHtml;
       } else {
         const el = document.createElement("div");
@@ -1180,7 +1262,8 @@ export class ResueltoCanvasComponent
     }
 
     if (this.documentData && this.documentData.bodyData) {
-      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] = casesListEl.innerHTML;
+      this.documentData.bodyData["_pageCasesHtml_" + pageIndex] =
+        casesListEl.innerHTML;
     }
 
     this.saveHistoryState();
@@ -1189,41 +1272,47 @@ export class ResueltoCanvasComponent
 
   // --- SISTEMA DE RESTAURACIÓN DE PUNTERO (CARET) ---
   // --- SISTEMA DE RESTAURACIÓN DE PUNTERO (CARET) ---
-  savedCaretPosition: { section: string; start: number; end: number } | null = null;
+  savedCaretPosition: { section: string; start: number; end: number } | null =
+    null;
 
   saveCaret() {
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) {
       const range = sel.getRangeAt(0);
-      
+
       // Encontrar el contenedor contenteditable más cercano
       let editableEl: HTMLElement | null = null;
       let node: Node | null = range.startContainer;
       while (node) {
         if (node.nodeType === Node.ELEMENT_NODE) {
           const el = node as HTMLElement;
-          if (el.hasAttribute('contenteditable') || el.classList.contains('cases-list')) {
+          if (
+            el.hasAttribute("contenteditable") ||
+            el.classList.contains("cases-list")
+          ) {
             editableEl = el;
             break;
           }
         }
         node = node.parentNode;
       }
-      
+
       if (editableEl) {
-        const section = editableEl.getAttribute('data-section') || 'cases';
+        const section = editableEl.getAttribute("data-section") || "cases";
         let start = 0;
         let end = 0;
-        
-        if (section === 'cases') {
+
+        if (section === "cases") {
           // Si es cases, sumamos los textos de todos los cases-list anteriores en el DOM
-          const allCasesLists = Array.from(this.el.nativeElement.querySelectorAll('.cases-list')) as HTMLElement[];
+          const allCasesLists = Array.from(
+            this.el.nativeElement.querySelectorAll(".cases-list"),
+          ) as HTMLElement[];
           const activeListIdx = allCasesLists.indexOf(editableEl);
-          
+
           for (let i = 0; i < activeListIdx; i++) {
             start += allCasesLists[i].textContent?.length || 0;
           }
-          
+
           const preCaretRange = range.cloneRange();
           preCaretRange.selectNodeContents(editableEl);
           preCaretRange.setEnd(range.startContainer, range.startOffset);
@@ -1237,7 +1326,7 @@ export class ResueltoCanvasComponent
           start = preCaretRange.toString().length;
           end = start + range.toString().length;
         }
-        
+
         this.savedCaretPosition = { section, start, end };
       }
     }
@@ -1248,11 +1337,15 @@ export class ResueltoCanvasComponent
       const saved = this.savedCaretPosition;
       const section = saved.section;
       let targetEl: HTMLElement | null = null;
-      
-      if (section === 'cases') {
-        const allCasesLists = Array.from(this.el.nativeElement.querySelectorAll('.cases-list')) as HTMLElement[];
+
+      if (section === "cases") {
+        const allCasesLists = Array.from(
+          this.el.nativeElement.querySelectorAll(".cases-list"),
+        ) as HTMLElement[];
         let totalTextLen = 0;
-        allCasesLists.forEach(list => totalTextLen += list.textContent?.length || 0);
+        allCasesLists.forEach(
+          (list) => (totalTextLen += list.textContent?.length || 0),
+        );
 
         // Clampear offsets para evitar problemas con espacios colapsados por render de innerHTML
         const clampedStart = Math.min(saved.start, totalTextLen);
@@ -1260,7 +1353,7 @@ export class ResueltoCanvasComponent
 
         let remainingStart = clampedStart;
         let remainingEnd = clampedEnd;
-        
+
         for (const list of allCasesLists) {
           const textLen = list.textContent?.length || 0;
           if (remainingStart <= textLen) {
@@ -1270,18 +1363,20 @@ export class ResueltoCanvasComponent
           remainingStart -= textLen;
           remainingEnd -= textLen;
         }
-        
+
         if (!targetEl && allCasesLists.length > 0) {
           targetEl = allCasesLists[allCasesLists.length - 1];
           remainingStart = targetEl.textContent?.length || 0;
           remainingEnd = remainingStart;
         }
-        
+
         if (targetEl) {
           this.restoreCaretInElement(targetEl, remainingStart, remainingEnd);
         }
       } else {
-        targetEl = this.el.nativeElement.querySelector(`[data-section="${section}"]`) as HTMLElement;
+        targetEl = this.el.nativeElement.querySelector(
+          `[data-section="${section}"]`,
+        ) as HTMLElement;
         if (targetEl) {
           const textLen = targetEl.textContent?.length || 0;
           const clampedStart = Math.min(saved.start, textLen);
@@ -1289,7 +1384,7 @@ export class ResueltoCanvasComponent
           this.restoreCaretInElement(targetEl, clampedStart, clampedEnd);
         }
       }
-      
+
       this.savedCaretPosition = null;
     }
   }
@@ -1307,19 +1402,11 @@ export class ResueltoCanvasComponent
     while (!foundEnd && (node = nodeStack.pop())) {
       if (node.nodeType === Node.TEXT_NODE) {
         const nextCharIndex = charIndex + (node.textContent?.length || 0);
-        if (
-          !foundStart &&
-          start >= charIndex &&
-          start <= nextCharIndex
-        ) {
+        if (!foundStart && start >= charIndex && start <= nextCharIndex) {
           range.setStart(node, start - charIndex);
           foundStart = true;
         }
-        if (
-          !foundEnd &&
-          end >= charIndex &&
-          end <= nextCharIndex
-        ) {
+        if (!foundEnd && end >= charIndex && end <= nextCharIndex) {
           range.setEnd(node, end - charIndex);
           foundEnd = true;
         }
@@ -1334,7 +1421,7 @@ export class ResueltoCanvasComponent
 
     // Fallback: Si no se encontró un nodo de texto pero el elemento tiene nodos hijos (ej. <p><br></p>)
     if (!foundStart) {
-      const editables = el.querySelectorAll('p, li, div, span');
+      const editables = el.querySelectorAll("p, li, div, span");
       if (editables.length > 0) {
         const lastEditable = editables[editables.length - 1] as HTMLElement;
         range.setStart(lastEditable, 0);
@@ -1388,7 +1475,10 @@ export class ResueltoCanvasComponent
     for (let p of paragraphs) {
       let currentPageIdx = this.documentData.pages.length - 1;
       this.documentData.pages[currentPageIdx].casesHtml += p;
-      this.documentData.pages[currentPageIdx].casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(this.documentData.pages[currentPageIdx].casesHtml);
+      this.documentData.pages[currentPageIdx].casesHtmlSafe =
+        this.sanitizer.bypassSecurityTrustHtml(
+          this.documentData.pages[currentPageIdx].casesHtml,
+        );
 
       this.cdr.detectChanges();
 
@@ -1403,9 +1493,10 @@ export class ResueltoCanvasComponent
           const listRect = casesList.getBoundingClientRect();
           // Cortar cuando el texto esté a 76 píxeles del borde inferior físico de la hoja
           // (aprox 0.5cm antes del paginador que está a 15mm)
-          isOverflow = (canvasRect.bottom - listRect.bottom) < 76;
+          isOverflow = canvasRect.bottom - listRect.bottom < 76;
         } else {
-          isOverflow = currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
+          isOverflow =
+            currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
         }
       }
 
@@ -1414,13 +1505,16 @@ export class ResueltoCanvasComponent
         const currentHtml = this.documentData.pages[currentPageIdx].casesHtml;
         this.documentData.pages[currentPageIdx].casesHtml =
           currentHtml.substring(0, currentHtml.length - p.length);
-        this.documentData.pages[currentPageIdx].casesHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(this.documentData.pages[currentPageIdx].casesHtml);
+        this.documentData.pages[currentPageIdx].casesHtmlSafe =
+          this.sanitizer.bypassSecurityTrustHtml(
+            this.documentData.pages[currentPageIdx].casesHtml,
+          );
 
         this.documentData.pages.push({
           pageIndex: currentPageIdx + 1,
           headerHtml: "",
           casesHtml: p,
-          casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(p)
+          casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(p),
         });
         this.cdr.detectChanges();
       }
@@ -1441,7 +1535,7 @@ export class ResueltoCanvasComponent
         pageIndex: this.documentData.pages.length,
         headerHtml: "",
         casesHtml: "",
-        casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml("")
+        casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(""),
       });
       this.cdr.detectChanges();
     }
@@ -1547,7 +1641,7 @@ export class ResueltoCanvasComponent
 
     this.activeElement = target;
     this.activeSection = target.getAttribute("data-section") || "";
-    
+
     // Registrar estado antes de que el usuario comience a editar
     this.saveHistoryState();
 

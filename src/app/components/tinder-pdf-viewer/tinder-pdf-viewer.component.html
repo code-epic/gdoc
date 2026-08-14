@@ -182,7 +182,9 @@
           <!-- Si hay múltiples documentos agrupados -->
           <ng-container *ngIf="activeDoc.documentos && activeDoc.documentos.length > 0">
             <div class="explorador-list">
-              <div class="explorador-item" *ngFor="let caso of activeDoc.documentos">
+              <div class="explorador-item" *ngFor="let caso of activeDoc.documentos"
+                   [class.clickable]="caso.digital || caso.anom"
+                   (click)="(caso.digital || caso.anom) ? obtenerWFD(caso) : null">
                 <div class="ei-avatar">
                   <i class="fas fa-user"></i>
                 </div>
@@ -191,15 +193,14 @@
                   <div class="ei-details">C.I: {{ caso.cedula }}</div>
                   <div class="ei-details" style="font-size: 0.75rem;">{{ caso.grado || 'S/G' }} - {{ caso.componente || 'S/C' }}</div>
                   <div class="ei-details" *ngIf="caso.digital || caso.anom" style="font-size: 0.75rem; color: #80cbc4;">
-                    <i class="fas fa-file-pdf"></i> {{ caso.digital || caso.anom }}
+                    <i class="fas fa-file-pdf"></i> {{  caso.anom }}
                   </div>
                 </div>
-                <!-- Botón descargar PDF individual -->
-                <!-- <div class="ei-actions" *ngIf="caso.digital || caso.anom || caso.archivo">
-                  <a [href]="pdfUrlResolver ? pdfUrlResolver(caso) : '#'" target="_blank" class="ei-download-btn" title="Descargar PDF">
-                    <i class="fas fa-cloud-download-alt"></i>
-                  </a>
-                </div> -->
+                <div class="ei-actions" *ngIf="caso.digital || caso.anom">
+                  <button type="button" class="ei-view-details-btn" title="Ver Detalles y PDF">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </ng-container>
@@ -207,7 +208,9 @@
           <!-- Si es un solo documento (sin agrupar) -->
           <ng-container *ngIf="!activeDoc.documentos || activeDoc.documentos.length === 0">
             <div class="explorador-list">
-              <div class="explorador-item">
+              <div class="explorador-item"
+                   [class.clickable]="activeDoc.digital || activeDoc.anom"
+                   (click)="(activeDoc.digital || activeDoc.anom) ? obtenerWFD(activeDoc) : null">
                 <div class="ei-avatar">
                   <i class="fas fa-user"></i>
                 </div>
@@ -219,10 +222,10 @@
                     <i class="fas fa-file-pdf"></i> {{ activeDoc.digital || activeDoc.anom }}
                   </div>
                 </div>
-                <div class="ei-actions" *ngIf="activeDoc.digital || activeDoc.anom || activeDoc.archivo">
-                  <a [href]="pdfUrlResolver ? pdfUrlResolver(activeDoc) : '#'" target="_blank" class="ei-download-btn" title="Descargar PDF">
-                    <i class="fas fa-cloud-download-alt"></i>
-                  </a>
+                <div class="ei-actions" *ngIf="activeDoc.digital || activeDoc.anom">
+                  <button type="button" class="ei-view-details-btn" title="Ver Detalles y PDF">
+                    <i class="fas fa-eye"></i>
+                  </button>
                 </div>
               </div>
             </div>
@@ -344,9 +347,8 @@
     </button>
 
     <!-- 1. Enviar a Revisión (Solo para Edición y si está guardado en Mongo) -->
-    <button class="tpv-btn"
+    <button class="tpv-btn tpv-btn-send-review"
             *ngIf="profile === 'Edicion' && hasSavedState"
-            style="background: #11cdef; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToReview()"
             title="Enviar a Revisión">
@@ -356,9 +358,8 @@
     </button>
 
     <!-- 2. Enviar a Jefe (Solo para Revisión de Resolución) -->
-    <button class="tpv-btn"
+    <button class="tpv-btn tpv-btn-send-boss"
             *ngIf="profile === 'Revision'"
-            style="background: #172b4d; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToBoss()"
             title="Enviar a Jefe">
@@ -368,9 +369,8 @@
     </button>
 
     <!-- 3. Enviar a Secretaría (Para Revisión y Jefe) -->
-    <button class="tpv-btn"
+    <button class="tpv-btn tpv-btn-send-secretariat"
             *ngIf="profile === 'Revision' || profile === 'Jefe'"
-            style="background: #fb6340; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToSecretariat()"
             title="Enviar a Secretaría">
@@ -380,9 +380,8 @@
     </button>
 
     <!-- 4. Enviar a Dirección (Para Revisión, Jefe y Secretaría) -->
-    <button class="tpv-btn"
+    <button class="tpv-btn tpv-btn-send-direction"
             *ngIf="profile === 'Revision' || profile === 'Jefe' || profile === 'Secretaria'"
-            style="background: #8965e0; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToDirection()"
             title="Enviar a Dirección">
@@ -392,9 +391,8 @@
     </button>
 
     <!-- 5. Enviar al Ministro (Para Revisión, Jefe, Secretaría y Dirección) -->
-    <button class="tpv-btn"
+    <button class="tpv-btn tpv-btn-send-minister"
             *ngIf="profile === 'Revision' || profile === 'Jefe' || profile === 'Secretaria' || profile === 'Direccion'"
-            style="background: #f5365c; color: white;"
             [disabled]="actionExecuting"
             (click)="onSendToMinister()"
             title="Enviar al Ministro">
@@ -412,5 +410,108 @@
       <div class="tpv-spinner-sm" *ngIf="actionExecuting && executingType === 'approve'"></div>
       <span>{{ approveLabel }}</span>
     </button>
+  </div>
+</div>
+
+<!-- Elegant Glassmorphic Modal for Case Details & PDF -->
+<div class="tpv-modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+  <div class="tpv-modal-card" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="tpv-modal-header">
+      <div class="tpv-modal-header-title">
+        <i class="fas fa-file-invoice"></i> Detalles del Documento
+      </div>
+      <button class="tpv-modal-close-btn" (click)="closeDetailsModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <!-- Loader -->
+    <div class="tpv-modal-loading" *ngIf="loadingDetails">
+      <div class="tpv-spinner"></div>
+      <div class="tpv-loading-text">Cargando detalles del documento...</div>
+    </div>
+    
+    <!-- Body -->
+    <div class="tpv-modal-body" *ngIf="!loadingDetails && modalDoc">
+      <!-- Caso Info Badge -->
+      <div class="tpv-case-badge" *ngIf="selectedCase">
+        <div class="tpv-case-badge-title">Expediente Seleccionado:</div>
+        <div class="tpv-case-badge-name">{{ (selectedCase.nombres_apellidos || selectedCase.nombres + ' ' + selectedCase.apellidos) | uppercase }}</div>
+        <div class="tpv-case-badge-meta">C.I: {{ selectedCase.cedula }} &bull; {{ selectedCase.grado || 'S/G' }} - {{ selectedCase.componente || 'S/C' }}</div>
+      </div>
+
+      <!-- Tables -->
+      <div class="tpv-table-responsive">
+        <table class="tpv-modal-table">
+          <thead>
+            <tr>
+              <th>Número de Control</th>
+              <th>Número de Origen</th>
+              <th>Fecha de Origen</th>
+              <th>Fecha de Recepción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ (selectedCase?.digital || modalDoc.ncontrol || modalDoc.numc || 'N/A') | uppercase }}</td>
+              <td>{{ modalDoc.norigen || 'N/A' | uppercase }}</td>
+              <td>{{ modalDoc.forigen || 'N/A' }}</td>
+              <td>{{ modalDoc.fcreacion || modalDoc.created_at || 'N/A' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tpv-table-responsive mt-3">
+        <table class="tpv-modal-table">
+          <thead>
+            <tr>
+              <th>Tipo de Documento</th>
+              <th>Remitente</th>
+              <th>Unidad o Dependencia</th>
+              <th>Gran Comando</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ modalDoc.tipo || 'N/A' | uppercase }}</td>
+              <td>{{ modalDoc.remitente || 'N/A' | uppercase }}</td>
+              <td>{{ modalDoc.unidad || 'N/A' | uppercase }}</td>
+              <td>{{ modalDoc.comando || 'N/A' | uppercase }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Contenido del oficio -->
+      <div class="tpv-section-title mt-4">Contenido del Oficio</div>
+      <div class="tpv-section-content" [innerHTML]="modalDoc.contenido"></div>
+
+      <!-- Instrucciones -->
+      <div *ngIf="modalDoc.instrucciones" class="mt-4">
+        <div class="tpv-section-title">Instrucciones</div>
+        <div class="tpv-section-content" [innerHTML]="modalDoc.instrucciones"></div>
+      </div>
+
+      <!-- Resumen de cuenta -->
+      <div *ngIf="rcuenta" class="mt-4">
+        <div class="tpv-section-title">Contenido de la Cuenta, Número: {{ nCuenta }}</div>
+        <div class="tpv-section-content" [innerHTML]="resumencuenta"></div>
+      </div>
+    </div>
+    
+    <!-- Footer / Actions -->
+    <div class="tpv-modal-footer">
+      <button type="button" class="btn btn-secondary shadow-sm" (click)="closeDetailsModal()">Cerrar</button>
+      
+      <!-- Option to view/download PDF -->
+      <a *ngIf="selectedCase && (selectedCase.anom || selectedCase.digital)"
+         [href]="getCasePdfUrl(selectedCase)" 
+         target="_blank" 
+         class="btn btn-success ml-2 tpv-btn-pdf-view shadow-sm">
+        <i class="fas fa-file-pdf mr-1"></i> Ver PDF en Nueva Pestaña
+      </a>
+    </div>
   </div>
 </div>

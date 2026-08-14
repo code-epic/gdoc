@@ -68,10 +68,16 @@ export interface PdfAction {
   styleUrls: ["./tinder-pdf-viewer.component.scss"],
 })
 export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
-  @HostListener('window:keydown', ['$event'])
+  @HostListener("window:keydown", ["$event"])
   onWindowKeyDown(event: KeyboardEvent) {
     const isCtrlOrCmd = event.ctrlKey || event.metaKey;
-    if (isCtrlOrCmd && (event.key === '-' || event.key === '+' || event.key === '=' || event.key === '0')) {
+    if (
+      isCtrlOrCmd &&
+      (event.key === "-" ||
+        event.key === "+" ||
+        event.key === "=" ||
+        event.key === "0")
+    ) {
       event.preventDefault();
     }
   }
@@ -154,30 +160,13 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   public activeTab: "explorador" | "metadata" | "comments" = "explorador";
 
-  get pendingCommentsCount(): number {
-    if (!this.activeDoc || !this.activeDoc.comentarios) return 0;
-    return this.activeDoc.comentarios.filter((c) => c.status === "pending")
-      .length;
-  }
-
-  public resolveComment(id: string) {
-    if (!this.activeDoc || !this.activeDoc.comentarios) return;
-    const comment = this.activeDoc.comentarios.find((c) => c.id === id);
-    if (comment) {
-      comment.status = "resolved";
-      // Also notify the canvas to remove the yellow highlight if it's currently showing
-      if (this.resueltoCanvas) {
-        this.resueltoCanvas.removeHighlight(id);
-      }
-      this.saveDocumentState();
-      this.cdr.detectChanges();
-    }
-  }
-
-  public onCommentAdded() {
-    this.syncFromCanvas();
-    this.saveDocumentState();
-  }
+  public showDetailsModal = false;
+  public selectedCase: any = null;
+  public loadingDetails = false;
+  public modalDoc: any = null;
+  public resumencuenta: string = "";
+  public nCuenta: string = "";
+  public rcuenta: boolean = false;
 
   private touchX = 0;
   private touchY = 0;
@@ -214,6 +203,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       "UA=",
       navigator.userAgent,
     );
+    //cargar obtenerWFD
   }
 
   /* ── Lifecycle ───────────────────────────────────────── */
@@ -1792,5 +1782,188 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       });
       throw err;
     }
+  }
+
+  //Evaluar si existe el campo digital
+
+  public obtenerWFD(caso: any) {
+    this.selectedCase = caso;
+    this.showDetailsModal = true;
+    this.loadingDetails = true;
+    this.modalDoc = null;
+    this.rcuenta = false;
+    this.resumencuenta = "";
+    this.nCuenta = "";
+    this.cdr.detectChanges();
+    console.log("Cargando datos");
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_CObtenerWFD";
+    const numcVal = caso.digital || "";
+    this.xAPI.parametros = `${numcVal}`;
+    this.xAPI.valores = "";
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        if (data && data.Cuerpo && data.Cuerpo.length > 0) {
+          const e = data.Cuerpo[0];
+          this.openDetailsModal(caso, e.wfd);
+        } else {
+          console.warn(
+            "No se encontró wfd en WKF_CObtenerWFD, usando identificador directo...",
+          );
+          const directId =
+            caso.documento ||
+            caso.idd ||
+            caso.id ||
+            caso.numc ||
+            caso.ncontrol ||
+            "0";
+          this.openDetailsModal(caso, directId);
+        }
+      },
+      (error) => {
+        console.error(
+          "Error al consultar obtenerWFD, intentando con identificador directo:",
+          error,
+        );
+        const directId =
+          caso.documento ||
+          caso.idd ||
+          caso.id ||
+          caso.numc ||
+          caso.ncontrol ||
+          "0";
+        this.openDetailsModal(caso, directId);
+      },
+    );
+  }
+
+  public openDetailsModal(caso: any, idwkf: string) {
+    this.selectedCase = caso;
+    this.showDetailsModal = true;
+    this.loadingDetails = true;
+    this.modalDoc = null;
+    this.rcuenta = false;
+    this.resumencuenta = "";
+    this.nCuenta = "";
+
+    const id = idwkf;
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_CDocumentoDetalle";
+    this.xAPI.parametros = `1,1,${idwkf}`;
+    this.xAPI.valores = "";
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        try {
+          if (data && data.Cuerpo && data.Cuerpo.length > 0) {
+            const e = data.Cuerpo[0];
+            this.modalDoc = e;
+            this.modalDoc.contenido = (e.contenido || "").toUpperCase();
+            this.modalDoc.instrucciones = (e.instrucciones || "").toUpperCase();
+
+            if (e.fcreacion) {
+              this.modalDoc.fcreacion = e.fcreacion.substring(0, 10);
+            }
+            if (e.forigen) {
+              this.modalDoc.forigen = e.forigen.substring(0, 10);
+            }
+
+            const punto_cuenta = this.modalDoc.subdocumento
+              ? JSON.parse(this.modalDoc.subdocumento)
+              : [];
+            const lstSubDoc = punto_cuenta.map((item: any) => {
+              return typeof item === "object" ? item : JSON.parse(item);
+            });
+
+            if (lstSubDoc.length > 0) {
+              this.resumencuenta = lstSubDoc[0].resumen || "";
+              this.nCuenta = lstSubDoc[0].cuenta || "";
+              this.rcuenta = true;
+            }
+          }
+        } catch (err) {
+          console.error("Error al procesar los detalles del documento:", err);
+        } finally {
+          this.loadingDetails = false;
+          this.cdr.detectChanges();
+        }
+      },
+      (error) => {
+        console.error("Error al consultar detalles del documento:", error);
+        this.loadingDetails = false;
+        this.cdr.detectChanges();
+      },
+    );
+  }
+
+  public closeDetailsModal() {
+    this.showDetailsModal = false;
+    this.selectedCase = null;
+    this.modalDoc = null;
+    this.rcuenta = false;
+    this.resumencuenta = "";
+    this.nCuenta = "";
+    this.cdr.detectChanges();
+  }
+
+  public getCasePdfUrl(caso: any): string {
+    if (!caso) return "";
+
+    if (this.pdfUrlResolver) {
+      const tempDoc: any = {
+        ncontrol:
+          caso.ncontrol ||
+          caso.numc ||
+          this.activeDoc?.ncontrol ||
+          this.activeDoc?.numc ||
+          "0",
+        numc:
+          caso.numc ||
+          caso.ncontrol ||
+          this.activeDoc?.numc ||
+          this.activeDoc?.ncontrol ||
+          "0",
+        archivo: caso.anom || caso.digital || caso.archivo || "",
+        anom: caso.anom || caso.digital || caso.archivo || "",
+      };
+      return this.pdfUrlResolver(tempDoc);
+    }
+
+    const ncontrol =
+      caso.ncontrol ||
+      caso.numc ||
+      this.activeDoc?.ncontrol ||
+      this.activeDoc?.numc ||
+      "0";
+    const archivo = caso.anom || caso.digital || caso.archivo || "";
+    if (!archivo) return "";
+    return this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
+  }
+
+  get pendingCommentsCount(): number {
+    if (!this.activeDoc || !this.activeDoc.comentarios) return 0;
+    return this.activeDoc.comentarios.filter((c) => c.status === "pending")
+      .length;
+  }
+
+  public resolveComment(id: string) {
+    if (!this.activeDoc || !this.activeDoc.comentarios) return;
+    const comment = this.activeDoc.comentarios.find((c) => c.id === id);
+    if (comment) {
+      comment.status = "resolved";
+      // Also notify the canvas to remove the yellow highlight if it's currently showing
+      if (this.resueltoCanvas) {
+        this.resueltoCanvas.removeHighlight(id);
+      }
+      this.saveDocumentState();
+      this.cdr.detectChanges();
+    }
+  }
+
+  public onCommentAdded() {
+    this.syncFromCanvas();
+    this.saveDocumentState();
   }
 }
