@@ -183,6 +183,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public nuevo_numero_resuelto: string = "";
 
   public NombreArchivo: string = "";
+  public NumeroControl: string = "";
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -1809,7 +1810,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         if (data && data.Cuerpo && data.Cuerpo.length > 0) {
           const e = data.Cuerpo[0];
           this.NombreArchivo = e.anom;
-          this.openDetailsModal(caso, e.wfd, this.NombreArchivo);
+          this.NumeroControl = e.numc;
+          this.openDetailsModal(caso, e.wfd);
         }
       },
       (error) => {
@@ -1821,7 +1823,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     );
   }
 
-  public openDetailsModal(caso: any, idwkf: string, archivo: string) {
+  public openDetailsModal(caso: any, idwkf: string) {
     this.selectedCase = caso;
     this.showDetailsModal = true;
     this.loadingDetails = true;
@@ -1893,8 +1895,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   public verPdf(caso: any) {
     if (!caso) return;
-    const archivo = this.NombreArchivo;
-    if (!archivo || archivo.trim() === "") {
+    if (!this.NombreArchivo || this.NombreArchivo.trim() === "") {
       Swal.fire({
         title: "Atención",
         text: "El documento digital PDF no ha sido cargado en el sistema.",
@@ -1904,9 +1905,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       });
       return;
     }
-    console.log(this.NombreArchivo);
-    const ncontrol = caso.ncontrol;
-    const url = this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
+
+    const url = this.apiService.Dws(
+      btoa("D" + this.NumeroControl) + "/" + this.NombreArchivo,
+    );
     window.open(url, "_blank");
   }
 
