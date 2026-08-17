@@ -961,6 +961,48 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
 }
 
 // =========================================================
+// CHIPS DE METADATOS EN MODO FIRMADOS
+// =========================================================
+.firmados-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+
+.firmados-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+
+  i {
+    font-size: 0.7rem;
+    opacity: 0.85;
+  }
+
+  // Número de resolución — verde corporativo
+  &.resol {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+  }
+
+  // Fecha de resolución — azul índigo suave
+  &.fecha {
+    background: #e8eaf6;
+    color: #3949ab;
+    border: 1px solid #c5cae9;
+  }
+}
+
+// =========================================================
 // BOTÓN INLINE DE DISTRIBUCIÓN (iPad-friendly)
 // =========================================================
 .btn-distribute-icon {

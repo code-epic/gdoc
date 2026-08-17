@@ -165,7 +165,7 @@
           </div>
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
             <!-- Acciones por lote (Etiqueta, Prioridades) al lado de Todos -->
-            <div class="rt-header-selection-actions" *ngIf="selectedDocsCount > 0 && (currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion')" style="display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(94, 170, 168, 0.2); background: rgba(94, 170, 168, 0.05); padding: 2px 8px; border-radius: 4px; margin-right: 8px;">
+            <div class="rt-header-selection-actions" *ngIf="selectedDocsCount > 0 && !showingFirmados && (currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion')" style="display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(94, 170, 168, 0.2); background: rgba(94, 170, 168, 0.05); padding: 2px 8px; border-radius: 4px; margin-right: 8px;">
               <span style="font-size: 0.72rem; font-weight: bold; color: #5eaaa8; margin-right: 4px;">{{ selectedDocsCount }} sel.</span>
               
               <button (click)="assignTagToSelectedDocs()" style="font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; height: 26px; display: inline-flex; align-items: center; gap: 4px; background: white; border: 1px solid #2dce89; color: #2dce89; font-weight: 600; cursor: pointer; transition: all 0.2s;">
@@ -186,7 +186,7 @@
             </div>
 
             <!-- Checkbox de Selección Masiva (Solo en perfiles de organización) -->
-            <div class="custom-control custom-checkbox mr-2" *ngIf="currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion'">
+            <div class="custom-control custom-checkbox mr-2" *ngIf="!showingFirmados && (currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion')">
               <input type="checkbox" class="custom-control-input" id="checkAll" [checked]="isAllSelected()" (change)="toggleSelectAll($event)">
               <label class="custom-control-label" for="checkAll" style="font-size: 0.8rem; font-weight: 600; cursor: pointer; padding-top: 2px;">Todos</label>
             </div>
@@ -283,7 +283,7 @@
                      (contextmenu)="onDocumentRightClick($event, doc, doc.index)"
                      style="cursor: pointer; transition: all 0.2s; padding: 12px 15px; margin-bottom: 10px; background: white; border-top: 1px solid; border-right: 1px solid; border-bottom: 1px solid; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.01); display: flex; align-items: center;">
                   
-                  <div class="checkbox-col" *ngIf="currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion'" style="padding-right: 15px; display: flex; align-items: center;">
+                  <div class="checkbox-col" *ngIf="!showingFirmados && (currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion')" style="padding-right: 15px; display: flex; align-items: center;">
                     <div style="width: 24px; height: 24px; border-radius: 6px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
                          [style.background-color]="doc.selected ? '#2dce89' : 'transparent'"
                          [style.border-color]="doc.selected ? '#2dce89' : '#ccc'">
@@ -299,6 +299,15 @@
                       <span *ngIf="doc.priority === 'Prioritario'" class="badge badge-warning text-white" style="font-size: 0.65rem; border-radius: 4px; padding: 1px 4px;">P</span>
                       <span *ngIf="doc.priority === 'Urgente'" class="badge badge-danger text-white" style="font-size: 0.65rem; border-radius: 4px; padding: 1px 4px;">U</span>
                     </div>
+                    <!-- Descripción extra: solo en modo Firmados -->
+                    <div *ngIf="showingFirmados" class="firmados-meta-row">
+                      <span class="firmados-chip resol" *ngIf="doc.numero_resol">
+                        <i class="fas fa-hashtag"></i> {{ doc.numero_resol }}
+                      </span>
+                      <span class="firmados-chip fecha" *ngIf="doc.fecha_resolucion">
+                        <i class="fas fa-calendar-check"></i> {{ doc.fecha_resolucion }}
+                      </span>
+                    </div>
                     <div class="meta" style="font-size: 0.85rem; color: #8898aa; display: flex; gap: 15px; margin-top: 4px;">
                       <span><i class="fas fa-layer-group"></i> {{ doc.asunto }}</span>
                       <span style="color: #5e72e4; font-weight: 600;"><i class="fas fa-users"></i> {{ doc.cantidad }} casos agrupados</span>
@@ -313,7 +322,9 @@
                             title="Instrucciones de Distribución">
                       <i class="fas fa-route"></i>
                     </button>
-                    <button class="btn btn-sm" 
+                    <!-- Ojo: oculto en Firmados -->
+                    <button *ngIf="!showingFirmados"
+                            class="btn btn-sm" 
                             (click)="startImmersiveMode(doc, currentProfile); $event.stopPropagation()" 
                             title="Visualizar Documento"
                             style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e3f2fd; color: #1e88e5; border: none; transition: transform 0.2s;"
@@ -335,7 +346,7 @@
                  (contextmenu)="onDocumentRightClick($event, doc, doc.index)"
                  style="cursor: pointer; transition: all 0.2s; padding: 12px 15px; margin-bottom: 10px; background: white; border-top: 1px solid; border-right: 1px solid; border-bottom: 1px solid; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.01); display: flex; align-items: center;">
               
-              <div class="checkbox-col" style="padding-right: 15px; display: flex; align-items: center;">
+              <div class="checkbox-col" *ngIf="!showingFirmados" style="padding-right: 15px; display: flex; align-items: center;">
                 <div style="width: 24px; height: 24px; border-radius: 6px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
                      [style.background-color]="doc.selected ? '#2dce89' : 'transparent'"
                      [style.border-color]="doc.selected ? '#2dce89' : '#ccc'">
@@ -351,6 +362,15 @@
                   <span *ngIf="doc.priority === 'Prioritario'" class="badge badge-warning text-white" style="font-size: 0.65rem; border-radius: 4px; padding: 1px 4px;">P</span>
                   <span *ngIf="doc.priority === 'Urgente'" class="badge badge-danger text-white" style="font-size: 0.65rem; border-radius: 4px; padding: 1px 4px;">U</span>
                 </div>
+                <!-- Descripción extra: solo en modo Firmados -->
+                <div *ngIf="showingFirmados" class="firmados-meta-row">
+                  <span class="firmados-chip resol" *ngIf="doc.numero_resol">
+                    <i class="fas fa-hashtag"></i> {{ doc.numero_resol }}
+                  </span>
+                  <span class="firmados-chip fecha" *ngIf="doc.fecha_resolucion">
+                    <i class="fas fa-calendar-check"></i> {{ doc.fecha_resolucion }}
+                  </span>
+                </div>
                 <div class="meta" style="font-size: 0.85rem; color: #8898aa; display: flex; gap: 15px; margin-top: 4px;">
                   <span><i class="fas fa-layer-group"></i> {{ doc.asunto }}</span>
                   <span style="color: #5e72e4; font-weight: 600;"><i class="fas fa-users"></i> {{ doc.cantidad }} casos agrupados</span>
@@ -365,7 +385,9 @@
                         title="Instrucciones de Distribución">
                   <i class="fas fa-route"></i>
                 </button>
-                <button class="btn btn-sm" 
+                <!-- Ojo: oculto en Firmados -->
+                <button *ngIf="!showingFirmados"
+                        class="btn btn-sm" 
                         (click)="startImmersiveMode(doc, currentProfile); $event.stopPropagation()" 
                         title="Visualizar Documento"
                         style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e3f2fd; color: #1e88e5; border: none; transition: transform 0.2s;"
@@ -386,7 +408,7 @@
                  (contextmenu)="onDocumentRightClick($event, doc, idx)"
                  style="cursor: pointer; transition: all 0.2s; padding: 12px 15px; margin-bottom: 10px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center;">
               
-              <div class="checkbox-col" *ngIf="currentProfile !== 'Edicion'" style="padding-right: 15px; display: flex; align-items: center;">
+              <div class="checkbox-col" *ngIf="currentProfile !== 'Edicion' && !showingFirmados" style="padding-right: 15px; display: flex; align-items: center;">
                 <div style="width: 24px; height: 24px; border-radius: 6px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
                      [style.background-color]="doc.selected ? '#2dce89' : 'transparent'"
                      [style.border-color]="doc.selected ? '#2dce89' : '#ccc'">
@@ -397,7 +419,18 @@
               <div class="number" style="font-weight: 700; color: #8898aa; width: 30px; font-size: 1.1rem;">{{ idx + 1 }}</div>
               
               <div class="doc-info" style="flex: 1;">
-                <div class="name" style="font-weight: 600; color: #32325d;">Carpeta N° {{ doc.numero_carpeta }}</div>
+                <div class="name" style="font-weight: 600; color: #32325d; display: flex; align-items: center; gap: 6px;">
+                  <span>Carpeta N° {{ doc.numero_carpeta }}</span>
+                </div>
+                <!-- Descripción extra: solo en modo Firmados -->
+                <div *ngIf="showingFirmados" class="firmados-meta-row">
+                  <span class="firmados-chip resol" *ngIf="doc.numero_resol">
+                    <i class="fas fa-hashtag"></i> {{ doc.numero_resol }}
+                  </span>
+                  <span class="firmados-chip fecha" *ngIf="doc.fecha_resolucion">
+                    <i class="fas fa-calendar-check"></i> {{ doc.fecha_resolucion }}
+                  </span>
+                </div>
                 <div class="meta" style="font-size: 0.85rem; color: #8898aa; display: flex; gap: 15px; margin-top: 4px;">
                   <span><i class="fas fa-layer-group"></i> {{ doc.asunto }}</span>
                   <span style="color: #5e72e4; font-weight: 600;"><i class="fas fa-users"></i> {{ doc.cantidad }} casos agrupados</span>
@@ -405,8 +438,9 @@
               </div>
               
               <div class="actions" style="display: flex; gap: 8px;">
+                <!-- Lápiz edición: oculto en Firmados -->
                 <button class="btn btn-sm" 
-                        *ngIf="currentProfile === 'Edicion'"
+                        *ngIf="currentProfile === 'Edicion' && !showingFirmados"
                         (click)="startImmersiveMode(doc, 'Edicion'); $event.stopPropagation()" 
                         title="Editar y Redactar"
                         style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e0f2f1; color: #00897b; border: none; transition: transform 0.2s;"
@@ -414,7 +448,9 @@
                   <i class="fas fa-pencil-alt" style="font-size: 1rem;"></i>
                 </button>
 
+                <!-- Ojo: oculto en Firmados -->
                 <button class="btn btn-sm" 
+                        *ngIf="!showingFirmados"
                         (click)="startImmersiveMode(doc, currentProfile === 'Edicion' ? 'Revision' : currentProfile); $event.stopPropagation()" 
                         title="Visualizar Documento"
                         style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e3f2fd; color: #1e88e5; border: none; transition: transform 0.2s;"

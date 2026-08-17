@@ -681,7 +681,17 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             grupos[num].documentos.push(doc);
           });
 
+          // Subir numero_resol y fecha_resolucion del primer doc al objeto grupo
+          Object.values(grupos).forEach((grupo: any) => {
+            if (grupo.documentos?.length > 0) {
+              const d = grupo.documentos[0];
+              grupo.numero_resol   = d.numero_resol   || null;
+              grupo.fecha_resolucion = d.fecha_resolucion || null;
+            }
+          });
+
           this.documents = Object.values(grupos);
+
         }
         this.loadingDocuments = false;
         this.changeDetector.detectChanges();
