@@ -7,18 +7,30 @@
   <!-- Encabezado del Módulo -->
   <div class="module-header shadow">
     <div>
-      <h1>Buzón de Resueltos Procesados en ({{ currentProfile === 'Edicion' ? 'Edición' : currentProfile === 'Revision' ? 'Revisión' : currentProfile === 'Secretaria' ? 'Secretaría' : currentProfile === 'Direccion' ? 'Dirección' : currentProfile === 'Aprobador' ? 'Aprobador' : currentProfile }})</h1>
-      <p>Seleccione una carpeta militar para gestionar y firmar digitalmente los resueltos aprobados.</p>
+      <h1 [ngSwitch]="currentProfile">
+        <span *ngSwitchCase="'Edicion'">Redactor de Resoluciones</span>
+        <span *ngSwitchCase="'Revision'">Revisión de Resoluciones</span>
+        <span *ngSwitchCase="'Jefe'">Bandeja del Jefe de Revisión</span>
+        <span *ngSwitchCase="'Secretaria'">Bandeja del Secretario del MPPD</span>
+        <span *ngSwitchCase="'Direccion'">Bandeja de la Dirección del Despacho</span>
+        <span *ngSwitchCase="'Aprobador'">Bandeja del Aprobador y Firmante</span>
+        <span *ngSwitchDefault>Bandeja de Resoluciones</span>
+      </h1>
+      <p>Gestión, clasificación y firma digital de resoluciones y expedientes ministeriales.</p>
     </div>
     <div style="display: flex; gap: 15px; align-items: center;">
-      <!-- Selector de Perfil Dinámico (Bajo Demanda) -->
+      <!-- Botón "Documentos Firmados" (Solo visible si no es Aprobador) -->
+      <div *ngIf="currentProfile !== 'Aprobador'" class="signed-docs-toggle-container">
+        <button class="btn-firmados" [class.active]="showingFirmados" (click)="toggleShowingFirmados()">
+          <i class="fas fa-file-signature"></i>
+          <span>Firmados</span>
+        </button>
+      </div>
+
       <!-- Selector de Perfil Dinámico (Bajo Demanda - Solo Admins) -->
       <div *ngIf="isAdmin()" class="profile-selector-container" style="display: flex; align-items: center; gap: 8px;">
-        <label style="margin: 0; font-weight: bold; font-size: 0.85rem; color: #a8b2c1;">
-          <i class="fas fa-user-shield"></i> Perfil:
-        </label>
-        <select class="form-control" 
-                style="background: #1c2541; color: #a8b2c1; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 4px 8px; font-size: 0.85rem; width: auto;"
+       
+        <select class="profile-select-custom" 
                 [(ngModel)]="currentProfile"
                 (change)="onProfileChange()">
           <option value="Edicion">Edición (Redactor)</option>
@@ -31,7 +43,7 @@
       </div>
 
       <button class="btn-close-view" (click)="exitComponent()" title="Salir del Buzón de Resueltos">
-        <i class="fas fa-times-circle"></i><span class="btn-text-close"> Cerrar Vista</span>
+        <i class="fas fa-times-circle"></i><span class="btn-text-close"> Cerrar</span>
       </button>
     </div>
   </div>
@@ -138,9 +150,9 @@
       
       <!-- Estado Vacío (Sin carpeta seleccionada) -->
       <div class="empty-state" *ngIf="!selectedFolder">
-        <i class="fas fa-copy"></i>
-        <h3>Buzón de Documentos Vacío</h3>
-        <p>Seleccione una carpeta militar en el panel izquierdo para visualizar las resoluciones y expedientes asociados.</p>
+        <i class="fas fa-folder-open" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem; display: block; text-align: center;"></i>
+        <h3 style="font-weight: 700; color: #4a5568; text-align: center;">Seleccione una Carpeta Militar</h3>
+        <p style="color: #718096; max-width: 400px; margin: 0 auto; text-align: center; font-size: 0.88rem; line-height: 1.4;">Por favor, seleccione una agrupación en el panel izquierdo para explorar y gestionar los expedientes y resoluciones asociadas.</p>
       </div>
 
       <!-- Contenido cuando se selecciona carpeta -->
@@ -294,6 +306,13 @@
                   </div>
                   
                   <div class="actions" style="display: flex; gap: 8px;" (click)="$event.stopPropagation()">
+                    <!-- Botón Distribución: Solo Dirección + Firmados -->
+                    <button *ngIf="showingFirmados && currentProfile === 'Direccion'"
+                            class="btn-distribute-icon"
+                            (click)="openDistributionModal(doc); $event.stopPropagation()"
+                            title="Instrucciones de Distribución">
+                      <i class="fas fa-route"></i>
+                    </button>
                     <button class="btn btn-sm" 
                             (click)="startImmersiveMode(doc, currentProfile); $event.stopPropagation()" 
                             title="Visualizar Documento"
@@ -339,6 +358,13 @@
               </div>
               
               <div class="actions" style="display: flex; gap: 8px;" (click)="$event.stopPropagation()">
+                <!-- Botón Distribución: Solo Dirección + Firmados -->
+                <button *ngIf="showingFirmados && currentProfile === 'Direccion'"
+                        class="btn-distribute-icon"
+                        (click)="openDistributionModal(doc); $event.stopPropagation()"
+                        title="Instrucciones de Distribución">
+                  <i class="fas fa-route"></i>
+                </button>
                 <button class="btn btn-sm" 
                         (click)="startImmersiveMode(doc, currentProfile); $event.stopPropagation()" 
                         title="Visualizar Documento"
@@ -420,37 +446,105 @@
     </ng-container>
 
     <ng-container *ngIf="contextMenuType === 'document'">
-      <ng-container *ngIf="currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion'">
-        <div class="context-menu-item" (click)="setDocPriority(contextMenuData, 'Normal')">
-          <i class="fas fa-check text-success"></i> Normal
+
+      <!-- CASO: Firmados + Dirección → Solo opción Publicar -->
+      <ng-container *ngIf="showingFirmados && currentProfile === 'Direccion'">
+        <div class="context-menu-item" (click)="openDistributionModal(contextMenuData)">
+          <i class="fas fa-route text-success"></i> Publicar
         </div>
-        <div class="context-menu-item" (click)="setDocPriority(contextMenuData, 'Prioritario')">
-          <i class="fas fa-exclamation-circle text-warning"></i> Prioritario
-        </div>
-        <div class="context-menu-item" (click)="setDocPriority(contextMenuData, 'Urgente')">
-          <i class="fas fa-bolt text-danger"></i> Urgente
-        </div>
-        <div class="context-divider" style="height: 1px; background-color: #e2e8f0; margin: 0.3rem 0;"></div>
-        <div class="context-menu-item" (click)="setDocTag(contextMenuData)">
-          <i class="fas fa-tag text-info"></i> Etiqueta
-        </div>
-        <div class="context-divider" style="height: 1px; background-color: #e2e8f0; margin: 0.3rem 0;"></div>
       </ng-container>
 
-      <div class="context-menu-item" (click)="startImmersiveMode(contextMenuData, currentProfile === 'Edicion' ? 'Revision' : currentProfile)">
-        <i class="fas fa-eye text-teal"></i> Ver 
-      </div>
-      <div class="context-menu-item" (click)="approveFast(contextMenuData)">
-        <i class="fas fa-signature text-success"></i> Firmar Rápido
-      </div>
-      <div class="context-menu-item text-danger" (click)="cancelFast(contextMenuData)">
-        <i class="fas fa-times text-danger"></i> Anular Carpeta
-      </div>
+      <!-- CASO NORMAL: Fuera de Firmados -->
+      <ng-container *ngIf="!showingFirmados">
+        <ng-container *ngIf="currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion'">
+          <div class="context-menu-item" (click)="setDocPriority(contextMenuData, 'Normal')">
+            <i class="fas fa-check text-success"></i> Normal
+          </div>
+          <div class="context-menu-item" (click)="setDocPriority(contextMenuData, 'Prioritario')">
+            <i class="fas fa-exclamation-circle text-warning"></i> Prioritario
+          </div>
+          <div class="context-menu-item" (click)="setDocPriority(contextMenuData, 'Urgente')">
+            <i class="fas fa-bolt text-danger"></i> Urgente
+          </div>
+          <div class="context-divider" style="height: 1px; background-color: #e2e8f0; margin: 0.3rem 0;"></div>
+          <div class="context-menu-item" (click)="setDocTag(contextMenuData)">
+            <i class="fas fa-tag text-info"></i> Etiqueta
+          </div>
+          <div class="context-divider" style="height: 1px; background-color: #e2e8f0; margin: 0.3rem 0;"></div>
+        </ng-container>
+
+        <div class="context-menu-item" (click)="startImmersiveMode(contextMenuData, currentProfile === 'Edicion' ? 'Revision' : currentProfile)">
+          <i class="fas fa-eye text-teal"></i> Ver 
+        </div>
+        <div class="context-menu-item" (click)="approveFast(contextMenuData)">
+          <i class="fas fa-signature text-success"></i> Firmar Rápido
+        </div>
+        <div class="context-menu-item text-danger" (click)="cancelFast(contextMenuData)">
+          <i class="fas fa-times text-danger"></i> Anular Carpeta
+        </div>
+      </ng-container>
+
+      <!-- CASO: Firmados pero NO es Dirección → Sin menu contextual (vacío) -->
     </ng-container>
   </div>
 </div>
 
 <!-- /resueltos-root -->
+
+<!-- ==================== MODAL DE DISTRIBUCIÓN ==================== -->
+<div class="dist-modal-backdrop" *ngIf="isDistributionModalOpen" (click)="closeDistributionModal()">
+  <div class="dist-modal-card" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="dist-modal-header">
+      <div class="dist-modal-icon">
+        <i class="fas fa-route"></i>
+      </div>
+      <div>
+        <h3 class="dist-modal-title">Instrucciones de Distribución</h3>
+        <p class="dist-modal-subtitle">Carpeta N° <strong>{{ selectedDocForDistribution?.numero_carpeta }}</strong></p>
+      </div>
+      <button class="dist-close-btn" (click)="closeDistributionModal()">&times;</button>
+    </div>
+
+    <!-- Body -->
+    <div class="dist-modal-body">
+      <p class="dist-instruction">Seleccione los canales de publicación para esta carpeta:</p>
+
+      <div class="dist-checklist-grid">
+        <label class="dist-check-item"
+               *ngFor="let option of distributionOptions"
+               [class.is-no-publicar]="option === 'NO PUBLICAR'"
+               [class.checked]="isOptionChecked(option)">
+          <input type="checkbox"
+                 [checked]="isOptionChecked(option)"
+                 (change)="toggleDistributionOption(option)">
+          <span class="dist-check-box">
+            <i class="fas fa-check"></i>
+          </span>
+          <span class="dist-check-label">{{ option }}</span>
+        </label>
+      </div>
+
+
+      <!-- Resumen de Selección -->
+      <div class="dist-summary" *ngIf="selectedDistributions.size > 0">
+        <i class="fas fa-route"></i>
+        <span>Canales: <strong>{{ selectedDistributions.size }}</strong> seleccionados</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="dist-modal-footer">
+      <button class="dist-btn-cancel" (click)="closeDistributionModal()">
+        <i class="fas fa-times"></i> Cancelar
+      </button>
+      <button class="dist-btn-accept" (click)="saveDistribution()">
+        <i class="fas fa-check"></i> Aceptar
+      </button>
+    </div>
+  </div>
+</div>
 </div>
 
 <!-- ==================== VISTA INMERSIVA (TINDER-STYLE PDF VIEW) ==================== -->

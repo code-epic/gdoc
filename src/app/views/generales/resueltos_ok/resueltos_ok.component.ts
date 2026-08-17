@@ -60,7 +60,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
   public documentSearchQuery = "";
 
-  public documentTags: { [docKey: string]: { priority: string; tag: string } } =
+  public documentTags: { [docKey: string]: { priority: string; tag: string; distribution?: string[] } } =
     {};
   public existingTags: string[] = [];
   public documentGroups: Array<{ name: string; docs: any[] }> = [];
@@ -151,6 +151,13 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     | "Secretaria"
     | "Direccion"
     | "Aprobador" = "Edicion";
+  public showingFirmados: boolean = false;
+
+  // --- DISTRIBUCIÓN (Solo Dirección + Firmados) ---
+  public isDistributionModalOpen: boolean = false;
+  public selectedDocForDistribution: any = null;
+  public distributionOptions: string[] = ['NORMAL', 'PDF RRSS', 'OFICIO', 'GACETA', 'SOBRE', 'NO PUBLICAR'];
+  public selectedDistributions: Set<string> = new Set<string>();
   public viewerProfile:
     | "Edicion"
     | "Revision"
@@ -393,9 +400,70 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   }
 
   public onProfileChange() {
+    this.showingFirmados = false;
     this.selectedFolder = null;
     this.documents = [];
     this.loadFolders();
+  }
+
+  public toggleShowingFirmados(): void {
+    this.showingFirmados = !this.showingFirmados;
+    this.selectedFolder = null;
+    this.documents = [];
+    this.loadFolders();
+  }
+
+  // --- MODAL DE DISTRIBUCIÓN ---
+  public openDistributionModal(doc: any): void {
+    this.selectedDocForDistribution = doc;
+    // Restaurar selecciones previas guardadas en el doc (si existen)
+    const savedDist: string[] = doc?.distribution || [];
+    this.selectedDistributions = new Set<string>(savedDist);
+    this.isDistributionModalOpen = true;
+    this.closeContextMenu();
+  }
+
+  public closeDistributionModal(): void {
+    this.isDistributionModalOpen = false;
+    this.selectedDocForDistribution = null;
+  }
+
+  public isOptionChecked(option: string): boolean {
+    return this.selectedDistributions.has(option);
+  }
+
+  public toggleDistributionOption(option: string): void {
+    if (option === 'NO PUBLICAR') {
+      // Si se selecciona "No Publicar" se desmarcan las demás opciones
+      if (this.selectedDistributions.has('NO PUBLICAR')) {
+        this.selectedDistributions.delete('NO PUBLICAR');
+      } else {
+        this.selectedDistributions.clear();
+        this.selectedDistributions.add('NO PUBLICAR');
+      }
+    } else {
+      // Al marcar cualquier otra opción, se elimina "No Publicar"
+      this.selectedDistributions.delete('NO PUBLICAR');
+      if (this.selectedDistributions.has(option)) {
+        this.selectedDistributions.delete(option);
+      } else {
+        this.selectedDistributions.add(option);
+      }
+    }
+  }
+
+  public saveDistribution(): void {
+    if (!this.selectedDocForDistribution) return;
+    const distribution = Array.from(this.selectedDistributions);
+    // Guardar en el objeto del documento para reflejo reactivo inmediato
+    this.selectedDocForDistribution.distribution = distribution;
+    // Persistir en documentTags también
+    const carpetaKey = this.selectedDocForDistribution.numero_carpeta;
+    if (!this.documentTags[carpetaKey]) {
+      this.documentTags[carpetaKey] = { priority: 'Normal', tag: '' };
+    }
+    this.documentTags[carpetaKey].distribution = distribution;
+    this.closeDistributionModal();
   }
 
   // --- LOGICA EXPLORADOR (CARPETAS Y DOCUMENTOS) ---
@@ -411,16 +479,21 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = environment.funcion.ENTRADAS_PROCESO_TIPO_TOTAL;
     let paramVal = "36";
-    if (this.currentProfile === "Aprobador") {
-      paramVal = "880";
-    } else if (this.currentProfile === "Secretaria") {
-      paramVal = "930";
-    } else if (this.currentProfile === "Direccion") {
-      paramVal = "340";
-    } else if (this.currentProfile === "Jefe") {
-      paramVal = "991";
-    } else if (this.currentProfile === "Revision") {
-      paramVal = "990";
+
+    if (this.showingFirmados) {
+      paramVal = "7766";
+    } else {
+      if (this.currentProfile === "Aprobador") {
+        paramVal = "880";
+      } else if (this.currentProfile === "Secretaria") {
+        paramVal = "930";
+      } else if (this.currentProfile === "Direccion") {
+        paramVal = "340";
+      } else if (this.currentProfile === "Jefe") {
+        paramVal = "991";
+      } else if (this.currentProfile === "Revision") {
+        paramVal = "990";
+      }
     }
 
     this.xAPI.parametros = paramVal;
@@ -561,16 +634,20 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.xAPI.funcion = environment.funcion.ENTRADAS_PROCESO_TIPO;
 
     let paramVal = "36";
-    if (this.currentProfile === "Aprobador") {
-      paramVal = "880";
-    } else if (this.currentProfile === "Secretaria") {
-      paramVal = "930";
-    } else if (this.currentProfile === "Direccion") {
-      paramVal = "340";
-    } else if (this.currentProfile === "Jefe") {
-      paramVal = "991";
-    } else if (this.currentProfile === "Revision") {
-      paramVal = "990";
+    if (this.showingFirmados) {
+      paramVal = "7766";
+    } else {
+      if (this.currentProfile === "Aprobador") {
+        paramVal = "880";
+      } else if (this.currentProfile === "Secretaria") {
+        paramVal = "930";
+      } else if (this.currentProfile === "Direccion") {
+        paramVal = "340";
+      } else if (this.currentProfile === "Jefe") {
+        paramVal = "991";
+      } else if (this.currentProfile === "Revision") {
+        paramVal = "990";
+      }
     }
 
     this.xAPI.parametros = `${folder.codigo},${paramVal}`;
