@@ -813,3 +813,71 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
     display: none;
   }
 }
+
+/* Selection top bar */
+.rt-selection-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: rgba(94, 170, 168, 0.06);
+  border: 1px solid rgba(94, 170, 168, 0.15);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: $ok-text;
+  font-weight: 500;
+
+  .rt-selection-actions {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .rt-selection-btn {
+    background: white;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: #f8f9fa;
+      border-color: #adb5bd;
+    }
+  }
+}
+
+/* Grouping styles */
+.rt-folder-group-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.4rem;
+  
+  .rt-folder-group-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background-color: rgba(94, 170, 168, 0.04);
+    border: 1px solid rgba(94, 170, 168, 0.15);
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 0.2rem;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(94, 170, 168, 0.08);
+    }
+  }
+
+  .rt-folder-group-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.2rem;
+  }
+}
+

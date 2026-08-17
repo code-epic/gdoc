@@ -1,27 +1,44 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ElementRef, ViewChild } from "@angular/core";
 import { PageEvent } from "@angular/material/paginator";
-import {NgbModal,NgbDate,NgbDateParserFormatter,} from "@ng-bootstrap/ng-bootstrap";
+import {
+  NgbModal,
+  NgbDate,
+  NgbDateParserFormatter,
+} from "@ng-bootstrap/ng-bootstrap";
 import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
-import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
-import {IWKFAlerta,IDocumento,} from "src/app/services/control/documentos.service";
+import {
+  ApiService,
+  IAPICore,
+  DocumentoAdjunto,
+} from "src/app/services/apicore/api.service";
+import {
+  IWKFAlerta,
+  IDocumento,
+} from "src/app/services/control/documentos.service";
 import { LoginService } from "src/app/services/seguridad/login.service";
 import { UtilService } from "src/app/services/util/util.service";
-import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from "@angular/forms";
+import {
+  FormBuilder,
+  FormControl,
+  FormControlName,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 import { PendientesService } from "src/app/core/service/control/pendientes.service";
 import { Router } from "@angular/router";
+import { FileService } from "src/app/services/apicore/file.service";
 
 @Component({
   selector: "app-pendientes",
   templateUrl: "./pendientes.component.html",
   styleUrls: ["./pendientes.component.scss"],
 })
-
 export class PendientesComponent implements OnInit {
-
   mostrarCamposAdicionales: boolean = false;
   mostrarBotonOcultar: boolean = false;
   fechaRango: FormGroup;
+  public activarTipo: boolean = false;
 
   public bzBusqueda: any[] = [];
   public numeroPlaceholder: string = "NÚMERO";
@@ -42,7 +59,7 @@ export class PendientesComponent implements OnInit {
   public cantidad = 0;
   public blBuscar = false;
   public max_paginador: number = 0;
-  public lstPaginas = [];
+  public lstPaginas: any[] = [];
   public actual: number = 1;
   public radio: number = 0;
   public tipoDocumento: string = "0";
@@ -76,12 +93,12 @@ export class PendientesComponent implements OnInit {
     observacion: "",
   };
 
-  public lstT = []; //Objeto Tipo documento
-  public lstR = []; //Objeto Remitente
-  public lstU = []; //Objeto Unidad
-  public lstC = []; //Objeto Comando
-  public lstCA = []; //Objeto Comando
-  
+  public lstT: any[] = []; //Objeto Tipo documento
+  public lstR: any[] = []; //Objeto Remitente
+  public lstU: any[] = []; //Objeto Unidad
+  public lstC: any[] = []; //Objeto Comando
+  public lstCA: any[] = []; //Objeto Comando
+
   public titulo = "Documento";
 
   public download: any;
@@ -101,15 +118,15 @@ export class PendientesComponent implements OnInit {
   toppingsaux = new FormControl("");
 
   lstPuntosCuentas: string[] = [];
-  lstPuntosCuentasAux: [];
-  public SubMenu = [];
+  lstPuntosCuentasAux: any[] = [];
+  public SubMenu: any[] = [];
 
   public isPunto: boolean = true;
   public sCedula: string = "Cédula";
   public sGrado: string = "Grado / Jerarquía";
   public sNombre: string = "Nombres y Apellidos";
 
-  public lstAcciones = [];
+  public lstAcciones: any[] = [];
 
   public xAPI: IAPICore = {
     funcion: "",
@@ -117,11 +134,24 @@ export class PendientesComponent implements OnInit {
     valores: "",
   };
 
+  @ViewChild("fileInput") fileInput!: ElementRef;
+  public archivos: any[] = [];
+  lblFile: any;
+  btnEnviar: boolean = false;
+  posicionProgreso: number = 0;
+  numControl = "";
+  hashcontrol = "";
+  public DocAdjunto: DocumentoAdjunto = {
+    documento: "",
+    archivo: "",
+    usuario: "",
+  };
+
   longitud = 0;
   pageSize = 10;
   pageEvent: PageEvent;
 
-  form:FormGroup;
+  form: FormGroup;
   constructor(
     private apiService: ApiService,
     private modalService: NgbModal,
@@ -129,12 +159,12 @@ export class PendientesComponent implements OnInit {
     private toastrService: ToastrService,
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
-    public formatter: NgbDateParserFormatter, 
-    public pendienteSrv : PendientesService,
-    private fb:FormBuilder,
-    private ruta: Router
+    public formatter: NgbDateParserFormatter,
+    public pendienteSrv: PendientesService,
+    private fb: FormBuilder,
+    private ruta: Router,
+    private fileService: FileService,
   ) {
-
     this.lstAcciones = this.pendienteSrv.getAction();
     this.Componentes = this.pendienteSrv.getComponent();
     this.Grados = this.pendienteSrv.getDegrees();
@@ -146,56 +176,86 @@ export class PendientesComponent implements OnInit {
   }
 
   async ngOnInit() {
-
     this.SubMenu = await this.loginService.obtenerSubMenu("/control");
-    let prv = this.loginService.obtenerPrivilegiosMenu("/control", this.ruta.url);
+    let prv = this.loginService.obtenerPrivilegiosMenu(
+      "/control",
+      this.ruta.url,
+    );
     if (prv != undefined && prv.Privilegios != undefined) {
       prv.Privilegios.forEach((e) => {
         if (e.nombre == "configurar") this.Configurar = true;
       });
-    } 
+    }
 
-    // ESTE BETA SIEMPRE DEBE ESTAR EN EL NGONINIT 
-    // NO PUEDE ESTAR EN EL CONSTRUCTOR RECORDEMOS QUE EL CONSTRUCTOR VA SIEMPRE ANTES QUE LAS LIBRERIAS DE ANGULAR 
+    // ESTE BETA SIEMPRE DEBE ESTAR EN EL NGONINIT
+    // NO PUEDE ESTAR EN EL CONSTRUCTOR RECORDEMOS QUE EL CONSTRUCTOR VA SIEMPRE ANTES QUE LAS LIBRERIAS DE ANGULAR
     this.form = this.fb.group({
-      tipoDocumento: new FormControl("valor por defecto", [Validators.required]),
+      tipoDocumento: new FormControl("valor por defecto", [
+        Validators.required,
+      ]),
       var3: new FormControl("222", [Validators.required]),
       var2: new FormControl("333", [Validators.required]),
     });
-
-
-
-  
-
   }
 
   async ConsultarSeguimiento(funcion: string) {
     let desdeLocal = "";
     let hastaLocal = "";
 
-    this.xAPI = {} as IAPICore
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = funcion;
     this.sinDatos = false;
-    
 
-    desdeLocal = this.desde == undefined || this.desde == "1900-01-01" ? new Date().getFullYear() - 5 + "-01-01" : this.desde;
-    hastaLocal = this.hasta == undefined || this.hasta == "1900-01-01" ? new Date().toISOString().slice(0, 10) : this.hasta;
+    desdeLocal =
+      this.desde == undefined || this.desde == "1900-01-01"
+        ? new Date().getFullYear() - 5 + "-01-01"
+        : this.desde;
+    hastaLocal =
+      this.hasta == undefined || this.hasta == "1900-01-01"
+        ? new Date().toISOString().slice(0, 10)
+        : this.hasta;
 
     if (this.xAPI.funcion == "WKF_CSeguimiento") {
       if (this.tipoDocumento == "1" || this.tipoDocumento == "5") {
         this.xAPI.funcion = "WKF_CSeguimiento_Cedula";
         this.xAPI.parametros = this.buscar + "," + this.tipoDocumento;
         // console.log(this.xAPI.parametros);
-
       } else {
-        this.xAPI.parametros = this.contenidoDocumento + "," +
-        desdeLocal + "," + hastaLocal + "," + this.buscar +  "," + this.tipoDocumento + "," + this.opttodos;
+        this.xAPI.parametros =
+          this.contenidoDocumento +
+          "," +
+          desdeLocal +
+          "," +
+          hastaLocal +
+          "," +
+          this.buscar +
+          "," +
+          this.tipoDocumento +
+          "," +
+          this.opttodos;
         // console.log(this.xAPI.parametros);
       }
     } else {
-      this.xAPI.parametros = this.contenidoDocumento + "," + desdeLocal + "," + hastaLocal + "," + this.Doc.contenido.trim() +
-        "," + this.Doc.tipo + "," + this.Doc.remitente + "," + this.Doc.unidad + "," + this.Doc.comando +"," + this.Doc.instrucciones +
-        "," + this.optfecha;
+      this.xAPI.parametros =
+        this.contenidoDocumento +
+        "," +
+        desdeLocal +
+        "," +
+        hastaLocal +
+        "," +
+        this.Doc.contenido.trim() +
+        "," +
+        this.Doc.tipo +
+        "," +
+        this.Doc.remitente +
+        "," +
+        this.Doc.unidad +
+        "," +
+        this.Doc.comando +
+        "," +
+        this.Doc.instrucciones +
+        "," +
+        this.optfecha;
       // console.log(this.xAPI.parametros)
     }
 
@@ -205,10 +265,27 @@ export class PendientesComponent implements OnInit {
       (data) => {
         // console.log(data.Cuerpo)
         this.bzSeguimientoO = data.Cuerpo.map((e) => {
-          e.busqueda = this.utilService.ConvertirCadena( e.norigen + " " + e.ncontrol + " " + e.contenido + e.estatus_nombre + " " +  
-          e.remitente + " " + e.nombre + " " + e.creado + " " + e.salida + " " + e.unidad + " " + e.subdocumento
+          e.busqueda = this.utilService.ConvertirCadena(
+            e.norigen +
+              " " +
+              e.ncontrol +
+              " " +
+              e.contenido +
+              e.estatus_nombre +
+              " " +
+              e.remitente +
+              " " +
+              e.nombre +
+              " " +
+              e.creado +
+              " " +
+              e.salida +
+              " " +
+              e.unidad +
+              " " +
+              e.subdocumento,
           );
-         
+
           e.numc = e.ncontrol;
           e.existe = e.anom == "" ? true : false;
           e.privado = e.priv == 1 ? true : false;
@@ -216,8 +293,11 @@ export class PendientesComponent implements OnInit {
           e.s_texto = "";
 
           if (e.s_estatus > 0 || e.s_estatus < 10) {
-            if( this.lstAcciones[e.s_estatus] != undefined )
-              e.s_texto = e.s_estatus != null ? " - " + this.lstAcciones[e.s_estatus].texto : "";
+            if (this.lstAcciones[e.s_estatus] != undefined)
+              e.s_texto =
+                e.s_estatus != null
+                  ? " - " + this.lstAcciones[e.s_estatus].texto
+                  : "";
           }
 
           switch (e.tdoc.toLowerCase()) {
@@ -239,6 +319,8 @@ export class PendientesComponent implements OnInit {
           }
           e.resumenl = e.contenido.substring(0, 200);
           e.completed = false;
+          e.statusprogreso = false;
+          e.progreso = 0;
           return e;
         });
 
@@ -251,7 +333,7 @@ export class PendientesComponent implements OnInit {
         this.MostrarPaginador();
         this.clear();
         this.ngxService.stopLoader("loader-aceptar");
-        
+
         if (data.Cuerpo.length === 0) {
           this.sinDatos = true;
         } else {
@@ -260,7 +342,7 @@ export class PendientesComponent implements OnInit {
       },
       (error) => {
         console.log("Error en la carga");
-      }
+      },
     );
   }
 
@@ -412,7 +494,7 @@ export class PendientesComponent implements OnInit {
         }
         this.toastrService.warning(
           "Debe dirigirse al modulo de salida para usar esta opcion",
-          `GDoc Salida`
+          `GDoc Salida`,
         );
       }
 
@@ -431,7 +513,7 @@ export class PendientesComponent implements OnInit {
 
   cargarPuntosdeCuenta() {
     this.ngxService.startLoader("loader-aceptar");
-    this.xAPI = {} as IAPICore
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "WKF_CPuntoCuentaSalida";
     this.xAPI.parametros = "5";
     this.xAPI.valores = "";
@@ -439,7 +521,7 @@ export class PendientesComponent implements OnInit {
       (data) => {
         data.Cuerpo.map((e) => {
           this.lstPuntosCuentas.push(
-            e.cuen + " | " + e.udep + " " + e.fori.substring(0, 10)
+            e.cuen + " | " + e.udep + " " + e.fori.substring(0, 10),
           );
         });
         this.ngxService.stopLoader("loader-aceptar");
@@ -448,24 +530,29 @@ export class PendientesComponent implements OnInit {
       (error) => {
         console.error("No existe la funcion ", error);
         this.ngxService.stopLoader("loader-aceptar");
-      }
+      },
     );
   }
 
   searchAndCloseModal() {
-    this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
+    this.desde = this.utilService.ConvertirFechaDia(
+      this.fechaRango.value.start,
+    );
     this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
 
     this.vistacontenido = true;
     this.ConsultarSeguimiento("WKF_CSeguimiento_Detalle");
     this.modalService.dismissAll();
-
   }
 
   consultarDocument(event: any) {
     if (event == undefined || event.charCode == 13) {
-      this.desde = this.utilService.ConvertirFechaDia(this.fechaRango.value.start);
-      this.hasta = this.utilService.ConvertirFechaDia(this.fechaRango.value.end);
+      this.desde = this.utilService.ConvertirFechaDia(
+        this.fechaRango.value.start,
+      );
+      this.hasta = this.utilService.ConvertirFechaDia(
+        this.fechaRango.value.end,
+      );
       this.vistacontenido = true;
       this.ConsultarSeguimiento("WKF_CSeguimiento");
     }
@@ -480,9 +567,11 @@ export class PendientesComponent implements OnInit {
   }
 
   onTipoDocumentoChange(event) {
-    this.numeroPlaceholder = this.pendienteSrv.getPlaceholderByTipoDocumento(event.value);
+    this.numeroPlaceholder = this.pendienteSrv.getPlaceholderByTipoDocumento(
+      event.value,
+    );
   }
-  
+
   getDate() {
     const today = new Date();
     const month = today.getMonth();
@@ -494,30 +583,101 @@ export class PendientesComponent implements OnInit {
     });
   }
 
-
   activarCamposAdicionales() {
     this.mostrarCamposAdicionales = !this.mostrarCamposAdicionales;
     this.mostrarBotonOcultar = !this.mostrarBotonOcultar;
   }
 
-  clear(){
-        this.contenidoDocumento = "";
-        this.buscar = "";
-        this.tipoDocumento = "0";
-        this.Doc.contenido = "";
-        this.Doc.tipo = "";
-        this.cargador = true;
-        this.Doc.remitente = "";
-        this.Doc.unidad = "";
-        this.Doc.comando = "";
-        this.Doc.instrucciones = "";
-        this.mostrarCamposAdicionales = false;
-        this.mostrarBotonOcultar = false;
-        this.desde = undefined;
-        this.hasta = undefined;
-        this.fechaRango.value.start = undefined;
-        this.fechaRango.value.end = undefined;
-        this.opttodos = "0";
+  openAdjuntar(content, id, posicion) {
+    if (this.fileInput) this.fileInput.nativeElement.value = "";
+    this.archivos = [];
+    this.lblFile = "";
+    this.numControl = id;
+    this.hashcontrol = btoa("D" + this.numControl); //Cifrar documentos
+    this.posicionProgreso = posicion;
+    this.modalService.open(content);
   }
-  
+
+  fileSelected(e) {
+    this.lblFile = e.target.files[0].name;
+    this.archivos.push(e.target.files[0]);
+    this.btnEnviar = true;
+  }
+
+  async SubirArchivo(e, posicion) {
+    var frm = new FormData(document.forms.namedItem("forma"));
+    this.bzSeguimiento[posicion].statusprogreso = true;
+    this.btnEnviar = false;
+    try {
+      await this.fileService.EnviarArchivosProgress(frm).subscribe({
+        next: (event) => {
+          this.bzSeguimiento[posicion].progreso = event.progress;
+          if (event.state === "DONE") {
+            this.bzSeguimiento[posicion].anom = "X";
+            this.cargarSubDetalle();
+          }
+        },
+        error: (err) => {
+          this.toastrService.error(err, `GDoc Adjunto`);
+          console.error("Error al subir el archivo:", err);
+        },
+        complete: () => {
+          this.bzSeguimiento[posicion].statusprogreso = false;
+          this.bzSeguimiento[posicion].progreso = 0;
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  cargarSubDetalle() {
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_ADocumentoAdjunto";
+    this.xAPI.parametros = "";
+    this.DocAdjunto.archivo = this.archivos[0].name;
+    this.DocAdjunto.usuario = this.loginService.Usuario.id;
+    this.DocAdjunto.documento = this.numControl;
+    this.xAPI.valores = JSON.stringify(this.DocAdjunto);
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (xdata) => {
+        if (xdata.tipo == 1) {
+          if (this.fileInput) this.fileInput.nativeElement.value = "";
+          this.lblFile = "";
+          this.archivos = [];
+          this.toastrService.success(
+            "Tu archivo ha sido cargado con exito ",
+            `GDoc Registro`,
+          );
+        } else {
+          this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+        }
+        this.ngxService.stopLoader("loader-aceptar");
+      },
+      (error) => {
+        this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
+        this.ngxService.stopLoader("loader-aceptar");
+      },
+    );
+  }
+
+  clear() {
+    this.contenidoDocumento = "";
+    this.buscar = "";
+    this.tipoDocumento = "0";
+    this.Doc.contenido = "";
+    this.Doc.tipo = "";
+    this.cargador = true;
+    this.Doc.remitente = "";
+    this.Doc.unidad = "";
+    this.Doc.comando = "";
+    this.Doc.instrucciones = "";
+    this.mostrarCamposAdicionales = false;
+    this.mostrarBotonOcultar = false;
+    this.desde = undefined;
+    this.hasta = undefined;
+    this.fechaRango.value.start = undefined;
+    this.fechaRango.value.end = undefined;
+    this.opttodos = "0";
+  }
 }

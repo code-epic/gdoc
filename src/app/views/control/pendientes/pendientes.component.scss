@@ -87,3 +87,98 @@ input, select, textarea {
   width: 15px; 
   margin-top: -3px;
 }
+
+.custom-file-upload {
+  border: 2px dashed #e0eafc;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #f6f9fc;
+    border-color: #cfdef3;
+  }
+
+  .upload-icon {
+    font-size: 3rem;
+    color: #5eaaa8;
+    margin-bottom: 1rem;
+  }
+
+  .upload-text {
+    color: #525f7f;
+    font-weight: 600;
+  }
+
+  .upload-hint {
+    color: #8898aa;
+    font-size: 0.8rem;
+  }
+}
+
+.pdf-pill {
+  display: inline-flex;
+  align-items: center;
+  background-color: #ffeef0;
+  color: #f5365c;
+  border: 1px solid #fad2e1;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f5365c;
+    color: #fff;
+    border-color: #f5365c;
+    text-decoration: none;
+  }
+
+  mat-icon {
+    font-size: 1rem !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 4px;
+    display: inline-block;
+    line-height: 16px !important;
+  }
+}
+
+.btn-attach {
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #8898aa;
+
+  &:hover {
+    background-color: #f6f9fc;
+    color: #5e72e4;
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  mat-icon {
+    font-size: 1.25rem !important;
+    width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    
+    &.attached {
+      color: #2dce89;
+    }
+  }
+}

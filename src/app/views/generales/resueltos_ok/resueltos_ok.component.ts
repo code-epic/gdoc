@@ -48,8 +48,24 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public filteredFolders: any[] = [];
   public paginatedFolders: any[] = [];
   public selectedFolder: any = null;
-  public documents: any[] = [];
+
+  private _documents: any[] = [];
+  get documents(): any[] {
+    return this._documents;
+  }
+  set documents(val: any[]) {
+    this._documents = val;
+    this.processDocumentsGrouping();
+  }
+
   public documentSearchQuery = "";
+
+  public documentTags: { [docKey: string]: { priority: string; tag: string } } =
+    {};
+  public existingTags: string[] = [];
+  public documentGroups: Array<{ name: string; docs: any[] }> = [];
+  public flatDocuments: any[] = [];
+  public expandedDocGroups: { [groupName: string]: boolean } = {};
 
   get filteredDocumentsList() {
     if (!this.documentSearchQuery) return this.documents;
@@ -181,6 +197,14 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
     this.loadComponentMap();
     this.decodeUserToken();
+    try {
+      const saved = localStorage.getItem("ok_document_tags");
+      if (saved) {
+        this.documentTags = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error("Error loading document tags:", e);
+    }
     this.loadFolders();
   }
 
@@ -402,11 +426,11 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.xAPI.parametros = paramVal;
     this.xAPI.valores = "";
 
-    console.log(this.xAPI);
-
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         try {
+          // console.log(data);
+
           if (data && data.Cuerpo) {
             this.allFolders = data.Cuerpo.map((e) => ({
               codigo: e.codigo,
@@ -414,6 +438,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               c_tipo: e.c_tipo,
               fecha: e.fecha,
             }));
+            // console.log(this.allFolders);
             this.filterAndPaginateFolders();
           }
         } catch (error) {
@@ -450,6 +475,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       // const compId = parseInt(this.activeComponentFilter, 10);
       // result = result.filter((f) => f.componente === compId);
     }
+
+    console.log(result);
 
     // 2. Filtrar por Búsqueda Query
     if (this.folderSearchQuery.trim() !== "") {
@@ -551,6 +578,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        console.log("Datos actos administrativos");
+        console.log(data);
         if (data && data.Cuerpo) {
           const rawDocs = data.Cuerpo.map((e) => {
             e.completed = false;
@@ -1207,7 +1236,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     const controlId = doc.ncontrol || doc.numc;
     const userDb = this.jwtData.userId;
 
-    console.log("Alta seleccion de datos y control II");
+    // console.log("Alta seleccion de datos y control II");
 
     Swal.fire({
       title: "Rechazar Documento",
@@ -1356,5 +1385,331 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         this.changeDetector.detectChanges();
       },
     );
+  }
+
+  // ── Tagging & Priority operations for Documents ─────
+  public processDocumentsGrouping(): void {
+    const listToProcess = this.filteredDocumentsList || [];
+    const groupsMap = new Map<string, any[]>();
+    const flatList: any[] = [];
+    const collectedTags = new Set<string>();
+
+    listToProcess.forEach((doc, idx) => {
+      const key = doc.numero_carpeta;
+      const tagInfo = this.documentTags[key];
+      const priority = tagInfo?.priority || "Normal";
+
+      // Fallback: If no tag in documentTags, search in doc.documentos for a non-empty observacion
+      let tag = tagInfo?.tag || "";
+      if (!tag && doc.documentos && Array.isArray(doc.documentos)) {
+        const foundObs = doc.documentos
+          .map((d) => d.observacion)
+          .find((o) => o && o.trim() !== "");
+        if (foundObs) {
+          tag = foundObs.trim().toUpperCase();
+        }
+      }
+
+      doc.index = idx;
+      doc.priority = priority;
+      doc.tag = tag;
+
+      if (tag && tag.trim() !== "") {
+        collectedTags.add(tag);
+        if (!groupsMap.has(tag)) {
+          groupsMap.set(tag, []);
+        }
+        groupsMap.get(tag)!.push(doc);
+      } else {
+        flatList.push(doc);
+      }
+    });
+
+    // Recorrer observaciones de todos los documentos para extraer tags existentes
+    listToProcess.forEach((doc) => {
+      if (doc.documentos && Array.isArray(doc.documentos)) {
+        doc.documentos.forEach((d: any) => {
+          if (d.observacion && d.observacion.trim() !== "") {
+            collectedTags.add(d.observacion.trim().toUpperCase());
+          }
+        });
+      }
+    });
+
+    this.existingTags = Array.from(collectedTags).sort();
+
+    this.documentGroups = Array.from(groupsMap.entries())
+      .map(([name, docs]) => ({
+        name,
+        docs: docs.sort((a, b) =>
+          a.numero_carpeta.localeCompare(b.numero_carpeta),
+        ),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    this.flatDocuments = flatList.sort((a, b) =>
+      a.numero_carpeta.localeCompare(b.numero_carpeta),
+    );
+  }
+
+  public toggleDocGroup(groupName: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.expandedDocGroups[groupName] = !this.expandedDocGroups[groupName];
+    this.changeDetector.detectChanges();
+  }
+
+  public isDocGroupExpanded(groupName: string): boolean {
+    return this.expandedDocGroups[groupName] === true; // collapsed by default
+  }
+
+  public saveDocumentTags(): void {
+    try {
+      localStorage.setItem(
+        "ok_document_tags",
+        JSON.stringify(this.documentTags),
+      );
+    } catch (e) {
+      console.error("Error writing document tags to localStorage:", e);
+    }
+    this.processDocumentsGrouping();
+    this.changeDetector.detectChanges();
+  }
+
+  public setDocPriority(doc: any, priority: string): void {
+    if (!doc) return;
+    const key = doc.numero_carpeta;
+    if (!this.documentTags[key]) {
+      this.documentTags[key] = { priority: "Normal", tag: "" };
+    }
+    this.documentTags[key].priority = priority;
+    this.saveDocumentTags();
+    this.closeContextMenu();
+  }
+
+  public async apiActualizarEtiqueta(
+    numeroCarpeta: string,
+    etiqueta: string,
+  ): Promise<any> {
+    const xAPI = {} as IAPICore;
+    xAPI.funcion = environment.funcion.ACTUALIZAR_CARPETA_ETIQUETA;
+    xAPI.parametros = `${numeroCarpeta},${etiqueta}`;
+    xAPI.valores = "";
+    try {
+      return await this.apiService.Ejecutar(xAPI).toPromise();
+    } catch (e) {
+      console.error(
+        `Error actualizando etiqueta para carpeta ${numeroCarpeta}:`,
+        e,
+      );
+      throw e;
+    }
+  }
+
+  public setDocTag(doc: any): void {
+    if (!doc) return;
+    this.closeContextMenu();
+    const key = doc.numero_carpeta;
+    const currentTag = this.documentTags[key]?.tag || "";
+
+    const options: { [key: string]: string } = {};
+    this.existingTags.forEach((t) => {
+      options[t] = t;
+    });
+    options["__NEW__"] = "+ Crear Nueva Etiqueta...";
+
+    let defaultVal = currentTag;
+    if (!defaultVal || !this.existingTags.includes(defaultVal)) {
+      defaultVal = "__NEW__";
+    }
+
+    Swal.fire({
+      title: "Asignar Etiqueta",
+      input: "select",
+      inputLabel: "Seleccione una etiqueta existente o cree una nueva",
+      inputValue: defaultVal,
+      inputOptions: options,
+      showCancelButton: true,
+      confirmButtonText: "Siguiente",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-secondary",
+        input: "swal-select-custom"
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const selection = result.value;
+        if (selection === "__NEW__") {
+          setTimeout(() => {
+            Swal.fire({
+              title: "Crear Nueva Etiqueta",
+              input: "text",
+              inputLabel: "Escriba el nombre de la nueva etiqueta",
+              showCancelButton: true,
+              confirmButtonText: "Aceptar",
+              cancelButtonText: "Cancelar",
+              customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-secondary",
+                input: "swal-input-custom"
+              },
+              buttonsStyling: false,
+              inputValidator: (val) => {
+                if (!val || val.trim() === "") {
+                  return "¡Debe ingresar un nombre para la etiqueta!";
+                }
+                return null;
+              },
+            }).then((textResult) => {
+              if (textResult.isConfirmed) {
+                const newTag = textResult.value.trim().toUpperCase();
+                this.applyDocTag(key, newTag);
+              }
+            });
+          }, 150);
+        } else if (selection) {
+          this.applyDocTag(key, selection);
+        }
+      }
+    });
+  }
+
+  private applyDocTag(key: string, tagValue: string): void {
+    if (!this.documentTags[key]) {
+      this.documentTags[key] = { priority: "Normal", tag: "" };
+    }
+    this.documentTags[key].tag = tagValue;
+    this.saveDocumentTags();
+
+    // Persistir en base de datos
+    this.apiActualizarEtiqueta(key, tagValue).then(
+      () =>
+        this.toastrService.success(
+          `Etiqueta "${tagValue}" guardada en base de datos.`,
+          "Éxito",
+        ),
+      () =>
+        this.toastrService.error(
+          "No se pudo guardar la etiqueta en el servidor.",
+          "Error",
+        ),
+    );
+  }
+
+  public clearDocSelection(): void {
+    this.documents.forEach((d) => (d.selected = false));
+    this.changeDetector.detectChanges();
+  }
+
+  get selectedDocsCount(): number {
+    return this.documents.filter((d) => d.selected).length;
+  }
+
+  public assignTagToSelectedDocs(): void {
+    const selected = this.documents.filter((d) => d.selected);
+    if (selected.length === 0) return;
+
+    const options: { [key: string]: string } = {};
+    this.existingTags.forEach((t) => {
+      options[t] = t;
+    });
+    options["__NEW__"] = "+ Crear Nueva Etiqueta...";
+
+    Swal.fire({
+      title: "Asignar Etiqueta a Seleccionados",
+      input: "select",
+      inputLabel:
+        "Seleccione una etiqueta existente o cree una nueva para las carpetas seleccionadas",
+      inputValue: "__NEW__",
+      inputOptions: options,
+      showCancelButton: true,
+      confirmButtonText: "Siguiente",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-secondary",
+        input: "swal-select-custom"
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const selection = result.value;
+        if (selection === "__NEW__") {
+          setTimeout(() => {
+            Swal.fire({
+              title: "Crear Nueva Etiqueta",
+              input: "text",
+              inputLabel: "Escriba el nombre de la nueva etiqueta",
+              showCancelButton: true,
+              confirmButtonText: "Aceptar",
+              cancelButtonText: "Cancelar",
+              customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-secondary",
+                input: "swal-input-custom"
+              },
+              buttonsStyling: false,
+              inputValidator: (val) => {
+                if (!val || val.trim() === "") {
+                  return "¡Debe ingresar un nombre!";
+                }
+                return null;
+              },
+            }).then((textResult) => {
+              if (textResult.isConfirmed) {
+                const newTag = textResult.value.trim().toUpperCase();
+                this.applyBatchTag(selected, newTag);
+              }
+            });
+          }, 150);
+        } else if (selection) {
+          this.applyBatchTag(selected, selection);
+        }
+      }
+    });
+  }
+
+  private applyBatchTag(selected: any[], tagValue: string): void {
+    const promises = selected.map((doc) => {
+      const key = doc.numero_carpeta;
+      if (!this.documentTags[key]) {
+        this.documentTags[key] = { priority: "Normal", tag: "" };
+      }
+      this.documentTags[key].tag = tagValue;
+      return this.apiActualizarEtiqueta(key, tagValue);
+    });
+
+    Promise.all(promises).then(
+      () =>
+        this.toastrService.success(
+          "Etiquetas actualizadas en base de datos.",
+          "Éxito",
+        ),
+      (err) => {
+        console.error("Error updating tags in batch:", err);
+        this.toastrService.warning(
+          "Algunas etiquetas no se guardaron en el servidor.",
+          "Advertencia",
+        );
+      },
+    );
+
+    this.saveDocumentTags();
+    this.clearDocSelection();
+  }
+
+  public assignPriorityToSelectedDocs(priority: string): void {
+    const selected = this.documents.filter((d) => d.selected);
+    if (selected.length === 0) return;
+    selected.forEach((doc) => {
+      const key = doc.numero_carpeta;
+      if (!this.documentTags[key]) {
+        this.documentTags[key] = { priority: "Normal", tag: "" };
+      }
+      this.documentTags[key].priority = priority;
+    });
+    this.saveDocumentTags();
+    this.clearDocSelection();
   }
 }

@@ -179,3 +179,23 @@ table {
   tr:nth-child(odd)   { background-color:#f1f1f1; }
   tr:nth-child(even)    { background-color:#fff; }
 }
+
+/* Custom Borderless Modal and Close Button */
+.close-btn-absolute {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #a0aec0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  z-index: 1050;
+
+  &:hover {
+    color: #2d3748;
+  }
+}
+
+

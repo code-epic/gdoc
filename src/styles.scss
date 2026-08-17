@@ -635,3 +635,88 @@ textarea.input-custom {
     width: 100% !important;
   }
 }
+
+/* ==========================================================================
+   Custom SweetAlert2 styles to prevent overflow and align with the design theme
+   ========================================================================== */
+.swal2-popup {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 1.5rem !important;
+  font-family: inherit !important;
+}
+
+.swal2-title {
+  text-align: center !important;
+  width: 100% !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.swal2-html-container {
+  text-align: center !important;
+  justify-content: center !important;
+  margin: 10px auto !important;
+  width: 100% !important;
+}
+
+.swal2-input-label {
+  display: block !important;
+  text-align: center !important;
+  margin: 15px auto 5px auto !important;
+  width: 100% !important;
+  color: #525f7f !important;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+}
+
+.swal-select-custom {
+  display: block !important;
+  width: 100% !important;
+  max-width: 360px !important;
+  margin: 15px auto !important;
+  height: calc(2.75rem + 2px) !important;
+  padding: 0.625rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #32325d !important;
+  background-color: #fff !important;
+  border: 1px solid #cad1d7 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  appearance: none !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 16px 12px !important;
+  padding-right: 2rem !important;
+  box-sizing: border-box !important;
+}
+
+.swal-input-custom {
+  display: block !important;
+  width: 100% !important;
+  max-width: 360px !important;
+  margin: 15px auto !important;
+  height: calc(2.75rem + 2px) !important;
+  padding: 0.625rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #32325d !important;
+  background-color: #fff !important;
+  border: 1px solid #cad1d7 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+.swal2-actions {
+  margin-top: 1.5rem !important;
+  gap: 10px !important;
+  justify-content: center !important;
+  width: 100% !important;
+}

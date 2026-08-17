@@ -515,7 +515,7 @@
     <!-- Adjuntar Imagenes al Documento -->
     <ng-template #archivos let-modal>
         <div class="modal-header bg-pastel-gradient">
-            <h4 class="modal-title" id="modal-basic-title">Lista de Archivos asociados {{ numControl }}</h4>
+            <h4 class="modal-title" id="modal-basic-title">Lista de Archivos </h4>
 
         </div>
         <div class="modal-body">
@@ -559,8 +559,7 @@
                                 </thead>
                                 <tbody>
 
-                                    <tr [ngModelOptions]="{standalone: true}"
-                                        *ngFor="let el of lstHzAdjunto;let i=index">
+                                    <tr *ngFor="let el of lstHzAdjunto;let i=index">
 
                                         <td>
                                             <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"
@@ -599,7 +598,7 @@
                     <mat-form-field>
                         <mat-label>Selecciona un punto de cuenta</mat-label>
                         <mat-select [formControl]="toppings" multiple>
-                            <mat-option *ngFor="let topping of toppingList" [value]="topping">{{topping}}</mat-option>
+                            <mat-option *ngFor="let topping of lstPuntosCuentas" [value]="topping">{{topping}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </div>

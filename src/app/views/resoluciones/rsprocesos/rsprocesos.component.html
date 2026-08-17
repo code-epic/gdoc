@@ -190,7 +190,28 @@
                             </a>
                         </div>
 
-
+                        <div class="col-xl-3 col-lg-4 col-md-6 mb-4 sub-anim-item" [style.animation-delay]="1.5 +'ms'">
+                            <a (click)="openOrganizarModal(organizarResueltos)"
+                                class="text-decoration-none cursor-pointer">
+                                <div class="card submenu-card h-100">
+                                    <div
+                                        class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center">
+                                        <div class="sub-icon-container">
+                                            <i class="fa fa-list-ol fa-2x"></i>
+                                        </div>
+                                        <h5 class="text-uppercase font-weight-bold mb-3 sub-text-title">Organizar Resueltos
+                                        </h5>
+                                        <div class="mt-auto">
+                                            <span class="badge badge-pill badge-secondary text-muted px-3 py-2"
+                                                style="background-color: #f8f9fe; border: 1px solid #f0f2f5;">
+                                                <i class="fa fa-chevron-right mr-1" style="font-size: 0.8em;"></i>
+                                                Acceder
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
 
                     </div>
 
@@ -265,7 +286,75 @@
 </ng-template>
 
 
+<!-- Interfaz para organizar Numero de Resueltos -->
+<ng-template #organizarResueltos let-c="close" let-d="dismiss">
+    <div class="modal-body position-relative p-4">
 
+        <div class="text-center pt-2 pb-3">
+            <div class="mb-2">
+                <i class="fa fa-list-ol fa-2x" style="color: #5eaaa8;"></i>
+            </div>
+            <h3 class="font-weight-bolder mb-1" style="color: #2b3b5c; font-size: 1.5rem;">Organizar Resueltos</h3>
+            <p class="text-muted mx-auto" style="max-width: 440px; font-size: 0.88rem; line-height: 1.4;">
+                Configure los parámetros del próximo número correlativo en la secuencia de resoluciones.
+            </p>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Numero -->
+                <div class="col-md-6 form-group">
+                    <label class="form-control-label font-weight-bold">Número de Resuelto</label>
+                    <input type="text" class="form-control shadow-sm" [(ngModel)]="resueltoForm.numero" placeholder="Ej: 001260" maxlength="12" style="padding: 10px 15px; border-radius: 8px;">
+                    <small class="text-muted">Ingrese el próximo número correlativo en la secuencia.</small>
+                </div>
+                <!-- Fecha -->
+                <div class="col-md-6 form-group">
+                    <label class="form-control-label font-weight-bold">Fecha de Operación</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text icon-box" (click)="fo.toggle()" style="cursor: pointer;">
+                                <mat-icon class="input-icon">event</mat-icon>
+                            </span>
+                        </div>
+                        <input class="input-custom" placeholder="AAAA-MM-DD"
+                            [(ngModel)]="resueltoForm.fechaDate" ngbDatepicker
+                            #fo="ngbDatepicker" [value]="formatter.format(resueltoForm.fechaDate)"
+                            [placement]="placement" readonly (click)="fo.toggle()">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-2">
+                <!-- Usuario (read-only) -->
+                <div class="col-md-6 form-group">
+                    <label class="form-control-label font-weight-bold">Usuario Operador</label>
+                    <input type="text" class="form-control bg-light shadow-sm" [value]="resueltoForm.usuario" readonly style="padding: 10px 15px; border-radius: 8px;">
+                </div>
+                <!-- Autoriza (required) -->
+                <div class="col-md-6 form-group">
+                    <label class="form-control-label font-weight-bold text-danger">Quién Autoriza</label>
+                    <input type="text" class="form-control shadow-sm" [(ngModel)]="resueltoForm.autoriza" placeholder="Ej: Cnel. Pérez Pérez" required style="padding: 10px 15px; border-radius: 8px;">
+                    <small class="text-muted">Nombre/Rango de quien ordena o autoriza el salto de secuencia.</small>
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <!-- Descripcion -->
+                <div class="col-md-12 form-group">
+                    <label class="form-control-label font-weight-bold">Descripción / Justificación</label>
+                    <textarea class="form-control shadow-sm" rows="3" [(ngModel)]="resueltoForm.descripcion" placeholder="Describa el motivo del ajuste en la secuencia..." style="border-radius: 8px; padding: 12px;"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary px-4 shadow-sm" style="border-radius: 4px;" (click)="d('Cancel')">Cancelar</button>
+        <button type="button" class="btn btn-primary px-4 shadow-sm" style="border-radius: 4px; background-color: #5eaaa8; border-color: #5eaaa8;" (click)="guardarOrganizarResueltos()">
+            <i class="fa fa-save mr-1"></i> Aceptar
+        </button>
+    </div>
+</ng-template>
 
 
 

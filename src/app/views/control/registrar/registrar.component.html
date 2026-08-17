@@ -135,8 +135,8 @@
                         <button mat-icon-button matTooltip="Editar" (click)="editar( e.idd )">
                           <mat-icon>edit_note</mat-icon>
                         </button>
-                        <button mat-icon-button matTooltip="Adjuntar" (click)="open(adjuntar, e.numc, i)">
-                          <mat-icon [ngClass]="{'text-primary': e.anom!=''}">attach_file</mat-icon>
+                        <button mat-icon-button matTooltip="Adjuntar PDF" (click)="open(adjuntar, e.numc, i)">
+                          <mat-icon [ngClass]="{'text-primary': e.anom!=''}">upload_file</mat-icon>
                         </button>
                         <button mat-icon-button matTooltip="Eliminar" (click)="eliminar(e.numc, e.idd)">
                           <mat-icon>delete_outline</mat-icon>
@@ -219,13 +219,13 @@
                             </div>
                           </td>
                           <td class="align-middle">
-                            <span class="document-dependency">{{ remitente | uppercase }}</span>
+                            <span class="document-dependency">{{ e.remitente | uppercase }}</span>
                             <small class="document-date">{{ e.fcre | date:"dd/MM/yyyy" }}</small>
                           </td>
                           <td class="text-right align-middle">
                             <div class="actions-container">
                               <button mat-icon-button matTooltip="Agregar Observación"
-                                (click)="open(observacion, e.idd)">
+                                (click)="open(observacion, e.idd, i)">
                                 <mat-icon class="action-icon">edit_note</mat-icon>
                               </button>
                               <button mat-icon-button matTooltip="Reversar Documento"

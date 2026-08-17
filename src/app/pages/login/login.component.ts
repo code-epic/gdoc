@@ -108,7 +108,7 @@ export class LoginComponent implements OnInit {
 
         this.loading = false;
         this.isHidden = false;
-        console.log(e);
+        // console.log(e);
         this.utilservice.AlertMini(
           "top-end",
           "error",

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { FooterComponent } from './footer/footer.component';
+import { TotpVerifyComponent } from './totp-verify/totp-verify.component';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -22,12 +23,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     FooterComponent,
     NavbarComponent,
     SidebarComponent,
-    
+    TotpVerifyComponent
   ],
   exports: [
     FooterComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
+    TotpVerifyComponent
   ]
 })
 export class ComponentsModule { }

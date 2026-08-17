@@ -67,6 +67,8 @@
         <span>Cargando carpetas...</span>
       </div>
 
+
+
       <!-- Lista carpetas -->
       <div class="rt-folders-list" *ngIf="!loadingFolders">
         <div class="rt-empty" *ngIf="filteredFolders.length === 0">
@@ -192,6 +194,24 @@
       </div>
     </ng-container>
     <ng-container *ngIf="contextMenuType === 'document'">
+      <div class="rt-context-item" (click)="setDocPriority(contextMenuData, 'Normal')">
+        <i class="fas fa-check text-success"></i>
+        <span>Normal</span>
+      </div>
+      <div class="rt-context-item" (click)="setDocPriority(contextMenuData, 'Prioritario')">
+        <i class="fas fa-exclamation-circle text-warning"></i>
+        <span>Prioritario</span>
+      </div>
+      <div class="rt-context-item" (click)="setDocPriority(contextMenuData, 'Urgente')">
+        <i class="fas fa-bolt text-danger"></i>
+        <span>Urgente</span>
+      </div>
+      <div class="rt-context-divider"></div>
+      <div class="rt-context-item" (click)="setDocTag(contextMenuData)">
+        <i class="fas fa-tag text-info"></i>
+        <span>Etiqueta</span>
+      </div>
+      <div class="rt-context-divider"></div>
       <div class="rt-context-item" (click)="enterImmersive(contextMenuIndex)">
         <i class="fas fa-eye text-success"></i>
         <span>Ver resuelto</span>

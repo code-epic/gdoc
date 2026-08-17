@@ -1,0 +1,45 @@
+<div class="totp-modal-wrapper text-center p-4">
+  <div class="totp-icon-container mb-3">
+    <i class="fas fa-shield-alt fa-3x" style="color: #5eaaa8;"></i>
+  </div>
+  <h4 class="mb-2 font-weight-bold" style="color: #2b3b5c;">{{ title }}</h4>
+  <p class="mb-4 text-muted mx-auto" style="max-width: 340px; font-size: 0.88rem; line-height: 1.5;">
+    Abre tu aplicación de autenticación (ej. Google Authenticator) e ingresa el código de 6 dígitos para autorizar esta operación.
+  </p>
+
+  <div class="otp-container" [class.shake]="isOtpInvalid">
+    <div class="otp-wrapper d-flex justify-content-center align-items-center gap-2 mb-3">
+      <input #otp0 type="tel" class="otp-box" maxlength="1" (input)="onInput($event, otp1)"
+        (keydown)="onKeydown($event, null)" (paste)="onPaste($event)" [disabled]="loading">
+      <input #otp1 type="tel" class="otp-box" maxlength="1" (input)="onInput($event, otp2)"
+        (keydown)="onKeydown($event, otp0)" [disabled]="loading">
+      <input #otp2 type="tel" class="otp-box" maxlength="1" (input)="onInput($event, otp3)"
+        (keydown)="onKeydown($event, otp1)" [disabled]="loading">
+
+      <span class="otp-divider"></span>
+
+      <input #otp3 type="tel" class="otp-box" maxlength="1" (input)="onInput($event, otp4)"
+        (keydown)="onKeydown($event, otp2)" [disabled]="loading">
+      <input #otp4 type="tel" class="otp-box" maxlength="1" (input)="onInput($event, otp5)"
+        (keydown)="onKeydown($event, otp3)" [disabled]="loading">
+      <input #otp5 type="tel" class="otp-box" maxlength="1" (input)="onInput($event, null)"
+        (keydown)="onKeydown($event, otp4)" [disabled]="loading">
+    </div>
+
+    <!-- Spinner during verification -->
+    <div class="verification-spinner-container mb-3" *ngIf="loading">
+      <div class="spinner-border text-primary" role="status" style="width: 1.5rem; height: 1.5rem;">
+        <span class="sr-only">Verificando...</span>
+      </div>
+      <span class="ml-2 font-weight-bold text-muted" style="font-size: 0.85rem;">Verificando código...</span>
+    </div>
+
+    <p *ngIf="isOtpInvalid" class="error-text text-danger font-weight-bold" style="font-size: 0.85rem; margin-top: 5px;">
+      Código incorrecto. Inténtalo de nuevo.
+    </p>
+  </div>
+
+  <div class="mt-4 d-flex justify-content-center">
+    <button type="button" class="btn btn-outline-secondary px-4 shadow-sm" style="border-radius: 4px;" (click)="dismiss()">Cancelar</button>
+  </div>
+</div>

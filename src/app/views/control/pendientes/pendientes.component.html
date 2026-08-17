@@ -151,14 +151,30 @@
                   </a>
                   | CREADO {{ e.fecha | date : "dd/MM/yyyy hh:mm:ss" }}
                 </div>
-                <div class="col-md-4 text-right">
-                  <span class="badge rounded-pill text-bg-primary">pdf</span>
+                <div class="col-md-4 text-right d-flex align-items-center justify-content-end" style="min-height: 40px;">
+                  <div class="d-flex align-items-center justify-content-end" style="gap: 8px; width: 100%;">
+                    
+                    <!-- PDF download pill -->
+                    <a [href]="dwUrl(e.numc, e.archivo)" target="top" rel="noopener noreferrer"
+                      class="pdf-pill" *ngIf="e.archivo && e.archivo != '' && !e.statusprogreso">
+                      <mat-icon>picture_as_pdf</mat-icon>
+                      <span>PDF</span>
+                    </a>
 
-                  <a [href]="dwUrl(e.numc, e.archivo)" target="_top" rel="noopener noreferrer"
-                    class="texto-detalle-pdf">
-                    {{ e.archivo.substring(0, 10) }}
-                    <img src="./assets/img/theme/pdf2.jpeg" alt="Descargar archivo" class="imagen-pdf" />
-                  </a>
+                    <!-- Upload button (adjuntar) -->
+                    <button type="button" class="btn-attach" matTooltip="Adjuntar PDF" (click)="openAdjuntar(adjuntar, e.numc, i)" *ngIf="!e.statusprogreso">
+                      <mat-icon [ngClass]="{'attached': e.archivo && e.archivo != ''}">attachment</mat-icon>
+                    </button>
+
+                    <!-- Progreso de carga de adjuntos (inline, no salta de línea) -->
+                    <div class="inline-progress-container d-flex align-items-center" *ngIf="e.statusprogreso" style="width: 140px; gap: 8px;">
+                      <div class="progress progress-xs flex-grow-1" style="height: 6px; margin: 0; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" [style.width.%]="e.progreso" style="height: 100%; transition: width 0.1s ease;"></div>
+                      </div>
+                      <span class="progress-text" style="font-size: 0.75rem; font-weight: 700; color: #2dce89; min-width: 32px; text-align: right;">{{ e.progreso }}%</span>
+                    </div>
+
+                  </div>
                 </div>
 
                 <div class="col-md-12 contenedor-documento">
@@ -239,7 +255,7 @@
 
 
 
-  <ng-template #busqueda_avanzada class="template-avanzado" #adjuntar let-c="close" let-d="dismiss">
+  <ng-template #busqueda_avanzada class="template-avanzado">
     <div class="modal-header form-group col-md-11 boton-avanzado">
       <h1 class="modal-title">Busqueda Avanzada</h1>
     </div>
@@ -376,4 +392,39 @@
         </button>
       </div>
     </div>
-  </ng-template>                                   
+  </ng-template> 
+
+<!-- Adjuntar Imagenes al Documento -->
+<ng-template #adjuntar let-c="close" let-d="dismiss">
+  <div class="modal-header bg-pastel-gradient">
+    <h4 class="modal-title text-white" id="modal-basic-title">Cargar Archivo en {{ numControl }}</h4>
+  </div>
+  <div class="modal-body">
+    <form method="post" enctype="multipart/form-data" id="forma" name="forma">
+      <div class="custom-file-upload" (click)="fileInput.click()">
+        <input type="hidden" name="identificador" value="{{hashcontrol}}" readonly="readonly">
+        <input type="hidden" name="return" value="true" readonly="readonly">
+        <input type="file"  name="archivos" class="d-none" (change)="fileSelected($event)" accept=".pdf" #fileInput>
+        <div class="upload-icon">
+          <i class="ni ni-cloud-upload-96"></i>
+        </div>
+        <div class="upload-text" *ngIf="!lblFile || lblFile === 'Seleccionar Archivo'">
+          Haz clic aquí para seleccionar un archivo
+        </div>
+        <div class="upload-text" *ngIf="lblFile && lblFile !== 'Seleccionar Archivo'">
+          {{ lblFile }}
+        </div>
+        <div class="upload-hint">
+          (Solo se permiten archivos PDF)
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button *ngIf="btnEnviar" class="btn btn-pastel text-white "
+      (click)="SubirArchivo($event, posicionProgreso);c('Save')">
+      <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
+    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="c('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>                                   

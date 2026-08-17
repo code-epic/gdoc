@@ -1,67 +1,70 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
-import { NgbModal, NgbDateStruct, NgbDate, NgbCalendar, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
-import { ToastrService } from 'ngx-toastr';
-import { NgxUiLoaderService } from 'ngx-ui-loader'
-import Swal from 'sweetalert2'
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import {
+  NgbModal,
+  NgbDateStruct,
+  NgbDate,
+  NgbCalendar,
+  NgbDateParserFormatter,
+} from "@ng-bootstrap/ng-bootstrap";
+import { ToastrService } from "ngx-toastr";
+import { NgxUiLoaderService } from "ngx-ui-loader";
+import Swal from "sweetalert2";
 
-import { ApiService, IAPICore } from 'src/app/services/apicore/api.service'
-import { IWKFAlerta, IDocumento, IWKFDocumento, IWKFCuenta, IWKFDependencia } from 'src/app/services/control/documentos.service'
-import { LoginService } from 'src/app/services/seguridad/login.service'
-import { UtilService } from 'src/app/services/util/util.service'
+import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
+import {
+  IWKFAlerta,
+  IDocumento,
+  IWKFDocumento,
+  IWKFCuenta,
+  IWKFDependencia,
+} from "src/app/services/control/documentos.service";
+import { LoginService } from "src/app/services/seguridad/login.service";
+import { UtilService } from "src/app/services/util/util.service";
 
-import { Location } from '@angular/common';
-import { FormControl } from '@angular/forms';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
-import { environment } from 'src/environments/environment';
-
+import { Location } from "@angular/common";
+import { FormControl } from "@angular/forms";
+import { AngularEditorConfig } from "@kolkov/angular-editor";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'app-documento',
-  templateUrl: './documento.component.html',
-  styleUrls: ['./documento.component.scss']
+  selector: "app-documento",
+  templateUrl: "./documento.component.html",
+  styleUrls: ["./documento.component.scss"],
 })
-
 export class DocumentoComponent implements OnInit, OnDestroy {
-
-
-
-
   editorConfig: AngularEditorConfig = {
     editable: true,
     spellcheck: true,
     enableToolbar: false,
     showToolbar: false,
-    placeholder: '',
+    placeholder: "",
   };
 
+  public estadoActual = 1;
+  public estadoOrigen = 1;
 
-  public estadoActual = 1
-  public estadoOrigen = 1
+  public ncontrolv = true; // visibilidad del input numero de control
+  public ncontrolt = "Número de Control";
+  public remitentet = "Remitente";
+  public origenvisible: boolean = true; // Visibilidad del Input Numero de Origen
+  public fsalida = "Fecha de Creación (*)";
+  public forigenv = true; // Visibilidad de Input Fecha Origen
 
-  public ncontrolv = true // visibilidad del input numero de control
-  public ncontrolt = 'Número de Control'
-  public remitentet = 'Remitente'
-  public origenvisible: boolean = true // Visibilidad del Input Numero de Origen
-  public fsalida = 'Fecha de Creación (*)'
-  public forigenv = true // Visibilidad de Input Fecha Origen
-
-  public camposalida = 2
-  public camposfechasalida = 3
-  public camponumsalida = 2
-
+  public camposalida = 2;
+  public camposfechasalida = 3;
+  public camponumsalida = 2;
 
   masterSelected: boolean;
   checklist: any;
   checkedList: any;
 
-  public bPDF = false
+  public bPDF = false;
 
-  closeResult = '';
+  closeResult = "";
 
-
-  title = 'Documentos';
-  placement = 'bottom-start';
+  title = "Documentos";
+  placement = "bottom-start";
 
   lineCountCache: number = 0;
   PosicionCuenta: number = -1;
@@ -69,315 +72,325 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   // editor: Editor = new Editor;
   // xeditor: Editor = new Editor;
 
-  public fcreacion: any
-  public forigen: any
-  public fcuenta: any
-  public fplazo: any
+  public fcreacion: any;
+  public forigen: any;
+  public fcuenta: any;
+  public fplazo: any;
 
-  public forigenDate: NgbDate | null
-  public fcuentaDate: NgbDate | null
+  public forigenDate: NgbDate | null;
+  public fcuentaDate: NgbDate | null;
 
-  public subfechaDate: NgbDate | null
+  public subfechaDate: NgbDate | null;
 
-  public editar: boolean = false
-  public puntocuenta: boolean = false
-  public salidavisible: boolean = true
-  public resolucion: boolean = false
-  public activarMensaje = false
+  public editar: boolean = false;
+  public puntocuenta: boolean = false;
+  public salidavisible: boolean = true;
+  public resolucion: boolean = false;
+  public activarMensaje = false;
 
-  public detalle: string = ''
+  public detalle: string = "";
 
-  public cuenta: string = ''
-  public resumen: string = ''
-  public subfecha: string = ''
-  public cedula: string = ''
-  public cargo: string = ''
-  public nmilitar: string = ''
-  public salida: string = 'Nro. de Salida'
-  public booPuntoCuenta: boolean = false
-
+  public cuenta: string = "";
+  public resumen: string = "";
+  public subfecha: string = "";
+  public cedula: string = "";
+  public cargo: string = "";
+  public nmilitar: string = "";
+  public salida: string = "Nro. de Salida";
+  public booPuntoCuenta: boolean = false;
 
   public WkDoc: IWKFDocumento = {
-    nombre: '',
+    nombre: "",
     estado: 0,
     estatus: 0,
     workflow: 0,
-    observacion: '',
-    usuario: ''
-  }
+    observacion: "",
+    usuario: "",
+  };
 
   public WkCuenta: IWKFCuenta = {
     documento: 0,
-    cuenta: '',
+    cuenta: "",
     estado: 0,
     estatus: 0,
-    detalle: '',
-    resumen: '',
-    cedula: '',
-    cargo: '',
-    nmilitar: '',
-    fecha: '',
-    usuario: '',
-    activo: 0
-  }
-
+    detalle: "",
+    resumen: "",
+    cedula: "",
+    cargo: "",
+    nmilitar: "",
+    fecha: "",
+    usuario: "",
+    activo: 0,
+  };
 
   public Doc: IDocumento = {
-    ncontrol: '',
+    ncontrol: "",
     wfdocumento: 0,
-    fcreacion: '',
-    forigen: '',
-    norigen: '',
-    salida: '',
-    tipo: '0',
-    remitente: '0',
-    unidad: '0',
-    comando: '0',
-    contenido: '',
-    instrucciones: '',
-    codigo: '0',
-    nexpediente: '',
-    creador: '',
-    archivo: '',
+    fcreacion: "",
+    forigen: "",
+    norigen: "",
+    salida: "",
+    tipo: "0",
+    remitente: "0",
+    unidad: "0",
+    comando: "0",
+    contenido: "",
+    instrucciones: "",
+    codigo: "0",
+    nexpediente: "",
+    creador: "",
+    archivo: "",
     privacidad: 0,
-    subdocumento: '',
-    dependencias: '',
-    puntodecuenta: '',
-  }
+    subdocumento: "",
+    dependencias: "",
+    puntodecuenta: "",
+  };
 
   public WAlerta: IWKFAlerta = {
     documento: 0,
     estado: 0,
     estatus: 0,
     activo: 0,
-    fecha: '',
-    usuario: '',
-    observacion: ''
-  }
+    fecha: "",
+    usuario: "",
+    observacion: "",
+  };
 
   public WKDependencia: IWKFDependencia = {
     documento: 0,
-    nombre: '',
-    observacion: ''
-  }
+    nombre: "",
+    observacion: "",
+  };
 
   public DocSalida: IDocumento = {
-    ncontrol: '',
+    ncontrol: "",
     wfdocumento: 0,
-    fcreacion: '',
-    forigen: '',
-    norigen: '',
-    salida: '',
-    tipo: '0',
-    remitente: '0',
-    unidad: '0',
-    comando: '0',
-    contenido: '',
-    instrucciones: '',
-    codigo: '0',
-    nexpediente: '',
-    creador: '',
-    archivo: '',
+    fcreacion: "",
+    forigen: "",
+    norigen: "",
+    salida: "",
+    tipo: "0",
+    remitente: "0",
+    unidad: "0",
+    comando: "0",
+    contenido: "",
+    instrucciones: "",
+    codigo: "0",
+    nexpediente: "",
+    creador: "",
+    archivo: "",
     privacidad: 0,
-    subdocumento: '',
-    dependencias: '',
-  }
+    subdocumento: "",
+    dependencias: "",
+  };
 
-  public booDependencia = false
+  public booDependencia = false;
 
-  public lstT = [] //Objeto Tipo documento
-  public lstR = [] //Objeto Remitente
-  public lstU = [] //Objeto Unidad
-  public lstC = [] //Objeto Comando
-  public lstCA = [] //Objeto Comando
-  public lstCuenta = [] //Objeto Unidad
+  public lstT: any[] = []; //Objeto Tipo documento
+  public lstR: any[] = []; //Objeto Remitente
+  public lstU: any[] = []; //Objeto Unidad
+  public lstC: any[] = []; //Objeto Comando
+  public lstCA: any[] = []; //Objeto Comando
+  public lstCuenta: any[] = []; //Objeto Unidad
 
-  public lstHzAdjunto = [] //Historico de documentos adjuntos
-  public lstTraza = []
-  public lstHistorial = []
-  public lstImg = []
-  public lstDependencias = []
-  public titulo = 'Documento'
-  public nasociacion = ''
+  public lstHzAdjunto: any[] = []; //Historico de documentos adjuntos
+  public lstTraza: any[] = [];
+  public lstHistorial: any[] = [];
+  public lstImg: any[] = [];
+  public lstDependencias: any[] = [];
+  public titulo = "Documento";
+  public nasociacion = "";
 
-  public download: any
+  public download: any;
 
-  public bHist = false
+  public bHist = false;
 
-  public Componentes: any
-  public Grados: any
-  public Categorias: any
-  public Clasificaciones: any
-  public Configuracion: any
-  public serializar: string = ""
-  public Configurar: boolean = false
+  public Componentes: any;
+  public Grados: any;
+  public Categorias: any;
+  public Clasificaciones: any;
+  public Configuracion: any;
+  public serializar: string = "";
+  public Configurar: boolean = false;
 
-  public activarTipo = false // activar tipo de documento
+  public activarTipo = false; // activar tipo de documento
   public xAPI: IAPICore = {
-    funcion: ''
-
+    funcion: "",
   };
 
   public xApi: IAPICore = {
-    funcion: '',
-    parametros: ''
-  }
-  routerDoc: { numc: string }
+    funcion: "",
+    parametros: "",
+  };
+  routerDoc: { numc: string };
 
-  toppings = new FormControl('');
-  toppingsaux = new FormControl('');
+  toppings = new FormControl("");
+  toppingsaux = new FormControl("");
 
-  lstPC: string[] = []; // Auxiliar para mappear las cuentas de toppings 
+  lstPC: string[] = []; // Auxiliar para mappear las cuentas de toppings
   lstPuntosCuentas: string[] = [];
-  lstPuntosCuentasAux: []
-  public SubMenu = []
+  lstPuntosCuentasAux: any[] = [];
+  public SubMenu: any[] = [];
 
-  public isPunto: boolean = true
-  public sCedula: string = 'Cédula'
-  public sGrado: string = 'Grado / Jerarquía'
-  public sNombre: string = 'Nombres y Apellidos'
+  public isPunto: boolean = true;
+  public sCedula: string = "Cédula";
+  public sGrado: string = "Grado / Jerarquía";
+  public sNombre: string = "Nombres y Apellidos";
 
-  public NUMERO_CONTROL: string = '' //Este codigo controlara el semillero para los codigos nuevos
-  public bControl  : boolean = false
+  public NUMERO_CONTROL: string = ""; //Este codigo controlara el semillero para los codigos nuevos
+  public bControl: boolean = false;
 
-
-  constructor(private apiService: ApiService,
+  constructor(
+    private apiService: ApiService,
     private modalService: NgbModal,
     private utilService: UtilService,
     private toastrService: ToastrService,
     private rutaActiva: ActivatedRoute,
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
-    private formatter: NgbDateParserFormatter,
+    public formatter: NgbDateParserFormatter,
     private location: Location,
-    private ruta: Router) {
-
-
-  }
+    private ruta: Router,
+  ) {}
 
   async ngOnInit() {
     if (this.rutaActiva.snapshot.params.id != undefined) {
-      var id = this.rutaActiva.snapshot.params.id
-      if (id == 'salida') {
-        this.SalidaTipo()
+      var id = this.rutaActiva.snapshot.params.id;
+      if (id == "salida") {
+        this.SalidaTipo();
         if (this.rutaActiva.snapshot.params.numc != undefined) {
-          var numc = this.rutaActiva.snapshot.params.numc
-          this.ncontrolt = 'Nro de Control'
-          this.ncontrolv = true
-          this.salidavisible = true
-          this.camponumsalida = 4
-          this.consultarDocumento(numc)
-          this.bControl = false
+          var numc = this.rutaActiva.snapshot.params.numc;
+          this.ncontrolt = "Nro de Control";
+          this.ncontrolv = true;
+          this.salidavisible = true;
+          this.camponumsalida = 4;
+          this.consultarDocumento(numc);
+          this.bControl = false;
         }
-
       } else {
         if (this.rutaActiva.snapshot.params.numc != undefined) {
-          var numc = this.rutaActiva.snapshot.params.numc
-          if (numc == 'salida') this.SalidaTipo()
+          var numc = this.rutaActiva.snapshot.params.numc;
+          if (numc == "salida") this.SalidaTipo();
         }
-        this.consultarDocumento(id)
+        this.consultarDocumento(id);
       }
-
     } else {
-      this.limpiarDoc()
+      this.limpiarDoc();
     }
-    this.SubMenu = await this.loginService.obtenerSubMenu("/control")
-    let prv = this.loginService.obtenerPrivilegiosMenu("/control", this.ruta.url)
+    this.SubMenu = await this.loginService.obtenerSubMenu("/control");
+    let prv = this.loginService.obtenerPrivilegiosMenu(
+      "/control",
+      this.ruta.url,
+    );
     if (prv != undefined && prv.Privilegios != undefined) {
-      prv.Privilegios.forEach(e => {
-        if (e.nombre == "configurar") this.Configurar = true
+      prv.Privilegios.forEach((e) => {
+        if (e.nombre == "configurar") this.Configurar = true;
       });
     }
-    this.Componentes = sessionStorage.getItem("MPPD_CComponente") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente"))) : []
-    this.Grados = sessionStorage.getItem("MPPD_CGrado") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado"))) : []
-    this.Categorias = sessionStorage.getItem("MPPD_CCategorias") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias"))) : []
-    this.Clasificaciones = sessionStorage.getItem("MPPD_CClasificacion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion"))) : []
+    this.Componentes =
+      sessionStorage.getItem("MPPD_CComponente") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
+        : [];
+    this.Grados =
+      sessionStorage.getItem("MPPD_CGrado") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado")))
+        : [];
+    this.Categorias =
+      sessionStorage.getItem("MPPD_CCategorias") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias")))
+        : [];
+    this.Clasificaciones =
+      sessionStorage.getItem("MPPD_CClasificacion") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion")))
+        : [];
 
-    this.Configuracion = sessionStorage.getItem("MD_CConfiguracion") != undefined ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion"))) : []
-    this.listarConfiguracion()
-    
-
+    this.Configuracion =
+      sessionStorage.getItem("MD_CConfiguracion") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MD_CConfiguracion")))
+        : [];
+    this.listarConfiguracion();
   }
 
   setDescripcionPunto() {
-    this.sCedula = 'Cédula'
-    this.sGrado = 'Grado / Jerarquía'
-    this.sNombre = 'Nombres y Apellidos'
+    this.sCedula = "Cédula";
+    this.sGrado = "Grado / Jerarquía";
+    this.sNombre = "Nombres y Apellidos";
   }
 
   setDescripcionContratos() {
-    this.sCedula = '# Contrato'
-    this.sGrado = 'Rif / Razón Social'
-    this.sNombre = 'Monto Total'
+    this.sCedula = "# Contrato";
+    this.sGrado = "Rif / Razón Social";
+    this.sNombre = "Monto Total";
   }
 
-
   SalidaTipo() {
-    this.titulo = 'Salida'
-    this.booDependencia = true
-    this.estadoActual = 9
-    this.estadoOrigen = 2
-    this.ncontrolv = false
-    this.salidavisible = false
-    this.origenvisible = false
-    this.forigenv = false
-    this.ncontrolt = 'Nro de Salida'
-    this.remitentet = 'Destinatario'
-    this.fsalida = 'Fecha de Salida (*)'
-    this.camposalida = 4
-    this.camposfechasalida = 4
+    this.titulo = "Salida";
+    this.booDependencia = true;
+    this.estadoActual = 9;
+    this.estadoOrigen = 2;
+    this.ncontrolv = false;
+    this.salidavisible = false;
+    this.origenvisible = false;
+    this.forigenv = false;
+    this.ncontrolt = "Nro de Salida";
+    this.remitentet = "Destinatario";
+    this.fsalida = "Fecha de Salida (*)";
+    this.camposalida = 4;
+    this.camposfechasalida = 4;
     let fechaActual = new Date().toISOString().substring(0, 10);
-    this.fcreacion = NgbDate.from(this.formatter.parse(fechaActual))
+    this.fcreacion = NgbDate.from(this.formatter.parse(fechaActual));
   }
 
   validarTipoDoc(): boolean {
-    return this.Doc.tipo.toLowerCase() == 'resolucion' || this.Doc.tipo.toLowerCase() == 'tramitacion por organo regular' || this.Doc.tipo.toLowerCase() == 'punto de cuenta'
+    return (
+      this.Doc.tipo.toLowerCase() == "resolucion" ||
+      this.Doc.tipo.toLowerCase() == "tramitacion por organo regular" ||
+      this.Doc.tipo.toLowerCase() == "punto de cuenta"
+    );
   }
 
   listarConfiguracion() {
-    this.Configuracion.forEach(e => {
+    this.Configuracion.forEach((e) => {
       switch (e.tipo) {
         case "1":
-          this.lstT.push(e)
-          break
+          this.lstT.push(e);
+          break;
         case "2":
-          this.lstR.push(e)
-          break
+          this.lstR.push(e);
+          break;
         case "3":
-          this.lstU.push(e)
-          break
+          this.lstU.push(e);
+          break;
         case "4":
-          this.lstC.push(e)
-          break
+          this.lstC.push(e);
+          break;
         case "5":
-          this.lstCA.push(e)
-          break
-
+          this.lstCA.push(e);
+          break;
       }
-    })
-
+    });
   }
 
   limpiarDoc() {
-    var dia = this.utilService.FechaActual()
+    var dia = this.utilService.FechaActual();
 
-    this.forigen = ''
-    this.fplazo = ''
-    this.Doc.ncontrol = ''
-    this.Doc.norigen = ''
-    this.Doc.contenido = ''
-    this.Doc.instrucciones = ''
-    this.Doc.nexpediente = ''
-    this.Doc.codigo = '0'
-    this.Doc.salida = ''
-    this.Doc.tipo = '0'
-    this.Doc.remitente = '0'
-    this.Doc.unidad = '0'
-    this.Doc.creador = ''
+    this.forigen = "";
+    this.fplazo = "";
+    this.Doc.ncontrol = "";
+    this.Doc.norigen = "";
+    this.Doc.contenido = "";
+    this.Doc.instrucciones = "";
+    this.Doc.nexpediente = "";
+    this.Doc.codigo = "0";
+    this.Doc.salida = "";
+    this.Doc.tipo = "0";
+    this.Doc.remitente = "0";
+    this.Doc.unidad = "0";
+    this.Doc.creador = "";
     let fechaActual = new Date().toISOString().substring(0, 10);
-    this.fcreacion = NgbDate.from(this.formatter.parse(fechaActual))
+    this.fcreacion = NgbDate.from(this.formatter.parse(fechaActual));
 
-    this.nasociacion = ''
+    this.nasociacion = "";
   }
 
   /**
@@ -385,72 +398,98 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    * @param numBase64  : base64
    */
   async consultarDocumento(numBase64: string) {
-    const base = atob(numBase64)
-    this.xAPI.funcion = 'WKF_CDocumentoDetalle'
-    this.xAPI.parametros = base
-    this.xAPI.valores = ''
+    const base = atob(numBase64);
+    this.xAPI.funcion = "WKF_CDocumentoDetalle";
+    this.xAPI.parametros = base;
+    this.xAPI.valores = "";
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        data.Cuerpo.forEach(e => {
-          this.Doc = e
-          this.fcreacion = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
-          this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
+      async (data) => {
+        data.Cuerpo.forEach((e) => {
+          this.Doc = e;
+          this.fcreacion = NgbDate.from(
+            this.formatter.parse(this.Doc.fcreacion.substring(0, 10)),
+          );
+          this.forigenDate = NgbDate.from(
+            this.formatter.parse(this.Doc.forigen.substring(0, 10)),
+          );
           if (e.alerta != null) {
-            this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
-            this.WAlerta.activo = 1
-            this.WAlerta.documento = this.Doc.wfdocumento
-            this.WAlerta.estado = this.estadoActual
-            this.WAlerta.estatus = this.estadoOrigen
-            this.WAlerta.usuario = this.loginService.Usuario.id
+            this.fplazo = NgbDate.from(
+              this.formatter.parse(e.alerta.substring(0, 10)),
+            );
+            this.WAlerta.activo = 1;
+            this.WAlerta.documento = this.Doc.wfdocumento;
+            this.WAlerta.estado = this.estadoActual;
+            this.WAlerta.estatus = this.estadoOrigen;
+            this.WAlerta.usuario = this.loginService.Usuario.id;
           }
         });
 
-        this.selTipoDocumento()
-        const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
-        this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        this.selTipoDocumento();
+        const punto_cuenta =
+          this.Doc.subdocumento != null
+            ? JSON.parse(this.Doc.subdocumento)
+            : [];
+        this.lstCuenta = punto_cuenta.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
 
-        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
-        this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : [];
+        this.lstTraza = traza.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
 
-        const historial = this.Doc.historial != null ? JSON.parse(this.Doc.historial) : []
-        this.lstHistorial = historial.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        const historial =
+          this.Doc.historial != null ? JSON.parse(this.Doc.historial) : [];
+        this.lstHistorial = historial.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
 
-        const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
-        this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        const hz_adjunto =
+          this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : [];
+        this.lstHzAdjunto = hz_adjunto.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
 
+        const dependencia =
+          this.Doc.dependencias != null
+            ? JSON.parse(this.Doc.dependencias)
+            : [];
+        this.lstDependencias = dependencia.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
 
-        const dependencia = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
-        this.lstDependencias = dependencia.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        const cuentasaux =
+          this.Doc.puntodecuenta != null
+            ? JSON.parse(this.Doc.puntodecuenta)
+            : [];
+        this.lstPuntosCuentasAux = cuentasaux.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
 
-
-
-        const cuentasaux = this.Doc.puntodecuenta != null ? JSON.parse(this.Doc.puntodecuenta) : []
-        this.lstPuntosCuentasAux = cuentasaux.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
-
-
-        this.toppingsaux.setValue('1')
-
-
-
+        this.toppingsaux.setValue("1");
 
         //Carga de Documentos
-        this.bPDF = this.Doc.archivo != "" ? true : false
-        this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
+        this.bPDF = this.Doc.archivo != "" ? true : false;
+        this.download = this.apiService.Dws(
+          btoa("D" + this.Doc.ncontrol) + "/" + this.Doc.archivo,
+        );
 
-        this.activarTipo = this.validarTipoDoc()
-        console.log(this.Doc)
+        this.activarTipo = this.validarTipoDoc();
+        console.log(this.Doc);
         // this.serializar =  btoa( JSON.stringify(this.Doc.norigen))
         // console.log( this.serializar)
       },
       (error) => {
-        console.error(error)
-      }
-    )
+        console.error(error);
+      },
+    );
   }
 
-  dwUrl(ncontrol: string, archivo: string): string {
-    return this.apiService.Dws(btoa("D" + ncontrol) + '/' + archivo)
+  dwUrl(ncontrol?: string, archivo?: string): string {
+    const nc = ncontrol || "";
+    const arc = archivo || "";
+    return this.apiService.Dws(btoa("D" + nc) + "/" + arc);
   }
 
   open(content) {
@@ -459,35 +498,44 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   //obtenerWorkFlow Permite generar los primeros valores de la red del documento
   obtenerWorkFlow() {
-
     this.WkDoc = {
-      "nombre": "Control de Gestion",
-      "workflow": 2,
-      "estado": this.estadoActual,
-      "estatus": this.estadoOrigen,
-      "observacion": "Creando " + this.titulo,
-      "usuario": this.loginService.Usuario.id
-    }
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = 'WKF_IDocumento'
-    this.xAPI.valores = JSON.stringify(this.WkDoc)
+      nombre: "Control de Gestion",
+      workflow: 2,
+      estado: this.estadoActual,
+      estatus: this.estadoOrigen,
+      observacion: "Creando " + this.titulo,
+      usuario: this.loginService.Usuario.id,
+    };
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_IDocumento";
+    this.xAPI.valores = JSON.stringify(this.WkDoc);
   }
 
   activarHistorial() {
-    this.bHist = !this.bHist
+    this.bHist = !this.bHist;
   }
-
 
   validarCamposObligatorios(): boolean {
     // Validar campos comunes
-    if (this.fcreacion == '' || this.fcreacion == undefined ||
-      this.Doc.contenido == '' || this.fplazo == '') {
+    if (
+      this.fcreacion == "" ||
+      this.fcreacion == undefined ||
+      this.Doc.contenido == "" ||
+      this.fplazo == ""
+    ) {
       return true;
     }
 
     // Validar Número de Origen solo si es entrada (no salida y el campo está visible)
-    if (this.origenvisible && this.titulo !== 'Salida' && (!this.Doc.norigen || this.Doc.norigen.trim() === '')) {
-      this.toastrService.error('GDoc MPPD debe ingresar un Número de Origen', 'Campo requerido');
+    if (
+      this.origenvisible &&
+      this.titulo !== "Salida" &&
+      (!this.Doc.norigen || this.Doc.norigen.trim() === "")
+    ) {
+      this.toastrService.error(
+        "GDoc MPPD debe ingresar un Número de Origen",
+        "Campo requerido",
+      );
       return true;
     }
     const tipoDoc = this.Doc.tipo.toLowerCase();
@@ -496,32 +544,44 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     // Solo validar si los campos de cuenta están visibles
     if (this.puntocuenta) {
       if (!this.cuenta?.trim()) {
-        this.toastrService.error('Número de Cuenta es requerido', 'Campo requerido');
+        this.toastrService.error(
+          "Número de Cuenta es requerido",
+          "Campo requerido",
+        );
         return true;
       }
       if (!this.resumen?.trim()) {
-        this.toastrService.error('Asunto de la Cuenta es requerido', 'Campo requerido');
+        this.toastrService.error(
+          "Asunto de la Cuenta es requerido",
+          "Campo requerido",
+        );
         return true;
       }
       if (!this.subfecha) {
-        this.toastrService.error('Fecha de Cuenta es requerida', 'Campo requerido');
+        this.toastrService.error(
+          "Fecha de Cuenta es requerida",
+          "Campo requerido",
+        );
         return true;
       }
     }
 
     // Para otros tipos que muestran la tabla de resoluciones (RESOLUCIÓN, COMISIÓN, etc.)
     const tiposConTabla = [
-      'resolucion',
-      'comision de servicio',
-      'tramitacion por organo regular',
-      'contratos/punto de cuenta',
-      'destitucion/punto de cuenta'
+      "resolucion",
+      "comision de servicio",
+      "tramitacion por organo regular",
+      "contratos/punto de cuenta",
+      "destitucion/punto de cuenta",
     ];
 
     if (tiposConTabla.includes(tipoDoc)) {
       // Solo validar que haya registros en la tabla, NO los campos del formulario
       if (!this.lstCuenta || this.lstCuenta.length === 0) {
-        this.toastrService.error('Debe agregar al menos un registro', 'Campo requerido');
+        this.toastrService.error(
+          "Debe agregar al menos un registro",
+          "Campo requerido",
+        );
         return true;
       }
     }
@@ -529,416 +589,397 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   registrar() {
-
-    this.ngxService.startLoader("loader-aceptar")
-    this.obtenerWorkFlow() //Obtener valores de una API
+    this.ngxService.startLoader("loader-aceptar");
+    this.obtenerWorkFlow(); //Obtener valores de una API
 
     if (this.rutaActiva.snapshot.params.numc != undefined) {
-      this.actualizarDocumentos()
-      return
-    } else if (this.rutaActiva.snapshot.params.id != undefined && this.rutaActiva.snapshot.params.id != 'salida') {
-      this.actualizarDocumentos()
-      return
+      this.actualizarDocumentos();
+      return;
+    } else if (
+      this.rutaActiva.snapshot.params.id != undefined &&
+      this.rutaActiva.snapshot.params.id != "salida"
+    ) {
+      this.actualizarDocumentos();
+      return;
     } else if (this.validarCamposObligatorios()) {
-      this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Documentos`)
-      this.ngxService.stopLoader("loader-aceptar")
-      return
+      this.toastrService.info(
+        "Debe ingresar los campos marcados con (*) ya que son requeridos",
+        `GDoc Wkf.Documentos`,
+      );
+      this.ngxService.stopLoader("loader-aceptar");
+      return;
     }
-
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.obtenerDatos(data)
+        this.obtenerDatos(data);
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (xdata) => {
             if (this.fplazo.year != undefined) {
-              this.obtenerAlertaWorkFlow(xdata)
+              this.obtenerAlertaWorkFlow(xdata);
               this.apiService.Ejecutar(this.xAPI).subscribe(
                 (ydata) => {
-
-                  this.ngxService.stopLoader("loader-aceptar")
+                  this.ngxService.stopLoader("loader-aceptar");
                 },
                 (errot) => {
-
-                  this.toastrService.error(data.msj, `GDoc Wkf.Alerta`)
-                  this.ngxService.stopLoader("loader-aceptar")
-                }
-              )
+                  this.toastrService.error(data.msj, `GDoc Wkf.Alerta`);
+                  this.ngxService.stopLoader("loader-aceptar");
+                },
+              );
             }
-            const cant = this.lstCuenta.length
+            const cant = this.lstCuenta.length;
 
             if (cant > 0) {
-              this.salvarCuentas(this.Doc.wfdocumento)
-
+              this.salvarCuentas(this.Doc.wfdocumento);
             } else {
-              this.aceptar(this.Doc.ncontrol)
-              this.limpiarDoc()
-              this.ngxService.stopLoader("loader-aceptar")
+              this.aceptar(this.Doc.ncontrol);
+              this.limpiarDoc();
+              this.ngxService.stopLoader("loader-aceptar");
             }
-            const cantdep = this.lstDependencias.length
-            const mpuntocuenta = this.toppings.value.length
+            const cantdep = this.lstDependencias.length;
+            const mpuntocuenta = this.toppings.value.length;
 
             if (cantdep > 0) {
-              this.salvarDependencias(this.Doc.wfdocumento)
+              this.salvarDependencias(this.Doc.wfdocumento);
               if (mpuntocuenta > 0) {
-                this.lstPC = this.toppings.value
-                this.salvarPuntoCuenta(this.Doc.wfdocumento)
+                this.lstPC = this.toppings.value;
+                this.salvarPuntoCuenta(this.Doc.wfdocumento);
               }
             } else {
-              this.aceptar(this.Doc.ncontrol)
-              this.limpiarDoc()
-              this.ngxService.stopLoader("loader-aceptar")
+              this.aceptar(this.Doc.ncontrol);
+              this.limpiarDoc();
+              this.ngxService.stopLoader("loader-aceptar");
             }
-
-
           },
           (errot) => {
-            this.toastrService.error(data.msj, `GDoc Wkf.Documento.Detalle`)
-            this.ngxService.stopLoader("loader-aceptar")
-          }
-        )
-
+            this.toastrService.error(data.msj, `GDoc Wkf.Documento.Detalle`);
+            this.ngxService.stopLoader("loader-aceptar");
+          },
+        );
       }, //En caso de fallar Wkf
       (errot) => {
-        var mensaje = errot + ' - ' + this.xAPI.funcion
-        this.toastrService.error(mensaje, `GDoc Wkf.Documento`)
-        this.ngxService.stopLoader("loader-aceptar")
-
-
-      }
-    )
-
-
-
+        var mensaje = errot + " - " + this.xAPI.funcion;
+        this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
+        this.ngxService.stopLoader("loader-aceptar");
+      },
+    );
   }
 
   //Obtener los dados de Documento
   obtenerDatos(data: any) {
     if (data.tipo == 0) {
-      var mensaje = data.msj + ' - ' + this.xAPI.funcion
+      var mensaje = data.msj + " - " + this.xAPI.funcion;
       this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
-      return false
+      return false;
     }
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = 'WKF_IDocumentoDetalle'
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_IDocumentoDetalle";
     if (this.estadoActual != 9) {
-      this.Doc.ncontrol = this.NUMERO_CONTROL!=''? this.NUMERO_CONTROL: this.utilService.Semillero(data.msj).toUpperCase()
-
+      this.Doc.ncontrol =
+        this.NUMERO_CONTROL != ""
+          ? this.NUMERO_CONTROL
+          : this.utilService.Semillero(data.msj).toUpperCase();
     } else {
-      this.Doc.salida = this.Doc.ncontrol.toUpperCase()
-      this.Doc.ncontrol = this.Doc.ncontrol.toUpperCase()
-
+      this.Doc.salida = this.Doc.ncontrol.toUpperCase();
+      this.Doc.ncontrol = this.Doc.ncontrol.toUpperCase();
     }
-    this.Doc.wfdocumento = parseInt(data.msj)
-    this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion)
-    this.Doc.forigen = this.forigen != undefined ? this.utilService.ConvertirFecha(this.forigen) : this.utilService.ConvertirFecha(this.fcreacion)
+    this.Doc.wfdocumento = parseInt(data.msj);
+    this.Doc.fcreacion = this.utilService.ConvertirFecha(this.fcreacion);
+    this.Doc.forigen =
+      this.forigen != undefined
+        ? this.utilService.ConvertirFecha(this.forigen)
+        : this.utilService.ConvertirFecha(this.fcreacion);
 
+    this.Doc.contenido = this.Doc.contenido.toUpperCase();
+    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase();
 
-    this.Doc.contenido = this.Doc.contenido.toUpperCase()
-    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
+    this.Doc.creador = this.loginService.Usuario.id;
 
-    this.Doc.creador = this.loginService.Usuario.id
-
-    this.xAPI.valores = JSON.stringify(this.Doc)
+    this.xAPI.valores = JSON.stringify(this.Doc);
   }
 
   //Obtener alerta del Documento
   obtenerAlertaWorkFlow(data: any) {
     if (data.tipo == 0) {
       this.toastrService.error(data.msj, `GDoc Wkf.Alerta`);
-      return false
+      return false;
     }
-    this.WAlerta.activo = 1
-    this.WAlerta.documento = this.Doc.wfdocumento
-    this.WAlerta.estado = this.WkDoc.estado
-    this.WAlerta.estatus = this.WkDoc.estatus
-    this.WAlerta.usuario = this.WkDoc.usuario
-    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = 'WKF_IAlerta'
-    this.xAPI.valores = JSON.stringify(this.WAlerta)
+    this.WAlerta.activo = 1;
+    this.WAlerta.documento = this.Doc.wfdocumento;
+    this.WAlerta.estado = this.WkDoc.estado;
+    this.WAlerta.estatus = this.WkDoc.estatus;
+    this.WAlerta.usuario = this.WkDoc.usuario;
+    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo);
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_IAlerta";
+    this.xAPI.valores = JSON.stringify(this.WAlerta);
   }
 
   protected aceptar(msj: string) {
-    if (this.activarMensaje) return false
-    this.activarMensaje = true
+    if (this.activarMensaje) return false;
+    this.activarMensaje = true;
     Swal.fire({
-      title: 'El Documento Registrado es # ' + msj,
+      title: "El Documento Registrado es # " + msj,
       text: "¿Desea registrar otro documento?",
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#5eaaa8',
-      cancelButtonColor: '#ef9a9a',
-      confirmButtonText: 'Si',
-      cancelButtonText: 'No',
+      confirmButtonColor: "#5eaaa8",
+      cancelButtonColor: "#ef9a9a",
+      confirmButtonText: "Si",
+      cancelButtonText: "No",
       allowEscapeKey: true,
     }).then((result) => {
       if (!result.isConfirmed) {
         if (this.estadoActual == 9) {
-          this.ruta.navigate(['/salidas']);
-          return
+          this.ruta.navigate(["/salidas"]);
+          return;
         }
 
-        this.ruta.navigate(['/registrar']);
+        this.ruta.navigate(["/registrar"]);
       }
-
-    })
+    });
   }
 
-
   async actualizarDocumentos() {
-
-    if (this.Doc.contenido == '') {
-      this.toastrService.info('Debe ingresar los campos marcados con (*) ya que son requeridos', `GDoc Wkf.Agregar Cuentas`)
-      return
+    if (this.Doc.contenido == "") {
+      this.toastrService.info(
+        "Debe ingresar los campos marcados con (*) ya que son requeridos",
+        `GDoc Wkf.Agregar Cuentas`,
+      );
+      return;
     }
-    let wfd = this.Doc.wfdocumento
+    let wfd = this.Doc.wfdocumento;
 
-    this.Doc.fcreacion = typeof this.fcreacion === 'object' ? this.utilService.ConvertirFecha(this.fcreacion) : this.Doc.fcreacion.substring(0, 10)
-    this.Doc.forigen = typeof this.forigen === 'object' ? this.utilService.ConvertirFecha(this.forigen) : this.Doc.forigen.substring(0, 10)
-    this.Doc.creador = this.loginService.Usuario.id
+    this.Doc.fcreacion =
+      typeof this.fcreacion === "object"
+        ? this.utilService.ConvertirFecha(this.fcreacion)
+        : this.Doc.fcreacion.substring(0, 10);
+    this.Doc.forigen =
+      typeof this.forigen === "object"
+        ? this.utilService.ConvertirFecha(this.forigen)
+        : this.Doc.forigen.substring(0, 10);
+    this.Doc.creador = this.loginService.Usuario.id;
 
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = 'WKF_ADocumentoDetalle'
-    this.xAPI.parametros = ''
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_ADocumentoDetalle";
+    this.xAPI.parametros = "";
 
-    this.Doc.contenido = this.Doc.contenido.toUpperCase()
-    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase()
+    this.Doc.contenido = this.Doc.contenido.toUpperCase();
+    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase();
 
-    this.xAPI.valores = JSON.stringify(this.Doc)
+    this.xAPI.valores = JSON.stringify(this.Doc);
 
-    if (this.WAlerta.documento != 0) this.WAlerta.fecha = typeof this.fplazo === 'object' ? this.utilService.ConvertirFecha(this.fplazo) : this.fplazo.substring(0, 10)
-
-
-
+    if (this.WAlerta.documento != 0)
+      this.WAlerta.fecha =
+        typeof this.fplazo === "object"
+          ? this.utilService.ConvertirFecha(this.fplazo)
+          : this.fplazo.substring(0, 10);
 
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
+        if (this.titulo == "Salida") {
+          this.insertarObservacion();
+          this.salvarDependencias(wfd);
+          this.lstPC = this.toppings.value;
 
+          this.salvarPuntoCuenta(wfd);
 
-
-        if (this.titulo == 'Salida') {
-          this.insertarObservacion()
-          this.salvarDependencias(wfd)
-          this.lstPC = this.toppings.value
-
-          this.salvarPuntoCuenta(wfd)
-
-          this.ruta.navigate(['/salidas']);
-
+          this.ruta.navigate(["/salidas"]);
         } else {
-          console.log(this.Doc)
+          console.log(this.Doc);
 
-          const cant = this.lstCuenta.length
+          const cant = this.lstCuenta.length;
 
           if (cant > 0) {
-
             let fnx = {
-              'funcion': 'WKF_ESubDocumentoPuntoCuenta',
-              'parametros': this.Doc.wfdocumento.toString(),
-              'valores': ''
-            }
+              funcion: "WKF_ESubDocumentoPuntoCuenta",
+              parametros: this.Doc.wfdocumento.toString(),
+              valores: "",
+            };
             // console.log(fnx)
 
             this.apiService.Ejecutar(fnx).subscribe(
-              async data => {
+              async (data) => {
                 // console.log(data)
-                await this.salvarCuentas(this.Doc.wfdocumento)
-
+                await this.salvarCuentas(this.Doc.wfdocumento);
               },
-              err => {
-                this.ruta.navigate(['/registrar']);
-              }
-            )
-
+              (err) => {
+                this.ruta.navigate(["/registrar"]);
+              },
+            );
           } else {
-            this.ruta.navigate(['/registrar']);
+            this.ruta.navigate(["/registrar"]);
           }
-
-
-
-
-
-
         }
 
-        this.toastrService.success('El documento ha sido actualizado', `GDoc Wkf.Actualizar Documentos`)
-        this.ngxService.stopLoader("loader-aceptar")
-
-
+        this.toastrService.success(
+          "El documento ha sido actualizado",
+          `GDoc Wkf.Actualizar Documentos`,
+        );
+        this.ngxService.stopLoader("loader-aceptar");
       },
       (errot) => {
-        this.toastrService.error(errot, `GDoc Wkf.Actualizar Documentos`)
-        this.ngxService.stopLoader("loader-aceptar")
-      }
-    )
-
-
-
+        this.toastrService.error(errot, `GDoc Wkf.Actualizar Documentos`);
+        this.ngxService.stopLoader("loader-aceptar");
+      },
+    );
   }
 
   insertarObservacion() {
-    const usuario = this.loginService.Usuario.id
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = 'WKF_IDocumentoObservacion'
-    this.xAPI.valores = JSON.stringify(
-      {
-        "documento": this.Doc.wfdocumento,
-        "estado": this.estadoActual, //Estado que ocupa
-        "estatus": this.estadoOrigen,
-        "observacion": 'DOCUMENTO EDITADO EN SALIDA',
-        "accion": '20',
-        "usuario": usuario
-      }
-    )
+    const usuario = this.loginService.Usuario.id;
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_IDocumentoObservacion";
+    this.xAPI.valores = JSON.stringify({
+      documento: this.Doc.wfdocumento,
+      estado: this.estadoActual, //Estado que ocupa
+      estatus: this.estadoOrigen,
+      observacion: "DOCUMENTO EDITADO EN SALIDA",
+      accion: "20",
+      usuario: usuario,
+    });
 
-    this.xAPI.parametros = ''
+    this.xAPI.parametros = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        await this.guardarAlerta(1)
+      async (data) => {
+        await this.guardarAlerta(1);
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
-      }) //
+      },
+    ); //
   }
 
   //Guardar la alerte define el momento y estadus
   guardarAlerta(activo: number) {
-    this.WAlerta.documento = this.Doc.wfdocumento
+    this.WAlerta.documento = this.Doc.wfdocumento;
 
-    this.WAlerta.activo = activo
-    this.WAlerta.estado = this.estadoActual
-    this.WAlerta.estatus = this.estadoOrigen
-    this.WAlerta.usuario = this.loginService.Usuario.id
-    this.WAlerta.observacion = 'DOCUMENTO EDITADO EN SALIDA'
+    this.WAlerta.activo = activo;
+    this.WAlerta.estado = this.estadoActual;
+    this.WAlerta.estatus = this.estadoOrigen;
+    this.WAlerta.usuario = this.loginService.Usuario.id;
+    this.WAlerta.observacion = "DOCUMENTO EDITADO EN SALIDA";
 
-    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo)
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = 'WKF_AAlertas'
-    this.xAPI.parametros = ''
-    this.xAPI.valores = JSON.stringify(this.WAlerta)
+    this.WAlerta.fecha = this.utilService.ConvertirFecha(this.fplazo);
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_AAlertas";
+    this.xAPI.parametros = "";
+    this.xAPI.valores = JSON.stringify(this.WAlerta);
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async alerData => {
-        console.log(alerData)
+      async (alerData) => {
+        console.log(alerData);
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
-      }) //
+      },
+    ); //
   }
 
-
-
   agregarDependencia(): IWKFDependencia {
-    let validar = false
+    let validar = false;
 
     const dependencia: IWKFDependencia = {
       documento: 0,
-      nombre: this.Doc.unidad.toUpperCase() + ' / ' + this.Doc.comando.toUpperCase(),
-    }
+      nombre:
+        this.Doc.unidad.toUpperCase() + " / " + this.Doc.comando.toUpperCase(),
+    };
 
-    this.lstDependencias.push(dependencia)
+    this.lstDependencias.push(dependencia);
 
-    return dependencia
+    return dependencia;
   }
 
-
   eliminarDependencia(pos: number, id: string) {
-
-    if (id == undefined || id == '') {
-      this.lstDependencias.splice(pos, 1)
-      return false
+    if (id == undefined || id == "") {
+      this.lstDependencias.splice(pos, 1);
+      return false;
     }
-    this.ngxService.startLoader("loader-aceptar")
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = "WKF_EDocumentoDependencia"
-    this.xAPI.parametros = id.toString()
-    this.xAPI.valores = ''
+    this.ngxService.startLoader("loader-aceptar");
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_EDocumentoDependencia";
+    this.xAPI.parametros = id.toString();
+    this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      data => {
-        this.lstDependencias.splice(pos, 1)
-        this.ngxService.stopLoader("loader-aceptar")
+      (data) => {
+        this.lstDependencias.splice(pos, 1);
+        this.ngxService.stopLoader("loader-aceptar");
       },
-      error => {
+      (error) => {
         this.toastrService.error(
-          'Fallo eliminar dependencia',
-          `WKF_EDocumentoDependencia`
+          "Fallo eliminar dependencia",
+          `WKF_EDocumentoDependencia`,
         );
-        this.ngxService.stopLoader("loader-aceptar")
-        console.error('Fallo consultando los datos de Configuraciones', error)
-      }
-    )
-
+        this.ngxService.stopLoader("loader-aceptar");
+        console.error("Fallo consultando los datos de Configuraciones", error);
+      },
+    );
   }
 
   async salvarPuntoCuenta(numc: number) {
-
-    const cant = this.lstPC.length
+    const cant = this.lstPC.length;
     if (cant == 0) {
-      this.ngxService.stopLoader("loader-aceptar")
-      return
+      this.ngxService.stopLoader("loader-aceptar");
+      return;
     } else {
-      const cuenta = this.lstPC[0]
-      const p_cuenta = cuenta.split('|')
-      this.xAPI = {} as IAPICore
-      this.xAPI.funcion = 'WKF_IPuntoCuentaMultiple'
-      this.xAPI.valores = ''
-      this.xAPI.parametros = numc + ',' + p_cuenta[0].trim() + ',' + p_cuenta[1].trim() + ',1'
+      const cuenta = this.lstPC[0];
+      const p_cuenta = cuenta.split("|");
+      this.xAPI = {} as IAPICore;
+      this.xAPI.funcion = "WKF_IPuntoCuentaMultiple";
+      this.xAPI.valores = "";
+      this.xAPI.parametros =
+        numc + "," + p_cuenta[0].trim() + "," + p_cuenta[1].trim() + ",1";
       // console.log('insertando puntoscuenta ', this.xAPI)
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          this.lstPC.splice(0, 1)
-          const c = this.lstPC.length
+          this.lstPC.splice(0, 1);
+          const c = this.lstPC.length;
           if (c == 0) {
-            this.ngxService.stopLoader("loader-aceptar")
+            this.ngxService.stopLoader("loader-aceptar");
           } else {
-            this.salvarPuntoCuenta(numc)
+            this.salvarPuntoCuenta(numc);
           }
         },
         (errot) => {
-          this.toastrService.error(errot, `GDoc Wkf.IDocumentoPuntoCuenta`)
-          this.ngxService.stopLoader("loader-aceptar")
-        }
-      )
+          this.toastrService.error(errot, `GDoc Wkf.IDocumentoPuntoCuenta`);
+          this.ngxService.stopLoader("loader-aceptar");
+        },
+      );
     }
   }
 
-
   async salvarDependencias(numc: number) {
-
-    const cant = this.lstDependencias.length
+    const cant = this.lstDependencias.length;
 
     if (cant == 0) {
-      this.ngxService.stopLoader("loader-aceptar")
-      return
+      this.ngxService.stopLoader("loader-aceptar");
+      return;
     } else {
-      this.xAPI = {} as IAPICore
+      this.xAPI = {} as IAPICore;
 
-      this.xAPI.funcion = 'WKF_IDocumentoDependencia'
-      this.xAPI.valores = ''
-      this.xAPI.parametros = numc + ',' + this.lstDependencias[0].nombre
+      this.xAPI.funcion = "WKF_IDocumentoDependencia";
+      this.xAPI.valores = "";
+      this.xAPI.parametros = numc + "," + this.lstDependencias[0].nombre;
       // console.log('insertando dependicia ', this.xAPI)
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          this.lstDependencias.splice(0, 1)
-          const c = this.lstDependencias.length
+          this.lstDependencias.splice(0, 1);
+          const c = this.lstDependencias.length;
           if (c == 0) {
-            this.ngxService.stopLoader("loader-aceptar")
+            this.ngxService.stopLoader("loader-aceptar");
             //this.aceptar(this.Doc.ncontrol)
-            this.limpiarDoc()
+            this.limpiarDoc();
           } else {
-            this.salvarDependencias(numc)
+            this.salvarDependencias(numc);
           }
         },
         (errot) => {
-          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`)
-          this.ngxService.stopLoader("loader-aceptar")
-        }
-      )
+          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`);
+          this.ngxService.stopLoader("loader-aceptar");
+        },
+      );
     }
   }
 
   editarCuenta() {
-
     if (this.PosicionCuenta != -1) {
       const wkcuenta: IWKFCuenta = {
         documento: 0,
@@ -948,42 +989,49 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         cedula: this.cedula,
         cargo: this.cargo,
         nmilitar: this.nmilitar,
-        fecha: typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha) : this.utilService.ConvertirFecha(this.subfechaDate),
+        fecha:
+          typeof this.subfecha === "object"
+            ? this.utilService.ConvertirFecha(this.subfecha)
+            : this.utilService.ConvertirFecha(this.subfechaDate),
         resumen: this.resumen.toUpperCase(),
         usuario: this.loginService.Usuario.id,
-        activo: 0
-      }
+        activo: 0,
+      };
 
-      this.lstCuenta[this.PosicionCuenta] = wkcuenta
-      this.cuenta = ''
-      this.resumen = ''
-      this.subfecha = ''
-      this.subfechaDate = null
-      this.cedula = ''
-      this.cargo = ''
-      this.nmilitar = ''
-      this.PosicionCuenta = -1
-      this.editar = !this.editar
+      this.lstCuenta[this.PosicionCuenta] = wkcuenta;
+      this.cuenta = "";
+      this.resumen = "";
+      this.subfecha = "";
+      this.subfechaDate = null;
+      this.cedula = "";
+      this.cargo = "";
+      this.nmilitar = "";
+      this.PosicionCuenta = -1;
+      this.editar = !this.editar;
     }
-
   }
 
   agregarCuenta(tipo: number): IWKFCuenta {
-    let validar = false
+    let validar = false;
 
     switch (this.Doc.tipo.toLowerCase()) {
       case "punto de cuenta":
-        if (this.cuenta == '' || this.resumen == '' || this.subfecha == '') validar = true
+        if (this.cuenta == "" || this.resumen == "" || this.subfecha == "")
+          validar = true;
         break;
 
       default:
-        if (this.cedula == '' || this.cargo == '' || this.nmilitar == '') validar = true
+        if (this.cedula == "" || this.cargo == "" || this.nmilitar == "")
+          validar = true;
         break;
     }
 
     if (validar) {
-      this.toastrService.info('Todos los campos son requeridos', `GDoc Wkf.Agregar Cuentas`)
-      return
+      this.toastrService.info(
+        "Todos los campos son requeridos",
+        `GDoc Wkf.Agregar Cuentas`,
+      );
+      return;
     }
     const wkcuenta: IWKFCuenta = {
       documento: 0,
@@ -993,208 +1041,220 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       cedula: this.cedula,
       cargo: this.cargo,
       nmilitar: this.nmilitar,
-      fecha: typeof this.subfecha === 'object' ? this.utilService.ConvertirFecha(this.subfecha) : this.utilService.FechaActual(),
+      fecha:
+        typeof this.subfecha === "object"
+          ? this.utilService.ConvertirFecha(this.subfecha)
+          : this.utilService.FechaActual(),
       resumen: this.resumen.toUpperCase(),
       usuario: this.loginService.Usuario.id,
-      activo: 0
-    }
+      activo: 0,
+    };
 
-    this.lstCuenta.push(wkcuenta)
+    this.lstCuenta.push(wkcuenta);
 
     if (tipo == 1) {
-      this.cuenta = ''
-      this.resumen = ''
-      this.subfecha = ''
+      this.cuenta = "";
+      this.resumen = "";
+      this.subfecha = "";
     }
-    this.cedula = ''
-    this.cargo = ''
-    this.nmilitar = ''
+    this.cedula = "";
+    this.cargo = "";
+    this.nmilitar = "";
 
-
-    return wkcuenta
+    return wkcuenta;
   }
 
   selEditarCuenta(pos: number) {
-    const wkcuenta = this.lstCuenta[pos]
+    const wkcuenta = this.lstCuenta[pos];
 
-    this.cuenta = wkcuenta.cuenta
-    this.resumen = wkcuenta.resumen
+    this.cuenta = wkcuenta.cuenta;
+    this.resumen = wkcuenta.resumen;
 
-    this.subfechaDate = NgbDate.from(this.formatter.parse(wkcuenta.fecha.substring(0, 10)))
+    this.subfechaDate = NgbDate.from(
+      this.formatter.parse(wkcuenta.fecha.substring(0, 10)),
+    );
 
-    this.cedula = wkcuenta.cedula
-    this.cargo = wkcuenta.cargo
-    this.nmilitar = wkcuenta.nmilitar
+    this.cedula = wkcuenta.cedula;
+    this.cargo = wkcuenta.cargo;
+    this.nmilitar = wkcuenta.nmilitar;
 
-    this.PosicionCuenta = pos
-    this.editar = !this.editar
+    this.PosicionCuenta = pos;
+    this.editar = !this.editar;
   }
 
   eliminarCuenta(pos: number) {
-
-    this.lstCuenta.splice(pos, 1)
-    this.cuenta = ''
-    this.resumen = ''
-    this.subfecha = ''
-    this.cedula = ''
-    this.cargo = ''
-    this.nmilitar = ''
-    this.editar = false
+    this.lstCuenta.splice(pos, 1);
+    this.cuenta = "";
+    this.resumen = "";
+    this.subfecha = "";
+    this.cedula = "";
+    this.cargo = "";
+    this.nmilitar = "";
+    this.editar = false;
   }
 
-
   async salvarCuentas(numc: number) {
-    const cant = this.lstCuenta.length
+    const cant = this.lstCuenta.length;
     // console.log('entrando en confianza... ', cant)
     // console.log('entrando en confianza... ', this.lstCuenta)
     if (cant == 0) {
-      this.ngxService.stopLoader("loader-aceptar")
-      return
+      this.ngxService.stopLoader("loader-aceptar");
+      return;
     } else {
-      this.xAPI = {} as IAPICore
-      this.xAPI.funcion = 'WKF_ISubDocumento'
-      this.xAPI.parametros = ''
-      this.lstCuenta[0].documento = numc
-      this.xAPI.valores = JSON.stringify(this.lstCuenta[0])
+      this.xAPI = {} as IAPICore;
+      this.xAPI.funcion = "WKF_ISubDocumento";
+      this.xAPI.parametros = "";
+      this.lstCuenta[0].documento = numc;
+      this.xAPI.valores = JSON.stringify(this.lstCuenta[0]);
       await this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-          this.lstCuenta.splice(0, 1)
-          const c = this.lstCuenta.length
+          this.lstCuenta.splice(0, 1);
+          const c = this.lstCuenta.length;
           if (c == 0) {
-            this.ngxService.stopLoader("loader-aceptar")
-            this.aceptar(this.Doc.ncontrol)
-            this.limpiarDoc()
+            this.ngxService.stopLoader("loader-aceptar");
+            this.aceptar(this.Doc.ncontrol);
+            this.limpiarDoc();
           } else {
-            this.salvarCuentas(numc)
+            this.salvarCuentas(numc);
           }
         },
         (errot) => {
-          this.aceptar(this.Doc.ncontrol)
-          this.limpiarDoc()
-          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`)
-          this.ngxService.stopLoader("loader-aceptar")
-        }
-      )
+          this.aceptar(this.Doc.ncontrol);
+          this.limpiarDoc();
+          this.toastrService.error(errot, `GDoc Wkf.SubDocumentos`);
+          this.ngxService.stopLoader("loader-aceptar");
+        },
+      );
     }
   }
 
-
   selTipoDocumento() {
-    const tipo = this.Doc.tipo.toLowerCase()
+    const tipo = this.Doc.tipo.toLowerCase();
     this.puntocuenta = false;
     this.resolucion = false;
     this.booPuntoCuenta = false;
 
-    if (tipo.indexOf('punto') >= 0) {
+    if (tipo.indexOf("punto") >= 0) {
       this.setDescripcionPunto();
       this.puntocuenta = true;
       this.resolucion = true;
 
-      if (tipo.indexOf('contratos') >= 0) {
+      if (tipo.indexOf("contratos") >= 0) {
         this.setDescripcionContratos();
       }
 
-      if (tipo.indexOf('multiple') >= 0) {
-        this.puntocuenta = false
-        this.resolucion = false
-        if (this.titulo == 'Salida') {
-          console.log('entrando')
+      if (tipo.indexOf("multiple") >= 0) {
+        this.puntocuenta = false;
+        this.resolucion = false;
+        if (this.titulo == "Salida") {
+          console.log("entrando");
           this.cargarPuntosdeCuenta();
-          return true
+          return true;
         }
-        this.toastrService.warning("Debe dirigirse al modulo de salida para usar esta opcion", `GDoc Salida`);
+        this.toastrService.warning(
+          "Debe dirigirse al modulo de salida para usar esta opcion",
+          `GDoc Salida`,
+        );
       }
 
-      if (this.titulo == 'Salida') {
-        this.puntocuenta = false
-        this.resolucion = false
+      if (this.titulo == "Salida") {
+        this.puntocuenta = false;
+        this.resolucion = false;
       }
-
-
-    } else if (tipo == 'resolucion' ||
-      tipo == 'tramitacion por organo regular' ||
-      tipo == 'comision de servicio') {
-      this.resolucion = true
+    } else if (
+      tipo == "resolucion" ||
+      tipo == "tramitacion por organo regular" ||
+      tipo == "comision de servicio"
+    ) {
+      this.resolucion = true;
     }
   }
 
   cargarPuntosdeCuenta() {
-
-    this.ngxService.startLoader("loader-aceptar")
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = 'WKF_CPuntoCuentaSalida'
-    this.xAPI.parametros = '5'
-    this.xAPI.valores = ''
+    this.ngxService.startLoader("loader-aceptar");
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_CPuntoCuentaSalida";
+    this.xAPI.parametros = "5";
+    this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-
-        data.Cuerpo.map(e => {
-          this.lstPuntosCuentas.push(e.cuen + ' | ' + e.udep + ' ' + e.fori.substring(0, 10))
-        })
-        this.ngxService.stopLoader("loader-aceptar")
-        this.booPuntoCuenta = true
+        data.Cuerpo.map((e) => {
+          this.lstPuntosCuentas.push(
+            e.cuen + " | " + e.udep + " " + e.fori.substring(0, 10),
+          );
+        });
+        this.ngxService.stopLoader("loader-aceptar");
+        this.booPuntoCuenta = true;
       },
       (error) => {
-        console.error("No existe la funcion ", error)
-        this.ngxService.stopLoader("loader-aceptar")
-      }
-
-    )
+        console.error("No existe la funcion ", error);
+        this.ngxService.stopLoader("loader-aceptar");
+      },
+    );
   }
-
 
   //Listar los archivos asociados al documento
   verArchivos(content) {
     // this.lstImg.push({ a: 1 })
-    this.modalService.open(content, { size: 'lg' })
-
+    this.modalService.open(content, { size: "lg" });
   }
 
   /**
-   * Consultar datos generales del militar 
+   * Consultar datos generales del militar
    */
   consultarCedula() {
-    if (this.cedula == '') return false
-    this.isPunto = true
-    if (this.Doc.tipo.toLowerCase() == 'destitucion/punto de cuenta' || this.Doc.tipo.toLowerCase() == 'contratos/punto de cuenta') {
-      this.isPunto = false
+    if (this.cedula == "") return false;
+    this.isPunto = true;
+    if (
+      this.Doc.tipo.toLowerCase() == "destitucion/punto de cuenta" ||
+      this.Doc.tipo.toLowerCase() == "contratos/punto de cuenta"
+    ) {
+      this.isPunto = false;
     } else {
-      this.ngxService.startLoader("loader-aceptar")
-      this.xAPI = {} as IAPICore
-      this.xAPI.funcion = 'MPPD_CDatosBasicos'
-      this.xAPI.parametros = this.cedula
-      this.xAPI.valores = ''
+      this.ngxService.startLoader("loader-aceptar");
+      this.xAPI = {} as IAPICore;
+      this.xAPI.funcion = "MPPD_CDatosBasicos";
+      this.xAPI.parametros = this.cedula;
+      this.xAPI.valores = "";
       this.apiService.Ejecutar(this.xAPI).subscribe(
         (data) => {
-
-          const militar = data.Cuerpo.map(e => {
-            e.resoluciones = JSON.parse(e.resoluciones)
-            e.entradas = JSON.parse(e.entradas)
-            e.componente = this.Componentes.filter(el => { return el.cod_componente == e.componente })[0].nombre_componente
-            e.categoria = this.Categorias.filter(el => { return el.cod_categoria == e.categoria })[0].nombre_categoria
-            e.clasificacion = this.Clasificaciones.filter(el => { return el.cod_clasificacion == e.clasificacion })[0].des_clasificacion
-            e.grado = this.Grados.filter(el => { return el.cod_grado == e.grado })[0].nombres_grado
-            return e
-          })[0]
+          const militar = data.Cuerpo.map((e) => {
+            e.resoluciones = JSON.parse(e.resoluciones);
+            e.entradas = JSON.parse(e.entradas);
+            e.componente = this.Componentes.filter((el) => {
+              return el.cod_componente == e.componente;
+            })[0].nombre_componente;
+            e.categoria = this.Categorias.filter((el) => {
+              return el.cod_categoria == e.categoria;
+            })[0].nombre_categoria;
+            e.clasificacion = this.Clasificaciones.filter((el) => {
+              return el.cod_clasificacion == e.clasificacion;
+            })[0].des_clasificacion;
+            e.grado = this.Grados.filter((el) => {
+              return el.cod_grado == e.grado;
+            })[0].nombres_grado;
+            return e;
+          })[0];
 
           if (data.Cuerpo.length > 0) {
-            this.nmilitar = militar.nombres
-            this.cargo = militar.grado + " " + militar.componente
-
+            this.nmilitar = militar.nombres;
+            this.cargo = militar.grado + " " + militar.componente;
           } else {
-            this.cedula = ""
-            this.nmilitar = ""
-            this.cargo = ""
-            this.toastrService.info("Debe dirigirse al departamento de resoluciones", `GDoc Resoluciones`)
+            this.cedula = "";
+            this.nmilitar = "";
+            this.cargo = "";
+            this.toastrService.info(
+              "Debe dirigirse al departamento de resoluciones",
+              `GDoc Resoluciones`,
+            );
           }
 
-          this.ngxService.stopLoader("loader-aceptar")
+          this.ngxService.stopLoader("loader-aceptar");
         },
         (error) => {
-          console.error("Error de conexion a los datos ", error)
-        }
-
-      )
+          console.error("Error de conexion a los datos ", error);
+        },
+      );
     }
   }
 
@@ -1203,96 +1263,119 @@ export class DocumentoComponent implements OnInit, OnDestroy {
    * @param numBase64  : base64
    */
   async consultarDocumentoSalida() {
-    if (this.titulo == 'Salida') return false
-    if (this.Doc.salida == '') return false
-    let dwf = ''
-    if (this.Doc.norigen != '') dwf = this.Doc.norigen
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = 'WKF_CDocumentoDetalleSalida'
-    this.xAPI.parametros = '9,1,' + this.Doc.salida
-    this.xAPI.valores = ''
+    if (this.titulo == "Salida") return false;
+    if (this.Doc.salida == "") return false;
+    let dwf = "";
+    if (this.Doc.norigen != "") dwf = this.Doc.norigen;
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_CDocumentoDetalleSalida";
+    this.xAPI.parametros = "9,1," + this.Doc.salida;
+    this.xAPI.valores = "";
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async data => {
-        data.Cuerpo.forEach(e => {
-          this.Doc = e
-          this.fcreacion = NgbDate.from(this.formatter.parse(this.Doc.fcreacion.substring(0, 10)))
-          this.forigenDate = NgbDate.from(this.formatter.parse(this.Doc.forigen.substring(0, 10)))
+      async (data) => {
+        data.Cuerpo.forEach((e) => {
+          this.Doc = e;
+          this.fcreacion = NgbDate.from(
+            this.formatter.parse(this.Doc.fcreacion.substring(0, 10)),
+          );
+          this.forigenDate = NgbDate.from(
+            this.formatter.parse(this.Doc.forigen.substring(0, 10)),
+          );
           if (e.alerta != null) {
-            this.fplazo = NgbDate.from(this.formatter.parse(e.alerta.substring(0, 10)))
-            this.WAlerta.activo = 1
-            this.WAlerta.documento = this.Doc.wfdocumento
-            this.WAlerta.estado = this.estadoActual
-            this.WAlerta.estatus = this.estadoOrigen
-            this.WAlerta.usuario = this.loginService.Usuario.id
+            this.fplazo = NgbDate.from(
+              this.formatter.parse(e.alerta.substring(0, 10)),
+            );
+            this.WAlerta.activo = 1;
+            this.WAlerta.documento = this.Doc.wfdocumento;
+            this.WAlerta.estado = this.estadoActual;
+            this.WAlerta.estatus = this.estadoOrigen;
+            this.WAlerta.usuario = this.loginService.Usuario.id;
           }
-          this.nasociacion = this.Doc.ncontrol
-          this.Doc.ncontrol = ''
+          this.nasociacion = this.Doc.ncontrol;
+          this.Doc.ncontrol = "";
         });
 
-        this.Doc.norigen = dwf
-        this.selTipoDocumento()
-        const punto_cuenta = this.Doc.subdocumento != null ? JSON.parse(this.Doc.subdocumento) : []
-        this.lstCuenta = punto_cuenta.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        this.Doc.norigen = dwf;
+        this.selTipoDocumento();
+        const punto_cuenta =
+          this.Doc.subdocumento != null
+            ? JSON.parse(this.Doc.subdocumento)
+            : [];
+        this.lstCuenta = punto_cuenta.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
         // console.log(this.lstCuenta)
 
-        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : []
-        this.lstTraza = traza.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        const traza = this.Doc.traza != null ? JSON.parse(this.Doc.traza) : [];
+        this.lstTraza = traza.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
 
-        const historial = this.Doc.historial != null ? JSON.parse(this.Doc.historial) : []
-        this.lstHistorial = historial.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        const historial =
+          this.Doc.historial != null ? JSON.parse(this.Doc.historial) : [];
+        this.lstHistorial = historial.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
 
-        const hz_adjunto = this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : []
-        this.lstHzAdjunto = hz_adjunto.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        const hz_adjunto =
+          this.Doc.hz_adjunto != null ? JSON.parse(this.Doc.hz_adjunto) : [];
+        this.lstHzAdjunto = hz_adjunto.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
 
-        const dependencias = this.Doc.dependencias != null ? JSON.parse(this.Doc.dependencias) : []
-        this.lstDependencias = dependencias.map(e => { return typeof e == 'object' ? e : JSON.parse(e) })
+        const dependencias =
+          this.Doc.dependencias != null
+            ? JSON.parse(this.Doc.dependencias)
+            : [];
+        this.lstDependencias = dependencias.map((e) => {
+          return typeof e == "object" ? e : JSON.parse(e);
+        });
 
         //Carga de Documentos
-        this.bPDF = this.Doc.archivo != "" ? true : false
-        this.download = this.apiService.Dws(btoa("D" + this.Doc.ncontrol) + '/' + this.Doc.archivo)
+        this.bPDF = this.Doc.archivo != "" ? true : false;
+        this.download = this.apiService.Dws(
+          btoa("D" + this.Doc.ncontrol) + "/" + this.Doc.archivo,
+        );
 
-        this.activarTipo = this.validarTipoDoc()
-
+        this.activarTipo = this.validarTipoDoc();
       },
       (error) => {
-        console.error(error)
-      }
-    )
+        console.error(error);
+      },
+    );
   }
 
-
   mensajeAgregarCuenta() {
-    if (this.Doc.tipo.toLowerCase().indexOf('punto de cuenta') >= 0) {
+    if (this.Doc.tipo.toLowerCase().indexOf("punto de cuenta") >= 0) {
       Swal.fire({
-        title: 'Alerta',
-        text: '¿Desea mantener los datos de la cuenta?',
-        icon: 'warning',
+        title: "Alerta",
+        text: "¿Desea mantener los datos de la cuenta?",
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: '#5eaaa8',
-        confirmButtonText: 'Sí, estoy seguro'
+        confirmButtonColor: "#5eaaa8",
+        confirmButtonText: "Sí, estoy seguro",
       }).then((result) => {
         if (result.isConfirmed) {
-          this.agregarCuenta(0)
+          this.agregarCuenta(0);
         } else {
-          this.agregarCuenta(1)
+          this.agregarCuenta(1);
         }
-      })
+      });
     } else {
-      this.agregarCuenta(1)
+      this.agregarCuenta(1);
     }
   }
 
-
   confirmarSalir() {
     Swal.fire({
-      title: '¿Está seguro que desea salir?',
-      text: 'Se perderán los cambios no guardados.',
-      icon: 'warning',
+      title: "¿Está seguro que desea salir?",
+      text: "Se perderán los cambios no guardados.",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#5eaaa8',
-      cancelButtonColor: '#ef9a9a',
-      confirmButtonText: 'Sí, salir',
-      cancelButtonText: 'Cancelar'
+      confirmButtonColor: "#5eaaa8",
+      cancelButtonColor: "#ef9a9a",
+      confirmButtonText: "Sí, salir",
+      cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
         window.history.back();
@@ -1300,35 +1383,34 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     });
   }
 
-
   ngOnDestroy(): void {
     // this.editor.destroy()
     // this.xeditor.destroy()
   }
 
-
   generarNumeroSerie() {
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = environment.funcion.NUMERO_DE_CONTROL
-    this.xAPI.parametros = environment.coleciones.CONTADORES
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = environment.funcion.NUMERO_DE_CONTROL;
+    this.xAPI.parametros = environment.coleciones.CONTADORES;
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         if (data !== undefined) {
           if (data.valor_actual !== undefined) {
-            this.NUMERO_CONTROL = this.utilService.NuevoSemillero(data.valor_actual)
-            this.registrar()
+            this.NUMERO_CONTROL = this.utilService.NuevoSemillero(
+              data.valor_actual,
+            );
+            this.registrar();
           }
         } else {
-           this.toastrService.info('Falla en la generación del número de serie', 'Campo requerido')
+          this.toastrService.info(
+            "Falla en la generación del número de serie",
+            "Campo requerido",
+          );
         }
-
       },
       (error) => {
-        console.error("No existe la funcion ", error)
-      }
-    )
-
+        console.error("No existe la funcion ", error);
+      },
+    );
   }
-
 }
-
