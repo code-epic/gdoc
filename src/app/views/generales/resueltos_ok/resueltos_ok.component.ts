@@ -1671,6 +1671,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   }
 
   private async applyBatchTag(selected: any[], tagValue: string): Promise<void> {
+    this.ngxService.startLoader("ld-fast");
     try {
       for (const doc of selected) {
         const key = doc.numero_carpeta;
@@ -1693,6 +1694,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         "Algunas etiquetas no se guardaron en el servidor.",
         "Advertencia",
       );
+    } finally {
+      this.ngxService.stopLoader("ld-fast");
     }
 
     this.saveDocumentTags();
