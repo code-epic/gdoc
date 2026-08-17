@@ -158,6 +158,9 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public selectedDocForDistribution: any = null;
   public distributionOptions: string[] = ['NORMAL', 'PDF RRSS', 'OFICIO', 'GACETA', 'SOBRE', 'NO PUBLICAR'];
   public selectedDistributions: Set<string> = new Set<string>();
+
+  // Acceso exclusivo al botón de Firmar Rápido
+  public isMinistro: boolean = false;
   public viewerProfile:
     | "Edicion"
     | "Revision"
@@ -266,6 +269,9 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               decoded.Usuario.descripcion ||
               "",
           };
+          // Verificar si el usuario es MINISTRO para habilitar firma directa
+          const desc: string = (decoded.Usuario.descripcion || "").trim().toUpperCase();
+          this.isMinistro = desc === 'MINISTRO';
         }
       }
       if (!this.jwtData.userId && this.loginService.Usuario) {
@@ -279,6 +285,11 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             this.loginService.Usuario.descripcion ||
             "",
         };
+        // Verificar MINISTRO también por la vía de loginService
+        if (!this.isMinistro) {
+          const descLogin = (this.loginService.Usuario.descripcion || "").trim().toUpperCase();
+          this.isMinistro = descLogin === 'MINISTRO';
+        }
       }
 
       // Intentar mapear perfil de forma síncrona usando caché o rol
@@ -303,6 +314,11 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             const cedula = decoded.Usuario.cedula || "";
             const sistema = decoded.Usuario.sistema || environment.ID || "";
             const correo = decoded.Usuario.correo || "";
+            // Verificar MINISTRO en el fallback asíncrono
+            if (!this.isMinistro) {
+              const descFb = (decoded.Usuario.descripcion || "").trim().toUpperCase();
+              this.isMinistro = descFb === 'MINISTRO';
+            }
 
             const userApi = {
               funcion: environment.funcion.CONSULTAR_USUARIO_PERFIL,

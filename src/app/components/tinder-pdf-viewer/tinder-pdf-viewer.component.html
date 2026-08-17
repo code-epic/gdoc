@@ -399,9 +399,9 @@
       <span>Enviar al Ministro</span>
     </button>
 
-    <!-- 5. Aprobado y firmado (Solo para Aprobador) -->
+    <!-- 5. Aprobado y firmado (Solo para Ministro) -->
     <button class="tpv-btn tpv-btn-approve"
-            *ngIf="profile === 'Aprobador'"
+            *ngIf="isMinistro"
             [disabled]="actionExecuting"
             (click)="onApprove()">
       <i [class]="approveIcon" *ngIf="!actionExecuting || executingType !== 'approve'"></i>

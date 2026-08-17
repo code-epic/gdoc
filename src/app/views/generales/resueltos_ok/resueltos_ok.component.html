@@ -512,7 +512,7 @@
         <div class="context-menu-item" (click)="startImmersiveMode(contextMenuData, currentProfile === 'Edicion' ? 'Revision' : currentProfile)">
           <i class="fas fa-eye text-teal"></i> Ver 
         </div>
-        <div class="context-menu-item" (click)="approveFast(contextMenuData)">
+        <div class="context-menu-item" *ngIf="isMinistro" (click)="approveFast(contextMenuData)">
           <i class="fas fa-signature text-success"></i> Firmar Rápido
         </div>
         <div class="context-menu-item text-danger" (click)="cancelFast(contextMenuData)">
@@ -592,6 +592,7 @@
   [startIndex]="currentDocIndex"
   [jwtData]="jwtData"
   [profile]="viewerProfile"
+  [isMinistro]="isMinistro"
   [loading]="loadingDocuments"
   [pdfUrlResolver]="resolvePdfUrl"
   [defaultBasamentoLegal]="fundamentoGlobal"

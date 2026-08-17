@@ -100,6 +100,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     | "Secretaria"
     | "Direccion"
     | "Aprobador" = "Edicion";
+  @Input() isMinistro = false;
   @Input() approveLabel = "Aprobar y Firmar";
   @Input() rejectLabel = "Rechazar";
   @Input() approveIcon = "fas fa-signature";
