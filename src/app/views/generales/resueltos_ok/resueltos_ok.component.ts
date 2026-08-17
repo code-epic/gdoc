@@ -1670,30 +1670,30 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     });
   }
 
-  private applyBatchTag(selected: any[], tagValue: string): void {
-    const promises = selected.map((doc) => {
-      const key = doc.numero_carpeta;
-      if (!this.documentTags[key]) {
-        this.documentTags[key] = { priority: "Normal", tag: "" };
+  private async applyBatchTag(selected: any[], tagValue: string): Promise<void> {
+    try {
+      for (const doc of selected) {
+        const key = doc.numero_carpeta;
+        if (!this.documentTags[key]) {
+          this.documentTags[key] = { priority: "Normal", tag: "" };
+        }
+        this.documentTags[key].tag = tagValue;
+        
+        // Execute sequentially and wait for completion
+        await this.apiActualizarEtiqueta(key, tagValue);
       }
-      this.documentTags[key].tag = tagValue;
-      return this.apiActualizarEtiqueta(key, tagValue);
-    });
-
-    Promise.all(promises).then(
-      () =>
-        this.toastrService.success(
-          "Etiquetas actualizadas en base de datos.",
-          "Éxito",
-        ),
-      (err) => {
-        console.error("Error updating tags in batch:", err);
-        this.toastrService.warning(
-          "Algunas etiquetas no se guardaron en el servidor.",
-          "Advertencia",
-        );
-      },
-    );
+      
+      this.toastrService.success(
+        "Etiquetas actualizadas en base de datos.",
+        "Éxito",
+      );
+    } catch (err) {
+      console.error("Error updating tags in batch:", err);
+      this.toastrService.warning(
+        "Algunas etiquetas no se guardaron en el servidor.",
+        "Advertencia",
+      );
+    }
 
     this.saveDocumentTags();
     this.clearDocSelection();
