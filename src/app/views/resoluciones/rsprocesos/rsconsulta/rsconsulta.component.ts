@@ -51,6 +51,7 @@ export class RsconsultaComponent implements OnInit {
   public cedula: string = "";
   public resolucion: string = "";
   public mostrarComponenteColumna: boolean = false;
+  nombrearchivo: any;
   public hayCorreccion(): boolean {
     return (
       this.lstResolucionesS &&
@@ -64,6 +65,14 @@ export class RsconsultaComponent implements OnInit {
     valores: "",
   };
   fechaRango: FormGroup;
+
+  get startControl(): FormControl {
+    return this.fechaRango.get("start") as FormControl;
+  }
+
+  get endControl(): FormControl {
+    return this.fechaRango.get("end") as FormControl;
+  }
 
   public tpf: WTipoArchivo = {};
 
@@ -106,6 +115,7 @@ export class RsconsultaComponent implements OnInit {
     direccion: "",
     estatura: "",
     estado_civil: "",
+    observaciones: "",
   };
 
   public IResolucion: IResoluciones = {
@@ -201,13 +211,13 @@ export class RsconsultaComponent implements OnInit {
   public lstNombres: any;
 
   public lstEntradas: any;
-  public lstIPSFA = []; //Objeto Comando
-  public archivos = [];
-  public lstCausa = []; //Objeto Comando
-  public lstMotivo = []; //Objeto Comando
-  public lstRangoCedula = [];
-  public lstRangoCedulaFile = [];
-  public lstAscenso = [];
+  public lstIPSFA: any[] = []; //Objeto Comando
+  public archivos: any[] = [];
+  public lstCausa: any[] = []; //Objeto Comando
+  public lstMotivo: any[] = []; //Objeto Comando
+  public lstRangoCedula: any[] = [];
+  public lstRangoCedulaFile: any[] = [];
+  public lstAscenso: any[] = [];
 
   public xasunto: string = "";
   public tipo: any;
@@ -1404,11 +1414,11 @@ export class RsconsultaComponent implements OnInit {
     this.blExpandida = true;
   }
 
-  getSex(sexo: String): String {
+  getSex(sexo: string): string {
     return sexo == "M" ? "MASCULINO" : "FEMENINO";
   }
 
-  getSituation(valor: String): String {
+  getSituation(valor: string): any {
     switch (valor) {
       case "ACT":
         return "ACTIVO";

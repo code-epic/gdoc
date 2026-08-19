@@ -20,6 +20,7 @@ import {
   TinderPdfViewerComponent,
   PdfAction,
 } from "src/app/components/tinder-pdf-viewer/tinder-pdf-viewer.component";
+import { LectorService } from "src/app/services/resoluciones/lector.service";
 
 @Component({
   selector: "app-resueltos-ok",
@@ -60,8 +61,13 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
   public documentSearchQuery = "";
 
-  public documentTags: { [docKey: string]: { priority: string; tag: string; distribution?: string[] } } =
-    {};
+  public documentTags: {
+    [docKey: string]: {
+      priority: string;
+      tag: string;
+      distribution?: string[];
+    };
+  } = {};
   public existingTags: string[] = [];
   public documentGroups: Array<{ name: string; docs: any[] }> = [];
   public flatDocuments: any[] = [];
@@ -153,11 +159,26 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     | "Aprobador" = "Edicion";
   public showingFirmados: boolean = false;
 
+  // --- PROCESAMIENTO DE CASOS ---
+  public isProcessModalOpen: boolean = false;
+  public selectedDocForProcessing: any = null;
+  public extractedCases: any[] = [];
+  public loadingProcessData: boolean = false;
+  public isAscensoType: boolean = false;
+
   // --- DISTRIBUCIÓN (Solo Dirección + Firmados) ---
   public isDistributionModalOpen: boolean = false;
   public selectedDocForDistribution: any = null;
-  public distributionOptions: string[] = ['NORMAL', 'PDF RRSS', 'OFICIO', 'GACETA', 'SOBRE', 'NO PUBLICAR'];
+  public distributionOptions: string[] = [
+    "NORMAL",
+    "PDF RRSS",
+    "OFICIO",
+    "GACETA",
+    "SOBRE",
+    "NO PUBLICAR",
+  ];
   public selectedDistributions: Set<string> = new Set<string>();
+  public distributionObservacion: string = "";
 
   // Acceso exclusivo al botón de Firmar Rápido
   public isMinistro: boolean = false;
@@ -198,6 +219,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private router: Router,
     private changeDetector: ChangeDetectorRef,
+    private lectorService: LectorService,
   ) {}
 
   ngOnInit() {
@@ -270,8 +292,10 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               "",
           };
           // Verificar si el usuario es MINISTRO para habilitar firma directa
-          const desc: string = (decoded.Usuario.descripcion || "").trim().toUpperCase();
-          this.isMinistro = desc === 'MINISTRO';
+          const desc: string = (decoded.Usuario.descripcion || "")
+            .trim()
+            .toUpperCase();
+          this.isMinistro = desc === "MINISTRO";
         }
       }
       if (!this.jwtData.userId && this.loginService.Usuario) {
@@ -285,11 +309,6 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             this.loginService.Usuario.descripcion ||
             "",
         };
-        // Verificar MINISTRO también por la vía de loginService
-        if (!this.isMinistro) {
-          const descLogin = (this.loginService.Usuario.descripcion || "").trim().toUpperCase();
-          this.isMinistro = descLogin === 'MINISTRO';
-        }
       }
 
       // Intentar mapear perfil de forma síncrona usando caché o rol
@@ -314,11 +333,6 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             const cedula = decoded.Usuario.cedula || "";
             const sistema = decoded.Usuario.sistema || environment.ID || "";
             const correo = decoded.Usuario.correo || "";
-            // Verificar MINISTRO en el fallback asíncrono
-            if (!this.isMinistro) {
-              const descFb = (decoded.Usuario.descripcion || "").trim().toUpperCase();
-              this.isMinistro = descFb === 'MINISTRO';
-            }
 
             const userApi = {
               funcion: environment.funcion.CONSULTAR_USUARIO_PERFIL,
@@ -439,27 +453,22 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.closeContextMenu();
   }
 
-  public closeDistributionModal(): void {
-    this.isDistributionModalOpen = false;
-    this.selectedDocForDistribution = null;
-  }
-
   public isOptionChecked(option: string): boolean {
     return this.selectedDistributions.has(option);
   }
 
   public toggleDistributionOption(option: string): void {
-    if (option === 'NO PUBLICAR') {
+    if (option === "NO PUBLICAR") {
       // Si se selecciona "No Publicar" se desmarcan las demás opciones
-      if (this.selectedDistributions.has('NO PUBLICAR')) {
-        this.selectedDistributions.delete('NO PUBLICAR');
+      if (this.selectedDistributions.has("NO PUBLICAR")) {
+        this.selectedDistributions.delete("NO PUBLICAR");
       } else {
         this.selectedDistributions.clear();
-        this.selectedDistributions.add('NO PUBLICAR');
+        this.selectedDistributions.add("NO PUBLICAR");
       }
     } else {
       // Al marcar cualquier otra opción, se elimina "No Publicar"
-      this.selectedDistributions.delete('NO PUBLICAR');
+      this.selectedDistributions.delete("NO PUBLICAR");
       if (this.selectedDistributions.has(option)) {
         this.selectedDistributions.delete(option);
       } else {
@@ -470,16 +479,64 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
   public saveDistribution(): void {
     if (!this.selectedDocForDistribution) return;
+
+    // Actualizamos el objeto local
     const distribution = Array.from(this.selectedDistributions);
-    // Guardar en el objeto del documento para reflejo reactivo inmediato
     this.selectedDocForDistribution.distribution = distribution;
-    // Persistir en documentTags también
+
+    // Persistir en documentTags
     const carpetaKey = this.selectedDocForDistribution.numero_carpeta;
     if (!this.documentTags[carpetaKey]) {
-      this.documentTags[carpetaKey] = { priority: 'Normal', tag: '' };
+      this.documentTags[carpetaKey] = { priority: "Normal", tag: "" };
     }
     this.documentTags[carpetaKey].distribution = distribution;
-    this.closeDistributionModal();
+
+    // Objeto reactivo según el schema
+    const ResolucionDistribuir = {
+      numero_resuelto:
+        this.selectedDocForDistribution.numero_resol ||
+        this.selectedDocForDistribution.numero_carpeta ||
+        "",
+      observacion: this.distributionObservacion || "",
+      normal: this.selectedDistributions.has("NORMAL") ? 1 : 0,
+      pdf_rrss: this.selectedDistributions.has("PDF RRSS") ? 1 : 0,
+      oficio: this.selectedDistributions.has("OFICIO") ? 1 : 0,
+      gaceta: this.selectedDistributions.has("GACETA") ? 1 : 0,
+      sobre: this.selectedDistributions.has("SOBRE") ? 1 : 0,
+      no_publicar: this.selectedDistributions.has("NO PUBLICAR") ? 1 : 0,
+      responsable:
+        this.jwtData.userId || this.loginService.Usuario?.usuario || "",
+    };
+
+    // Llamada al API
+    this.ngxService.startLoader("ld-fast");
+    this.xAPI = {} as IAPICore;
+    // Usamos el nombre de la función que el backend debe tener configurado para esta tabla (asumimos MPPD_IDistribucionResolucion o la que se asigne)
+    this.xAPI.funcion = environment.funcion.RESOLUCION_DISTRIBUCION;
+    this.xAPI.parametros = "";
+    this.xAPI.valores = JSON.stringify(ResolucionDistribuir);
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (res: any) => {
+        this.ngxService.stopLoader("ld-fast");
+        this.toastrService.success(
+          "Distribución guardada correctamente",
+          "Éxito",
+        );
+        this.closeDistributionModal();
+      },
+      (error) => {
+        this.ngxService.stopLoader("ld-fast");
+        this.toastrService.error("Error al guardar la distribución", "Error");
+        console.error("Error en distribución:", error);
+      },
+    );
+  }
+
+  public closeDistributionModal(): void {
+    this.isDistributionModalOpen = false;
+    this.selectedDocForDistribution = null;
+    this.distributionObservacion = ""; // Limpiar textarea
   }
 
   // --- LOGICA EXPLORADOR (CARPETAS Y DOCUMENTOS) ---
@@ -701,13 +758,20 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
           Object.values(grupos).forEach((grupo: any) => {
             if (grupo.documentos?.length > 0) {
               const d = grupo.documentos[0];
-              grupo.numero_resol   = d.numero_resol   || null;
+              grupo.numero_resol = d.numero_resol || null;
               grupo.fecha_resolucion = d.fecha_resolucion || null;
+              grupo.observacion = d.observacion || null;
+              grupo.pub_observacion = d.pub_observacion || null;
+              grupo.normal = d.normal;
+              grupo.pdf_rrss = d.pdf_rrss;
+              grupo.oficio = d.oficio;
+              grupo.gaceta = d.gaceta;
+              grupo.sobre = d.sobre;
+              grupo.no_publicar = d.no_publicar;
             }
           });
 
           this.documents = Object.values(grupos);
-
         }
         this.loadingDocuments = false;
         this.changeDetector.detectChanges();
@@ -1637,9 +1701,9 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       customClass: {
         confirmButton: "btn btn-success",
         cancelButton: "btn btn-secondary",
-        input: "swal-select-custom"
+        input: "swal-select-custom",
       },
-      buttonsStyling: false
+      buttonsStyling: false,
     }).then((result) => {
       if (result.isConfirmed) {
         const selection = result.value;
@@ -1655,7 +1719,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               customClass: {
                 confirmButton: "btn btn-success",
                 cancelButton: "btn btn-secondary",
-                input: "swal-input-custom"
+                input: "swal-input-custom",
               },
               buttonsStyling: false,
               inputValidator: (val) => {
@@ -1732,9 +1796,9 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       customClass: {
         confirmButton: "btn btn-success",
         cancelButton: "btn btn-secondary",
-        input: "swal-select-custom"
+        input: "swal-select-custom",
       },
-      buttonsStyling: false
+      buttonsStyling: false,
     }).then((result) => {
       if (result.isConfirmed) {
         const selection = result.value;
@@ -1750,7 +1814,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               customClass: {
                 confirmButton: "btn btn-success",
                 cancelButton: "btn btn-secondary",
-                input: "swal-input-custom"
+                input: "swal-input-custom",
               },
               buttonsStyling: false,
               inputValidator: (val) => {
@@ -1773,7 +1837,10 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     });
   }
 
-  private async applyBatchTag(selected: any[], tagValue: string): Promise<void> {
+  private async applyBatchTag(
+    selected: any[],
+    tagValue: string,
+  ): Promise<void> {
     this.ngxService.startLoader("ld-fast");
     try {
       for (const doc of selected) {
@@ -1782,11 +1849,11 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
           this.documentTags[key] = { priority: "Normal", tag: "" };
         }
         this.documentTags[key].tag = tagValue;
-        
+
         // Execute sequentially and wait for completion
         await this.apiActualizarEtiqueta(key, tagValue);
       }
-      
+
       this.toastrService.success(
         "Etiquetas actualizadas en base de datos.",
         "Éxito",
@@ -1817,5 +1884,181 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     });
     this.saveDocumentTags();
     this.clearDocSelection();
+  }
+
+  // --- METODOS DE PROCESAMIENTO DE CASOS ---
+
+  public ObtenerResuelto(numero_carpeta: string): Promise<any> {
+    return new Promise((resolve) => {
+      const cleanNumeroCarpeta = numero_carpeta
+        ? numero_carpeta.replace(/[\r\n\t]+/g, "").trim()
+        : "";
+      const xAPI = {} as IAPICore;
+      xAPI.funcion = environment.funcion.OBTENER_RESUELTO;
+      xAPI.parametros = `${cleanNumeroCarpeta}`;
+      this.apiService.Ejecutar(xAPI).subscribe(
+        (data: any) => {
+          resolve(data && data.length > 0 ? data[0] : null);
+        },
+        (err: any) => {
+          console.error("Error al obtener resuelto desde PostgreSQL:", err);
+          resolve(null);
+        },
+      );
+    });
+  }
+
+  public async openProcessModal(doc: any) {
+    this.selectedDocForProcessing = doc;
+    this.extractedCases = [];
+    this.isProcessModalOpen = true;
+    this.loadingProcessData = true;
+    this.isAscensoType = false;
+
+    // Verificar si es de tipo Ascenso
+    if (doc.asunto && doc.asunto.toUpperCase().includes("ASCENSO")) {
+      this.isAscensoType = true;
+    }
+
+    try {
+      // 1. Intentar obtener el template de resolución
+      const pgTemplate = await this.ObtenerResuelto(doc.numero_carpeta);
+      let htmlCompleto = "";
+      let docsOriginales: any[] = [];
+
+      if (pgTemplate && pgTemplate.task) {
+        const unico_parrafo = pgTemplate.task.unico_parrafo || "";
+        const lista_casos = pgTemplate.task.lista_casos || "";
+        htmlCompleto = unico_parrafo + " " + lista_casos;
+        docsOriginales = pgTemplate.task.documentos_originales || pgTemplate.task.documentos || [];
+      }
+
+      if (docsOriginales.length === 0 && doc.documentos) {
+        docsOriginales = doc.documentos;
+      }
+
+      // 2. Intentar parsear el HTML con LectorService
+      let parsedOficiales: any[] = [];
+      if (htmlCompleto) {
+        parsedOficiales = this.lectorService.extraerDatosMilitar(htmlCompleto);
+      }
+
+      // 3. Mapeo de casos con lógica de fallback
+      if (parsedOficiales && parsedOficiales.length > 0) {
+        this.extractedCases = parsedOficiales.map((o, idx) => ({
+          cedula: o.cedula || "",
+          nombre: o.nombre || "",
+          asunto: "", // Los asuntos se inicializan en blanco
+          orden: this.isAscensoType ? (idx + 1) : null,
+        }));
+      } else {
+        // Fallback: usar las cédulas de documentos_originales
+        this.extractedCases = docsOriginales.map((d: any, idx: number) => ({
+          cedula: d.cedula || d.persona?.cedula || "",
+          nombre: d.nombres_apellidos || d.nombre || "",
+          asunto: "", // Los asuntos se inicializan en blanco
+          orden: this.isAscensoType ? (idx + 1) : null,
+        }));
+      }
+    } catch (e) {
+      console.error("Error al cargar datos del modal de procesamiento:", e);
+      this.toastrService.error("Ocurrió un error al cargar la información del documento.");
+    } finally {
+      this.loadingProcessData = false;
+      this.changeDetector.detectChanges();
+    }
+  }
+
+  public closeProcessModal() {
+    this.isProcessModalOpen = false;
+    this.selectedDocForProcessing = null;
+    this.extractedCases = [];
+    this.isAscensoType = false;
+    this.changeDetector.detectChanges();
+  }
+
+  public async saveProcessedCases() {
+    if (!this.selectedDocForProcessing) return;
+
+    this.ngxService.startLoader("ld-fast");
+    const doc = this.selectedDocForProcessing;
+    const numeroCarpeta = doc.numero_carpeta || "000000";
+    const numeroResolucion = doc.numero_resol || doc.numc || "";
+
+    try {
+      // Imprimir en consola el recorrido de los cambios
+      console.log("--- PROCESANDO CASOS DE RESOLUCION ---");
+      console.log("Carpeta N°:", numeroCarpeta);
+      console.log("Resolución N°:", numeroResolucion);
+      console.log("Tipo de Caso:", doc.asunto);
+      console.log("Casos Modificados:", this.extractedCases);
+
+      // Actualizar en memoria el listado del documento
+      if (doc.documentos) {
+        doc.documentos.forEach((d: any) => {
+          const match = this.extractedCases.find(c => c.cedula === d.cedula);
+          if (match) {
+            d.asunto = match.asunto;
+            if (this.isAscensoType) {
+               d.orden = match.orden;
+            }
+          }
+        });
+      }
+
+      // Simular la comunicación con apiService / ExecColeccion para persistencia posterior
+      const pgTemplate = await this.ObtenerResuelto(doc.numero_carpeta);
+      let taskObj: any = {};
+      if (pgTemplate && pgTemplate.task) {
+        taskObj = { ...pgTemplate.task };
+      } else {
+        taskObj = {
+          fecha_resolucion: doc.fecha_resolucion,
+          numero_carpeta: numeroCarpeta,
+          numero_resolucion: numeroResolucion,
+          basamento_legal: "",
+          unico_parrafo: "",
+          lista_casos: "",
+          styles: null,
+          ediciones: [],
+          comentarios: [],
+        };
+      }
+
+      // Actualizar la lista en el taskObj para MongoDB
+      taskObj.documentos_originales = this.extractedCases.map((c) => ({
+        cedula: c.cedula,
+        nombres_apellidos: c.nombre,
+        asunto: c.asunto,
+        orden: c.orden
+      }));
+
+      let obj = {
+        usuario: this.jwtData?.userId,
+        numero_carpeta: numeroCarpeta,
+        numero_resolucion: numeroResolucion,
+        task: taskObj,
+        fecha: new Date(),
+      };
+
+      console.log("Objeto estructurado para apiService / ExecColeccion:", obj);
+
+      this.ngxService.stopLoader("ld-fast");
+      this.isProcessModalOpen = false;
+
+      Swal.fire({
+        title: "¡Procesado!",
+        text: "Los casos de esta resolución han sido procesados y recorridos exitosamente (revisa la consola).",
+        icon: "success",
+        confirmButtonColor: "#2e5a73",
+        confirmButtonText: "Aceptar",
+      });
+
+      this.changeDetector.detectChanges();
+    } catch (e) {
+      console.error("Error en saveProcessedCases:", e);
+      this.ngxService.stopLoader("ld-fast");
+      this.toastrService.error("Ocurrió un error al procesar los casos.");
+    }
   }
 }

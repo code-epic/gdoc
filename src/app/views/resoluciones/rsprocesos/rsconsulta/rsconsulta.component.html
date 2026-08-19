@@ -262,7 +262,7 @@
                                                                     </div>
                                                                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                                                         <span class="text-muted text-xs font-weight-bold text-uppercase">Clasificación</span>
-                                                                        <span class="font-weight-600 text-dark text-sm">{{ (IDatosBasicos.clasificacion | uppercase) || 'NO APLICA' }}</span>
+                                                                        <span class="font-weight-600 text-dark text-sm">{{ (IDatosBasicos.clasificacion) || 'NO APLICA' }}</span>
                                                                     </div>
                                                                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                                                         <span class="text-muted text-xs font-weight-bold text-uppercase">Categoría</span>
@@ -760,7 +760,7 @@
                                                             </span>
                                                         </div>
                                                         <input class="input-custom" placeholder="AAAA-MM-DD"
-                                                            [formControl]="fechaRango.get('start')" ngbDatepicker #dStart="ngbDatepicker"
+                                                            [formControl]="startControl" ngbDatepicker #dStart="ngbDatepicker"
                                                             placement="bottom-left" readonly (click)="dStart.toggle()">
                                                     </div>
                                                 </div>
@@ -773,7 +773,7 @@
                                                             </span>
                                                         </div>
                                                         <input class="input-custom" placeholder="AAAA-MM-DD"
-                                                            [formControl]="fechaRango.get('end')" ngbDatepicker #dEnd="ngbDatepicker"
+                                                            [formControl]="endControl" ngbDatepicker #dEnd="ngbDatepicker"
                                                             placement="bottom-left" readonly (click)="dEnd.toggle()">
                                                     </div>
                                                 </div>
