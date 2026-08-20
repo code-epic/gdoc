@@ -85,5 +85,6 @@ export const environment = {
     INSERTAR_NUMERO_RESUELTO: "MPPD_INumeroResuelto",
     ACTUALIZAR_CARPETA_ETIQUETA: "MPPD_UCarpetaEtiqueta",
     RESOLUCION_DISTRIBUCION: "MPPD_IResolucionDistribuir",
+    INSERTAR_RESOLUCIONES: "MPPD_IResoluciones",
   },
 };

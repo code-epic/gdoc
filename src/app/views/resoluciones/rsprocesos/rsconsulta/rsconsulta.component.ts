@@ -32,6 +32,7 @@ import { MensajeService } from "src/app/services/util/mensaje.service";
 import { ExcelService } from "src/app/services/util/excel.service";
 import Swal from "sweetalert2";
 import * as moment from "moment";
+import { DomSanitizer } from "@angular/platform-browser";
 
 interface ITipoResolucion {
   codigo: string;
@@ -351,6 +352,9 @@ export class RsconsultaComponent implements OnInit {
   public xmeses = "";
   public xdia = "";
   public blAlertas: boolean = false;
+  public fotoAfiliadoBlobUrl: any = "";
+  public isLoadingFoto: boolean = false;
+  private rawBlobUrl: string = "";
 
   constructor(
     private apiService: ApiService,
@@ -367,6 +371,7 @@ export class RsconsultaComponent implements OnInit {
     private router: Router,
     private excelService: ExcelService,
     private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer,
   ) {
     this.Estados =
       sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR) !=
@@ -615,6 +620,12 @@ export class RsconsultaComponent implements OnInit {
       this.lstEntradas = [];
       this.lstAscenso = [];
       this.lstResoluciones = [];
+      
+      if (this.rawBlobUrl) {
+        URL.revokeObjectURL(this.rawBlobUrl);
+      }
+      this.rawBlobUrl = "";
+      this.fotoAfiliadoBlobUrl = "";
 
       if (this.cedula == "") return false;
 
@@ -664,6 +675,7 @@ export class RsconsultaComponent implements OnInit {
             this.dbDatosNombre = false;
 
             this.seleccionColor();
+            this.getPhotoId(this.IDatosBasicos.cedula);
           }
 
           this.ngxService.stopLoader("loader-buscar");
@@ -1086,9 +1098,43 @@ export class RsconsultaComponent implements OnInit {
   }
 
   obtenerFoto(id: string) {
+    if (this.fotoAfiliadoBlobUrl) {
+      return this.fotoAfiliadoBlobUrl;
+    }
     return (
       "https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/" + id + "/foto.jpg"
     );
+  }
+
+  getPhotoId(cedula: string) {
+    if (cedula && cedula.toString().trim() !== "") {
+      this.isLoadingFoto = true;
+      const payload = {
+        ruta: "img/temp/" + cedula + "/",
+        archivo: "foto.jpg",
+      };
+      this.apiService.postBlob("dwscdn", payload).subscribe({
+        next: (data: Blob) => {
+          this.isLoadingFoto = false;
+          if (data && data.size > 0) {
+            if (this.rawBlobUrl) {
+              URL.revokeObjectURL(this.rawBlobUrl);
+            }
+            this.rawBlobUrl = URL.createObjectURL(data);
+            this.fotoAfiliadoBlobUrl = this.sanitizer.bypassSecurityTrustUrl(this.rawBlobUrl);
+          } else {
+            this.fotoAfiliadoBlobUrl = "";
+          }
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          this.isLoadingFoto = false;
+          console.error("Error al cargar la foto:", error);
+          this.fotoAfiliadoBlobUrl = "";
+          this.cdr.detectChanges();
+        },
+      });
+    }
   }
 
   fileSelected(e) {

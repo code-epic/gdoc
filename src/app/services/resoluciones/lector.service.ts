@@ -18,30 +18,62 @@ export interface NodoJerarquia {
 export class LectorService {
   constructor() {}
 
+  /**
+   * Entrada principal consolidada que ejecuta todos los clasificadores de resoluciones,
+   * elimina duplicados por cédula y normaliza los textos de asunto y cargo.
+   */
   extraerDatosMilitar(contenidoHtml: string): Oficial[] {
+    // 1. Ejecutar el clasificador jerárquico tradicional
+    const porJerarquia = this.parseMilitarPorJerarquia(contenidoHtml);
+
+    // 2. Ejecutar el clasificador de cese en el empleo / reserva activa
+    const porCese = this.parseCeseEmpleo(contenidoHtml);
+
+    // Consolidar resultados eliminando duplicados por cédula (preferir el del cese si coincide)
+    const mapaOficiales = new Map<string, Oficial>();
+
+    porJerarquia.forEach((o) => {
+      o.ubicacion = this.normalizarAsunto(o.ubicacion);
+      o.cargo = this.normalizarAsunto(o.cargo);
+      mapaOficiales.set(o.cedula, o);
+    });
+
+    porCese.forEach((o) => {
+      o.ubicacion = this.normalizarAsunto(o.ubicacion);
+      o.cargo = this.normalizarAsunto(o.cargo);
+      mapaOficiales.set(o.cedula, o);
+    });
+
+    return Array.from(mapaOficiales.values());
+  }
+
+  /**
+   * Caso 1: Clasificador Jerárquico.
+   * Analiza la estructura del árbol de dependencias organizacionales basándose en la tabulación (margin-left)
+   * o jerarquías de cabecera en negrita/mayúsculas.
+   */
+  private parseMilitarPorJerarquia(contenidoHtml: string): Oficial[] {
     const resultados: Oficial[] = [];
     const pilaJerarquia: NodoJerarquia[] = [];
 
     // Regex para atrapar todo el contenido dentro de las etiquetas <p>...</p>
     const regexParrafo = /<p[^>]*>(.*?)<\/p>/gis;
-    // Variables de jerarquía
     let matchParrafo;
 
-    // 1. Iterar sobre cada párrafo del HTML
     while ((matchParrafo = regexParrafo.exec(contenidoHtml)) !== null) {
       const pTagCompleto = matchParrafo[0];
       const pContenido = matchParrafo[1];
 
-      // Limpiar el texto: quitar etiquetas HTML (como <u>, <b>, <span>), entidades (&nbsp;) y espacios extra
+      // Limpiar texto de etiquetas HTML
       const textoLimpio = pContenido
-        .replace(/<[^>]+>/g, "") // Elimina cualquier etiqueta HTML interna
-        .replace(/&nbsp;/g, " ") // Reemplaza espacios non-breaking
-        .replace(/\s+/g, " ") // Normaliza múltiples espacios
+        .replace(/<[^>]+>/g, "")
+        .replace(/&nbsp;/g, " ")
+        .replace(/\s+/g, " ")
         .trim();
 
       if (!textoLimpio || textoLimpio === "-") continue;
 
-      // 2. Extraer la tabulación (margin-left) para calcular la profundidad
+      // Calcular profundidad (margin-left)
       let profundidad = 0;
       const matchMargen = pTagCompleto.match(/margin-left:\s*([\d.]+)(cm|pt)/i);
 
@@ -49,12 +81,9 @@ export class LectorService {
       if (matchMargen) {
         const valor = parseFloat(matchMargen[1]);
         const unidad = matchMargen[2].toLowerCase();
-        // Convertir cm a pt (1 cm ≈ 28.3465 pt) para tener una escala universal
         margenPt = unidad === "cm" ? valor * 28.3465 : valor;
       }
 
-      // Lógica avanzada para determinar jerarquías cuando el margen es 0
-      // Usamos el formato (Negrita, Mayúsculas) para diferenciar los niveles base
       if (margenPt === 0) {
         const isBold = /<b\b[^>]*>|<strong>/i.test(pTagCompleto) || /font-weight:\s*(bold|700)/i.test(pTagCompleto);
         const isUpperCase = textoLimpio === textoLimpio.toUpperCase() && textoLimpio !== textoLimpio.toLowerCase();
@@ -70,21 +99,18 @@ export class LectorService {
         profundidad = Math.round(margenPt * 10) / 10; 
       }
 
-      // 3. Regex para detectar si el párrafo contiene una Cédula y Cargo
-      // Busca variaciones de "C.I. N°", atrapa los números con puntos, y luego atrapa el texto hasta la coma.
+      // Detectar persona con Cédula y Cargo
       const regexPersona = /([^,]+),\s*(?:C\.I\.\s*N[°º]?|C\.I\.|N[°º])\s*([\d\.]+)\s*,\s*([^,]+)/i;
       const matchPersona = textoLimpio.match(regexPersona);
 
       if (matchPersona) {
-        // Es una persona: Extraemos y limpiamos datos
         const nombreRaw = matchPersona[1];
         const nombreMatches = nombreRaw.match(/[A-ZÁÉÍÓÚÑ\s]+$/);
         const nombre = nombreMatches ? nombreMatches[0].trim() : nombreRaw.trim();
 
         const cedulaSucia = matchPersona[2];
-        const cedula = cedulaSucia.replace(/\./g, ""); // Quita los puntos
+        const cedula = cedulaSucia.replace(/\./g, "").trim();
         
-        // Limpiamos el cargo hasta la primera coma (si el regex capturó de más) o quitamos el "p/v."
         let cargo = matchPersona[3].trim(); 
         if (cargo.includes(',')) {
            cargo = cargo.substring(0, cargo.indexOf(',')).trim();
@@ -92,28 +118,26 @@ export class LectorService {
            cargo = cargo.substring(0, cargo.length - 4).trim();
         }
 
-        // 4. Construir la ubicación leyendo la pila (stack) en reversa
         const rutaDependencias = pilaJerarquia
           .map((nodo) => nodo.texto)
           .reverse()
           .join(", ");
 
-        const ubicacion = `${cargo} de ${rutaDependencias}`;
+        const ubicacion = rutaDependencias ? `${cargo}, ${rutaDependencias}` : cargo;
 
         resultados.push({ nombre, cedula, cargo, ubicacion });
       } else {
         // Es un nodo de jerarquía (Dependencia, Batallón, Sección, etc.)
-
-        // 5. Eliminar de la pila los nodos que estén al mismo nivel o más profundos
-        // Esto simula que estamos entrando a una nueva rama del árbol organizacional
+        // Eliminar de la pila los nodos que estén al mismo nivel o más profundos, 
+        // excepto si son cabeceras iniciales antes de los resultados
         while (
           pilaJerarquia.length > 0 &&
-          pilaJerarquia[pilaJerarquia.length - 1].profundidad >= profundidad
+          pilaJerarquia[pilaJerarquia.length - 1].profundidad >= profundidad &&
+          !(pilaJerarquia[pilaJerarquia.length - 1].profundidad < 0 && profundidad < 0 && resultados.length === 0)
         ) {
           pilaJerarquia.pop();
         }
 
-        // Ignorar párrafos misceláneos que no son dependencias organizacionales
         if (
           !textoLimpio.startsWith("PRIMERO:") &&
           !textoLimpio.startsWith("SEGUNDO:")
@@ -124,5 +148,73 @@ export class LectorService {
     }
 
     return resultados;
+  }
+
+  /**
+   * Caso 2: Clasificador de Cese en el Empleo / Reserva Activa.
+   * Detecta enunciados con patrón de cese de empleo, extrayendo el asunto, grado/nombre y cédula.
+   * Ejemplo: "ÚNICO: CESAR EN EL EMPLEO (PROPIA SOLICITUD) al Capitán LUIS MIGUEL CARVAJAL CARRIÓN, C.I. N° 20.022.914."
+   */
+  private parseCeseEmpleo(contenidoHtml: string): Oficial[] {
+    const resultados: Oficial[] = [];
+    const regexParrafo = /<p[^>]*>(.*?)<\/p>/gis;
+    let matchParrafo;
+
+    while ((matchParrafo = regexParrafo.exec(contenidoHtml)) !== null) {
+      const pContenido = matchParrafo[1];
+      const textoLimpio = pContenido
+        .replace(/<[^>]+>/g, "")
+        .replace(/&nbsp;/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (!textoLimpio) continue;
+
+      // Regex para patrón de cese de empleo
+      // ÚNICO: [Asunto] al/del [Grado Nombre], C.I. N° [Cédula]
+      const regexCese = /(?:ÚNICO|PRIMERO|SEGUNDO|TERCERO|CUARTO|QUINTO):\s*([^,]+?)\s+(?:al?\s+(?:ciudadano\s+|ciudadana\s+)?|del?\s+la?\s+)([^,]+),\s*(?:C\.I\.\s*N[°º]?|C\.I\.|N[°º])\s*([\d\.]+)/i;
+      const matchCese = textoLimpio.match(regexCese);
+
+      if (matchCese) {
+        const asuntoExtraido = matchCese[1].trim();
+        const rankAndName = matchCese[2].trim();
+        const cedulaSucia = matchCese[3];
+        const cedula = cedulaSucia.replace(/\./g, "").trim();
+
+        // Extraer nombre en mayúsculas al final
+        const nombreMatches = rankAndName.match(/[A-ZÁÉÍÓÚÑ\s]+$/);
+        const nombre = nombreMatches ? nombreMatches[0].trim() : rankAndName;
+        
+        // Extraer cargo/grado (lo que queda al inicio)
+        let cargo = rankAndName.replace(nombre, "").trim();
+        if (!cargo) cargo = "Oficial";
+
+        // Para cese en el empleo, la ubicación es el asunto extraído
+        const ubicacion = asuntoExtraido;
+
+        resultados.push({ nombre, cedula, cargo, ubicacion });
+      }
+    }
+
+    return resultados;
+  }
+
+  /**
+   * Convierte a MAYÚSCULAS y remueve acentos/diéresis, pero protege la letra Ñ/ñ,
+   * comillas y paréntesis para optimizar las búsquedas.
+   */
+  public normalizarAsunto(texto: string): string {
+    if (!texto) return "";
+    let res = texto.toUpperCase();
+
+    // Reemplazar de manera explícita y manual para preservar la Ñ y caracteres de búsqueda clave
+    res = res.replace(/[ÁÀÄÂ]/g, "A")
+             .replace(/[ÉÈËÊ]/g, "E")
+             .replace(/[ÍÌÏÎ]/g, "I")
+             .replace(/[ÓÒÖÔ]/g, "O")
+             .replace(/[ÚÙÜÛ]/g, "U")
+             .replace(/[ÝŸ]/g, "Y");
+
+    return res.trim();
   }
 }

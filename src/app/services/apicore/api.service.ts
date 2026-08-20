@@ -4,12 +4,24 @@ import {
   HttpEventType,
   HttpEvent,
   HttpResponse,
+  HttpParams,
 } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { environment } from "src/environments/environment";
 
 import { map, tap } from "rxjs/operators";
+
+export type ApiParams =
+  | HttpParams
+  | {
+      [param: string]:
+        | string
+        | number
+        | boolean
+        | ReadonlyArray<string | number | boolean>;
+    };
+export type ApiHeaders = HttpHeaders | { [header: string]: string | string[] };
 
 export interface IAPICore {
   id?: string;
@@ -83,6 +95,7 @@ export interface ProcessID {
 export class ApiService {
   // Dirección Get para servicios en la página WEB
   URL = environment.API;
+  private _url = environment.API;
 
   // hash = environment.Hash
 
@@ -442,5 +455,50 @@ export class ApiService {
     var url = this.URL + "makeqr";
 
     return this.http.post<any>(url, objeto, httpOptions);
+  }
+
+  /**
+   * Realiza una petición POST genérica que retorna un Blob
+   * @param endpoint Endpoint relativo
+   * @param body Cuerpo de la petición
+   */
+  public postBlob(
+    endpoint: string,
+    body: unknown,
+    params?: ApiParams,
+    headers?: ApiHeaders,
+  ): Observable<Blob> {
+    return this.http.post(this._resolveUrl(endpoint), body, {
+      params,
+      headers,
+      responseType: "blob",
+    });
+  }
+
+  /**
+   * Construye la URL completa manejando slashes y dominios
+   */
+  private _resolveUrl(endpoint: string): string {
+    if (/^https?:\/\//.test(endpoint)) return endpoint;
+
+    // Asegurar que la URL base termine en /
+    const baseUrl = this._url.endsWith("/") ? this._url : `${this._url}/`;
+    // Limpiar el endpoint de slash inicial
+    const cleanEndpoint = endpoint.startsWith("/")
+      ? endpoint.substring(1)
+      : endpoint;
+
+    let url = baseUrl + cleanEndpoint;
+
+    // Regla: si el endpoint inicia con 'crud' o 'fnx' y NO contiene ya el hash, lo anexamos.
+    // Se asume que estos endpoints requieren la firma del hash.
+    if (
+      cleanEndpoint.startsWith("crud") &&
+      !cleanEndpoint.includes(environment.Hash)
+    ) {
+      url += ":" + environment.Hash;
+    }
+
+    return url;
   }
 }

@@ -166,6 +166,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public loadingProcessData: boolean = false;
   public isAscensoType: boolean = false;
 
+  // Tab-based layout state for cases processing modal
+  public activeTab: "casos" | "detalles" = "casos";
+  public processingInstrucciones: string = "";
+  public processingObservaciones: string = "";
+  public processingPublicacion: string = "Publicar";
+
   // --- DISTRIBUCIÓN (Solo Dirección + Firmados) ---
   public isDistributionModalOpen: boolean = false;
   public selectedDocForDistribution: any = null;
@@ -1920,6 +1926,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       this.isAscensoType = true;
     }
 
+    // Initialize tab and form values
+    this.activeTab = "casos";
+    this.processingInstrucciones = doc.instrucciones || "";
+    this.processingObservaciones = doc.pub_observacion || doc.observacion || "";
+    this.processingPublicacion = doc.publicacion || "Publicar";
+
     try {
       // 1. Intentar obtener el template de resolución
       const pgTemplate = await this.ObtenerResuelto(doc.numero_carpeta);
@@ -1930,7 +1942,10 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         const unico_parrafo = pgTemplate.task.unico_parrafo || "";
         const lista_casos = pgTemplate.task.lista_casos || "";
         htmlCompleto = unico_parrafo + " " + lista_casos;
-        docsOriginales = pgTemplate.task.documentos_originales || pgTemplate.task.documentos || [];
+        docsOriginales =
+          pgTemplate.task.documentos_originales ||
+          pgTemplate.task.documentos ||
+          [];
       }
 
       if (docsOriginales.length === 0 && doc.documentos) {
@@ -1945,24 +1960,36 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
       // 3. Mapeo de casos con lógica de fallback
       if (parsedOficiales && parsedOficiales.length > 0) {
-        this.extractedCases = parsedOficiales.map((o, idx) => ({
-          cedula: o.cedula || "",
-          nombre: o.nombre || "",
-          asunto: "", // Los asuntos se inicializan en blanco
-          orden: this.isAscensoType ? (idx + 1) : null,
-        }));
+        this.extractedCases = parsedOficiales.map((o, idx) => {
+          const match = docsOriginales.find((d) => {
+            const dCed = (d.cedula || d.persona?.cedula || "")
+              .toString()
+              .replace(/\./g, "")
+              .trim();
+            const oCed = (o.cedula || "").toString().replace(/\./g, "").trim();
+            return dCed === oCed;
+          });
+          return {
+            cedula: o.cedula || "",
+            nombre: o.nombre || "",
+            asunto: o.ubicacion || match?.asunto || "",
+            orden: match?.orden || (this.isAscensoType ? idx + 1 : null),
+          };
+        });
       } else {
         // Fallback: usar las cédulas de documentos_originales
         this.extractedCases = docsOriginales.map((d: any, idx: number) => ({
           cedula: d.cedula || d.persona?.cedula || "",
           nombre: d.nombres_apellidos || d.nombre || "",
-          asunto: "", // Los asuntos se inicializan en blanco
-          orden: this.isAscensoType ? (idx + 1) : null,
+          asunto: d.asunto || "",
+          orden: d.orden || (this.isAscensoType ? idx + 1 : null),
         }));
       }
     } catch (e) {
       console.error("Error al cargar datos del modal de procesamiento:", e);
-      this.toastrService.error("Ocurrió un error al cargar la información del documento.");
+      this.toastrService.error(
+        "Ocurrió un error al cargar la información del documento.",
+      );
     } finally {
       this.loadingProcessData = false;
       this.changeDetector.detectChanges();
@@ -1974,7 +2001,102 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.selectedDocForProcessing = null;
     this.extractedCases = [];
     this.isAscensoType = false;
+    this.activeTab = "casos";
+    this.processingInstrucciones = "";
+    this.processingObservaciones = "";
+    this.processingPublicacion = "Publicar";
     this.changeDetector.detectChanges();
+  }
+
+  /**
+   * Convierte la fecha del resuelto (ej. "17 AGO 2026", "17 DE AGOSTO DE 2026", "17/08/2026")
+   * a formato estándar YYYY-MM-DD para búsquedas de sistema.
+   */
+  public obtenerFechaSistema(fechaStr: string): string {
+    if (!fechaStr) return "";
+
+    let str = fechaStr
+      .toUpperCase()
+      .replace(/\bDE\b/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+      return str;
+    }
+
+    const matchDDMMYYYY = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (matchDDMMYYYY) {
+      const d = matchDDMMYYYY[1].padStart(2, "0");
+      const m = matchDDMMYYYY[2].padStart(2, "0");
+      const y = matchDDMMYYYY[3];
+      return `${y}-${m}-${d}`;
+    }
+
+    const mesesMap: { [key: string]: string } = {
+      ENE: "01",
+      ENERO: "01",
+      FEB: "02",
+      FEBRERO: "02",
+      MAR: "03",
+      MARZO: "03",
+      ABR: "04",
+      ABRIL: "04",
+      MAY: "05",
+      MAYO: "05",
+      JUN: "06",
+      JUNIO: "06",
+      JUL: "07",
+      JULIO: "07",
+      AGO: "08",
+      AGOSTO: "08",
+      SEP: "09",
+      SEPTIEMBRE: "09",
+      OCT: "10",
+      OCTUBRE: "10",
+      NOV: "11",
+      NOVIEMBRE: "11",
+      DIC: "12",
+      DICIEMBRE: "12",
+    };
+
+    const partes = str.split(" ");
+    let dia = "";
+    let mesStr = "";
+    let anio = "";
+
+    for (const p of partes) {
+      if (/^\d{1,2}$/.test(p)) {
+        dia = p.padStart(2, "0");
+      } else if (/^[A-ZÑÁÉÍÓÚ]+$/.test(p)) {
+        mesStr = p;
+      } else if (/^\d{4}$/.test(p)) {
+        anio = p;
+      }
+    }
+
+    if (dia && mesStr && anio) {
+      let mesNum = mesesMap[mesStr];
+      if (!mesNum) {
+        const prefix = mesStr.substring(0, 3);
+        mesNum = mesesMap[prefix] || "";
+      }
+      if (mesNum) {
+        return `${anio}-${mesNum}-${dia}`;
+      }
+    }
+
+    try {
+      const d = new Date(fechaStr);
+      if (!isNaN(d.getTime())) {
+        const diaNum = d.getDate().toString().padStart(2, "0");
+        const mesNum = (d.getMonth() + 1).toString().padStart(2, "0");
+        const anioNum = d.getFullYear();
+        return `${anioNum}-${mesNum}-${diaNum}`;
+      }
+    } catch (e) {}
+
+    return "";
   }
 
   public async saveProcessedCases() {
@@ -1986,27 +2108,32 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     const numeroResolucion = doc.numero_resol || doc.numc || "";
 
     try {
-      // Imprimir en consola el recorrido de los cambios
-      console.log("--- PROCESANDO CASOS DE RESOLUCION ---");
-      console.log("Carpeta N°:", numeroCarpeta);
-      console.log("Resolución N°:", numeroResolucion);
-      console.log("Tipo de Caso:", doc.asunto);
-      console.log("Casos Modificados:", this.extractedCases);
+      // Guardar campos de detalles en el documento local
+      doc.instrucciones = this.processingInstrucciones;
+      doc.pub_observacion = this.processingObservaciones;
+      doc.observacion = this.processingObservaciones;
+      doc.publicacion = this.processingPublicacion;
+      doc.fecha_sistema = this.obtenerFechaSistema(doc.fecha_resolucion);
+
+      // Normalizar asuntos en mayúsculas y sin acentos antes de procesar
+      this.extractedCases.forEach((caso) => {
+        caso.asunto = this.lectorService.normalizarAsunto(caso.asunto);
+      });
 
       // Actualizar en memoria el listado del documento
       if (doc.documentos) {
         doc.documentos.forEach((d: any) => {
-          const match = this.extractedCases.find(c => c.cedula === d.cedula);
+          const match = this.extractedCases.find((c) => c.cedula === d.cedula);
           if (match) {
             d.asunto = match.asunto;
             if (this.isAscensoType) {
-               d.orden = match.orden;
+              d.orden = match.orden;
             }
           }
         });
       }
 
-      // Simular la comunicación con apiService / ExecColeccion para persistencia posterior
+      // Obtener el template de resolución
       const pgTemplate = await this.ObtenerResuelto(doc.numero_carpeta);
       let taskObj: any = {};
       if (pgTemplate && pgTemplate.task) {
@@ -2025,40 +2152,216 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         };
       }
 
-      // Actualizar la lista en el taskObj para MongoDB
+      // Actualizar la lista en el taskObj
+      taskObj.instrucciones = this.processingInstrucciones;
+      taskObj.pub_observacion = this.processingObservaciones;
+      taskObj.observacion = this.processingObservaciones;
+      taskObj.publicacion = this.processingPublicacion;
+      taskObj.fecha_sistema = doc.fecha_sistema;
+
       taskObj.documentos_originales = this.extractedCases.map((c) => ({
         cedula: c.cedula,
         nombres_apellidos: c.nombre,
         asunto: c.asunto,
-        orden: c.orden
+        orden: c.orden,
       }));
 
-      let obj = {
-        usuario: this.jwtData?.userId,
-        numero_carpeta: numeroCarpeta,
-        numero_resolucion: numeroResolucion,
-        task: taskObj,
-        fecha: new Date(),
-      };
+      // 1. Construir la colección DocResoluciones para PostgreSQL
+      const DocResoluciones = this.extractedCases.map((c) => {
+        // Encontrar documento original correspondiente
+        const d =
+          doc.documentos?.find((item: any) => {
+            const itemCed = (item.cedula || item.persona?.cedula || "")
+              .toString()
+              .replace(/\./g, "")
+              .trim();
+            const cCed = (c.cedula || "").toString().replace(/\./g, "").trim();
+            return itemCed === cCed;
+          }) || {};
 
-      console.log("Objeto estructurado para apiService / ExecColeccion:", obj);
+        const toSqlDate = (dateStr: string) => {
+          if (!dateStr) return null;
+          const converted = this.obtenerFechaSistema(dateStr);
+          return converted ? converted : null;
+        };
 
-      this.ngxService.stopLoader("ld-fast");
-      this.isProcessModalOpen = false;
+        const fechaResolSql = toSqlDate(doc.fecha_resolucion);
+        let dia = null;
+        let mes = null;
+        let anio = null;
+        if (fechaResolSql) {
+          const parts = fechaResolSql.split("-");
+          if (parts.length === 3) {
+            dia = parseInt(parts[2], 10);
+            mes = parseInt(parts[1], 10);
+            anio = parseInt(parts[0], 10);
+          }
+        }
 
-      Swal.fire({
-        title: "¡Procesado!",
-        text: "Los casos de esta resolución han sido procesados y recorridos exitosamente (revisa la consola).",
-        icon: "success",
-        confirmButtonColor: "#2e5a73",
-        confirmButtonText: "Aceptar",
+        return {
+          grado: parseInt(d.agrado || d.grado || d.cod_grado || 0, 10),
+          anio: anio || d.anio || new Date().getFullYear(),
+          asunto: c.asunto,
+          cedula: c.cedula,
+          pais: parseInt(d.cod_pais || d.pais || 1, 10),
+          reserva: parseInt(d.cod_reserva || d.reserva || 0, 10),
+          solicitud: parseInt(d.cod_solicitud || d.solicitud || 0, 10),
+          tipo: parseInt(
+            d.cod_tipo_resol || d.tipo || doc.cod_tipo_resol || 0,
+            10,
+          ),
+          unidad: parseInt(d.cod_unidad || d.unidad || 0, 10),
+          comando: d.comando || "",
+          comision_fin: toSqlDate(d.comision_fin),
+          comision_inicio: toSqlDate(d.comision_inicio),
+          creador: d.creador || this.jwtData?.userName || "",
+          destino: d.destino || "",
+          dia: dia || d.dia || new Date().getDate(),
+          distribucion: d.distribucion || "",
+          estatus: parseInt(d.esta || d.estatus || 1, 10),
+          modificado: toSqlDate(d.f_modificado || d.modificado),
+          fecha_termino: toSqlDate(d.f_termino || d.fecha_termino),
+          falta: d.falta || "",
+          registro: toSqlDate(
+            d.fecha_registro ||
+              d.registro ||
+              new Date().toISOString().substring(0, 10),
+          ),
+          fecha_resolucion: fechaResolSql,
+          formato: d.formato || "",
+          ultimo_ascenso: toSqlDate(d.fultimoascenso || d.ultimo_ascenso),
+          instrucciones: this.processingInstrucciones,
+          mes: mes || d.mes || new Date().getMonth() + 1,
+          documento: parseInt(d.documento || doc.id || 0, 10),
+          causa: parseInt(d.causa || 0, 10),
+          autor_modificar: this.jwtData?.userName || "",
+          motivo: d.motivo || "",
+          numero: numeroResolucion,
+          observacion: this.processingObservaciones,
+          orden_merito: c.orden ? parseInt(c.orden, 10) : null,
+          otro_resuelto: d.otro_resuelto || "",
+          autor_registro:
+            d.registrado || d.autor_registro || this.jwtData?.userName || "",
+          termino: parseInt(d.termino || 0, 10),
+          unidad_texto: d.unidad_comando || d.unidad_texto || "",
+          archivo: d.anom || d.archivo || "",
+        };
       });
 
-      this.changeDetector.detectChanges();
+      if (DocResoluciones.length === 0) {
+        this.ngxService.stopLoader("ld-fast");
+        this.toastrService.warning("No hay casos para procesar.");
+        return;
+      }
+
+      // 2. Mostrar modal de progreso SweetAlert2
+      Swal.fire({
+        title: "Procesando Resoluciones",
+        html: `Registrando caso <b>1</b> de ${DocResoluciones.length}...`,
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      // 3. Lanzar la inserción recursiva
+      this.procesarResolucionRecursivo(
+        0,
+        DocResoluciones.length,
+        DocResoluciones,
+        doc,
+        taskObj,
+      );
     } catch (e) {
       console.error("Error en saveProcessedCases:", e);
       this.ngxService.stopLoader("ld-fast");
       this.toastrService.error("Ocurrió un error al procesar los casos.");
     }
+  }
+
+  /**
+   * Ejecuta recursivamente el registro de resoluciones elemento por elemento.
+   */
+  private procesarResolucionRecursivo(
+    index: number,
+    total: number,
+    list: any[],
+    doc: any,
+    taskObj: any,
+  ) {
+    // if (index < total) {
+    // Actualizar diálogo de progreso
+    const container = Swal.getHtmlContainer();
+    if (container) {
+      const bTag = container.querySelector("b");
+      if (bTag) bTag.textContent = (index + 1).toString();
+    }
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = environment.funcion.INSERTAR_RESOLUCIONES;
+    this.xAPI.parametros = "";
+    this.xAPI.valores = JSON.stringify([list[index]]);
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (res: any) => {
+        this.procesarResolucionRecursivo(index + 1, total, list, doc, taskObj);
+      },
+      (error) => {
+        this.ngxService.stopLoader("ld-fast");
+        Swal.close();
+        this.toastrService.error(
+          `Error al registrar el caso C.I. ${list[index].cedula}.`,
+          "Error",
+        );
+        console.error("Error en registrar caso:", error);
+      },
+    );
+    // } else {
+    //   // 1. Guardar el estado consolidado en MongoDB mediante ExecColeccion
+    //   const numeroCarpeta = doc.numero_carpeta || "000000";
+    //   const numeroResolucion = doc.numero_resol || doc.numc || "";
+
+    //   let obj = {
+    //     usuario: this.jwtData?.userId,
+    //     numero_carpeta: numeroCarpeta,
+    //     numero_resolucion: numeroResolucion,
+    //     task: taskObj,
+    //     fecha: new Date(),
+    //   };
+
+    //   let cl = {
+    //     coleccion: "estatus_resolucion",
+    //     numero_carpeta: `${numeroCarpeta}`,
+    //     numero_resolucion: `${numeroResolucion}`,
+    //     driver: environment.driver.PRINCIPAL,
+    //     objeto: obj,
+    //     donde: '{"numero_carpeta":"' + numeroCarpeta + '"}',
+    //     upsert: true,
+    //   };
+
+    //   this.apiService.ExecColeccion(cl).subscribe(
+    //     (res: any) => {
+    //       this.ngxService.stopLoader("ld-fast");
+    //       this.isProcessModalOpen = false;
+    //       Swal.close();
+    //       Swal.fire({
+    //         title: "¡Procesado!",
+    //         text: "Todos los casos de esta resolución se han insertado y el estado se guardó en MongoDB.",
+    //         icon: "success",
+    //         confirmButtonColor: "#2e5a73",
+    //         confirmButtonText: "Aceptar",
+    //       });
+    //       this.changeDetector.detectChanges();
+    //     },
+    //     (err: any) => {
+    //       this.ngxService.stopLoader("ld-fast");
+    //       this.isProcessModalOpen = false;
+    //       Swal.close();
+    //       console.error("Error al guardar en MongoDB:", err);
+    //       this.toastrService.error("Se registraron los casos en PostgreSQL, pero no se pudo guardar el estado en MongoDB.");
+    //       this.changeDetector.detectChanges();
+    //     }
+    //   );
+    // }
   }
 }
