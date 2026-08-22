@@ -186,6 +186,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public NombreArchivo: string = "";
   public NumeroControl: string = "";
 
+  public fotosCasos: { [cedula: string]: any } = {};
+  public loadingFotos: { [cedula: string]: boolean } = {};
+  private rawUrlsMap: { [cedula: string]: string } = {};
+
   constructor(
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
@@ -289,6 +293,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.revokeAll();
+    this.clearPhotosMap();
     if (this.timer) {
       clearTimeout(this.timer);
     }
@@ -1643,6 +1648,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     const doc = this.activeDoc;
     if (!doc) return;
 
+    this.loadPhotosForCases();
+
     this.loadingPdf = true;
     this.pdfError = false;
     this.pdfErrorMsg = "";
@@ -1936,5 +1943,85 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public onCommentAdded() {
     this.syncFromCanvas();
     this.saveDocumentState();
+  }
+
+  private loadPhotosForCases() {
+    this.clearPhotosMap();
+
+    const doc = this.activeDoc;
+    if (!doc) return;
+
+    // Obtener lista de casos (agrupados o el documento único de fallback)
+    const list =
+      doc.documentos && doc.documentos.length > 0 ? doc.documentos : [doc];
+
+    list.forEach((caso: any) => {
+      const cedula = (caso.cedula || "").toString().replace(/\./g, "").trim();
+      if (!cedula) return;
+
+      this.loadingFotos[cedula] = true;
+      const payload = {
+        ruta: "img/temp/" + cedula + "/",
+        archivo: "foto.jpg",
+      };
+      this.apiService.postBlob("federate/sssifanb/dwscdn", payload).subscribe({
+        next: (data: Blob) => {
+          this.loadingFotos[cedula] = false;
+          if (data && data.size > 0) {
+            const rawUrl = URL.createObjectURL(data);
+            this.rawUrlsMap[cedula] = rawUrl;
+            this.fotosCasos[cedula] =
+              this.sanitizer.bypassSecurityTrustUrl(rawUrl);
+          } else {
+            this.fotosCasos[cedula] = "";
+          }
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          this.loadingFotos[cedula] = false;
+          console.error("Error al cargar foto de cédula " + cedula, error);
+          this.fotosCasos[cedula] = "";
+          this.cdr.detectChanges();
+        },
+      });
+    });
+  }
+
+  public verFotoAmpliada(cedula: string) {
+    if (!cedula) return;
+    const cleanCed = cedula.toString().replace(/\./g, "").trim();
+    const rawUrl = this.rawUrlsMap[cleanCed];
+
+    const swalOptions: any = {
+      imageAlt: "Fotografía Militar",
+      imageHeight: 500,
+      confirmButtonColor: "#00b4d8",
+      confirmButtonText: "Cerrar",
+      background: "#1b263b",
+      color: "#ffffff",
+    };
+
+    if (rawUrl) {
+      swalOptions.imageUrl = rawUrl;
+    } else {
+      swalOptions.imageUrl =
+        "https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/" +
+        cleanCed +
+        "/foto.jpg";
+    }
+
+    Swal.fire(swalOptions);
+  }
+
+  private clearPhotosMap() {
+    Object.keys(this.rawUrlsMap).forEach((key) => {
+      const url = this.rawUrlsMap[key];
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
+    });
+    this.rawUrlsMap = {};
+    this.fotosCasos = {};
+    this.loadingFotos = {};
   }
 }

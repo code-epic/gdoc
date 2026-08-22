@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
-import { from, Observable, switchMap } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { environment } from '../../../environments/environment';
-import { UtilService } from 'src/app/services/util/util.service';
+import { Injectable } from "@angular/core";
+import { from, Observable, switchMap } from "rxjs";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Router } from "@angular/router";
+import { environment } from "../../../environments/environment";
+import { UtilService } from "src/app/services/util/util.service";
 
-import { JwtHelperService } from '@auth0/angular-jwt';
-import Swal from 'sweetalert2';
-import { ApiService, IAPICore } from '../apicore/api.service';
-import { Md5 } from 'md5-typescript';
-import { Sha256Service } from '../util/sha256';
+import { JwtHelperService } from "@auth0/angular-jwt";
+import Swal from "sweetalert2";
+import { ApiService, IAPICore } from "../apicore/api.service";
+import { Md5 } from "md5-typescript";
+import { Sha256Service } from "../util/sha256";
 
 export interface IUsuario {
   nombre: string;
@@ -33,16 +33,12 @@ export interface UClave {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
-
-
-
 export class LoginService {
+  public URL: string = environment.API;
 
-  public URL: string =  environment.API;
-
-  public Id = '';
+  public Id = "";
 
   public SToken: any;
 
@@ -52,87 +48,88 @@ export class LoginService {
 
   public Aplicacion: any;
 
-  public urlGet = '';
-
+  public urlGet = "";
 
   public xAPI: IAPICore = {
-    funcion: '',
-    parametros: ''
-  }
+    funcion: "",
+    parametros: "",
+  };
 
   constructor(
     private utils: UtilService,
     private apiService: ApiService,
-    private router: Router, 
+    private router: Router,
     private sha256: Sha256Service,
-    private http: HttpClient) {
-
+    private http: HttpClient,
+  ) {
     this.Id = environment.ID;
-    if (sessionStorage.getItem('token') != undefined ) { 
-      this.SToken = sessionStorage.getItem('token')
-      this.getUserDecrypt(this.SToken)
+    if (sessionStorage.getItem("token") != undefined) {
+      this.SToken = sessionStorage.getItem("token");
+      this.getUserDecrypt(this.SToken);
     }
   }
 
   async IniciarSesion(itk: string) {
-    this.Token = await this.getUserDecrypt(itk)
+    this.Token = await this.getUserDecrypt(itk);
     sessionStorage.setItem("token", itk);
-    this.obenterAplicacion(itk)
+    this.obenterAplicacion(itk);
   }
 
-  async Iniciar(token: string = '') {
-    token = token == '' ? sessionStorage.getItem('token'): token
+  async Iniciar(token: string = "") {
+    token = token == "" ? sessionStorage.getItem("token") : token;
 
     await this.getUserDecrypt(token);
     this.obenterAplicacion(token);
-    
   }
   getLogin(user: string, clave: string): Observable<IToken> {
-    const netInfo = sessionStorage.getItem('net_info');
-    let deviceContext = '';
+    const netInfo = sessionStorage.getItem("net_info");
+    let deviceContext = "";
 
     if (netInfo) {
       const info = JSON.parse(netInfo);
       const context = {
-        os_info: info.system?.os_info || 'unknown',
-        mac_address: info.system?.mac_address || 'unknown',
-        network: info.network || 'unknown',
+        os_info: info.system?.os_info || "unknown",
+        mac_address: info.system?.mac_address || "unknown",
+        network: info.network || "unknown",
       };
       deviceContext = btoa(JSON.stringify(context));
     }
-    console.log('Device Context:', deviceContext);
-    
-    return from(this.sha256.EncryptDeviceContext(deviceContext, environment.Hash.slice(-32))).pipe(
-      switchMap(encodeDeviceContext => {
+    console.log("Device Context:", deviceContext);
+
+    return from(
+      this.sha256.EncryptDeviceContext(
+        deviceContext,
+        environment.Hash.slice(-32),
+      ),
+    ).pipe(
+      switchMap((encodeDeviceContext) => {
         const timestamp = new Date().getTime().toString();
         const httpOptions = {
           headers: new HttpHeaders({
-            'X-Skip-Interceptor': 'true',
+            "X-Skip-Interceptor": "true",
             "Content-Type": "application/json",
-            'X-Device-Context': encodeDeviceContext,
-            'X-Timestamp': timestamp,
-            'Web-API-key': environment.Hash,
+            "X-Device-Context": encodeDeviceContext,
+            "X-Timestamp": timestamp,
+            "Web-API-key": environment.Hash,
           }),
         };
 
-        
-
         var usuario = {
-          "nombre": user,
-          "clave": clave,
-        }
-        var url = this.URL + 'wusuario/loginV2'
+          nombre: user,
+          clave: clave,
+        };
+        var url = this.URL + "wusuario/loginV2";
         return this.http.post<IToken>(url, usuario, httpOptions);
-      })
+      }),
     );
   }
 
   makeUser(user: IUsuario): Observable<any> {
-    let url = this.URL + 'identicacion';
-    return this.http.post<any>( url, user );
+    let url = this.URL + "identicacion";
+    return this.http.post<any>(url, user);
   }
 
-  public getUserDecrypt(token : string ): any {
+  public getUserDecrypt(token: string): any {
     const helper = new JwtHelperService();
     const decodedToken = helper.decodeToken(token);
     this.Token = decodedToken;
@@ -141,17 +138,16 @@ export class LoginService {
     return this.Token;
   }
 
-
   obtenerMenu(): any {
-    return JSON.parse(sessionStorage.getItem('menu'))
+    return JSON.parse(sessionStorage.getItem("menu"));
   }
 
-  obtenerPrivilegiosMenu(menu : string, subMenu: string): any {
+  obtenerPrivilegiosMenu(menu: string, subMenu: string): any {
     let Prv: any;
-    let lst = this.obtenerSubMenu(menu)
-    lst.forEach(e => {
-      if (e.url === subMenu && e.url != '') { 
-        if(e.Privilegios.length>0) Prv = e.Privilegios
+    let lst = this.obtenerSubMenu(menu);
+    lst.forEach((e) => {
+      if (e.url === subMenu && e.url != "") {
+        if (e.Privilegios.length > 0) Prv = e.Privilegios;
       }
     });
     return Prv;
@@ -159,46 +155,45 @@ export class LoginService {
 
   obtenerSubMenu(menu: string): any {
     let SubMenu = [];
-    this.obtenerMenu().forEach(e => {
-      if (e.url == menu) { 
-        SubMenu = e.SubMenu; 
+    this.obtenerMenu().forEach((e) => {
+      if (e.url == menu) {
+        SubMenu = e.SubMenu;
       }
-    })
-   
+    });
+
     return SubMenu;
   }
 
   isLogged() {
-    return sessionStorage.getItem('token') ? true : false;
+    return sessionStorage.getItem("token") ? true : false;
   }
 
-
-   logout() {
+  logout() {
     Swal.fire({
-      title: '¿Desea cerrar sesión?',
+      title: "¿Desea cerrar sesión?",
       text: "Gracias por su tiempo",
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#5eaaa8',
-      cancelButtonColor: '#ef9a9a',
-      confirmButtonText: 'Si, cerrar',
-      cancelButtonText: 'Cancelar'
+      confirmButtonColor: "#5eaaa8",
+      cancelButtonColor: "#ef9a9a",
+      confirmButtonText: "Si, cerrar",
+      cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        this.router.navigate(['/logout']);
+        this.router.navigate(["/logout"]);
       }
-    })
+    });
   }
-
-
 
   /**
    * Orquesta el proceso de cierre de sesión completo, notificando el progreso.
    * @param progressCallback Una función para reportar el progreso a la UI.
    */
-  public async performLogoutProcess(progressCallback: (message: string) => void) {
+  public async performLogoutProcess(
+    progressCallback: (message: string) => void,
+  ) {
     try {
-      progressCallback('Finalizando sesión en el servidor...');
+      progressCallback("Finalizando sesión en el servidor...");
       await this.utils.sleep(800); // Pequeña pausa para UX
       const httpOptions = {
         headers: new HttpHeaders({
@@ -206,20 +201,26 @@ export class LoginService {
           Authorization: "Bearer " + sessionStorage.getItem("token"),
         }),
       };
-      const url = this.URL + 'wusuario/logout:' + localStorage.getItem("userId");
+      const url =
+        this.URL + "wusuario/logout:" + localStorage.getItem("userId");
       await this.http.post(url, {}, httpOptions).toPromise();
     } catch (error) {
-      console.error("Error al contactar el servidor para logout (se procederá con la limpieza local):", error);
-      progressCallback('No se pudo contactar al servidor, limpiando localmente...');
+      console.error(
+        "Error al contactar el servidor para logout (se procederá con la limpieza local):",
+        error,
+      );
+      progressCallback(
+        "No se pudo contactar al servidor, limpiando localmente...",
+      );
       await this.utils.sleep(1500);
     } finally {
-      progressCallback('Limpiando datos de la sesión...');
+      progressCallback("Limpiando datos de la sesión...");
       await this.utils.sleep(800); // Pequeña pausa para UX
       await this.clearSession();
 
-      progressCallback('¡Hasta pronto!');
+      progressCallback("¡Hasta pronto!");
       await this.utils.sleep(1200); // Pequeña pausa para que el usuario lea el mensaje final.
-      this.router.navigate(['/login']);
+      this.router.navigate(["/login"]);
     }
   }
 
@@ -228,53 +229,74 @@ export class LoginService {
    * Es async para asegurar que los pasos se completen antes de continuar.
    */
   async clearSession(): Promise<void> {
-   
-      // Esto SIEMPRE debe ejecutarse para garantizar el cierre de sesión en el cliente.
-      sessionStorage.clear();
-      localStorage.clear();
-
+    // Esto SIEMPRE debe ejecutarse para garantizar el cierre de sesión en el cliente.
+    sessionStorage.clear();
+    localStorage.clear();
   }
 
-
-  //ObenterAplicacion 
+  //ObenterAplicacion
   protected obenterAplicacion(itk: string) {
-
-
-    let cadena = this.Token.Usuario.cedula + ',' + this.Token.Usuario.sistema + ',' + this.Token.Usuario.correo
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = environment.funcion.CONSULTAR_USUARIO_PERFIL
-    this.xAPI.parametros = cadena
+    let cadena =
+      this.Token.Usuario.cedula +
+      "," +
+      this.Token.Usuario.sistema +
+      "," +
+      this.Token.Usuario.correo;
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = environment.funcion.CONSULTAR_USUARIO_PERFIL;
+    this.xAPI.parametros = cadena;
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         try {
           // Verificamos que la data y las propiedades anidadas existan antes de usarlas
-          if (!data || data.length === 0 || !data[0].Aplicacion || data[0].Aplicacion.length === 0 || !data[0].Aplicacion[0].Rol) {
-            throw new Error("La respuesta del perfil de usuario no es válida o está vacía.");
+          if (
+            !data ||
+            data.length === 0 ||
+            !data[0].Aplicacion ||
+            data[0].Aplicacion.length === 0 ||
+            !data[0].Aplicacion[0].Rol
+          ) {
+            throw new Error(
+              "La respuesta del perfil de usuario no es válida o está vacía.",
+            );
           }
 
-          console.log('Imprimiendo')
-          sessionStorage.setItem("menu", JSON.stringify(data[0].Aplicacion[0].Rol.Menu));
+          // console.log('Imprimiendo')
+          sessionStorage.setItem(
+            "menu",
+            JSON.stringify(data[0].Aplicacion[0].Rol.Menu),
+          );
           let texto = Md5.init(JSON.stringify(data[0].Aplicacion[0].Rol.Menu));
 
           this.utils.uuidv4();
 
           sessionStorage.setItem("crypt", texto);
-          this.router.navigate(["/dashboard"]).then(() => {
-            window.location.reload();
+          // Realizamos la conexión federada y redirigimos/recargamos sólo al finalizar la petición HTTP
+          this.apiService.ConexionFederada("informatica").subscribe({
+            next: (resp) => {
+              console.log("Handshake de federación exitoso:", resp);
+              this.router.navigate(["/dashboard"]).then(() => {
+                window.location.reload();
+              });
+            },
+            error: (err) => {
+              console.error("Error al establecer la conexión federada:", err);
+              // Procedemos igualmente con la redirección para no bloquear la sesión
+              this.router.navigate(["/dashboard"]).then(() => {
+                window.location.reload();
+              });
+            }
           });
         } catch (e) {
-
-          console.error('Error al procesar el perfil del usuario:', e);
+          console.error("Error al procesar el perfil del usuario:", e);
           Swal.fire({
-            title: 'Error de Perfil',
-            text: 'No se pudo cargar la configuración de su perfil. Por favor, contacte al administrador.',
-            icon: 'error'
+            title: "Error de Perfil",
+            text: "No se pudo cargar la configuración de su perfil. Por favor, contacte al administrador.",
+            icon: "error",
           });
           sessionStorage.clear();
           localStorage.clear();
-
         }
-
       },
       (error) => {
         sessionStorage.clear();
@@ -282,14 +304,8 @@ export class LoginService {
         // this.router.navigate(["/login"]).then(() => {
         //   window.location.reload();
         // });
-        console.error('Fallo conectando al perfil del usuario: ', error)
-      }
-    )
-
-
-
-
+        console.error("Fallo conectando al perfil del usuario: ", error);
+      },
+    );
   }
-
-
 }

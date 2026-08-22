@@ -184,8 +184,12 @@
             <div class="explorador-list">
               <div class="explorador-item clickable" *ngFor="let caso of activeDoc.documentos"
                    (click)="obtenerWFD(caso)">
-                <div class="ei-avatar">
-                  <i class="fas fa-user"></i>
+                <div class="ei-avatar d-flex align-items-center justify-content-center" style="position: relative; overflow: hidden; border-radius: 50%; cursor: zoom-in;" (click)="verFotoAmpliada(caso.cedula || ''); $event.stopPropagation()">
+                  <img [src]="fotosCasos[caso.cedula || '']" 
+                       *ngIf="!loadingFotos[caso.cedula || ''] && fotosCasos[caso.cedula || '']" 
+                       style="width: 100%; height: 100%; object-fit: cover;" alt="avatar">
+                  <i class="fas fa-spinner fa-spin text-info" *ngIf="loadingFotos[caso.cedula || '']"></i>
+                  <i class="fas fa-user" *ngIf="!loadingFotos[caso.cedula || ''] && !fotosCasos[caso.cedula || '']"></i>
                 </div>
                 <div class="ei-content">
                   <div class="ei-name">{{ (caso.nombres_apellidos || caso.nombres + ' ' + caso.apellidos) | uppercase }}</div>
@@ -209,8 +213,12 @@
             <div class="explorador-list">
               <div class="explorador-item clickable"
                    (click)="obtenerWFD(activeDoc)">
-                <div class="ei-avatar">
-                  <i class="fas fa-user"></i>
+                <div class="ei-avatar d-flex align-items-center justify-content-center" style="position: relative; overflow: hidden; border-radius: 50%; cursor: zoom-in;" (click)="verFotoAmpliada(activeDoc.cedula || ''); $event.stopPropagation()">
+                  <img [src]="fotosCasos[activeDoc.cedula || '']" 
+                       *ngIf="!loadingFotos[activeDoc.cedula || ''] && fotosCasos[activeDoc.cedula || '']" 
+                       style="width: 100%; height: 100%; object-fit: cover;" alt="avatar">
+                  <i class="fas fa-spinner fa-spin text-info" *ngIf="loadingFotos[activeDoc.cedula || '']"></i>
+                  <i class="fas fa-user" *ngIf="!loadingFotos[activeDoc.cedula || ''] && !fotosCasos[activeDoc.cedula || '']"></i>
                 </div>
                 <div class="ei-content">
                   <div class="ei-name">{{ (activeDoc.nombres_apellidos || activeDoc.nombres + ' ' + activeDoc.apellidos) | uppercase }}</div>
@@ -434,9 +442,27 @@
     <div class="tpv-modal-body" *ngIf="!loadingDetails && modalDoc">
       <!-- Caso Info Badge -->
       <div class="tpv-case-badge" *ngIf="selectedCase">
-        <div class="tpv-case-badge-title">Expediente Seleccionado:</div>
-        <div class="tpv-case-badge-name">{{ (selectedCase.nombres_apellidos || selectedCase.nombres + ' ' + selectedCase.apellidos) | uppercase }}</div>
-        <div class="tpv-case-badge-meta">C.I: {{ selectedCase.cedula }} &bull; {{ selectedCase.grado || 'S/G' }} - {{ selectedCase.componente || 'S/C' }}</div>
+        <!-- Photo container -->
+        <div class="tpv-case-badge-photo-container" (click)="verFotoAmpliada(selectedCase.cedula || '')">
+         <img [src]="fotosCasos[selectedCase.cedula || '']" 
+               *ngIf="!loadingFotos[selectedCase.cedula || ''] && fotosCasos[selectedCase.cedula || '']" 
+               alt="Foto"> 
+          <i class="fas fa-spinner fa-spin text-info" *ngIf="loadingFotos[selectedCase.cedula || '']"></i>
+          <i class="fas fa-user" *ngIf="!loadingFotos[selectedCase.cedula || ''] && !fotosCasos[selectedCase.cedula || '']"></i>
+          <div class="photo-overlay">
+            <i class="fas fa-search-plus"></i>
+          </div>
+        </div>
+
+        <!-- Case textual information -->
+        <div style="flex-grow: 1;">
+          <div class="tpv-case-badge-title">Expediente Seleccionado:</div>
+          <div class="tpv-case-badge-name">{{ (selectedCase.nombres_apellidos || selectedCase.nombres + ' ' + selectedCase.apellidos) | uppercase }}</div>
+          <div class="tpv-case-badge-meta">
+            <i class="fas fa-id-card mr-1"></i> C.I: {{ selectedCase.cedula }} &bull; 
+            <i class="fas fa-graduation-cap mr-1"></i> {{ selectedCase.grado || 'S/G' }} - {{ selectedCase.componente || 'S/C' }}
+          </div>
+        </div>
       </div>
 
       <!-- Tables -->

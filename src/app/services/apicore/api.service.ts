@@ -501,4 +501,17 @@ export class ApiService {
 
     return url;
   }
+
+  //logica de federacion de sistema
+  public ConexionFederada(targetUser: string = "informatica"): Observable<any> {
+    const url = this.URL + "federation/connect/sssifanb";
+    const body = { target_user: targetUser };
+    const options = {
+      headers: new HttpHeaders({
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + sessionStorage.getItem("token"),
+      }),
+    };
+    return this.http.post<any>(url, body, options);
+  }
 }

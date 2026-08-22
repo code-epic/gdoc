@@ -620,7 +620,7 @@ export class RsconsultaComponent implements OnInit {
       this.lstEntradas = [];
       this.lstAscenso = [];
       this.lstResoluciones = [];
-      
+
       if (this.rawBlobUrl) {
         URL.revokeObjectURL(this.rawBlobUrl);
       }
@@ -1113,7 +1113,7 @@ export class RsconsultaComponent implements OnInit {
         ruta: "img/temp/" + cedula + "/",
         archivo: "foto.jpg",
       };
-      this.apiService.postBlob("dwscdn", payload).subscribe({
+      this.apiService.postBlob("federate/sssifanb/dwscdn", payload).subscribe({
         next: (data: Blob) => {
           this.isLoadingFoto = false;
           if (data && data.size > 0) {
@@ -1121,7 +1121,9 @@ export class RsconsultaComponent implements OnInit {
               URL.revokeObjectURL(this.rawBlobUrl);
             }
             this.rawBlobUrl = URL.createObjectURL(data);
-            this.fotoAfiliadoBlobUrl = this.sanitizer.bypassSecurityTrustUrl(this.rawBlobUrl);
+            this.fotoAfiliadoBlobUrl = this.sanitizer.bypassSecurityTrustUrl(
+              this.rawBlobUrl,
+            );
           } else {
             this.fotoAfiliadoBlobUrl = "";
           }

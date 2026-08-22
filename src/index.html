@@ -154,7 +154,18 @@
 
       xhr.addEventListener('loadend', function () {
         if (xhr.status >= 400) {
-          let responseBody = xhr.responseText || '[No Body]';
+          let responseBody = '[No Body]';
+          try {
+            if (xhr.responseType === '' || xhr.responseType === 'text') {
+              responseBody = xhr.responseText || '[No Body]';
+            } else if (xhr.responseType === 'blob') {
+              responseBody = '[Blob Response Content]';
+            } else {
+              responseBody = '[Binary Response Content]';
+            }
+          } catch (e) {
+            responseBody = '[Error reading responseText: ' + e.message + ']';
+          }
           if (responseBody.length > 5000) responseBody = responseBody.substring(0, 5000) + '... (truncated)';
 
           // Mensaje corto para la lista
