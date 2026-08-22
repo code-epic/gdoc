@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { NgbDateParserFormatter, NgbModal } from "@ng-bootstrap/ng-bootstrap";
@@ -32,8 +33,12 @@ interface ITipoResolucion {
   templateUrl: './consulta-general.component.html',
   styleUrls: ['./consulta-general.component.scss']
 })
-export class ConsultaGeneralComponent implements OnInit {
+export class ConsultaGeneralComponent implements OnInit, OnDestroy {
 
+  public fotoAfiliadoBlobUrl: SafeUrl | string = "";
+  public rawBlobUrl: string = "";
+  public isLoadingFoto: boolean = false;
+  
   public cedula: string = "";
   public resolucion: string = "";
 
@@ -294,7 +299,9 @@ export class ConsultaGeneralComponent implements OnInit {
     public dialog: MatDialog,
     public formatter: NgbDateParserFormatter,
     private _snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private sanitizer: DomSanitizer,
+    private cdr: ChangeDetectorRef
   ) {}
 
   convertirFecha(fecha: string): string {
@@ -473,6 +480,11 @@ export class ConsultaGeneralComponent implements OnInit {
       this.blResolucionPanel = false;
       this.blDatosBasicos = false;
 
+      if (this.rawBlobUrl) {
+        URL.revokeObjectURL(this.rawBlobUrl);
+      }
+      this.fotoAfiliadoBlobUrl = "";
+
       if (this.cedula == "") return false;
 
       this.cedula = this.cedula.replace(/\./g, '')
@@ -522,6 +534,7 @@ export class ConsultaGeneralComponent implements OnInit {
             this.cargarGradosIPSFA(this.Resolucion.n_componente);
             this.IDatosBasicos = data.Cuerpo[0];
             this.dbDatos = true;
+            this.getPhotoId(this.IDatosBasicos.cedula);
             this.dbDatosNombre = false;
 
             this.blDatosBasicos = this.blConfidencial;
@@ -944,6 +957,9 @@ export class ConsultaGeneralComponent implements OnInit {
   }
 
   obtenerFoto(id: string) {
+    if (this.fotoAfiliadoBlobUrl) {
+      return this.fotoAfiliadoBlobUrl;
+    }
     return (
       "https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/" + id + "/foto.jpg"
     );
@@ -1273,4 +1289,50 @@ export class ConsultaGeneralComponent implements OnInit {
     this.valEdit = false
   }
 
+  ngOnDestroy(): void {
+    if (this.rawBlobUrl) {
+      URL.revokeObjectURL(this.rawBlobUrl);
+    }
+  }
+
+  getPhotoId(cedula: string) {
+    if (cedula && cedula.toString().trim() !== "") {
+      this.isLoadingFoto = true;
+      const payload = {
+        ruta: "img/temp/" + cedula + "/",
+        archivo: "foto.jpg",
+      };
+      this.apiService.postBlob("federate/sssifanb/dwscdn", payload).subscribe({
+        next: (data: Blob) => {
+          this.isLoadingFoto = false;
+          if (data && data.size > 0) {
+            if (this.rawBlobUrl) {
+              URL.revokeObjectURL(this.rawBlobUrl);
+            }
+            this.rawBlobUrl = URL.createObjectURL(data);
+            this.fotoAfiliadoBlobUrl = this.sanitizer.bypassSecurityTrustUrl(
+              this.rawBlobUrl,
+            );
+          } else {
+            this.fotoAfiliadoBlobUrl = "";
+          }
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          this.isLoadingFoto = false;
+          console.error("Error al cargar la foto:", error);
+          this.fotoAfiliadoBlobUrl = "";
+          this.cdr.detectChanges();
+        },
+      });
+    }
+  }
+
+  detalleFoto(content, e) {
+    this.modalService.open(content, {
+      windowClass: "modal-custom",
+      keyboard: true,
+      centered: true,
+    });
+  }
 }

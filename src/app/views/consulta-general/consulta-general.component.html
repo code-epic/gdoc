@@ -321,12 +321,22 @@
                                                             <!-- Left Column: Profile & Personal Data -->
                                                             <div class="col-lg-3 bg-secondary p-4 border-right d-flex flex-column align-items-center">
                                                                 
-                                                                <!-- Photo with elegant frame -->
-                                                                <div class="position-relative mb-3">
+                                                                <!-- Photo with elegant frame and maximize action -->
+                                                                <div class="position-relative mb-3" style="cursor: pointer;" (click)="detalleFoto(fotoModal, IDatosBasicos)">
                                                                     <div class="shadow-lg p-1 bg-white rounded">
                                                                         <img [src]="obtenerFoto(IDatosBasicos.cedula)" class="rounded" 
                                                                              style="width: 100%; max-width: 220px; height: auto; object-fit: cover;" 
-                                                                             alt="Foto del perfil">
+                                                                             alt="Foto del perfil"
+                                                                             *ngIf="!isLoadingFoto">
+                                                                        <div *ngIf="isLoadingFoto" class="d-flex align-items-center justify-content-center bg-light rounded" style="width: 200px; height: 200px;">
+                                                                            <i class="fa fa-spinner fa-spin text-info" style="font-size: 2rem;"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="position-absolute rounded d-flex align-items-center justify-content-center" 
+                                                                         style="top: 0; left: 0; width: 100%; height: 100%; background: rgba(94, 170, 168, 0.6); opacity: 0; transition: opacity 0.3s;"
+                                                                         onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0"
+                                                                         *ngIf="!isLoadingFoto">
+                                                                        <mat-icon class="text-white" style="font-size: 36px; width: 36px; height: 36px;">zoom_in</mat-icon>
                                                                     </div>
                                                                 </div>
                                             
@@ -787,5 +797,18 @@
         <button class="btn btn-pastel text-white " (click)="c('Save')">
             <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
 
+    </div>
+</ng-template>
+
+<!-- Modal Foto -->
+<ng-template #fotoModal let-c="close" let-d="dismiss">
+    <div class="modal-body p-0 bg-transparent text-center" style="overflow: hidden; position: relative;">
+        <button type="button" class="close text-white position-absolute" style="right: 20px; top: 20px; z-index: 10; opacity: 1; text-shadow: 0 0 5px black;" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true" style="font-size: 2rem;">&times;</span>
+        </button>
+        <img [src]="obtenerFoto(IDatosBasicos.cedula)" class="img-fluid rounded shadow-lg" style="max-height: 85vh; border: 5px solid white;" *ngIf="!isLoadingFoto">
+        <div *ngIf="isLoadingFoto" class="d-flex align-items-center justify-content-center bg-dark rounded" style="height: 350px; border: 5px solid white;">
+            <i class="fa fa-spinner fa-spin text-info" style="font-size: 2rem;"></i>
+        </div>
     </div>
 </ng-template>
