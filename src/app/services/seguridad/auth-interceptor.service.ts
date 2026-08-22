@@ -35,12 +35,7 @@ export class AuthInterceptorService implements HttpInterceptor {
       return next.handle(cleanReq);
     }
 
-    if (
-      !req.body ||
-      req.method === "GET" ||
-      req.url.includes("federation/") ||
-      req.url.includes("federate/")
-    ) {
+    if (!req.body || req.method === "GET") {
       return this.procesarPeticion(req, next);
     }
 
