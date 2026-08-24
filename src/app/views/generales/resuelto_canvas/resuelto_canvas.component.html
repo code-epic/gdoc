@@ -1,7 +1,7 @@
 <div class="canvas-toolbar">
   <!-- Zoom Controls -->
   <button class="btn btn-sm btn-outline-light" (click)="zoomOut()" title="Alejar"><i class="fas fa-search-minus"></i></button>
-  <span class="zoom-level">{{ (zoomScale * 100) | number:'1.0-0' }}%</span>
+  <span class="zoom-level">{{ formattedZoom }}%</span>
   <button class="btn btn-sm btn-outline-light" (click)="zoomIn()" title="Acercar"><i class="fas fa-search-plus"></i></button>
   <button class="btn btn-sm btn-outline-light ml-2" (click)="autoFit()" title="Ajustar a pantalla"><i class="fas fa-expand-arrows-alt"></i></button>
   
@@ -238,8 +238,8 @@
     <div class="relative-page-footer" style="margin-top: 5pt; font-family: 'Tahoma', sans-serif; text-align: left;">
       <!-- Contenedor para Iniciales y Media Firma -->
       <div style="position: relative; display: inline-block;">
-        <!-- Media firma del director (MG.png) -->
-        <img *ngIf="profile === 'Aprobador'" 
+        <!-- Media firma del director (mg.png) -->
+        <img *ngIf="profile === 'Aprobador' || (profile === 'Edicion' && jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')" 
              src="assets/img/mppd/mg.png" 
              alt="Media Firma Director"
              style="position: absolute; bottom: 6px; left: 2px; width: 15mm; z-index: 1; pointer-events: none;">

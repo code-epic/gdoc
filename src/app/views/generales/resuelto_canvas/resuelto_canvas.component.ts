@@ -74,6 +74,10 @@ export class ResueltoCanvasComponent
 
   public zoomScale: number = 1.0;
 
+  get formattedZoom(): number {
+    return Math.round(this.zoomScale * 100);
+  }
+
   // Recibimos la data estructurada (el mapeo de Golang/Base de datos)
   @Input() documentData: any = {
     header: {

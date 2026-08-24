@@ -47,6 +47,7 @@ export interface JwtUserData {
   userRole: string;
   userLogin?: string;
   userCedula?: string;
+  userCargo?: string;
 }
 
 export interface PdfAction {
@@ -90,6 +91,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     userRole: "",
     userLogin: "",
     userCedula: "",
+    userCargo: "",
   };
   @Input() loading = false;
   @Input() useCanvas = false;
@@ -404,7 +406,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       casesHtml: casesHtml,
     });
 
-    const rawDateStr = this.activeDoc.fecha_resolucion;
+    const isAdmin = this.jwtData?.userCargo?.toUpperCase() === "ADMINISTRADOR";
+    const rawDateStr = isAdmin
+      ? (this.activeDoc.documentos?.[0]?.fecha_resolucion || this.activeDoc.fecha_resolucion)
+      : this.activeDoc.fecha_resolucion;
     let formattedDate = "";
     if (rawDateStr && rawDateStr.includes("-")) {
       const parts = rawDateStr.split("-");
@@ -455,6 +460,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     formattedDate = formattedDate.replace(/\s+/g, "");
 
     const resNum =
+      (isAdmin &&
+        (this.activeDoc.numero_resol || this.activeDoc.numero_resuelto)) ||
       this.activeDoc.numc ||
       this.activeDoc.ncontrol ||
       this.activeDoc.numero_carpeta ||
@@ -704,6 +711,223 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       });
     } catch (err) {
       console.error("Error generando/firmando PDF: ", err);
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al generar o firmar el documento PDF.",
+        icon: "error",
+        confirmButtonColor: "#f5365c",
+      });
+    } finally {
+      // 3. Restaurar zoom original y apagar modo de impresión
+      if (this.resueltoCanvas) {
+        this.resueltoCanvas.zoomScale = originalZoom;
+      }
+      this.printModeActive = false;
+      this.loadingPdf = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  public async printCanvasAdmin() {
+    // 1. Mostrar modal de carga inicial
+    Swal.fire({
+      title: "Generando PDF (Administrador)...",
+      text: "Por favor espere mientras se procesa el documento con los datos cargados en memoria.",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    this.printModeActive = true;
+    this.loadingPdf = true;
+
+    // Limpiar espacios en blanco de la fecha de resolución antes de generar
+    if (this.activeDoc?.fecha_resolucion) {
+      this.activeDoc.fecha_resolucion = this.activeDoc.fecha_resolucion
+        .toString()
+        .replace(/\s+/g, "");
+    }
+    if (this.activeDoc?.documentos?.[0]?.fecha_resolucion) {
+      this.activeDoc.documentos[0].fecha_resolucion = this.activeDoc.documentos[0].fecha_resolucion
+        .toString()
+        .replace(/\s+/g, "");
+    }
+
+    // Asignar un nuevo objeto para forzar la detección de cambios en Angular (@Input)
+    if (this.canvasData?.header?.date) {
+      this.canvasData = {
+        ...this.canvasData,
+        header: {
+          ...this.canvasData.header,
+          date: this.canvasData.header.date.toString().replace(/\s+/g, ""),
+        },
+      };
+    }
+
+    this.cdr.detectChanges();
+
+    // LIMPIEZA FORZADA DEL DOM (Anula el caché visual de contenteditable)
+    const dateSpans = document.querySelectorAll(
+      ".a4-canvas .m-resolucion-lugar-fecha .variable, .a4-canvas .doc-header u",
+    );
+    dateSpans.forEach((span) => {
+      if (
+        span.textContent &&
+        span.textContent.match(/[A-Z]/i) &&
+        span.textContent.match(/[0-9]/)
+      ) {
+        span.textContent = span.textContent.replace(/\s+/g, "");
+      }
+    });
+
+    // 2. Guardar y temporalmente resetear el zoom a 1.0 para evitar distorsión de escala
+    let originalZoom = 1.0;
+    if (this.resueltoCanvas) {
+      originalZoom = this.resueltoCanvas.zoomScale || 1.0;
+      this.resueltoCanvas.zoomScale = 1.0;
+      this.cdr.detectChanges();
+    }
+
+    // Pequeño retardo para permitir que las firmas, sellos y el zoom se rendericen en el DOM
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // Omitimos crearSemillero() para tomar los números y fecha de resolución de los datos ya en memoria.
+
+    try {
+      const pdf = new jsPDF({
+        orientation: "p",
+        unit: "mm",
+        format: [215.9, 330.2], // Oficio (8.5 x 13 pulgadas)
+      });
+
+      const canvases = document.querySelectorAll(".a4-canvas");
+      if (canvases.length > 0) {
+        for (let i = 0; i < canvases.length; i++) {
+          const canvasElement = canvases[i] as HTMLElement;
+
+          const htmlCanvas = await html2canvas(canvasElement, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            allowTaint: true,
+            backgroundColor: "#ffffff",
+          });
+
+          const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
+
+          const pageWidth = 215.9;
+          const pageHeight = 330.2; // Oficio
+
+          if (i > 0) {
+            pdf.addPage();
+          }
+          pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, pageHeight);
+        }
+      }
+
+      const cleanNumc = this.activeDoc?.numero_resol
+        .toString()
+        .replace(/[\r\n\t]+/g, "")
+        .trim();
+
+      const filename = cleanNumc
+        ? `${cleanNumc}.pdf`
+        : `${new Date().getTime()}.pdf`;
+
+      // Dibujar "M P P D" verticalmente en la esquina superior derecha
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 0, 128);
+      pdf.text("M\nP\nP\nD", 195, 20);
+
+      // Generar el blob del PDF local original
+      const pdfBlob = pdf.output("blob");
+
+      // Construir formulario multipart
+      const formData = new FormData();
+      formData.append("archivos", pdfBlob, filename);
+      formData.append(
+        "nombre",
+        this.activeDoc?.signatures?.mainSignatory || "MINISTRO DE LA DEFENSA",
+      );
+      formData.append("locacion", "Caracas, Venezuela");
+      formData.append("razon", "Firma de Resolución Ministerial");
+      formData.append("contacto", "MPPD");
+      formData.append("codigo", filename);
+      formData.append("return", "true"); // <-- Solicitar retorno de archivo PDF firmado directamente
+
+      // Firma digital visible en cabecera (esquina superior derecha, sutil ~2cm)
+      formData.append("visible", "true");
+
+      // --- NUEVOS PARÁMETROS PARA EL BACKEND EN GO ---
+      formData.append("transparente", "true"); // El Widget Annotation será INVISIBLE
+      formData.append("page", "1"); // Página donde se ubicará el Widget interactivo
+
+      // Coordenadas PDF (en puntos, no mm) para colocar el Widget Annotation
+      formData.append("llx", "540"); // Margen izquierdo
+      formData.append("lly", "910"); // Margen inferior
+      formData.append("urx", "580"); // Margen derecho
+      formData.append("ury", "970"); // Margen superior
+
+      // Consumir servicio Go de firma con barras de progreso de subida
+      const signedPdfBlob = await new Promise<Blob>(
+        (resolvePromise, rejectPromise) => {
+          this.fileService.FirmarPDFProgress(formData).subscribe(
+            (event: any) => {
+              if (event.type === HttpEventType.UploadProgress) {
+                const progress = Math.round(100 * (event.loaded / event.total));
+                Swal.update({
+                  title: "Enviando al servidor...",
+                  html: `Progreso de subida: <b>${progress}%</b><br><div style="width: 100%; background: #e9ecef; border-radius: 4px; overflow: hidden; margin-top: 10px;"><div style="width: ${progress}%; height: 8px; background: #2dce89; transition: width 0.1s ease;"></div></div>`,
+                });
+              } else if (event.type === HttpEventType.Response) {
+                if (event.body) {
+                  resolvePromise(event.body);
+                } else {
+                  rejectPromise(
+                    new Error(
+                      "No se recibieron datos en la respuesta del servidor.",
+                    ),
+                  );
+                }
+              }
+            },
+            (err: any) => {
+              rejectPromise(err);
+            },
+          );
+        },
+      );
+
+      // Cerrar modal de carga con éxito
+      Swal.close();
+
+      // Ofrecer la opción de ver/descargar el documento firmado devuelto por Go
+      await Swal.fire({
+        title: "Proceso Completado",
+        text: "El documento ha sido firmado digitalmente y guardado con éxito. ¿Desea descargar una copia firmada para verla?",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "Sí, descargar",
+        cancelButtonText: "No, continuar",
+        confirmButtonColor: "#2dce89",
+        cancelButtonColor: "#8898aa",
+      }).then((resAlert) => {
+        if (resAlert.isConfirmed) {
+          const downloadUrl = window.URL.createObjectURL(signedPdfBlob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        }
+      });
+    } catch (err) {
+      console.error("Error generando/firmando PDF (Administrador): ", err);
       Swal.fire({
         title: "Error",
         text: "Ocurrió un error al generar o firmar el documento PDF.",

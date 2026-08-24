@@ -47,6 +47,9 @@
       <button class="tpv-btn-print" *ngIf="useCanvas && profile === 'Edicion'" (click)="confirmSaveDocumentState()" title="Guardar Progreso" style="margin-right: 10px; background: #5e72e4; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
         <i class="fas fa-save"></i> Guardar
       </button>
+      <button class="tpv-btn-print" *ngIf="useCanvas && profile === 'Edicion' && (jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')" (click)="printCanvasAdmin()" title="Generar Resuelto (ADMINISTRADOR)" style="margin-right: 10px; background: #fb6340; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+        <i class="fas fa-magic"></i> Generar Resuelto (ADMIN)
+      </button>
       <button class="tpv-btn-print" *ngIf="useCanvas && profile === 'Revision'" (click)="printCanvas()" title="Generar PDF" style="margin-right: 15px; background: #2dce89; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
         <i class="fas fa-file-pdf"></i> Generar PDF
       </button>

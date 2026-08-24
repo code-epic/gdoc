@@ -1,7 +1,7 @@
 <div class="canvas-toolbar">
   <!-- Controles de Zoom -->
   <button class="btn btn-sm btn-outline-light" (click)="zoomOut()" title="Alejar"><i class="fas fa-search-minus"></i></button>
-  <span class="zoom-level">{{ (zoomScale * 100) | number:'1.0-0' }}%</span>
+  <span class="zoom-level">{{ formattedZoom }}%</span>
   <button class="btn btn-sm btn-outline-light" (click)="zoomIn()" title="Acercar"><i class="fas fa-search-plus"></i></button>
   <button class="btn btn-sm btn-outline-light ml-2" (click)="autoFit()" title="Ajustar a pantalla"><i class="fas fa-expand-arrows-alt"></i></button>
   

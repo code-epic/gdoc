@@ -35,27 +35,8 @@
 
                     <div *ngIf="bmenu" class="col-md-12 row justify-content-center text-center">
                         <div class="col-md-2"></div>
-                        <!-- <div class="col-md-2 cardround" (click)="cambiarFormulario(1)">
-                            <div class="text-center botones">
-                                <br>
-                                <h2 class="text-center text-red"><i class="fa fa-exclamation"
-                                        style="font-size: 42px;"></i>
-                                </h2>
-                                <p>Codigos Rojos</p>
-                            </div>
-                        </div> -->
 
-                        <!-- <div class="col-md-2 cardround" (click)="cambiarFormulario(2)">
-                            <div class="text-center botones">
-                                <br>
-                                <h2 class="text-center text-orange"><i class="fa fa-arrow-down"
-                                        style="font-size: 42px;"></i>
-                                </h2>
-                                <p>Bajas</p>
-                            </div>
-                        </div> -->
-
-                        <div class="col-md-2 cardround" (click)="cambiarFormulario(3)">
+                        <div class="col-md-2 cardround" (click)="cambiarFormulario(1)">
                             <div class="text-center botones">
                                 <br>
                                 <h2 class="text-center text-blue"><i class="fa fa-clipboard-check"
@@ -65,15 +46,15 @@
                             </div>
                         </div>
 
-                        <!-- <div class="col-md-2 cardround" (click)="cambiarFormulario(4)">
+                        <div class="col-md-2 cardround" (click)="cambiarFormulario(2)">
                             <div class="text-center botones">
                                 <br>
-                                <h2 class="text-center text-green"><i class="fa fa-arrow-up"
+                                <h2 class="text-center text-green"><i class="fa fa-anchor"
                                         style="font-size: 42px;"></i>
                                 </h2>
-                                <p>Ascensos</p>
+                                <p>Cumpleaños</p>
                             </div>
-                        </div> -->
+                        </div>
 
                         <div class="col-md-2"></div>
                     </div>
@@ -91,9 +72,10 @@
                         </button>
                     </div>
                     <div *ngIf="!bmenu" class="row">
-                        <div class="col-md-12 text-center col-lg-12">
+                        <div class="col-md-12 col-lg-12">
 
-                            <table id="tbl-ejercitos" class="tbl-ejercitos table-container" border="1">
+                            <!-- Reporte de Administración Pública (Diseño en Tabla) -->
+                            <table *ngIf="!isBirthdayReport" id="tbl-ejercitos" class="tbl-ejercitos table-container text-center" border="1">
                                 <thead>
                                     <tr class="header-principal">
                                         <th class="celda-grado">#</th>
@@ -130,6 +112,53 @@
                                    </tr>
                                 </tbody>
                             </table>
+
+                            <!-- Reporte de Cumpleañeros (Diseño en Lista Elegante) -->
+                            <div *ngIf="isBirthdayReport" class="birthday-list-container d-flex flex-column gap-3 text-left">
+                                <div *ngFor="let e of lst; index as i" class="birthday-card animate-fade-in d-flex align-items-center p-3 mb-3 bg-white shadow-sm" style="border-radius: 12px; border-left: 5px solid #5eaaa8; min-height: 120px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                                    
+                                    <!-- Foto al lado izquierdo -->
+                                    <div class="birthday-photo-wrapper mr-4 d-flex align-items-center justify-content-center" style="width: 90px; height: 90px; flex-shrink: 0; position: relative;">
+                                        <div class="shadow-sm rounded-circle bg-light d-flex align-items-center justify-content-center overflow-hidden" style="width: 80px; height: 80px; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;">
+                                            <img [src]="obtenerFoto(e.cedula)" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;" *ngIf="!loadingFotos[e.cedula]" alt="Foto">
+                                            <div *ngIf="loadingFotos[e.cedula]" class="d-flex align-items-center justify-content-center w-100 h-100 bg-light">
+                                                <i class="fa fa-spinner fa-spin text-info" style="font-size: 1.2rem;"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Datos al lado derecho -->
+                                    <div class="birthday-details-wrapper d-flex flex-column justify-content-center">
+                                        <h4 class="font-weight-bold text-dark mb-1 text-uppercase" style="letter-spacing: 0.5px;">{{ e.nombres_apellidos | uppercase }}</h4>
+                                        
+                                        <div class="d-flex flex-wrap align-items-center text-muted" style="font-size: 0.88rem; gap: 8px 15px;">
+                                            <div>
+                                                <span class="badge badge-pill badge-info px-2.5 py-1 text-white shadow-sm" style="font-size: 11px; background-color: #5eaaa8 !important;">V-{{ e.cedula }}</span>
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-award text-warning mr-1"></i>
+                                                <strong>Grado:</strong> {{ e.ngrado || e.grado || 'NO REGISTRA' }}
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-calendar-star text-info mr-1"></i>
+                                                <strong>Promoción:</strong> {{ e.fecha_promocion || 'NO REGISTRA' }}
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-graduation-cap text-success mr-1"></i>
+                                                <strong>Especialidad:</strong> {{ e.especialidad || 'NO REGISTRA' }}
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-birthday-cake text-danger mr-1"></i>
+                                                <strong>Nacimiento:</strong> {{ e.fecha_nacimiento || 'NO REGISTRA' }}
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-briefcase text-secondary mr-1"></i>
+                                                <strong>Último Cargo:</strong> {{ e.carg || e.cargo || 'NO REGISTRA' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <br>
                         </div>
 

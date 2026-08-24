@@ -25,7 +25,7 @@ import { NgxUiLoaderModule, NgxUiLoaderConfig } from "ngx-ui-loader";
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatCommonModule, MatNativeDateModule } from '@angular/material/core';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { AuthGuardGuard } from './services/seguridad/auth-guard.guard';
-import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
+import { CommonModule, HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
 
 import { AngularFileUploaderModule } from "angular-file-uploader";
 import { AuthInterceptorService } from './services/seguridad/auth-interceptor.service';
@@ -141,6 +141,7 @@ const ngWizardConfig: NgWizardConfig = {
 @NgModule({
   imports: [
     BrowserAnimationsModule,
+    CommonModule,
     FormsModule,
     HttpClientModule,
     ComponentsModule,

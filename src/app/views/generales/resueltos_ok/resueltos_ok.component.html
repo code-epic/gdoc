@@ -347,7 +347,7 @@
                     <!-- Botón VER PDF: Para todos menos Secretaria, si ya está publicado -->
                     <button class="btn btn-sm" 
                             *ngIf="currentProfile !== 'Secretaria' && (doc.normal == 1 || doc.pdf_rrss == 1 || doc.oficio == 1 || doc.gaceta == 1 || doc.sobre == 1 || doc.no_publicar == 1)"
-                            (click)="startImmersiveMode(doc, currentProfile); $event.stopPropagation()" 
+                            (click)="VerPDF(doc); $event.stopPropagation()" 
                             title="Ver PDF"
                             style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e8eaf6; color: #3949ab; border: none; transition: transform 0.2s;"
                             onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
@@ -362,6 +362,16 @@
                             style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e3f2fd; color: #1e88e5; border: none; transition: transform 0.2s;"
                             onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                       <i class="fas fa-eye" style="font-size: 1rem;"></i>
+                    </button>
+
+                    <!-- Botón Resolución (ADMINISTRADOR) -->
+                    <button *ngIf="currentProfile === 'Edicion' && (jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')"
+                            class="btn btn-sm" 
+                            (click)="startImmersiveMode(doc, 'Edicion'); $event.stopPropagation()" 
+                            title="Resolución (ADMINISTRADOR)"
+                            style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e0f7fa; color: #006064; border: none; transition: transform 0.2s;"
+                            onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                      <i class="fas fa-user-shield" style="font-size: 1rem;"></i>
                     </button>
                   </div>
                 </div>
@@ -442,7 +452,7 @@
                 <!-- Botón VER PDF: Para todos menos Secretaria, si ya está publicado -->
                 <button class="btn btn-sm" 
                         *ngIf="currentProfile !== 'Secretaria' && (doc.normal == 1 || doc.pdf_rrss == 1 || doc.oficio == 1 || doc.gaceta == 1 || doc.sobre == 1 || doc.no_publicar == 1)"
-                        (click)="startImmersiveMode(doc, currentProfile); $event.stopPropagation()" 
+                        (click)="VerPDF(doc); $event.stopPropagation()" 
                         title="Ver PDF"
                         style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e8eaf6; color: #3949ab; border: none; transition: transform 0.2s;"
                         onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
@@ -457,6 +467,16 @@
                         style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e3f2fd; color: #1e88e5; border: none; transition: transform 0.2s;"
                         onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                   <i class="fas fa-eye" style="font-size: 1rem;"></i>
+                </button>
+
+                <!-- Botón Resolución (ADMINISTRADOR) -->
+                <button *ngIf="currentProfile === 'Edicion' && (jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')"
+                        class="btn btn-sm" 
+                        (click)="startImmersiveMode(doc, 'Edicion'); $event.stopPropagation()" 
+                        title="Resolución (ADMINISTRADOR)"
+                        style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e0f7fa; color: #006064; border: none; transition: transform 0.2s;"
+                        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                  <i class="fas fa-user-shield" style="font-size: 1rem;"></i>
                 </button>
               </div>
             </div>
@@ -524,7 +544,7 @@
                 
                 <button class="btn btn-sm" 
                         *ngIf="doc.normal == 1 || doc.pdf_rrss == 1 || doc.oficio == 1 || doc.gaceta == 1 || doc.sobre == 1 || doc.no_publicar == 1"
-                        (click)="startImmersiveMode(doc, currentProfile === 'Edicion' ? 'Revision' : currentProfile); $event.stopPropagation()" 
+                        (click)="VerPDF(doc); $event.stopPropagation()" 
                         title="Ver PDF"
                         style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e8eaf6; color: #3949ab; border: none; transition: transform 0.2s;"
                         onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
@@ -559,6 +579,16 @@
                         style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e3f2fd; color: #1e88e5; border: none; transition: transform 0.2s;"
                         onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                   <i class="fas fa-eye" style="font-size: 1rem;"></i>
+                </button>
+
+                <!-- Botón Resolución (ADMINISTRADOR) -->
+                <button *ngIf="currentProfile === 'Edicion' && (jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')"
+                        class="btn btn-sm" 
+                        (click)="startImmersiveMode(doc, 'Edicion'); $event.stopPropagation()" 
+                        title="Resolución (ADMINISTRADOR)"
+                        style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e0f7fa; color: #006064; border: none; transition: transform 0.2s;"
+                        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                  <i class="fas fa-user-shield" style="font-size: 1rem;"></i>
                 </button>
               </div>
             </div>

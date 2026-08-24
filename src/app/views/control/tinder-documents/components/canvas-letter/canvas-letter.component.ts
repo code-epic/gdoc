@@ -23,6 +23,11 @@ export class CanvasLetterComponent implements OnInit {
   @Input() showSignaturesForPrint: boolean = false;
 
   public zoomScale: number = 1.0;
+
+  get formattedZoom(): number {
+    return Math.round(this.zoomScale * 100);
+  }
+
   public currentDateTime: Date = new Date();
 
   constructor() { }

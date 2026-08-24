@@ -141,12 +141,14 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     userRole: string;
     perfil: string;
     userCedula: string;
+    userCargo: string;
   } = {
     userId: "",
     userName: "",
     userRole: "",
     userCedula: "",
     perfil: "",
+    userCargo: "",
   };
 
   // Perfil dinámico de seguridad
@@ -296,6 +298,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               sessionStorage.getItem("perfil") ||
               decoded.Usuario.descripcion ||
               "",
+            userCargo: decoded.Usuario.cargo || "",
           };
           // Verificar si el usuario es MINISTRO para habilitar firma directa
           const desc: string = (decoded.Usuario.descripcion || "")
@@ -314,6 +317,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             sessionStorage.getItem("perfil") ||
             this.loginService.Usuario.descripcion ||
             "",
+          userCargo: this.loginService.Usuario.cargo || "",
         };
       }
 
@@ -2363,5 +2367,51 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     //     }
     //   );
     // }
+  }
+
+  //Mostrar los PDF cuando ya estan publicados
+  VerPDF(doc: any) {
+    const num = doc.numero_resol || doc.numero_resuelto;
+    if (num) {
+      this.getResueltoId(num);
+    } else {
+      this.toastrService.warning(
+        "El documento no posee un número de resolución asignado.",
+      );
+    }
+  }
+
+  getResueltoId(numero: string) {
+    if (numero && numero.toString().trim() !== "") {
+      const payload = {
+        ruta: "resueltos/",
+        archivo: `${numero.trim()}.pdf`,
+      };
+      // Mostrar indicador de carga
+      Swal.fire({
+        title: "Cargando PDF...",
+        text: "Por favor espere mientras se descarga el documento desde el servidor.",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      this.apiService.postBlob("dwscdn", payload).subscribe({
+        next: (data: Blob) => {
+          Swal.close();
+          const fileURL = URL.createObjectURL(data);
+          window.open(fileURL, "_blank");
+        },
+        error: (error) => {
+          Swal.close();
+          console.error("Error al descargar el PDF:", error);
+          this.toastrService.error(
+            "No se pudo obtener el archivo PDF desde el servidor de almacenamiento.",
+          );
+        },
+      });
+    }
   }
 }
