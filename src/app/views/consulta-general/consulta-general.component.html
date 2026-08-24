@@ -361,7 +361,7 @@
                                                                     </div>
                                                                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                                                         <span class="text-muted text-xs font-weight-bold text-uppercase">Clasificación</span>
-                                                                        <span class="font-weight-600 text-dark text-sm">{{ (IDatosBasicos.clasificacion | uppercase) || 'NO APLICA' }}</span>
+                                                                        <span class="font-weight-600 text-dark text-sm">{{ (IDatosBasicos.clasificacion.toString() | uppercase) || 'NO APLICA' }}</span>
                                                                     </div>
                                                                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                                                         <span class="text-muted text-xs font-weight-bold text-uppercase">Categoría</span>
@@ -509,8 +509,8 @@
                                                     <tbody>
                                                         <tr *ngFor="let e of lstNombres; index as i">
                                                             <td>{{ i+1 }}</td>
-                                                            <td>{{ e.grado_abreviado }}</td>
-                                                            <td>{{ e.nombres }}</td>
+                                                            <td>{{ e.grado_abreviado | uppercase}}</td>
+                                                            <td>{{ e.nombres | uppercase}}</td>
                                                             <td><a class="enlace"
                                                                     (click)="MoverForm(e.cedula);volverDatos(0)"
                                                                     style="font-weight: bold; color: brown;">

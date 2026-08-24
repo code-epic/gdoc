@@ -1,4 +1,10 @@
-import { Component, Input, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  ChangeDetectorRef,
+} from "@angular/core";
 import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
@@ -29,16 +35,15 @@ interface ITipoResolucion {
   nombre: string;
 }
 @Component({
-  selector: 'app-consulta-general',
-  templateUrl: './consulta-general.component.html',
-  styleUrls: ['./consulta-general.component.scss']
+  selector: "app-consulta-general",
+  templateUrl: "./consulta-general.component.html",
+  styleUrls: ["./consulta-general.component.scss"],
 })
 export class ConsultaGeneralComponent implements OnInit, OnDestroy {
-
   public fotoAfiliadoBlobUrl: SafeUrl | string = "";
   public rawBlobUrl: string = "";
   public isLoadingFoto: boolean = false;
-  
+
   public cedula: string = "";
   public resolucion: string = "";
 
@@ -89,7 +94,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
     merito: "",
     direccion: "",
     estatura: "",
-    estado_civil: ""
+    estado_civil: "",
   };
 
   public IResolucion: IResoluciones = {
@@ -184,13 +189,13 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
   public lstNombres: any;
 
   public lstEntradas: any;
-  public lstIPSFA = []; //Objeto Comando
-  public archivos = [];
-  public lstCausa = []; //Objeto Comando
-  public lstMotivo = []; //Objeto Comando
-  public lstDetalle = []; //Objeto Comando
-  public lstRangoCedula = [];
-  public lstAscenso = [];
+  public lstIPSFA: any[] = []; //Objeto Comando
+  public archivos: any[] = [];
+  public lstCausa: any[] = []; //Objeto Comando
+  public lstMotivo: any[] = []; //Objeto Comando
+  public lstDetalle: any[] = []; //Objeto Comando
+  public lstRangoCedula: any[] = [];
+  public lstAscenso: any[] = [];
 
   public xasunto: string = "";
   public tipo: any;
@@ -206,7 +211,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
   public valEdit: boolean = false;
 
   public dbTools: boolean = false;
-  public delimitador : string = ';'
+  public delimitador: string = ";";
 
   public carpeta: string = "";
   public nombre: string = "";
@@ -260,29 +265,26 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
   public fecha_registro: string = "";
   public destino: string = "";
 
-  cuenta = ''
-  digital = ''
-  documento = ''
-  numero = ''
-  responsable_entrada = ''
-  registrado_entrada = ''
+  cuenta = "";
+  digital = "";
+  documento = "";
+  numero = "";
+  responsable_entrada = "";
+  registrado_entrada = "";
 
-  modificado_entrada = ''
-  carpeta_entrada = ''
-  acto = 'RESOLUCION'
-  estatus_entrada: any
-  tipo_entrada = ''
-  asunto_entrada = ''
-  observacion_entrada = ''
-  opttodos = "0"
-
-  
+  modificado_entrada = "";
+  carpeta_entrada = "";
+  acto = "RESOLUCION";
+  estatus_entrada: any;
+  tipo_entrada = "";
+  asunto_entrada = "";
+  observacion_entrada = "";
+  opttodos = "0";
 
   filteredOptions: Observable<ITipoResolucion[]>;
   myControl = new FormControl();
   selected = new FormControl(0);
   public csvHead: any;
-
 
   public blResolucionPanel: boolean = false;
   public orden_pagina: number = 0;
@@ -301,7 +303,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
     private _snackBar: MatSnackBar,
     private router: Router,
     private sanitizer: DomSanitizer,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   convertirFecha(fecha: string): string {
@@ -396,7 +398,9 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(""),
       map((value) => (typeof value === "string" ? value : value?.name)),
-      map((name) => (name ? this._filter(name) : this.TipoResoluciones.slice()))
+      map((name) =>
+        name ? this._filter(name) : this.TipoResoluciones.slice(),
+      ),
     );
 
     this.codigoSession = this.utilService.GenerarUnicId();
@@ -423,14 +427,14 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
     const filterValue = name.toLowerCase();
 
     return this.TipoResoluciones.filter((option) =>
-      option.nombre.toLowerCase().includes(filterValue)
+      option.nombre.toLowerCase().includes(filterValue),
     );
   }
 
   consultar(e) {
     if (e.keyCode == 13) {
-      this.cedula = this.cedula.replace('.', '')
-      this.xAPI = {} as IAPICore
+      this.cedula = this.cedula.replace(".", "");
+      this.xAPI = {} as IAPICore;
       this.xAPI.funcion = "MPPD_CUnidad";
       this.xAPI.parametros = this.cedula;
       this.xAPI.valores = "";
@@ -441,7 +445,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
         },
         (err) => {
           console.error(err);
-        }
+        },
       );
     }
   }
@@ -487,10 +491,10 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
 
       if (this.cedula == "") return false;
 
-      this.cedula = this.cedula.replace(/\./g, '')
-      
+      this.cedula = this.cedula.replace(/\./g, "");
+
       this.ngxService.startLoader("loader-buscar");
-      this.xAPI = {} as IAPICore
+      this.xAPI = {} as IAPICore;
       this.xAPI.funcion = "MPPD_CDatosBasicos";
       this.xAPI.parametros = this.cedula;
       this.xAPI.valores = "";
@@ -519,7 +523,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
               data.Cuerpo[0].resoluciones != ""
             ) {
               this.lstResoluciones = JSON.parse(
-                data.Cuerpo[0].resoluciones
+                data.Cuerpo[0].resoluciones,
               ).reverse();
               this.filtrarNombramiento();
             }
@@ -547,7 +551,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
         (error) => {
           console.error("Error de conexion a los datos ", error);
           this.ngxService.stopLoader("loader-buscar");
-        }
+        },
       );
     }
   }
@@ -640,7 +644,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
 
       if (this.IResolucion.numero == "") return false;
       this.ngxService.startLoader("loader-buscar");
-      this.xAPI = {} as IAPICore
+      this.xAPI = {} as IAPICore;
       this.xAPI.funcion = "MPPD_CResoluciones";
       this.xAPI.parametros = this.IResolucion.numero;
       this.xAPI.valores = "";
@@ -655,7 +659,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
         (error) => {
           console.error("Error de conexion a los datos ", error);
           this.ngxService.stopLoader("loader-buscar");
-        }
+        },
       );
     }
   }
@@ -706,7 +710,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
         ? ""
         : " AND  rs.observacion LIKE '%" + this.observaciones + "%' ";
 
-    this.xAPI = {} as IAPICore
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "MPPD_CResolucionesRangoTipo";
     codigo = asunto + instrucciones + observaciones + causa;
 
@@ -750,7 +754,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
       (error) => {
         console.error("Error de conexion a los datos ", error);
         this.ngxService.stopLoader("loader-buscar");
-      }
+      },
     );
   }
 
@@ -841,7 +845,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
 
   getAdministracion(id: string) {
     this.lstCausa = [];
-    this.xAPI = {} as IAPICore
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "MPPD_CCausaResolucion";
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = id;
@@ -854,14 +858,14 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
       },
       (err) => {
         console.error(err);
-      }
+      },
     );
   }
 
   getCausa(id: string) {
     this.lstCausa = [];
     this.lstMotivo = [];
-    this.xAPI = {} as IAPICore
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "MPPD_CCausaResolucion";
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = id;
@@ -875,13 +879,13 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
       },
       (err) => {
         console.error(err);
-      }
+      },
     );
   }
 
   getMotivo() {
     this.lstMotivo = [];
-    this.xAPI = {} as IAPICore
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "MPPD_CMotivoResolucion";
     this.ngxService.startLoader("loader-buscar");
     this.xAPI.parametros = this.IResolucion.causa.toString();
@@ -894,7 +898,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
       },
       (err) => {
         console.error(err);
-      }
+      },
     );
   }
 
@@ -915,7 +919,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
 
       this.ngxService.startLoader("loader-buscar");
 
-      this.xAPI = {} as IAPICore
+      this.xAPI = {} as IAPICore;
       this.xAPI.funcion = "MPPD_CDatosBasicosNombre";
       var grado = this.dbgrado == "%" ? "LIKE '%'" : " = " + this.dbgrado;
       var componente =
@@ -941,7 +945,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
         (error) => {
           console.error("Error de conexion a los datos ", error);
           this.ngxService.stopLoader("loader-buscar");
-        }
+        },
       );
     }
   }
@@ -1009,7 +1013,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
       head,
       this.lstResolucionesX,
       "RS-" + this.utilService.GenerarUnicId(),
-      this.delimitador
+      this.delimitador,
     );
   }
 
@@ -1021,7 +1025,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
       head,
       this.lstRangoCedula,
       "RC-" + this.utilService.GenerarUnicId(),
-      this.delimitador
+      this.delimitador,
     );
   }
 
@@ -1097,10 +1101,10 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
             (error) => {
               this.toastrService.error(
                 "El documento no se encuentra disponible",
-                `GDoc Resoluciones`
+                `GDoc Resoluciones`,
               );
               this.ngxService.stopLoader("loader-buscar");
-            }
+            },
           );
 
           return;
@@ -1118,7 +1122,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
   }
 
   ConsultaExpandida() {
-    this.xAPI = {} as IAPICore
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "MPPD_CCedulaRango";
     this.xAPI.parametros = "cedula##" + this.rango_cedula;
     this.xAPI.valores = "";
@@ -1135,7 +1139,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
       (error) => {
         console.error("Error de conexion a los datos ", error);
         this.ngxService.stopLoader("loader-buscar");
-      }
+      },
     );
   }
 
@@ -1143,11 +1147,11 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
     this.blExpandida = true;
   }
 
-  getSex(sexo: String): String {
+  getSex(sexo: string): string {
     return sexo == "M" ? "MASCULINO" : "FEMENINO";
   }
 
-  getSituation(valor: String): String {
+  getSituation(valor: string): string {
     switch (valor) {
       case "ACT":
         return "ACTIVO";
@@ -1211,7 +1215,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
    */
   getResueltoID(id) {
     this.ngxService.startLoader("loader-buscar");
-    this.xAPI = {} as IAPICore
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "MPPD_CResueltoID";
     this.xAPI.parametros = id.toString();
     this.xAPI.valores = {};
@@ -1237,7 +1241,7 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
       },
       (error) => {
         console.error("Error de conexion a los datos ", error);
-      }
+      },
     );
   }
 
@@ -1248,35 +1252,31 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
   }
 
   detalleEntrada(content, e) {
+    this.modalService.open(content, { size: "lg" });
 
-    this.modalService.open(content, { size: "lg" })
-
-
-    this.documento = e.cod_acto == 0 ? 'RESOLUCIÓN' : 'ORDEN GENERAL'
-    this.responsable_entrada = e.des_responsable
-    this.registrado_entrada = e.des_registrado
-    this.numero = e.numero_carpeta
-    this.cuenta = e.cuenta_oficio
-    this.digital = e.digital
-    this.modificado_entrada = e.f_modificado
-    this.estatus_entrada = e.estatus_descripcion
+    this.documento = e.cod_acto == 0 ? "RESOLUCIÓN" : "ORDEN GENERAL";
+    this.responsable_entrada = e.des_responsable;
+    this.registrado_entrada = e.des_registrado;
+    this.numero = e.numero_carpeta;
+    this.cuenta = e.cuenta_oficio;
+    this.digital = e.digital;
+    this.modificado_entrada = e.f_modificado;
+    this.estatus_entrada = e.estatus_descripcion;
 
     // console.log(new Date(e.f_modificado))
     // console.log(new Date('2024-09-01 00:00:00'))
 
-    if ( new Date(e.f_modificado) < new Date('2024-09-01 00:00:00')){
-      this.tipo_entrada = e.des_tipo_entrada
+    if (new Date(e.f_modificado) < new Date("2024-09-01 00:00:00")) {
+      this.tipo_entrada = e.des_tipo_entrada;
       // console.log('ENTRADA')
     } else {
-      this.tipo_entrada = e.des_tipo_resol
+      this.tipo_entrada = e.des_tipo_resol;
       // console.log('RESOLUCION')
-
     }
 
-    this.asunto_entrada = e.asunto
-    this.observacion_entrada = e.observacion
-    this.carpeta_entrada = e.des_carpeta
-
+    this.asunto_entrada = e.asunto;
+    this.observacion_entrada = e.observacion;
+    this.carpeta_entrada = e.des_carpeta;
   }
 
   editarDatosBasicos() {
@@ -1285,8 +1285,8 @@ export class ConsultaGeneralComponent implements OnInit, OnDestroy {
     this.EDITOR = this.IDatosBasicos.cedula;
   }
 
-  volver(){
-    this.valEdit = false
+  volver() {
+    this.valEdit = false;
   }
 
   ngOnDestroy(): void {
