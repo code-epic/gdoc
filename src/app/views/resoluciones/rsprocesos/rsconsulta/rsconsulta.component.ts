@@ -463,7 +463,7 @@ export class RsconsultaComponent implements OnInit {
       this.bEliminarEntrada = true;
     }
 
-    if (this.loginService.Usuario.cargo == "Confidencial") {
+    if (this.loginService.Usuario.cargo == "CONFIDENCIAL") {
       this.bEliminarEntrada = true;
       this.blConfidencial = true;
     }
