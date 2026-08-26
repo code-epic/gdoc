@@ -34,15 +34,19 @@ export class AppUpdateService {
 
   public async forceCacheUpdate(): Promise<void> {
     try {
-      Swal.fire({
-        title: 'Actualizando...',
-        text: 'Limpiando la caché de la aplicación.',
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+      if (!isLocal) {
+        Swal.fire({
+          title: 'Actualizando...',
+          text: 'Limpiando la caché y reiniciando la aplicación.',
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+      }
 
       // 1. Limpiar la API de Caché del navegador (Cache Storage)
       if ('caches' in window) {
@@ -65,8 +69,18 @@ export class AppUpdateService {
         }
       }
 
-      // Cerrar modal de carga y mostrar éxito antes de recargar
-      Swal.close();
+      if (!isLocal) {
+        // Dar tiempo para ver la animación de carga
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Cerrar el modal de carga anterior
+        Swal.close();
+
+        // Yield/pausa de 100ms para permitir que la animación de cierre de SweetAlert se complete
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      // Mostrar éxito antes de recargar
       await Swal.fire({
         title: 'Proceso Exitoso',
         text: 'La caché ha sido limpiada con éxito. La aplicación se reiniciará ahora.',
