@@ -42,7 +42,7 @@ export class DashboardComponent implements OnInit {
       "REDACTOR",
       "REVISION",
       "JEFE",
-      // "SECRETARIA",
+      "SECRETARIA",
       // "DIRECCION",
       // "MINISTRO",
     ];
