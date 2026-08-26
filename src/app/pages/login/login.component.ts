@@ -1,4 +1,5 @@
 import { Component, Inject, OnInit } from "@angular/core";
+import { LoaderStep } from "../../components/federation-loader/federation-loader.component";
 import { Router } from "@angular/router";
 import { IToken, LoginService } from "../../services/seguridad/login.service";
 import { NgxUiLoaderService } from "ngx-ui-loader";
@@ -50,6 +51,17 @@ export class LoginComponent implements OnInit {
 
   public version = "1.0.0";
   public fecha = "";
+
+  // Federation Loader State
+  showFederationLoader: boolean = false;
+  federationComplete: boolean = false;
+  federationError: boolean = false;
+  federationSteps: LoaderStep[] = [
+    { key: 'MAIN_CONN', label: 'Estableciendo conexión principal', status: 'pending' },
+    { key: 'SECURE_NODES', label: 'Cargando nodos seguros', status: 'pending' },
+    { key: 'FEDERATION', label: 'Estableciendo conexión federada', status: 'pending' },
+    { key: 'PREPARE', label: 'Preparando experiencia segura', status: 'pending' }
+  ];
 
   constructor(
     private router: Router,
@@ -123,7 +135,27 @@ export class LoginComponent implements OnInit {
           this.showTotpSection = true;
           this.tempAuthToken = this.itk.token; // Store the temporary token
         } else {
-          this.loginService.IniciarSesion(this.itk.token);
+          this.showFederationLoader = true;
+          this.loginService.IniciarSesion(
+            this.itk.token,
+            (stepKey, status) => {
+              const stepIndex = this.federationSteps.findIndex(s => s.key === stepKey);
+              if (stepIndex > -1) {
+                if (status === 'in-progress') {
+                  for (let i = 0; i < stepIndex; i++) {
+                    if (this.federationSteps[i].status !== 'error') {
+                      this.federationSteps[i].status = 'done';
+                    }
+                  }
+                }
+                this.federationSteps[stepIndex].status = status;
+                if (status === 'error') this.federationError = true;
+              }
+            },
+            () => {
+              this.federationComplete = !this.federationError;
+            }
+          );
         }
 
         this.ngxService.stopLoader("loader-login");

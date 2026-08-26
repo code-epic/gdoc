@@ -25,14 +25,14 @@ export class AppUpdateService {
           cancelButtonColor: '#f5365c'
         }).then((result) => {
           if (result.isConfirmed) {
-            this.forceCacheUpdate();
+            this.forceCacheUpdate(true);
           }
         });
       });
     }
   }
 
-  public async forceCacheUpdate(): Promise<void> {
+  public async forceCacheUpdate(activateSW = false): Promise<void> {
     try {
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
@@ -60,8 +60,8 @@ export class AppUpdateService {
       localStorage.clear();
       sessionStorage.clear();
 
-      // 3. Activar actualización de service worker si está habilitado
-      if (this.swUpdate.isEnabled) {
+      // 3. Activar actualización de service worker si está habilitado y lo indicamos
+      if (activateSW && this.swUpdate.isEnabled) {
         try {
           await this.swUpdate.activateUpdate();
         } catch (swErr) {

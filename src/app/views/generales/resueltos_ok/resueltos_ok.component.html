@@ -564,7 +564,7 @@
                 </button>
 
                 <!-- Botón Resolución (ADMINISTRADOR) -->
-                <button *ngIf="currentProfile === 'Edicion' && (jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')"
+                <button *ngIf="(currentProfile === 'Edicion' || (currentProfile === 'Revision' && showingFirmados)) && (jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')"
                         class="btn btn-sm" 
                         (click)="startImmersiveMode(doc, 'Edicion'); $event.stopPropagation()" 
                         title="Resolución (ADMINISTRADOR)"

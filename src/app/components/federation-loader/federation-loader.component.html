@@ -1,0 +1,41 @@
+<div class="loader-bg" *ngIf="show">
+  <div class="shape-blob shape-1"></div>
+  <div class="shape-blob shape-2"></div>
+
+  <div class="container h-100">
+    <div class="row h-100 justify-content-center align-items-center">
+      <div class="col-lg-5 col-md-7 col-sm-9 col-11">
+        
+        <div class="card border-0 shadow-lg card-anim">
+          <div class="card-body px-lg-5 py-lg-5">
+            
+            <div class="text-center mb-4">
+              <div class="icon-container mb-3">
+                <i [class]="getHeaderIconClass()"></i>
+              </div>
+              <h3 class="text-dark font-weight-bold">{{ isComplete ? '¡Bienvenido!' : (isError ? 'Error de conexión' : 'Iniciando Sesión') }}</h3>
+              
+              <div style="min-height: 24px;">
+                  <p class="text-muted mb-0 fade-in-up">{{ isComplete ? 'Redirigiendo al inicio...' : texto }}</p>
+              </div>
+            </div>
+
+            <!-- Pasos -->
+            <div class="steps-container mt-4" style="margin: 0 auto; width: 100%; max-width: 320px; text-align: left;">
+              <div *ngFor="let step of steps" class="step-card mb-3 p-3 d-flex align-items-center"
+                  [ngClass]="getStepClass(step.status)">
+                <div class="icon-box mr-3 d-flex justify-content-center align-items-center" [ngClass]="getStepClass(step.status)">
+                  <i [ngClass]="getIconClass(step.status)" class="transition-all"></i>
+                </div>
+                <span [ngClass]="getTextClass(step.status)" class="transition-all step-text">
+                  {{ step.label }}
+                </span>
+              </div>
+            </div>
+     
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

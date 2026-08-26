@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthLayoutRoutes } from './auth-layout.routing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ComponentsModule } from '../../components/components.module';
 
 import { LoginComponent } from '../../pages/login/login.component';
 import { RegisterComponent } from '../../pages/register/register.component';
@@ -46,7 +47,8 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
     RouterModule.forChild(AuthLayoutRoutes),
     FormsModule,
     NgxUiLoaderModule.forRoot(ngxUiLoaderConfig),
-    NgbModule
+    NgbModule,
+    ComponentsModule
   ],
   declarations: [
     LoginComponent,

@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FederationLoaderComponent } from './federation-loader/federation-loader.component';
 
 
 @NgModule({
@@ -23,13 +24,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     FooterComponent,
     NavbarComponent,
     SidebarComponent,
-    TotpVerifyComponent
+    TotpVerifyComponent,
+    FederationLoaderComponent
   ],
   exports: [
     FooterComponent,
     NavbarComponent,
     SidebarComponent,
-    TotpVerifyComponent
+    TotpVerifyComponent,
+    FederationLoaderComponent
   ]
 })
 export class ComponentsModule { }

@@ -69,10 +69,10 @@ export class LoginService {
     }
   }
 
-  async IniciarSesion(itk: string) {
+  async IniciarSesion(itk: string, progressCallback?: (step: string, status: 'pending' | 'in-progress' | 'done' | 'error') => void, completeCallback?: () => void) {
     this.Token = await this.getUserDecrypt(itk);
     sessionStorage.setItem("token", itk);
-    this.obenterAplicacion(itk);
+    this.obenterAplicacion(itk, progressCallback, completeCallback);
   }
 
   async Iniciar(token: string = "") {
@@ -235,7 +235,7 @@ export class LoginService {
   }
 
   //ObenterAplicacion
-  protected obenterAplicacion(itk: string) {
+  protected obenterAplicacion(itk: string, progressCallback?: (step: string, status: 'pending' | 'in-progress' | 'done' | 'error') => void, completeCallback?: () => void) {
     let cadena =
       this.Token.Usuario.cedula +
       "," +
@@ -271,22 +271,56 @@ export class LoginService {
           this.utils.uuidv4();
 
           sessionStorage.setItem("crypt", texto);
-          // Realizamos la conexión federada y redirigimos/recargamos sólo al finalizar la petición HTTP
-          this.apiService.ConexionFederada("informatica").subscribe({
-            next: (resp) => {
-              console.log("Handshake de federación exitoso:", resp);
-              this.router.navigate(["/dashboard"]).then(() => {
-                window.location.reload();
+
+          const updateStep = (key: string, status: 'pending' | 'in-progress' | 'done' | 'error') => {
+            if (progressCallback) progressCallback(key, status);
+          };
+
+          updateStep('MAIN_CONN', 'in-progress');
+
+          // Simular la inicialización rápida de la conexión
+          setTimeout(() => {
+            updateStep('MAIN_CONN', 'done');
+            updateStep('SECURE_NODES', 'in-progress');
+            
+            setTimeout(() => {
+              updateStep('SECURE_NODES', 'done');
+              updateStep('FEDERATION', 'in-progress');
+
+              // Realizamos la conexión federada y redirigimos/recargamos sólo al finalizar la petición HTTP
+              this.apiService.ConexionFederada("informatica").subscribe({
+                next: (resp) => {
+                  console.log("Handshake de federación exitoso:", resp);
+                  updateStep('FEDERATION', 'done');
+                  updateStep('PREPARE', 'in-progress');
+
+                  setTimeout(() => {
+                    updateStep('PREPARE', 'done');
+                    
+                    setTimeout(() => {
+                      if (completeCallback) completeCallback();
+                      this.router.navigate(["/dashboard"]).then(() => {
+                        window.location.reload();
+                      });
+                    }, 500);
+                  }, 600);
+                },
+                error: (err) => {
+                  console.error("Error al establecer la conexión federada:", err);
+                  updateStep('FEDERATION', 'error');
+                  updateStep('PREPARE', 'error');
+
+                  setTimeout(() => {
+                    if (completeCallback) completeCallback();
+                    // Procedemos igualmente con la redirección para no bloquear la sesión
+                    this.router.navigate(["/dashboard"]).then(() => {
+                      window.location.reload();
+                    });
+                  }, 2000);
+                }
               });
-            },
-            error: (err) => {
-              console.error("Error al establecer la conexión federada:", err);
-              // Procedemos igualmente con la redirección para no bloquear la sesión
-              this.router.navigate(["/dashboard"]).then(() => {
-                window.location.reload();
-              });
-            }
-          });
+            }, 600);
+          }, 500);
         } catch (e) {
           console.error("Error al procesar el perfil del usuario:", e);
           Swal.fire({

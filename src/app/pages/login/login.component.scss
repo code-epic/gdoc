@@ -192,63 +192,125 @@
 
   /* Animación de entrada */
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translate3d(0, 30px, 0); }
-    to { opacity: 1; transform: translate3d(0, 0, 0); }
+    from { opacity: 0; transform: translate3d(0, 40px, 0) scale(0.98); }
+    to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
   }
 
-  /* Fondo Pastel Elegante Global para Auth Layout */
+  /* Fondo Ejecutivo Sutil - Duotono Minimalista Verde */
   ::ng-deep html.auth-layout body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background: #dce5df !important; /* Base verde salvia intermedia */
+    overflow-x: hidden;
+  }
+  
+  .executive-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    /* Gradiente Duotono: Salvia pálido hacia un Verde Eucalipto más elevado y presente */
+    background: linear-gradient(135deg, #e4ede6 0%, #aabfae 100%);
+    background-size: 200% 200%;
+    animation: gentlePan 25s ease infinite;
+  }
+
+  @keyframes gentlePan {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   ::ng-deep html.auth-layout .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
+    z-index: 10;
+    position: relative;
   }
 
-  /* Fondo Pastel Elegante */
-  .bg-pastel-gradient {
-    background: linear-gradient(135deg, #a6bf9a 0%, #96b0c4 100%) !important; /* Pastel Blue-Green */
+  /* Hacer transparente el header antiguo y ocultar separator */
+  .header.bg-pastel-gradient {
+    background: transparent !important;
+  }
+  .separator {
+    display: none !important;
   }
 
-  /* Tarjeta de Login */
+  /* Tarjeta de Login Ejecutiva con Toque Pastel */
   .login-card {
-    border: none;
-    border-radius: 20px;
+    border: 1px solid #dce4de;
+    border-radius: 16px; /* Balance ideal entre forma ejecutiva y amigable */
     background: #ffffff;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    animation: fadeInUp 0.8s ease-out both;
+    box-shadow: 0 10px 40px rgba(166, 191, 154, 0.15); /* Sombra sutil tintada de verde */
+    animation: fadeInUp 0.8s cubic-bezier(0.25, 1, 0.2, 1) both;
+    overflow: hidden;
+    margin-bottom: 2rem;
   }
 
   /* Inputs personalizados */
-  .custom-input-group .input-group-text {
-    background-color: #f8f9fe;
-    border: 1px solid #e9ecef;
-    border-right: none;
-    color: #adb5bd;
-    transition: all 0.3s ease;
-  }
-  
-  .custom-input-group .form-control {
-    background-color: #f8f9fe;
-    border: 1px solid #e9ecef;
-    border-left: none;
-    color: #525f7f;
-    padding-left: 10px;
-    transition: all 0.3s ease;
-  }
+  .custom-input-group {
+    border-radius: 12px;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    .input-group-text,
+    .form-control {
+      background-color: #f8faf9;
+      border: 1px solid #d4dfd7;
+      color: #495057;
+      transition: all 0.3s ease;
+      box-shadow: none !important;
+    }
+    
+    .input-group-text {
+      border-right: none;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+    
+    .form-control {
+      border-left: none;
+      padding-left: 10px;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
 
-  .custom-input-group:focus-within .input-group-text,
-  .custom-input-group:focus-within .form-control {
-    border-color: #5eaaa8;
-    background-color: #fff;
+    &:focus-within {
+      box-shadow: 0 3px 12px rgba(166, 191, 154, 0.2);
+      
+      .input-group-text,
+      .form-control {
+        border-color: #a6bf9a; /* Verde pastel elegante */
+        background-color: #fff;
+      }
+      
+      .input-group-text i {
+        color: #7b9c6f; /* Verde pastel acentuado */
+      }
+    }
   }
   
-  .custom-input-group:focus-within .input-group-text i {
-    color: #5eaaa8;
+  /* Boton de login elegante y pastel */
+  .btn-pastel {
+    background: linear-gradient(135deg, #a6bf9a 0%, #8ba881 100%); /* Tonos pasteles verdes elegantes */
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(166, 191, 154, 0.3);
+    transition: all 0.2s ease;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0.75rem 2rem;
+    
+    &:hover {
+      background: linear-gradient(135deg, #96b08a 0%, #7c9872 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(166, 191, 154, 0.4);
+    }
   }
 
   /* OTP Styles */
@@ -283,17 +345,15 @@
     }
 
     ::ng-deep html.auth-layout body {
-      background: linear-gradient(135deg, #eef2f7 0%, #d8e2dc 100%) !important;
-      
-      @media (prefers-color-scheme: dark) {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
-      }
+      background: #eef3f0 !important;
     }
 
     .header {
       background: transparent !important;
       padding-top: 1rem !important;
       padding-bottom: 1.5rem !important;
+      position: relative;
+      z-index: 10;
 
       .separator {
         display: none !important;
@@ -301,7 +361,7 @@
     }
 
     .login-title {
-      color: #32325d !important;
+      color: #4a5c50 !important;
       text-shadow: none;
 
       @media (prefers-color-scheme: dark) {
