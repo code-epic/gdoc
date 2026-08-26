@@ -8,6 +8,9 @@ import { ApiService } from "src/app/services/apicore/api.service";
 import { DOCUMENT } from "@angular/common";
 import { environment } from "src/environments/environment";
 
+import { AppUpdateService } from "../../services/util/app-update.service";
+import Swal from "sweetalert2";
+
 @Component({
   selector: "app-login",
   templateUrl: "./login.component.html",
@@ -28,6 +31,7 @@ export class LoginComponent implements OnInit {
 
   submitted: boolean;
   rememberMe: boolean;
+  public showPassword = false;
 
   loading = false;
   isHidden: boolean = true;
@@ -54,10 +58,15 @@ export class LoginComponent implements OnInit {
     private apiService: ApiService,
     private ngxService: NgxUiLoaderService,
     @Inject(DOCUMENT) private document: Document,
+    private appUpdateService: AppUpdateService,
   ) {
     if (sessionStorage.getItem("token") != undefined) {
       this.router.navigate(["/dashboard"]);
     }
+  }
+
+  public forceUpdate() {
+    this.appUpdateService.forceCacheUpdate();
   }
 
   ngOnInit() {
@@ -84,6 +93,25 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    if (window.location.protocol !== "https:" && !isLocal) {
+      Swal.fire({
+        title: "Conexión Insegura",
+        html: `El protocolo HTTP utilizado para suministrar sus credenciales es <b>inseguro</b>.<br>Por seguridad, por favor cámbiese al protocolo seguro HTTPS.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Redireccionar a HTTPS",
+        cancelButtonText: "Permanecer aquí",
+        confirmButtonColor: "#2dce89",
+        cancelButtonColor: "#f5365c",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = window.location.href.replace("http://", "https://");
+        }
+      });
+      return;
+    }
+
     this.ngxService.startLoader("loader-login");
 
     this.loginService.getLogin(this.usuario, this.clave).subscribe(

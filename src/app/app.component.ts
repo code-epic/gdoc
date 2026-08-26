@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
+import { AppUpdateService } from './services/util/app-update.service';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +11,7 @@ export class AppComponent implements OnInit {
   title = 'GDoc MPPD';
   updateAvailable = false;
 
-  constructor(private swUpdate: SwUpdate) { }
+  constructor(private swUpdate: SwUpdate, private appUpdateService: AppUpdateService) { }
 
   ngOnInit() {
     // Si las notificaciones de Service Worker están habilitadas

@@ -49,8 +49,13 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                 </div>
-                <input class="form-control" placeholder="Clave" type="password" name="clave" id="clave"
+                <input class="form-control" placeholder="Clave" [type]="showPassword ? 'text' : 'password'" name="clave" id="clave"
                   [(ngModel)]="clave" [ngModelOptions]="{standalone: true}" required>
+                <div class="input-group-append" style="cursor: pointer;" (click)="showPassword = !showPassword" title="Mostrar/ocultar clave">
+                  <span class="input-group-text">
+                    <i class="fa" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -72,6 +77,10 @@
             {{version}}
             <br>
             Versión: {{ fechaX  }}
+            <br>
+            <a href="javascript:void(0)" class="text-muted mt-2 d-inline-block" (click)="forceUpdate()" title="Limpiar caché y buscar actualizaciones" style="text-decoration: underline; font-size: 0.8rem;">
+              <i class="fas fa-sync-alt mr-1"></i>Limpiar Caché y Actualizar
+            </a>
           </small></p>
         </div>
         </div>

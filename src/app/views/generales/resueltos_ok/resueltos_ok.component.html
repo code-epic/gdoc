@@ -364,15 +364,6 @@
                       <i class="fas fa-eye" style="font-size: 1rem;"></i>
                     </button>
 
-                    <!-- Botón Resolución (ADMINISTRADOR) -->
-                    <button *ngIf="currentProfile === 'Edicion' && (jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')"
-                            class="btn btn-sm" 
-                            (click)="startImmersiveMode(doc, 'Edicion'); $event.stopPropagation()" 
-                            title="Resolución (ADMINISTRADOR)"
-                            style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e0f7fa; color: #006064; border: none; transition: transform 0.2s;"
-                            onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                      <i class="fas fa-user-shield" style="font-size: 1rem;"></i>
-                    </button>
                   </div>
                 </div>
               </div>
@@ -469,15 +460,6 @@
                   <i class="fas fa-eye" style="font-size: 1rem;"></i>
                 </button>
 
-                <!-- Botón Resolución (ADMINISTRADOR) -->
-                <button *ngIf="currentProfile === 'Edicion' && (jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')"
-                        class="btn btn-sm" 
-                        (click)="startImmersiveMode(doc, 'Edicion'); $event.stopPropagation()" 
-                        title="Resolución (ADMINISTRADOR)"
-                        style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e0f7fa; color: #006064; border: none; transition: transform 0.2s;"
-                        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                  <i class="fas fa-user-shield" style="font-size: 1rem;"></i>
-                </button>
               </div>
             </div>
           </ng-container>
