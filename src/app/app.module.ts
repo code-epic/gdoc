@@ -99,6 +99,7 @@ import { CodigosrojoComponent } from './views/resoluciones/codigosrojo/codigosro
 import { ErrorModalComponent } from './components/error-modal/error-modal.component';
 import { TinderPdfViewerComponent } from './components/tinder-pdf-viewer/tinder-pdf-viewer.component';
 import { ResueltoCanvasComponent } from './views/generales/resuelto_canvas/resuelto_canvas.component';
+import { RsindicadoresComponent } from './views/resoluciones/rsindicadores/rsindicadores.component';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -254,6 +255,7 @@ const ngWizardConfig: NgWizardConfig = {
     CodigosrojoComponent,
     ErrorModalComponent,
     TinderPdfViewerComponent,
+    RsindicadoresComponent,
   ],
   providers: [
     {

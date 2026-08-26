@@ -82,7 +82,7 @@
       </div>
     </div>
 
-    <div class="col-xl-3 col-lg-4 col-md-6 col-6 mb-4 sub-anim-item">
+    <div class="col-xl-3 col-lg-4 col-md-6 col-6 mb-4 sub-anim-item" *ngIf="isStatsAllowed()">
 
       <a routerLinkActive="active" [routerLink]="['/resueltos_ok']" id="resueltos_ok"
         class="text-decoration-none">
@@ -104,17 +104,14 @@
       </a>
     </div>
 
-    <!-- <div class="col-xl-3 col-lg-4 col-md-6 col-6 mb-4 sub-anim-item">
-
-      <a routerLinkActive="active" [routerLink]="['/directorio']" id="directorio"
-        class="text-decoration-none">
+    <div class="col-xl-3 col-lg-4 col-md-6 col-6 mb-4 sub-anim-item" *ngIf="isStatsAllowed()">
+      <a routerLinkActive="active" [routerLink]="['/rsindicadores']" id="rsindicadores" class="text-decoration-none">
         <div class="menu-card h-100">
-
           <div class="card-body text-center p-4 d-flex flex-column align-items-center justify-content-center">
             <div class="icon-container">
-              <i class="ni ni-collection fa-2x"></i>
+              <i class="ni ni-chart-bar-32 fa-2x"></i>
             </div>
-            <h5 class="text-uppercase font-weight-bold mb-3 text-title">Directorio</h5>
+            <h5 class="text-uppercase font-weight-bold mb-3 text-title">Estadísticas</h5>
             <div class="mt-auto">
               <span class="badge badge-pill badge-secondary text-muted px-3 py-2"
                 style="background-color: #f8f9fe; border: 1px solid #f0f2f5;">
@@ -124,7 +121,7 @@
           </div>
         </div>
       </a>
-    </div> -->
+    </div>
 
   </div>
 </div>

@@ -61,6 +61,7 @@ export class AuthGuardGuard implements CanActivate {
         "/resueltos_tinder",
         "/resueltos_ios",
         "/resueltos_ok",
+        "/rsindicadores",
         "/mreportes",
         "/pendientes",
         "/configuracion",

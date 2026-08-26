@@ -65,6 +65,7 @@ import { ChatbotComponent } from "src/app/views/chatbot/chatbot.component";
 import { SnuevoComponent } from "src/app/views/secretaria/snuevo/snuevo.component";
 import { CodigosrojoComponent } from "src/app/views/resoluciones/codigosrojo/codigosrojo.component";
 import { ErrorComponent } from "src/app/pages/error/error.component";
+import { RsindicadoresComponent } from "src/app/views/resoluciones/rsindicadores/rsindicadores.component";
 
 export const AdminLayoutRoutes: Routes = [
   {
@@ -94,6 +95,11 @@ export const AdminLayoutRoutes: Routes = [
   {
     path: "notaentrega",
     component: ListadosComponent,
+    canActivate: [AuthGuardGuard],
+  },
+  {
+    path: "rsindicadores",
+    component: RsindicadoresComponent,
     canActivate: [AuthGuardGuard],
   },
   {

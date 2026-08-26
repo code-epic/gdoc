@@ -219,14 +219,14 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   /* ── Lifecycle ───────────────────────────────────────── */
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(
-      "[TinderPdfViewer] ngOnChanges",
-      Object.keys(changes),
-      "docs",
-      this.documents.length,
-      "startIndex",
-      this.startIndex,
-    );
+    // console.log(
+    //   "[TinderPdfViewer] ngOnChanges",
+    //   Object.keys(changes),
+    //   "docs",
+    //   this.documents.length,
+    //   "startIndex",
+    //   this.startIndex,
+    // );
     if (changes.documents || changes.startIndex) {
       if (changes.documents && this.documents) {
         this.extractUniqueCarpetas();
@@ -408,7 +408,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     const isAdmin = this.jwtData?.userCargo?.toUpperCase() === "ADMINISTRADOR";
     const rawDateStr = isAdmin
-      ? (this.activeDoc.documentos?.[0]?.fecha_resolucion || this.activeDoc.fecha_resolucion)
+      ? this.activeDoc.documentos?.[0]?.fecha_resolucion ||
+        this.activeDoc.fecha_resolucion
       : this.activeDoc.fecha_resolucion;
     let formattedDate = "";
     if (rawDateStr && rawDateStr.includes("-")) {
@@ -750,9 +751,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         .replace(/\s+/g, "");
     }
     if (this.activeDoc?.documentos?.[0]?.fecha_resolucion) {
-      this.activeDoc.documentos[0].fecha_resolucion = this.activeDoc.documentos[0].fecha_resolucion
-        .toString()
-        .replace(/\s+/g, "");
+      this.activeDoc.documentos[0].fecha_resolucion =
+        this.activeDoc.documentos[0].fecha_resolucion
+          .toString()
+          .replace(/\s+/g, "");
     }
 
     // Asignar un nuevo objeto para forzar la detección de cambios en Angular (@Input)
