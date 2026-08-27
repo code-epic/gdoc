@@ -1297,7 +1297,6 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         fecha_resolucion: this.activeDoc.fecha_resolucion,
         responsable: this.jwtData.userName,
         observacion: this.observations.trim(),
-        // transcriptor: this.activeDoc.transcriptor,
         fecha: new Date(),
       };
 
@@ -1313,7 +1312,31 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       await this.apiService.ExecColeccion(cl).subscribe(
         (response) => {
           console.log("Se registro el rechazo a: " + this.activeDoc.ncontrol);
-          console.log(response);
+
+          let registro_rechazo_db = {
+            rusuario: this.jwtData?.userId,
+            rnumero_carpeta: this.activeDoc.numero_carpeta,
+            rresponsable: this.jwtData.userName,
+            robservaciones: this.observations.trim(),
+            restatus: 0,
+          };
+
+          let RegistrarAPI = {} as IAPICore;
+          RegistrarAPI = {
+            funcion: environment.funcion.INSERTAR_RECHAZOS_RESOLUCIONES,
+            valores: JSON.stringify(registro_rechazo_db),
+          };
+          console.log(RegistrarAPI);
+          this.apiService.Ejecutar(RegistrarAPI).subscribe(
+            (response) => {
+              console.log(
+                "Se registro el rechazo a: " + this.activeDoc.ncontrol,
+              );
+            },
+            (error) => {
+              console.error(error);
+            },
+          );
         },
         (error) => {
           console.error(error);

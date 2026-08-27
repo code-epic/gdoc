@@ -276,12 +276,13 @@
               <div class="rt-folder-group-content" *ngIf="isDocGroupExpanded(group.name)" style="display: flex; flex-direction: column; gap: 0.4rem; padding-left: 0.5rem; margin-bottom: 0.5rem;">
                 <div class="doc-item-row animate-fade-in" 
                      *ngFor="let doc of group.docs"
-                     [style.background-color]="doc.selected ? 'rgba(45, 206, 137, 0.03)' : ''"
-                     [style.border-color]="doc.selected ? '#2dce89' : '#edf2f7'"
-                     [style.border-left]="doc.selected ? '4px solid #2dce89' : (doc.priority === 'Urgente' ? '4px solid #f5365c' : (doc.priority === 'Prioritario' ? '4px solid #fb6340' : '4px solid #e9ecef'))"
+                     [style.background]="doc.selected ? 'rgba(45, 206, 137, 0.05)' : (doc.rechazos_observacion ? 'linear-gradient(to right, rgba(245, 54, 92, 0.06), #ffffff 40%)' : '#ffffff')"
+                     [style.border-color]="doc.selected ? '#2dce89' : (doc.rechazos_observacion ? '#ffccd5' : '#edf2f7')"
+                     [style.border-left]="doc.selected ? '4px solid #2dce89' : (doc.rechazos_observacion ? '4px solid #f5365c' : (doc.priority === 'Urgente' ? '4px solid #f5365c' : (doc.priority === 'Prioritario' ? '4px solid #fb6340' : '4px solid #e9ecef')))"
                      (click)="(currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion' || currentProfile === 'Revision') ? (doc.selected = !doc.selected) : null"
                      (contextmenu)="onDocumentRightClick($event, doc, doc.index)"
-                     style="cursor: pointer; transition: all 0.2s; padding: 12px 15px; margin-bottom: 10px; background: white; border-top: 1px solid; border-right: 1px solid; border-bottom: 1px solid; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.01); display: flex; align-items: center;">
+                     [style.box-shadow]="doc.rechazos_observacion ? '0 4px 12px rgba(245, 54, 92, 0.05)' : '0 1px 3px rgba(0,0,0,0.01)'"
+                     style="cursor: pointer; transition: all 0.3s ease; padding: 12px 15px; margin-bottom: 10px; border-top: 1px solid; border-right: 1px solid; border-bottom: 1px solid; border-radius: 8px; display: flex; align-items: center;">
                   
                   <div class="checkbox-col" *ngIf="!showingFirmados && (currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion' || currentProfile === 'Revision')" style="padding-right: 15px; display: flex; align-items: center;">
                     <div style="width: 24px; height: 24px; border-radius: 6px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
@@ -331,6 +332,11 @@
                         <i class="fas fa-comment-dots text-info"></i> <span>{{ doc.pub_observacion }}</span>
                       </div>
                     </div>
+                    
+                    <!-- Observacion de Rechazo -->
+                    <div *ngIf="doc.rechazos_observacion && doc.rechazos_observacion.trim() !== ''" style="margin-top: 8px; margin-bottom: 2px;">
+                      <span style="font-size: 0.8rem; font-style: italic; color: #f5365c; line-height: 1.4; white-space: pre-wrap; display: block;">{{ doc.rechazos_observacion }}</span>
+                    </div>
                   </div>
                   
                   <div class="actions" style="display: flex; gap: 8px; align-items: center;" (click)="$event.stopPropagation()">
@@ -372,12 +378,13 @@
             <!-- Carpetas Directas (Sin Etiqueta) -->
             <div class="doc-item-row animate-fade-in" 
                  *ngFor="let doc of flatDocuments"
-                 [style.background-color]="doc.selected ? 'rgba(45, 206, 137, 0.03)' : ''"
-                 [style.border-color]="doc.selected ? '#2dce89' : '#edf2f7'"
-                 [style.border-left]="doc.selected ? '4px solid #2dce89' : (doc.priority === 'Urgente' ? '4px solid #f5365c' : (doc.priority === 'Prioritario' ? '4px solid #fb6340' : '4px solid #e9ecef'))"
+                 [style.background]="doc.selected ? 'rgba(45, 206, 137, 0.05)' : (doc.rechazos_observacion ? 'linear-gradient(to right, rgba(245, 54, 92, 0.06), #ffffff 40%)' : '#ffffff')"
+                 [style.border-color]="doc.selected ? '#2dce89' : (doc.rechazos_observacion ? '#ffccd5' : '#edf2f7')"
+                 [style.border-left]="doc.selected ? '4px solid #2dce89' : (doc.rechazos_observacion ? '4px solid #f5365c' : (doc.priority === 'Urgente' ? '4px solid #f5365c' : (doc.priority === 'Prioritario' ? '4px solid #fb6340' : '4px solid #e9ecef')))"
                  (click)="doc.selected = !doc.selected"
                  (contextmenu)="onDocumentRightClick($event, doc, doc.index)"
-                 style="cursor: pointer; transition: all 0.2s; padding: 12px 15px; margin-bottom: 10px; background: white; border-top: 1px solid; border-right: 1px solid; border-bottom: 1px solid; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.01); display: flex; align-items: center;">
+                 [style.box-shadow]="doc.rechazos_observacion ? '0 4px 12px rgba(245, 54, 92, 0.05)' : '0 1px 3px rgba(0,0,0,0.01)'"
+                 style="cursor: pointer; transition: all 0.3s ease; padding: 12px 15px; margin-bottom: 10px; border-top: 1px solid; border-right: 1px solid; border-bottom: 1px solid; border-radius: 8px; display: flex; align-items: center;">
               
               <div class="checkbox-col" *ngIf="!showingFirmados" style="padding-right: 15px; display: flex; align-items: center;">
                 <div style="width: 24px; height: 24px; border-radius: 6px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
@@ -427,6 +434,11 @@
                     <i class="fas fa-comment-dots text-info"></i> <span>{{ doc.pub_observacion }}</span>
                   </div>
                 </div>
+                
+                <!-- Observacion de Rechazo -->
+                <div *ngIf="doc.rechazos_observacion && doc.rechazos_observacion.trim() !== ''" style="margin-top: 8px; margin-bottom: 2px;">
+                  <span style="font-size: 0.8rem; font-style: italic; color: #f5365c; line-height: 1.4; white-space: pre-wrap; display: block;">{{ doc.rechazos_observacion }}</span>
+                </div>
               </div>
               
               <div class="actions" style="display: flex; gap: 8px; align-items: center;" (click)="$event.stopPropagation()">
@@ -468,11 +480,13 @@
           <ng-container *ngIf="currentProfile !== 'Jefe' && currentProfile !== 'Secretaria' && currentProfile !== 'Direccion' && currentProfile !== 'Aprobador' && currentProfile !== 'Revision'">
             <div class="doc-item-row animate-fade-in" 
                  *ngFor="let doc of filteredDocumentsList; let idx = index"
-                 [style.background-color]="doc.selected ? 'rgba(45, 206, 137, 0.05)' : ''"
-                 [style.border-left]="doc.selected ? '4px solid #2dce89' : '4px solid transparent'"
+                 [style.background]="doc.selected ? 'rgba(45, 206, 137, 0.05)' : (doc.rechazos_observacion ? 'linear-gradient(to right, rgba(245, 54, 92, 0.06), #ffffff 40%)' : '#ffffff')"
+                 [style.border]="doc.rechazos_observacion ? '1px solid #ffccd5' : '1px solid transparent'"
+                 [style.border-left]="doc.selected ? '4px solid #2dce89' : (doc.rechazos_observacion ? '4px solid #f5365c' : '4px solid transparent')"
                  (click)="currentProfile !== 'Edicion' ? (doc.selected = !doc.selected) : null"
                  (contextmenu)="onDocumentRightClick($event, doc, idx)"
-                 style="cursor: pointer; transition: all 0.2s; padding: 12px 15px; margin-bottom: 10px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center;">
+                 [style.box-shadow]="doc.rechazos_observacion ? '0 4px 12px rgba(245, 54, 92, 0.05)' : '0 2px 4px rgba(0,0,0,0.02)'"
+                 style="cursor: pointer; transition: all 0.3s ease; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center;">
               
               <div class="checkbox-col" *ngIf="currentProfile !== 'Edicion' && !showingFirmados" style="padding-right: 15px; display: flex; align-items: center;">
                 <div style="width: 24px; height: 24px; border-radius: 6px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
@@ -519,6 +533,11 @@
                   <div style="font-size: 0.75rem; color: #8898aa; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px;" [title]="doc.pub_observacion">
                     <i class="fas fa-comment-dots text-info"></i> <span>{{ doc.pub_observacion }}</span>
                   </div>
+                </div>
+
+                <!-- Observacion de Rechazo -->
+                <div *ngIf="doc.rechazos_observacion && doc.rechazos_observacion.trim() !== ''" style="margin-top: 8px; margin-bottom: 2px;">
+                  <span style="font-size: 0.8rem; font-style: italic; color: #f5365c; line-height: 1.4; white-space: pre-wrap; display: block;">{{ doc.rechazos_observacion }}</span>
                 </div>
               </div>
               

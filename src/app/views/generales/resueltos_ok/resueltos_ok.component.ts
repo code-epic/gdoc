@@ -778,6 +778,10 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               grupo.gaceta = d.gaceta;
               grupo.sobre = d.sobre;
               grupo.no_publicar = d.no_publicar;
+              
+              // Mapear observación de rechazo (soportando ambos nombres de columna) e ignorar 'null'
+              const rechazoText = d.rechazos_observacion || d.robservaciones || null;
+              grupo.rechazos_observacion = (rechazoText && rechazoText !== 'null') ? rechazoText : null;
             }
           });
 
