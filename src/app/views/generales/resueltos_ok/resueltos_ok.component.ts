@@ -28,9 +28,26 @@ import { LectorService } from "src/app/services/resoluciones/lector.service";
   styleUrls: ["./resueltos_ok.component.scss"],
 })
 export class ResueltosOkComponent implements OnInit, OnDestroy {
+  detalleCarpeta: any;
   @HostListener("window:keydown", ["$event"])
   onWindowKeyDown(event: KeyboardEvent) {
+    // Cerrar buscador avanzado con tecla Escape
+    if (event.key === "Escape" || event.code === "Escape") {
+      if (this.showAdvancedSearchModal) {
+        this.closeAdvancedSearch();
+      }
+    }
+
     const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+
+    // Abrir buscador avanzado con Ctrl + B (o Cmd + B)
+    if (isCtrlOrCmd && (event.key === "b" || event.key === "B")) {
+      event.preventDefault(); // Evita comportamiento por defecto del navegador (marcadores)
+      if (!this.showAdvancedSearchModal) {
+        this.openAdvancedSearch();
+      }
+    }
+
     if (
       isCtrlOrCmd &&
       (event.key === "-" ||
@@ -1807,19 +1824,19 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     const predefinedTags = [
       "EJERCITO BOLIVARIANO",
       "ARMADA BOLIVARIANA",
-      "AVIACIÓN MILITAR BOLIVARIANA",
+      "AVIACION MILITAR BOLIVARIANA",
       "GUARDIA NACIONAL BOLIVARIANA",
       "MILICIA BOLIVARIANA",
-      "COMANDO ESTRATÉGICO OPERACIONAL",
+      "COMANDO ESTRATEGICO OPERACIONAL",
       "COMANDO DE DEFENSA AEROESPACIAL INTEGRAL",
-      "VICEMINISTERIO DE EDUCACIÓN",
+      "VICEMINISTERIO DE EDUCACION",
       "UNIVERSIDAD MILITAR BOLIVARIANA",
-      "VICEMINISTERIO DE PLANIFICACIÓN",
+      "VICEMINISTERIO DE PLANIFICACION",
       "VICEMINISTERIO DE SERVICIOS",
       "GUARDIA DE HONOR PRESIDENCIAL",
       "EMPRESAS Y SERVICIOS",
-      "CONTRALORÍA GENERAL",
-      "INSPECTORÍA GENERAL",
+      "CONTRALORIA GENERAL",
+      "INSPECTORIA GENERAL",
       "SISTEMA DE JUSTICIA MILITAR",
       "DIRECCIONES GENERALES DEL MPPD",
     ];
@@ -2408,6 +2425,152 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     //     }
     //   );
     // }
+  }
+
+  // --- BÚSQUEDA AVANZADA GLOBAL ---
+  public showAdvancedSearchModal: boolean = false;
+  public advancedSearchQuery: string = "";
+  public advancedSearchResults: any[] = [];
+  public isSearchingAdvanced: boolean = false;
+  public advancedSearchStatus: string = "idle"; // 'idle', 'searching', 'success', 'error', 'empty'
+
+  public openAdvancedSearch() {
+    this.showAdvancedSearchModal = true;
+    this.advancedSearchQuery = "";
+    this.advancedSearchResults = [];
+    this.advancedSearchStatus = "idle";
+
+    setTimeout(() => {
+      const input = document.getElementById("advancedSearchInput");
+      if (input) input.focus();
+    }, 100);
+  }
+
+  public closeAdvancedSearch() {
+    this.showAdvancedSearchModal = false;
+  }
+
+  public performAdvancedSearch() {
+    if (!this.advancedSearchQuery || this.advancedSearchQuery.trim().length < 3)
+      return;
+
+    this.isSearchingAdvanced = true;
+    this.advancedSearchStatus = "searching";
+    this.advancedSearchResults = [];
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = environment.funcion.CONSULTAR_DOCUMENTOS_LIBRES;
+    this.xAPI.parametros = this.advancedSearchQuery.trim();
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (res: any) => {
+        this.isSearchingAdvanced = false;
+        if (res && Array.isArray(res) && res.length > 0) {
+          this.advancedSearchStatus = "success";
+          // Mapear la estructura JSON proveída (con 'task' y 'documentos_originales') a la interfaz
+          this.advancedSearchResults = res.map((doc: any) => {
+            const task = doc.task || {};
+            const docOriginales = task.documentos_originales || [];
+            const primerDoc = docOriginales.length > 0 ? docOriginales[0] : {};
+
+            // Extraer fecha formateada
+            let fechaFormat = "N/A";
+            if (doc.fecha) {
+              try {
+                fechaFormat = new Date(doc.fecha).toLocaleDateString();
+              } catch (e) {}
+            } else if (task.fecha_resolucion) {
+              fechaFormat = task.fecha_resolucion;
+            }
+
+            return {
+              numero_carpeta: doc.numero_carpeta || "S/N",
+              asunto: task.asunto || primerDoc.asunto || "Sin Asunto",
+              fecha_resolucion: fechaFormat,
+              buzon: doc.buzon || "Bandeja General",
+              observacion: task.observacion || task.pub_observacion || "",
+              rechazo:
+                primerDoc.observacion && primerDoc.observacion !== "null"
+                  ? primerDoc.observacion
+                  : "",
+              usuario:
+                primerDoc.responsable ||
+                primerDoc.creador ||
+                primerDoc.registrado ||
+                "Desconocido",
+              fecha_registro:
+                primerDoc.fecha_registro || primerDoc.fecha_entrada || "N/A",
+              comentarios_count: Array.isArray(task.comentarios)
+                ? task.comentarios.length
+                : 0,
+              expanded: false,
+              loadingDetails: false,
+            };
+          });
+        } else {
+          this.advancedSearchStatus = "empty";
+          this.advancedSearchResults = [];
+        }
+      },
+      (error) => {
+        this.isSearchingAdvanced = false;
+        this.advancedSearchStatus = "error";
+        this.toastrService.error("Error al buscar documentos.");
+      },
+    );
+  }
+
+  public toggleDetails(res: any) {
+    res.expanded = !res.expanded;
+    if (res.expanded && !res.detailsLoaded) {
+      res.loadingDetails = true;
+      let xAPI = {} as IAPICore;
+      xAPI.funcion = environment.funcion.CONSULTAR_CARPETA_RESOLUCIONES;
+      xAPI.parametros = res.numero_carpeta;
+      
+      this.apiService.Ejecutar(xAPI).subscribe(
+        (data: any) => {
+          res.loadingDetails = false;
+          res.detailsLoaded = true;
+          
+          if (data && data.Cuerpo && data.Cuerpo.length > 0) {
+            const detalle = data.Cuerpo[0];
+            res.estadoCarpeta = this.mapEstatus(detalle.estatus);
+            res.tipoDocumento = this.mapTipo(detalle.cod_tipo_entrada);
+            res.fecha_entrada = detalle.fecha_entrada;
+            res.cuenta_oficio = detalle.cuenta_oficio;
+            res.numero_resol = detalle.numero_resol;
+          }
+        },
+        (error) => {
+          res.loadingDetails = false;
+          res.detailsLoaded = true;
+        }
+      );
+    }
+  }
+
+  private mapEstatus(estatus: string | number): string {
+    const e = parseInt(estatus as string, 10);
+    switch (e) {
+      case 36: return "REDACTAR - EDICION";
+      case 776: return "FIRMADO";
+      case 880: return "MINISTRO APROBADOR";
+      case 930: return "SECRETARIA (JEFE)";
+      case 990: return "RESOLUCION (REVISION)";
+      case 991: return "RESOLUCION (JEFE)";
+      default: return "ESTATUS (" + e + ")";
+    }
+  }
+
+  private mapTipo(tipo: string | number): string {
+    const t = parseInt(tipo as string, 10);
+    switch (t) {
+      case 85: return "NOMBRAMIENTO";
+      case 86: return "NORMAS";
+      case 87: return "PENSION DE GRACIA";
+      default: return "OTRO (" + t + ")";
+    }
   }
 
   //Mostrar los PDF cuando ya estan publicados

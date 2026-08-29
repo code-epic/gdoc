@@ -42,8 +42,14 @@
         </select>
       </div>
 
-      <button class="btn-close-view" (click)="exitComponent()" title="Salir del Buzón de Resueltos">
-        <i class="fas fa-times-circle"></i><span class="btn-text-close"> Cerrar</span>
+      <!-- Botón de Búsqueda Avanzada -->
+      <button class="rt-icon-btn rt-search-btn" (click)="openAdvancedSearch()" title="Búsqueda Avanzada Global">
+        <i class="fas fa-search"></i>
+      </button>
+
+      <!-- Botón Circular de Cerrar -->
+      <button class="rt-icon-btn rt-close-btn" (click)="exitComponent()" title="Salir del Buzón de Resueltos">
+        <i class="fas fa-times"></i>
       </button>
     </div>
   </div>
@@ -920,3 +926,130 @@
   (sendToDirection)="onTinderDocumentRouted($event, 'Revisión (Dirección)')"
   (sendToMinister)="onTinderDocumentRouted($event, 'Aprobador (Ministro)')">
 </app-tinder-pdf-viewer>
+
+<!-- ========================================== -->
+<!-- MODAL DE BÚSQUEDA AVANZADA (GLASSMORPHISM) -->
+<!-- ========================================== -->
+<div *ngIf="showAdvancedSearchModal" class="adv-search-backdrop animate-fade-in">
+  <div class="adv-search-modal-container slide-in-top">
+    <!-- Header del Modal -->
+    <div class="adv-search-header">
+      <div class="search-title">
+        <i class="fas fa-search-plus text-primary"></i>
+        <span>Búsqueda Avanzada</span>
+      </div>
+      <button class="btn-close-modal" (click)="closeAdvancedSearch()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="adv-search-body">
+      <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon-left"></i>
+        <input type="text" id="advancedSearchInput" class="adv-search-input" 
+               placeholder="Buscar por N° Carpeta, Cédula, Asunto o Etiqueta..." 
+               [(ngModel)]="advancedSearchQuery" 
+               (keyup.enter)="performAdvancedSearch()"
+               autocomplete="off">
+        <button class="btn-search-action" (click)="performAdvancedSearch()" [disabled]="isSearchingAdvanced">
+          <span *ngIf="!isSearchingAdvanced">Buscar</span>
+          <i *ngIf="isSearchingAdvanced" class="fas fa-spinner fa-spin"></i>
+        </button>
+      </div>
+
+      <!-- Resultados de Búsqueda -->
+      <div class="adv-search-results-area">
+        
+        <!-- Estado: Inicial -->
+        <div class="search-state-empty" *ngIf="advancedSearchStatus === 'idle'">
+          <i class="fas fa-folder-open text-muted" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+          <p>Ingrese un término para buscar de forma global en todos los buzones del sistema.</p>
+        </div>
+
+        <!-- Estado: Buscando -->
+        <div class="search-state-loading" *ngIf="advancedSearchStatus === 'searching'">
+          <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="sr-only">Buscando...</span>
+          </div>
+          <p class="mt-3 text-muted">Buscando coincidencias globales...</p>
+        </div>
+
+        <!-- Estado: Sin Resultados -->
+        <div class="search-state-empty" *ngIf="advancedSearchStatus === 'empty'">
+          <i class="fas fa-search-minus text-warning" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.7;"></i>
+          <p>No se encontraron casos para "<strong>{{advancedSearchQuery}}</strong>".</p>
+        </div>
+
+        <!-- Estado: Con Resultados -->
+        <div class="search-results-list" *ngIf="advancedSearchStatus === 'success'">
+          <div class="result-stats">
+            <span class="badge badge-success" style="font-size: 0.8rem;">{{ advancedSearchResults.length }}</span> resultados encontrados
+          </div>
+          
+          <div class="result-card animate-fade-in" *ngFor="let res of advancedSearchResults">
+            <div class="result-card-left">
+              <div class="result-number">Carpeta N° {{ res.numero_carpeta }}</div>
+              <div class="result-subject">{{ res.asunto }}</div>
+              <div class="result-meta">
+                <span><i class="fas fa-calendar-alt"></i> {{ res.fecha_resolucion }}</span>
+                
+              </div>
+              <div *ngIf="res.observacion" class="result-obs">
+                <i class="fas fa-info-circle"></i> {{ res.observacion }}
+              </div>
+            </div>
+            <div class="result-card-right">
+              <button class="btn-toggle-details" (click)="toggleDetails(res)" title="Ver Detalles">
+                <i class="fas" [class.fa-plus]="!res.expanded" [class.fa-minus]="res.expanded"></i>
+              </button>
+            </div>
+            
+            <!-- Detalles Extendidos -->
+            <div class="result-details-expand" [class.show]="res.expanded">
+              <div>
+                <div class="details-loading" *ngIf="res.loadingDetails">
+                  <i class="fas fa-circle-notch fa-spin"></i> Consultando trazabilidad y detalles...
+                </div>
+                <div class="details-content" *ngIf="!res.loadingDetails && res.detailsLoaded">
+                  <!-- Data from Root Object -->
+                  <div class="detail-item" *ngIf="res.rechazo">
+                    <span class="detail-label"><i class="fas fa-exclamation-triangle text-danger"></i> Rechazo/Observación:</span>
+                    <span class="detail-value text-danger">{{ res.rechazo }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-comments text-success"></i> Comentarios:</span>
+                    <span class="detail-value">{{ res.comentarios_count }} registrados</span>
+                  </div>
+                  
+                  <!-- Data from Tracking API -->
+                  <div class="detail-item" *ngIf="res.estadoCarpeta">
+                    <span class="detail-label"><i class="fas fa-info-circle text-info"></i> Estado actual:</span>
+                    <span class="detail-value font-weight-bold">{{ res.estadoCarpeta }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="res.tipoDocumento">
+                    <span class="detail-label"><i class="fas fa-file-alt text-primary"></i> Tipo Documento:</span>
+                    <span class="detail-value">{{ res.tipoDocumento }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="res.fecha_entrada">
+                    <span class="detail-label"><i class="fas fa-calendar-check text-success"></i> Fecha Entrada:</span>
+                    <span class="detail-value">{{ res.fecha_entrada }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="res.cuenta_oficio">
+                    <span class="detail-label"><i class="fas fa-hashtag text-warning"></i> Cuenta/Oficio:</span>
+                    <span class="detail-value">{{ res.cuenta_oficio }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="res.numero_resol">
+                    <span class="detail-label"><i class="fas fa-certificate text-danger"></i> N° Resolución:</span>
+                    <span class="detail-value">{{ res.numero_resol }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
