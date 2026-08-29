@@ -778,10 +778,21 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               grupo.gaceta = d.gaceta;
               grupo.sobre = d.sobre;
               grupo.no_publicar = d.no_publicar;
-              
+
               // Mapear observación de rechazo (soportando ambos nombres de columna) e ignorar 'null'
-              const rechazoText = d.rechazos_observacion || d.robservaciones || null;
-              grupo.rechazos_observacion = (rechazoText && rechazoText !== 'null') ? rechazoText : null;
+              let rechazoText =
+                d.rechazos_observacion || d.robservaciones || null;
+
+              // Si el perfil es Aprobador, el rechazo SOLO se debe ver si el usuario es 'admin'
+              if (
+                this.currentProfile === "Aprobador" &&
+                d.usuario !== "admin"
+              ) {
+                rechazoText = null;
+              }
+
+              grupo.rechazos_observacion =
+                rechazoText && rechazoText !== "null" ? rechazoText : null;
             }
           });
 
@@ -1792,9 +1803,35 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     if (selected.length === 0) return;
 
     const options: { [key: string]: string } = {};
+
+    const predefinedTags = [
+      "EJERCITO BOLIVARIANO",
+      "ARMADA BOLIVARIANA",
+      "AVIACIÓN MILITAR BOLIVARIANA",
+      "GUARDIA NACIONAL BOLIVARIANA",
+      "MILICIA BOLIVARIANA",
+      "COMANDO ESTRATÉGICO OPERACIONAL",
+      "COMANDO DE DEFENSA AEROESPACIAL INTEGRAL",
+      "VICEMINISTERIO DE EDUCACIÓN",
+      "UNIVERSIDAD MILITAR BOLIVARIANA",
+      "VICEMINISTERIO DE PLANIFICACIÓN",
+      "VICEMINISTERIO DE SERVICIOS",
+      "GUARDIA DE HONOR PRESIDENCIAL",
+      "EMPRESAS Y SERVICIOS",
+      "CONTRALORÍA GENERAL",
+      "INSPECTORÍA GENERAL",
+      "SISTEMA DE JUSTICIA MILITAR",
+      "DIRECCIONES GENERALES DEL MPPD",
+    ];
+
+    predefinedTags.forEach((t) => {
+      options[t] = t;
+    });
+
     this.existingTags.forEach((t) => {
       options[t] = t;
     });
+
     options["__NEW__"] = "+ Crear Nueva Etiqueta...";
 
     Swal.fire({
