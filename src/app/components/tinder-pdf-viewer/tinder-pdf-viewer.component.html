@@ -182,10 +182,17 @@
 
         <!-- ═══ Tab: Explorador (Casos) ═══ -->
         <div class="tpv-tab-content tpv-explorador-tab" *ngIf="activeTab === 'explorador'">
-          <!-- Si hay múltiples documentos agrupados -->
-          <ng-container *ngIf="activeDoc.documentos && activeDoc.documentos.length > 0">
-            <div class="explorador-list">
-              <div class="explorador-item clickable" *ngFor="let caso of activeDoc.documentos"
+          <!-- Estado de Análisis Streaming -->
+          <div *ngIf="analyzingDocument" class="tpv-analyzing-spinner">
+            <i class="fas fa-satellite-dish fa-spin" style="margin-right: 8px;"></i> Escaneando contenido y validando casos...
+          </div>
+
+          <!-- Si hay casos (agrupados o nuevos extraídos) -->
+          <ng-container *ngIf="!analyzingDocument && (validCases.length > 0 || eliminadoCases.length > 0)">
+            <div class="explorador-list" *ngIf="validCases.length > 0">
+              <div class="explorador-item clickable" 
+                   *ngFor="let caso of validCases"
+                   [ngClass]="'estado-' + (caso.estadoSincronizacion || 'default')"
                    (click)="obtenerWFD(caso)">
                 <div class="ei-avatar d-flex align-items-center justify-content-center" style="position: relative; overflow: hidden; border-radius: 50%; cursor: zoom-in;" (click)="verFotoAmpliada(caso.cedula || ''); $event.stopPropagation()">
                   <img [src]="fotosCasos[caso.cedula || '']" 
@@ -196,11 +203,23 @@
                 </div>
                 <div class="ei-content">
                   <div class="ei-name">{{ (caso.nombres_apellidos || caso.nombres + ' ' + caso.apellidos) | uppercase }}</div>
-                  <div class="ei-details">C.I: {{ caso.cedula }}</div>
-                  <div class="ei-details" style="font-size: 0.75rem;">{{ caso.grado || 'S/G' }} - {{ caso.componente || 'S/C' }}</div>
-                  <!-- <div class="ei-details" *ngIf="caso.digital || caso.anom" style="font-size: 0.75rem; color: #80cbc4;">
-                    <i class="fas fa-file-pdf"></i> {{  caso.anom }}
-                  </div> -->
+                  <div class="ei-details">
+                    C.I: {{ caso.cedula }} <span style="margin: 0 4px; opacity: 0.5;">|</span> <span style="color: rgba(255,255,255,0.85);">{{ caso.grado || 'S/G' }}</span>
+                  </div>
+                  <div class="ei-details" style="font-size: 0.75rem;" *ngIf="caso.cargo && caso.cargo !== caso.grado">
+                    {{ caso.cargo }}
+                  </div>
+                  <div class="ei-details" style="font-size: 0.75rem; opacity: 0.6;" *ngIf="caso.componente && caso.componente !== 'S/C'">
+                    {{ caso.componente }}
+                  </div>
+                  
+                  <div class="ei-sync-status mt-1" *ngIf="caso.estadoSincronizacion">
+                    <span class="status-indicator" 
+                          [ngClass]="'status-' + caso.estadoSincronizacion.replace(' ', '-')">
+                      <span class="dot"></span>
+                      {{ caso.estadoSincronizacion | uppercase }}
+                    </span>
+                  </div>
                 </div>
                 <div class="ei-actions" *ngIf="caso.digital || caso.anom">
                   <button type="button" class="ei-view-details-btn" title="Ver Detalles y PDF">
@@ -209,10 +228,53 @@
                 </div>
               </div>
             </div>
+
+            <!-- Carpeta de Eliminados -->
+            <div class="tpv-eliminados-folder" *ngIf="eliminadoCases.length > 0">
+              <div class="folder-header" (click)="showEliminados = !showEliminados">
+                <i class="fas" [ngClass]="showEliminados ? 'fa-folder-open text-warning' : 'fa-folder text-warning'"></i>
+                <span>Casos Eliminados ({{ eliminadoCases.length }})</span>
+                <i class="fas" [ngClass]="showEliminados ? 'fa-chevron-up' : 'fa-chevron-down'" style="margin-left: auto; font-size: 0.8rem;"></i>
+              </div>
+              <div class="folder-content" *ngIf="showEliminados">
+                <div class="explorador-list">
+                  <div class="explorador-item clickable estado-eliminado" 
+                       *ngFor="let caso of eliminadoCases"
+                       (click)="obtenerWFD(caso)">
+                    <div class="ei-avatar d-flex align-items-center justify-content-center" style="position: relative; overflow: hidden; border-radius: 50%; cursor: zoom-in;" (click)="verFotoAmpliada(caso.cedula || ''); $event.stopPropagation()">
+                      <img [src]="fotosCasos[caso.cedula || '']" 
+                           *ngIf="!loadingFotos[caso.cedula || ''] && fotosCasos[caso.cedula || '']" 
+                           style="width: 100%; height: 100%; object-fit: cover;" alt="avatar">
+                      <i class="fas fa-spinner fa-spin text-info" *ngIf="loadingFotos[caso.cedula || '']"></i>
+                      <i class="fas fa-user" *ngIf="!loadingFotos[caso.cedula || ''] && !fotosCasos[caso.cedula || '']"></i>
+                    </div>
+                    <div class="ei-content">
+                      <div class="ei-name">{{ (caso.nombres_apellidos || caso.nombres + ' ' + caso.apellidos) | uppercase }}</div>
+                      <div class="ei-details">
+                        C.I: {{ caso.cedula }} <span style="margin: 0 4px; opacity: 0.5;">|</span> <span style="color: rgba(255,255,255,0.85);">{{ caso.grado || 'S/G' }}</span>
+                      </div>
+                      <div class="ei-details" style="font-size: 0.75rem;" *ngIf="caso.cargo && caso.cargo !== caso.grado">
+                        {{ caso.cargo }}
+                      </div>
+                      <div class="ei-details" style="font-size: 0.75rem; opacity: 0.6;" *ngIf="caso.componente && caso.componente !== 'S/C'">
+                        {{ caso.componente }}
+                      </div>
+                      
+                      <div class="ei-sync-status mt-1" *ngIf="caso.estadoSincronizacion">
+                        <span class="status-indicator status-eliminado">
+                          <span class="dot"></span>
+                          {{ caso.estadoSincronizacion | uppercase }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </ng-container>
           
-          <!-- Si es un solo documento (sin agrupar) -->
-          <ng-container *ngIf="!activeDoc.documentos || activeDoc.documentos.length === 0">
+          <!-- Si no hay casos ni en DB ni extraídos, se asume un solo doc (fallback original) -->
+          <ng-container *ngIf="!analyzingDocument && validCases.length === 0 && eliminadoCases.length === 0">
             <div class="explorador-list">
               <div class="explorador-item clickable"
                    (click)="obtenerWFD(activeDoc)">
@@ -225,8 +287,15 @@
                 </div>
                 <div class="ei-content">
                   <div class="ei-name">{{ (activeDoc.nombres_apellidos || activeDoc.nombres + ' ' + activeDoc.apellidos) | uppercase }}</div>
-                  <div class="ei-details">C.I: {{ activeDoc.cedula }}</div>
-                  <div class="ei-details" style="font-size: 0.75rem;">{{ activeDoc.grado || 'S/G' }} - {{ activeDoc.componente || 'S/C' }}</div>
+                  <div class="ei-details">
+                    C.I: {{ activeDoc.cedula }} <span style="margin: 0 4px; opacity: 0.5;">|</span> <span style="color: rgba(255,255,255,0.85);">{{ activeDoc.grado || 'S/G' }}</span>
+                  </div>
+                  <div class="ei-details" style="font-size: 0.75rem;" *ngIf="activeDoc.cargo && activeDoc.cargo !== activeDoc.grado">
+                    {{ activeDoc.cargo }}
+                  </div>
+                  <div class="ei-details" style="font-size: 0.75rem; opacity: 0.6;" *ngIf="activeDoc.componente && activeDoc.componente !== 'S/C'">
+                    {{ activeDoc.componente }}
+                  </div>
                   <div class="ei-details" *ngIf="activeDoc.digital || activeDoc.anom" style="font-size: 0.75rem; color: #80cbc4;">
                     <i class="fas fa-file-pdf"></i> {{ activeDoc.digital || activeDoc.anom }}
                   </div>

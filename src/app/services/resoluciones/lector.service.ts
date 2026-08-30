@@ -99,19 +99,24 @@ export class LectorService {
         profundidad = Math.round(margenPt * 10) / 10; 
       }
 
-      // Detectar persona con Cédula y Cargo
-      const regexPersona = /([^,]+),\s*(?:C\.I\.\s*N[°º]?|C\.I\.|N[°º])\s*([\d\.]+)\s*,\s*([^,]+)/i;
+      // Detectar persona con Cédula y Cargo (Cargo puede ser opcional al final o terminar en punto)
+      const regexPersona = /([^,]+),\s*(?:C\.I\.\s*N[°º]?|C\.I\.|N[°º])\s*([\d\.]+)(?:\s*,\s*([^,.]+))?/i;
       const matchPersona = textoLimpio.match(regexPersona);
 
       if (matchPersona) {
-        const nombreRaw = matchPersona[1];
+        let nombreRaw = matchPersona[1].trim();
+        if (nombreRaw.startsWith('-')) {
+          nombreRaw = nombreRaw.substring(1).trim();
+        }
+        
         const nombreMatches = nombreRaw.match(/[A-ZÁÉÍÓÚÑ\s]+$/);
-        const nombre = nombreMatches ? nombreMatches[0].trim() : nombreRaw.trim();
+        const nombre = nombreMatches ? nombreMatches[0].trim() : nombreRaw;
+        const grado = nombreRaw.replace(nombre, '').trim() || "S/G";
 
         const cedulaSucia = matchPersona[2];
         const cedula = cedulaSucia.replace(/\./g, "").trim();
         
-        let cargo = matchPersona[3].trim(); 
+        let cargo = matchPersona[3] ? matchPersona[3].trim() : ""; 
         if (cargo.includes(',')) {
            cargo = cargo.substring(0, cargo.indexOf(',')).trim();
         } else if (cargo.toLowerCase().endsWith('p/v.')) {
@@ -125,7 +130,7 @@ export class LectorService {
 
         const ubicacion = rutaDependencias ? `${cargo}, ${rutaDependencias}` : cargo;
 
-        resultados.push({ nombre, cedula, cargo, ubicacion });
+        resultados.push({ nombre, cedula, cargo: grado + " " + cargo, ubicacion });
       } else {
         // Es un nodo de jerarquía (Dependencia, Batallón, Sección, etc.)
         // Eliminar de la pila los nodos que estén al mismo nivel o más profundos, 

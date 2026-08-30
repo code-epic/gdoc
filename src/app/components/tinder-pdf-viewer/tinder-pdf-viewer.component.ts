@@ -16,6 +16,7 @@ import html2canvas from "html2canvas";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { environment } from "src/environments/environment";
 import { FileService } from "src/app/services/apicore/file.service";
+import { LectorService } from "src/app/services/resoluciones/lector.service";
 import { HttpEventType } from "@angular/common/http";
 import Swal from "sweetalert2";
 
@@ -38,6 +39,8 @@ export interface TinderDocument {
   anom?: string;
   archivo?: string;
   comentarios?: DocumentComment[];
+  documentos?: any[];
+  mergedDocumentos?: any[];
   [key: string]: any;
 }
 
@@ -138,6 +141,22 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public rawPdfUrl: string | null = null;
   public loadingPdf = false;
   public actionExecuting = false;
+  public analyzingDocument = false;
+  public showEliminados = false;
+
+  public get validCases() {
+    if (!this.activeDoc) return [];
+    const docs = this.activeDoc.mergedDocumentos || this.activeDoc.documentos || [];
+    // Si todavía no se han analizado, estadoSincronizacion no existe (mostrarlos como válidos)
+    return docs.filter((c: any) => c.estadoSincronizacion !== 'eliminado');
+  }
+
+  public get eliminadoCases() {
+    if (!this.activeDoc) return [];
+    const docs = this.activeDoc.mergedDocumentos || this.activeDoc.documentos || [];
+    return docs.filter((c: any) => c.estadoSincronizacion === 'eliminado');
+  }
+
   public executingType:
     | "approve"
     | "reject"
@@ -197,6 +216,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     private cdr: ChangeDetectorRef,
     private apiService: ApiService,
     private fileService: FileService,
+    private lectorService: LectorService,
   ) {
     // Detección robusta de Safari (desktop + iOS)
     const ua = navigator.userAgent.toLowerCase();
@@ -1064,6 +1084,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       (res: any) => {
         console.log("Estado de resolución guardado con éxito", res);
         this.hasSavedState = true;
+        
+        // Re-analizar el documento por si hubo ediciones manuales en el texto
+        this.analyzeDocument(this.activeDoc);
+
         Swal.fire({
           title: "¡Guardado!",
           text: "El estado del documento se ha guardado exitosamente.",
@@ -1908,6 +1932,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     // Intentar recuperar el estado de base de datos antes de pintar
     await this.loadSavedState();
+    
+    // Iniciar análisis de documento
+    this.analyzeDocument(doc);
 
     this.updateCanvasData();
     this.cdr.detectChanges();
@@ -2201,8 +2228,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     if (!doc) return;
 
     // Obtener lista de casos (agrupados o el documento único de fallback)
-    const list =
-      doc.documentos && doc.documentos.length > 0 ? doc.documentos : [doc];
+    let list = doc.mergedDocumentos && doc.mergedDocumentos.length > 0 
+      ? doc.mergedDocumentos 
+      : (doc.documentos && doc.documentos.length > 0 ? doc.documentos : [doc]);
 
     list.forEach((caso: any) => {
       const cedula = (caso.cedula || "").toString().replace(/\./g, "").trim();
@@ -2273,4 +2301,106 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     this.fotosCasos = {};
     this.loadingFotos = {};
   }
+
+  /* ── Analisis de Documento (LectorService) ───────────── */
+  private analyzeDocument(doc: TinderDocument): void {
+    if (!doc) return;
+    
+    this.analyzingDocument = true;
+    this.cdr.detectChanges();
+    
+    setTimeout(() => {
+      let htmlCompleto = "";
+      if (doc._headerHtml) {
+        htmlCompleto += (doc._headerHtml.includes('<p') ? doc._headerHtml : `<p>${doc._headerHtml}</p>`) + " ";
+      }
+      if (doc["_pageCasesHtml_0"]) {
+        htmlCompleto += (doc["_pageCasesHtml_0"].includes('<p') ? doc["_pageCasesHtml_0"] : `<p>${doc["_pageCasesHtml_0"]}</p>`);
+      }
+      
+      let parsedOficiales: any[] = [];
+      if (htmlCompleto) {
+        parsedOficiales = this.lectorService.extraerDatosMilitar(htmlCompleto);
+      }
+      
+      this.syncCases(doc, parsedOficiales, htmlCompleto);
+      this.analyzingDocument = false;
+      this.cdr.detectChanges();
+      
+      // Intentar recargar fotos si hay cedulas nuevas
+      this.loadPhotosForCases();
+    }, 500); // Simulate streaming / non-blocking process
+  }
+
+  private syncCases(doc: TinderDocument, parsedOficiales: any[], htmlCompleto: string): void {
+    const originalDocs = doc.documentos || [];
+    let mergedDocs: any[] = [];
+    const addedCedulas = new Set<string>();
+
+    const isEmptyHtml = !htmlCompleto || htmlCompleto.trim().length === 0;
+
+    // Mapeo rápido de lo analizado
+    const parsedMap = new Map();
+    if (!isEmptyHtml) {
+      parsedOficiales.forEach(o => {
+        const ced = (o.cedula || "").toString().replace(/\./g, "").trim();
+        if (ced) parsedMap.set(ced, o);
+      });
+    }
+
+    // 1. Los que están en el doc original
+    originalDocs.forEach(d => {
+      const ced = (d.cedula || d.persona?.cedula || "").toString().replace(/\./g, "").trim();
+      if (ced && addedCedulas.has(ced)) {
+        return; // Skip duplicate
+      }
+      if (ced) addedCedulas.add(ced);
+
+      const clone = { ...d };
+      
+      if (isEmptyHtml) {
+        clone.estadoSincronizacion = "pendiente";
+      } else if (parsedMap.has(ced)) {
+        clone.estadoSincronizacion = "sin alteraciones";
+        const parsed = parsedMap.get(ced);
+        // Si LectorService extrae el cargo/grado en 'cargo', actualizar ambos para visualización
+        if (parsed.cargo && parsed.cargo !== "S/G" && parsed.cargo !== "Oficial") {
+          clone.grado = parsed.cargo; 
+          clone.cargo = parsed.cargo; 
+        }
+      } else {
+        clone.estadoSincronizacion = "eliminado";
+      }
+      mergedDocs.push(clone);
+    });
+
+    // 2. Los que están en el texto parseado y NO estaban originales
+    if (!isEmptyHtml) {
+      parsedOficiales.forEach(o => {
+        const ced = (o.cedula || "").toString().replace(/\./g, "").trim();
+        if (ced && !addedCedulas.has(ced)) {
+          addedCedulas.add(ced);
+          mergedDocs.push({
+            cedula: o.cedula,
+            nombres_apellidos: o.nombre,
+            nombres: o.nombre,
+            grado: o.cargo || "S/G",
+            componente: o.componente || "S/C",
+            cargo: o.cargo,
+            estadoSincronizacion: "nuevo"
+          });
+        }
+      });
+    }
+
+    // 3. Ordenar (Los "eliminado" van al final)
+    mergedDocs.sort((a, b) => {
+      if (a.estadoSincronizacion === "eliminado" && b.estadoSincronizacion !== "eliminado") return 1;
+      if (b.estadoSincronizacion === "eliminado" && a.estadoSincronizacion !== "eliminado") return -1;
+      return 0;
+    });
+
+    doc.mergedDocumentos = mergedDocs;
+  }
 }
+

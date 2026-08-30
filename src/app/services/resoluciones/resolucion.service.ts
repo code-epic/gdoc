@@ -18,8 +18,10 @@ export interface IResoluciones {
   reserva: number;
   solicitud: number;
   tipo: number;
-  unidad: number;
+  unidad: number | string;
   comando: string;
+  remitente?: string;
+  numero_origen?: string;
   comision_fin: string;
   comision_inicio: string;
   creador: string;
@@ -76,6 +78,10 @@ export interface IEntradas {
   fecha_resolucion: string;
   detalle: string;
   accion: number;
+  remitente?: string;
+  unidad?: string;
+  comando?: string;
+  numero_origen?: string;
 }
 
 // export interface IDatosBasicos {

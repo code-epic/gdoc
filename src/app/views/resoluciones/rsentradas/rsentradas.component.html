@@ -39,8 +39,6 @@
                     <input matInput placeholder="Cédula" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="Resolucion.cedula" value="{{Resolucion.cedula}}" (blur)="consultarCedula()">
                     <mat-icon matSuffix *ngIf="!editar_datos">person_search</mat-icon>
-                    <mat-icon matSuffix *ngIf="editar_datos" (click)="Seleccionar()"
-                        class="text-blue">person_search</mat-icon>
                 </mat-form-field>
             </div>
             <div class="form-group col-md-3">
@@ -111,6 +109,7 @@
 
 
 
+        <!-- Fila 1: Datos Básicos del Documento -->
         <div class="form-row">
             <div class="col-md-3">
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
@@ -122,54 +121,7 @@
                 </mat-form-field>
             </div>
 
-
-            <div class="col-md-3">
-                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                    <mat-label>Fecha (*)</mat-label>
-                    <input matInput placeholder="Fecha " [ngModelOptions]="{standalone: true}" ngbDatepicker
-                        #fo="ngbDatepicker" [placement]="placement" [positionTarget]="buttonEl"
-                        [(ngModel)]="fecha_resolucion">
-                    <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button" id="fori">edit_calendar</mat-icon>
-
-
-                </mat-form-field>
-            </div>
-
-
-            <div class="col-md-3">
-                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                    <mat-label style="width:100%">Carpeta Número</mat-label>
-
-                    <input matInput placeholder="Carpeta Número" [ngModelOptions]="{standalone: true}"
-                        [(ngModel)]="Entradas.numero_carpeta" value="{{Entradas.numero_carpeta}}" required="required">
-
-                </mat-form-field>
-            </div>
-
-            <div class="form-group col-md-3">
-
-                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                    <mat-label style="width:100%">Cuenta</mat-label>
-                    <input type="text" matInput required="required" placeholder="Cuenta"
-                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Entradas.cuenta" value="{{Entradas.cuenta}}">
-                </mat-form-field>
-            </div>
-
-
-            <div class="col-md-4">
-                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
-                    <mat-label>Componente</mat-label>
-                    <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}" [(ngModel)]="xcomponente"
-                        value="{{xcomponente}}" required="required">
-                        <mat-option *ngFor="let e of Componentes;"
-                            [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-
-
-
-            <div class="form-group col-md-5">
+            <div class="form-group col-md-4">
                 <mat-form-field *ngIf="bclasificacion" class="example-full-width" appearance="outline"
                     style="width:100%">
                     <input readonly="readonly" type="text" matInput (click)="activar()" [(ngModel)]="xclasificacion">
@@ -188,18 +140,108 @@
                 </mat-form-field>
             </div>
 
+            <div class="col-md-2">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label>Fecha (*)</mat-label>
+                    <input matInput placeholder="Fecha " [ngModelOptions]="{standalone: true}" ngbDatepicker
+                        #fo="ngbDatepicker" [placement]="placement" positionTarget="fori"
+                        [(ngModel)]="fecha_resolucion">
+                    <mat-icon matSuffix #buttonEl (click)="fo.toggle()" type="button" id="fori">edit_calendar</mat-icon>
+                </mat-form-field>
+            </div>
+
             <div class="col-md-3">
                 <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
                     <mat-label>Estatus</mat-label>
                     <mat-select placeholder="Estatus" required="required" [(value)]="estatus">
                         <mat-option *ngFor="let e of Estados;"
                             [value]="e.cod_estado_resol">{{e.des_estado_resol}}</mat-option>
-
                     </mat-select>
                 </mat-form-field>
             </div>
+        </div>
 
+        <!-- Fila 2: Datos de Origen -->
+        <div class="form-row">
+            <div class="col-md-3">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label>Remitente</mat-label>
+                    <input type="text" placeholder="Seleccione remitente" matInput [formControl]="remitenteCtrl"
+                        [matAutocomplete]="autoRem" [(ngModel)]="Entradas.remitente">
+                    <mat-autocomplete #autoRem="matAutocomplete">
+                        <mat-option *ngFor="let option of filteredRemitentes | async" [value]="option.nomb">
+                            {{option.nomb}}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <mat-icon matSuffix>person</mat-icon>
+                </mat-form-field>
+            </div>
+        
+            <div class="col-md-4">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label>Unidad o Dependencia</mat-label>
+                    <input type="text" placeholder="Seleccione unidad" matInput [formControl]="unidadCtrl"
+                        [matAutocomplete]="autoUnidad" [(ngModel)]="Entradas.unidad">
+                    <mat-autocomplete #autoUnidad="matAutocomplete">
+                        <mat-option *ngFor="let option of filteredUnidades | async" [value]="option.nomb">
+                            {{option.nomb}}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <mat-icon matSuffix>account_balance</mat-icon>
+                </mat-form-field>
+            </div>
+        
+            <div class="col-md-3">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label>Componente / Gran Comando</mat-label>
+                    <input type="text" placeholder="Seleccione comando" matInput [formControl]="comandoCtrl"
+                        [matAutocomplete]="autoComando" [(ngModel)]="Entradas.comando">
+                    <mat-autocomplete #autoComando="matAutocomplete">
+                        <mat-option *ngFor="let option of filteredComandos | async" [value]="option.nomb">
+                            {{option.nomb}}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <mat-icon matSuffix>security</mat-icon>
+                </mat-form-field>
+            </div>
+        
+            <div class="col-md-2">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label style="width:100%">Número de Origen</mat-label>
+                    <input type="text" matInput [(ngModel)]="Entradas.numero_origen" placeholder="Ej. 1234">
+                    <mat-icon matSuffix>tag</mat-icon>
+                </mat-form-field>
+            </div>
+        </div>
 
+        <!-- Fila 3: Organización y Ubicación -->
+        <div class="form-row">
+            <div class="col-md-4">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label style="width:100%">Carpeta Número</mat-label>
+                    <input matInput placeholder="Carpeta Número" [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="Entradas.numero_carpeta" value="{{Entradas.numero_carpeta}}" required="required">
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-4">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label style="width:100%">Cuenta</mat-label>
+                    <input type="text" matInput required="required" placeholder="Cuenta"
+                        [ngModelOptions]="{standalone: true}" [(ngModel)]="Entradas.cuenta" value="{{Entradas.cuenta}}">
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-4">
+                <mat-form-field class="example-full-width" appearance="outline" style="width:100%">
+                    <mat-label>Componente</mat-label>
+                    <mat-select placeholder="Componente" [ngModelOptions]="{standalone: true}" [(ngModel)]="xcomponente"
+                        value="{{xcomponente}}" required="required">
+                        <mat-option *ngFor="let e of Componentes;"
+                            [value]="e.cod_componente">{{e.nombre_componente}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
         </div>
 
 
@@ -241,11 +283,6 @@
 
                             </div>
                         </div>
-                        <!-- <div class="col-md-3">
-                                        <button class="btn bg-success text-white ">
-                                            <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar
-                                            Archivos </button>
-                                    </div> -->
                     </div>
                 </form>
             </div>
@@ -315,7 +352,7 @@
                             </thead>
                             <tbody>
 
-                                <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstHzAdjunto;let i=index">
+                                <tr *ngFor="let el of lstHzAdjunto;let i=index">
 
                                     <td>
                                         <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"

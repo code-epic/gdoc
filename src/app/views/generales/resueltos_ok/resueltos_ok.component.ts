@@ -2527,12 +2527,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       let xAPI = {} as IAPICore;
       xAPI.funcion = environment.funcion.CONSULTAR_CARPETA_RESOLUCIONES;
       xAPI.parametros = res.numero_carpeta;
-      
+
       this.apiService.Ejecutar(xAPI).subscribe(
         (data: any) => {
           res.loadingDetails = false;
           res.detailsLoaded = true;
-          
+
           if (data && data.Cuerpo && data.Cuerpo.length > 0) {
             const detalle = data.Cuerpo[0];
             res.estadoCarpeta = this.mapEstatus(detalle.estatus);
@@ -2545,7 +2545,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         (error) => {
           res.loadingDetails = false;
           res.detailsLoaded = true;
-        }
+        },
       );
     }
   }
@@ -2553,23 +2553,36 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   private mapEstatus(estatus: string | number): string {
     const e = parseInt(estatus as string, 10);
     switch (e) {
-      case 36: return "REDACTAR - EDICION";
-      case 776: return "FIRMADO";
-      case 880: return "MINISTRO APROBADOR";
-      case 930: return "SECRETARIA (JEFE)";
-      case 990: return "RESOLUCION (REVISION)";
-      case 991: return "RESOLUCION (JEFE)";
-      default: return "ESTATUS (" + e + ")";
+      case 36:
+        return "REDACTAR - EDICION";
+      case 776:
+        return "FIRMADO";
+      case 7776:
+        return "PUBLICADO POR EL MINISTRO";
+      case 880:
+        return "MINISTRO APROBADOR";
+      case 930:
+        return "SECRETARIA (JEFE)";
+      case 990:
+        return "RESOLUCION (REVISION)";
+      case 991:
+        return "RESOLUCION (JEFE)";
+      default:
+        return "ESTATUS (" + e + ")";
     }
   }
 
   private mapTipo(tipo: string | number): string {
     const t = parseInt(tipo as string, 10);
     switch (t) {
-      case 85: return "NOMBRAMIENTO";
-      case 86: return "NORMAS";
-      case 87: return "PENSION DE GRACIA";
-      default: return "OTRO (" + t + ")";
+      case 85:
+        return "NOMBRAMIENTO";
+      case 86:
+        return "NORMAS";
+      case 87:
+        return "PENSION DE GRACIA";
+      default:
+        return "OTRO (" + t + ")";
     }
   }
 
