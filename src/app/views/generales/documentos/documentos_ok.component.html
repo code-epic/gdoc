@@ -1,0 +1,473 @@
+<!-- Wrapper raíz para posicionamiento iOS-safe -->
+<div class="documentos-root">
+
+  <!-- Vista Principal: Explorador Master-Detail (Tablet-First) -->
+  <div class="documentos-container" (click)="$event.stopPropagation()">
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ENCABEZADO DEL MÓDULO
+    ══════════════════════════════════════════════════════════════ -->
+    <div class="module-header shadow">
+      <div>
+        <h1 [ngSwitch]="currentProfile">
+          <span *ngSwitchCase="'JefeResolucion'">Bandeja del Jefe de Resoluciones</span>
+          <span *ngSwitchCase="'Direccion'">Bandeja de la Dirección del Despacho</span>
+          <span *ngSwitchCase="'Ministro'">Bandeja del Ministro</span>
+          <span *ngSwitchDefault>Buzón de Documentos</span>
+        </h1>
+        <p>Búsqueda y consulta de documentos ministeriales.</p>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: center;">
+
+        <!-- Selector de Perfil (Solo Admins) -->
+        <div *ngIf="isAdmin()" style="display: flex; align-items: center; gap: 8px;">
+          <select class="profile-select-custom"
+                  [(ngModel)]="currentProfile"
+                  (change)="onProfileChange()">
+            <option value="JefeResolucion">Jefe de Resoluciones</option>
+            <option value="Direccion">Dirección</option>
+            <option value="Ministro">Ministro</option>
+          </select>
+        </div>
+
+        <!-- Botón Circular de Cerrar -->
+        <button class="rt-icon-btn rt-close-btn" (click)="exitComponent()" title="Salir del Buzón de Documentos">
+          <i class="fas fa-times"></i>
+        </button>
+
+      </div>
+    </div>
+    <!-- FIN ENCABEZADO -->
+
+    <!-- ══════════════════════════════════════════════════════════════
+         LAYOUT MASTER-DETAIL (TABLET PHILOSOPHY)
+    ══════════════════════════════════════════════════════════════ -->
+    <div class="tablet-layout">
+
+      <!-- ════════════════════════════════════════════════════════════
+           COLUMNA IZQUIERDA — Carpetas de Documentos (Master)
+      ════════════════════════════════════════════════════════════ -->
+      <div class="master-panel">
+
+        <!-- Título del panel -->
+        <div class="panel-section-title">
+          <i class="fas fa-folder-open"></i>
+          <span>Buzones de Documentos</span>
+        </div>
+
+        <!-- Lista de Carpetas Estáticas -->
+        <div class="folders-list-container">
+          <div class="folder-card-compact"
+               *ngFor="let carpeta of carpetas"
+               [class.active]="selectedCarpeta?.id === carpeta.id"
+               [class.disabled]="!carpeta.disponible"
+               (click)="onCarpetaClick(carpeta)">
+
+            <!-- Ícono de carpeta -->
+            <div class="folder-icon-wrapper" [style.background]="carpeta.disponible ? (carpeta.color + '18') : '#f1f3f5'">
+              <i [class]="carpeta.icono + ' folder-icon-main'"
+                 [style.color]="carpeta.disponible ? carpeta.color : '#adb5bd'"></i>
+            </div>
+
+            <!-- Info -->
+            <div class="folder-info-compact">
+              <div class="name">{{ carpeta.nombre }}</div>
+              <div class="date" *ngIf="carpeta.disponible">
+                <i class="far fa-calendar-alt mr-1"></i>
+                {{ xyear }}
+              </div>
+              <div class="date text-muted" *ngIf="!carpeta.disponible">
+                <i class="fas fa-clock mr-1"></i>
+                Próximamente
+              </div>
+            </div>
+
+            <!-- Indicador de activa -->
+            <span class="folder-status-dot"
+                  *ngIf="carpeta.disponible"
+                  [style.background]="selectedCarpeta?.id === carpeta.id ? carpeta.color : '#e9ecef'">
+            </span>
+
+          </div>
+        </div>
+        <!-- FIN Lista Carpetas -->
+
+      </div>
+      <!-- FIN COLUMNA IZQUIERDA -->
+
+
+      <!-- ════════════════════════════════════════════════════════════
+           COLUMNA DERECHA — Contenido del Buzón (Detail)
+      ════════════════════════════════════════════════════════════ -->
+      <div class="detail-panel">
+
+        <!-- Botón Volver (Solo visible en Móvil) -->
+        <button class="btn-back-master" (click)="selectedCarpeta = null; buzon = []; bzOriginal = []">
+          <i class="fas fa-arrow-left"></i> Volver a Carpetas
+        </button>
+
+        <!-- ── Estado Vacío (Sin carpeta seleccionada) ── -->
+        <div class="empty-state" *ngIf="!selectedCarpeta">
+          <i class="fas fa-inbox"></i>
+          <h3>Seleccione un Buzón</h3>
+          <p>Seleccione una categoría de documentos en el panel izquierdo para visualizar el contenido.</p>
+        </div>
+
+        <!-- ── Contenido cuando hay carpeta seleccionada ── -->
+        <div class="detail-content" *ngIf="selectedCarpeta">
+
+          <!-- Cabecera del Detalle -->
+          <div class="detail-header">
+            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+              <div class="detail-header-icon" [style.background]="selectedCarpeta.color + '18'">
+                <i [class]="selectedCarpeta.icono" [style.color]="selectedCarpeta.color"></i>
+              </div>
+              <div style="min-width: 0;">
+                <h3>{{ selectedCarpeta.nombre }}</h3>
+                <div class="detail-header-meta">
+                  <span><i class="fas fa-calendar-alt"></i> {{ xyear }}</span>
+                  <span *ngIf="!loadingBuzon">
+                    <i class="fas fa-list"></i> {{ longitud }} documento(s)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Acciones -->
+            <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+              <!-- Botón Actualizar -->
+              <button class="btn-action-round" (click)="actualizarBuzon()" title="Actualizar buzón"
+                      [disabled]="loadingBuzon">
+                <i class="fas fa-sync-alt" [class.fa-spin]="loadingBuzon"></i>
+              </button>
+              <span class="badge-count">{{ longitud }}</span>
+            </div>
+          </div>
+
+          <!-- Barra de Búsqueda -->
+          <div class="search-bar-wrapper" *ngIf="!loadingBuzon && longitud > 0">
+            <div class="search-wrapper">
+              <i class="fas fa-search"></i>
+              <input type="text"
+                     [(ngModel)]="buscarQuery"
+                     placeholder="Buscar por cédula, cuenta, asunto..."
+                     autocomplete="off" />
+            </div>
+          </div>
+
+          <!-- Spinner de carga -->
+          <div class="loading-state" *ngIf="loadingBuzon">
+            <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;"></div>
+            <p class="mt-2 text-muted" style="font-size: 0.8rem;">Cargando documentos...</p>
+          </div>
+
+          <!-- Lista del Buzón -->
+          <div class="documents-list-container" *ngIf="!loadingBuzon">
+
+            <!-- Estado vacío -->
+            <div class="empty-buzon" *ngIf="buzonFiltrado.length === 0 && !loadingBuzon">
+              <i class="fas fa-folder-open"></i>
+              <p>No se encontraron documentos en este buzón.</p>
+            </div>
+
+            <!-- Filas de documentos -->
+            <div class="doc-item-row animate-fade-in"
+                 *ngFor="let e of buzonFiltrado; let i = index"
+                 [class.doc-active]="activeDoc?.numc === e.numc"
+                 (click)="openDetail(e)">
+
+              <!-- Número de fila -->
+              <div class="row-index">{{ i + 1 }}</div>
+
+              <!-- Avatar Foto de Cédula (Clic para ampliar) -->
+              <div class="doc-avatar-container"
+                   *ngIf="getCedula(e)"
+                   (click)="verFotoAmpliada(getCedula(e)); $event.stopPropagation()"
+                   title="Clic para ver foto ampliada">
+                <img [src]="fotosCasos[getCedula(e)]"
+                     *ngIf="!loadingFotos[getCedula(e)] && fotosCasos[getCedula(e)]"
+                     alt="Avatar">
+                <i class="fas fa-spinner fa-spin text-primary" *ngIf="loadingFotos[getCedula(e)]"></i>
+                <i class="fas fa-user" *ngIf="!loadingFotos[getCedula(e)] && !fotosCasos[getCedula(e)]"></i>
+              </div>
+
+              <!-- Info principal -->
+              <div class="doc-info">
+
+                <!-- Identificador (Cédula y Nombre si existe) -->
+                <div class="doc-id-row">
+                  <span class="doc-id-badge">
+                    <i class="fas fa-id-card"></i>
+                    {{ getIdentificador(e) || 'Sin identificador' }}
+                  </span>
+                  <span class="doc-nombre-badge" *ngIf="getNombre(e)">
+                    <i class="fas fa-user-check"></i>
+                    {{ getNombre(e) }}
+                  </span>
+                  <span class="doc-tdoc-badge" [title]="e.tdoc">
+                    {{ e.nombre_accion || e.tdoc || '' }}
+                  </span>
+                </div>
+
+                <!-- Grado / Cargo si existe -->
+                <div class="doc-cargo-row" *ngIf="getCargo(e)">
+                  <span class="doc-cargo-chip">
+                    <i class="fas fa-user-tie"></i> {{ getCargo(e) }}
+                  </span>
+                </div>
+
+                <!-- Asunto/Contenido LIMPIO (sin HTML) -->
+                <div class="doc-asunto">
+                  {{ getAsuntoClean(e) }}
+                </div>
+
+                <!-- Meta: fecha, número de control -->
+                <div class="doc-meta">
+                  <span *ngIf="getFecha(e)">
+                    <i class="far fa-calendar-alt"></i>
+                    {{ getFecha(e) }}
+                  </span>
+                  <span *ngIf="e.numc">
+                    <i class="fas fa-hashtag"></i>
+                    {{ e.numc }}
+                  </span>
+                </div>
+
+              </div>
+              <!-- FIN doc-info -->
+
+              <!-- Acción Ver -->
+              <div class="doc-actions" (click)="$event.stopPropagation()">
+                <button class="btn-ver-doc"
+                        (click)="openDetail(e); $event.stopPropagation()"
+                        title="Ver Detalle del Documento">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+
+            </div>
+            <!-- FIN *ngFor -->
+
+          </div>
+          <!-- FIN documents-list-container -->
+
+          <!-- Paginador -->
+          <div class="paginator-wrapper" *ngIf="!loadingBuzon && longitud > pageSize">
+            <mat-paginator
+              [length]="longitud"
+              [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions"
+              (page)="pageChangeEvent($event)"
+              showFirstLastButtons>
+            </mat-paginator>
+          </div>
+
+        </div>
+        <!-- FIN detail-content -->
+
+      </div>
+      <!-- FIN COLUMNA DERECHA -->
+
+    </div>
+    <!-- FIN tablet-layout -->
+
+  </div>
+  <!-- FIN documentos-container -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       PANEL DE DETALLE INMERSIVO (slide-in desde la derecha / bottom en móvil)
+       Se muestra sobre el explorador cuando se selecciona un documento
+  ══════════════════════════════════════════════════════════════════════════════ -->
+  <div class="detail-drawer-backdrop"
+       *ngIf="isDetailOpen && activeDoc"
+       (click)="closeDetail()">
+  </div>
+
+  <div class="detail-drawer"
+       *ngIf="activeDoc"
+       [class.detail-drawer-open]="isDetailOpen"
+       (click)="$event.stopPropagation()">
+
+    <!-- ── Header del Drawer ── -->
+    <div class="drawer-header">
+      <div class="drawer-header-left">
+        <!-- Avatar Foto en el Header -->
+        <div class="drawer-header-avatar"
+             *ngIf="getCedula(activeDoc)"
+             (click)="verFotoAmpliada(getCedula(activeDoc)); $event.stopPropagation()"
+             title="Clic para ver foto ampliada">
+          <img [src]="fotosCasos[getCedula(activeDoc)]"
+               *ngIf="!loadingFotos[getCedula(activeDoc)] && fotosCasos[getCedula(activeDoc)]"
+               alt="Avatar">
+          <i class="fas fa-spinner fa-spin text-white" *ngIf="loadingFotos[getCedula(activeDoc)]"></i>
+          <i class="fas fa-user" *ngIf="!loadingFotos[getCedula(activeDoc)] && !fotosCasos[getCedula(activeDoc)]"></i>
+        </div>
+        <div class="drawer-header-icon" *ngIf="!getCedula(activeDoc)">
+          <i class="fas fa-file-contract"></i>
+        </div>
+        <div>
+          <div class="drawer-header-title">Detalle — {{ getIdentificador(activeDoc) }}</div>
+          <div class="drawer-header-sub">{{ selectedCarpeta?.nombre }}</div>
+        </div>
+      </div>
+      <button class="drawer-close-btn" (click)="closeDetail()" title="Cerrar (Esc)">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- ── Cuerpo del Drawer ── -->
+    <div class="drawer-body">
+
+      <!-- ── Sección: Identificación ── -->
+      <div class="drawer-section">
+        <div class="drawer-section-label">
+          <i class="fas fa-id-card"></i> Identificación
+        </div>
+        <div class="drawer-field-group">
+          <div class="drawer-field" *ngIf="getCedula(activeDoc)">
+            <span class="drawer-field-label">Cédula</span>
+            <span class="drawer-field-value highlight">
+              {{ getCedula(activeDoc) }}
+            </span>
+          </div>
+          <div class="drawer-field" *ngIf="getNombre(activeDoc)">
+            <span class="drawer-field-label">Nombre / Afiliado</span>
+            <span class="drawer-field-value font-weight-bold">
+              {{ getNombre(activeDoc) }}
+            </span>
+          </div>
+          <div class="drawer-field" *ngIf="getCargo(activeDoc)">
+            <span class="drawer-field-label">Grado / Cargo</span>
+            <span class="drawer-field-value text-primary">
+              {{ getCargo(activeDoc) }}
+            </span>
+          </div>
+          <div class="drawer-field">
+            <span class="drawer-field-label">N° Control</span>
+            <span class="drawer-field-value">{{ activeDoc.numc || activeDoc.ncontrol || '—' }}</span>
+          </div>
+          <div class="drawer-field">
+            <span class="drawer-field-label">Tipo Documento</span>
+            <span class="drawer-field-value">
+              <span class="doc-tdoc-badge">{{ activeDoc.tdoc || '—' }}</span>
+            </span>
+          </div>
+          <div class="drawer-field">
+            <span class="drawer-field-label">Fecha</span>
+            <span class="drawer-field-value">{{ getFecha(activeDoc) || '—' }}</span>
+          </div>
+          <div class="drawer-field" *ngIf="activeDoc.nombre_accion">
+            <span class="drawer-field-label">Acción</span>
+            <span class="drawer-field-value">{{ activeDoc.nombre_accion }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Sección: Asunto / Contenido ── -->
+      <div class="drawer-section">
+        <div class="drawer-section-label">
+          <i class="fas fa-align-left"></i> Asunto / Contenido
+        </div>
+        <div class="drawer-asunto-block">
+          {{ getAsuntoClean(activeDoc) || 'Sin descripción disponible.' }}
+        </div>
+      </div>
+
+      <!-- ── Sección: Documentos del Caso ── -->
+      <div class="drawer-section">
+        <div class="drawer-section-label">
+          <i class="fas fa-paperclip"></i> Documentos del Caso
+        </div>
+        <div class="drawer-doc-buttons">
+          <!-- Botón Ver PDF -->
+          <button class="drawer-btn drawer-btn-pdf"
+                  (click)="verPDF(activeDoc)"
+                  [disabled]="!getDwsUrl(activeDoc)"
+                  title="Ver documento en PDF">
+            <i class="fas fa-file-pdf"></i>
+            <span>Ver PDF</span>
+          </button>
+
+          <!-- Botón Constancia (ir a ministerial) -->
+          <button class="drawer-btn drawer-btn-detail"
+                  (click)="router.navigate(['/ministerial', (btoa(JSON.stringify({tipo:'MINISTERIAL', objeto: activeDoc})))])"
+                  title="Ver ficha completa en Ministerial">
+            <i class="fas fa-external-link-alt"></i>
+            <span>Ficha Completa</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Sección: Observación ── -->
+      <div class="drawer-section">
+        <div class="drawer-section-label">
+          <i class="fas fa-comment-alt"></i> Observación
+        </div>
+        <textarea class="drawer-textarea"
+                  [(ngModel)]="observacion"
+                  placeholder="Ingrese una observación (opcional para Favorable)..."
+                  rows="3"
+                  [disabled]="loadingAction">
+        </textarea>
+      </div>
+
+      <!-- ── Sección: Acciones de Decisión ── -->
+      <div class="drawer-section">
+        <div class="drawer-section-label">
+          <i class="fas fa-gavel"></i> Decisión
+        </div>
+        <div class="drawer-action-buttons">
+
+          <!-- FAVORABLE -->
+          <button class="drawer-action-btn favorable"
+                  (click)="ejecutarAccion('FAVORABLE')"
+                  [disabled]="loadingAction"
+                  title="Registrar como Favorable">
+            <div class="action-btn-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <span>Favorable</span>
+            <div class="action-btn-spinner" *ngIf="loadingAction">
+              <div class="spinner-border" role="status" style="width: 1rem; height: 1rem;"></div>
+            </div>
+          </button>
+
+          <!-- DIFERIDO -->
+          <button class="drawer-action-btn diferido"
+                  (click)="ejecutarAccion('DIFERIDO')"
+                  [disabled]="loadingAction"
+                  title="Registrar como Diferido (requiere observación)">
+            <div class="action-btn-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <span>Diferido</span>
+          </button>
+
+          <!-- NEGADO -->
+          <button class="drawer-action-btn negado"
+                  (click)="ejecutarAccion('NEGADO')"
+                  [disabled]="loadingAction"
+                  title="Registrar como Negado (requiere observación)">
+            <div class="action-btn-icon">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <span>Negado</span>
+          </button>
+
+        </div>
+        <p class="drawer-action-note">
+          <i class="fas fa-info-circle"></i>
+          Diferido y Negado requieren una observación.
+        </p>
+      </div>
+
+    </div>
+    <!-- FIN drawer-body -->
+
+  </div>
+  <!-- FIN detail-drawer -->
+
+</div>
+<!-- FIN documentos-root -->

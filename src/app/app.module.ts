@@ -100,6 +100,7 @@ import { ErrorModalComponent } from './components/error-modal/error-modal.compon
 import { TinderPdfViewerComponent } from './components/tinder-pdf-viewer/tinder-pdf-viewer.component';
 import { ResueltoCanvasComponent } from './views/generales/resuelto_canvas/resuelto_canvas.component';
 import { RsindicadoresComponent } from './views/resoluciones/rsindicadores/rsindicadores.component';
+import { DocumentosOkComponent } from './views/generales/documentos/documentos_ok.component';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -256,6 +257,7 @@ const ngWizardConfig: NgWizardConfig = {
     ErrorModalComponent,
     TinderPdfViewerComponent,
     RsindicadoresComponent,
+    DocumentosOkComponent,
   ],
   providers: [
     {

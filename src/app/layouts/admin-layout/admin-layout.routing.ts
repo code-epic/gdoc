@@ -66,6 +66,7 @@ import { SnuevoComponent } from "src/app/views/secretaria/snuevo/snuevo.componen
 import { CodigosrojoComponent } from "src/app/views/resoluciones/codigosrojo/codigosrojo.component";
 import { ErrorComponent } from "src/app/pages/error/error.component";
 import { RsindicadoresComponent } from "src/app/views/resoluciones/rsindicadores/rsindicadores.component";
+import { DocumentosOkComponent } from "src/app/views/generales/documentos/documentos_ok.component";
 
 export const AdminLayoutRoutes: Routes = [
   {
@@ -235,6 +236,11 @@ export const AdminLayoutRoutes: Routes = [
   {
     path: "resueltos_ok",
     component: ResueltosOkComponent,
+    canActivate: [AuthGuardGuard],
+  },
+  {
+    path: "documentos_ok",
+    component: DocumentosOkComponent,
     canActivate: [AuthGuardGuard],
   },
   {

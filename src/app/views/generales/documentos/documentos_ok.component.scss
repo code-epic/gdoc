@@ -1,0 +1,1473 @@
+/* Componente documentos_ok — Estilos Adaptativos Tablet-First
+   Paleta: Azul Índigo — Diferenciado de resueltos_ok (verde)
+   Hereda la misma filosofía estructural de resueltos_ok.component.scss
+*/
+
+// ── Paleta Azul Índigo ──────────────────────────────────────────────────────
+$dok-primary:       #5e72e4;
+$dok-primary-dark:  #4a5cd0;
+$dok-primary-light: #e8eaf6;
+$dok-bg:            #f5f6ff;
+$dok-surface:       #ffffff;
+$dok-text:          #2d3748;
+$dok-text-muted:    #718096;
+$dok-border:        #e2e8f0;
+$dok-shadow:        rgba(94, 114, 228, 0.12);
+
+// ── Raíz ─────────────────────────────────────────────────────────────────────
+.documentos-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: -webkit-fill-available;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.documentos-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: $dok-text;
+  background-color: $dok-bg;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+// ── Modo Inmersivo (oculta sidebar y navbar) ──────────────────────────────────
+::ng-deep {
+  html.immersive-active,
+  body.immersive-active {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body.immersive-active {
+    app-root,
+    app-admin-layout,
+    .wrapper,
+    mat-sidenav-container,
+    .example-container {
+      display: block;
+      height: 100%;
+    }
+
+    .example-sidenav, mat-sidenav {
+      display: none !important;
+      width: 0 !important;
+    }
+    app-navbar {
+      display: none !important;
+    }
+    .main-content {
+      margin-left: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 100% !important;
+      overflow: hidden;
+    }
+    app-documentos-ok {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+// ── Header del Módulo ─────────────────────────────────────────────────────────
+.module-header {
+  background: linear-gradient(135deg, $dok-primary 0%, $dok-primary-dark 100%);
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px $dok-shadow;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+  min-height: 0;
+
+  h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  p {
+    font-size: 0.78rem;
+    margin: 0;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+}
+
+// ── Botones del header ────────────────────────────────────────────────────────
+.rt-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+  }
+}
+
+.rt-close-btn:hover {
+  background: rgba(245, 54, 92, 0.7) !important;
+  border-color: #f5365c !important;
+}
+
+.profile-select-custom {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  border-radius: 30px;
+  padding: 0.25rem 2.2rem 0.25rem 1rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  height: 38px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 18px;
+
+  option {
+    background: #1c2541;
+    color: white;
+    font-weight: normal;
+  }
+}
+
+// ── Botón Volver (Solo móvil) ─────────────────────────────────────────────────
+.btn-back-master {
+  display: none;
+}
+
+// ── Layout Master-Detail ─────────────────────────────────────────────────────
+.tablet-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 1.5rem;
+  height: calc(100vh - 100px);
+  height: calc(100dvh - 100px);
+  height: calc(100svh - 100px);
+  overflow: hidden;
+}
+
+// ── Panel Izquierdo (Master) ──────────────────────────────────────────────────
+.master-panel {
+  height: 100%;
+  min-height: 0;
+  background: $dok-surface;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px $dok-shadow;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid $dok-border;
+  box-sizing: border-box;
+}
+
+.panel-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: $dok-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid $dok-border;
+  flex-shrink: 0;
+
+  i {
+    color: $dok-primary;
+    font-size: 0.9rem;
+  }
+}
+
+// ── Panel Derecho (Detail) ────────────────────────────────────────────────────
+.detail-panel {
+  height: 100%;
+  min-height: 0;
+  background: $dok-surface;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px $dok-shadow;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid $dok-border;
+  box-sizing: border-box;
+}
+
+// ── Lista de Carpetas ─────────────────────────────────────────────────────────
+.folders-list-container {
+  flex: 1 1 0px;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 0.25rem;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $dok-border;
+    border-radius: 4px;
+  }
+}
+
+// ── Tarjeta de Carpeta ────────────────────────────────────────────────────────
+.folder-card-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: $dok-surface;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid $dok-border;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+
+  &:hover:not(.disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px $dok-shadow;
+    border-color: $dok-primary;
+  }
+
+  &.active {
+    background: $dok-primary-light;
+    border-color: $dok-primary;
+    box-shadow: 0 4px 14px $dok-shadow;
+
+    .folder-icon-main {
+      transform: scale(1.1);
+    }
+
+    .folder-info-compact .name {
+      color: $dok-primary-dark;
+    }
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+.folder-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.folder-icon-main {
+  font-size: 1.4rem;
+  transition: transform 0.2s ease;
+}
+
+.folder-info-compact {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  .name {
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: $dok-text;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .date {
+    font-size: 0.7rem;
+    color: $dok-text-muted;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}
+
+.folder-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+// ── Estado vacío ──────────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+  color: $dok-text-muted;
+  padding: 2rem;
+
+  i {
+    font-size: 4rem;
+    color: $dok-border;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: $dok-text;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+    max-width: 280px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+}
+
+// ── Contenido del panel de detalle ────────────────────────────────────────────
+.detail-content {
+  flex: 1 1 0px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Cabecera del detalle ──────────────────────────────────────────────────────
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid $dok-border;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+  gap: 0.75rem;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $dok-text;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.detail-header-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.2rem;
+}
+
+.detail-header-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 3px;
+  font-size: 0.72rem;
+  color: $dok-text-muted;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.btn-action-round {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid $dok-border;
+  background: $dok-bg;
+  color: $dok-text-muted;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+
+  &:hover:not(:disabled) {
+    background: $dok-primary-light;
+    border-color: $dok-primary;
+    color: $dok-primary;
+    transform: rotate(90deg);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.badge-count {
+  background: $dok-primary;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  flex-shrink: 0;
+}
+
+// ── Barra de búsqueda ─────────────────────────────────────────────────────────
+.search-bar-wrapper {
+  flex-shrink: 0;
+  margin-bottom: 0.75rem;
+}
+
+.search-wrapper {
+  position: relative;
+
+  i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $dok-text-muted;
+    font-size: 0.85rem;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.55rem 1rem 0.55rem 2.2rem;
+    border-radius: 25px;
+    border: 1px solid $dok-border;
+    font-size: 0.85rem;
+    color: $dok-text;
+    background-color: $dok-bg;
+    transition: all 0.2s ease;
+
+    &:focus {
+      background-color: white;
+      border-color: $dok-primary;
+      box-shadow: 0 0 0 3px $dok-primary-light;
+      outline: none;
+    }
+  }
+}
+
+// ── Estado de carga ───────────────────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 2rem;
+}
+
+// ── Lista de documentos ───────────────────────────────────────────────────────
+.documents-list-container {
+  flex: 1 1 0px;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 0.25rem;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $dok-border;
+    border-radius: 4px;
+  }
+}
+
+.empty-buzon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: $dok-text-muted;
+  text-align: center;
+
+  i {
+    font-size: 2.5rem;
+    opacity: 0.4;
+    margin-bottom: 0.75rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+    margin: 0;
+  }
+}
+
+// ── Fila de Documento ─────────────────────────────────────────────────────────
+.doc-item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid $dok-border;
+  border-left: 4px solid $dok-primary;
+  margin-bottom: 0.6rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba($dok-primary, 0.2);
+  background: $dok-surface;
+
+  &:hover {
+    background-color: $dok-bg;
+    border-color: $dok-primary;
+    box-shadow: 0 2px 8px $dok-shadow;
+    transform: translateX(2px);
+  }
+
+  &:active {
+    background-color: $dok-primary-light;
+  }
+}
+
+.row-index {
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: $dok-text-muted;
+  width: 22px;
+  flex-shrink: 0;
+  text-align: center;
+  margin-top: 3px;
+}
+
+.doc-avatar-container {
+  width: 58px;
+  height: 72px;
+  border-radius: 10px;
+  background: $dok-primary-light;
+  color: $dok-primary-dark;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  cursor: zoom-in;
+  border: 2px solid white;
+  box-shadow: 0 3px 10px rgba(94, 114, 228, 0.22);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+  align-self: center;
+
+  &:hover {
+    transform: scale(1.12);
+    box-shadow: 0 6px 18px rgba(94, 114, 228, 0.4);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  i {
+    font-size: 1.35rem;
+  }
+}
+
+// ── Info del documento ────────────────────────────────────────────────────────
+.doc-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.doc-id-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.doc-id-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: $dok-primary-light;
+  color: $dok-primary-dark;
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  i {
+    font-size: 0.7rem;
+  }
+}
+
+.doc-nombre-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  i {
+    font-size: 0.7rem;
+  }
+}
+
+.doc-cargo-row {
+  margin-bottom: 4px;
+}
+
+.doc-cargo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+
+  i {
+    font-size: 0.65rem;
+    color: #64748b;
+  }
+}
+
+.doc-tdoc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f8f9fa;
+  color: $dok-text-muted;
+  border: 1px solid $dok-border;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.doc-asunto {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $dok-text;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.doc-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+  font-size: 0.7rem;
+  color: $dok-text-muted;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.doc-accion-chip {
+  display: inline-flex;
+  align-items: center;
+  background: #fff3e0;
+  color: #e65100;
+  border-radius: 12px;
+  padding: 1px 7px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+// ── Acciones del documento ────────────────────────────────────────────────────
+.doc-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.btn-ver-doc {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #e3f2fd;
+  color: #1e88e5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+
+  &:hover {
+    background: #1e88e5;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(30, 136, 229, 0.3);
+  }
+}
+
+// ── Paginador ─────────────────────────────────────────────────────────────────
+.paginator-wrapper {
+  flex-shrink: 0;
+  border-top: 1px solid $dok-border;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+
+  ::ng-deep {
+    .mat-paginator {
+      background: transparent;
+      font-size: 0.78rem;
+    }
+  }
+}
+
+// ── Animación ─────────────────────────────────────────────────────────────────
+.animate-fade-in {
+  animation: fadeInUp 0.25s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RESPONSIVE — TABLET-FIRST
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Tablets grandes (≤ 1024px)
+@media (max-width: 1024px) {
+  .tablet-layout {
+    gap: 1rem;
+    grid-template-columns: minmax(250px, 290px) 1fr;
+    height: calc(100vh - 130px);
+    height: calc(100dvh - 130px);
+    height: calc(100svh - 130px);
+  }
+
+  .master-panel,
+  .detail-panel {
+    padding: 1rem;
+  }
+
+  .module-header {
+    padding: 0.9rem 1rem;
+
+    h1 { font-size: 1rem; }
+  }
+}
+
+// Tablets medianas y landscape phones (≤ 900px)
+@media (max-width: 900px) {
+  .tablet-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+    gap: 1rem;
+  }
+
+  .master-panel,
+  .detail-panel {
+    width: 100%;
+    height: auto;
+    min-height: 350px;
+  }
+}
+
+// Móviles (≤ 768px)
+@media (max-width: 768px) {
+  .tablet-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    height: calc(100vh - 130px) !important;
+    height: calc(100dvh - 130px) !important;
+    height: calc(100svh - 130px) !important;
+    overflow: hidden !important;
+    gap: 0 !important;
+  }
+
+  // Base: ocultar detail, mostrar master
+  .tablet-layout .detail-panel {
+    display: none !important;
+  }
+
+  .tablet-layout .master-panel {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    flex: 1 1 auto !important;
+  }
+
+  // Cuando hay carpeta activa, cambiar a detail
+  .tablet-layout:has(.detail-content) {
+    .master-panel {
+      display: none !important;
+    }
+    .detail-panel {
+      display: flex !important;
+      width: 100% !important;
+      height: 100% !important;
+      flex: 1 1 auto !important;
+    }
+  }
+
+  // Botón volver visible en móvil
+  .btn-back-master {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    background: #eef0fd;
+    border: 1px solid #c5cae9;
+    color: $dok-primary-dark;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: all 0.2s ease;
+
+    i { font-size: 0.85rem; }
+
+    &:active {
+      background: #c5cae9;
+      transform: translateY(1px);
+    }
+  }
+
+  .module-header {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 10px;
+
+    h1 { font-size: 0.95rem; }
+    p { display: none; }
+  }
+
+  .rt-icon-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 0.9rem;
+  }
+
+  .master-panel,
+  .detail-panel {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 0.85rem;
+    border-radius: 12px;
+  }
+
+  .folder-card-compact {
+    padding: 0.75rem 0.9rem !important;
+    margin-bottom: 0.6rem !important;
+    border-radius: 10px !important;
+  }
+
+  .folder-icon-wrapper {
+    width: 38px;
+    height: 38px;
+  }
+
+  .folder-icon-main {
+    font-size: 1.2rem;
+  }
+
+  .folder-info-compact .name {
+    font-size: 0.78rem;
+  }
+
+  .doc-item-row {
+    padding: 0.75rem 0.85rem !important;
+    margin-bottom: 0.5rem !important;
+    border-radius: 10px !important;
+  }
+
+  .doc-asunto {
+    font-size: 0.78rem;
+  }
+
+  .doc-meta {
+    font-size: 0.65rem;
+    gap: 0.25rem 0.6rem;
+  }
+
+  .detail-header h3 {
+    font-size: 0.9rem;
+  }
+}
+
+// Móviles pequeños (≤ 480px)
+@media (max-width: 480px) {
+  .doc-item-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .doc-info {
+    width: calc(100% - 36px);
+  }
+
+  .doc-actions {
+    width: 100%;
+    justify-content: flex-end;
+    padding-left: 22px;
+    margin-top: 4px;
+  }
+
+  .doc-id-row {
+    flex-wrap: wrap;
+  }
+
+  .doc-tdoc-badge {
+    max-width: 150px;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FILA ACTIVA (documento seleccionado en el drawer)
+// ══════════════════════════════════════════════════════════════════════════════
+.doc-item-row.doc-active {
+  background: $dok-primary-light !important;
+  border-color: $dok-primary !important;
+  border-left-color: $dok-primary !important;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PANEL DE DETALLE DRAWER (slide-in desde derecha / bottom en móvil)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Backdrop semitransparente
+.detail-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 55, 72, 0.35);
+  z-index: 400;
+  animation: backdropFadeIn 0.2s ease forwards;
+}
+
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// Drawer principal
+.detail-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(480px, 100vw);
+  background: $dok-surface;
+  z-index: 401;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 32px rgba(94, 114, 228, 0.18);
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px 0 0 16px;
+
+  &.detail-drawer-open {
+    transform: translateX(0);
+  }
+}
+
+// Header del Drawer
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.25rem;
+  background: linear-gradient(135deg, $dok-primary 0%, $dok-primary-dark 100%);
+  border-radius: 16px 0 0 0;
+  flex-shrink: 0;
+}
+
+.drawer-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.drawer-header-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.drawer-header-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  cursor: zoom-in;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+.drawer-header-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.3;
+}
+
+.drawer-header-sub {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 1px;
+}
+
+.drawer-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(245, 54, 92, 0.7);
+    border-color: #f5365c;
+    transform: scale(1.05);
+  }
+}
+
+// Cuerpo del Drawer (scroll)
+.drawer-body {
+  flex: 1 1 0px;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $dok-border;
+    border-radius: 4px;
+  }
+}
+
+// Sección dentro del Drawer
+.drawer-section {
+  background: $dok-bg;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  border: 1px solid $dok-border;
+}
+
+.drawer-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: $dok-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  i {
+    color: $dok-primary;
+    font-size: 0.8rem;
+  }
+}
+
+// Grupo de campos
+.drawer-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.drawer-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.drawer-field-label {
+  color: $dok-text-muted;
+  font-weight: 500;
+  flex-shrink: 0;
+  min-width: 100px;
+}
+
+.drawer-field-value {
+  color: $dok-text;
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+
+  &.highlight {
+    color: $dok-primary-dark;
+    font-size: 0.9rem;
+    background: $dok-primary-light;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+}
+
+// Bloque de asunto
+.drawer-asunto-block {
+  font-size: 0.85rem;
+  color: $dok-text;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid $dok-border;
+  font-style: italic;
+}
+
+// Botones de documentos del caso
+.drawer-doc-buttons {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.drawer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+
+  i {
+    font-size: 0.9rem;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &.drawer-btn-pdf {
+    background: #e8eaf6;
+    color: #3949ab;
+
+    &:hover:not(:disabled) {
+      background: #3949ab;
+      color: white;
+      box-shadow: 0 4px 12px rgba(57, 73, 171, 0.25);
+      transform: translateY(-1px);
+    }
+  }
+
+  &.drawer-btn-detail {
+    background: #e3f2fd;
+    color: #1e88e5;
+
+    &:hover:not(:disabled) {
+      background: #1e88e5;
+      color: white;
+      box-shadow: 0 4px 12px rgba(30, 136, 229, 0.25);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// Textarea de observación
+.drawer-textarea {
+  width: 100%;
+  border: 1px solid $dok-border;
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.82rem;
+  color: $dok-text;
+  background: white;
+  resize: vertical;
+  min-height: 72px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: $dok-primary;
+    box-shadow: 0 0 0 3px $dok-primary-light;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Botones de decisión
+.drawer-action-buttons {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.drawer-action-btn {
+  flex: 1;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+
+  .action-btn-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+
+  .action-btn-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.favorable {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-color: #c8e6c9;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #43a047, #2e7d32);
+      color: white;
+      border-color: #2e7d32;
+      box-shadow: 0 6px 18px rgba(46, 125, 50, 0.3);
+      transform: translateY(-2px);
+    }
+  }
+
+  &.diferido {
+    background: #fff8e1;
+    color: #f57f17;
+    border-color: #ffe082;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #ffa000, #f57f17);
+      color: white;
+      border-color: #f57f17;
+      box-shadow: 0 6px 18px rgba(245, 127, 23, 0.3);
+      transform: translateY(-2px);
+    }
+  }
+
+  &.negado {
+    background: #ffebee;
+    color: #c62828;
+    border-color: #ffcdd2;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #e53935, #c62828);
+      color: white;
+      border-color: #c62828;
+      box-shadow: 0 6px 18px rgba(198, 40, 40, 0.3);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.drawer-action-note {
+  font-size: 0.68rem;
+  color: $dok-text-muted;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  i {
+    color: $dok-primary;
+  }
+}
+
+// ── Responsive Drawer ─────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .detail-drawer {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 90dvh;
+    border-radius: 16px 16px 0 0;
+    transform: translateY(100%);
+    box-shadow: 0 -8px 32px rgba(94, 114, 228, 0.18);
+
+    &.detail-drawer-open {
+      transform: translateY(0);
+    }
+  }
+
+  .drawer-header {
+    border-radius: 16px 16px 0 0;
+  }
+
+  .drawer-action-buttons {
+    gap: 0.4rem;
+  }
+
+  .drawer-action-btn {
+    padding: 0.65rem 0.35rem;
+    font-size: 0.72rem;
+
+    .action-btn-icon {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .drawer-field {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .drawer-field-label {
+    font-size: 0.68rem;
+    min-width: auto;
+  }
+
+  .drawer-field-value {
+    text-align: left;
+  }
+
+  .drawer-doc-buttons {
+    flex-direction: column;
+  }
+
+  .drawer-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

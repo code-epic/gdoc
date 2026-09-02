@@ -146,15 +146,17 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
   public get validCases() {
     if (!this.activeDoc) return [];
-    const docs = this.activeDoc.mergedDocumentos || this.activeDoc.documentos || [];
+    const docs =
+      this.activeDoc.mergedDocumentos || this.activeDoc.documentos || [];
     // Si todavía no se han analizado, estadoSincronizacion no existe (mostrarlos como válidos)
-    return docs.filter((c: any) => c.estadoSincronizacion !== 'eliminado');
+    return docs.filter((c: any) => c.estadoSincronizacion !== "eliminado");
   }
 
   public get eliminadoCases() {
     if (!this.activeDoc) return [];
-    const docs = this.activeDoc.mergedDocumentos || this.activeDoc.documentos || [];
-    return docs.filter((c: any) => c.estadoSincronizacion === 'eliminado');
+    const docs =
+      this.activeDoc.mergedDocumentos || this.activeDoc.documentos || [];
+    return docs.filter((c: any) => c.estadoSincronizacion === "eliminado");
   }
 
   public executingType:
@@ -227,26 +229,22 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       ua,
     );
     this.isSafari = isSafariUA || isIOS;
-    console.log(
-      "[TinderPdfViewer] isSafari=",
-      this.isSafari,
-      "UA=",
-      navigator.userAgent,
-    );
+    // console.log(
+    //   "[TinderPdfViewer] isSafari=",
+    //   this.isSafari,
+    //   "UA=",
+    //   navigator.userAgent,
+    // );
     //cargar obtenerWFD
+
+    console.log("Validacion 1 ");
+    console.log(this.documents);
+    console.log("Control de datos");
   }
 
   /* ── Lifecycle ───────────────────────────────────────── */
 
   ngOnChanges(changes: SimpleChanges): void {
-    // console.log(
-    //   "[TinderPdfViewer] ngOnChanges",
-    //   Object.keys(changes),
-    //   "docs",
-    //   this.documents.length,
-    //   "startIndex",
-    //   this.startIndex,
-    // );
     if (changes.documents || changes.startIndex) {
       if (changes.documents && this.documents) {
         this.extractUniqueCarpetas();
@@ -261,6 +259,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           Math.min(idx, this.documents.length - 1),
         );
         this.loadCurrentPdf();
+        console.log("Validacion 3");
+        console.log(this.documents[this.currentIndex]);
+        console.log("Control de datos");
       }
     }
   }
@@ -1084,7 +1085,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       (res: any) => {
         console.log("Estado de resolución guardado con éxito", res);
         this.hasSavedState = true;
-        
+
         // Re-analizar el documento por si hubo ediciones manuales en el texto
         this.analyzeDocument(this.activeDoc);
 
@@ -1656,12 +1657,12 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
    *  - Chrome/Firefox/Edge: fetch con auth → blob URL → <object>, fallback a data URL.
    */
   loadPdfFromUrl(url: string): void {
-    console.log(
-      "[TinderPdfViewer] loadPdfFromUrl",
-      url,
-      "isSafari=",
-      this.isSafari,
-    );
+    // console.log(
+    //   "[TinderPdfViewer] loadPdfFromUrl",
+    //   url,
+    //   "isSafari=",
+    //   this.isSafari,
+    // );
     this.loadingPdf = true;
     this.pdfError = false;
     this.pdfErrorMsg = "";
@@ -1678,12 +1679,12 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     fetch(url, { headers })
       .then((res) => {
         const ct = res.headers.get("content-type") || "unknown";
-        console.log(
-          "[TinderPdfViewer] fetch status",
-          res.status,
-          "content-type",
-          ct,
-        );
+        // console.log(
+        //   "[TinderPdfViewer] fetch status",
+        //   res.status,
+        //   "content-type",
+        //   ct,
+        // );
         if (!res.ok) {
           throw new Error(`HTTP ${res.status} ${res.statusText}`);
         }
@@ -1932,7 +1933,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     // Intentar recuperar el estado de base de datos antes de pintar
     await this.loadSavedState();
-    
+
     // Iniciar análisis de documento
     this.analyzeDocument(doc);
 
@@ -2082,7 +2083,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     this.resumencuenta = "";
     this.nCuenta = "";
     this.cdr.detectChanges();
-    console.log("Cargando datos");
+    console.log("Validacion");
+    console.log(caso);
+    console.log("Control de datos");
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "WKF_CObtenerWFD";
     const numcVal = caso.digital || "";
@@ -2178,6 +2181,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   }
 
   public verPdf(caso: any) {
+    console.log(caso);
+
     if (!caso) return;
     if (!this.NombreArchivo || this.NombreArchivo.trim() === "") {
       Swal.fire({
@@ -2228,9 +2233,12 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     if (!doc) return;
 
     // Obtener lista de casos (agrupados o el documento único de fallback)
-    let list = doc.mergedDocumentos && doc.mergedDocumentos.length > 0 
-      ? doc.mergedDocumentos 
-      : (doc.documentos && doc.documentos.length > 0 ? doc.documentos : [doc]);
+    let list =
+      doc.mergedDocumentos && doc.mergedDocumentos.length > 0
+        ? doc.mergedDocumentos
+        : doc.documentos && doc.documentos.length > 0
+          ? doc.documentos
+          : [doc];
 
     list.forEach((caso: any) => {
       const cedula = (caso.cedula || "").toString().replace(/\./g, "").trim();
@@ -2305,34 +2313,43 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   /* ── Analisis de Documento (LectorService) ───────────── */
   private analyzeDocument(doc: TinderDocument): void {
     if (!doc) return;
-    
+
     this.analyzingDocument = true;
     this.cdr.detectChanges();
-    
+
     setTimeout(() => {
       let htmlCompleto = "";
       if (doc._headerHtml) {
-        htmlCompleto += (doc._headerHtml.includes('<p') ? doc._headerHtml : `<p>${doc._headerHtml}</p>`) + " ";
+        htmlCompleto +=
+          (doc._headerHtml.includes("<p")
+            ? doc._headerHtml
+            : `<p>${doc._headerHtml}</p>`) + " ";
       }
       if (doc["_pageCasesHtml_0"]) {
-        htmlCompleto += (doc["_pageCasesHtml_0"].includes('<p') ? doc["_pageCasesHtml_0"] : `<p>${doc["_pageCasesHtml_0"]}</p>`);
+        htmlCompleto += doc["_pageCasesHtml_0"].includes("<p")
+          ? doc["_pageCasesHtml_0"]
+          : `<p>${doc["_pageCasesHtml_0"]}</p>`;
       }
-      
+
       let parsedOficiales: any[] = [];
       if (htmlCompleto) {
         parsedOficiales = this.lectorService.extraerDatosMilitar(htmlCompleto);
       }
-      
+
       this.syncCases(doc, parsedOficiales, htmlCompleto);
       this.analyzingDocument = false;
       this.cdr.detectChanges();
-      
+
       // Intentar recargar fotos si hay cedulas nuevas
       this.loadPhotosForCases();
     }, 500); // Simulate streaming / non-blocking process
   }
 
-  private syncCases(doc: TinderDocument, parsedOficiales: any[], htmlCompleto: string): void {
+  private syncCases(
+    doc: TinderDocument,
+    parsedOficiales: any[],
+    htmlCompleto: string,
+  ): void {
     const originalDocs = doc.documentos || [];
     let mergedDocs: any[] = [];
     const addedCedulas = new Set<string>();
@@ -2342,31 +2359,38 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     // Mapeo rápido de lo analizado
     const parsedMap = new Map();
     if (!isEmptyHtml) {
-      parsedOficiales.forEach(o => {
+      parsedOficiales.forEach((o) => {
         const ced = (o.cedula || "").toString().replace(/\./g, "").trim();
         if (ced) parsedMap.set(ced, o);
       });
     }
 
     // 1. Los que están en el doc original
-    originalDocs.forEach(d => {
-      const ced = (d.cedula || d.persona?.cedula || "").toString().replace(/\./g, "").trim();
+    originalDocs.forEach((d) => {
+      const ced = (d.cedula || d.persona?.cedula || "")
+        .toString()
+        .replace(/\./g, "")
+        .trim();
       if (ced && addedCedulas.has(ced)) {
         return; // Skip duplicate
       }
       if (ced) addedCedulas.add(ced);
 
       const clone = { ...d };
-      
+
       if (isEmptyHtml) {
         clone.estadoSincronizacion = "pendiente";
       } else if (parsedMap.has(ced)) {
         clone.estadoSincronizacion = "sin alteraciones";
         const parsed = parsedMap.get(ced);
         // Si LectorService extrae el cargo/grado en 'cargo', actualizar ambos para visualización
-        if (parsed.cargo && parsed.cargo !== "S/G" && parsed.cargo !== "Oficial") {
-          clone.grado = parsed.cargo; 
-          clone.cargo = parsed.cargo; 
+        if (
+          parsed.cargo &&
+          parsed.cargo !== "S/G" &&
+          parsed.cargo !== "Oficial"
+        ) {
+          clone.grado = parsed.cargo;
+          clone.cargo = parsed.cargo;
         }
       } else {
         clone.estadoSincronizacion = "eliminado";
@@ -2376,7 +2400,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     // 2. Los que están en el texto parseado y NO estaban originales
     if (!isEmptyHtml) {
-      parsedOficiales.forEach(o => {
+      parsedOficiales.forEach((o) => {
         const ced = (o.cedula || "").toString().replace(/\./g, "").trim();
         if (ced && !addedCedulas.has(ced)) {
           addedCedulas.add(ced);
@@ -2387,7 +2411,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
             grado: o.cargo || "S/G",
             componente: o.componente || "S/C",
             cargo: o.cargo,
-            estadoSincronizacion: "nuevo"
+            estadoSincronizacion: "nuevo",
           });
         }
       });
@@ -2395,12 +2419,19 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     // 3. Ordenar (Los "eliminado" van al final)
     mergedDocs.sort((a, b) => {
-      if (a.estadoSincronizacion === "eliminado" && b.estadoSincronizacion !== "eliminado") return 1;
-      if (b.estadoSincronizacion === "eliminado" && a.estadoSincronizacion !== "eliminado") return -1;
+      if (
+        a.estadoSincronizacion === "eliminado" &&
+        b.estadoSincronizacion !== "eliminado"
+      )
+        return 1;
+      if (
+        b.estadoSincronizacion === "eliminado" &&
+        a.estadoSincronizacion !== "eliminado"
+      )
+        return -1;
       return 0;
     });
 
     doc.mergedDocumentos = mergedDocs;
   }
 }
-
