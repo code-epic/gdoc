@@ -1180,34 +1180,16 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         const motivo = result.value.toUpperCase();
         let successCount = 0;
         let errorCount = 0;
+        console.log(docsToCancel);
 
         for (const doc of docsToCancel) {
           const controlId = doc.ncontrol || doc.numc;
           try {
             this.xAPI = {} as IAPICore;
-            this.xAPI.funcion = environment.funcion.DOCUMENTO_OBSERVACION;
-            this.xAPI.valores = JSON.stringify({
-              documento: controlId,
-              estado: doc.ultimo_estado || doc.estatus || 36,
-              estatus: Math.max(
-                1,
-                (doc.ultimo_estado || doc.estatus || 36) - 1,
-              ),
-              observacion: motivo,
-              accion: "1",
-              usuario: userDb,
-            });
-            this.xAPI.parametros = "";
-
-            await this.apiService.Ejecutar(this.xAPI).toPromise();
-
-            const currentState = doc.ultimo_estado || doc.estatus || 36;
-            const previousState = Math.max(1, currentState - 1);
-            this.xAPI = {} as IAPICore;
-            this.xAPI.funcion = environment.funcion.PROMOVER_ESTATUS;
+            this.xAPI.funcion = environment.funcion.ACTUALIZAR_ESTATUS_FIRMA;
             this.xAPI.valores = "";
-            this.xAPI.parametros = `${previousState},${userDb},${controlId}`;
 
+            this.xAPI.parametros = `881,${doc.cedula},${doc.numero_carpeta}`;
             await this.apiService.Ejecutar(this.xAPI).toPromise();
             successCount++;
           } catch (error) {
