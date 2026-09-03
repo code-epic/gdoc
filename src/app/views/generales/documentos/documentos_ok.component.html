@@ -10,7 +10,7 @@
     <div class="module-header shadow">
       <div>
         <h1 [ngSwitch]="currentProfile">
-          <span *ngSwitchCase="'JefeResolucion'">Bandeja del Jefe de Resoluciones</span>
+          <span *ngSwitchCase="'JefeSecretaria'">Bandeja del Jefe de Secretaría</span>
           <span *ngSwitchCase="'Direccion'">Bandeja de la Dirección del Despacho</span>
           <span *ngSwitchCase="'Ministro'">Bandeja del Ministro</span>
           <span *ngSwitchDefault>Buzón de Documentos</span>
@@ -25,7 +25,7 @@
           <select class="profile-select-custom"
                   [(ngModel)]="currentProfile"
                   (change)="onProfileChange()">
-            <option value="JefeResolucion">Jefe de Resoluciones</option>
+            <option value="JefeSecretaria">Jefe de Secretaría</option>
             <option value="Direccion">Dirección</option>
             <option value="Ministro">Ministro</option>
           </select>
@@ -420,15 +420,15 @@
         </div>
         <div class="drawer-action-buttons">
 
-          <!-- FAVORABLE -->
+          <!-- FAVORABLE (Jefe de Secretaría / Dirección) / FIRMAR (Ministro) -->
           <button class="drawer-action-btn favorable"
-                  (click)="ejecutarAccion('FAVORABLE')"
+                  (click)="ejecutarAccion(currentProfile === 'Ministro' ? 'FIRMAR' : 'FAVORABLE')"
                   [disabled]="loadingAction"
-                  title="Registrar como Favorable">
+                  [title]="currentProfile === 'Ministro' ? 'Firmar Documento' : 'Registrar como Favorable'">
             <div class="action-btn-icon">
-              <i class="fas fa-check-circle"></i>
+              <i [class]="currentProfile === 'Ministro' ? 'fas fa-file-signature' : 'fas fa-check-circle'"></i>
             </div>
-            <span>Favorable</span>
+            <span>{{ currentProfile === 'Ministro' ? 'Firmar' : 'Favorable' }}</span>
             <div class="action-btn-spinner" *ngIf="loadingAction">
               <div class="spinner-border" role="status" style="width: 1rem; height: 1rem;"></div>
             </div>

@@ -16,7 +16,7 @@ import { environment } from "src/environments/environment";
 import Swal from "sweetalert2";
 
 // ─── Tipos de perfil para este módulo ────────────────────────────────────────
-export type DocumentosProfile = "JefeResolucion" | "Direccion" | "Ministro";
+export type DocumentosProfile = "JefeSecretaria" | "Direccion" | "Ministro";
 
 // ─── Definición de carpetas estáticas ─────────────────────────────────────────
 export interface CarpetaDocumento {
@@ -90,7 +90,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public fecha_hasta: string;
 
   // ─── Perfil de usuario ────────────────────────────────────────────────────────
-  public currentProfile: DocumentosProfile = "JefeResolucion";
+  public currentProfile: DocumentosProfile = "JefeSecretaria";
   public jwtData: {
     userId: string;
     userName: string;
@@ -318,8 +318,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     } else if (p.includes("DIRECCION") || r.includes("DIR")) {
       this.currentProfile = "Direccion";
     } else {
-      // Jefe de resolución como perfil base
-      this.currentProfile = "JefeResolucion";
+      // Jefe de Secretaría como perfil base
+      this.currentProfile = "JefeSecretaria";
     }
   }
 
@@ -642,10 +642,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ─── Acciones: Favorable / Diferido / Negado ──────────────────────────────────
-  public ejecutarAccion(decision: "FAVORABLE" | "DIFERIDO" | "NEGADO"): void {
+  // ─── Acciones: Favorable / Diferido / Negado / Firmar ─────────────────────────
+  public ejecutarAccion(decision: "FAVORABLE" | "DIFERIDO" | "NEGADO" | "FIRMAR"): void {
     if (!this.activeDoc) return;
-    if (!this.observacion.trim() && decision !== "FAVORABLE") {
+    if (!this.observacion.trim() && decision !== "FAVORABLE" && decision !== "FIRMAR") {
       this.toastrService.warning(
         "Debe ingresar una observación.",
         "Campo requerido",
@@ -664,8 +664,12 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     });
     this.apiService.Ejecutar(xAPI).subscribe(
       (_data) => {
+        const msgLabel =
+          decision === "FIRMAR"
+            ? "Documento firmado"
+            : `Decisión '${decision}' registrada`;
         this.toastrService.success(
-          `Decisión '${decision}' registrada correctamente.`,
+          `${msgLabel} correctamente.`,
           "Documentos",
         );
         this.loadingAction = false;
