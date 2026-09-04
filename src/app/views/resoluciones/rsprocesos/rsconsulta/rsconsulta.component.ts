@@ -45,7 +45,7 @@ interface ITipoResolucion {
   styleUrls: ["./rsconsulta.component.scss"],
 })
 export class RsconsultaComponent implements OnInit {
-  @ViewChild("modalConfirmarDescarga", { static: true })
+  @ViewChild("modalConfirmarDescarga", { static: false })
   modalConfirmarDescarga: any;
   archivoParaDescargar: { ncontrol: string; archivo: string } | null = null;
 
@@ -1576,6 +1576,8 @@ export class RsconsultaComponent implements OnInit {
   }
 
   detalleEntrada(content, e) {
+    console.log("Pasando los documentos ");
+    console.log(e);
     this.modalService.open(content, {
       windowClass: "modal-custom",
       keyboard: true,
@@ -1586,7 +1588,8 @@ export class RsconsultaComponent implements OnInit {
     this.registrado_entrada = e.des_registrado;
     this.numero = e.numero_carpeta;
     this.cuenta = e.cuenta_oficio;
-    this.digital = e.digital;
+    this.digital = e.digital || e.anombre;
+    this.nombrearchivo = e.anombre;
     this.modificado_entrada = e.f_modificado;
     this.estatus_entrada = e.estatus_descripcion;
 
@@ -1599,6 +1602,7 @@ export class RsconsultaComponent implements OnInit {
     }
 
     this.asunto_entrada = e.asunto;
+    this.cedula = e.acedula;
     this.observacion_entrada = e.observacion;
     this.carpeta_entrada = e.des_carpeta;
   }
@@ -1666,10 +1670,10 @@ export class RsconsultaComponent implements OnInit {
 
   confirmarDescarga() {
     if (!this.archivoParaDescargar) return;
-    this.dwUrlDigital(
-      this.archivoParaDescargar.ncontrol,
-      this.archivoParaDescargar.archivo,
-    );
+    const { ncontrol, archivo } = this.archivoParaDescargar;
+    this.modalService.dismissAll();
+    this.dwUrlDigital(ncontrol, archivo);
+
     this.archivoParaDescargar = null;
   }
 
@@ -1683,17 +1687,40 @@ export class RsconsultaComponent implements OnInit {
       async (data) => {
         let doc = data.Cuerpo;
         console.log(doc);
-        if (doc.length > 0) {
+        if (doc && doc.length > 0 && doc[0].anom) {
           this.apiService.DwsResolDigital(
             btoa("D" + ncontrol) + "/" + doc[0].anom,
+          );
+        } else if (archivo) {
+          if (ncontrol == archivo) {
+            console.log(
+              btoa("RE" + this.cedula) + "/" + archivo,
+              " --> entrando en: ",
+              this.cedula,
+            );
+            this.apiService.DwsResolDigital(
+              btoa("RE" + this.cedula) + "/" + archivo,
+            );
+          } else {
+            this.apiService.DwsResolDigital(
+              btoa("D" + ncontrol) + "/" + archivo,
+            );
+          }
+        } else {
+          this.toastrService.warning(
+            "No se encontró archivo digital para este documento",
+            "Descarga",
           );
         }
       },
       (error) => {
         console.error("Error de conexion a los datos ", error);
         this.ngxService.stopLoader("loader-buscar");
+        this.toastrService.error(
+          "Error de conexión al obtener la información de descarga",
+          "Error",
+        );
       },
     );
-    // return this.apiService.Dws(btoa('D' + ncontrol) + '/' + archivo);
   }
 }

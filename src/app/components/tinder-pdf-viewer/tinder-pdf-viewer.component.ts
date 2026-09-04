@@ -72,6 +72,7 @@ export interface PdfAction {
   styleUrls: ["./tinder-pdf-viewer.component.scss"],
 })
 export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
+  ResumenEntrada: TinderDocument;
   @HostListener("window:keydown", ["$event"])
   onWindowKeyDown(event: KeyboardEvent) {
     const isCtrlOrCmd = event.ctrlKey || event.metaKey;
@@ -213,6 +214,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public loadingFotos: { [cedula: string]: boolean } = {};
   private rawUrlsMap: { [cedula: string]: string } = {};
 
+  public DocumentoGlobal: any = {};
+
   constructor(
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
@@ -259,9 +262,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           Math.min(idx, this.documents.length - 1),
         );
         this.loadCurrentPdf();
-        console.log("Validacion 3");
-        console.log(this.documents[this.currentIndex]);
-        console.log("Control de datos");
+
+        this.ResumenEntrada = this.documents[this.currentIndex];
       }
     }
   }
@@ -2183,21 +2185,26 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   public verPdf(caso: any) {
     console.log(caso);
 
-    if (!caso) return;
-    if (!this.NombreArchivo || this.NombreArchivo.trim() === "") {
-      Swal.fire({
-        title: "Atención",
-        text: "El documento digital PDF no ha sido cargado en el sistema.",
-        icon: "warning",
-        confirmButtonColor: "#3a86c8",
-        confirmButtonText: "Aceptar",
-      });
-      return;
+    let url: any;
+
+    if (caso.anombre == "") {
+      if (!this.NombreArchivo || this.NombreArchivo.trim() === "") {
+        Swal.fire({
+          title: "Atención",
+          text: "El documento digital PDF no ha sido cargado en el sistema.",
+          icon: "warning",
+          confirmButtonColor: "#3a86c8",
+          confirmButtonText: "Aceptar",
+        });
+        return;
+      }
+      url = this.apiService.Dws(
+        btoa("D" + this.NumeroControl) + "/" + this.NombreArchivo,
+      );
+    } else {
+      url = this.apiService.Dws(btoa("RE" + caso.cedula) + "/" + caso.anom);
     }
 
-    const url = this.apiService.Dws(
-      btoa("D" + this.NumeroControl) + "/" + this.NombreArchivo,
-    );
     window.open(url, "_blank");
   }
 

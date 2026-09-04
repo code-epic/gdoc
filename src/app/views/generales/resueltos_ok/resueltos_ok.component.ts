@@ -1180,7 +1180,6 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         const motivo = result.value.toUpperCase();
         let successCount = 0;
         let errorCount = 0;
-        console.log(docsToCancel);
 
         for (const doc of docsToCancel) {
           const controlId = doc.ncontrol || doc.numc;
