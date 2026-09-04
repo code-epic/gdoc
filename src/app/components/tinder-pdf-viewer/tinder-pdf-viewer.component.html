@@ -602,7 +602,7 @@
       <button type="button" class="btn btn-secondary shadow-sm" (click)="closeDetailsModal()">Cerrar</button>
       
       <!-- Option to view/download PDF -->
-      <button *ngIf="selectedCase"
+      <button *ngIf="selectedCase && (selectedCase.digital || selectedCase.anom)"
          (click)="verPdf(selectedCase)" 
          class="btn btn-success ml-2 tpv-btn-pdf-view shadow-sm">
         <i class="fas fa-file-pdf mr-1"></i> Ver PDF en Nueva Pestaña

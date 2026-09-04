@@ -2187,7 +2187,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     let url: any;
 
-    if (caso.anombre == "") {
+    if (caso.anom == "") {
       if (!this.NombreArchivo || this.NombreArchivo.trim() === "") {
         Swal.fire({
           title: "Atención",
