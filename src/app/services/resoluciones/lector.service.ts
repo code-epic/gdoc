@@ -29,7 +29,10 @@ export class LectorService {
     // 2. Ejecutar el clasificador de cese en el empleo / reserva activa
     const porCese = this.parseCeseEmpleo(contenidoHtml);
 
-    // Consolidar resultados eliminando duplicados por cédula (preferir el del cese si coincide)
+    // 3. Ejecutar el clasificador directo de líneas (para otros formatos o patrones sin jerarquía)
+    const porDirecto = this.parseMilitarDirecto(contenidoHtml);
+
+    // Consolidar resultados eliminando duplicados por cédula (preferir el del cese o jerárquico si coincide)
     const mapaOficiales = new Map<string, Oficial>();
 
     porJerarquia.forEach((o) => {
@@ -42,6 +45,14 @@ export class LectorService {
       o.ubicacion = this.normalizarAsunto(o.ubicacion);
       o.cargo = this.normalizarAsunto(o.cargo);
       mapaOficiales.set(o.cedula, o);
+    });
+
+    porDirecto.forEach((o) => {
+      o.ubicacion = this.normalizarAsunto(o.ubicacion);
+      o.cargo = this.normalizarAsunto(o.cargo);
+      if (o.cedula && !mapaOficiales.has(o.cedula)) {
+        mapaOficiales.set(o.cedula, o);
+      }
     });
 
     return Array.from(mapaOficiales.values());
@@ -109,9 +120,18 @@ export class LectorService {
           nombreRaw = nombreRaw.substring(1).trim();
         }
         
+        let nombre = "";
+        let grado = "";
+
         const nombreMatches = nombreRaw.match(/[A-ZÁÉÍÓÚÑ\s]+$/);
-        const nombre = nombreMatches ? nombreMatches[0].trim() : nombreRaw;
-        const grado = nombreRaw.replace(nombre, '').trim() || "S/G";
+        if (nombreMatches && nombreMatches[0].trim() !== nombreRaw) {
+          nombre = nombreMatches[0].trim();
+          grado = nombreRaw.replace(nombre, '').trim() || "S/G";
+        } else {
+          const sep = this.separarGradoYNombre(nombreRaw);
+          nombre = sep.nombre;
+          grado = sep.grado;
+        }
 
         const cedulaSucia = matchPersona[2];
         const cedula = cedulaSucia.replace(/\./g, "").trim();
@@ -130,7 +150,7 @@ export class LectorService {
 
         const ubicacion = rutaDependencias ? `${cargo}, ${rutaDependencias}` : cargo;
 
-        resultados.push({ nombre, cedula, cargo: grado + " " + cargo, ubicacion });
+        resultados.push({ nombre, cedula, cargo: grado + (cargo ? " " + cargo : ""), ubicacion });
       } else {
         // Es un nodo de jerarquía (Dependencia, Batallón, Sección, etc.)
         // Eliminar de la pila los nodos que estén al mismo nivel o más profundos, 
@@ -186,13 +206,18 @@ export class LectorService {
         const cedulaSucia = matchCese[3];
         const cedula = cedulaSucia.replace(/\./g, "").trim();
 
-        // Extraer nombre en mayúsculas al final
+        let nombre = "";
+        let cargo = "";
+
         const nombreMatches = rankAndName.match(/[A-ZÁÉÍÓÚÑ\s]+$/);
-        const nombre = nombreMatches ? nombreMatches[0].trim() : rankAndName;
-        
-        // Extraer cargo/grado (lo que queda al inicio)
-        let cargo = rankAndName.replace(nombre, "").trim();
-        if (!cargo) cargo = "Oficial";
+        if (nombreMatches && nombreMatches[0].trim() !== rankAndName) {
+          nombre = nombreMatches[0].trim();
+          cargo = rankAndName.replace(nombre, "").trim() || "Oficial";
+        } else {
+          const sep = this.separarGradoYNombre(rankAndName);
+          nombre = sep.nombre;
+          cargo = sep.grado !== "S/G" ? sep.grado : "Oficial";
+        }
 
         // Para cese en el empleo, la ubicación es el asunto extraído
         const ubicacion = asuntoExtraido;
@@ -202,6 +227,157 @@ export class LectorService {
     }
 
     return resultados;
+  }
+
+  /**
+   * Caso 3: Clasificador Directo de Líneas / Párrafos (Nueva funcionalidad añadida).
+   * Analiza cualquier texto o etiqueta buscando patrones de [Grado] [Nombre] [, ] C.I. [Cédula].
+   */
+  private parseMilitarDirecto(contenidoHtml: string): Oficial[] {
+    const resultados: Oficial[] = [];
+    if (!contenidoHtml) return resultados;
+
+    // Convertir etiquetas de quiebre en saltos de línea para procesar por bloques/líneas
+    const htmlNormalizado = contenidoHtml
+      .replace(/<\/(p|div|li|tr|h[1-6])>/gi, "\n")
+      .replace(/<br\s*\/?>/gi, "\n");
+
+    const textoLimpio = htmlNormalizado
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/gi, " ");
+
+    const lineas = textoLimpio.split("\n");
+
+    for (const linea of lineas) {
+      const l = linea.trim();
+      if (!l || l === "-") continue;
+
+      const regexPersona = /([^,.\n]+?)\s*,?\s*(?:C\.?I\.?\s*(?:N[°ºo\.]*|NRO\.?|NUMERO)?|CÉDULA(?:\s+DE\s+IDENTIDAD)?\s*(?:N[°ºo\.]*)?|N[°ºo]\.?)\s*[:\.-]*\s*(?:[VEve]-?)?\s*([\d\.]+)(?:\s*[,.]?\s*([^,.\n]+))?/gi;
+      let match;
+      while ((match = regexPersona.exec(l)) !== null) {
+        const rankAndName = match[1].trim();
+        const cedulaSucia = match[2];
+        const cedula = cedulaSucia.replace(/\./g, "").trim();
+        const cargoPost = match[3] ? match[3].trim() : "";
+
+        if (!cedula || cedula.length < 5) continue;
+
+        const { grado, nombre } = this.separarGradoYNombre(rankAndName);
+        if (!nombre) continue;
+
+        const cargo = cargoPost ? `${grado} ${cargoPost}` : grado;
+        const ubicacion = cargoPost || grado;
+
+        resultados.push({
+          nombre,
+          cedula,
+          cargo,
+          ubicacion,
+        });
+      }
+    }
+
+    return resultados;
+  }
+
+  /**
+   * Helper que separa inteligentemente Grado/Rango del Nombre del Oficial (Nueva funcionalidad añadida).
+   * Maneja rangos compuestos (ej. Sargento Supervisor, Sargento Ayudante, Sargento Mayor de Primera, etc.),
+   * prefijos (Ciudadano, al, del) y diferencias de mayúsculas/minúsculas.
+   */
+  public separarGradoYNombre(textoRaw: string): { grado: string; nombre: string } {
+    if (!textoRaw) return { grado: "S/G", nombre: "" };
+
+    // 1. Limpiar prefijos conocidos (al, del, a la, de la, ciudadano, ciudadana, guiones, viñetas)
+    let limpio = textoRaw
+      .replace(/^[\s\-*•–]+/, "")
+      .replace(/^(?:al?\s+(?:ciudadano\s+|ciudadana\s+)?|del?\s+(?:la\s+)?(?:ciudadano\s+|ciudadana\s+)?|ciudadano\s+|ciudadana\s+)/i, "")
+      .trim();
+
+    if (!limpio) return { grado: "S/G", nombre: textoRaw.trim() };
+
+    // 2. Intentar extraer nombre si está en MAYÚSCULAS al final y el grado en Mixto (ej: Sargento Ayudante DAVID ENRIQUE HERMOSO VELASCO)
+    const matchMayusculasFinal = limpio.match(/^(.*?)\s+([A-ZÁÉÍÓÚÑ]{2,}(?:\s+[A-ZÁÉÍÓÚÑ]{2,})+)$/);
+    if (matchMayusculasFinal) {
+      const posibleGrado = matchMayusculasFinal[1].trim();
+      const posibleNombre = matchMayusculasFinal[2].trim();
+      if (posibleGrado.length > 0 && posibleGrado !== posibleGrado.toUpperCase()) {
+        return { grado: posibleGrado, nombre: posibleNombre };
+      }
+    }
+
+    // 3. Lista de rangos militares ordenados de mayor a menor longitud
+    const rangosConocidos = [
+      "SARGENTO MAYOR DE PRIMERA",
+      "SARGENTO MAYOR DE SEGUNDA",
+      "SARGENTO MAYOR DE TERCERA",
+      "SARGENTO SUPERVISOR",
+      "SARGENTO AYUDANTE",
+      "SARGENTO PRIMERO",
+      "SARGENTO SEGUNDO",
+      "GENERAL DE DIVISION",
+      "GENERAL DE BRIGADA",
+      "GENERAL EN JEFE",
+      "MAYOR GENERAL",
+      "ALMIRANTE EN JEFE",
+      "VICEALMIRANTE",
+      "CONTRALMIRANTE",
+      "TENIENTE CORONEL",
+      "CAPITAN DE NAVIO",
+      "CAPITAN DE FRAGATA",
+      "CAPITAN DE CORBETA",
+      "PRIMER TENIENTE",
+      "TENIENTE DE NAVIO",
+      "TENIENTE DE FRAGATA",
+      "ALFEREZ DE NAVIO",
+      "MAESTRE PRINCIPAL",
+      "MAESTRE TECNICO",
+      "MAESTRE MAYOR",
+      "MAESTRE DE PRIMERA",
+      "MAESTRE DE SEGUNDA",
+      "MAESTRE DE TERCERA",
+      "TROPA PROFESIONAL",
+      "TROPA ALISTADA",
+      "CORONEL",
+      "CAPITAN",
+      "TENIENTE",
+      "SARGENTO",
+      "MAESTRE",
+      "MAYOR",
+      "CADETE",
+      "ALUMNO",
+      "OFICIAL"
+    ];
+
+    const limpioUpper = this.normalizarAsunto(limpio);
+    for (const rango of rangosConocidos) {
+      if (limpioUpper.startsWith(rango)) {
+        const len = rango.length;
+        const grado = limpio.substring(0, len).trim();
+        const nombre = limpio.substring(len).replace(/^[\s,:-]+/, "").trim();
+        if (nombre.length > 0) {
+          return { grado, nombre };
+        }
+      }
+    }
+
+    // 4. Si la cadena tiene nombre en mayúsculas al final (ej: "Sargento Supervisor INGEL RAFAEL ARANGUREN PERDOMO")
+    const matchNombreUpper = limpio.match(/[A-ZÁÉÍÓÚÑ]{2,}(?:\s+[A-ZÁÉÍÓÚÑ]{2,})+$/);
+    if (matchNombreUpper) {
+      const nombre = matchNombreUpper[0].trim();
+      const grado = limpio.replace(nombre, "").replace(/[\s,:-]+$/, "").trim() || "S/G";
+      return { grado, nombre };
+    }
+
+    // 5. Fallback por número de palabras (si tiene 3 o más palabras, las últimas 2 o 3 son el nombre)
+    const palabras = limpio.split(/\s+/);
+    if (palabras.length >= 3) {
+      const nombre = palabras.slice(-2).join(" ");
+      const grado = palabras.slice(0, -2).join(" ");
+      return { grado, nombre };
+    }
+
+    return { grado: "S/G", nombre: limpio };
   }
 
   /**
@@ -223,3 +399,4 @@ export class LectorService {
     return res.trim();
   }
 }
+

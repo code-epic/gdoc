@@ -645,7 +645,7 @@
                             </thead>
                             <tbody>
 
-                                <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstHzAdjunto;let i=index">
+                                <tr *ngFor="let el of lstHzAdjunto;let i=index">
 
                                     <td>
                                         <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top"

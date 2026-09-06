@@ -71,6 +71,7 @@ export class MinisterialComponent implements OnInit {
   public lstAcciones = [
     { valor: "1", texto: "ANALISTA", visible: "1" },
     { valor: "2", texto: "JEFE DE AREA", visible: "1" },
+    { valor: "14", texto: "JEFE DE AREA / PARA LA FIRMA", visible: "1" }, //PARA FIRMAR PUNTOS DE CUENTAS
     { valor: "3", texto: "BANDEJA DE ESPERA", visible: "1" },
     { valor: "4", texto: "PRESIDENCIAL", visible: "1" },
     { valor: "15", texto: "VICEPRESIDENCIAL", visible: "1" },
@@ -104,9 +105,9 @@ export class MinisterialComponent implements OnInit {
   public nombre = "";
   public grado = "";
   public titulo = "";
-  public archivos = [];
-  public lstMinisterial = [];
-  public lstCuenta = [];
+  public archivos: any[] = [];
+  public lstMinisterial: any[] = [];
+  public lstCuenta: any[] = [];
 
   public download: any;
   public fcreacion: any;
@@ -127,7 +128,7 @@ export class MinisterialComponent implements OnInit {
 
   public AccionTexto: string = "0";
 
-  public lstHzAdjunto = [];
+  public lstHzAdjunto: any[] = [];
 
   public SubDocumento: SubDocumento = {
     subdocumento: 0,
@@ -166,7 +167,7 @@ export class MinisterialComponent implements OnInit {
   public dwValidate = false;
   public dwSub = false;
   public doc: any;
-  public lstNotaEntrega = [];
+  public lstNotaEntrega: any[] = [];
   public parametros: string = "";
   public allComplete: boolean = false;
 
@@ -316,15 +317,15 @@ export class MinisterialComponent implements OnInit {
 
         this.cargarDatosBase(this.lstCuenta);
 
-        if (
-          this.lstCuenta[0].cuenta != "" &&
-          this.lstCuenta[0].cuenta != null
-        ) {
-          this.cargarPuntoCuentas();
-          this.blOficio = true;
-        } else {
-          this.blOficio = false;
-        }
+        // if (
+        //   this.lstCuenta[0].cuenta != "" &&
+        //   this.lstCuenta[0].cuenta != null
+        // ) {
+        this.cargarPuntoCuentas();
+        this.blOficio = true;
+        // } else {
+        //   this.blOficio = false;
+        // }
       },
       (error) => {},
     );

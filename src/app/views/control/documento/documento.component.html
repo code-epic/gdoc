@@ -772,8 +772,7 @@
                                     <th>Unidades o Dependencias Seleccionadas</th>
                                 </thead>
                                 <tbody>
-                                    <tr [ngModelOptions]="{standalone: true}"
-                                        *ngFor="let el of lstDependencias;let i=index">
+                                    <tr *ngFor="let el of lstDependencias;let i=index">
                                         <td style="width:20px">
                                             <button type="button" class="btn btn-danger btn-sm"
                                                 (click)="eliminarDependencia( i, el.id )">
@@ -896,7 +895,7 @@
                                     <th>{{sCedula}}</th>
                                 </thead>
                                 <tbody>
-                                    <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
+                                    <tr *ngFor="let el of lstCuenta;let i=index">
                                         <td style="text-align:center;width:10px">
                                             <font style="font-weight: bold;"> {{i+1}}</font>
                                         </td>

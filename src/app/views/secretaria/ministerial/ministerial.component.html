@@ -202,7 +202,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstCuenta;let i=index">
+                        <tr *ngFor="let el of lstCuenta;let i=index">
                           <td style="width: 20px;">{{i+1}}</td>
                           <td style="display: none;">
                             <input type="hidden" class="form-control" id="{{ i }}-nomb" value="{{ el.nombre }}">
@@ -363,7 +363,7 @@
                   <button class="btn btn-pastel-cancel text-white" (click)="open(adjuntar, numc)" style="height: 40px;">
                     <i class="fa fa-upload mr-2"></i> Adjuntar
                     Documento</button>
-                  <button class="btn btn-pastel text-white" *ngIf="dwSub" (click)="open(archivos)" style="height: 40px;">
+                  <button class="btn btn-pastel text-white" *ngIf="dwSub" (click)="open(archivos, null)" style="height: 40px;">
                     <i class="fa fa-download mr-2"></i> Ver Documento</button>
 
                   <button mat-raised-button class="btn btn-pastel text-white" (click)="aceptar()" style="height: 40px;">
@@ -482,10 +482,10 @@
                 </thead>
                 <tbody>
 
-                  <tr [ngModelOptions]="{standalone: true}" *ngFor="let el of lstHzAdjunto;let i=index">
+                  <tr *ngFor="let el of lstHzAdjunto;let i=index">
 
                     <td>
-                      <a [href]="dwUrl(Doc.ncontrol, el.nombre)" target="_top" rel="noopener noreferrer">
+                      <a [href]="dwUrl(numControl, el.nombre)" target="_top" rel="noopener noreferrer">
                         {{ el.nombre.substring(20,32) }}
                       </a>
                     </td>
