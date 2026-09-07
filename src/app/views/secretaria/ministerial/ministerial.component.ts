@@ -504,7 +504,7 @@ export class MinisterialComponent implements OnInit {
     this.archivos.push(e.target.files[0]);
   }
 
-  async SubirArchivo(e) {
+  async SubirArchivo() {
     this.ngxService.startLoader("loader-aceptar");
     var frm = new FormData(document.forms.namedItem("forma"));
     try {

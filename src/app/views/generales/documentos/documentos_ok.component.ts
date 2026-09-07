@@ -14,6 +14,7 @@ import { LoginService } from "src/app/services/seguridad/login.service";
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { environment } from "src/environments/environment";
 import Swal from "sweetalert2";
+import { IWKFAlerta } from "src/app/services/control/documentos.service";
 
 // ─── Tipos de perfil para este módulo ────────────────────────────────────────
 export type DocumentosProfile = "JefeSecretaria" | "Direccion" | "Ministro";
@@ -54,6 +55,18 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  public estadoActual = 4;
+  public estadoOrigen = 2;
+  public WAlerta: IWKFAlerta = {
+    documento: 0,
+    estado: 0,
+    estatus: 0,
+    activo: 0,
+    fecha: "",
+    usuario: "",
+    observacion: "",
+  };
 
   // ─── Estado del módulo ───────────────────────────────────────────────────────
   public selectedCarpeta: CarpetaDocumento | null = null;
@@ -191,6 +204,12 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     document.documentElement.classList.add("immersive-active");
 
     this.decodeUserToken();
+    this.updateEstadosFromProfile();
+
+    const disponible = this.carpetas.find((c) => c.disponible);
+    if (disponible) {
+      this.onCarpetaClick(disponible);
+    }
   }
 
   ngOnDestroy(): void {
@@ -212,6 +231,49 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   // ─── Salir del módulo ─────────────────────────────────────────────────────────
   public exitComponent(): void {
     this.router.navigate(["/dashboard"]);
+  }
+
+  // ─── Navegar a vista Ministerial ─────────────────────────────────────────────
+  public irAMinisterial(doc: any): void {
+    if (!doc) return;
+    const obj = { tipo: "MINISTERIAL", objeto: doc };
+    const base = btoa(JSON.stringify(obj));
+    this.router.navigate(["/ministerial", base]);
+  }
+
+  // ─── Obtener código de estado según perfil (JefeSecretaria=4, Direccion=5, Ministro=6) ───
+  public getEstadoFromProfile(
+    profile: DocumentosProfile = this.currentProfile,
+  ): number {
+    switch (profile) {
+      case "JefeSecretaria":
+        return 4;
+      case "Direccion":
+        return 5;
+      case "Ministro":
+        return 6;
+      default:
+        return 4;
+    }
+  }
+
+  public selectedEstadoBuzon: "por_procesar" | "firmados" = "por_procesar";
+
+  // ─── Sincronizar estadoOrigen con el perfil actual o modo firmados (estadoActual fijo en 4) ──────────
+  public updateEstadosFromProfile(): void {
+    this.estadoActual = 4;
+    if (this.selectedEstadoBuzon === "firmados") {
+      this.estadoOrigen = 7;
+    } else {
+      this.estadoOrigen = this.getEstadoFromProfile(this.currentProfile);
+    }
+
+    this.carpetas.forEach((c) => {
+      if (c.disponible) {
+        c.estadoActual = 4;
+        c.estadoOrigen = this.estadoOrigen;
+      }
+    });
   }
 
   // ─── Decodificar JWT y mapear perfil ─────────────────────────────────────────
@@ -321,6 +383,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       // Jefe de Secretaría como perfil base
       this.currentProfile = "JefeSecretaria";
     }
+    this.updateEstadosFromProfile();
   }
 
   public isAdmin(): boolean {
@@ -334,10 +397,33 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   public onProfileChange(): void {
+    this.updateEstadosFromProfile();
     this.selectedCarpeta = null;
     this.buzon = [];
     this.bzOriginal = [];
     this.longitud = 0;
+    this.buscarQuery = "";
+
+    // Auto-refrescar seleccionando el buzón disponible para el nuevo estado (4, 5 o 6)
+    const disponible = this.carpetas.find((c) => c.disponible);
+    if (disponible) {
+      this.onCarpetaClick(disponible);
+    }
+  }
+
+  public onEstadoBuzonChange(): void {
+    this.updateEstadosFromProfile();
+    this.selectedCarpeta = null;
+    this.buzon = [];
+    this.bzOriginal = [];
+    this.longitud = 0;
+    this.buscarQuery = "";
+
+    // Auto-refrescar seleccionando el buzón disponible para el estado origen (7 u origen del perfil)
+    const disponible = this.carpetas.find((c) => c.disponible);
+    if (disponible) {
+      this.onCarpetaClick(disponible);
+    }
   }
 
   // ─── Selección de carpeta ─────────────────────────────────────────────────────
@@ -362,6 +448,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public async cargarBuzon(carpeta: CarpetaDocumento): Promise<void> {
     if (!carpeta.funcion) return;
 
+    this.updateEstadosFromProfile();
+    carpeta.estadoActual = this.estadoActual;
+    carpeta.estadoOrigen = this.estadoOrigen;
+
     this.loadingBuzon = true;
     this.ngxService.startLoader("loader-documentos");
 
@@ -375,6 +465,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         const bz: any[] = [];
         console.log(data);
         if (data && data.Cuerpo) {
+          const groupMap = new Map<string, any>();
+
           data.Cuerpo.forEach((e: any) => {
             e.edit =
               e.tdoc && e.tdoc.toLowerCase() === "punto de cuenta"
@@ -394,16 +486,117 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             e.sub_nombre = this.stripHtml(e.sub_nombre || "").toUpperCase();
             e.sub_cargo = this.stripHtml(e.sub_cargo || "").toUpperCase();
 
-            if (carpeta.filtro === 1) {
-              if (e.accion != null) {
-                const text = this.cmbAcciones[e.accion]?.texto || "";
-                e.nombre_accion = text;
+            if (e.accion != null) {
+              const text = this.cmbAcciones[e.accion]?.texto || "";
+              e.nombre_accion = text;
+            }
+
+            // Clave de agrupación por numc / ncontrol / cuenta
+            const key = (e.numc || e.ncontrol || e.cuenta || e.id || "0")
+              .toString()
+              .trim();
+
+            if (!groupMap.has(key)) {
+              const folder = {
+                ...e,
+                keyGroup: key,
+                mergedDocumentos: [],
+              };
+
+              // Si el elemento individual posee información de persona, agregar como subcaso
+              if (
+                e.sub_cedula ||
+                e.sub_nombre ||
+                e.cedula ||
+                e.nombres_apellidos
+              ) {
+                folder.mergedDocumentos.push({
+                  ...e,
+                  cedula: e.sub_cedula || e.cedula,
+                  nombre: e.sub_nombre || e.nombres_apellidos || e.nombre,
+                  cargo: e.sub_cargo || e.cargo || e.grado,
+                  sub_detalle: e.sub_detalle || e.detalle || "",
+                  detalle:
+                    e.sub_detalle || e.detalle || e.estatus || e.estado || "PR",
+                  observacion: e.observacion || e.obse || "",
+                });
               }
-              bz.push(e);
-            } else if (carpeta.filtro === 3 && e.tdoc === "PUNTO DE CUENTA") {
-              bz.push(e);
+
+              // Si tiene campo subdocumento JSON
+              if (e.subdocumento) {
+                try {
+                  const parsed =
+                    typeof e.subdocumento === "string"
+                      ? JSON.parse(e.subdocumento)
+                      : e.subdocumento;
+                  if (Array.isArray(parsed)) {
+                    parsed.forEach((subItem: any) => {
+                      const itemObj =
+                        typeof subItem === "object"
+                          ? subItem
+                          : JSON.parse(subItem);
+                      folder.mergedDocumentos.push(itemObj);
+                    });
+                  }
+                } catch (err) {
+                  console.warn(
+                    "[DocumentosOk] Error parsing subdocumento:",
+                    err,
+                  );
+                }
+              }
+
+              groupMap.set(key, folder);
             } else {
-              bz.push(e);
+              const folder = groupMap.get(key);
+              const cleanCed = e.sub_cedula || e.cedula || "";
+              const cleanNom =
+                e.sub_nombre || e.nombres_apellidos || e.nombre || "";
+
+              const exists = folder.mergedDocumentos.some((sub: any) => {
+                const subCed = (sub.cedula || sub.sub_cedula || "")
+                  .toString()
+                  .trim();
+                const subNom = (
+                  sub.nombre ||
+                  sub.sub_nombre ||
+                  sub.nombres_apellidos ||
+                  ""
+                )
+                  .toString()
+                  .trim();
+                return (
+                  (cleanCed && subCed === cleanCed) ||
+                  (cleanNom && subNom === cleanNom)
+                );
+              });
+
+              if (!exists && (cleanCed || cleanNom)) {
+                folder.mergedDocumentos.push({
+                  ...e,
+                  cedula: cleanCed,
+                  nombre: cleanNom,
+                  cargo: e.sub_cargo || e.cargo || e.grado,
+                  sub_detalle: e.sub_detalle || e.detalle || "",
+                  detalle:
+                    e.sub_detalle || e.detalle || e.estatus || e.estado || "PR",
+                  observacion: e.observacion || e.obse || "",
+                });
+              }
+            }
+          });
+
+          // Convertir el Map agrupado a arreglo
+          groupMap.forEach((folder) => {
+            if (carpeta.filtro === 1) {
+              bz.push(folder);
+            } else if (
+              carpeta.filtro === 3 &&
+              folder.tdoc === "PUNTO DE CUENTA"
+            ) {
+              bz.push(folder);
+            } else {
+              bz.push(folder);
             }
           });
         }
@@ -433,7 +626,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public recorrerElementos(pagina: number): void {
     const start = this.pageSize * pagina;
     this.buzon = this.bzOriginal.slice(start, start + this.pageSize);
-    this.cargarFotosBuzon(this.buzon);
+
+    const itemsToFetch: any[] = [];
+    this.buzon.forEach((folder) => {
+      itemsToFetch.push(folder);
+      const sub = this.getSubcasos(folder);
+      if (sub && sub.length > 0) {
+        itemsToFetch.push(...sub);
+      }
+    });
+    this.cargarFotosBuzon(itemsToFetch);
   }
 
   public pageChangeEvent(e: any): void {
@@ -454,6 +656,27 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       const cont = (e.cont || "").toLowerCase();
       const resumen = (e.resumen || "").toLowerCase();
       const numc = (e.numc || "").toLowerCase();
+
+      // Búsqueda en los subcasos/personas agrupadas
+      const subcasos = this.getSubcasos(e);
+      const matchSubcaso = subcasos.some((sub: any) => {
+        const sced = (sub.cedula || sub.sub_cedula || "")
+          .toString()
+          .toLowerCase();
+        const snom = (
+          sub.nombre ||
+          sub.sub_nombre ||
+          sub.nombres_apellidos ||
+          ""
+        )
+          .toString()
+          .toLowerCase();
+        const scarg = (sub.cargo || sub.sub_cargo || "")
+          .toString()
+          .toLowerCase();
+        return sced.includes(q) || snom.includes(q) || scarg.includes(q);
+      });
+
       return (
         cedula.includes(q) ||
         nombre.includes(q) ||
@@ -461,7 +684,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         cuenta.includes(q) ||
         cont.includes(q) ||
         resumen.includes(q) ||
-        numc.includes(q)
+        numc.includes(q) ||
+        matchSubcaso
       );
     });
   }
@@ -482,6 +706,128 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (!e) return "";
     const c = e.sub_cargo || e.cargo || "";
     return c.toString().trim().toUpperCase();
+  }
+
+  // ─── Extraer el código de estatus real del integrante (soporta hash|estatus) ───
+  public getEstatusFromDetalle(item: any): string {
+    if (!item) return "PR";
+    let raw =
+      item.sub_detalle ||
+      item.detalle ||
+      item.s_estatus ||
+      item.sub_estatus ||
+      item.estatus ||
+      item.estado ||
+      "";
+    if (typeof raw !== "string") {
+      raw = (raw || "").toString();
+    }
+    raw = raw.trim();
+    if (!raw) return "PR";
+
+    if (raw.includes("|")) {
+      const parts = raw.split("|");
+      if (parts.length > 1 && parts[1].trim()) {
+        return parts[1].trim().toUpperCase();
+      }
+    }
+    return raw.toUpperCase();
+  }
+
+  // ─── Etiqueta de detalle de estatus de la persona ─────────────────────────────
+  public getDetalleLabel(item: any): string {
+    const val = this.getEstatusFromDetalle(item);
+
+    if (
+      !val ||
+      val === "1" ||
+      val === "0" ||
+      val === "4" ||
+      val === "PR" ||
+      val === "PROCESAR" ||
+      val === "PROCESADO" ||
+      val === "APROBADO"
+    ) {
+      return "APROBADO";
+    }
+
+    if (
+      val === "NP" ||
+      val === "NO PROCESAR" ||
+      val === "NEGADO" ||
+      val === "RECHAZADO"
+    )
+      return "NEGADO";
+    if (val === "NPPIDD") return "NP POR INT. DEL DIRECTOR";
+    if (val === "NPPIDJ") return "NP POR INT. DEL JEFE DE AREA";
+    if (val === "CR" || val === "CODIGO ROJO" || val === "CÓDIGO ROJO")
+      return "CÓDIGO ROJO";
+    if (val === "BD") return "NO PROCESAR POR ASCENSO";
+    if (val === "PE" || val === "PENDIENTE") return "PENDIENTE";
+    if (val === "DI" || val === "DIFERIDO") return "DIFERIDO";
+
+    if (val.startsWith("NP ")) return "NEGADO";
+    if (val.startsWith("PE ")) return "PENDIENTE";
+
+    return val || "APROBADO";
+  }
+
+  // ─── Evaluar si un caso interno es Negado / No Procesar / Código Rojo ─────────
+  public isNoProcesar(item: any): boolean {
+    const val = this.getEstatusFromDetalle(item);
+    if (
+      !val ||
+      val === "1" ||
+      val === "0" ||
+      val === "4" ||
+      val === "PR" ||
+      val === "PROCESAR" ||
+      val === "PROCESADO" ||
+      val === "APROBADO"
+    ) {
+      return false;
+    }
+    return (
+      val === "NP" ||
+      val === "NEGADO" ||
+      val === "NO PROCESAR" ||
+      val === "NPPIDD" ||
+      val === "NPPIDJ" ||
+      val === "CR" ||
+      val === "BD" ||
+      val === "CODIGO ROJO" ||
+      val === "CÓDIGO ROJO" ||
+      val.startsWith("NP ") ||
+      val.includes("RECHAZADO")
+    );
+  }
+
+  // ─── Evaluar si un caso interno está Pendiente / Diferido ─────────────────────
+  public isPendiente(item: any): boolean {
+    const val = this.getEstatusFromDetalle(item);
+    return (
+      val === "PE" ||
+      val === "PENDIENTE" ||
+      val === "DI" ||
+      val === "DIFERIDO" ||
+      val.startsWith("PE ")
+    );
+  }
+
+  // ─── Obtener subcasos APROBADOS / PROCESAR ─────────────────────────────────────
+  public getSubcasosProcesar(e: any): any[] {
+    const list = this.getSubcasos(e);
+    return list.filter(
+      (item) => !this.isNoProcesar(item) && !this.isPendiente(item),
+    );
+  }
+
+  // ─── Obtener subcasos NEGADOS / EXCEPCIONES / CÓDIGO ROJO / PENDIENTES ──────────
+  public getSubcasosNoProcesar(e: any): any[] {
+    const list = this.getSubcasos(e);
+    return list.filter(
+      (item) => this.isNoProcesar(item) || this.isPendiente(item),
+    );
   }
 
   // ─── Obtener datos a mostrar por elemento del buzón ──────────────────────────
@@ -606,9 +952,51 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.pdfUrl = null;
     this.isDetailOpen = true;
     if (e) {
-      this.cargarFotosBuzon([e]);
+      const subcasos = this.getSubcasos(e);
+      this.cargarFotosBuzon([e, ...subcasos]);
     }
     this.changeDetector.detectChanges();
+  }
+
+  // ─── Obtener subcasos / personas dentro del expediente ────────────────────────
+  public getSubcasos(e: any): any[] {
+    if (!e) return [];
+    let list: any[] = [];
+    if (e.subdocumento) {
+      try {
+        const parsed =
+          typeof e.subdocumento === "string"
+            ? JSON.parse(e.subdocumento)
+            : e.subdocumento;
+        if (Array.isArray(parsed)) {
+          list = parsed.map((item: any) =>
+            typeof item === "object" ? item : JSON.parse(item),
+          );
+        }
+      } catch (err) {
+        console.warn("[DocumentosOk] Error parsing subdocumento:", err);
+      }
+    }
+    if (
+      list.length === 0 &&
+      Array.isArray(e.mergedDocumentos) &&
+      e.mergedDocumentos.length > 0
+    ) {
+      list = e.mergedDocumentos;
+    } else if (
+      list.length === 0 &&
+      Array.isArray(e.documentos) &&
+      e.documentos.length > 0
+    ) {
+      list = e.documentos;
+    } else if (
+      list.length === 0 &&
+      Array.isArray(e.lstCuenta) &&
+      e.lstCuenta.length > 0
+    ) {
+      list = e.lstCuenta;
+    }
+    return list;
   }
 
   // ─── Cerrar panel de detalle ──────────────────────────────────────────────────
@@ -623,9 +1011,41 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   // ─── URL del PDF del documento ────────────────────────────────────────────────
   public getDwsUrl(e: any): string {
+    if (!e) return "";
     const ncontrol = e.numc || e.ncontrol || "0";
-    const archivo = e.anom || e.archivo || "";
+    let archivo =
+      e.anom_firmado || e.archivo_firmado || e.anom || e.archivo || "";
     if (!archivo) return "";
+
+    const isFirmado =
+      this.estadoOrigen === 7 ||
+      e.estado === 7 ||
+      e.idestado === "7" ||
+      e.idestado === 7 ||
+      this.selectedEstadoBuzon === "firmados";
+
+    if (isFirmado) {
+      let cleanName = archivo.replace(/\.pdf$/i, "");
+      const isPunto =
+        (e.tdoc || "").toUpperCase().includes("PUNTO") ||
+        this.selectedCarpeta?.id === "PUNTO_DE_CUENTA";
+      const isTor =
+        (e.tdoc || "").toUpperCase().includes("TRAMITA") ||
+        this.selectedCarpeta?.id === "TRAMITE_ORGANO_REGULAR";
+
+      if (!cleanName.toLowerCase().startsWith("firmado")) {
+        cleanName = `firmado_${cleanName}`;
+      }
+
+      if (isPunto && !cleanName.toLowerCase().endsWith("_punt")) {
+        cleanName = `${cleanName}_punt`;
+      } else if (isTor && !cleanName.toLowerCase().endsWith("_tramitacion")) {
+        cleanName = `${cleanName}_tramitacion`;
+      }
+
+      archivo = `${cleanName}.pdf`;
+    }
+
     return this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
   }
 
@@ -643,9 +1063,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   // ─── Acciones: Favorable / Diferido / Negado / Firmar ─────────────────────────
-  public ejecutarAccion(decision: "FAVORABLE" | "DIFERIDO" | "NEGADO" | "FIRMAR"): void {
+  public ejecutarAccion(
+    decision: "FAVORABLE" | "DIFERIDO" | "NEGADO" | "FIRMAR",
+  ): void {
     if (!this.activeDoc) return;
-    if (!this.observacion.trim() && decision !== "FAVORABLE" && decision !== "FIRMAR") {
+    if (
+      !this.observacion.trim() &&
+      decision !== "FAVORABLE" &&
+      decision !== "FIRMAR"
+    ) {
       this.toastrService.warning(
         "Debe ingresar una observación.",
         "Campo requerido",
@@ -653,37 +1079,61 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       return;
     }
     this.loadingAction = true;
-    const xAPI: IAPICore = {} as IAPICore;
-    xAPI.funcion = "WKF_IDocumentoDecision";
-    xAPI.parametros = "";
-    xAPI.valores = JSON.stringify({
-      documento: this.activeDoc.numc || this.activeDoc.ncontrol || "",
-      decision: decision,
-      observacion: this.observacion.toUpperCase(),
-      usuario: this.jwtData.userId,
-    });
-    this.apiService.Ejecutar(xAPI).subscribe(
-      (_data) => {
+    this.redistribuir(decision);
+  }
+
+  async redistribuir(decision: any) {
+    const estadoDestino = Math.min(this.estadoOrigen + 1, 7);
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_ARedistribuir";
+    this.xAPI.valores = "";
+    this.xAPI.parametros = `${this.estadoActual},${this.estadoActual},${estadoDestino},${this.jwtData.userId},${this.activeDoc.idd}`;
+    console.log(this.xAPI.parametros);
+    await this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
         const msgLabel =
           decision === "FIRMAR"
             ? "Documento firmado"
             : `Decisión '${decision}' registrada`;
-        this.toastrService.success(
-          `${msgLabel} correctamente.`,
-          "Documentos",
-        );
+        this.toastrService.success(`${msgLabel} correctamente.`, "Documentos");
         this.loadingAction = false;
         this.closeDetail();
         this.actualizarBuzon();
-      },
-      (err) => {
-        console.error("[DocumentosOk] Error en acción:", err);
-        this.toastrService.error(
-          "Error al registrar la decisión.",
-          "Documentos",
+
+        // this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
+        this.toastrService.success(
+          "El documento ha sido redistribuido segun su selección",
+          `GDoc Wkf.DocumentoObservacion`,
         );
+      },
+      (error) => {
+        console.error(error);
         this.loadingAction = false;
       },
     );
+  }
+
+  //Guardar la alerte define el momento y estadus
+  guardarAlerta(activo: number, fecha: string) {
+    this.WAlerta.activo = activo;
+    this.WAlerta.documento = parseInt(this.activeDoc.numc);
+    this.WAlerta.estado = this.estadoActual;
+    this.WAlerta.usuario = this.jwtData.userId;
+    this.WAlerta.observacion = "PROCESO DE VALIDACION DEL TOR";
+    this.WAlerta.fecha = fecha;
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_AAlertas";
+    this.xAPI.parametros = "";
+    console.log(this.WAlerta);
+    this.xAPI.valores = JSON.stringify(this.WAlerta);
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async (alerData) => {
+        console.log(alerData);
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
+      },
+    ); //
   }
 }

@@ -111,46 +111,48 @@ export class LectorService {
       }
 
       // Detectar persona con Cédula y Cargo (Cargo puede ser opcional al final o terminar en punto)
-      const regexPersona = /([^,]+),\s*(?:C\.I\.\s*N[°º]?|C\.I\.|N[°º])\s*([\d\.]+)(?:\s*,\s*([^,.]+))?/i;
+      const regexPersona = /([^,]+),\s*(?:C\.?I\.?\s*(?:N[°ºo\.]*|NRO\.?|NUMERO)?|CÉDULA(?:\s+DE\s+IDENTIDAD)?\s*(?:N[°ºo\.]*)?|(?:V|E)-)\s*[:\.-]*\s*(?:[VEve]-?)?\s*([\d\.]+)(?:\s*,\s*([^,.]+))?/i;
       const matchPersona = textoLimpio.match(regexPersona);
 
-      if (matchPersona) {
+      if (matchPersona && this.esCedulaValida(matchPersona[2])) {
         let nombreRaw = matchPersona[1].trim();
         if (nombreRaw.startsWith('-')) {
           nombreRaw = nombreRaw.substring(1).trim();
         }
         
-        let nombre = "";
-        let grado = "";
+        if (!/(?:Resolución|Resolucion|Código|Codigo|Venezuela|Decreto|Gaceta|Oficio|Partidas?)/i.test(nombreRaw)) {
+          let nombre = "";
+          let grado = "";
 
-        const nombreMatches = nombreRaw.match(/[A-ZÁÉÍÓÚÑ\s]+$/);
-        if (nombreMatches && nombreMatches[0].trim() !== nombreRaw) {
-          nombre = nombreMatches[0].trim();
-          grado = nombreRaw.replace(nombre, '').trim() || "S/G";
-        } else {
-          const sep = this.separarGradoYNombre(nombreRaw);
-          nombre = sep.nombre;
-          grado = sep.grado;
+          const nombreMatches = nombreRaw.match(/[A-ZÁÉÍÓÚÑ\s]+$/);
+          if (nombreMatches && nombreMatches[0].trim() !== nombreRaw) {
+            nombre = nombreMatches[0].trim();
+            grado = nombreRaw.replace(nombre, '').trim() || "S/G";
+          } else {
+            const sep = this.separarGradoYNombre(nombreRaw);
+            nombre = sep.nombre;
+            grado = sep.grado;
+          }
+
+          const cedulaSucia = matchPersona[2];
+          const cedula = cedulaSucia.replace(/\./g, "").trim();
+          
+          let cargo = matchPersona[3] ? matchPersona[3].trim() : ""; 
+          if (cargo.includes(',')) {
+             cargo = cargo.substring(0, cargo.indexOf(',')).trim();
+          } else if (cargo.toLowerCase().endsWith('p/v.')) {
+             cargo = cargo.substring(0, cargo.length - 4).trim();
+          }
+
+          const rutaDependencias = pilaJerarquia
+            .map((nodo) => nodo.texto)
+            .reverse()
+            .join(", ");
+
+          const ubicacion = rutaDependencias ? `${cargo}, ${rutaDependencias}` : cargo;
+
+          resultados.push({ nombre, cedula, cargo: grado + (cargo ? " " + cargo : ""), ubicacion });
         }
-
-        const cedulaSucia = matchPersona[2];
-        const cedula = cedulaSucia.replace(/\./g, "").trim();
-        
-        let cargo = matchPersona[3] ? matchPersona[3].trim() : ""; 
-        if (cargo.includes(',')) {
-           cargo = cargo.substring(0, cargo.indexOf(',')).trim();
-        } else if (cargo.toLowerCase().endsWith('p/v.')) {
-           cargo = cargo.substring(0, cargo.length - 4).trim();
-        }
-
-        const rutaDependencias = pilaJerarquia
-          .map((nodo) => nodo.texto)
-          .reverse()
-          .join(", ");
-
-        const ubicacion = rutaDependencias ? `${cargo}, ${rutaDependencias}` : cargo;
-
-        resultados.push({ nombre, cedula, cargo: grado + (cargo ? " " + cargo : ""), ubicacion });
       } else {
         // Es un nodo de jerarquía (Dependencia, Batallón, Sección, etc.)
         // Eliminar de la pila los nodos que estén al mismo nivel o más profundos, 
@@ -176,8 +178,8 @@ export class LectorService {
   }
 
   /**
-   * Caso 2: Clasificador de Cese en el Empleo / Reserva Activa.
-   * Detecta enunciados con patrón de cese de empleo, extrayendo el asunto, grado/nombre y cédula.
+   * Caso 2: Clasificador de Cese en el Empleo / Reserva Activa / Designación.
+   * Detecta enunciados con patrón de cese de empleo o designación, extrayendo el asunto, grado/nombre y cédula.
    * Ejemplo: "ÚNICO: CESAR EN EL EMPLEO (PROPIA SOLICITUD) al Capitán LUIS MIGUEL CARVAJAL CARRIÓN, C.I. N° 20.022.914."
    */
   private parseCeseEmpleo(contenidoHtml: string): Oficial[] {
@@ -195,12 +197,12 @@ export class LectorService {
 
       if (!textoLimpio) continue;
 
-      // Regex para patrón de cese de empleo
+      // Regex para patrón de cese de empleo / designación
       // ÚNICO: [Asunto] al/del [Grado Nombre], C.I. N° [Cédula]
-      const regexCese = /(?:ÚNICO|PRIMERO|SEGUNDO|TERCERO|CUARTO|QUINTO):\s*([^,]+?)\s+(?:al?\s+(?:ciudadano\s+|ciudadana\s+)?|del?\s+la?\s+)([^,]+),\s*(?:C\.I\.\s*N[°º]?|C\.I\.|N[°º])\s*([\d\.]+)/i;
+      const regexCese = /(?:ÚNICO|PRIMERO|SEGUNDO|TERCERO|CUARTO|QUINTO):\s*([^,]+?)\s+(?:al?\s+(?:ciudadano\s+|ciudadana\s+)?|del?\s+la?\s+)([^,]+),\s*(?:C\.?I\.?\s*(?:N[°ºo\.]*|NRO\.?|NUMERO)?|CÉDULA(?:\s+DE\s+IDENTIDAD)?\s*(?:N[°ºo\.]*)?|(?:V|E)-)\s*[:\.-]*\s*(?:[VEve]-?)?\s*([\d\.]+)/i;
       const matchCese = textoLimpio.match(regexCese);
 
-      if (matchCese) {
+      if (matchCese && this.esCedulaValida(matchCese[3])) {
         const asuntoExtraido = matchCese[1].trim();
         const rankAndName = matchCese[2].trim();
         const cedulaSucia = matchCese[3];
@@ -219,7 +221,7 @@ export class LectorService {
           cargo = sep.grado !== "S/G" ? sep.grado : "Oficial";
         }
 
-        // Para cese en el empleo, la ubicación es el asunto extraído
+        // Para cese o designación, la ubicación es el asunto extraído
         const ubicacion = asuntoExtraido;
 
         resultados.push({ nombre, cedula, cargo, ubicacion });
@@ -230,7 +232,7 @@ export class LectorService {
   }
 
   /**
-   * Caso 3: Clasificador Directo de Líneas / Párrafos (Nueva funcionalidad añadida).
+   * Caso 3: Clasificador Directo de Líneas / Párrafos.
    * Analiza cualquier texto o etiqueta buscando patrones de [Grado] [Nombre] [, ] C.I. [Cédula].
    */
   private parseMilitarDirecto(contenidoHtml: string): Oficial[] {
@@ -252,21 +254,27 @@ export class LectorService {
       const l = linea.trim();
       if (!l || l === "-") continue;
 
-      const regexPersona = /([^,.\n]+?)\s*,?\s*(?:C\.?I\.?\s*(?:N[°ºo\.]*|NRO\.?|NUMERO)?|CÉDULA(?:\s+DE\s+IDENTIDAD)?\s*(?:N[°ºo\.]*)?|N[°ºo]\.?)\s*[:\.-]*\s*(?:[VEve]-?)?\s*([\d\.]+)(?:\s*[,.]?\s*([^,.\n]+))?/gi;
+      const regexPersona = /([^,.\n]+?)\s*,?\s*(?:C\.?I\.?\s*(?:N[°ºo\.]*|NRO\.?|NUMERO)?|CÉDULA(?:\s+DE\s+IDENTIDAD)?\s*(?:N[°ºo\.]*)?|(?:V|E)-)\s*[:\.-]*\s*(?:[VEve]-?)?\s*([\d\.]+)(?:\s*[,.]?\s*([^,.\n]+))?/gi;
       let match;
       while ((match = regexPersona.exec(l)) !== null) {
         const rankAndName = match[1].trim();
         const cedulaSucia = match[2];
-        const cedula = cedulaSucia.replace(/\./g, "").trim();
         const cargoPost = match[3] ? match[3].trim() : "";
 
-        if (!cedula || cedula.length < 5) continue;
+        // Omitir prefijos no deseados (Resolución Nº, Código Nº, Venezuela Nº, Decreto Nº, Gaceta Nº, Oficio Nº, Partidas)
+        if (/(?:Resolución|Resolucion|Código|Codigo|Venezuela|Decreto|Gaceta|Oficio|Partidas?)/i.test(rankAndName)) {
+          continue;
+        }
+
+        if (!this.esCedulaValida(cedulaSucia)) continue;
 
         const { grado, nombre } = this.separarGradoYNombre(rankAndName);
         if (!nombre) continue;
 
         const cargo = cargoPost ? `${grado} ${cargoPost}` : grado;
         const ubicacion = cargoPost || grado;
+
+        const cedula = cedulaSucia.replace(/\./g, "").trim();
 
         resultados.push({
           nombre,
@@ -397,6 +405,26 @@ export class LectorService {
              .replace(/[ÝŸ]/g, "Y");
 
     return res.trim();
+  }
+
+  /**
+   * Valida si la cadena extraída corresponde a una Cédula de Identidad venezolana real.
+   * Omite explícitamente números de resolución (ej. 001151), códigos (ej. 04516), partidas (4.02)
+   * y números/cantidades pequeñas (ej. limitantes a 43.238).
+   */
+  public esCedulaValida(cedulaStr: string): boolean {
+    if (!cedulaStr) return false;
+    const clean = cedulaStr.replace(/\./g, "").trim();
+    if (!/^\d{6,9}$/.test(clean)) {
+      return false;
+    }
+    const val = parseInt(clean, 10);
+    // Cédulas venezolanas válidas están en el rango de 500.000 a 100.000.000 (val >= 100000)
+    // Esto excluye códigos como 04516 (4516), 001151 (1151) y limitantes como 43.238 (43238).
+    if (isNaN(val) || val < 100000 || val > 100000000) {
+      return false;
+    }
+    return true;
   }
 }
 

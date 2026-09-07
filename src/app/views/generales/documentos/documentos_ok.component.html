@@ -10,15 +10,31 @@
     <div class="module-header shadow">
       <div>
         <h1 [ngSwitch]="currentProfile">
-          <span *ngSwitchCase="'JefeSecretaria'">Bandeja del Jefe de Secretaría</span>
-          <span *ngSwitchCase="'Direccion'">Bandeja de la Dirección del Despacho</span>
-          <span *ngSwitchCase="'Ministro'">Bandeja del Ministro</span>
-          <span *ngSwitchDefault>Buzón de Documentos</span>
+          <ng-container *ngIf="selectedEstadoBuzon === 'firmados'; else normalTitle">
+            Documentos Firmados
+          </ng-container>
+          <ng-template #normalTitle>
+            <span *ngSwitchCase="'JefeSecretaria'">Bandeja del Jefe de Secretaría</span>
+            <span *ngSwitchCase="'Direccion'">Bandeja de la Dirección del Despacho</span>
+            <span *ngSwitchCase="'Ministro'">Bandeja del Ministro</span>
+            <span *ngSwitchDefault>Buzón de Documentos</span>
+          </ng-template>
         </h1>
-        <p>Búsqueda y consulta de documentos ministeriales.</p>
+        <p *ngIf="selectedEstadoBuzon === 'firmados'">Consulta de expedientes firmados digitalmente.</p>
+        <p *ngIf="selectedEstadoBuzon !== 'firmados'">Búsqueda y consulta de documentos ministeriales en trámite.</p>
       </div>
 
-      <div style="display: flex; gap: 12px; align-items: center;">
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+
+        <!-- Selector de Estado del Buzón (En Trámite vs Documentos Firmados) -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <select class="profile-select-custom"
+                  [(ngModel)]="selectedEstadoBuzon"
+                  (change)="onEstadoBuzonChange()">
+            <option value="por_procesar">En Trámite</option>
+            <option value="firmados">Documentos Firmados</option>
+          </select>
+        </div>
 
         <!-- Selector de Perfil (Solo Admins) -->
         <div *ngIf="isAdmin()" style="display: flex; align-items: center; gap: 8px;">
@@ -180,38 +196,63 @@
               <!-- Número de fila -->
               <div class="row-index">{{ i + 1 }}</div>
 
-              <!-- Avatar Foto de Cédula (Clic para ampliar) -->
-              <div class="doc-avatar-container"
-                   *ngIf="getCedula(e)"
-                   (click)="verFotoAmpliada(getCedula(e)); $event.stopPropagation()"
-                   title="Clic para ver foto ampliada">
-                <img [src]="fotosCasos[getCedula(e)]"
-                     *ngIf="!loadingFotos[getCedula(e)] && fotosCasos[getCedula(e)]"
-                     alt="Avatar">
-                <i class="fas fa-spinner fa-spin text-primary" *ngIf="loadingFotos[getCedula(e)]"></i>
-                <i class="fas fa-user" *ngIf="!loadingFotos[getCedula(e)] && !fotosCasos[getCedula(e)]"></i>
-              </div>
+              <!-- Avatar: Carpeta Agrupada vs Foto de Persona Individual -->
+              <ng-container *ngIf="getSubcasos(e).length > 0; else singleAvatar">
+                <div class="doc-avatar-container folder-avatar-container" title="Caso Agrupado con {{ getSubcasos(e).length }} personas">
+                  <div class="folder-stack-icon">
+                    <i class="fas fa-folder-open"></i>
+                    <span class="folder-count-pill">{{ getSubcasos(e).length }}</span>
+                  </div>
+                </div>
+              </ng-container>
 
-              <!-- Info principal -->
+              <ng-template #singleAvatar>
+                <div class="doc-avatar-container"
+                     *ngIf="getCedula(e)"
+                     (click)="verFotoAmpliada(getCedula(e)); $event.stopPropagation()"
+                     title="Clic para ver foto ampliada">
+                  <img [src]="fotosCasos[getCedula(e)]"
+                       *ngIf="!loadingFotos[getCedula(e)] && fotosCasos[getCedula(e)]"
+                       alt="Avatar">
+                  <i class="fas fa-spinner fa-spin text-primary" *ngIf="loadingFotos[getCedula(e)]"></i>
+                  <i class="fas fa-user" *ngIf="!loadingFotos[getCedula(e)] && !fotosCasos[getCedula(e)]"></i>
+                </div>
+              </ng-template>
+
+              <!-- Info principal del Caso / Documento -->
               <div class="doc-info">
 
-                <!-- Identificador (Cédula y Nombre si existe) -->
+                <!-- Identificador Row: Encabezado de Expediente vs Persona Individual -->
                 <div class="doc-id-row">
-                  <span class="doc-id-badge">
-                    <i class="fas fa-id-card"></i>
-                    {{ getIdentificador(e) || 'Sin identificador' }}
-                  </span>
-                  <span class="doc-nombre-badge" *ngIf="getNombre(e)">
-                    <i class="fas fa-user-check"></i>
-                    {{ getNombre(e) }}
-                  </span>
-                  <span class="doc-tdoc-badge" [title]="e.tdoc">
-                    {{ e.nombre_accion || e.tdoc || '' }}
-                  </span>
+                  <ng-container *ngIf="getSubcasos(e).length > 0; else singleDocHeader">
+                    <span class="doc-expediente-badge">
+                      <i class="fas fa-folder text-warning"></i> Expediente Nº {{ e.numc || e.ncontrol || e.cuenta || 'Sin número' }}
+                    </span>
+                    <span class="doc-subcasos-badge">
+                      <i class="fas fa-users text-primary"></i> {{ getSubcasos(e).length }} Personas agrupadas
+                    </span>
+                    <span class="doc-tdoc-badge" [title]="e.tdoc">
+                      {{ e.nombre_accion || e.tdoc || 'Trámite por Órgano Regular' }}
+                    </span>
+                  </ng-container>
+
+                  <ng-template #singleDocHeader>
+                    <span class="doc-id-badge" *ngIf="getIdentificador(e)">
+                      <i class="fas fa-id-card"></i>
+                      {{ getIdentificador(e) }}
+                    </span>
+                    <span class="doc-nombre-badge" *ngIf="getNombre(e)">
+                      <i class="fas fa-user-check"></i>
+                      {{ getNombre(e) }}
+                    </span>
+                    <span class="doc-tdoc-badge" [title]="e.tdoc">
+                      {{ e.nombre_accion || e.tdoc || '' }}
+                    </span>
+                  </ng-template>
                 </div>
 
-                <!-- Grado / Cargo si existe -->
-                <div class="doc-cargo-row" *ngIf="getCargo(e)">
+                <!-- Grado / Cargo solo si es persona individual -->
+                <div class="doc-cargo-row" *ngIf="getSubcasos(e).length === 0 && getCargo(e)">
                   <span class="doc-cargo-chip">
                     <i class="fas fa-user-tie"></i> {{ getCargo(e) }}
                   </span>
@@ -222,7 +263,7 @@
                   {{ getAsuntoClean(e) }}
                 </div>
 
-                <!-- Meta: fecha, número de control -->
+                <!-- Meta: fecha, número de control y sugerencia para abrir detalles -->
                 <div class="doc-meta">
                   <span *ngIf="getFecha(e)">
                     <i class="far fa-calendar-alt"></i>
@@ -231,6 +272,9 @@
                   <span *ngIf="e.numc">
                     <i class="fas fa-hashtag"></i>
                     {{ e.numc }}
+                  </span>
+                  <span class="doc-hint-badge" *ngIf="getSubcasos(e).length > 0">
+                    <i class="fas fa-chevron-right"></i> Clic para ver {{ getSubcasos(e).length }} persona(s) y firmar
                   </span>
                 </div>
 
@@ -241,7 +285,7 @@
               <div class="doc-actions" (click)="$event.stopPropagation()">
                 <button class="btn-ver-doc"
                         (click)="openDetail(e); $event.stopPropagation()"
-                        title="Ver Detalle del Documento">
+                        title="Ver Detalle e Integrantes del Expediente">
                   <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
@@ -277,112 +321,262 @@
 
 
   <!-- ══════════════════════════════════════════════════════════════════════════
-       PANEL DE DETALLE INMERSIVO (slide-in desde la derecha / bottom en móvil)
-       Se muestra sobre el explorador cuando se selecciona un documento
+       MODAL DE DETALLE EJECUTIVO (Centrado, Floating Glassmorphism, 2 Columnas)
   ══════════════════════════════════════════════════════════════════════════════ -->
-  <div class="detail-drawer-backdrop"
+  <div class="detail-modal-backdrop"
        *ngIf="isDetailOpen && activeDoc"
        (click)="closeDetail()">
-  </div>
 
-  <div class="detail-drawer"
-       *ngIf="activeDoc"
-       [class.detail-drawer-open]="isDetailOpen"
-       (click)="$event.stopPropagation()">
+    <div class="detail-modal-card"
+         (click)="$event.stopPropagation()">
 
-    <!-- ── Header del Drawer ── -->
-    <div class="drawer-header">
-      <div class="drawer-header-left">
-        <!-- Avatar Foto en el Header -->
-        <div class="drawer-header-avatar"
-             *ngIf="getCedula(activeDoc)"
-             (click)="verFotoAmpliada(getCedula(activeDoc)); $event.stopPropagation()"
-             title="Clic para ver foto ampliada">
-          <img [src]="fotosCasos[getCedula(activeDoc)]"
-               *ngIf="!loadingFotos[getCedula(activeDoc)] && fotosCasos[getCedula(activeDoc)]"
-               alt="Avatar">
-          <i class="fas fa-spinner fa-spin text-white" *ngIf="loadingFotos[getCedula(activeDoc)]"></i>
-          <i class="fas fa-user" *ngIf="!loadingFotos[getCedula(activeDoc)] && !fotosCasos[getCedula(activeDoc)]"></i>
+      <!-- ── Header del Modal ── -->
+      <div class="modal-header-custom">
+        <div class="modal-header-left">
+          <div class="modal-header-icon">
+            <i class="fas fa-folder-open"></i>
+          </div>
+          <div>
+            <div class="modal-header-title d-flex align-items-center gap-2">
+              <span>Expediente Nº {{ activeDoc.numc || activeDoc.ncontrol || activeDoc.cuenta || 'Sin Número' }}</span>
+            </div>
+            <div class="modal-header-sub">
+              {{ selectedCarpeta?.nombre || 'Buzón de Documentos' }}
+            </div>
+          </div>
         </div>
-        <div class="drawer-header-icon" *ngIf="!getCedula(activeDoc)">
-          <i class="fas fa-file-contract"></i>
-        </div>
-        <div>
-          <div class="drawer-header-title">Detalle — {{ getIdentificador(activeDoc) }}</div>
-          <div class="drawer-header-sub">{{ selectedCarpeta?.nombre }}</div>
-        </div>
-      </div>
-      <button class="drawer-close-btn" (click)="closeDetail()" title="Cerrar (Esc)">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
 
-    <!-- ── Cuerpo del Drawer ── -->
-    <div class="drawer-body">
+        <!-- Tally badge de resumen de decisiones -->
+        <div class="modal-header-tally d-none d-md-flex align-items-center gap-2">
+          <span class="tally-pill tally-approved" *ngIf="getSubcasosProcesar(activeDoc).length > 0">
+            <i class="fas fa-check-circle mr-1"></i> {{ getSubcasosProcesar(activeDoc).length }} Aprobado(s)
+          </span>
+          <span class="tally-pill tally-denied" *ngIf="getSubcasosNoProcesar(activeDoc).length > 0">
+            <i class="fas fa-times-circle mr-1"></i> {{ getSubcasosNoProcesar(activeDoc).length }} Negado(s)
+          </span>
+        </div>
 
-      <!-- ── Sección: Identificación ── -->
-      <div class="drawer-section">
-        <div class="drawer-section-label">
-          <i class="fas fa-id-card"></i> Identificación
-        </div>
-        <div class="drawer-field-group">
-          <div class="drawer-field" *ngIf="getCedula(activeDoc)">
-            <span class="drawer-field-label">Cédula</span>
-            <span class="drawer-field-value highlight">
-              {{ getCedula(activeDoc) }}
-            </span>
-          </div>
-          <div class="drawer-field" *ngIf="getNombre(activeDoc)">
-            <span class="drawer-field-label">Nombre / Afiliado</span>
-            <span class="drawer-field-value font-weight-bold">
-              {{ getNombre(activeDoc) }}
-            </span>
-          </div>
-          <div class="drawer-field" *ngIf="getCargo(activeDoc)">
-            <span class="drawer-field-label">Grado / Cargo</span>
-            <span class="drawer-field-value text-primary">
-              {{ getCargo(activeDoc) }}
-            </span>
-          </div>
-          <div class="drawer-field">
-            <span class="drawer-field-label">N° Control</span>
-            <span class="drawer-field-value">{{ activeDoc.numc || activeDoc.ncontrol || '—' }}</span>
-          </div>
-          <div class="drawer-field">
-            <span class="drawer-field-label">Tipo Documento</span>
-            <span class="drawer-field-value">
-              <span class="doc-tdoc-badge">{{ activeDoc.tdoc || '—' }}</span>
-            </span>
-          </div>
-          <div class="drawer-field">
-            <span class="drawer-field-label">Fecha</span>
-            <span class="drawer-field-value">{{ getFecha(activeDoc) || '—' }}</span>
-          </div>
-          <div class="drawer-field" *ngIf="activeDoc.nombre_accion">
-            <span class="drawer-field-label">Acción</span>
-            <span class="drawer-field-value">{{ activeDoc.nombre_accion }}</span>
-          </div>
-        </div>
+        <button class="modal-close-btn ml-3" (click)="closeDetail()" title="Cerrar modal (Esc)">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
 
-      <!-- ── Sección: Asunto / Contenido ── -->
-      <div class="drawer-section">
-        <div class="drawer-section-label">
-          <i class="fas fa-align-left"></i> Asunto / Contenido
-        </div>
-        <div class="drawer-asunto-block">
-          {{ getAsuntoClean(activeDoc) || 'Sin descripción disponible.' }}
-        </div>
-      </div>
+      <!-- ── Cuerpo del Modal (2 Columnas en Desktop/Tablet) ── -->
+      <div class="modal-body-custom">
 
-      <!-- ── Sección: Documentos del Caso ── -->
-      <div class="drawer-section">
-        <div class="drawer-section-label">
-          <i class="fas fa-paperclip"></i> Documentos del Caso
+        <!-- COLUMNA IZQUIERDA: Información del Expediente & Observaciones -->
+        <div class="modal-col-left">
+
+          <!-- Identificación Card -->
+          <div class="info-card-block">
+            <div class="block-title">
+              <i class="fas fa-info-circle text-primary mr-1"></i> Datos del Expediente
+            </div>
+            <div class="info-grid">
+              <div class="info-item" *ngIf="getCedula(activeDoc)">
+                <span class="info-label">Cédula Principal</span>
+                <span class="info-val highlight">{{ getCedula(activeDoc) }}</span>
+              </div>
+              <div class="info-item" *ngIf="getNombre(activeDoc)">
+                <span class="info-label">Titular / Afiliado</span>
+                <span class="info-val font-weight-bold">{{ getNombre(activeDoc) }}</span>
+              </div>
+              <div class="info-item" *ngIf="getCargo(activeDoc)">
+                <span class="info-label">Grado / Cargo</span>
+                <span class="info-val text-primary">{{ getCargo(activeDoc) }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Tipo Documento</span>
+                <span class="info-val">
+                  <span class="doc-tdoc-badge">{{ activeDoc.tdoc || '—' }}</span>
+                </span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Fecha Registro</span>
+                <span class="info-val">{{ getFecha(activeDoc) || '—' }}</span>
+              </div>
+              <div class="info-item" *ngIf="activeDoc.nombre_accion">
+                <span class="info-label">Acción</span>
+                <span class="info-val">{{ activeDoc.nombre_accion }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Asunto Block -->
+          <div class="info-card-block">
+            <div class="block-title">
+              <i class="fas fa-align-left text-primary mr-1"></i> Asunto / Objeto del Caso
+            </div>
+            <div class="asunto-text-box">
+              {{ getAsuntoClean(activeDoc) || 'Sin descripción disponible.' }}
+            </div>
+          </div>
+
+          <!-- Observación Textarea Block -->
+          <div class="info-card-block">
+            <div class="block-title d-flex justify-content-between align-items-center">
+              <span><i class="fas fa-comment-alt text-primary mr-1"></i> Observación para Decisión</span>
+              <small class="text-muted font-weight-normal" style="font-size: 0.72rem;">* Requerido para Diferido / Negado</small>
+            </div>
+            <textarea class="modal-textarea"
+                      [(ngModel)]="observacion"
+                      placeholder="Ingrese una observación o motivo de la decisión..."
+                      rows="3"
+                      [disabled]="loadingAction">
+            </textarea>
+          </div>
+
         </div>
-        <div class="drawer-doc-buttons">
-          <!-- Botón Ver PDF -->
-          <button class="drawer-btn drawer-btn-pdf"
+        <!-- FIN COLUMNA IZQUIERDA -->
+
+        <!-- COLUMNA DERECHA: Integrantes / Subcasos Categorizados por Viñetas -->
+        <div class="modal-col-right">
+
+          <div class="subcasos-header-bar mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-users text-primary fa-lg"></i>
+              <span class="subcasos-main-title">Integrantes del Caso</span>
+            </div>
+            <span class="badge badge-primary px-3 py-1 font-weight-bold" style="font-size: 0.8rem; border-radius: 12px;"
+                  *ngIf="getSubcasos(activeDoc).length > 0">
+              {{ getSubcasos(activeDoc).length }} Personas
+            </span>
+          </div>
+
+          <!-- Estado si no hay subcasos adicionales -->
+          <div class="empty-subcasos-box text-center p-4" *ngIf="getSubcasos(activeDoc).length === 0">
+            <i class="fas fa-user-check text-muted fa-2x mb-2"></i>
+            <p class="text-muted m-0" style="font-size: 0.85rem;">Trámite individual sin integrantes adicionales agrupados.</p>
+          </div>
+
+          <!-- 🟢 CATEGORÍA 1: Integrantes Aprobados -->
+          <div class="subcasos-category-block mb-3" *ngIf="getSubcasosProcesar(activeDoc).length > 0">
+            <div class="category-header category-header-procesar">
+              <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-check-circle text-success"></i>
+                <span class="category-title">Integrantes Aprobados</span>
+              </div>
+              <span class="category-count-badge badge-success-light">
+                {{ getSubcasosProcesar(activeDoc).length }} Aprobado(s)
+              </span>
+            </div>
+
+            <div class="subcasos-list-container p-2">
+              <div class="subcaso-card-item subcaso-procesar mb-2"
+                   *ngFor="let item of getSubcasosProcesar(activeDoc); let idx = index">
+
+                <!-- Avatar -->
+                <div class="subcaso-avatar"
+                     *ngIf="getCedula(item)"
+                     (click)="verFotoAmpliada(getCedula(item)); $event.stopPropagation()"
+                     title="Clic para ver foto ampliada">
+                  <img [src]="fotosCasos[getCedula(item)]"
+                       *ngIf="!loadingFotos[getCedula(item)] && fotosCasos[getCedula(item)]"
+                       alt="Avatar">
+                  <i class="fas fa-spinner fa-spin text-primary" *ngIf="loadingFotos[getCedula(item)]"></i>
+                  <i class="fas fa-user" *ngIf="!loadingFotos[getCedula(item)] && !fotosCasos[getCedula(item)]"></i>
+                </div>
+
+                <!-- Información -->
+                <div class="subcaso-content">
+                  <div class="subcaso-name font-weight-bold">
+                    {{ (item.nombre || item.nombres_apellidos || getNombre(item) || 'Sin Nombre') | uppercase }}
+                  </div>
+                  <div class="subcaso-meta">
+                    <span class="subcaso-cedula" *ngIf="getCedula(item)">
+                      <i class="fas fa-id-card"></i> C.I: {{ getCedula(item) }}
+                    </span>
+                    <span class="subcaso-cargo ml-2" *ngIf="getCargo(item)">
+                      <i class="fas fa-user-tie"></i> {{ getCargo(item) }}
+                    </span>
+                  </div>
+                  <div class="subcaso-obs text-muted mt-1" *ngIf="item.observacion || item.sub_observacion || item.obse">
+                    {{ item.observacion || item.sub_observacion || item.obse }}
+                  </div>
+                </div>
+
+                <!-- Estatus / Chip -->
+                <div class="subcaso-status-badge">
+                  <span class="badge-status-chip chip-procesar">
+                    <i class="fas fa-check mr-1"></i> {{ getDetalleLabel(item) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 🔴 CATEGORÍA 2: Integrantes Negados / Con Observación -->
+          <div class="subcasos-category-block mb-3" *ngIf="getSubcasosNoProcesar(activeDoc).length > 0">
+            <div class="category-header category-header-noprocesar">
+              <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-times-circle text-danger"></i>
+                <span class="category-title">Integrantes Negados / Con Observación</span>
+              </div>
+              <span class="category-count-badge badge-danger-light">
+                {{ getSubcasosNoProcesar(activeDoc).length }} Negado(s) / Excepción(es)
+              </span>
+            </div>
+
+            <div class="subcasos-list-container p-2">
+              <div class="subcaso-card-item subcaso-no-procesar mb-2"
+                   *ngFor="let item of getSubcasosNoProcesar(activeDoc); let idx = index"
+                   [class.subcaso-pendiente]="isPendiente(item)">
+
+                <!-- Avatar -->
+                <div class="subcaso-avatar"
+                     *ngIf="getCedula(item)"
+                     (click)="verFotoAmpliada(getCedula(item)); $event.stopPropagation()"
+                     title="Clic para ver foto ampliada">
+                  <img [src]="fotosCasos[getCedula(item)]"
+                       *ngIf="!loadingFotos[getCedula(item)] && fotosCasos[getCedula(item)]"
+                       alt="Avatar">
+                  <i class="fas fa-spinner fa-spin text-danger" *ngIf="loadingFotos[getCedula(item)]"></i>
+                  <i class="fas fa-user" *ngIf="!loadingFotos[getCedula(item)] && !fotosCasos[getCedula(item)]"></i>
+                </div>
+
+                <!-- Información -->
+                <div class="subcaso-content">
+                  <div class="subcaso-name text-strikethrough font-weight-bold">
+                    {{ (item.nombre || item.nombres_apellidos || getNombre(item) || 'Sin Nombre') | uppercase }}
+                  </div>
+                  <div class="subcaso-meta">
+                    <span class="subcaso-cedula" *ngIf="getCedula(item)">
+                      <i class="fas fa-id-card"></i> C.I: {{ getCedula(item) }}
+                    </span>
+                    <span class="subcaso-cargo ml-2" *ngIf="getCargo(item)">
+                      <i class="fas fa-user-tie"></i> {{ getCargo(item) }}
+                    </span>
+                  </div>
+                  <div class="subcaso-obs text-danger font-weight-bold mt-1" *ngIf="item.observacion || item.sub_observacion || item.obse">
+                    <i class="fas fa-info-circle mr-1"></i> {{ item.observacion || item.sub_observacion || item.obse }}
+                  </div>
+                </div>
+
+                <!-- Estatus / Chip -->
+                <div class="subcaso-status-badge">
+                  <span class="badge-status-chip"
+                        [class.chip-no-procesar]="isNoProcesar(item)"
+                        [class.chip-pendiente]="isPendiente(item)">
+                    {{ getDetalleLabel(item) }}
+                  </span>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- FIN COLUMNA DERECHA -->
+
+      </div>
+      <!-- FIN modal-body-custom -->
+
+      <!-- ── FOOTER DE ACCIONES Y DECISIÓN MINISTERIAL ── -->
+      <div class="modal-footer-toolbar">
+
+        <!-- Herramientas del Documento (PDF y Ficha) -->
+        <div class="modal-footer-tools">
+          <button class="btn-modal-tool btn-pdf"
                   (click)="verPDF(activeDoc)"
                   [disabled]="!getDwsUrl(activeDoc)"
                   title="Ver documento en PDF">
@@ -390,84 +584,51 @@
             <span>Ver PDF</span>
           </button>
 
-          <!-- Botón Constancia (ir a ministerial) -->
-          <button class="drawer-btn drawer-btn-detail"
-                  (click)="router.navigate(['/ministerial', (btoa(JSON.stringify({tipo:'MINISTERIAL', objeto: activeDoc})))])"
+          <button class="btn-modal-tool btn-ficha"
+                  (click)="irAMinisterial(activeDoc)"
                   title="Ver ficha completa en Ministerial">
             <i class="fas fa-external-link-alt"></i>
             <span>Ficha Completa</span>
           </button>
         </div>
-      </div>
 
-      <!-- ── Sección: Observación ── -->
-      <div class="drawer-section">
-        <div class="drawer-section-label">
-          <i class="fas fa-comment-alt"></i> Observación
-        </div>
-        <textarea class="drawer-textarea"
-                  [(ngModel)]="observacion"
-                  placeholder="Ingrese una observación (opcional para Favorable)..."
-                  rows="3"
-                  [disabled]="loadingAction">
-        </textarea>
-      </div>
-
-      <!-- ── Sección: Acciones de Decisión ── -->
-      <div class="drawer-section">
-        <div class="drawer-section-label">
-          <i class="fas fa-gavel"></i> Decisión
-        </div>
-        <div class="drawer-action-buttons">
-
-          <!-- FAVORABLE (Jefe de Secretaría / Dirección) / FIRMAR (Ministro) -->
-          <button class="drawer-action-btn favorable"
+        <!-- Botones Principales de Decisión Executive -->
+        <div class="modal-footer-decisions">
+          <!-- FAVORABLE / FIRMAR -->
+          <button class="btn-modal-decision btn-favorable"
                   (click)="ejecutarAccion(currentProfile === 'Ministro' ? 'FIRMAR' : 'FAVORABLE')"
                   [disabled]="loadingAction"
-                  [title]="currentProfile === 'Ministro' ? 'Firmar Documento' : 'Registrar como Favorable'">
-            <div class="action-btn-icon">
-              <i [class]="currentProfile === 'Ministro' ? 'fas fa-file-signature' : 'fas fa-check-circle'"></i>
-            </div>
+                  [title]="currentProfile === 'Ministro' ? 'Firmar y Aprobar Expediente' : 'Aprobar como Favorable'">
+            <i [class]="currentProfile === 'Ministro' ? 'fas fa-file-signature' : 'fas fa-check-circle'"></i>
             <span>{{ currentProfile === 'Ministro' ? 'Firmar' : 'Favorable' }}</span>
-            <div class="action-btn-spinner" *ngIf="loadingAction">
-              <div class="spinner-border" role="status" style="width: 1rem; height: 1rem;"></div>
-            </div>
+            <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
           </button>
 
           <!-- DIFERIDO -->
-          <button class="drawer-action-btn diferido"
+          <button class="btn-modal-decision btn-diferido"
                   (click)="ejecutarAccion('DIFERIDO')"
                   [disabled]="loadingAction"
-                  title="Registrar como Diferido (requiere observación)">
-            <div class="action-btn-icon">
-              <i class="fas fa-clock"></i>
-            </div>
+                  title="Registrar como Diferido (Requiere Observación)">
+            <i class="fas fa-clock"></i>
             <span>Diferido</span>
           </button>
 
           <!-- NEGADO -->
-          <button class="drawer-action-btn negado"
+          <button class="btn-modal-decision btn-negado"
                   (click)="ejecutarAccion('NEGADO')"
                   [disabled]="loadingAction"
-                  title="Registrar como Negado (requiere observación)">
-            <div class="action-btn-icon">
-              <i class="fas fa-times-circle"></i>
-            </div>
+                  title="Registrar como Negado (Requiere Observación)">
+            <i class="fas fa-times-circle"></i>
             <span>Negado</span>
           </button>
-
         </div>
-        <p class="drawer-action-note">
-          <i class="fas fa-info-circle"></i>
-          Diferido y Negado requieren una observación.
-        </p>
+
       </div>
+      <!-- FIN modal-footer-toolbar -->
 
     </div>
-    <!-- FIN drawer-body -->
-
   </div>
-  <!-- FIN detail-drawer -->
+  <!-- FIN detail-modal-backdrop -->
 
 </div>
 <!-- FIN documentos-root -->
