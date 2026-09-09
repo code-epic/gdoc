@@ -10,9 +10,16 @@
       <div class="card shadow">
         <div class="card-header bg-transparent">
           <div class="row align-items-center">
-            <div class="col-md-10">
-              <h6 class="text-uppercase text-muted ls-1 mb-1">Control</h6>
-              <h2 class="mb-0">Archivados</h2>
+            <div class="col-md-7">
+              <h6 class="text-uppercase text-muted ls-1 mb-1" style="letter-spacing: 1.5px; font-weight: 600; font-size: 0.75rem;">Unidad de Archivo</h6>
+              <h2 class="mb-0 text-primary font-weight-bold d-flex align-items-center">
+                <i class="ni ni-folder-17 mr-2"></i>{{ nombreArchivoActual }}
+              </h2>
+            </div>
+            <div class="col-md-3 text-right">
+              <button class="btn btn-sm btn-white shadow-sm rounded-pill px-3 py-2 text-primary border" (click)="openModalSeleccionArchivo()" title="Cambiar Unidad de Archivo">
+                <i class="ni ni-bold-toggle mr-1"></i> Cambiar Archivo
+              </button>
             </div>
             <div class="col-md-1">
               <div class="media align-items-center">
@@ -298,33 +305,53 @@
   </div>
 </ng-template>
 
-
-<ng-template #adjuntar let-c="close" let-d="dismiss">
-  <div class="modal-header header bg-gradient-success">
-    <h4 class="modal-title" id="modal-basic-title">Cargar Archivo en {{ numControl }}</h4>
-
-  </div>
-  <div class="modal-body">
-
-
-    <form method="post" enctype="multipart/form-data" id="forma" name="forma">
-      <input type="hidden" name="txtFileID" id="txtFileID" [ngModelOptions]="{standalone: true}"
-        [(ngModel)]="numControl" value="{{numControl}}" readonly="readonly">
-      <label for="input-folder-2">Seleccionar Archivo</label>
-      <div class="file-loading">
-        <input id="input-folder-2" (change)="fileSelected($event)" class="file-input" name="input-folder-2" type="file"
-          multiple accept=".pdf">
+<!-- Modal Configurar / Seleccionar Archivo (Diseño Minimalista & Sobrio) -->
+<ng-template #modalSeleccionarArchivo let-modal>
+  <div class="archivo-modal-wrapper p-4 p-md-4 bg-white rounded-lg shadow-lg position-relative">
+    
+    <!-- Minimalist Header -->
+    <div class="text-center mb-4 pt-2">
+      <div class="icon-avatar mx-auto mb-3 d-flex align-items-center justify-content-center shadow-sm">
+        <i class="ni ni-folder-17 text-primary"></i>
       </div>
-      <div id="errorBlock" class="help-block"></div>
-    </form>
+      <h2 class="h3 font-weight-bold text-dark mb-1">Seleccionar Archivo</h2>
+      <p class="text-muted small mb-0">Elija la unidad documental a la que desea ingresar</p>
+    </div>
 
+    <!-- Archivo Options Grid -->
+    <div class="archivo-options-grid">
+      <div 
+        *ngFor="let opcion of opcionesArchivo" 
+        class="archivo-card-option d-flex align-items-center p-3 mb-3 rounded-lg border transition-all"
+        [class.selected]="estadoActual === opcion.id"
+        (click)="seleccionarArchivo(opcion)">
+        
+        <div class="option-icon-box d-flex align-items-center justify-content-center rounded-circle mr-3"
+             [style.color]="opcion.color" 
+             [style.background-color]="opcion.lightBg">
+          <i [class]="opcion.icono"></i>
+        </div>
+        
+        <div class="option-content flex-grow-1">
+          <h5 class="option-title mb-0 font-weight-bold text-dark">{{ opcion.nombre }}</h5>
+          <p class="option-subtitle text-muted small mb-0 mt-1">{{ opcion.subtitulo }}</p>
+        </div>
 
+        <div class="option-check ml-3">
+          <div class="custom-radio-indicator d-flex align-items-center justify-content-center rounded-circle">
+            <i class="fa fa-check text-white small" *ngIf="estadoActual === opcion.id"></i>
+          </div>
+        </div>
 
-  </div>
-  <div class="modal-footer">
-    <button class="btn bg-gradient-success text-white " (click)="SubirArchivo();c('Save')">
-      <span class="fa fa-upload"></span>&nbsp;&nbsp;Enviar Archivos </button>
-    <button class="btn btn-warning" aria-label="Close" (click)="c('Close')">
-      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Footer info -->
+    <div class="text-center mt-3 pt-2">
+      <span class="text-muted small">
+        <i class="ni ni-lock-circle-open mr-1"></i> Acceso configurado según su unidad asignada
+      </span>
+    </div>
+
   </div>
 </ng-template>

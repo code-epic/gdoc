@@ -116,3 +116,99 @@ select{
 textarea {
     text-transform: uppercase;
 }
+
+// Clean Minimalist Modal Styling
+::ng-deep .archivo-custom-modal {
+  .modal-dialog {
+    max-width: 520px;
+  }
+  .modal-content {
+    border: none !important;
+    border-radius: 1.25rem !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.06) !important;
+    background: transparent !important;
+    overflow: hidden;
+  }
+}
+
+.archivo-modal-wrapper {
+  border-radius: 1.25rem;
+  background: #ffffff;
+  position: relative;
+
+  .icon-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #f4f5fe;
+    font-size: 24px;
+    transition: transform 0.3s ease;
+  }
+}
+
+.archivo-options-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.archivo-card-option {
+  background: #ffffff;
+  border: 1.5px solid #e9ecef !important;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .option-icon-box {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    font-size: 20px;
+    transition: transform 0.25s ease;
+  }
+
+  .option-badge {
+    background-color: #f6f9fc;
+    color: #8898aa;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .custom-radio-indicator {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #cad1d7;
+    transition: all 0.2s ease;
+  }
+
+  &:hover {
+    border-color: #5e72e4 !important;
+    background-color: #fafbfd;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(50, 50, 93, 0.06), 0 3px 6px rgba(0, 0, 0, 0.04);
+
+    .option-icon-box {
+      transform: scale(1.08);
+    }
+  }
+
+  &.selected {
+    border-color: #5e72e4 !important;
+    background: linear-gradient(135deg, rgba(94, 114, 228, 0.04) 0%, rgba(94, 114, 228, 0.01) 100%);
+    box-shadow: 0 4px 12px rgba(94, 114, 228, 0.12);
+
+    .custom-radio-indicator {
+      background-color: #5e72e4;
+      border-color: #5e72e4;
+    }
+
+    .option-badge {
+      background-color: #5e72e4;
+      color: #ffffff;
+    }
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
