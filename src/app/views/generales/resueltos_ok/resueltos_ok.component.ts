@@ -266,34 +266,10 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
   public resolvePdfUrl = (doc: any): string => {
     const ncontrol = doc.ncontrol || doc.numc || "0";
-    let archivo =
+    const archivo =
       doc.anom_firmado || doc.archivo_firmado || doc.archivo || doc.anom || "";
     if (!archivo) {
       return "";
-    }
-
-    const isFirmado =
-      this.showingFirmados ||
-      doc.estado === 7 ||
-      doc.idestado === 7 ||
-      doc.idestado === "7";
-
-    if (isFirmado) {
-      let cleanName = archivo.replace(/\.pdf$/i, "");
-      if (cleanName.toLowerCase().startsWith("firmado_")) {
-        cleanName = cleanName.substring(8);
-      } else if (cleanName.toLowerCase().startsWith("firmado")) {
-        cleanName = cleanName.substring(7);
-      }
-      cleanName = cleanName
-        .replace(/_tramitacion$/i, "")
-        .replace(/_punt$/i, "");
-
-      if (!cleanName.toLowerCase().endsWith("_firmado")) {
-        cleanName = `${cleanName}_firmado`;
-      }
-
-      archivo = `${cleanName}.pdf`;
     }
 
     const peticion = btoa("D" + ncontrol) + "/" + archivo;
@@ -2663,27 +2639,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
   getResueltoId(numero: string, doc?: any) {
     if (numero && numero.toString().trim() !== "") {
-      let cleanName = numero.trim().replace(/\.pdf$/i, "");
-      if (
-        doc &&
-        (this.showingFirmados ||
-          doc.estado === 7 ||
-          doc.idestado === 7 ||
-          doc.idestado === "7")
-      ) {
-        if (cleanName.toLowerCase().startsWith("firmado_")) {
-          cleanName = cleanName.substring(8);
-        } else if (cleanName.toLowerCase().startsWith("firmado")) {
-          cleanName = cleanName.substring(7);
-        }
-        cleanName = cleanName
-          .replace(/_tramitacion$/i, "")
-          .replace(/_punt$/i, "");
-
-        if (!cleanName.toLowerCase().endsWith("_firmado")) {
-          cleanName = `${cleanName}_firmado`;
-        }
-      }
+      const cleanName = numero.trim().replace(/\.pdf$/i, "");
 
       const payload = {
         ruta: "resueltos/",
