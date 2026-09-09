@@ -669,6 +669,28 @@
           </ng-template>
         </div>
 
+        <!-- Botones Principales en documentos firmados (Enviar a Resoluciones / Enviar a Oficio) -->
+        <div class="modal-footer-decisions" *ngIf="esDocFirmado(activeDoc)">
+          <button class="btn-modal-decision btn-favorable"
+                  (click)="enviarAResoluciones(activeDoc)"
+                  [disabled]="loadingAction"
+                  title="Enviar trámite a Resoluciones">
+            <i class="fas fa-file-contract"></i>
+            <span>Enviar a Resoluciones</span>
+            <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
+          </button>
+
+          <button class="btn-modal-decision btn-diferido"
+                  (click)="enviarAOficio(activeDoc)"
+                  [disabled]="loadingAction"
+                  title="Enviar trámite a Oficio"
+                  style="background: linear-gradient(135deg, #11cdef 0%, #1171ef 100%); color: #ffffff; border: none;">
+            <i class="fas fa-paper-plane"></i>
+            <span>Enviar a Oficio</span>
+            <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
+          </button>
+        </div>
+
       </div>
       <!-- FIN modal-footer-toolbar -->
 

@@ -205,6 +205,12 @@
   </div>
 
   <div class="modal-footer">
+    <button class="btn btn-primary" (click)="enviarAResoluciones();modal.close('Save')">
+      <span class="fa fa-file-contract"></span>&nbsp;&nbsp;Enviar a Resoluciones
+    </button>
+    <button class="btn btn-info" (click)="enviarAOficio();modal.close('Save')">
+      <span class="fa fa-paper-plane"></span>&nbsp;&nbsp;Enviar a Oficio
+    </button>
     <button class="btn btn-pastel text-white " (click)="insertarObservacion();modal.close('Save')">
       <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
     <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="modal.dismiss('Close')">

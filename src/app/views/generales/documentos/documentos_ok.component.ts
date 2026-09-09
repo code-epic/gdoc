@@ -1287,6 +1287,100 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     );
   }
 
+  async enviarAResoluciones(doc?: any) {
+    const targetDoc = doc || this.activeDoc;
+    if (!targetDoc) return;
+    const docId = targetDoc.idd || targetDoc.id || targetDoc.numc;
+    const userId = this.loginService.Usuario?.id || this.jwtData?.userId || "1";
+
+    const result = await Swal.fire({
+      title: "¿Enviar a Resoluciones?",
+      text: "¿Está seguro que desea enviar el trámite a resoluciones?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#5e72e4",
+      cancelButtonColor: "#f5365c",
+      confirmButtonText: "Sí, enviar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      this.loadingAction = true;
+      this.ngxService.startLoader("loader-documentos");
+
+      this.xAPI = {} as IAPICore;
+      this.xAPI.funcion = "WKF_ARedistribuir";
+      this.xAPI.valores = "";
+      this.xAPI.parametros = `3,3,1,${userId},${docId}`;
+
+      this.apiService.Ejecutar(this.xAPI).subscribe({
+        next: (data) => {
+          this.ngxService.stopLoader("loader-documentos");
+          this.loadingAction = false;
+          this.toastrService.success(
+            "El trámite ha sido enviado a Resoluciones exitosamente.",
+            "Redistribución de Documento"
+          );
+          if (this.closeDetail) this.closeDetail();
+          if (this.actualizarBuzon) this.actualizarBuzon();
+        },
+        error: (error) => {
+          this.ngxService.stopLoader("loader-documentos");
+          this.loadingAction = false;
+          console.error(error);
+          this.toastrService.error("Error al redistribuir el documento", "Error");
+        }
+      });
+    }
+  }
+
+  async enviarAOficio(doc?: any) {
+    const targetDoc = doc || this.activeDoc;
+    if (!targetDoc) return;
+    const docId = targetDoc.idd || targetDoc.id || targetDoc.numc;
+    const userId = this.loginService.Usuario?.id || this.jwtData?.userId || "1";
+
+    const result = await Swal.fire({
+      title: "¿Enviar a Oficio?",
+      text: "¿Está seguro que desea enviar el trámite a Oficio?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#11cdef",
+      cancelButtonColor: "#f5365c",
+      confirmButtonText: "Sí, enviar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      this.loadingAction = true;
+      this.ngxService.startLoader("loader-documentos");
+
+      this.xAPI = {} as IAPICore;
+      this.xAPI.funcion = "WKF_ARedistribuir";
+      this.xAPI.valores = "";
+      this.xAPI.parametros = `2,2,1,${userId},${docId}`;
+
+      this.apiService.Ejecutar(this.xAPI).subscribe({
+        next: (data) => {
+          this.ngxService.stopLoader("loader-documentos");
+          this.loadingAction = false;
+          this.toastrService.success(
+            "El trámite ha sido enviado a Oficio exitosamente.",
+            "Redistribución de Documento"
+          );
+          if (this.closeDetail) this.closeDetail();
+          if (this.actualizarBuzon) this.actualizarBuzon();
+        },
+        error: (error) => {
+          this.ngxService.stopLoader("loader-documentos");
+          this.loadingAction = false;
+          console.error(error);
+          this.toastrService.error("Error al redistribuir el documento", "Error");
+        }
+      });
+    }
+  }
+
   //Guardar la alerte define el momento y estadus
   guardarAlerta(activo: number, fecha: string) {
     this.WAlerta.activo = activo;
