@@ -141,7 +141,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       nombre: "PUNTO DE CUENTA",
       icono: "fas fa-file-alt",
       color: "#2dce89",
-      disponible: false,
+      disponible: true,
+      funcion: "WKF_CDocumentosSecretariaPunto",
+      estadoActual: 4,
+      estadoOrigen: 2,
+      filtro: 1,
     },
     {
       id: "OFICIOS",
@@ -194,7 +198,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
   ) {
     // Fechas fijas: agosto → diciembre del año en curso
-    this.fecha_desde = this.xyear + "-08-01";
+    this.fecha_desde = this.xyear + "-06-01";
     this.fecha_hasta = this.xyear + "-12-31";
   }
 
@@ -270,8 +274,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     this.carpetas.forEach((c) => {
       if (c.disponible) {
-        c.estadoActual = 4;
-        c.estadoOrigen = this.estadoOrigen;
+        if (this.selectedEstadoBuzon === "firmados") {
+          c.estadoOrigen = 7;
+          c.estadoActual = 4;
+        } else {
+          if (c.estadoActual === undefined) {
+            c.estadoActual = 4;
+          }
+          if (c.estadoOrigen === undefined) {
+            c.estadoOrigen = this.estadoOrigen;
+          }
+        }
       }
     });
   }
@@ -448,9 +461,27 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public async cargarBuzon(carpeta: CarpetaDocumento): Promise<void> {
     if (!carpeta.funcion) return;
 
+    const customEstadoActual = carpeta.estadoActual;
+    const customEstadoOrigen = carpeta.estadoOrigen;
+
     this.updateEstadosFromProfile();
-    carpeta.estadoActual = this.estadoActual;
-    carpeta.estadoOrigen = this.estadoOrigen;
+
+    if (this.selectedEstadoBuzon === "firmados") {
+      carpeta.estadoActual = 4;
+      carpeta.estadoOrigen = 7;
+    } else {
+      carpeta.estadoActual =
+        customEstadoActual !== undefined
+          ? customEstadoActual
+          : this.estadoActual;
+      carpeta.estadoOrigen =
+        customEstadoOrigen !== undefined
+          ? customEstadoOrigen
+          : this.estadoOrigen;
+    }
+
+    this.estadoActual = carpeta.estadoActual;
+    this.estadoOrigen = carpeta.estadoOrigen;
 
     this.loadingBuzon = true;
     this.ngxService.startLoader("loader-documentos");
@@ -1015,11 +1046,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (this.selectedEstadoBuzon === "firmados" || this.estadoOrigen === 7)
       return true;
     if (!doc) return false;
-    return (
-      doc.estado === 7 ||
-      doc.idestado === 7 ||
-      doc.idestado === "7"
-    );
+    return doc.estado === 7 || doc.idestado === 7 || doc.idestado === "7";
   }
 
   // ─── URL del PDF del documento ────────────────────────────────────────────────
@@ -1092,7 +1119,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       title: "Decisión y Firma Ministerial",
       html: `
         <p class="text-muted mb-3" style="font-size: 0.88rem;">
-          Seleccione la decisión final para el expediente <strong>Nº ${this.activeDoc.numc || this.activeDoc.ncontrol || ''}</strong>:
+          Seleccione la decisión final para el expediente <strong>Nº ${this.activeDoc.numc || this.activeDoc.ncontrol || ""}</strong>:
         </p>
         <div class="swal-decision-grid">
           <button id="btn-swal-aprobado" class="swal-decision-btn btn-swal-aprobado" type="button">
@@ -1126,7 +1153,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       showConfirmButton: false,
       showCloseButton: false,
       customClass: {
-        popup: "swal-executive-popup"
+        popup: "swal-executive-popup",
       },
       didOpen: () => {
         const popup = Swal.getPopup();
@@ -1158,7 +1185,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       },
       preConfirm: () => {
         return (Swal as any).selectedDecision || null;
-      }
+      },
     });
 
     if (!decisionSeleccionada) return;
@@ -1181,12 +1208,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             return "Debe ingresar una explicación cuando selecciona la opción OTRO.";
           }
           return null;
-        }
+        },
       });
 
       if (!comentarioOtro) return;
       observacionFinal = comentarioOtro.trim();
-    } else if (decisionSeleccionada === "DIFERIDO" || decisionSeleccionada === "NEGADO") {
+    } else if (
+      decisionSeleccionada === "DIFERIDO" ||
+      decisionSeleccionada === "NEGADO"
+    ) {
       if (!observacionFinal) {
         const { value: comentarioReq } = await Swal.fire({
           title: `Observación requerida para ${decisionSeleccionada}`,
@@ -1203,7 +1233,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
               return `La observación es obligatoria para registrar la decisión '${decisionSeleccionada}'.`;
             }
             return null;
-          }
+          },
         });
 
         if (!comentarioReq) return;
