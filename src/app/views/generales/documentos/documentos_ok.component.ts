@@ -274,16 +274,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     this.carpetas.forEach((c) => {
       if (c.disponible) {
+        c.estadoActual = 4;
         if (this.selectedEstadoBuzon === "firmados") {
           c.estadoOrigen = 7;
-          c.estadoActual = 4;
+        } else if (this.currentProfile === "Direccion") {
+          c.estadoOrigen = 5;
+        } else if (this.currentProfile === "Ministro") {
+          c.estadoOrigen = 6;
         } else {
-          if (c.estadoActual === undefined) {
-            c.estadoActual = 4;
-          }
-          if (c.estadoOrigen === undefined) {
-            c.estadoOrigen = this.estadoOrigen;
-          }
+          // Perfil inicial / JefeSecretaria: respeta estadoOrigen inicial propio del objeto (2 para Punto de Cuenta, 4 para TOR)
+          c.estadoOrigen = c.id === "PUNTO_DE_CUENTA" ? 2 : 4;
         }
       }
     });
@@ -411,31 +411,39 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   public onProfileChange(): void {
     this.updateEstadosFromProfile();
-    this.selectedCarpeta = null;
+    const carpetaToLoad =
+      (this.selectedCarpeta &&
+        this.carpetas.find(
+          (c) => c.id === this.selectedCarpeta?.id && c.disponible,
+        )) ||
+      this.carpetas.find((c) => c.disponible);
+
     this.buzon = [];
     this.bzOriginal = [];
     this.longitud = 0;
     this.buscarQuery = "";
 
-    // Auto-refrescar seleccionando el buzón disponible para el nuevo estado (4, 5 o 6)
-    const disponible = this.carpetas.find((c) => c.disponible);
-    if (disponible) {
-      this.onCarpetaClick(disponible);
+    if (carpetaToLoad) {
+      this.onCarpetaClick(carpetaToLoad);
     }
   }
 
   public onEstadoBuzonChange(): void {
     this.updateEstadosFromProfile();
-    this.selectedCarpeta = null;
+    const carpetaToLoad =
+      (this.selectedCarpeta &&
+        this.carpetas.find(
+          (c) => c.id === this.selectedCarpeta?.id && c.disponible,
+        )) ||
+      this.carpetas.find((c) => c.disponible);
+
     this.buzon = [];
     this.bzOriginal = [];
     this.longitud = 0;
     this.buscarQuery = "";
 
-    // Auto-refrescar seleccionando el buzón disponible para el estado origen (7 u origen del perfil)
-    const disponible = this.carpetas.find((c) => c.disponible);
-    if (disponible) {
-      this.onCarpetaClick(disponible);
+    if (carpetaToLoad) {
+      this.onCarpetaClick(carpetaToLoad);
     }
   }
 
@@ -461,27 +469,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public async cargarBuzon(carpeta: CarpetaDocumento): Promise<void> {
     if (!carpeta.funcion) return;
 
-    const customEstadoActual = carpeta.estadoActual;
-    const customEstadoOrigen = carpeta.estadoOrigen;
-
     this.updateEstadosFromProfile();
-
-    if (this.selectedEstadoBuzon === "firmados") {
-      carpeta.estadoActual = 4;
-      carpeta.estadoOrigen = 7;
-    } else {
-      carpeta.estadoActual =
-        customEstadoActual !== undefined
-          ? customEstadoActual
-          : this.estadoActual;
-      carpeta.estadoOrigen =
-        customEstadoOrigen !== undefined
-          ? customEstadoOrigen
-          : this.estadoOrigen;
-    }
-
-    this.estadoActual = carpeta.estadoActual;
-    this.estadoOrigen = carpeta.estadoOrigen;
+    this.estadoActual = carpeta.estadoActual || 4;
+    this.estadoOrigen = carpeta.estadoOrigen || 4;
 
     this.loadingBuzon = true;
     this.ngxService.startLoader("loader-documentos");
