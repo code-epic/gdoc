@@ -19,7 +19,7 @@
         
         <div class="row text-center mb-4">
           <!-- Firmados -->
-          <div class="col-md-4 mb-3 mb-md-0">
+          <div class="col-xl-3 col-md-6 mb-3 mb-xl-0">
             <div class="kpi-block success">
               <div class="kpi-icon"><i class="fas fa-check-double"></i></div>
               <div class="kpi-value">{{kpis.firmados | number}}</div>
@@ -30,7 +30,7 @@
             </div>
           </div>
           <!-- En Proceso -->
-          <div class="col-md-4 mb-3 mb-md-0">
+          <div class="col-xl-3 col-md-6 mb-3 mb-xl-0">
             <div class="kpi-block warning">
               <div class="kpi-icon"><i class="fas fa-spinner fa-spin"></i></div>
               <div class="kpi-value">{{kpis.enProceso | number}}</div>
@@ -40,8 +40,19 @@
               </div>
             </div>
           </div>
+          <!-- En Proceso Ministro -->
+          <div class="col-xl-3 col-md-6 mb-3 mb-xl-0">
+            <div class="kpi-block info">
+              <div class="kpi-icon"><i class="fas fa-user-shield"></i></div>
+              <div class="kpi-value">{{kpis.enProcesoMinistro | number}}</div>
+              <div class="kpi-label">En Proceso Ministro ({{getPercentage(kpis.enProcesoMinistro)}}%)</div>
+              <div class="progress elegant-progress">
+                <div class="progress-bar bg-info" role="progressbar" [style.width]="getProgressWidth(kpis.enProcesoMinistro)"></div>
+              </div>
+            </div>
+          </div>
           <!-- Rechazados -->
-          <div class="col-md-4">
+          <div class="col-xl-3 col-md-6">
             <div class="kpi-block danger">
               <div class="kpi-icon"><i class="fas fa-ban"></i></div>
               <div class="kpi-value">{{kpis.rechazados | number}}</div>

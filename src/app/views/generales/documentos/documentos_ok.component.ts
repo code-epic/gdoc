@@ -1009,6 +1009,19 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.changeDetector.detectChanges();
   }
 
+  // ─── Evaluar si un documento está Firmado ────────────────────────────
+  public esDocFirmado(doc?: any): boolean {
+    if (!doc) doc = this.activeDoc;
+    if (this.selectedEstadoBuzon === "firmados" || this.estadoOrigen === 7)
+      return true;
+    if (!doc) return false;
+    return (
+      doc.estado === 7 ||
+      doc.idestado === 7 ||
+      doc.idestado === "7"
+    );
+  }
+
   // ─── URL del PDF del documento ────────────────────────────────────────────────
   public getDwsUrl(e: any): string {
     if (!e) return "";
@@ -1017,30 +1030,21 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       e.anom_firmado || e.archivo_firmado || e.anom || e.archivo || "";
     if (!archivo) return "";
 
-    const isFirmado =
-      this.estadoOrigen === 7 ||
-      e.estado === 7 ||
-      e.idestado === "7" ||
-      e.idestado === 7 ||
-      this.selectedEstadoBuzon === "firmados";
+    const isFirmado = this.esDocFirmado(e);
 
     if (isFirmado) {
       let cleanName = archivo.replace(/\.pdf$/i, "");
-      const isPunto =
-        (e.tdoc || "").toUpperCase().includes("PUNTO") ||
-        this.selectedCarpeta?.id === "PUNTO_DE_CUENTA";
-      const isTor =
-        (e.tdoc || "").toUpperCase().includes("TRAMITA") ||
-        this.selectedCarpeta?.id === "TRAMITE_ORGANO_REGULAR";
-
-      if (!cleanName.toLowerCase().startsWith("firmado")) {
-        cleanName = `firmado_${cleanName}`;
+      if (cleanName.toLowerCase().startsWith("firmado_")) {
+        cleanName = cleanName.substring(8);
+      } else if (cleanName.toLowerCase().startsWith("firmado")) {
+        cleanName = cleanName.substring(7);
       }
+      cleanName = cleanName
+        .replace(/_tramitacion$/i, "")
+        .replace(/_punt$/i, "");
 
-      if (isPunto && !cleanName.toLowerCase().endsWith("_punt")) {
-        cleanName = `${cleanName}_punt`;
-      } else if (isTor && !cleanName.toLowerCase().endsWith("_tramitacion")) {
-        cleanName = `${cleanName}_tramitacion`;
+      if (!cleanName.toLowerCase().endsWith("_firmado")) {
+        cleanName = `${cleanName}_firmado`;
       }
 
       archivo = `${cleanName}.pdf`;
@@ -1060,6 +1064,156 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         "Sin archivo",
       );
     }
+  }
+
+  // ─── Alternar Estatus de Subcaso / Integrante (Solo en Nivel Ministro) ────────
+  public toggleSubcasoEstatus(item: any): void {
+    if (this.currentProfile !== "Ministro") return;
+    const isCurrentlyNoProcesar = this.isNoProcesar(item);
+    const newStatus = isCurrentlyNoProcesar ? "PR" : "NP";
+
+    item.sub_detalle = newStatus;
+    item.detalle = newStatus;
+    item.s_estatus = newStatus;
+    item.sub_estatus = newStatus;
+    item.estatus = newStatus;
+    item.estado = newStatus;
+
+    this.changeDetector.detectChanges();
+  }
+
+  // ─── Modal de Firma Ministerial (APROBADO, NEGADO, VISTO, DIFERIDO, OTRO) ───────
+  public async solicitarFirmaMinistro(): Promise<void> {
+    if (!this.activeDoc) return;
+
+    (Swal as any).selectedDecision = null;
+
+    const { value: decisionSeleccionada } = await Swal.fire({
+      title: "Decisión y Firma Ministerial",
+      html: `
+        <p class="text-muted mb-3" style="font-size: 0.88rem;">
+          Seleccione la decisión final para el expediente <strong>Nº ${this.activeDoc.numc || this.activeDoc.ncontrol || ''}</strong>:
+        </p>
+        <div class="swal-decision-grid">
+          <button id="btn-swal-aprobado" class="swal-decision-btn btn-swal-aprobado" type="button">
+            <i class="fas fa-check-circle"></i>
+            <span>APROBADO</span>
+          </button>
+          <button id="btn-swal-negado" class="swal-decision-btn btn-swal-negado" type="button">
+            <i class="fas fa-times-circle"></i>
+            <span>NEGADO</span>
+          </button>
+          <button id="btn-swal-visto" class="swal-decision-btn btn-swal-visto" type="button">
+            <i class="fas fa-eye"></i>
+            <span>VISTO</span>
+          </button>
+          <button id="btn-swal-diferido" class="swal-decision-btn btn-swal-diferido" type="button">
+            <i class="fas fa-clock"></i>
+            <span>DIFERIDO</span>
+          </button>
+          <button id="btn-swal-otro" class="swal-decision-btn btn-swal-otro" type="button">
+            <i class="fas fa-comment-dots"></i>
+            <span>OTRO</span>
+          </button>
+        </div>
+
+        <div class="swal-cancel-wrapper mt-3">
+          <button id="btn-swal-cancelar" class="swal-cancel-btn" type="button">
+            <i class="fas fa-times mr-1"></i> Cancelar sin Acción
+          </button>
+        </div>
+      `,
+      showConfirmButton: false,
+      showCloseButton: false,
+      customClass: {
+        popup: "swal-executive-popup"
+      },
+      didOpen: () => {
+        const popup = Swal.getPopup();
+        if (!popup) return;
+
+        const bindBtn = (id: string, val: string) => {
+          const btn = popup.querySelector(id);
+          if (btn) {
+            btn.addEventListener("click", () => {
+              (Swal as any).selectedDecision = val;
+              Swal.clickConfirm();
+            });
+          }
+        };
+
+        bindBtn("#btn-swal-aprobado", "APROBADO");
+        bindBtn("#btn-swal-negado", "NEGADO");
+        bindBtn("#btn-swal-visto", "VISTO");
+        bindBtn("#btn-swal-diferido", "DIFERIDO");
+        bindBtn("#btn-swal-otro", "OTRO");
+
+        const cancelBtn = popup.querySelector("#btn-swal-cancelar");
+        if (cancelBtn) {
+          cancelBtn.addEventListener("click", () => {
+            (Swal as any).selectedDecision = null;
+            Swal.close();
+          });
+        }
+      },
+      preConfirm: () => {
+        return (Swal as any).selectedDecision || null;
+      }
+    });
+
+    if (!decisionSeleccionada) return;
+
+    let observacionFinal = this.observacion.trim();
+
+    if (decisionSeleccionada === "OTRO") {
+      const { value: comentarioOtro } = await Swal.fire({
+        title: "Especificar motivo de la decisión (OTRO)",
+        input: "textarea",
+        inputLabel: "Describa el motivo o justificación de la decisión:",
+        inputPlaceholder: "Escriba aquí la justificación explicativa...",
+        showCancelButton: true,
+        confirmButtonColor: "#5e72e4",
+        cancelButtonColor: "#8898aa",
+        confirmButtonText: "Confirmar y Firmar",
+        cancelButtonText: "Cancelar",
+        inputValidator: (value) => {
+          if (!value || !value.trim()) {
+            return "Debe ingresar una explicación cuando selecciona la opción OTRO.";
+          }
+          return null;
+        }
+      });
+
+      if (!comentarioOtro) return;
+      observacionFinal = comentarioOtro.trim();
+    } else if (decisionSeleccionada === "DIFERIDO" || decisionSeleccionada === "NEGADO") {
+      if (!observacionFinal) {
+        const { value: comentarioReq } = await Swal.fire({
+          title: `Observación requerida para ${decisionSeleccionada}`,
+          input: "textarea",
+          inputLabel: `Ingrese el motivo o razón para la decisión '${decisionSeleccionada}':`,
+          inputPlaceholder: "Escriba aquí la observación...",
+          showCancelButton: true,
+          confirmButtonColor: "#5e72e4",
+          cancelButtonColor: "#8898aa",
+          confirmButtonText: "Continuar y Firmar",
+          cancelButtonText: "Cancelar",
+          inputValidator: (value) => {
+            if (!value || !value.trim()) {
+              return `La observación es obligatoria para registrar la decisión '${decisionSeleccionada}'.`;
+            }
+            return null;
+          }
+        });
+
+        if (!comentarioReq) return;
+        observacionFinal = comentarioReq.trim();
+      }
+    }
+
+    this.observacion = observacionFinal;
+    this.loadingAction = true;
+    this.redistribuir(decisionSeleccionada);
   }
 
   // ─── Acciones: Favorable / Diferido / Negado / Firmar ─────────────────────────

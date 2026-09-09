@@ -72,6 +72,9 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     return this._documents;
   }
   set documents(val: any[]) {
+    if (Array.isArray(val)) {
+      val.sort((a, b) => this.compareDocsByResolucionDesc(a, b));
+    }
     this._documents = val;
     this.processDocumentsGrouping();
   }
@@ -91,28 +94,31 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public expandedDocGroups: { [groupName: string]: boolean } = {};
 
   get filteredDocumentsList() {
-    if (!this.documentSearchQuery) return this.documents;
-    const query = this.documentSearchQuery.toLowerCase().trim();
-    return this.documents.filter((doc) => {
-      if (
-        doc.numero_carpeta &&
-        doc.numero_carpeta.toLowerCase().includes(query)
-      )
-        return true;
+    let list = this.documents || [];
+    if (this.documentSearchQuery) {
+      const query = this.documentSearchQuery.toLowerCase().trim();
+      list = list.filter((doc) => {
+        if (
+          doc.numero_carpeta &&
+          doc.numero_carpeta.toLowerCase().includes(query)
+        )
+          return true;
 
-      if (doc.documentos && Array.isArray(doc.documentos)) {
-        for (const item of doc.documentos) {
-          if (item.cedula && item.cedula.toLowerCase().includes(query))
-            return true;
-          if (
-            item.nombres_apellidos &&
-            item.nombres_apellidos.toLowerCase().includes(query)
-          )
-            return true;
+        if (doc.documentos && Array.isArray(doc.documentos)) {
+          for (const item of doc.documentos) {
+            if (item.cedula && item.cedula.toLowerCase().includes(query))
+              return true;
+            if (
+              item.nombres_apellidos &&
+              item.nombres_apellidos.toLowerCase().includes(query)
+            )
+              return true;
+          }
         }
-      }
-      return false;
-    });
+        return false;
+      });
+    }
+    return list.slice().sort((a, b) => this.compareDocsByResolucionDesc(a, b));
   }
 
   // Paginación y Filtros de Carpetas
@@ -223,14 +229,37 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   };
 
   public resolvePdfUrl = (doc: any): string => {
-    // const activar_pdf = (this as any).activar_pdf;
-    // if (!activar_pdf) {
-    // }
     const ncontrol = doc.ncontrol || doc.numc || "0";
-    const archivo = doc.archivo || doc.anom || "";
+    let archivo =
+      doc.anom_firmado || doc.archivo_firmado || doc.archivo || doc.anom || "";
     if (!archivo) {
       return "";
     }
+
+    const isFirmado =
+      this.showingFirmados ||
+      doc.estado === 7 ||
+      doc.idestado === 7 ||
+      doc.idestado === "7";
+
+    if (isFirmado) {
+      let cleanName = archivo.replace(/\.pdf$/i, "");
+      if (cleanName.toLowerCase().startsWith("firmado_")) {
+        cleanName = cleanName.substring(8);
+      } else if (cleanName.toLowerCase().startsWith("firmado")) {
+        cleanName = cleanName.substring(7);
+      }
+      cleanName = cleanName
+        .replace(/_tramitacion$/i, "")
+        .replace(/_punt$/i, "");
+
+      if (!cleanName.toLowerCase().endsWith("_firmado")) {
+        cleanName = `${cleanName}_firmado`;
+      }
+
+      archivo = `${cleanName}.pdf`;
+    }
+
     const peticion = btoa("D" + ncontrol) + "/" + archivo;
     return this.apiService.Dws(peticion);
   };
@@ -785,7 +814,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
           Object.values(grupos).forEach((grupo: any) => {
             if (grupo.documentos?.length > 0) {
               const d = grupo.documentos[0];
-              grupo.numero_resol = d.numero_resol || null;
+              grupo.numero_resol = d.numero_resol || d.numero_resuelto || null;
+              grupo.numero_resuelto = d.numero_resuelto || d.numero_resol || null;
               grupo.fecha_resolucion = d.fecha_resolucion || null;
               grupo.observacion = d.observacion || null;
               grupo.pub_observacion = d.pub_observacion || null;
@@ -1631,14 +1661,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.documentGroups = Array.from(groupsMap.entries())
       .map(([name, docs]) => ({
         name,
-        docs: docs.sort((a, b) =>
-          a.numero_carpeta.localeCompare(b.numero_carpeta),
-        ),
+        docs: docs.sort((a, b) => this.compareDocsByResolucionDesc(a, b)),
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
 
     this.flatDocuments = flatList.sort((a, b) =>
-      a.numero_carpeta.localeCompare(b.numero_carpeta),
+      this.compareDocsByResolucionDesc(a, b),
     );
   }
 
@@ -2571,7 +2599,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   VerPDF(doc: any) {
     const num = doc.numero_resol || doc.numero_resuelto;
     if (num) {
-      this.getResueltoId(num);
+      this.getResueltoId(num, doc);
     } else {
       this.toastrService.warning(
         "El documento no posee un número de resolución asignado.",
@@ -2579,11 +2607,33 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     }
   }
 
-  getResueltoId(numero: string) {
+  getResueltoId(numero: string, doc?: any) {
     if (numero && numero.toString().trim() !== "") {
+      let cleanName = numero.trim().replace(/\.pdf$/i, "");
+      if (
+        doc &&
+        (this.showingFirmados ||
+          doc.estado === 7 ||
+          doc.idestado === 7 ||
+          doc.idestado === "7")
+      ) {
+        if (cleanName.toLowerCase().startsWith("firmado_")) {
+          cleanName = cleanName.substring(8);
+        } else if (cleanName.toLowerCase().startsWith("firmado")) {
+          cleanName = cleanName.substring(7);
+        }
+        cleanName = cleanName
+          .replace(/_tramitacion$/i, "")
+          .replace(/_punt$/i, "");
+
+        if (!cleanName.toLowerCase().endsWith("_firmado")) {
+          cleanName = `${cleanName}_firmado`;
+        }
+      }
+
       const payload = {
         ruta: "resueltos/",
-        archivo: `${numero.trim()}.pdf`,
+        archivo: `${cleanName}.pdf`,
       };
       // Mostrar indicador de carga
       Swal.fire({
@@ -2611,5 +2661,124 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         },
       });
     }
+  }
+
+  /**
+   * Ordena dos documentos por su número de resolución (numero_resol / numero_resuelto) de mayor a menor.
+   */
+  public compareDocsByResolucionDesc(a: any, b: any): number {
+    const numAStr = (a?.numero_resol || a?.numero_resuelto || "").toString().trim();
+    const numBStr = (b?.numero_resol || b?.numero_resuelto || "").toString().trim();
+
+    const cleanA = numAStr.replace(/\D/g, "");
+    const cleanB = numBStr.replace(/\D/g, "");
+
+    const numA = parseInt(cleanA, 10);
+    const numB = parseInt(cleanB, 10);
+
+    const hasNumA = !isNaN(numA) && cleanA.length > 0;
+    const hasNumB = !isNaN(numB) && cleanB.length > 0;
+
+    if (hasNumA && hasNumB) {
+      if (numB !== numA) {
+        return numB - numA; // De mayor a menor
+      }
+    }
+
+    if (hasNumA && !hasNumB) return -1;
+    if (!hasNumA && hasNumB) return 1;
+
+    if (numAStr || numBStr) {
+      return numBStr.localeCompare(numAStr, undefined, { numeric: true });
+    }
+
+    const carpA = (a?.numero_carpeta || "").toString();
+    const carpB = (b?.numero_carpeta || "").toString();
+    return carpB.localeCompare(carpA, undefined, { numeric: true });
+  }
+
+  /**
+   * Verifica si el documento posee un número de resolución asignado (numero_resol o numero_resuelto)
+   */
+  public tieneNumeroResolucion(doc: any): boolean {
+    if (!doc) return false;
+    const num = doc.numero_resol || doc.numero_resuelto;
+    return !!(num && num.toString().trim() !== "" && num.toString().trim() !== "null");
+  }
+
+  /**
+   * Se da por cumplido el documento cuando está en el módulo de firmados (showingFirmados)
+   * y posee número de resolución asignado (numero_resol o numero_resuelto).
+   */
+  public esDocCumplido(doc: any): boolean {
+    return this.showingFirmados && this.tieneNumeroResolucion(doc);
+  }
+
+  /**
+   * Determina si el documento tiene un rechazo activo para resaltado en fondo rojo.
+   * Si está en el módulo de firmados y tiene número de resolución (esDocCumplido),
+   * se omiten observaciones y se evita el fondo rojo.
+   */
+  public tieneRechazoActivo(doc: any): boolean {
+    if (this.esDocCumplido(doc)) {
+      return false;
+    }
+    const obs = doc?.rechazos_observacion;
+    return !!(obs && obs.trim() !== "" && obs !== "null");
+  }
+
+  /**
+   * Estilos de tarjeta refinados para el módulo de firmados y estado general
+   */
+  public getCardBackground(doc: any): string {
+    if (doc?.selected) {
+      return "rgba(45, 206, 137, 0.05)";
+    }
+    if (this.tieneRechazoActivo(doc)) {
+      return "linear-gradient(to right, rgba(245, 54, 92, 0.06), #ffffff 40%)";
+    }
+    return "#ffffff";
+  }
+
+  public getCardBorderColor(doc: any): string {
+    if (doc?.selected) {
+      return "#2dce89";
+    }
+    if (this.tieneRechazoActivo(doc)) {
+      return "#ffccd5";
+    }
+    if (this.showingFirmados) {
+      return "#cbd5e1";
+    }
+    return "#edf2f7";
+  }
+
+  public getCardBorderLeft(doc: any): string {
+    if (doc?.selected) {
+      return "4px solid #2dce89";
+    }
+    if (this.tieneRechazoActivo(doc)) {
+      return "4px solid #f5365c";
+    }
+    if (this.showingFirmados) {
+      return "4px solid #2e7d32";
+    }
+    if (doc?.priority === "Urgente") {
+      return "4px solid #f5365c";
+    }
+    if (doc?.priority === "Prioritario") {
+      return "4px solid #fb6340";
+    }
+    return "4px solid #e9ecef";
+  }
+
+  public getCardBoxShadow(doc: any): string {
+    if (this.tieneRechazoActivo(doc)) {
+      return "0 4px 12px rgba(245, 54, 92, 0.05)";
+    }
+    if (this.showingFirmados) {
+      return "0 3px 10px rgba(46, 125, 50, 0.07), 0 1px 3px rgba(0, 0, 0, 0.03)";
+    }
+    return "0 1px 3px rgba(0,0,0,0.01)";
   }
 }

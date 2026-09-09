@@ -495,11 +495,27 @@
                   </div>
                 </div>
 
-                <!-- Estatus / Chip -->
+                <!-- Estatus / Chip o Switch (Solo en Perfil Ministro) -->
                 <div class="subcaso-status-badge">
-                  <span class="badge-status-chip chip-procesar">
-                    <i class="fas fa-check mr-1"></i> {{ getDetalleLabel(item) }}
-                  </span>
+                  <ng-container *ngIf="currentProfile === 'Ministro'; else defaultBadge1">
+                    <div class="minister-toggle-wrapper">
+                      <label class="toggle-switch-custom" title="Cambiar estatus del integrante">
+                        <input type="checkbox"
+                               [checked]="!isNoProcesar(item)"
+                               (change)="toggleSubcasoEstatus(item)">
+                        <span class="slider"></span>
+                      </label>
+                      <span class="switch-label" [class.text-success]="!isNoProcesar(item)" [class.text-danger]="isNoProcesar(item)">
+                        {{ isNoProcesar(item) ? 'NEGADO' : 'APROBADO' }}
+                      </span>
+                    </div>
+                  </ng-container>
+
+                  <ng-template #defaultBadge1>
+                    <span class="badge-status-chip chip-procesar">
+                      <i class="fas fa-check mr-1"></i> {{ getDetalleLabel(item) }}
+                    </span>
+                  </ng-template>
                 </div>
               </div>
             </div>
@@ -552,13 +568,29 @@
                   </div>
                 </div>
 
-                <!-- Estatus / Chip -->
+                <!-- Estatus / Chip o Switch (Solo en Perfil Ministro) -->
                 <div class="subcaso-status-badge">
-                  <span class="badge-status-chip"
-                        [class.chip-no-procesar]="isNoProcesar(item)"
-                        [class.chip-pendiente]="isPendiente(item)">
-                    {{ getDetalleLabel(item) }}
-                  </span>
+                  <ng-container *ngIf="currentProfile === 'Ministro'; else defaultBadge2">
+                    <div class="minister-toggle-wrapper">
+                      <label class="toggle-switch-custom" title="Cambiar estatus del integrante">
+                        <input type="checkbox"
+                               [checked]="!isNoProcesar(item)"
+                               (change)="toggleSubcasoEstatus(item)">
+                        <span class="slider"></span>
+                      </label>
+                      <span class="switch-label" [class.text-success]="!isNoProcesar(item)" [class.text-danger]="isNoProcesar(item)">
+                        {{ isNoProcesar(item) ? 'NEGADO' : 'APROBADO' }}
+                      </span>
+                    </div>
+                  </ng-container>
+
+                  <ng-template #defaultBadge2>
+                    <span class="badge-status-chip"
+                          [class.chip-no-procesar]="isNoProcesar(item)"
+                          [class.chip-pendiente]="isPendiente(item)">
+                      {{ getDetalleLabel(item) }}
+                    </span>
+                  </ng-template>
                 </div>
 
               </div>
@@ -579,9 +611,9 @@
           <button class="btn-modal-tool btn-pdf"
                   (click)="verPDF(activeDoc)"
                   [disabled]="!getDwsUrl(activeDoc)"
-                  title="Ver documento en PDF">
+                  [title]="esDocFirmado(activeDoc) ? 'Documento Firmado' : 'Ver documento en PDF'">
             <i class="fas fa-file-pdf"></i>
-            <span>Ver PDF</span>
+            <span>{{ esDocFirmado(activeDoc) ? 'Documento Firmado' : 'Ver PDF' }}</span>
           </button>
 
           <button class="btn-modal-tool btn-ficha"
@@ -592,35 +624,49 @@
           </button>
         </div>
 
-        <!-- Botones Principales de Decisión Executive -->
-        <div class="modal-footer-decisions">
-          <!-- FAVORABLE / FIRMAR -->
-          <button class="btn-modal-decision btn-favorable"
-                  (click)="ejecutarAccion(currentProfile === 'Ministro' ? 'FIRMAR' : 'FAVORABLE')"
-                  [disabled]="loadingAction"
-                  [title]="currentProfile === 'Ministro' ? 'Firmar y Aprobar Expediente' : 'Aprobar como Favorable'">
-            <i [class]="currentProfile === 'Ministro' ? 'fas fa-file-signature' : 'fas fa-check-circle'"></i>
-            <span>{{ currentProfile === 'Ministro' ? 'Firmar' : 'Favorable' }}</span>
-            <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
-          </button>
+        <!-- Botones Principales de Decisión Executive (Ocultos en documentos firmados) -->
+        <div class="modal-footer-decisions" *ngIf="!esDocFirmado(activeDoc)">
+          <ng-container *ngIf="currentProfile === 'Ministro'; else defaultDecisions">
+            <!-- ÚNICO BOTÓN FIRMAR EN PERFIL MINISTRO -->
+            <button class="btn-modal-decision btn-favorable btn-firmar-ministro"
+                    (click)="solicitarFirmaMinistro()"
+                    [disabled]="loadingAction"
+                    title="Iniciar decisión y firma ministerial">
+              <i class="fas fa-file-signature"></i>
+              <span>Firmar Documento</span>
+              <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
+            </button>
+          </ng-container>
 
-          <!-- DIFERIDO -->
-          <button class="btn-modal-decision btn-diferido"
-                  (click)="ejecutarAccion('DIFERIDO')"
-                  [disabled]="loadingAction"
-                  title="Registrar como Diferido (Requiere Observación)">
-            <i class="fas fa-clock"></i>
-            <span>Diferido</span>
-          </button>
+          <ng-template #defaultDecisions>
+            <!-- FAVORABLE -->
+            <button class="btn-modal-decision btn-favorable"
+                    (click)="ejecutarAccion('FAVORABLE')"
+                    [disabled]="loadingAction"
+                    title="Registrar como Favorable">
+              <i class="fas fa-check-circle"></i>
+              <span>Favorable</span>
+              <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
+            </button>
 
-          <!-- NEGADO -->
-          <button class="btn-modal-decision btn-negado"
-                  (click)="ejecutarAccion('NEGADO')"
-                  [disabled]="loadingAction"
-                  title="Registrar como Negado (Requiere Observación)">
-            <i class="fas fa-times-circle"></i>
-            <span>Negado</span>
-          </button>
+            <!-- DIFERIDO -->
+            <button class="btn-modal-decision btn-diferido"
+                    (click)="ejecutarAccion('DIFERIDO')"
+                    [disabled]="loadingAction"
+                    title="Registrar como Diferido (Requiere Observación)">
+              <i class="fas fa-clock"></i>
+              <span>Diferido</span>
+            </button>
+
+            <!-- NEGADO -->
+            <button class="btn-modal-decision btn-negado"
+                    (click)="ejecutarAccion('NEGADO')"
+                    [disabled]="loadingAction"
+                    title="Registrar como Negado (Requiere Observación)">
+              <i class="fas fa-times-circle"></i>
+              <span>Negado</span>
+            </button>
+          </ng-template>
         </div>
 
       </div>

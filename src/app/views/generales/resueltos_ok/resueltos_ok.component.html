@@ -282,12 +282,13 @@
               <div class="rt-folder-group-content" *ngIf="isDocGroupExpanded(group.name)" style="display: flex; flex-direction: column; gap: 0.4rem; padding-left: 0.5rem; margin-bottom: 0.5rem;">
                 <div class="doc-item-row animate-fade-in" 
                      *ngFor="let doc of group.docs"
-                     [style.background]="doc.selected ? 'rgba(45, 206, 137, 0.05)' : (doc.rechazos_observacion ? 'linear-gradient(to right, rgba(245, 54, 92, 0.06), #ffffff 40%)' : '#ffffff')"
-                     [style.border-color]="doc.selected ? '#2dce89' : (doc.rechazos_observacion ? '#ffccd5' : '#edf2f7')"
-                     [style.border-left]="doc.selected ? '4px solid #2dce89' : (doc.rechazos_observacion ? '4px solid #f5365c' : (doc.priority === 'Urgente' ? '4px solid #f5365c' : (doc.priority === 'Prioritario' ? '4px solid #fb6340' : '4px solid #e9ecef')))"
+                     [class.firmado-card]="showingFirmados"
+                     [style.background]="getCardBackground(doc)"
+                     [style.border-color]="getCardBorderColor(doc)"
+                     [style.border-left]="getCardBorderLeft(doc)"
                      (click)="(currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion' || currentProfile === 'Revision') ? (doc.selected = !doc.selected) : null"
                      (contextmenu)="onDocumentRightClick($event, doc, doc.index)"
-                     [style.box-shadow]="doc.rechazos_observacion ? '0 4px 12px rgba(245, 54, 92, 0.05)' : '0 1px 3px rgba(0,0,0,0.01)'"
+                     [style.box-shadow]="getCardBoxShadow(doc)"
                      style="cursor: pointer; transition: all 0.3s ease; padding: 12px 15px; margin-bottom: 10px; border-top: 1px solid; border-right: 1px solid; border-bottom: 1px solid; border-radius: 8px; display: flex; align-items: center;">
                   
                   <div class="checkbox-col" *ngIf="!showingFirmados && (currentProfile === 'Jefe' || currentProfile === 'Secretaria' || currentProfile === 'Direccion' || currentProfile === 'Revision')" style="padding-right: 15px; display: flex; align-items: center;">
@@ -320,11 +321,14 @@
                     </div>
                     <!-- Descripción extra: solo en modo Firmados -->
                     <div *ngIf="showingFirmados" class="firmados-meta-row">
-                      <span class="firmados-chip resol" *ngIf="doc.numero_resol">
-                        <i class="fas fa-hashtag"></i> {{ doc.numero_resol }}
+                      <span class="firmados-chip resol" *ngIf="doc.numero_resol || doc.numero_resuelto">
+                        <i class="fas fa-hashtag"></i> {{ doc.numero_resol || doc.numero_resuelto }}
                       </span>
                       <span class="firmados-chip fecha" *ngIf="doc.fecha_resolucion">
                         <i class="fas fa-calendar-check"></i> {{ doc.fecha_resolucion }}
+                      </span>
+                      <span class="firmados-chip cumplido" *ngIf="esDocCumplido(doc)" style="background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                        <i class="fas fa-check-circle" style="color: #2e7d32;"></i> Cumplido
                       </span>
                     </div>
                     <div class="meta" style="font-size: 0.85rem; color: #8898aa; display: flex; gap: 15px; margin-top: 4px;">
@@ -340,7 +344,7 @@
                     </div>
                     
                     <!-- Observacion de Rechazo -->
-                    <div *ngIf="doc.rechazos_observacion && doc.rechazos_observacion.trim() !== ''" style="margin-top: 8px; margin-bottom: 2px;">
+                    <div *ngIf="!esDocCumplido(doc) && doc.rechazos_observacion && doc.rechazos_observacion.trim() !== ''" style="margin-top: 8px; margin-bottom: 2px;">
                       <span style="font-size: 0.8rem; font-style: italic; color: #f5365c; line-height: 1.4; white-space: pre-wrap; display: block;">{{ doc.rechazos_observacion }}</span>
                     </div>
                   </div>
@@ -360,7 +364,7 @@
                     <button class="btn btn-sm" 
                             *ngIf="currentProfile !== 'Secretaria' && (doc.normal == 1 || doc.pdf_rrss == 1 || doc.oficio == 1 || doc.gaceta == 1 || doc.sobre == 1 || doc.no_publicar == 1)"
                             (click)="VerPDF(doc); $event.stopPropagation()" 
-                            title="Ver PDF"
+                            [title]="showingFirmados ? 'Documento Firmado' : 'Ver PDF'"
                             style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e8eaf6; color: #3949ab; border: none; transition: transform 0.2s;"
                             onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                       <i class="fas fa-file-pdf" style="font-size: 1rem;"></i>
@@ -384,12 +388,13 @@
             <!-- Carpetas Directas (Sin Etiqueta) -->
             <div class="doc-item-row animate-fade-in" 
                  *ngFor="let doc of flatDocuments"
-                 [style.background]="doc.selected ? 'rgba(45, 206, 137, 0.05)' : (doc.rechazos_observacion ? 'linear-gradient(to right, rgba(245, 54, 92, 0.06), #ffffff 40%)' : '#ffffff')"
-                 [style.border-color]="doc.selected ? '#2dce89' : (doc.rechazos_observacion ? '#ffccd5' : '#edf2f7')"
-                 [style.border-left]="doc.selected ? '4px solid #2dce89' : (doc.rechazos_observacion ? '4px solid #f5365c' : (doc.priority === 'Urgente' ? '4px solid #f5365c' : (doc.priority === 'Prioritario' ? '4px solid #fb6340' : '4px solid #e9ecef')))"
+                 [class.firmado-card]="showingFirmados"
+                 [style.background]="getCardBackground(doc)"
+                 [style.border-color]="getCardBorderColor(doc)"
+                 [style.border-left]="getCardBorderLeft(doc)"
                  (click)="doc.selected = !doc.selected"
                  (contextmenu)="onDocumentRightClick($event, doc, doc.index)"
-                 [style.box-shadow]="doc.rechazos_observacion ? '0 4px 12px rgba(245, 54, 92, 0.05)' : '0 1px 3px rgba(0,0,0,0.01)'"
+                 [style.box-shadow]="getCardBoxShadow(doc)"
                  style="cursor: pointer; transition: all 0.3s ease; padding: 12px 15px; margin-bottom: 10px; border-top: 1px solid; border-right: 1px solid; border-bottom: 1px solid; border-radius: 8px; display: flex; align-items: center;">
               
               <div class="checkbox-col" *ngIf="!showingFirmados" style="padding-right: 15px; display: flex; align-items: center;">
@@ -422,11 +427,14 @@
                 </div>
                 <!-- Descripción extra: solo en modo Firmados -->
                 <div *ngIf="showingFirmados" class="firmados-meta-row">
-                  <span class="firmados-chip resol" *ngIf="doc.numero_resol">
-                    <i class="fas fa-hashtag"></i> {{ doc.numero_resol }}
+                  <span class="firmados-chip resol" *ngIf="doc.numero_resol || doc.numero_resuelto">
+                    <i class="fas fa-hashtag"></i> {{ doc.numero_resol || doc.numero_resuelto }}
                   </span>
                   <span class="firmados-chip fecha" *ngIf="doc.fecha_resolucion">
                     <i class="fas fa-calendar-check"></i> {{ doc.fecha_resolucion }}
+                  </span>
+                  <span class="firmados-chip cumplido" *ngIf="esDocCumplido(doc)" style="background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> Cumplido
                   </span>
                 </div>
                 <div class="meta" style="font-size: 0.85rem; color: #8898aa; display: flex; gap: 15px; margin-top: 4px;">
@@ -442,7 +450,7 @@
                 </div>
                 
                 <!-- Observacion de Rechazo -->
-                <div *ngIf="doc.rechazos_observacion && doc.rechazos_observacion.trim() !== ''" style="margin-top: 8px; margin-bottom: 2px;">
+                <div *ngIf="!esDocCumplido(doc) && doc.rechazos_observacion && doc.rechazos_observacion.trim() !== ''" style="margin-top: 8px; margin-bottom: 2px;">
                   <span style="font-size: 0.8rem; font-style: italic; color: #f5365c; line-height: 1.4; white-space: pre-wrap; display: block;">{{ doc.rechazos_observacion }}</span>
                 </div>
               </div>
@@ -462,7 +470,7 @@
                 <button class="btn btn-sm" 
                         *ngIf="currentProfile !== 'Secretaria' && (doc.normal == 1 || doc.pdf_rrss == 1 || doc.oficio == 1 || doc.gaceta == 1 || doc.sobre == 1 || doc.no_publicar == 1)"
                         (click)="VerPDF(doc); $event.stopPropagation()" 
-                        title="Ver PDF"
+                        [title]="showingFirmados ? 'Documento Firmado' : 'Ver PDF'"
                         style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e8eaf6; color: #3949ab; border: none; transition: transform 0.2s;"
                         onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                   <i class="fas fa-file-pdf" style="font-size: 1rem;"></i>
@@ -486,12 +494,13 @@
           <ng-container *ngIf="currentProfile !== 'Jefe' && currentProfile !== 'Secretaria' && currentProfile !== 'Direccion' && currentProfile !== 'Aprobador' && currentProfile !== 'Revision'">
             <div class="doc-item-row animate-fade-in" 
                  *ngFor="let doc of filteredDocumentsList; let idx = index"
-                 [style.background]="doc.selected ? 'rgba(45, 206, 137, 0.05)' : (doc.rechazos_observacion ? 'linear-gradient(to right, rgba(245, 54, 92, 0.06), #ffffff 40%)' : '#ffffff')"
-                 [style.border]="doc.rechazos_observacion ? '1px solid #ffccd5' : '1px solid transparent'"
-                 [style.border-left]="doc.selected ? '4px solid #2dce89' : (doc.rechazos_observacion ? '4px solid #f5365c' : '4px solid transparent')"
+                 [class.firmado-card]="showingFirmados"
+                 [style.background]="getCardBackground(doc)"
+                 [style.border-color]="getCardBorderColor(doc)"
+                 [style.border-left]="getCardBorderLeft(doc)"
                  (click)="currentProfile !== 'Edicion' ? (doc.selected = !doc.selected) : null"
                  (contextmenu)="onDocumentRightClick($event, doc, idx)"
-                 [style.box-shadow]="doc.rechazos_observacion ? '0 4px 12px rgba(245, 54, 92, 0.05)' : '0 2px 4px rgba(0,0,0,0.02)'"
+                 [style.box-shadow]="getCardBoxShadow(doc)"
                  style="cursor: pointer; transition: all 0.3s ease; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center;">
               
               <div class="checkbox-col" *ngIf="currentProfile !== 'Edicion' && !showingFirmados" style="padding-right: 15px; display: flex; align-items: center;">
@@ -522,11 +531,14 @@
                 </div>
                 <!-- Descripción extra: solo en modo Firmados -->
                 <div *ngIf="showingFirmados" class="firmados-meta-row">
-                  <span class="firmados-chip resol" *ngIf="doc.numero_resol">
-                    <i class="fas fa-hashtag"></i> {{ doc.numero_resol }}
+                  <span class="firmados-chip resol" *ngIf="doc.numero_resol || doc.numero_resuelto">
+                    <i class="fas fa-hashtag"></i> {{ doc.numero_resol || doc.numero_resuelto }}
                   </span>
                   <span class="firmados-chip fecha" *ngIf="doc.fecha_resolucion">
                     <i class="fas fa-calendar-check"></i> {{ doc.fecha_resolucion }}
+                  </span>
+                  <span class="firmados-chip cumplido" *ngIf="esDocCumplido(doc)" style="background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> Cumplido
                   </span>
                 </div>
                 <div class="meta" style="font-size: 0.85rem; color: #8898aa; display: flex; gap: 15px; margin-top: 4px;">
@@ -542,7 +554,7 @@
                 </div>
 
                 <!-- Observacion de Rechazo -->
-                <div *ngIf="doc.rechazos_observacion && doc.rechazos_observacion.trim() !== ''" style="margin-top: 8px; margin-bottom: 2px;">
+                <div *ngIf="!esDocCumplido(doc) && doc.rechazos_observacion && doc.rechazos_observacion.trim() !== ''" style="margin-top: 8px; margin-bottom: 2px;">
                   <span style="font-size: 0.8rem; font-style: italic; color: #f5365c; line-height: 1.4; white-space: pre-wrap; display: block;">{{ doc.rechazos_observacion }}</span>
                 </div>
               </div>
@@ -552,7 +564,7 @@
                 <button class="btn btn-sm" 
                         *ngIf="doc.normal == 1 || doc.pdf_rrss == 1 || doc.oficio == 1 || doc.gaceta == 1 || doc.sobre == 1 || doc.no_publicar == 1"
                         (click)="VerPDF(doc); $event.stopPropagation()" 
-                        title="Ver PDF"
+                        [title]="showingFirmados ? 'Documento Firmado' : 'Ver PDF'"
                         style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #e8eaf6; color: #3949ab; border: none; transition: transform 0.2s;"
                         onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                   <i class="fas fa-file-pdf" style="font-size: 1rem;"></i>
@@ -560,7 +572,7 @@
 
                 <!-- Botón Procesar: Solo Edicion (Redactor) + Firmados + Numero Resolucion generado -->
                 <button class="btn btn-sm"
-                        *ngIf="showingFirmados && currentProfile === 'Edicion' && doc.numero_resol"
+                        *ngIf="showingFirmados && currentProfile === 'Edicion' && (doc.numero_resol || doc.numero_resuelto)"
                         (click)="openProcessModal(doc); $event.stopPropagation()"
                         title="Procesar Casos"
                         style="width: 36px; height: 36px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: #fff3e0; color: #f57c00; border: none; transition: transform 0.2s;"
