@@ -96,14 +96,35 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   get filteredDocumentsList() {
     let list = this.documents || [];
     if (this.documentSearchQuery) {
-      const query = this.documentSearchQuery.toLowerCase().trim();
+      const rawQuery = this.documentSearchQuery.trim();
+      const query = rawQuery.toLowerCase();
+      const cleanQuery = rawQuery.replace(/\D/g, "");
+
       list = list.filter((doc) => {
+        // 1. Búsqueda por número de carpeta
         if (
           doc.numero_carpeta &&
-          doc.numero_carpeta.toLowerCase().includes(query)
+          doc.numero_carpeta.toString().toLowerCase().includes(query)
         )
           return true;
 
+        // 2. Búsqueda por número de resolución (numero_resol / numero_resuelto) a nivel de carpeta/grupo
+        const numResolDoc = (
+          doc.numero_resol ||
+          doc.numero_resuelto ||
+          ""
+        ).toString();
+        if (numResolDoc) {
+          if (numResolDoc.toLowerCase().includes(query)) return true;
+          if (cleanQuery && numResolDoc.replace(/\D/g, "").includes(cleanQuery))
+            return true;
+        }
+
+        // 3. Búsqueda por asunto
+        if (doc.asunto && doc.asunto.toLowerCase().includes(query))
+          return true;
+
+        // 4. Búsqueda en casos/integrantes internos
         if (doc.documentos && Array.isArray(doc.documentos)) {
           for (const item of doc.documentos) {
             if (item.cedula && item.cedula.toLowerCase().includes(query))
@@ -113,6 +134,21 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               item.nombres_apellidos.toLowerCase().includes(query)
             )
               return true;
+
+            const numResolItem = (
+              item.numero_resol ||
+              item.numero_resuelto ||
+              item.numero ||
+              ""
+            ).toString();
+            if (numResolItem) {
+              if (numResolItem.toLowerCase().includes(query)) return true;
+              if (
+                cleanQuery &&
+                numResolItem.replace(/\D/g, "").includes(cleanQuery)
+              )
+                return true;
+            }
           }
         }
         return false;
@@ -682,10 +718,28 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
 
     // 2. Filtrar por Búsqueda Query
     if (this.folderSearchQuery.trim() !== "") {
-      const query = this.folderSearchQuery.toLowerCase();
-      result = result.filter(
-        (f) => f.tipo && f.tipo.toLowerCase().includes(query),
-      );
+      const rawQuery = this.folderSearchQuery.trim();
+      const query = rawQuery.toLowerCase();
+      const cleanQuery = rawQuery.replace(/\D/g, "");
+
+      result = result.filter((f) => {
+        if (f.tipo && f.tipo.toLowerCase().includes(query)) return true;
+        if (f.c_tipo && f.c_tipo.toString().toLowerCase().includes(query))
+          return true;
+
+        const numResolF = (
+          f.numero_resol ||
+          f.numero_resuelto ||
+          f.codigo ||
+          ""
+        ).toString();
+        if (numResolF) {
+          if (numResolF.toLowerCase().includes(query)) return true;
+          if (cleanQuery && numResolF.replace(/\D/g, "").includes(cleanQuery))
+            return true;
+        }
+        return false;
+      });
     }
 
     this.filteredFolders = result;

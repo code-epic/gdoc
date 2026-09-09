@@ -227,7 +227,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fas fa-search"></i></span>
             </div>
-            <input type="text" class="form-control" placeholder="Buscar por N° Carpeta o Cédula..." [(ngModel)]="documentSearchQuery" (ngModelChange)="processDocumentsGrouping()">
+            <input type="text" class="form-control" [placeholder]="showingFirmados ? 'Buscar por N° Resolución, N° Carpeta, Cédula o Asunto...' : 'Buscar por N° Carpeta, Cédula o Asunto...'" [(ngModel)]="documentSearchQuery" (ngModelChange)="processDocumentsGrouping()">
           </div>
         </div>
 
