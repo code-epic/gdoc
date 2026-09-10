@@ -4,7 +4,11 @@ import { PageEvent } from "@angular/material/paginator";
 import { Router } from "@angular/router";
 import { NgbModalConfig, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ToastrService } from "ngx-toastr";
-import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
+import {
+  ApiService,
+  DocumentoAdjunto,
+  IAPICore,
+} from "src/app/services/apicore/api.service";
 import { IWKFAlerta } from "src/app/services/control/documentos.service";
 import { LoginService } from "src/app/services/seguridad/login.service";
 import { UtilService } from "src/app/services/util/util.service";
@@ -22,8 +26,8 @@ export class SbuzonComponent implements OnInit {
   fecha_desde = "-09-01";
   fecha_hasta = "-09-30";
   xyear = "2024";
-  public lstMeses = [];
-  public lstYear = [];
+  public lstMeses: any[] = [];
+  public lstYear: any[] = [];
   public xmeses = "";
 
   public paginador = 10;
@@ -32,6 +36,14 @@ export class SbuzonComponent implements OnInit {
     funcion: "",
     parametros: "",
     valores: "",
+  };
+
+  public archivos = [];
+
+  public DocAdjunto: DocumentoAdjunto = {
+    documento: "",
+    archivo: "",
+    usuario: "",
   };
 
   public WAlerta: IWKFAlerta = {
@@ -45,7 +57,8 @@ export class SbuzonComponent implements OnInit {
   };
 
   lst = [];
-  public lstEstados = []; //Listar Estados
+  public lstEstatus: any[] = [];
+  public lstEstados: any[] = []; //Listar Estados
 
   longitud = 0;
   pageSize = 25;
@@ -56,8 +69,8 @@ export class SbuzonComponent implements OnInit {
 
   selNav = 0;
 
-  public buzon = [];
-  public bzOriginal = [];
+  public buzon: any[] = [];
+  public bzOriginal: any[] = [];
 
   public estilocheck = "none";
 
@@ -78,7 +91,7 @@ export class SbuzonComponent implements OnInit {
 
   public cmbDestino = "";
 
-  public lstAcciones = [];
+  public lstAcciones: any[] = [];
 
   public cmbAcciones = [
     { valor: "1", texto: "RECHAZAR", visible: "0" },
@@ -88,15 +101,18 @@ export class SbuzonComponent implements OnInit {
     { valor: "4", texto: "OTROS DOCUMENTOS", visible: "0" },
   ];
 
-  public bzBusqueda = [];
-  public bzAlertasO = [];
-  public bzAlertas = [];
+  public bzBusqueda: any[] = [];
+  public bzAlertasO: any[] = [];
+  public bzAlertas: any[] = [];
   public buscar = "";
 
   public extender_plazo: any;
 
   public posicionPagina = 0;
   public placement = "bottom";
+  buttonEl: string | HTMLElement;
+  cmbEstatus: any;
+  cmbDecision: any;
 
   constructor(
     private apiService: ApiService,
@@ -453,6 +469,43 @@ export class SbuzonComponent implements OnInit {
   }
 
   dwUrl(ncontrol: string, archivo: string): string {
-    return this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
+    return this.apiService.Dws(btoa("RS" + ncontrol) + "/" + archivo);
+  }
+
+  fileSelected(e) {
+    this.archivos.push(e.target.files[0]);
+  }
+
+  async SubirArchivo() {
+    var frm = new FormData(document.forms.namedItem("forma"));
+    try {
+      await this.apiService.EnviarArchivos(frm).subscribe((data) => {
+        this.xAPI = {} as IAPICore;
+        this.xAPI.funcion = "WKF_ADocumentoAdjunto";
+        this.xAPI.parametros = "";
+        this.DocAdjunto.archivo = this.archivos[0].name;
+        this.DocAdjunto.usuario = this.loginService.Usuario.id;
+        this.DocAdjunto.documento = this.numControl;
+        this.xAPI.valores = JSON.stringify(this.DocAdjunto);
+
+        this.apiService.Ejecutar(this.xAPI).subscribe(
+          (xdata) => {
+            if (xdata.tipo == 1) {
+              this.toastrService.success(
+                "Tu archivo ha sido cargado con exito ",
+                `GDoc Registro`,
+              );
+            } else {
+              this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
+            }
+          },
+          (error) => {
+            this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
+          },
+        );
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
