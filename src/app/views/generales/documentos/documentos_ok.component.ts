@@ -15,6 +15,8 @@ import { JwtHelperService } from "@auth0/angular-jwt";
 import { environment } from "src/environments/environment";
 import Swal from "sweetalert2";
 import { IWKFAlerta } from "src/app/services/control/documentos.service";
+import { toBase64String } from "@angular/compiler/src/output/source_map";
+import { EncriptarSDC } from "src/app/services/seguridad/encriptar-sdc.service";
 
 // ─── Interface para Agrupación de Etiquetas WKF ────────────────────────────────
 export interface IWKFEtiqueta {
@@ -65,9 +67,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     }
 
     // Flechas de navegación para desplazarse entre casos del agrupado
-    if (this.isDetailOpen && this.currentTagGroupFolder && this.groupCases.length > 1) {
+    if (
+      this.isDetailOpen &&
+      this.currentTagGroupFolder &&
+      this.groupCases.length > 1
+    ) {
       const target = event.target as HTMLElement;
-      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
+      if (
+        target &&
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA")
+      ) {
         return;
       }
       if (event.key === "ArrowRight" || event.code === "ArrowRight") {
@@ -248,6 +257,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     public router: Router,
     private changeDetector: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
+    private encriptarService: EncriptarSDC,
   ) {
     // Fechas fijas: agosto → diciembre del año en curso
     this.fecha_desde = this.xyear + "-06-01";
@@ -1293,10 +1303,25 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public getCedula(e: any): string {
     if (!e) return "";
     let ced = (e.sub_cedula || e.cedula || "").toString().trim();
-    if (!ced && Array.isArray(e.mergedDocumentos) && e.mergedDocumentos.length > 0) {
-      ced = (e.mergedDocumentos[0]?.sub_cedula || e.mergedDocumentos[0]?.cedula || "").toString().trim();
+    if (
+      !ced &&
+      Array.isArray(e.mergedDocumentos) &&
+      e.mergedDocumentos.length > 0
+    ) {
+      ced = (
+        e.mergedDocumentos[0]?.sub_cedula ||
+        e.mergedDocumentos[0]?.cedula ||
+        ""
+      )
+        .toString()
+        .trim();
     }
-    if (!ced && e.cuenta && e.cuenta.toString().length >= 6 && !isNaN(Number(e.cuenta))) {
+    if (
+      !ced &&
+      e.cuenta &&
+      e.cuenta.toString().length >= 6 &&
+      !isNaN(Number(e.cuenta))
+    ) {
       ced = e.cuenta.toString().trim();
     }
     return ced;
@@ -1304,18 +1329,44 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   public getNombre(e: any): string {
     if (!e) return "";
-    let n = (e.sub_nombre || e.nombre || e.nombres_apellidos || e.nom || "").toString().trim();
-    if (!n && Array.isArray(e.mergedDocumentos) && e.mergedDocumentos.length > 0) {
-      n = (e.mergedDocumentos[0]?.sub_nombre || e.mergedDocumentos[0]?.nombre || e.mergedDocumentos[0]?.nombres_apellidos || "").toString().trim();
+    let n = (e.sub_nombre || e.nombre || e.nombres_apellidos || e.nom || "")
+      .toString()
+      .trim();
+    if (
+      !n &&
+      Array.isArray(e.mergedDocumentos) &&
+      e.mergedDocumentos.length > 0
+    ) {
+      n = (
+        e.mergedDocumentos[0]?.sub_nombre ||
+        e.mergedDocumentos[0]?.nombre ||
+        e.mergedDocumentos[0]?.nombres_apellidos ||
+        ""
+      )
+        .toString()
+        .trim();
     }
     return n.toUpperCase();
   }
 
   public getCargo(e: any): string {
     if (!e) return "";
-    let c = (e.sub_cargo || e.cargo || e.grado || e.puesto || "").toString().trim();
-    if (!c && Array.isArray(e.mergedDocumentos) && e.mergedDocumentos.length > 0) {
-      c = (e.mergedDocumentos[0]?.sub_cargo || e.mergedDocumentos[0]?.cargo || e.mergedDocumentos[0]?.grado || "").toString().trim();
+    let c = (e.sub_cargo || e.cargo || e.grado || e.puesto || "")
+      .toString()
+      .trim();
+    if (
+      !c &&
+      Array.isArray(e.mergedDocumentos) &&
+      e.mergedDocumentos.length > 0
+    ) {
+      c = (
+        e.mergedDocumentos[0]?.sub_cargo ||
+        e.mergedDocumentos[0]?.cargo ||
+        e.mergedDocumentos[0]?.grado ||
+        ""
+      )
+        .toString()
+        .trim();
     }
     return c.toUpperCase();
   }
@@ -1466,7 +1517,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       return e.cont || e.resumen || "";
     }
     let asu = e.resumen || e.cont || "";
-    if (!asu && Array.isArray(e.mergedDocumentos) && e.mergedDocumentos.length > 0) {
+    if (
+      !asu &&
+      Array.isArray(e.mergedDocumentos) &&
+      e.mergedDocumentos.length > 0
+    ) {
       asu = e.mergedDocumentos[0]?.resumen || e.mergedDocumentos[0]?.cont || "";
     }
     return asu;
@@ -1579,7 +1634,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.pdfUrl = null;
     this.isDetailOpen = true;
 
-    if (e.isTagFolder && Array.isArray(e.puntosDeCuenta) && e.puntosDeCuenta.length > 0) {
+    if (
+      e.isTagFolder &&
+      Array.isArray(e.puntosDeCuenta) &&
+      e.puntosDeCuenta.length > 0
+    ) {
       this.currentTagGroupFolder = e;
       this.groupCases = e.puntosDeCuenta;
       this.currentGroupCaseIndex = 0;
@@ -1603,7 +1662,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   // ─── Navegación entre Casos del Agrupado ───────────────────────────────────────
   public selectGroupCase(index: number): void {
-    if (!this.groupCases || index < 0 || index >= this.groupCases.length) return;
+    if (!this.groupCases || index < 0 || index >= this.groupCases.length)
+      return;
     this.currentGroupCaseIndex = index;
     // Renovar referencia clonando el objeto para forzar refrescamiento reactivo en Angular
     this.activeDoc = { ...this.groupCases[index] };
@@ -1621,7 +1681,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   public nextGroupCase(): void {
-    if (this.groupCases && this.currentGroupCaseIndex < this.groupCases.length - 1) {
+    if (
+      this.groupCases &&
+      this.currentGroupCaseIndex < this.groupCases.length - 1
+    ) {
       this.selectGroupCase(this.currentGroupCaseIndex + 1);
     }
   }
@@ -1699,11 +1762,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       this.currentTagGroupFolder.mergedDocumentos.length > 0
     ) {
       const eNumc = (e.numc || e.ncontrol || e.cuenta || "").toString().trim();
-      const matched = this.currentTagGroupFolder.mergedDocumentos.filter((sub: any) => {
-        if (!sub) return false;
-        const subNumc = (sub.numc || sub.ncontrol || sub.cuenta || "").toString().trim();
-        return eNumc && subNumc && subNumc === eNumc;
-      });
+      const matched = this.currentTagGroupFolder.mergedDocumentos.filter(
+        (sub: any) => {
+          if (!sub) return false;
+          const subNumc = (sub.numc || sub.ncontrol || sub.cuenta || "")
+            .toString()
+            .trim();
+          return eNumc && subNumc && subNumc === eNumc;
+        },
+      );
       if (matched.length > 0) {
         list = [...matched];
       }
@@ -1720,7 +1787,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           sub_nombre: this.getNombre(e),
           cargo: this.getCargo(e),
           sub_cargo: this.getCargo(e),
-          sub_detalle: e.sub_detalle || e.detalle || e.estatus || e.estado || "PR",
+          sub_detalle:
+            e.sub_detalle || e.detalle || e.estatus || e.estado || "PR",
           detalle: e.sub_detalle || e.detalle || e.estatus || e.estado || "PR",
           observacion: e.observacion || e.sub_observacion || e.obse || "",
           sub_observacion: e.observacion || e.sub_observacion || e.obse || "",
@@ -1731,7 +1799,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     // 6. Normalizar campos en cada integrante para asegurar que la vista siempre tenga los valores
     return list.map((item: any) => {
       if (!item) return item;
-      const ced = (item.sub_cedula || item.cedula || item.cuenta || "").toString().trim();
+      const ced = (item.sub_cedula || item.cedula || item.cuenta || "")
+        .toString()
+        .trim();
       const nom = (
         item.sub_nombre ||
         item.nombre ||
@@ -1753,11 +1823,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         .trim()
         .toUpperCase();
       const det =
-        item.sub_detalle ||
-        item.detalle ||
-        item.estatus ||
-        item.estado ||
-        "PR";
+        item.sub_detalle || item.detalle || item.estatus || item.estado || "PR";
       const obs = item.observacion || item.sub_observacion || item.obse || "";
 
       return {
@@ -1779,7 +1845,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   // ─── TrackBy para optimizar y forzar re-render de integrantes ────────────────
   public trackBySubcaso(index: number, item: any): string {
     if (!item) return `${index}`;
-    return `${item.cedula || item.sub_cedula || item.cuenta || index}_${item.sub_detalle || item.detalle || ''}_${index}`;
+    return `${item.cedula || item.sub_cedula || item.cuenta || index}_${item.sub_detalle || item.detalle || ""}_${index}`;
   }
 
   // ─── Cerrar panel de detalle ──────────────────────────────────────────────────
@@ -1811,26 +1877,6 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     let archivo =
       e.anom_firmado || e.archivo_firmado || e.anom || e.archivo || "";
     if (!archivo) return "";
-
-    const isFirmado = this.esDocFirmado(e);
-
-    if (isFirmado) {
-      let cleanName = archivo.replace(/\.pdf$/i, "");
-      if (cleanName.toLowerCase().startsWith("firmado_")) {
-        cleanName = cleanName.substring(8);
-      } else if (cleanName.toLowerCase().startsWith("firmado")) {
-        cleanName = cleanName.substring(7);
-      }
-      cleanName = cleanName
-        .replace(/_tramitacion$/i, "")
-        .replace(/_punt$/i, "");
-
-      if (!cleanName.toLowerCase().endsWith("_firmado")) {
-        cleanName = `${cleanName}_firmado`;
-      }
-
-      archivo = `${cleanName}.pdf`;
-    }
 
     return this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
   }
@@ -1867,6 +1913,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   // ─── Modal de Firma Ministerial (APROBADO, NEGADO, VISTO, DIFERIDO, OTRO) ───────
   public async solicitarFirmaMinistro(): Promise<void> {
     if (!this.activeDoc) return;
+
+    console.log("Verificando");
+    console.log(this.activeDoc);
 
     (Swal as any).selectedDecision = null;
 
@@ -1996,6 +2045,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       }
     }
 
+    this.fnxFirmaMinistro();
     this.observacion = observacionFinal;
     this.loadingAction = true;
     this.redistribuir(decisionSeleccionada);
@@ -2169,6 +2219,27 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (alerData) => {
         console.log(alerData);
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
+      },
+    ); //
+  }
+
+  public fnxFirmaMinistro() {
+    let numero_control = btoa("D" + this.activeDoc.numc);
+    let archivo = this.activeDoc.anom;
+
+    let fnx = {
+      funcion: "Fnx_FirmarPuntos",
+      codigo: this.encriptarService.GCodeEncrypt(numero_control),
+      archivo: archivo,
+      puntos: 1,
+    };
+
+    this.apiService.ExecFnx(fnx).subscribe(
+      async (data) => {
+        console.log(data);
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
