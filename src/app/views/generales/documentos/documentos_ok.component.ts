@@ -16,6 +16,14 @@ import { environment } from "src/environments/environment";
 import Swal from "sweetalert2";
 import { IWKFAlerta } from "src/app/services/control/documentos.service";
 
+// ─── Interface para Agrupación de Etiquetas WKF ────────────────────────────────
+export interface IWKFEtiqueta {
+  autor: string;
+  contenido: string;
+  num_control: string;
+  wf_documento: number;
+}
+
 // ─── Tipos de perfil para este módulo ────────────────────────────────────────
 export type DocumentosProfile = "JefeSecretaria" | "Direccion" | "Ministro";
 
@@ -53,6 +61,20 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.bzOriginal = [];
         this.longitud = 0;
       }
+      return;
+    }
+
+    // Flechas de navegación para desplazarse entre casos del agrupado
+    if (this.isDetailOpen && this.currentTagGroupFolder && this.groupCases.length > 1) {
+      const target = event.target as HTMLElement;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
+        return;
+      }
+      if (event.key === "ArrowRight" || event.code === "ArrowRight") {
+        this.nextGroupCase();
+      } else if (event.key === "ArrowLeft" || event.code === "ArrowLeft") {
+        this.prevGroupCase();
+      }
     }
   }
 
@@ -67,6 +89,33 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     usuario: "",
     observacion: "",
   };
+
+  // ─── Etiquetas y Agrupación de Puntos ──────────────────────────────────────────
+  public WEtiqueta: IWKFEtiqueta = {
+    autor: "",
+    contenido: "",
+    num_control: "",
+    wf_documento: 0,
+  };
+  public rawBuzonFolders: any[] = [];
+  public documentTags: {
+    [keyGroup: string]: { tag: string; autor?: string; fecha?: string };
+  } = {};
+  public existingTags: string[] = [
+    "PRIORITARIO",
+    "EN REVISIÓN",
+    "URGENTE",
+    "EJERCITO BOLIVARIANO",
+    "ARMADA BOLIVARIANA",
+    "AVIACION MILITAR BOLIVARIANA",
+    "GUARDIA NACIONAL BOLIVARIANA",
+    "MILICIA BOLIVARIANA",
+    "COMANDO ESTRATEGICO OPERACIONAL",
+    "UNIVERSIDAD MILITAR BOLIVARIANA",
+    "SISTEMA DE JUSTICIA MILITAR",
+  ];
+  public etiquetaFiltro: string = "";
+  public selectAllDocs: boolean = false;
 
   // ─── Estado del módulo ───────────────────────────────────────────────────────
   public selectedCarpeta: CarpetaDocumento | null = null;
@@ -83,6 +132,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public loadingAction = false;
   public pdfUrl: string | null = null;
   public showPdf = false;
+  public currentTagGroupFolder: any = null;
+  public groupCases: any[] = [];
+  public currentGroupCaseIndex = 0;
 
   // ─── Fotos de Cédula / Afiliados ──────────────────────────────────────────────
   public fotosCasos: { [cedula: string]: SafeUrl } = {};
@@ -209,6 +261,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     this.decodeUserToken();
     this.updateEstadosFromProfile();
+    this.loadDocumentTagsFromStorage();
 
     const disponible = this.carpetas.find((c) => c.disponible);
     if (disponible) {
@@ -483,7 +536,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        const bz: any[] = [];
+        let bz: any[] = [];
         console.log(data);
         if (data && data.Cuerpo) {
           const groupMap = new Map<string, any>();
@@ -608,18 +661,37 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           });
 
           // Convertir el Map agrupado a arreglo
+          const rawFolders: any[] = [];
+
           groupMap.forEach((folder) => {
+            const key = folder.keyGroup;
+            const savedTagInfo = this.documentTags[key];
+            const initialTag = savedTagInfo?.tag || folder.etiqueta || "";
+
+            folder.etiqueta = initialTag;
+            folder.wde_contenido = initialTag;
+            folder.wde_autor = savedTagInfo?.autor || folder.wde_autor || null;
+            folder.wde_fecha = savedTagInfo?.fecha || folder.wde_fecha || null;
+            folder.selected = false;
+
+            if (initialTag && !this.existingTags.includes(initialTag)) {
+              this.existingTags.push(initialTag);
+            }
+
             if (carpeta.filtro === 1) {
-              bz.push(folder);
+              rawFolders.push(folder);
             } else if (
               carpeta.filtro === 3 &&
               folder.tdoc === "PUNTO DE CUENTA"
             ) {
-              bz.push(folder);
+              rawFolders.push(folder);
             } else {
-              bz.push(folder);
+              rawFolders.push(folder);
             }
           });
+
+          this.rawBuzonFolders = rawFolders;
+          bz = this.agruparPorEtiquetas(rawFolders);
         }
 
         this.longitud = bz.length;
@@ -643,33 +715,22 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     );
   }
 
-  // ─── Paginación ───────────────────────────────────────────────────────────────
-  public recorrerElementos(pagina: number): void {
-    const start = this.pageSize * pagina;
-    this.buzon = this.bzOriginal.slice(start, start + this.pageSize);
+  // ─── Paginación y Filtrado ───────────────────────────────────────────────────
+  public get filteredOriginal(): any[] {
+    let list = this.bzOriginal || [];
 
-    const itemsToFetch: any[] = [];
-    this.buzon.forEach((folder) => {
-      itemsToFetch.push(folder);
-      const sub = this.getSubcasos(folder);
-      if (sub && sub.length > 0) {
-        itemsToFetch.push(...sub);
+    if (this.etiquetaFiltro) {
+      if (this.etiquetaFiltro === "__SIN_ETIQUETA__") {
+        list = list.filter((e) => !e.etiqueta);
+      } else {
+        list = list.filter((e) => e.etiqueta === this.etiquetaFiltro);
       }
-    });
-    this.cargarFotosBuzon(itemsToFetch);
-  }
+    }
 
-  public pageChangeEvent(e: any): void {
-    this.pageSize = e.pageSize;
-    this.currentPage = e.pageIndex;
-    this.recorrerElementos(e.pageIndex);
-  }
+    if (!this.buscarQuery.trim()) return list;
 
-  // ─── Búsqueda en el buzón ─────────────────────────────────────────────────────
-  public get buzonFiltrado(): any[] {
-    if (!this.buscarQuery.trim()) return this.buzon;
     const q = this.buscarQuery.toLowerCase().trim();
-    return this.buzon.filter((e) => {
+    return list.filter((e) => {
       const cedula = this.getCedula(e).toLowerCase();
       const nombre = this.getNombre(e).toLowerCase();
       const cargo = this.getCargo(e).toLowerCase();
@@ -677,8 +738,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       const cont = (e.cont || "").toLowerCase();
       const resumen = (e.resumen || "").toLowerCase();
       const numc = (e.numc || "").toLowerCase();
+      const etiqueta = (e.etiqueta || "").toLowerCase();
 
-      // Búsqueda en los subcasos/personas agrupadas
       const subcasos = this.getSubcasos(e);
       const matchSubcaso = subcasos.some((sub: any) => {
         const sced = (sub.cedula || sub.sub_cedula || "")
@@ -706,27 +767,557 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         cont.includes(q) ||
         resumen.includes(q) ||
         numc.includes(q) ||
+        etiqueta.includes(q) ||
         matchSubcaso
       );
     });
   }
 
+  public recorrerElementos(pagina: number): void {
+    const list = this.filteredOriginal;
+    this.longitud = list.length;
+    const start = this.pageSize * pagina;
+    this.buzon = list.slice(start, start + this.pageSize);
+
+    const itemsToFetch: any[] = [];
+    this.buzon.forEach((folder) => {
+      itemsToFetch.push(folder);
+      const sub = this.getSubcasos(folder);
+      if (sub && sub.length > 0) {
+        itemsToFetch.push(...sub);
+      }
+    });
+    this.cargarFotosBuzon(itemsToFetch);
+  }
+
+  public pageChangeEvent(e: any): void {
+    this.pageSize = e.pageSize;
+    this.currentPage = e.pageIndex;
+    this.recorrerElementos(e.pageIndex);
+  }
+
+  public get buzonFiltrado(): any[] {
+    return this.buzon;
+  }
+
+  // ─── Gestión de Etiquetas y Agrupación ─────────────────────────────────────
+  public loadDocumentTagsFromStorage(): void {
+    try {
+      const stored = localStorage.getItem("gdoc_documentos_tags");
+      if (stored) {
+        this.documentTags = JSON.parse(stored);
+        Object.values(this.documentTags).forEach((item: any) => {
+          if (item?.tag && !this.existingTags.includes(item.tag)) {
+            this.existingTags.push(item.tag);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("[DocumentosOk] Error al cargar etiquetas almacenadas:", e);
+    }
+  }
+
+  public saveDocumentTagsToStorage(): void {
+    try {
+      localStorage.setItem(
+        "gdoc_documentos_tags",
+        JSON.stringify(this.documentTags),
+      );
+    } catch (e) {
+      console.warn("[DocumentosOk] Error al guardar etiquetas:", e);
+    }
+  }
+
+  public agruparPorEtiquetas(rawFolders: any[]): any[] {
+    if (!rawFolders || !Array.isArray(rawFolders)) return [];
+    const tagMap = new Map<string, any>();
+    const unTagged: any[] = [];
+
+    rawFolders.forEach((folder) => {
+      if (!folder) return;
+      const tag = (folder.etiqueta || "").toString().trim().toUpperCase();
+
+      if (tag !== "") {
+        const tagKey = `TAG_FOLDER_${tag}`;
+
+        if (!tagMap.has(tagKey)) {
+          const tagFolder = {
+            isTagFolder: true,
+            etiqueta: tag,
+            wde_contenido: tag,
+            wde_autor: folder.wde_autor,
+            wde_fecha: folder.wde_fecha,
+            numc: (folder.numc || folder.ncontrol || folder.cuenta || "")
+              .toString()
+              .trim(),
+            keyGroup: tagKey,
+            tdoc: "Carpeta de Agrupación",
+            nombre_accion: `Agrupación: ${tag}`,
+            cont: `Carpeta agrupada por etiqueta "${tag}".`,
+            resumen: `Carpeta agrupada por etiqueta "${tag}".`,
+            puntosDeCuenta: [folder],
+            mergedDocumentos: [...(folder.mergedDocumentos || [])],
+            selected: false,
+          };
+          tagMap.set(tagKey, tagFolder);
+        } else {
+          const tagFolder = tagMap.get(tagKey);
+          tagFolder.puntosDeCuenta.push(folder);
+
+          const currentNumc = (
+            folder.numc ||
+            folder.ncontrol ||
+            folder.cuenta ||
+            ""
+          )
+            .toString()
+            .trim();
+          if (currentNumc && !tagFolder.numc.includes(currentNumc)) {
+            tagFolder.numc += `, ${currentNumc}`;
+          }
+
+          // Combinar subcasos sin duplicar
+          (folder.mergedDocumentos || []).forEach((subItem: any) => {
+            if (!subItem) return;
+            const cleanCed = (subItem.cedula || subItem.sub_cedula || "")
+              .toString()
+              .trim();
+            const cleanNom = (
+              subItem.nombre ||
+              subItem.sub_nombre ||
+              subItem.nombres_apellidos ||
+              ""
+            )
+              .toString()
+              .trim();
+
+            const exists = tagFolder.mergedDocumentos.some((existing: any) => {
+              if (!existing) return false;
+              const exCed = (existing.cedula || existing.sub_cedula || "")
+                .toString()
+                .trim();
+              const exNom = (
+                existing.nombre ||
+                existing.sub_nombre ||
+                existing.nombres_apellidos ||
+                ""
+              )
+                .toString()
+                .trim();
+              return (
+                (cleanCed && exCed === cleanCed) ||
+                (cleanNom && exNom === cleanNom)
+              );
+            });
+
+            if (!exists) {
+              tagFolder.mergedDocumentos.push(subItem);
+            }
+          });
+        }
+      } else {
+        unTagged.push(folder);
+      }
+    });
+
+    const result: any[] = [];
+    tagMap.forEach((tf) => result.push(tf));
+    unTagged.forEach((uf) => result.push(uf));
+
+    return result;
+  }
+
+  public refrescarAgrupacionEtiquetas(): void {
+    this.bzOriginal = this.agruparPorEtiquetas(this.rawBuzonFolders);
+    this.recorrerElementos(this.currentPage);
+    this.changeDetector.detectChanges();
+  }
+
+  public async apiInsertarEtiqueta(doc: any, etiqueta: string): Promise<any> {
+    if (doc.isTagFolder && Array.isArray(doc.puntosDeCuenta)) {
+      let lastRes = null;
+      for (const p of doc.puntosDeCuenta) {
+        lastRes = await this.apiInsertarEtiqueta(p, etiqueta);
+      }
+      this.refrescarAgrupacionEtiquetas();
+      return lastRes;
+    }
+
+    const numControl = (
+      doc.numc ||
+      doc.ncontrol ||
+      doc.cuenta ||
+      doc.num_control ||
+      ""
+    )
+      .toString()
+      .trim();
+    const wfDocRaw = doc.idd || doc.id || doc.wf_documento || "0";
+    const wfDoc = parseInt(wfDocRaw.toString().trim(), 10);
+    const userId = this.loginService.Usuario?.id || this.jwtData?.userId || "";
+    const fechaActual = new Date().toISOString();
+
+    this.WEtiqueta = {
+      autor: userId,
+      contenido: etiqueta.trim().toUpperCase(),
+      num_control: numControl,
+      wf_documento: isNaN(wfDoc) ? 0 : wfDoc,
+    };
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion =
+      environment.funcion.INSERTAR_SECRETARIA_ETIQUETA ||
+      "WKF_ISecretariaEtiqueta";
+    this.xAPI.parametros = "";
+    this.xAPI.valores = JSON.stringify(this.WEtiqueta);
+
+    return new Promise((resolve, reject) => {
+      this.apiService.Ejecutar(this.xAPI).subscribe(
+        async (data) => {
+          const key = doc.keyGroup || numControl;
+          if (key) {
+            this.documentTags[key] = {
+              tag: etiqueta.trim().toUpperCase(),
+              autor: userId,
+              fecha: fechaActual,
+            };
+            this.saveDocumentTagsToStorage();
+          }
+          doc.etiqueta = etiqueta.trim().toUpperCase();
+          doc.wde_contenido = etiqueta.trim().toUpperCase();
+          doc.wde_autor = userId;
+          doc.wde_fecha = fechaActual;
+
+          if (doc.etiqueta && !this.existingTags.includes(doc.etiqueta)) {
+            this.existingTags.push(doc.etiqueta);
+          }
+          this.refrescarAgrupacionEtiquetas();
+          resolve(data);
+        },
+        (error) => {
+          this.toastrService.error(
+            error?.toString() || "Error al guardar etiqueta",
+            "GDoc Wkf.ISecretariaEtiqueta",
+          );
+          reject(error);
+        },
+      );
+    });
+  }
+
+  public setDocTag(doc: any, event?: Event): void {
+    if (event) event.stopPropagation();
+    if (!doc) return;
+
+    const key =
+      doc.keyGroup ||
+      (doc.numc || doc.ncontrol || doc.cuenta || "").toString().trim();
+    const currentTag =
+      doc.etiqueta || doc.wde_contenido || this.documentTags[key]?.tag || "";
+
+    const options: { [key: string]: string } = {};
+    this.existingTags.forEach((t) => {
+      options[t] = t;
+    });
+    options["__NEW__"] = "+ Crear Nueva Etiqueta...";
+
+    let defaultVal = currentTag;
+    if (!defaultVal || !this.existingTags.includes(defaultVal)) {
+      defaultVal = "__NEW__";
+    }
+
+    Swal.fire({
+      title: "Agrupar / Asignar Etiqueta",
+      input: "select",
+      inputLabel:
+        "Seleccione una etiqueta existente o cree una nueva para agrupar este punto de cuenta",
+      inputValue: defaultVal,
+      inputOptions: options,
+      showCancelButton: true,
+      confirmButtonText: "Siguiente",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        confirmButton: "btn btn-primary",
+        cancelButton: "btn btn-secondary",
+        input: "swal-select-custom",
+      },
+      buttonsStyling: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const selection = result.value;
+        if (selection === "__NEW__") {
+          setTimeout(() => {
+            Swal.fire({
+              title: "Crear Nueva Etiqueta",
+              input: "text",
+              inputLabel: "Escriba el nombre de la nueva etiqueta",
+              inputPlaceholder: "Ej: PRIORITARIO, FUERZA ARMADA...",
+              showCancelButton: true,
+              confirmButtonText: "Guardar",
+              cancelButtonText: "Cancelar",
+              customClass: {
+                confirmButton: "btn btn-primary",
+                cancelButton: "btn btn-secondary",
+                input: "swal-input-custom",
+              },
+              buttonsStyling: false,
+              inputValidator: (val) => {
+                if (!val || val.trim() === "") {
+                  return "¡Debe ingresar un nombre para la etiqueta!";
+                }
+                return null;
+              },
+            }).then((textResult) => {
+              if (textResult.isConfirmed) {
+                const newTag = textResult.value.trim().toUpperCase();
+                this.apiInsertarEtiqueta(doc, newTag).then(() => {
+                  this.toastrService.success(
+                    `Etiqueta "${newTag}" asignada a documento`,
+                    "Éxito",
+                  );
+                  this.recorrerElementos(this.currentPage);
+                  this.changeDetector.detectChanges();
+                });
+              }
+            });
+          }, 150);
+        } else if (selection) {
+          this.apiInsertarEtiqueta(doc, selection).then(() => {
+            this.toastrService.success(
+              `Etiqueta "${selection}" asignada a documento`,
+              "Éxito",
+            );
+            this.recorrerElementos(this.currentPage);
+            this.changeDetector.detectChanges();
+          });
+        }
+      }
+    });
+  }
+
+  public assignTagToSelectedDocs(): void {
+    const selected = this.selectedDocs;
+    if (selected.length === 0) {
+      this.toastrService.warning(
+        "Seleccione al menos un documento para etiquetar",
+        "Advertencia",
+      );
+      return;
+    }
+
+    const options: { [key: string]: string } = {};
+    this.existingTags.forEach((t) => {
+      options[t] = t;
+    });
+    options["__NEW__"] = "+ Crear Nueva Etiqueta...";
+
+    Swal.fire({
+      title: `Agrupar / Asignar Etiqueta (${selected.length} seleccionados)`,
+      input: "select",
+      inputLabel:
+        "Seleccione una etiqueta para agrupar los puntos de cuenta seleccionados",
+      inputValue: "__NEW__",
+      inputOptions: options,
+      showCancelButton: true,
+      confirmButtonText: "Siguiente",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        confirmButton: "btn btn-primary",
+        cancelButton: "btn btn-secondary",
+        input: "swal-select-custom",
+      },
+      buttonsStyling: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const selection = result.value;
+        if (selection === "__NEW__") {
+          setTimeout(() => {
+            Swal.fire({
+              title: "Crear Nueva Etiqueta",
+              input: "text",
+              inputLabel: "Escriba el nombre de la nueva etiqueta para agrupar",
+              inputPlaceholder: "Ej: ORGANO REGULAR 2026",
+              showCancelButton: true,
+              confirmButtonText: "Guardar y Asignar",
+              cancelButtonText: "Cancelar",
+              customClass: {
+                confirmButton: "btn btn-primary",
+                cancelButton: "btn btn-secondary",
+                input: "swal-input-custom",
+              },
+              buttonsStyling: false,
+              inputValidator: (val) => {
+                if (!val || val.trim() === "") {
+                  return "¡Debe ingresar un nombre para la etiqueta!";
+                }
+                return null;
+              },
+            }).then((textResult) => {
+              if (textResult.isConfirmed) {
+                const newTag = textResult.value.trim().toUpperCase();
+                this.applyBatchTag(selected, newTag);
+              }
+            });
+          }, 150);
+        } else if (selection) {
+          this.applyBatchTag(selected, selection);
+        }
+      }
+    });
+  }
+
+  public async applyBatchTag(selected: any[], tagValue: string): Promise<void> {
+    this.ngxService.startLoader("loader-documentos");
+    let successCount = 0;
+    for (const doc of selected) {
+      try {
+        await this.apiInsertarEtiqueta(doc, tagValue);
+        doc.selected = false;
+        successCount++;
+      } catch (e) {
+        console.error("Error asignando etiqueta en lote a:", doc, e);
+      }
+    }
+    this.ngxService.stopLoader("loader-documentos");
+    this.selectAllDocs = false;
+    this.toastrService.success(
+      `Etiqueta "${tagValue}" asignada a ${successCount} documento(s)`,
+      "Agrupación completada",
+    );
+    this.recorrerElementos(0);
+    this.changeDetector.detectChanges();
+  }
+
+  public crearNuevaEtiquetaGeneral(): void {
+    Swal.fire({
+      title: "Crear Nueva Etiqueta de Agrupación",
+      input: "text",
+      inputLabel:
+        "Escriba el nombre de la nueva etiqueta para agrupar puntos de cuenta",
+      inputPlaceholder: "Ej: SECRETARIA GENERAL",
+      showCancelButton: true,
+      confirmButtonText: "Crear Etiqueta",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        confirmButton: "btn btn-primary",
+        cancelButton: "btn btn-secondary",
+        input: "swal-input-custom",
+      },
+      buttonsStyling: false,
+      inputValidator: (val) => {
+        if (!val || val.trim() === "") {
+          return "¡Debe ingresar un nombre para la etiqueta!";
+        }
+        return null;
+      },
+    }).then((res) => {
+      if (res.isConfirmed && res.value) {
+        const tag = res.value.trim().toUpperCase();
+        if (!this.existingTags.includes(tag)) {
+          this.existingTags.push(tag);
+          this.toastrService.success(
+            `Etiqueta "${tag}" creada correctamente`,
+            "Nueva Etiqueta",
+          );
+          this.filterByTag(tag);
+        } else {
+          this.toastrService.info(
+            `La etiqueta "${tag}" ya existe`,
+            "Etiqueta Existente",
+          );
+          this.filterByTag(tag);
+        }
+      }
+    });
+  }
+
+  // ─── Selección de Documentos ────────────────────────────────────────────────
+  public toggleSelectAll(event: any): void {
+    const checked = event.target.checked;
+    this.selectAllDocs = checked;
+    this.buzon.forEach((d) => (d.selected = checked));
+  }
+
+  public toggleDocSelect(doc: any, event: Event): void {
+    event.stopPropagation();
+    doc.selected = !doc.selected;
+    this.selectAllDocs =
+      this.buzon.length > 0 && this.buzon.every((d) => d.selected);
+  }
+
+  public clearDocSelection(): void {
+    this.selectAllDocs = false;
+    this.bzOriginal.forEach((d) => (d.selected = false));
+  }
+
+  public get selectedDocs(): any[] {
+    return this.bzOriginal.filter((d) => d.selected);
+  }
+
+  public get selectedDocsCount(): number {
+    return this.selectedDocs.length;
+  }
+
+  // ─── Conteo de Casos y Documentos ───────────────────────────────────────────
+  public get totalCasosCount(): number {
+    return (this.rawBuzonFolders || []).reduce((acc, doc) => {
+      const sub = doc.mergedDocumentos || [];
+      return acc + (sub.length > 0 ? sub.length : 1);
+    }, 0);
+  }
+
+  public getTagDocCount(tagName: string): number {
+    return (this.rawBuzonFolders || []).filter((e) => e.etiqueta === tagName)
+      .length;
+  }
+
+  public getTagCasosCount(tagName: string): number {
+    return (this.rawBuzonFolders || [])
+      .filter((e) => e.etiqueta === tagName)
+      .reduce((acc, doc) => {
+        const sub = doc.mergedDocumentos || [];
+        return acc + (sub.length > 0 ? sub.length : 1);
+      }, 0);
+  }
+
+  public get unassignedDocsCount(): number {
+    return (this.rawBuzonFolders || []).filter((e) => !e.etiqueta).length;
+  }
+
+  public filterByTag(tagName: string): void {
+    this.etiquetaFiltro = tagName;
+    this.recorrerElementos(0);
+  }
+
   // ─── Helpers de campos (sub_cedula, sub_nombre, sub_cargo) ───────────────────
   public getCedula(e: any): string {
     if (!e) return "";
-    return (e.sub_cedula || e.cedula || e.cuenta || "").toString().trim();
+    let ced = (e.sub_cedula || e.cedula || "").toString().trim();
+    if (!ced && Array.isArray(e.mergedDocumentos) && e.mergedDocumentos.length > 0) {
+      ced = (e.mergedDocumentos[0]?.sub_cedula || e.mergedDocumentos[0]?.cedula || "").toString().trim();
+    }
+    if (!ced && e.cuenta && e.cuenta.toString().length >= 6 && !isNaN(Number(e.cuenta))) {
+      ced = e.cuenta.toString().trim();
+    }
+    return ced;
   }
 
   public getNombre(e: any): string {
     if (!e) return "";
-    const n = e.sub_nombre || e.nombre || "";
-    return n.toString().trim().toUpperCase();
+    let n = (e.sub_nombre || e.nombre || e.nombres_apellidos || e.nom || "").toString().trim();
+    if (!n && Array.isArray(e.mergedDocumentos) && e.mergedDocumentos.length > 0) {
+      n = (e.mergedDocumentos[0]?.sub_nombre || e.mergedDocumentos[0]?.nombre || e.mergedDocumentos[0]?.nombres_apellidos || "").toString().trim();
+    }
+    return n.toUpperCase();
   }
 
   public getCargo(e: any): string {
     if (!e) return "";
-    const c = e.sub_cargo || e.cargo || "";
-    return c.toString().trim().toUpperCase();
+    let c = (e.sub_cargo || e.cargo || e.grado || e.puesto || "").toString().trim();
+    if (!c && Array.isArray(e.mergedDocumentos) && e.mergedDocumentos.length > 0) {
+      c = (e.mergedDocumentos[0]?.sub_cargo || e.mergedDocumentos[0]?.cargo || e.mergedDocumentos[0]?.grado || "").toString().trim();
+    }
+    return c.toUpperCase();
   }
 
   // ─── Extraer el código de estatus real del integrante (soporta hash|estatus) ───
@@ -837,18 +1428,28 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   // ─── Obtener subcasos APROBADOS / PROCESAR ─────────────────────────────────────
   public getSubcasosProcesar(e: any): any[] {
-    const list = this.getSubcasos(e);
-    return list.filter(
-      (item) => !this.isNoProcesar(item) && !this.isPendiente(item),
-    );
+    if (!e) return [];
+    try {
+      const list = this.getSubcasos(e) || [];
+      return list.filter(
+        (item) => item && !this.isNoProcesar(item) && !this.isPendiente(item),
+      );
+    } catch (err) {
+      return [];
+    }
   }
 
   // ─── Obtener subcasos NEGADOS / EXCEPCIONES / CÓDIGO ROJO / PENDIENTES ──────────
   public getSubcasosNoProcesar(e: any): any[] {
-    const list = this.getSubcasos(e);
-    return list.filter(
-      (item) => this.isNoProcesar(item) || this.isPendiente(item),
-    );
+    if (!e) return [];
+    try {
+      const list = this.getSubcasos(e) || [];
+      return list.filter(
+        (item) => item && (this.isNoProcesar(item) || this.isPendiente(item)),
+      );
+    } catch (err) {
+      return [];
+    }
   }
 
   // ─── Obtener datos a mostrar por elemento del buzón ──────────────────────────
@@ -860,10 +1461,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   public getAsunto(e: any): string {
+    if (!e) return "";
     if (e.tdoc === "TRAMITACION POR ORGANO REGULAR") {
-      return e.cont || "";
+      return e.cont || e.resumen || "";
     }
-    return e.resumen || e.cont || "";
+    let asu = e.resumen || e.cont || "";
+    if (!asu && Array.isArray(e.mergedDocumentos) && e.mergedDocumentos.length > 0) {
+      asu = e.mergedDocumentos[0]?.resumen || e.mergedDocumentos[0]?.cont || "";
+    }
+    return asu;
   }
 
   public getFecha(e: any): string {
@@ -967,23 +1573,94 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   // ─── Abrir panel de detalle ───────────────────────────────────────────────────
   public openDetail(e: any): void {
-    this.activeDoc = e;
+    if (!e) return;
     this.observacion = "";
     this.showPdf = false;
     this.pdfUrl = null;
     this.isDetailOpen = true;
-    if (e) {
-      const subcasos = this.getSubcasos(e);
-      this.cargarFotosBuzon([e, ...subcasos]);
+
+    if (e.isTagFolder && Array.isArray(e.puntosDeCuenta) && e.puntosDeCuenta.length > 0) {
+      this.currentTagGroupFolder = e;
+      this.groupCases = e.puntosDeCuenta;
+      this.currentGroupCaseIndex = 0;
+      this.activeDoc = { ...this.groupCases[0] };
+    } else {
+      this.currentTagGroupFolder = null;
+      this.groupCases = [];
+      this.currentGroupCaseIndex = -1;
+      this.activeDoc = { ...e };
     }
+
+    try {
+      const subcasos = this.getSubcasos(this.activeDoc) || [];
+      this.cargarFotosBuzon([this.activeDoc, ...subcasos]);
+    } catch (err) {
+      console.warn("[DocumentosOk] Error en cargarFotosBuzon:", err);
+    }
+    this.changeDetector.markForCheck();
     this.changeDetector.detectChanges();
+  }
+
+  // ─── Navegación entre Casos del Agrupado ───────────────────────────────────────
+  public selectGroupCase(index: number): void {
+    if (!this.groupCases || index < 0 || index >= this.groupCases.length) return;
+    this.currentGroupCaseIndex = index;
+    // Renovar referencia clonando el objeto para forzar refrescamiento reactivo en Angular
+    this.activeDoc = { ...this.groupCases[index] };
+    this.observacion = "";
+    this.showPdf = false;
+    this.pdfUrl = null;
+    try {
+      const subcasos = this.getSubcasos(this.activeDoc) || [];
+      this.cargarFotosBuzon([this.activeDoc, ...subcasos]);
+    } catch (err) {
+      console.warn("[DocumentosOk] Error en cargarFotosBuzon:", err);
+    }
+    this.changeDetector.markForCheck();
+    this.changeDetector.detectChanges();
+  }
+
+  public nextGroupCase(): void {
+    if (this.groupCases && this.currentGroupCaseIndex < this.groupCases.length - 1) {
+      this.selectGroupCase(this.currentGroupCaseIndex + 1);
+    }
+  }
+
+  public prevGroupCase(): void {
+    if (this.groupCases && this.currentGroupCaseIndex > 0) {
+      this.selectGroupCase(this.currentGroupCaseIndex - 1);
+    }
   }
 
   // ─── Obtener subcasos / personas dentro del expediente ────────────────────────
   public getSubcasos(e: any): any[] {
     if (!e) return [];
+    if (e.isTagFolder) {
+      if (Array.isArray(e.mergedDocumentos) && e.mergedDocumentos.length > 0) {
+        return e.mergedDocumentos;
+      }
+      const allSub: any[] = [];
+      if (Array.isArray(e.puntosDeCuenta)) {
+        e.puntosDeCuenta.forEach((p: any) => {
+          if (p && p.mergedDocumentos) {
+            p.mergedDocumentos.forEach((s: any) => {
+              if (s && !allSub.includes(s)) allSub.push(s);
+            });
+          }
+        });
+      }
+      return allSub;
+    }
+
     let list: any[] = [];
-    if (e.subdocumento) {
+
+    // 1. Prioridad: mergedDocumentos generados al agrupar
+    if (Array.isArray(e.mergedDocumentos) && e.mergedDocumentos.length > 0) {
+      list = [...e.mergedDocumentos];
+    }
+
+    // 2. Si no hay mergedDocumentos, intentar parsear subdocumento JSON
+    if (list.length === 0 && e.subdocumento) {
       try {
         const parsed =
           typeof e.subdocumento === "string"
@@ -998,32 +1675,120 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         console.warn("[DocumentosOk] Error parsing subdocumento:", err);
       }
     }
+
+    // 3. Fallbacks de colecciones existentes
     if (
-      list.length === 0 &&
-      Array.isArray(e.mergedDocumentos) &&
-      e.mergedDocumentos.length > 0
-    ) {
-      list = e.mergedDocumentos;
-    } else if (
       list.length === 0 &&
       Array.isArray(e.documentos) &&
       e.documentos.length > 0
     ) {
-      list = e.documentos;
+      list = [...e.documentos];
     } else if (
       list.length === 0 &&
       Array.isArray(e.lstCuenta) &&
       e.lstCuenta.length > 0
     ) {
-      list = e.lstCuenta;
+      list = [...e.lstCuenta];
     }
-    return list;
+
+    // 4. Si estamos navegando dentro de una carpeta agrupada, buscar en mergedDocumentos de la carpeta
+    if (
+      list.length === 0 &&
+      this.currentTagGroupFolder &&
+      Array.isArray(this.currentTagGroupFolder.mergedDocumentos) &&
+      this.currentTagGroupFolder.mergedDocumentos.length > 0
+    ) {
+      const eNumc = (e.numc || e.ncontrol || e.cuenta || "").toString().trim();
+      const matched = this.currentTagGroupFolder.mergedDocumentos.filter((sub: any) => {
+        if (!sub) return false;
+        const subNumc = (sub.numc || sub.ncontrol || sub.cuenta || "").toString().trim();
+        return eNumc && subNumc && subNumc === eNumc;
+      });
+      if (matched.length > 0) {
+        list = [...matched];
+      }
+    }
+
+    // 5. Si el caso individual posee datos de persona propios, sintetizar subcaso
+    if (list.length === 0 && (this.getCedula(e) || this.getNombre(e))) {
+      list = [
+        {
+          ...e,
+          cedula: this.getCedula(e),
+          sub_cedula: this.getCedula(e),
+          nombre: this.getNombre(e),
+          sub_nombre: this.getNombre(e),
+          cargo: this.getCargo(e),
+          sub_cargo: this.getCargo(e),
+          sub_detalle: e.sub_detalle || e.detalle || e.estatus || e.estado || "PR",
+          detalle: e.sub_detalle || e.detalle || e.estatus || e.estado || "PR",
+          observacion: e.observacion || e.sub_observacion || e.obse || "",
+          sub_observacion: e.observacion || e.sub_observacion || e.obse || "",
+        },
+      ];
+    }
+
+    // 6. Normalizar campos en cada integrante para asegurar que la vista siempre tenga los valores
+    return list.map((item: any) => {
+      if (!item) return item;
+      const ced = (item.sub_cedula || item.cedula || item.cuenta || "").toString().trim();
+      const nom = (
+        item.sub_nombre ||
+        item.nombre ||
+        item.nombres_apellidos ||
+        item.nom ||
+        ""
+      )
+        .toString()
+        .trim()
+        .toUpperCase();
+      const car = (
+        item.sub_cargo ||
+        item.cargo ||
+        item.grado ||
+        item.puesto ||
+        ""
+      )
+        .toString()
+        .trim()
+        .toUpperCase();
+      const det =
+        item.sub_detalle ||
+        item.detalle ||
+        item.estatus ||
+        item.estado ||
+        "PR";
+      const obs = item.observacion || item.sub_observacion || item.obse || "";
+
+      return {
+        ...item,
+        cedula: ced,
+        sub_cedula: ced,
+        nombre: nom,
+        sub_nombre: nom,
+        cargo: car,
+        sub_cargo: car,
+        detalle: det,
+        sub_detalle: det,
+        observacion: obs,
+        sub_observacion: obs,
+      };
+    });
+  }
+
+  // ─── TrackBy para optimizar y forzar re-render de integrantes ────────────────
+  public trackBySubcaso(index: number, item: any): string {
+    if (!item) return `${index}`;
+    return `${item.cedula || item.sub_cedula || item.cuenta || index}_${item.sub_detalle || item.detalle || ''}_${index}`;
   }
 
   // ─── Cerrar panel de detalle ──────────────────────────────────────────────────
   public closeDetail(): void {
     this.isDetailOpen = false;
     this.activeDoc = null;
+    this.currentTagGroupFolder = null;
+    this.groupCases = [];
+    this.currentGroupCaseIndex = -1;
     this.observacion = "";
     this.showPdf = false;
     this.pdfUrl = null;
@@ -1319,7 +2084,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           this.loadingAction = false;
           this.toastrService.success(
             "El trámite ha sido enviado a Resoluciones exitosamente.",
-            "Redistribución de Documento"
+            "Redistribución de Documento",
           );
           if (this.closeDetail) this.closeDetail();
           if (this.actualizarBuzon) this.actualizarBuzon();
@@ -1328,8 +2093,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           this.ngxService.stopLoader("loader-documentos");
           this.loadingAction = false;
           console.error(error);
-          this.toastrService.error("Error al redistribuir el documento", "Error");
-        }
+          this.toastrService.error(
+            "Error al redistribuir el documento",
+            "Error",
+          );
+        },
       });
     }
   }
@@ -1366,7 +2134,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           this.loadingAction = false;
           this.toastrService.success(
             "El trámite ha sido enviado a Oficio exitosamente.",
-            "Redistribución de Documento"
+            "Redistribución de Documento",
           );
           if (this.closeDetail) this.closeDetail();
           if (this.actualizarBuzon) this.actualizarBuzon();
@@ -1375,8 +2143,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           this.ngxService.stopLoader("loader-documentos");
           this.loadingAction = false;
           console.error(error);
-          this.toastrService.error("Error al redistribuir el documento", "Error");
-        }
+          this.toastrService.error(
+            "Error al redistribuir el documento",
+            "Error",
+          );
+        },
       });
     }
   }

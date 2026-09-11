@@ -161,15 +161,83 @@
             </div>
           </div>
 
-          <!-- Barra de Búsqueda -->
-          <div class="search-bar-wrapper" *ngIf="!loadingBuzon && longitud > 0">
-            <div class="search-wrapper">
-              <i class="fas fa-search"></i>
-              <input type="text"
-                     [(ngModel)]="buscarQuery"
-                     placeholder="Buscar por cédula, cuenta, asunto..."
-                     autocomplete="off" />
+          <!-- ════════════════════════════════════════════════════════════
+               SECCIÓN DE ETIQUETAS Y AGRUPACIÓN DE PUNTOS DE CUENTA
+          ════════════════════════════════════════════════════════════ -->
+          <div class="tags-section-wrapper" *ngIf="!loadingBuzon && bzOriginal.length > 0">
+
+            <!-- Fila superior: Búsqueda, Seleccionar Todos, Botones de Acción -->
+            <div class="tags-toolbar-row">
+              <!-- Búsqueda -->
+              <div class="search-wrapper" style="flex: 1; min-width: 200px;">
+                <i class="fas fa-search"></i>
+                <input type="text"
+                       [(ngModel)]="buscarQuery"
+                       (ngModelChange)="recorrerElementos(0)"
+                       placeholder="Buscar por cédula, cuenta, asunto, etiqueta..."
+                       autocomplete="off" />
+              </div>
+
+              <!-- Checkbox Seleccionar Todos -->
+              <div class="select-all-box">
+                <label class="custom-checkbox-label">
+                  <input type="checkbox" [checked]="selectAllDocs" (change)="toggleSelectAll($event)">
+                  <span>Todos</span>
+                </label>
+              </div>
+
+              <!-- Botón Agrupar / Asignar Etiqueta a Seleccionados -->
+              <button class="btn-batch-tag"
+                      *ngIf="selectedDocsCount > 0"
+                      (click)="assignTagToSelectedDocs()"
+                      title="Agrupar puntos de cuenta seleccionados">
+                <i class="fas fa-tags mr-1"></i>
+                Agrupar ({{ selectedDocsCount }})
+              </button>
+
+              <!-- Botón Crear Nueva Etiqueta -->
+              <button class="btn-create-tag"
+                      (click)="crearNuevaEtiquetaGeneral()"
+                      title="Crear una nueva etiqueta para agrupar">
+                <i class="fas fa-plus-circle mr-1"></i>
+                + Etiqueta
+              </button>
             </div>
+
+            <!-- Fila inferior: Chips / Pills de Etiquetas con Conteo de Casos -->
+            <div class="tags-pills-scroll">
+              <!-- Chip 'Todas' -->
+              <div class="tag-pill-chip"
+                   [class.active]="etiquetaFiltro === ''"
+                   (click)="filterByTag('')">
+                <i class="fas fa-layer-group"></i>
+                <span>Todas</span>
+                <span class="pill-count-badge">{{ bzOriginal.length }} docs / {{ totalCasosCount }} casos</span>
+              </div>
+
+              <!-- Chips para cada etiqueta existente -->
+              <ng-container *ngFor="let tag of existingTags">
+                <div class="tag-pill-chip"
+                     *ngIf="getTagDocCount(tag) > 0 || etiquetaFiltro === tag"
+                     [class.active]="etiquetaFiltro === tag"
+                     (click)="filterByTag(tag)">
+                  <i class="fas fa-tag"></i>
+                  <span>{{ tag }}</span>
+                  <span class="pill-count-badge">{{ getTagDocCount(tag) }}</span>
+                </div>
+              </ng-container>
+
+              <!-- Chip 'Sin Etiqueta' -->
+              <div class="tag-pill-chip tag-pill-unassigned"
+                   *ngIf="unassignedDocsCount > 0"
+                   [class.active]="etiquetaFiltro === '__SIN_ETIQUETA__'"
+                   (click)="filterByTag('__SIN_ETIQUETA__')">
+                <i class="far fa-circle text-muted"></i>
+                <span>Sin Etiqueta</span>
+                <span class="pill-count-badge">{{ unassignedDocsCount }}</span>
+              </div>
+            </div>
+
           </div>
 
           <!-- Spinner de carga -->
@@ -190,80 +258,131 @@
             <!-- Filas de documentos -->
             <div class="doc-item-row animate-fade-in"
                  *ngFor="let e of buzonFiltrado; let i = index"
-                 [class.doc-active]="activeDoc?.numc === e.numc"
+                 [class.doc-active]="activeDoc?.keyGroup === e.keyGroup"
+                 [class.doc-tag-folder-row]="e.isTagFolder"
                  (click)="openDetail(e)">
+
+              <!-- Checkbox de Selección Individual -->
+              <div class="doc-select-checkbox" (click)="$event.stopPropagation()">
+                <input type="checkbox" [checked]="e.selected" (change)="toggleDocSelect(e, $event)">
+              </div>
 
               <!-- Número de fila -->
               <div class="row-index">{{ i + 1 }}</div>
 
-              <!-- Avatar: Carpeta Agrupada vs Foto de Persona Individual -->
-              <ng-container *ngIf="getSubcasos(e).length > 0; else singleAvatar">
-                <div class="doc-avatar-container folder-avatar-container" title="Caso Agrupado con {{ getSubcasos(e).length }} personas">
+              <!-- Avatar: Carpeta de Agrupación por Etiqueta vs Carpeta Agrupada vs Foto Persona -->
+              <ng-container *ngIf="e.isTagFolder; else normalAvatar">
+                <div class="doc-avatar-container tag-folder-avatar-container"
+                     title="Carpeta Agrupada por Etiqueta '{{ e.etiqueta }}' con {{ e.puntosDeCuenta.length }} Puntos de Cuenta">
                   <div class="folder-stack-icon">
-                    <i class="fas fa-folder-open"></i>
-                    <span class="folder-count-pill">{{ getSubcasos(e).length }}</span>
+                    <i class="fas fa-tags text-primary"></i>
+                    <span class="folder-count-pill bg-primary text-white">{{ e.puntosDeCuenta.length }}</span>
                   </div>
                 </div>
               </ng-container>
 
-              <ng-template #singleAvatar>
-                <div class="doc-avatar-container"
-                     *ngIf="getCedula(e)"
-                     (click)="verFotoAmpliada(getCedula(e)); $event.stopPropagation()"
-                     title="Clic para ver foto ampliada">
-                  <img [src]="fotosCasos[getCedula(e)]"
-                       *ngIf="!loadingFotos[getCedula(e)] && fotosCasos[getCedula(e)]"
-                       alt="Avatar">
-                  <i class="fas fa-spinner fa-spin text-primary" *ngIf="loadingFotos[getCedula(e)]"></i>
-                  <i class="fas fa-user" *ngIf="!loadingFotos[getCedula(e)] && !fotosCasos[getCedula(e)]"></i>
-                </div>
+              <ng-template #normalAvatar>
+                <ng-container *ngIf="getSubcasos(e).length > 0; else singleAvatar">
+                  <div class="doc-avatar-container folder-avatar-container" title="Caso Agrupado con {{ getSubcasos(e).length }} personas">
+                    <div class="folder-stack-icon">
+                      <i class="fas fa-folder-open"></i>
+                      <span class="folder-count-pill">{{ getSubcasos(e).length }}</span>
+                    </div>
+                  </div>
+                </ng-container>
+
+                <ng-template #singleAvatar>
+                  <div class="doc-avatar-container"
+                       *ngIf="getCedula(e)"
+                       (click)="verFotoAmpliada(getCedula(e)); $event.stopPropagation()"
+                       title="Clic para ver foto ampliada">
+                    <img [src]="fotosCasos[getCedula(e)]"
+                         *ngIf="!loadingFotos[getCedula(e)] && fotosCasos[getCedula(e)]"
+                         alt="Avatar">
+                    <i class="fas fa-spinner fa-spin text-primary" *ngIf="loadingFotos[getCedula(e)]"></i>
+                    <i class="fas fa-user" *ngIf="!loadingFotos[getCedula(e)] && !fotosCasos[getCedula(e)]"></i>
+                  </div>
+                </ng-template>
               </ng-template>
 
               <!-- Info principal del Caso / Documento -->
               <div class="doc-info">
 
-                <!-- Identificador Row: Encabezado de Expediente vs Persona Individual -->
+                <!-- Identificador Row: Carpeta por Etiqueta vs Expediente vs Persona -->
                 <div class="doc-id-row">
-                  <ng-container *ngIf="getSubcasos(e).length > 0; else singleDocHeader">
-                    <span class="doc-expediente-badge">
-                      <i class="fas fa-folder text-warning"></i> Expediente Nº {{ e.numc || e.ncontrol || e.cuenta || 'Sin número' }}
+                  <ng-container *ngIf="e.isTagFolder; else normalHeader">
+                    <span class="doc-tag-folder-badge">
+                      <i class="fas fa-tags text-primary"></i> Agrupación: {{ e.etiqueta }}
                     </span>
-                    <span class="doc-subcasos-badge">
+                    <span class="doc-puntos-badge">
+                      <i class="fas fa-file-alt text-success"></i> {{ e.puntosDeCuenta.length }} Puntos de Cuenta
+                    </span>
+                    <span class="doc-subcasos-badge" *ngIf="getSubcasos(e).length > 0">
                       <i class="fas fa-users text-primary"></i> {{ getSubcasos(e).length }} Personas agrupadas
-                    </span>
-                    <span class="doc-tdoc-badge" [title]="e.tdoc">
-                      {{ e.nombre_accion || e.tdoc || 'Trámite por Órgano Regular' }}
                     </span>
                   </ng-container>
 
-                  <ng-template #singleDocHeader>
-                    <span class="doc-id-badge" *ngIf="getIdentificador(e)">
-                      <i class="fas fa-id-card"></i>
-                      {{ getIdentificador(e) }}
+                  <ng-template #normalHeader>
+                    <ng-container *ngIf="getSubcasos(e).length > 0; else singleDocHeader">
+                      <span class="doc-expediente-badge">
+                        <i class="fas fa-folder text-warning"></i> Expediente Nº {{ e.numc || e.ncontrol || e.cuenta || 'Sin número' }}
+                      </span>
+                      <span class="doc-subcasos-badge">
+                        <i class="fas fa-users text-primary"></i> {{ getSubcasos(e).length }} Personas agrupadas
+                      </span>
+                      <span class="doc-tdoc-badge" [title]="e.tdoc">
+                        {{ e.nombre_accion || e.tdoc || 'Trámite por Órgano Regular' }}
+                      </span>
+                    </ng-container>
+
+                    <ng-template #singleDocHeader>
+                      <span class="doc-id-badge" *ngIf="getIdentificador(e)">
+                        <i class="fas fa-id-card"></i>
+                        {{ getIdentificador(e) }}
+                      </span>
+                      <span class="doc-nombre-badge" *ngIf="getNombre(e)">
+                        <i class="fas fa-user-check"></i>
+                        {{ getNombre(e) }}
+                      </span>
+                      <span class="doc-tdoc-badge" [title]="e.tdoc">
+                        {{ e.nombre_accion || e.tdoc || '' }}
+                      </span>
+                    </ng-template>
+
+                    <!-- Badge de Etiqueta individual -->
+                    <span class="doc-tag-badge"
+                          *ngIf="e.etiqueta || e.wde_contenido"
+                          (click)="setDocTag(e, $event)"
+                          title="Etiqueta de agrupación. Clic para cambiar. Autor: {{ e.wde_autor || 'Sistema' }}">
+                      <i class="fas fa-tag"></i> {{ e.etiqueta || e.wde_contenido }}
                     </span>
-                    <span class="doc-nombre-badge" *ngIf="getNombre(e)">
-                      <i class="fas fa-user-check"></i>
-                      {{ getNombre(e) }}
-                    </span>
-                    <span class="doc-tdoc-badge" [title]="e.tdoc">
-                      {{ e.nombre_accion || e.tdoc || '' }}
+                    <span class="doc-tag-add-badge"
+                          *ngIf="!e.etiqueta && !e.wde_contenido"
+                          (click)="setDocTag(e, $event)"
+                          title="Clic para agrupar o asignar etiqueta">
+                      <i class="fas fa-plus-circle"></i> Etiquetar
                     </span>
                   </ng-template>
                 </div>
 
                 <!-- Grado / Cargo solo si es persona individual -->
-                <div class="doc-cargo-row" *ngIf="getSubcasos(e).length === 0 && getCargo(e)">
+                <div class="doc-cargo-row" *ngIf="!e.isTagFolder && getSubcasos(e).length === 0 && getCargo(e)">
                   <span class="doc-cargo-chip">
                     <i class="fas fa-user-tie"></i> {{ getCargo(e) }}
                   </span>
                 </div>
 
-                <!-- Asunto/Contenido LIMPIO (sin HTML) -->
+                <!-- Asunto/Contenido LIMPIO -->
                 <div class="doc-asunto">
-                  {{ getAsuntoClean(e) }}
+                  <ng-container *ngIf="e.isTagFolder; else normalAsunto">
+                    Carpeta agrupada por etiqueta "{{ e.etiqueta }}". Incluye los números de control: {{ e.numc }}
+                  </ng-container>
+                  <ng-template #normalAsunto>
+                    {{ getAsuntoClean(e) }}
+                  </ng-template>
                 </div>
 
-                <!-- Meta: fecha, número de control y sugerencia para abrir detalles -->
+                <!-- Meta: fecha, números de control -->
                 <div class="doc-meta">
                   <span *ngIf="getFecha(e)">
                     <i class="far fa-calendar-alt"></i>
@@ -273,7 +392,10 @@
                     <i class="fas fa-hashtag"></i>
                     {{ e.numc }}
                   </span>
-                  <span class="doc-hint-badge" *ngIf="getSubcasos(e).length > 0">
+                  <span class="doc-hint-badge" *ngIf="e.isTagFolder">
+                    <i class="fas fa-chevron-right"></i> Clic para ver {{ e.puntosDeCuenta.length }} Punto(s) de Cuenta y {{ getSubcasos(e).length }} persona(s)
+                  </span>
+                  <span class="doc-hint-badge" *ngIf="!e.isTagFolder && getSubcasos(e).length > 0">
                     <i class="fas fa-chevron-right"></i> Clic para ver {{ getSubcasos(e).length }} persona(s) y firmar
                   </span>
                 </div>
@@ -281,8 +403,13 @@
               </div>
               <!-- FIN doc-info -->
 
-              <!-- Acción Ver -->
+              <!-- Acciones Etiquetar & Ver -->
               <div class="doc-actions" (click)="$event.stopPropagation()">
+                <button class="btn-tag-doc mr-1"
+                        (click)="setDocTag(e, $event)"
+                        [title]="e.isTagFolder ? 'Cambiar etiqueta a toda la carpeta' : 'Agrupar / Asignar Etiqueta'">
+                  <i class="fas fa-tag"></i>
+                </button>
                 <button class="btn-ver-doc"
                         (click)="openDetail(e); $event.stopPropagation()"
                         title="Ver Detalle e Integrantes del Expediente">
@@ -338,10 +465,12 @@
           </div>
           <div>
             <div class="modal-header-title d-flex align-items-center gap-2">
-              <span>Expediente Nº {{ activeDoc.numc || activeDoc.ncontrol || activeDoc.cuenta || 'Sin Número' }}</span>
+              <span *ngIf="currentTagGroupFolder"><i class="fas fa-tags text-primary mr-1"></i> Agrupación: {{ currentTagGroupFolder.etiqueta }} &bull; Punto Nº {{ activeDoc.numc || activeDoc.ncontrol || activeDoc.cuenta || 'Sin Número' }}</span>
+              <span *ngIf="!currentTagGroupFolder">Expediente Nº {{ activeDoc.numc || activeDoc.ncontrol || activeDoc.cuenta || 'Sin Número' }}</span>
             </div>
             <div class="modal-header-sub">
-              {{ selectedCarpeta?.nombre || 'Buzón de Documentos' }}
+              <span *ngIf="currentTagGroupFolder">Caso {{ currentGroupCaseIndex + 1 }} de {{ groupCases.length }} del agrupado &bull; {{ activeDoc.tdoc || 'Punto de Cuenta' }}</span>
+              <span *ngIf="!currentTagGroupFolder">{{ selectedCarpeta?.nombre || 'Buzón de Documentos' }}</span>
             </div>
           </div>
         </div>
@@ -359,6 +488,45 @@
         <button class="modal-close-btn ml-3" (click)="closeDetail()" title="Cerrar modal (Esc)">
           <i class="fas fa-times"></i>
         </button>
+      </div>
+
+      <!-- ── Barra de Desplazamiento y Navegación del Agrupado ── -->
+      <div class="group-navigation-bar animate-fade-in" *ngIf="currentTagGroupFolder && groupCases.length > 1">
+        <div class="group-nav-left">
+          <span class="group-tag-pill">
+            <i class="fas fa-tags mr-1"></i> {{ currentTagGroupFolder.etiqueta }}
+          </span>
+          <span class="group-counter-text">
+            Caso <strong>{{ currentGroupCaseIndex + 1 }}</strong> de <strong>{{ groupCases.length }}</strong>
+          </span>
+        </div>
+
+        <div class="group-nav-pills-scroll">
+          <button type="button"
+                  class="nav-case-tab"
+                  *ngFor="let p of groupCases; let pIdx = index"
+                  [class.active]="pIdx === currentGroupCaseIndex"
+                  (click)="selectGroupCase(pIdx)">
+            <i class="fas fa-file-alt mr-1"></i> Punto Nº {{ p.numc || p.ncontrol || p.cuenta }}
+          </button>
+        </div>
+
+        <div class="group-nav-arrows">
+          <button type="button"
+                  class="btn-nav-arrow"
+                  [disabled]="currentGroupCaseIndex === 0"
+                  (click)="prevGroupCase()"
+                  title="Caso anterior (Flecha Izquierda ←)">
+            <i class="fas fa-chevron-left mr-1"></i> Anterior
+          </button>
+          <button type="button"
+                  class="btn-nav-arrow btn-nav-arrow-primary"
+                  [disabled]="currentGroupCaseIndex === groupCases.length - 1"
+                  (click)="nextGroupCase()"
+                  title="Caso siguiente (Flecha Derecha →)">
+            Siguiente <i class="fas fa-chevron-right ml-1"></i>
+          </button>
+        </div>
       </div>
 
       <!-- ── Cuerpo del Modal (2 Columnas en Desktop/Tablet) ── -->
@@ -398,6 +566,50 @@
               <div class="info-item" *ngIf="activeDoc.nombre_accion">
                 <span class="info-label">Acción</span>
                 <span class="info-val">{{ activeDoc.nombre_accion }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Etiqueta / Grupo</span>
+                <span class="info-val">
+                  <span class="doc-tag-badge shadow-sm" *ngIf="activeDoc.etiqueta || activeDoc.wde_contenido" (click)="setDocTag(activeDoc)">
+                    <i class="fas fa-tag"></i> {{ activeDoc.etiqueta || activeDoc.wde_contenido }}
+                  </span>
+                  <button class="btn btn-xs btn-outline-primary ml-1 font-weight-bold" *ngIf="!activeDoc.etiqueta && !activeDoc.wde_contenido" (click)="setDocTag(activeDoc)">
+                    + Asignar Etiqueta
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Todos los Puntos del Agrupado si está dentro de un agrupado -->
+          <div class="info-card-block" *ngIf="currentTagGroupFolder && groupCases.length > 1">
+            <div class="block-title d-flex justify-content-between align-items-center">
+              <span><i class="fas fa-layer-group text-primary mr-1"></i> Todos los Puntos del Agrupado ({{ groupCases.length }})</span>
+              <button class="btn btn-xs btn-outline-primary font-weight-bold" (click)="setDocTag(currentTagGroupFolder)">
+                <i class="fas fa-edit mr-1"></i> Cambiar Etiqueta
+              </button>
+            </div>
+            <div class="puntos-contenidos-list mt-2">
+              <div class="punto-item-card p-2 mb-2 border rounded shadow-xs"
+                   *ngFor="let p of groupCases; let pIdx = index"
+                   [class.active-punto-card]="pIdx === currentGroupCaseIndex"
+                   (click)="selectGroupCase(pIdx)"
+                   style="cursor: pointer; transition: all 0.2s ease;">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="font-weight-bold" [class.text-primary]="pIdx === currentGroupCaseIndex" style="font-size: 0.82rem;">
+                    <i class="fas fa-file-alt mr-1" [class.text-primary]="pIdx === currentGroupCaseIndex" [class.text-muted]="pIdx !== currentGroupCaseIndex"></i>
+                    Punto Nº {{ p.numc || p.ncontrol || p.cuenta }}
+                  </span>
+                  <div class="d-flex align-items-center gap-1">
+                    <span class="badge badge-primary text-white" *ngIf="pIdx === currentGroupCaseIndex" style="font-size: 0.68rem;">Activo</span>
+                    <button class="btn btn-xs btn-outline-danger py-0 px-2" *ngIf="getDwsUrl(p)" (click)="verPDF(p); $event.stopPropagation()" title="Ver PDF">
+                      <i class="fas fa-file-pdf"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="asunto-mini text-muted mt-1" style="font-size: 0.76rem; line-height: 1.3;">
+                  {{ getAsuntoClean(p) | slice:0:120 }}...
+                </div>
               </div>
             </div>
           </div>
@@ -463,7 +675,7 @@
 
             <div class="subcasos-list-container p-2">
               <div class="subcaso-card-item subcaso-procesar mb-2"
-                   *ngFor="let item of getSubcasosProcesar(activeDoc); let idx = index">
+                   *ngFor="let item of getSubcasosProcesar(activeDoc); let idx = index; trackBy: trackBySubcaso">
 
                 <!-- Avatar -->
                 <div class="subcaso-avatar"
@@ -535,7 +747,7 @@
 
             <div class="subcasos-list-container p-2">
               <div class="subcaso-card-item subcaso-no-procesar mb-2"
-                   *ngFor="let item of getSubcasosNoProcesar(activeDoc); let idx = index"
+                   *ngFor="let item of getSubcasosNoProcesar(activeDoc); let idx = index; trackBy: trackBySubcaso"
                    [class.subcaso-pendiente]="isPendiente(item)">
 
                 <!-- Avatar -->
