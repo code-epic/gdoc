@@ -44,11 +44,34 @@ export class UtilService {
       String(date.getDate()).padStart(2, "0");
     return output;
   }
-  //retorna fecha en formato Dia/Mes/Anio
+  //retorna fecha en formato YYYY-MM-DD (si fecha es null retorna fecha actual del día)
   ConvertirFecha(fecha: any): string {
     console.log(fecha);
+    if (!fecha || fecha === "null" || fecha === "undefined" || fecha === "") {
+      return this.FechaActual();
+    }
 
-    return fecha.year + "-" + +fecha.month + "-" + fecha.day;
+    if (
+      typeof fecha === "object" &&
+      fecha !== null &&
+      "year" in fecha &&
+      "month" in fecha &&
+      "day" in fecha
+    ) {
+      const month = String(fecha.month).padStart(2, "0");
+      const day = String(fecha.day).padStart(2, "0");
+      return `${fecha.year}-${month}-${day}`;
+    }
+
+    if (typeof fecha === "string") {
+      return fecha;
+    }
+
+    if (fecha instanceof Date) {
+      return this.convertirFechaVEN(fecha);
+    }
+
+    return this.FechaActual();
   }
 
   convertirFechaVEN(fecha: any): string {

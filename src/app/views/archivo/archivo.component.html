@@ -305,40 +305,56 @@
   </div>
 </ng-template>
 
-<!-- Modal Configurar / Seleccionar Archivo (Diseño Minimalista & Sobrio) -->
+<!-- Modal Configurar / Seleccionar Archivo (Diseño Minimalista, Sobrio & Animado) -->
 <ng-template #modalSeleccionarArchivo let-modal>
   <div class="archivo-modal-wrapper p-4 p-md-4 bg-white rounded-lg shadow-lg position-relative">
     
-    <!-- Minimalist Header -->
-    <div class="text-center mb-4 pt-2">
-      <div class="icon-avatar mx-auto mb-3 d-flex align-items-center justify-content-center shadow-sm">
+    <!-- Boton de Cierre superior -->
+    <button type="button" class="close position-absolute" style="top: 16px; right: 20px; z-index: 10; font-size: 1.4rem; opacity: 0.6; transition: all 0.2s;" (click)="modal.dismiss('Cerrar')" title="Cerrar modal">
+      <span aria-hidden="true">&times;</span>
+    </button>
+
+    <!-- Header Elegante -->
+    <div class="text-center mb-4 pt-1">
+      <span class="badge badge-pill badge-light text-primary font-weight-bold text-uppercase mb-2 tracking-wider" style="font-size: 0.68rem; padding: 5px 12px; border: 1px solid #e0e7ff; background: #eef2ff;">
+        Módulo de Consulta y Gestión
+      </span>
+      <div class="icon-avatar floating-avatar mx-auto mb-3 d-flex align-items-center justify-content-center shadow-xs">
         <i class="ni ni-folder-17 text-primary"></i>
       </div>
-      <h2 class="h3 font-weight-bold text-dark mb-1">Seleccionar Archivo</h2>
-      <p class="text-muted small mb-0">Elija la unidad documental a la que desea ingresar</p>
+      <h3 class="h4 font-weight-bold text-dark mb-1 tracking-tight" style="letter-spacing: -0.4px;">Seleccionar Archivo Documental</h3>
+      <p class="text-muted small mb-0" style="font-size: 0.84rem;">Elija la unidad documental a la que desea ingresar para consultar expedientes</p>
     </div>
 
-    <!-- Archivo Options Grid -->
+    <!-- Archivo Options Grid con Animación Staggered -->
     <div class="archivo-options-grid">
       <div 
-        *ngFor="let opcion of opcionesArchivo" 
+        *ngFor="let opcion of opcionesArchivo; let i = index" 
         class="archivo-card-option d-flex align-items-center p-3 mb-3 rounded-lg border transition-all"
         [class.selected]="estadoActual === opcion.id"
+        [style.--stagger-index]="i"
         (click)="seleccionarArchivo(opcion)">
         
-        <div class="option-icon-box d-flex align-items-center justify-content-center rounded-circle mr-3"
+        <div class="option-icon-box d-flex align-items-center justify-content-center rounded-circle mr-3 shadow-xs"
              [style.color]="opcion.color" 
              [style.background-color]="opcion.lightBg">
           <i [class]="opcion.icono"></i>
         </div>
         
-        <div class="option-content flex-grow-1">
-          <h5 class="option-title mb-0 font-weight-bold text-dark">{{ opcion.nombre }}</h5>
-          <p class="option-subtitle text-muted small mb-0 mt-1">{{ opcion.subtitulo }}</p>
+        <div class="option-content flex-grow-1 pr-2">
+          <div class="d-flex align-items-center justify-content-between mb-1">
+            <h5 class="option-title mb-0 font-weight-bold text-dark" style="font-size: 0.95rem; letter-spacing: -0.2px;">{{ opcion.nombre }}</h5>
+            <span class="badge badge-pill badge-light font-weight-bold text-muted" style="font-size: 0.65rem;" *ngIf="estadoActual === opcion.id">
+              ACTIVO
+            </span>
+          </div>
+          <p class="option-subtitle text-muted small mb-0" style="font-size: 0.8rem; line-height: 1.35;">{{ opcion.subtitulo }}</p>
         </div>
 
-        <div class="option-check ml-3">
-          <div class="custom-radio-indicator d-flex align-items-center justify-content-center rounded-circle">
+        <div class="option-check ml-2">
+          <div class="custom-radio-indicator d-flex align-items-center justify-content-center rounded-circle"
+               [style.border-color]="estadoActual === opcion.id ? opcion.color : '#cad1d7'"
+               [style.background-color]="estadoActual === opcion.id ? opcion.color : 'transparent'">
             <i class="fa fa-check text-white small" *ngIf="estadoActual === opcion.id"></i>
           </div>
         </div>
@@ -346,10 +362,10 @@
       </div>
     </div>
 
-    <!-- Footer info -->
-    <div class="text-center mt-3 pt-2">
-      <span class="text-muted small">
-        <i class="ni ni-lock-circle-open mr-1"></i> Acceso configurado según su unidad asignada
+    <!-- Footer Info -->
+    <div class="text-center mt-3 pt-2 border-top">
+      <span class="text-muted small" style="font-size: 0.78rem;">
+        <i class="ni ni-lock-circle-open mr-1 text-primary"></i> Acceso seguro configurado según su unidad asignada
       </span>
     </div>
 

@@ -575,8 +575,11 @@ export class RsbuzonComponent implements OnInit {
         if (data && data.Cuerpo && data.Cuerpo.length > 0) {
           const res = data.Cuerpo[0];
           this.constanciaDoc = res;
-          if (res.fcreacion) this.constanciaDoc.fcreacion = res.fcreacion.substring(0, 10);
-          if (res.forigen) this.constanciaDoc.forigen = res.forigen.substring(0, 10);
+          console.log(res);
+          if (res.fcreacion)
+            this.constanciaDoc.fcreacion = res.fcreacion.substring(0, 10);
+          if (res.forigen)
+            this.constanciaDoc.forigen = res.forigen.substring(0, 10);
 
           if (res.ncontrol) {
             this.getQR(res.ncontrol);
@@ -584,9 +587,15 @@ export class RsbuzonComponent implements OnInit {
 
           if (res.subdocumento) {
             try {
-              const subParsed = typeof res.subdocumento === "string" ? JSON.parse(res.subdocumento) : res.subdocumento;
+              const subParsed =
+                typeof res.subdocumento === "string"
+                  ? JSON.parse(res.subdocumento)
+                  : res.subdocumento;
               if (Array.isArray(subParsed)) {
-                this.constanciaSubDoc = subParsed.map((item: any) => typeof item === "object" ? item : JSON.parse(item));
+                this.constanciaSubDoc = subParsed.map((item: any) =>
+                  typeof item === "object" ? item : JSON.parse(item),
+                );
+                console.log(this.constanciaSubDoc);
               }
             } catch (e) {
               console.warn(e);
@@ -595,10 +604,17 @@ export class RsbuzonComponent implements OnInit {
 
           if (res.traza) {
             try {
-              const trazaParsed = typeof res.traza === "string" ? JSON.parse(res.traza) : res.traza;
+              const trazaParsed =
+                typeof res.traza === "string"
+                  ? JSON.parse(res.traza)
+                  : res.traza;
               if (Array.isArray(trazaParsed)) {
-                this.constanciaTraza = trazaParsed.map((item: any) => typeof item === "object" ? item : JSON.parse(item));
-                this.constanciaTraza.sort((a: any, b: any) => (b.id || 0) - (a.id || 0));
+                this.constanciaTraza = trazaParsed.map((item: any) =>
+                  typeof item === "object" ? item : JSON.parse(item),
+                );
+                this.constanciaTraza.sort(
+                  (a: any, b: any) => (b.id || 0) - (a.id || 0),
+                );
               }
             } catch (e) {
               console.warn(e);
@@ -611,7 +627,7 @@ export class RsbuzonComponent implements OnInit {
       (error) => {
         this.loadingConstancia = false;
         this.constanciaDoc = doc;
-      }
+      },
     );
 
     let modalRef = this.modalService.open(content, {
@@ -641,14 +657,16 @@ export class RsbuzonComponent implements OnInit {
       },
       (error) => {
         console.error("Error generando QR:", error);
-      }
+      },
     );
   }
 
   public async exportarPDF() {
     const element = document.getElementById("constanciaSheet") as HTMLElement;
     if (!element) {
-      this.toastrService.error("No se encontró el lienzo del documento para exportar.");
+      this.toastrService.error(
+        "No se encontró el lienzo del documento para exportar.",
+      );
       return;
     }
 
@@ -682,13 +700,20 @@ export class RsbuzonComponent implements OnInit {
 
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
-      const numControl = this.constanciaDoc?.ncontrol || this.docSeleccionado?.numc || "documento";
+      const numControl =
+        this.constanciaDoc?.ncontrol ||
+        this.docSeleccionado?.numc ||
+        "documento";
       pdf.save(`Constancia_${numControl}.pdf`);
       Swal.close();
       this.toastrService.success("Documento exportado a PDF exitosamente.");
     } catch (error) {
       console.error("Error al exportar PDF:", error);
-      Swal.fire("Error", "No se pudo generar el documento PDF con jsPDF.", "error");
+      Swal.fire(
+        "Error",
+        "No se pudo generar el documento PDF con jsPDF.",
+        "error",
+      );
     }
   }
 
@@ -697,15 +722,21 @@ export class RsbuzonComponent implements OnInit {
     let list: any[] = [];
     if (doc.subdocumento) {
       try {
-        const parsed = typeof doc.subdocumento === "string" ? JSON.parse(doc.subdocumento) : doc.subdocumento;
+        const parsed =
+          typeof doc.subdocumento === "string"
+            ? JSON.parse(doc.subdocumento)
+            : doc.subdocumento;
         if (Array.isArray(parsed)) {
-          list = parsed.map((item: any) => typeof item === "object" ? item : JSON.parse(item));
+          list = parsed.map((item: any) =>
+            typeof item === "object" ? item : JSON.parse(item),
+          );
         }
       } catch (err) {
         console.warn("[Rsbuzon] Error parsing subdocumento:", err);
       }
     }
-    if (list.length === 0 && Array.isArray(doc.documentos)) list = doc.documentos;
+    if (list.length === 0 && Array.isArray(doc.documentos))
+      list = doc.documentos;
     if (list.length === 0 && Array.isArray(doc.lstCuenta)) list = doc.lstCuenta;
     return list;
   }
@@ -1051,6 +1082,8 @@ export class RsbuzonComponent implements OnInit {
             break;
           case "10": //Oficio por OPINION
             this.promoverBuzon(5, this.utilService.FechaActual());
+          case "11":
+            this.redistribuir(15);
             break;
           case "1": //Rechazar en el estado inicial
             this.rechazarBuzon();
@@ -1131,7 +1164,30 @@ export class RsbuzonComponent implements OnInit {
   }
 
   reducirVector() {
-    this.bzRecibidoResumen.splice(this.posicion, 1);
+    this.reducirVectorAnimado(this.posicion);
+  }
+
+  reducirVectorAnimado(pos?: number, onComplete?: () => void) {
+    const targetPos = pos !== undefined ? pos : this.posicion;
+    const targetItem = this.bzRecibidoResumen[targetPos];
+
+    if (targetItem) {
+      targetItem.isArchiving = true;
+      setTimeout(() => {
+        const idx = this.bzRecibidoResumen.indexOf(targetItem);
+        if (idx !== -1) {
+          this.bzRecibidoResumen.splice(idx, 1);
+        } else if (targetPos < this.bzRecibidoResumen.length) {
+          this.bzRecibidoResumen.splice(targetPos, 1);
+        }
+        if (onComplete) onComplete();
+      }, 750);
+    } else {
+      if (targetPos < this.bzRecibidoResumen.length) {
+        this.bzRecibidoResumen.splice(targetPos, 1);
+      }
+      if (onComplete) onComplete();
+    }
   }
 
   async redistribuir(destino: number = 0) {
@@ -1147,6 +1203,9 @@ export class RsbuzonComponent implements OnInit {
       this.loginService.Usuario.id +
       "," +
       this.numControl;
+
+    const targetPos = this.posicion;
+
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.guardarAlerta(
@@ -1154,10 +1213,12 @@ export class RsbuzonComponent implements OnInit {
           this.utilService.ConvertirFecha(this.extender_plazo),
         );
         this.toastrService.success(
-          "El documento ha sido redistribuido segun su selección",
+          "El documento ha sido empaquetado y archivado exitosamente",
           `GDoc Wkf.DocumentoObservacion`,
         );
-        this.seleccionNavegacion(this.selNav);
+        this.reducirVectorAnimado(targetPos);
+        this.Observacion = "";
+        this.numControl = "0";
       },
       (error) => {
         console.error(error);
@@ -1556,6 +1617,41 @@ export class RsbuzonComponent implements OnInit {
 
   getDetalleX(e: string): string {
     return this.allService.getDetalleX(e);
+  }
+
+  getDetalleSubDoc(item: any): string {
+    if (!item) return "PENDIENTE";
+    let val =
+      item.detalle !== undefined && item.detalle !== null && item.detalle !== ""
+        ? item.detalle
+        : item.observacion || item.obse || "";
+
+    if (!val || val === "" || val === "null" || val === "undefined") {
+      return "PENDIENTE";
+    }
+
+    if (typeof val === "string" && val.includes("|")) {
+      const parts = val.split("|");
+      const code = parts[1] ? parts[1].trim() : parts[0].trim();
+      switch (code) {
+        case "PR":
+          return "PROCESAR";
+        case "NP":
+          return "NO PROCESAR";
+        case "PE":
+          return "PENDIENTE";
+        case "NPPIDD":
+          return "NP POR INT. DEL DIRECTOR";
+        case "NPPIDJ":
+          return "NP POR INT. DEL JEFE DE AREA";
+        case "CR":
+          return "CODIGO ROJO";
+        default:
+          return this.getDetalleX(val) || "PENDIENTE";
+      }
+    }
+
+    return this.limpiarTexto(val) || "PENDIENTE";
   }
 
   getDetalleEnabled(e): boolean {

@@ -123,6 +123,7 @@
 
                                                     <mat-list *ngIf="blNavegacion" style="margin-top: -10px; padding: 10px; width: 100%;">
                                                         <mat-list-item *ngFor="let e of bzRecibidoResumen; let i=index"
+                                                            [class.row-empaquetando-carpeta]="e.isArchiving"
                                                             style="border-bottom: 1px #f1f5f9 solid; height: auto; padding-top: 6px; padding-bottom: 6px;">
                                                             <div class="row w-100 align-items-center">
                                                                 <div class="col-md-1 text-center font-weight-bold" style="font-size: 0.85rem; color: #495057;">
@@ -883,7 +884,7 @@
                                     <td class="font-weight-bold text-dark">{{ item.cedula | uppercase }}</td>
                                     <td>{{ limpiarTexto(item.nmilitar || item.nombre || item.nombres_apellidos) | uppercase }}</td>
                                     <td>{{ limpiarTexto(item.cargo || item.grado) | uppercase }}</td>
-                                    <td>{{ limpiarTexto(getDetalle(item.detalle || item.observacion || item.obse)) }}</td>
+                                    <td>{{ limpiarTexto(getDetalle(item.detalle)) }}</td>
                                 </tr>
                             </tbody>
                         </table>

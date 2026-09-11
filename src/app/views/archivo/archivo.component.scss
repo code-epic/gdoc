@@ -136,14 +136,37 @@ textarea {
   background: #ffffff;
   position: relative;
 
+  .close {
+    outline: none;
+    &:hover {
+      opacity: 1 !important;
+      transform: scale(1.15);
+      color: #f5365c;
+    }
+  }
+
   .icon-avatar {
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: #f4f5fe;
-    font-size: 24px;
+    font-size: 26px;
     transition: transform 0.3s ease;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 15px rgba(94, 114, 228, 0.15);
   }
+
+  .floating-avatar {
+    animation: avatarFloatGlow 3.5s ease-in-out infinite;
+  }
+}
+
+.tracking-wider {
+  letter-spacing: 0.5px;
+}
+
+.tracking-tight {
+  letter-spacing: -0.4px;
 }
 
 .archivo-options-grid {
@@ -156,56 +179,95 @@ textarea {
   border: 1.5px solid #e9ecef !important;
   cursor: pointer;
   position: relative;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0.85rem;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: cardFadeInUp 0.45s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  animation-delay: calc(var(--stagger-index, 0) * 0.09s);
+  opacity: 0;
 
   .option-icon-box {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
     font-size: 20px;
-    transition: transform 0.25s ease;
-  }
-
-  .option-badge {
-    background-color: #f6f9fc;
-    color: #8898aa;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
   .custom-radio-indicator {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border: 2px solid #cad1d7;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    .fa-check {
+      animation: checkScalePop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
   }
 
   &:hover {
     border-color: #5e72e4 !important;
-    background-color: #fafbfd;
-    transform: translateY(-2px);
-    box-shadow: 0 7px 14px rgba(50, 50, 93, 0.06), 0 3px 6px rgba(0, 0, 0, 0.04);
+    background-color: #f8fafc;
+    transform: translateY(-3px) scale(1.008);
+    box-shadow: 0 10px 24px rgba(50, 50, 93, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
 
     .option-icon-box {
-      transform: scale(1.08);
+      transform: scale(1.12) rotate(-3deg);
     }
+  }
+
+  &:active {
+    transform: translateY(-1px) scale(0.99);
   }
 
   &.selected {
     border-color: #5e72e4 !important;
-    background: linear-gradient(135deg, rgba(94, 114, 228, 0.04) 0%, rgba(94, 114, 228, 0.01) 100%);
-    box-shadow: 0 4px 12px rgba(94, 114, 228, 0.12);
+    border-left: 4px solid #5e72e4 !important;
+    background: linear-gradient(135deg, rgba(94, 114, 228, 0.05) 0%, rgba(94, 114, 228, 0.01) 100%);
+    box-shadow: 0 6px 16px rgba(94, 114, 228, 0.14);
+
+    .option-icon-box {
+      transform: scale(1.05);
+    }
 
     .custom-radio-indicator {
-      background-color: #5e72e4;
-      border-color: #5e72e4;
+      transform: scale(1.08);
     }
+  }
+}
 
-    .option-badge {
-      background-color: #5e72e4;
-      color: #ffffff;
-    }
+@keyframes avatarFloatGlow {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px rgba(94, 114, 228, 0.15);
+  }
+  50% {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 22px rgba(94, 114, 228, 0.25);
+  }
+}
+
+@keyframes cardFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes checkScalePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
