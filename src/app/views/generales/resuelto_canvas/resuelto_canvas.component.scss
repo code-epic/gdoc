@@ -237,8 +237,8 @@
   font-size: 13pt;
   flex: 0 0 auto;
   
-  p {
-    line-height: 1.15; /* Fuerza Word Sencillo sobre todos los p del cuerpo */
+  > p {
+    line-height: 1.15; /* Fuerza Word Sencillo sobre hijos directos de doc-body */
   }
 
   .basamento-legal {
@@ -391,3 +391,150 @@
     padding-bottom: 1px;
   }
 }
+
+/* ==============================================================
+   ESTILOS DE IMÁGENES Y BARRA FLOTANTE DE CONTROL
+   ============================================================== */
+::ng-deep .resuelto-doc-image {
+  cursor: pointer;
+  max-width: 100%;
+  height: auto;
+  border-radius: 2px;
+  transition: outline 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    outline: 1.5px solid #5e72e4;
+  }
+
+  &.selected-doc-image {
+    outline: 2.5px dashed #007bff !important;
+    outline-offset: 3px;
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.35);
+  }
+}
+
+.floating-image-toolbar {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #172b4d;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 5px 10px;
+  border-radius: 8px;
+  z-index: 10050;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  font-size: 0.8rem;
+  pointer-events: auto;
+
+  .image-tb-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+
+  .image-tb-dimension {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #ffd600;
+    min-width: 38px;
+    text-align: center;
+  }
+
+  .image-tb-sep {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 0 4px;
+  }
+
+  .btn {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  .btn-danger {
+    background-color: #f5365c;
+    border-color: #f5365c;
+    &:hover {
+      background-color: #ec0c38;
+    }
+  }
+}
+
+.a4-measurement-sandbox {
+  box-sizing: border-box;
+  background: white;
+  color: #000;
+  
+  .a4-canvas {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+
+/* Superposición interactiva para redimensionar arrastrando esquinas (Google Docs / Word Style) */
+.image-resize-overlay {
+  position: fixed;
+  pointer-events: none;
+  border: 1.5px dashed #007bff;
+  z-index: 10040;
+  box-sizing: border-box;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.25);
+
+  .resize-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #007bff;
+    border: 1.5px solid white;
+    border-radius: 2px;
+    pointer-events: auto;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    transition: transform 0.1s ease, background-color 0.15s ease;
+
+    &.handle-br {
+      right: -5px;
+      bottom: -5px;
+      cursor: nwse-resize;
+    }
+
+    &.handle-r {
+      right: -5px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: ew-resize;
+      &:hover {
+        transform: translateY(-50%) scale(1.3);
+      }
+    }
+
+    &.handle-b {
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: ns-resize;
+      &:hover {
+        transform: translateX(-50%) scale(1.3);
+      }
+    }
+
+    &:hover {
+      background: #0056b3;
+      transform: scale(1.3);
+    }
+  }
+}
+
+

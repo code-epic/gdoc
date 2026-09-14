@@ -87,7 +87,7 @@
                         <button mat-icon-button matTooltip="Recibir" (click)="open(observacion, e.idd)">
                           <mat-icon class="text-gray">account_tree</mat-icon>
                         </button>
-                        <a [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer" mat-icon-button matTooltip="Descargar PDF">
+                        <a [href]="dwUrl(e.numc, e.anom)" target="top" rel="noopener noreferrer" mat-icon-button matTooltip="Descargar PDF">
                           <mat-icon class="text-red">picture_as_pdf</mat-icon>
                         </a>
                       </div>
@@ -158,7 +158,7 @@
                         <button mat-icon-button matTooltip="Editar" (click)="editar(e)">
                           <mat-icon>edit_note</mat-icon>
                         </button>
-                        <a [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer" mat-icon-button matTooltip="Descargar PDF">
+                        <a [href]="dwUrl(e.numc, e.anom)" target="top" rel="noopener noreferrer" mat-icon-button matTooltip="Descargar PDF">
                           <mat-icon class="text-red">picture_as_pdf</mat-icon>
                         </a>
                       </div>

@@ -85,8 +85,12 @@
     <!-- Controles de Sangría / Ancho de Fila o Línea -->
     <button class="btn btn-sm btn-outline-light ml-2 mr-1" (mousedown)="$event.preventDefault(); widenLine()" title="Ampliar Ancho de Fila (Más Ancho)"><i class="fas fa-expand"></i></button>
     <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); narrowLine()" title="Disminuir Ancho de Fila (Más Estrecho)"><i class="fas fa-compress"></i></button>
-    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); decreaseIndentLeft()" title="Reducir Sangría Izquierda (Mover Izquierda)"><i class="fas fa-outdent"></i></button>
-    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); increaseIndentLeft()" title="Aumentar Sangría Izquierda (Mover Derecha)"><i class="fas fa-indent"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); decreaseIndentLeft()" title="Reducir Sangría Izquierda (Shift+Tab)"><i class="fas fa-outdent"></i></button>
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); increaseIndentLeft()" title="Aumentar Sangría Izquierda (Tab)"><i class="fas fa-indent"></i></button>
+
+    <!-- Inserción de Imagen -->
+    <button class="btn btn-sm btn-outline-light mr-1" (mousedown)="$event.preventDefault(); triggerImageUpload()" title="Insertar Imagen desde PC"><i class="fas fa-image"></i></button>
+    <input type="file" #imageFileInput (change)="onImageFileSelected($event)" accept="image/*" style="display: none;">
 
     <!-- Separator -->
     <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
@@ -114,7 +118,7 @@
   </ng-container>
 </div>
 
-<div class="a4-canvas-container" #container [style.transform]="'scale(' + zoomScale + ')'">
+<div class="a4-canvas-container" #container [style.transform]="'scale(' + zoomScale + ')'" (click)="onCanvasClick($event)">
   <ng-container *ngIf="documentData && documentData.pages">
     <div class="a4-canvas" *ngFor="let page of documentData.pages; let i = index" 
          [style.padding-top.mm]="documentData?.styles?.margins?.top ? documentData.styles.margins.top : 25"
@@ -281,3 +285,77 @@
      (mousedown)="$event.preventDefault(); addComment(); showFloatingCommentBtn = false">
   <i class="fas fa-comment-dots"></i> Comentar
 </div>
+
+<!-- Floating Image Toolbar (Control Interactivo de Imagen: Ancho, Alto, Proporción, Alineación y Eliminación) -->
+<div class="floating-image-toolbar shadow-lg"
+     *ngIf="showImageToolbar && selectedImage"
+     [style.top.px]="imageToolbarPos.y"
+     [style.left.px]="imageToolbarPos.x"
+     (mousedown)="$event.stopPropagation()">
+  <span class="image-tb-label"><i class="fas fa-image mr-1"></i> Imagen:</span>
+
+  <!-- Presets de porcentaje -->
+  <button type="button" class="btn btn-sm btn-dark" (mousedown)="$event.preventDefault(); setImageSize(25)" title="25% de ancho">25%</button>
+  <button type="button" class="btn btn-sm btn-dark" (mousedown)="$event.preventDefault(); setImageSize(50)" title="50% de ancho">50%</button>
+  <button type="button" class="btn btn-sm btn-dark" (mousedown)="$event.preventDefault(); setImageSize(75)" title="75% de ancho">75%</button>
+  <button type="button" class="btn btn-sm btn-dark" (mousedown)="$event.preventDefault(); setImageSize(100)" title="100% de ancho">100%</button>
+
+  <div class="image-tb-sep"></div>
+
+  <!-- Dimensiones Numéricas (W y H exactos) -->
+  <div class="d-flex align-items-center" title="Ancho en píxeles">
+    <span class="mr-1 text-muted font-weight-bold" style="font-size: 0.7rem; color: #adb5bd !important;">W:</span>
+    <input type="number" class="form-control form-control-sm image-size-input"
+           [value]="imageCustomWidth"
+           (change)="setImageWidthPx($any($event.target).value)"
+           step="10" min="30" style="width: 55px; height: 24px; padding: 2px 4px; font-size: 0.75rem; text-align: center; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.25); border-radius: 3px;">
+  </div>
+
+  <!-- Bloqueo de Aspect Ratio / Proporción -->
+  <button type="button" class="btn btn-sm btn-dark px-1 mx-1" (mousedown)="$event.preventDefault(); toggleAspectRatio()" [title]="keepAspectRatio ? 'Proporción Bloqueada (Escalado Uniforme)' : 'Proporción Libre (Desbloqueada)'">
+    <i class="fas" [class.fa-link]="keepAspectRatio" [class.fa-unlink]="!keepAspectRatio" [style.color]="keepAspectRatio ? '#2dce89' : '#fb6340'"></i>
+  </button>
+
+  <div class="d-flex align-items-center" title="Alto en píxeles">
+    <span class="mr-1 text-muted font-weight-bold" style="font-size: 0.7rem; color: #adb5bd !important;">H:</span>
+    <input type="number" class="form-control form-control-sm image-size-input"
+           [value]="imageCustomHeight"
+           (change)="setImageHeightPx($any($event.target).value)"
+           step="10" min="30" style="width: 55px; height: 24px; padding: 2px 4px; font-size: 0.75rem; text-align: center; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.25); border-radius: 3px;">
+  </div>
+
+  <div class="image-tb-sep"></div>
+
+  <!-- Botones de incremento fino -->
+  <button type="button" class="btn btn-sm btn-dark" (mousedown)="$event.preventDefault(); adjustImageWidth(-20)" title="Reducir Ancho (-20px)"><i class="fas fa-minus"></i></button>
+  <button type="button" class="btn btn-sm btn-dark" (mousedown)="$event.preventDefault(); adjustImageWidth(20)" title="Aumentar Ancho (+20px)"><i class="fas fa-plus"></i></button>
+
+  <div class="image-tb-sep"></div>
+
+  <!-- Alineación -->
+  <button type="button" class="btn btn-sm btn-dark" (mousedown)="$event.preventDefault(); setImageAlign('left')" title="Alinear a la Izquierda"><i class="fas fa-align-left"></i></button>
+  <button type="button" class="btn btn-sm btn-dark" (mousedown)="$event.preventDefault(); setImageAlign('center')" title="Centrar"><i class="fas fa-align-center"></i></button>
+  <button type="button" class="btn btn-sm btn-dark" (mousedown)="$event.preventDefault(); setImageAlign('right')" title="Alinear a la Derecha"><i class="fas fa-align-right"></i></button>
+
+  <div class="image-tb-sep"></div>
+
+  <!-- Eliminar Imagen -->
+  <button type="button" class="btn btn-sm btn-danger" (mousedown)="$event.preventDefault(); deleteSelectedImage()" title="Eliminar Imagen"><i class="fas fa-trash-alt"></i></button>
+</div>
+
+<!-- Superposición visual para redimensionar arrastrando esquinas (Resize Handles) -->
+<div class="image-resize-overlay"
+     *ngIf="showImageToolbar && selectedImage"
+     [style.left.px]="imageOverlayPos.left"
+     [style.top.px]="imageOverlayPos.top"
+     [style.width.px]="imageOverlayPos.width"
+     [style.height.px]="imageOverlayPos.height"
+     (mousedown)="$event.stopPropagation()">
+  <div class="resize-handle handle-br" (mousedown)="startResizeDrag($event, 'br')" title="Arrastrar para redimensionar imagen"></div>
+  <div class="resize-handle handle-r" (mousedown)="startResizeDrag($event, 'r')" title="Arrastrar ancho"></div>
+  <div class="resize-handle handle-b" (mousedown)="startResizeDrag($event, 'b')" title="Arrastrar alto"></div>
+</div>
+
+<!-- Sandbox Oculto para Medición Métrica de Páginas Off-Screen (Evita Parpadeos y Saltos de Scroll) -->
+<div #sandboxContainer class="a4-measurement-sandbox" style="position: absolute; left: -9999px; top: 0; width: 215.9mm; visibility: hidden; pointer-events: none; z-index: -1000; font-family: 'Tahoma', sans-serif;"></div>
+

@@ -71,6 +71,28 @@ export class ResueltoCanvasComponent
   }
 
   @ViewChild("container") containerRef!: ElementRef;
+  @ViewChild("sandboxContainer") sandboxContainerRef!: ElementRef;
+  @ViewChild("imageFileInput") imageFileInput!: ElementRef<HTMLInputElement>;
+
+  // Variables para control interactivo de imágenes
+  public selectedImage: HTMLImageElement | null = null;
+  public showImageToolbar: boolean = false;
+  public imageToolbarPos = { x: 0, y: 0 };
+  public imageCustomWidth: number = 0;
+  public imageCustomHeight: number = 0;
+  public keepAspectRatio: boolean = true;
+  public imageOverlayPos = { left: 0, top: 0, width: 0, height: 0 };
+  private imageNaturalRatio: number = 1;
+  public isDraggingResize: boolean = false;
+  private dragStartX: number = 0;
+  private dragStartY: number = 0;
+  private dragStartWidth: number = 0;
+  private dragStartHeight: number = 0;
+
+  get currentImageWidthDisplay(): string {
+    if (!this.selectedImage) return "50%";
+    return this.selectedImage.style.width || "50%";
+  }
 
   public zoomScale: number = 1.0;
 
@@ -275,6 +297,11 @@ export class ResueltoCanvasComponent
       rootEditable.querySelectorAll("p, li, h1, h2, h3"),
     ) as HTMLElement[];
 
+    // Si el propio contenedor editable es un bloque directo (ej. <p data-section="basamento"> o <p data-section="unico">)
+    if (["p", "li", "h1", "h2", "h3"].includes(rootEditable.tagName.toLowerCase())) {
+      allBlocks.push(rootEditable);
+    }
+
     // Filtrar bloques que intersectan con el rango de selección
     allBlocks.forEach((block) => {
       if (selection.containsNode(block, true)) {
@@ -295,7 +322,12 @@ export class ResueltoCanvasComponent
             break;
           }
         }
-        if (node === rootEditable) break;
+        if (node === rootEditable) {
+          if (["p", "li", "h1", "h2", "h3"].includes((node as HTMLElement).tagName.toLowerCase())) {
+            blocks.push(node as HTMLElement);
+          }
+          break;
+        }
         node = node.parentNode;
       }
     }
@@ -874,18 +906,10 @@ export class ResueltoCanvasComponent
         this.casesInput$.next();
       }
     } else if (this.activeElement) {
-      this.activeElement.style.setProperty(
-        "line-height",
-        this.currentLineSpacing.toString(),
-        "important",
-      );
+      this.activeElement.style.lineHeight = this.currentLineSpacing.toString();
       const children = this.activeElement.querySelectorAll("p, span, div");
       children.forEach((child) => {
-        (child as HTMLElement).style.setProperty(
-          "line-height",
-          this.currentLineSpacing.toString(),
-          "important",
-        );
+        (child as HTMLElement).style.lineHeight = this.currentLineSpacing.toString();
       });
 
       if (this.activeElement.classList.contains("cases-list")) {
@@ -924,7 +948,7 @@ export class ResueltoCanvasComponent
       };
     }
 
-    this.casesInput$.pipe(debounceTime(600)).subscribe(() => {
+    this.casesInput$.pipe(debounceTime(350)).subscribe(() => {
       this.casesBlur.emit();
       this.paginateDOM();
       this.saveHistoryState();
@@ -1084,59 +1108,8 @@ export class ResueltoCanvasComponent
       this.documentData.bodyData["_pageCasesHtml_" + pageIndex] = html;
     }
 
-    // Auto-paginación inteligente tipo Google Docs:
-    const currentCanvas = target.closest(".a4-canvas") as HTMLElement;
-    if (currentCanvas) {
-      let isOverflowing = false;
-      const casesList = currentCanvas.querySelector(".cases-list");
-      if (casesList) {
-        const canvasRect = currentCanvas.getBoundingClientRect();
-        const listRect = casesList.getBoundingClientRect();
-        isOverflowing = canvasRect.bottom - listRect.bottom < 76;
-      } else {
-        isOverflowing =
-          currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
-      }
-
-      if (isOverflowing) {
-        // Desbordamiento = repaginamos inmediatamente para empujar el texto a la página siguiente
-        // Excepción: Evitamos repaginación síncrona inmediata en espacios para no romper la edición fluida
-        const inputEvent = event as InputEvent;
-        const isSpace =
-          inputEvent &&
-          (inputEvent.data === " " ||
-            (inputEvent.inputType === "insertText" && !inputEvent.data));
-        if (isSpace) {
-          this.casesInput$.next();
-        } else {
-          this.paginateDOM();
-        }
-      } else {
-        const inputEvent = event as InputEvent;
-        // Si el usuario está borrando texto, puede haber espacio de sobra (Underflow)
-        const isDeleting =
-          inputEvent &&
-          inputEvent.inputType &&
-          inputEvent.inputType.startsWith("delete");
-        const isEnter =
-          inputEvent &&
-          inputEvent.inputType &&
-          (inputEvent.inputType === "insertParagraph" ||
-            inputEvent.inputType === "insertLineBreak");
-
-        if (isEnter) {
-          // Si presiona enter, repaginamos de forma debouncada (600ms) para no interrumpir el flujo del retorno del carro
-          this.casesInput$.next();
-        } else if (
-          isDeleting &&
-          pageIndex < this.documentData.pages.length - 1
-        ) {
-          // Llamamos al subject que dispara paginateDOM con debounce (600ms)
-          // Así evitamos interrumpir al usuario si mantiene presionado Backspace
-          this.casesInput$.next();
-        }
-      }
-    }
+    // Disparar paginación debouncada para no interrumpir el tipeo del usuario ni congelar la interfaz
+    this.casesInput$.next();
   }
 
   onCasesListBlur(event: Event, pageIndex: number) {
@@ -1161,6 +1134,31 @@ export class ResueltoCanvasComponent
     this.casesBlur.emit();
   }
 
+  getClosestBlock(node: Node | null): HTMLElement | null {
+    while (node) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as HTMLElement;
+        const tag = el.tagName.toLowerCase();
+        if (["p", "li", "h1", "h2", "h3", "div"].includes(tag)) {
+          return el;
+        }
+      }
+      node = node.parentNode;
+    }
+    return null;
+  }
+
+  isCaretAtStartOfBlock(range: Range, block: HTMLElement): boolean {
+    try {
+      const preRange = range.cloneRange();
+      preRange.selectNodeContents(block);
+      preRange.setEnd(range.startContainer, range.startOffset);
+      return preRange.toString().length === 0;
+    } catch {
+      return false;
+    }
+  }
+
   onKeydownCases(event: KeyboardEvent, pageIndex: number) {
     if (event.key === "Tab") {
       event.preventDefault();
@@ -1168,22 +1166,434 @@ export class ResueltoCanvasComponent
       const inList =
         document.queryCommandState("insertUnorderedList") ||
         document.queryCommandState("insertOrderedList");
-      if (inList) {
-        if (event.shiftKey) {
+
+      if (event.shiftKey) {
+        // Shift + Tab (Reducir Sangría / Outdent hacia el margen)
+        if (inList) {
           document.execCommand("outdent", false, "");
         } else {
-          document.execCommand("indent", false, "");
+          this.decreaseIndentLeft();
         }
       } else {
-        // Insertar espacios non-breaking en lugar de \t para que se rendericen visualmente en el HTML sin colapsar el puntero
-        document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
+        // Normal Tab (Aumentar Sangría / Indent)
+        if (inList) {
+          document.execCommand("indent", false, "");
+        } else {
+          const selection = window.getSelection();
+          if (selection && !selection.isCollapsed) {
+            this.increaseIndentLeft();
+          } else {
+            const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+            const block = range ? this.getClosestBlock(range.startContainer) : null;
+            if (block && range && this.isCaretAtStartOfBlock(range, block)) {
+              this.increaseIndentLeft();
+            } else {
+              document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
+            }
+          }
+        }
       }
 
       this.onCasesListInput(event, pageIndex);
+      return;
+    }
+
+    // Control de retroceso (Backspace) para liberar tabulaciones/sangrías condenadas
+    if (event.key === "Backspace") {
+      const sel = window.getSelection();
+      if (sel && sel.isCollapsed && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        const block = this.getClosestBlock(range.startContainer);
+        if (block && this.isCaretAtStartOfBlock(range, block)) {
+          const pl = parseFloat(block.style.paddingLeft) || 0;
+          const ml = parseFloat(block.style.marginLeft) || 0;
+          const ti = parseFloat(block.style.textIndent) || 0;
+
+          if (pl > 0 || ml > 0 || ti > 0) {
+            event.preventDefault();
+            if (pl > 0) {
+              const newPl = Math.max(0, pl - 5);
+              block.style.paddingLeft = newPl > 0 ? `${newPl}mm` : "";
+            }
+            if (ml > 0) {
+              const newMl = Math.max(0, ml - 5);
+              block.style.marginLeft = newMl > 0 ? `${newMl}mm` : "";
+            }
+            if (ti > 0) {
+              block.style.textIndent = "";
+            }
+            this.syncDOMToModel();
+            this.casesInput$.next();
+            return;
+          }
+        }
+      }
     }
   }
 
+  // --- CONTROL Y MANEJO DE IMÁGENES ---
+  @HostListener("window:scroll")
+  onWindowScroll() {
+    if (this.showImageToolbar && this.selectedImage) {
+      this.updateImageToolbarPos();
+    }
+  }
+
+  onCanvasClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (
+      target &&
+      target.tagName.toLowerCase() === "img" &&
+      !target.classList.contains("wet-stamp-layer") &&
+      !target.classList.contains("signature-layer")
+    ) {
+      this.selectImage(target as HTMLImageElement);
+    } else if (!target.closest(".floating-image-toolbar") && !target.closest(".image-resize-overlay")) {
+      this.deselectImage();
+    }
+  }
+
+  selectImage(img: HTMLImageElement) {
+    if (this.selectedImage && this.selectedImage !== img) {
+      this.selectedImage.classList.remove("selected-doc-image");
+    }
+    this.selectedImage = img;
+    img.classList.add("selected-doc-image");
+    img.classList.add("resuelto-doc-image");
+
+    const rect = img.getBoundingClientRect();
+    this.imageCustomWidth = Math.round(rect.width);
+    this.imageCustomHeight = Math.round(rect.height);
+
+    if (img.naturalWidth && img.naturalHeight) {
+      this.imageNaturalRatio = img.naturalWidth / img.naturalHeight;
+    } else {
+      this.imageNaturalRatio =
+        this.imageCustomWidth / (this.imageCustomHeight || 1);
+    }
+
+    this.updateImageToolbarPos();
+    this.showImageToolbar = true;
+  }
+
+  deselectImage() {
+    if (this.selectedImage) {
+      this.selectedImage.classList.remove("selected-doc-image");
+      this.selectedImage = null;
+    }
+    this.showImageToolbar = false;
+  }
+
+  updateImageToolbarPos() {
+    if (!this.selectedImage) return;
+    const rect = this.selectedImage.getBoundingClientRect();
+    this.imageCustomWidth = Math.round(rect.width);
+    this.imageCustomHeight = Math.round(rect.height);
+
+    this.imageToolbarPos = {
+      x: Math.max(10, rect.left + rect.width / 2 - 200),
+      y: rect.top > 65 ? rect.top - 52 : rect.bottom + 12,
+    };
+
+    this.imageOverlayPos = {
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+    };
+  }
+
+  /**
+   * Determina el ancho máximo permitido para la imagen:
+   * Si no hay texto cerca (bloque independiente), permite agrandar hasta el ancho completo disponible del canvas.
+   * Si hay texto al lado (float), limita el tamaño para respetar el tope de texto.
+   */
+  getMaxAvailableWidth(): number {
+    if (!this.selectedImage) return 800;
+    const canvas = this.selectedImage.closest(".a4-canvas") as HTMLElement;
+    if (!canvas) return 800;
+
+    const parent = this.selectedImage.parentElement;
+    const hasInlineText =
+      parent && parent.textContent && parent.textContent.trim().length > 0;
+    const isFloating =
+      this.selectedImage.style.float === "left" ||
+      this.selectedImage.style.float === "right";
+
+    const canvasWidth = canvas.clientWidth;
+    const margins = this.documentData?.styles?.margins || {
+      left: 20,
+      right: 20,
+    };
+    // Margen físico en px (~3.78px/mm)
+    const marginsPx = ((margins.left || 20) + (margins.right || 20)) * 3.78;
+    const printableWidth = Math.max(200, canvasWidth - marginsPx);
+
+    // Si tiene float y hay texto contiguo, limitamos al 65% para no aplastar el texto
+    if (isFloating && hasInlineText) {
+      return Math.round(printableWidth * 0.65);
+    }
+
+    // Si está aislada o centrada sin tope de texto contiguo, puede expandirse hasta el ancho útil completo
+    return Math.round(printableWidth);
+  }
+
+  setImageSize(percent: number) {
+    if (!this.selectedImage) return;
+    const maxWidth = this.getMaxAvailableWidth();
+    const targetWidth = Math.round((maxWidth * percent) / 100);
+
+    this.selectedImage.style.maxWidth = `${maxWidth}px`;
+    this.selectedImage.style.width = `${targetWidth}px`;
+    if (this.keepAspectRatio) {
+      this.selectedImage.style.height = "auto";
+    }
+
+    this.syncDOMToModel();
+    this.casesInput$.next();
+
+    setTimeout(() => {
+      this.updateImageToolbarPos();
+    }, 50);
+  }
+
+  setImageWidthPx(widthPx: any) {
+    const val = parseFloat(widthPx);
+    if (!this.selectedImage || isNaN(val) || val <= 20) return;
+    const maxWidth = this.getMaxAvailableWidth();
+    const clampedWidth = Math.min(maxWidth, Math.max(30, val));
+
+    this.selectedImage.style.maxWidth = `${maxWidth}px`;
+    this.selectedImage.style.width = `${clampedWidth}px`;
+    if (this.keepAspectRatio) {
+      this.selectedImage.style.height = `${Math.round(clampedWidth / this.imageNaturalRatio)}px`;
+    }
+
+    this.syncDOMToModel();
+    this.casesInput$.next();
+    setTimeout(() => this.updateImageToolbarPos(), 50);
+  }
+
+  setImageHeightPx(heightPx: any) {
+    const val = parseFloat(heightPx);
+    if (!this.selectedImage || isNaN(val) || val <= 20) return;
+    this.selectedImage.style.height = `${Math.max(30, val)}px`;
+
+    if (this.keepAspectRatio) {
+      const newWidth = Math.round(val * this.imageNaturalRatio);
+      const maxWidth = this.getMaxAvailableWidth();
+      const clampedWidth = Math.min(maxWidth, Math.max(30, newWidth));
+      this.selectedImage.style.maxWidth = `${maxWidth}px`;
+      this.selectedImage.style.width = `${clampedWidth}px`;
+    }
+
+    this.syncDOMToModel();
+    this.casesInput$.next();
+    setTimeout(() => this.updateImageToolbarPos(), 50);
+  }
+
+  toggleAspectRatio() {
+    this.keepAspectRatio = !this.keepAspectRatio;
+  }
+
+  adjustImageWidth(delta: number) {
+    if (!this.selectedImage) return;
+    const currentW =
+      this.imageCustomWidth ||
+      Math.round(this.selectedImage.getBoundingClientRect().width) ||
+      100;
+    this.setImageWidthPx(currentW + delta);
+  }
+
+  startResizeDrag(event: MouseEvent, direction: "br" | "r" | "b") {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.selectedImage) return;
+
+    this.isDraggingResize = true;
+    this.dragStartX = event.clientX;
+    this.dragStartY = event.clientY;
+    const rect = this.selectedImage.getBoundingClientRect();
+    this.dragStartWidth = rect.width;
+    this.dragStartHeight = rect.height;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      if (!this.selectedImage) return;
+      const deltaX = moveEvent.clientX - this.dragStartX;
+      const deltaY = moveEvent.clientY - this.dragStartY;
+      let newWidth = this.dragStartWidth;
+      let newHeight = this.dragStartHeight;
+
+      const maxWidth = this.getMaxAvailableWidth();
+
+      if (direction === "br" || direction === "r") {
+        newWidth = Math.min(
+          maxWidth,
+          Math.max(30, this.dragStartWidth + deltaX),
+        );
+      }
+      if (direction === "br") {
+        if (this.keepAspectRatio) {
+          newHeight = Math.round(newWidth / this.imageNaturalRatio);
+        } else {
+          newHeight = Math.max(30, this.dragStartHeight + deltaY);
+        }
+      } else if (direction === "b") {
+        newHeight = Math.max(30, this.dragStartHeight + deltaY);
+        if (this.keepAspectRatio) {
+          newWidth = Math.min(
+            maxWidth,
+            Math.max(30, Math.round(newHeight * this.imageNaturalRatio)),
+          );
+        }
+      }
+
+      this.selectedImage.style.maxWidth = `${maxWidth}px`;
+      this.selectedImage.style.width = `${newWidth}px`;
+      this.selectedImage.style.height = `${newHeight}px`;
+      this.updateImageToolbarPos();
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+      this.isDraggingResize = false;
+      this.syncDOMToModel();
+      this.casesInput$.next();
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  }
+
+  setImageAlign(align: "left" | "center" | "right") {
+    if (!this.selectedImage) return;
+    if (align === "center") {
+      this.selectedImage.style.display = "block";
+      this.selectedImage.style.margin = "8px auto";
+      this.selectedImage.style.float = "none";
+    } else if (align === "left") {
+      this.selectedImage.style.display = "block";
+      this.selectedImage.style.margin = "8px auto 8px 0";
+      this.selectedImage.style.float = "left";
+    } else if (align === "right") {
+      this.selectedImage.style.display = "block";
+      this.selectedImage.style.margin = "8px 0 8px auto";
+      this.selectedImage.style.float = "right";
+    }
+    this.syncDOMToModel();
+    this.casesInput$.next();
+    setTimeout(() => this.updateImageToolbarPos(), 50);
+  }
+
+  deleteSelectedImage() {
+    if (!this.selectedImage) return;
+    const parent = this.selectedImage.parentNode;
+    this.selectedImage.remove();
+    if (parent && parent.childNodes.length === 0) {
+      parent.parentNode?.removeChild(parent);
+    }
+    this.deselectImage();
+    this.syncDOMToModel();
+    this.casesInput$.next();
+  }
+
+  triggerImageUpload() {
+    if (this.imageFileInput) {
+      this.imageFileInput.nativeElement.click();
+    }
+  }
+
+  onImageFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        this.insertImageToDocument(dataUrl);
+        input.value = "";
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  insertImageToDocument(dataUrl: string, pageIndex?: number) {
+    const imgHtml = `<p style="text-align: center; margin: 8px 0;"><img src="${dataUrl}" class="resuelto-doc-image" style="width: 50%; max-width: 100%; height: auto; display: block; margin: 8px auto; border-radius: 2px; cursor: pointer;" /></p>`;
+
+    const sel = window.getSelection();
+    let inserted = false;
+    if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+      const range = sel.getRangeAt(0);
+      const container = range.commonAncestorContainer;
+      if (this.el.nativeElement.contains(container)) {
+        try {
+          range.deleteContents();
+          const div = document.createElement("div");
+          div.innerHTML = imgHtml;
+          const frag = document.createDocumentFragment();
+          while (div.firstChild) {
+            frag.appendChild(div.firstChild);
+          }
+          range.insertNode(frag);
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+          inserted = true;
+        } catch (e) {
+          console.warn("Error inserting image via range:", e);
+        }
+      }
+    }
+
+    if (!inserted) {
+      const pIdx =
+        pageIndex !== undefined
+          ? pageIndex
+          : (this.documentData.pages.length - 1);
+      const canvases = Array.from(
+        this.el.nativeElement.querySelectorAll(".a4-canvas"),
+      ) as HTMLElement[];
+      const targetCanvas = canvases[pIdx] || canvases[canvases.length - 1];
+      const casesList = targetCanvas?.querySelector(".cases-list") as HTMLElement;
+      if (casesList) {
+        casesList.insertAdjacentHTML("beforeend", imgHtml);
+      } else if (this.documentData.pages[pIdx]) {
+        this.documentData.pages[pIdx].casesHtml =
+          (this.documentData.pages[pIdx].casesHtml || "") + imgHtml;
+        this.documentData.pages[pIdx].casesHtmlSafe =
+          this.sanitizer.bypassSecurityTrustHtml(
+            this.documentData.pages[pIdx].casesHtml,
+          );
+      }
+    }
+
+    this.syncDOMToModel();
+    this.saveHistoryState();
+    this.casesInput$.next();
+  }
+
   onPasteCases(event: ClipboardEvent, pageIndex: number) {
+    // 1. Detectar si viene una imagen en el portapapeles
+    const items = event.clipboardData?.items;
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          event.preventDefault();
+          const file = items[i].getAsFile();
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const dataUrl = e.target?.result as string;
+              this.insertImageToDocument(dataUrl, pageIndex);
+            };
+            reader.readAsDataURL(file);
+            return;
+          }
+        }
+      }
+    }
+
     event.preventDefault();
 
     let html = event.clipboardData?.getData("text/html");
@@ -1450,8 +1860,11 @@ export class ResueltoCanvasComponent
 
     this.isPaginating = true;
 
-    // Guardar el cursor antes de destruir las páginas
+    // Guardar cursor y posición de scroll del visor
     this.saveCaret();
+    const scrollContainer =
+      this.containerRef?.nativeElement?.parentElement || this.el.nativeElement;
+    const prevScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
 
     let allCasesHtml = "";
     this.documentData.pages.forEach(
@@ -1467,87 +1880,239 @@ export class ResueltoCanvasComponent
       (n) => (n as HTMLElement).outerHTML || n.textContent || "",
     );
 
-    // Resetear a una sola página limpia
-    this.documentData.pages = [
-      {
-        pageIndex: 0,
-        headerHtml: "",
-        casesHtml: "",
-      },
-    ];
+    const sandboxEl = this.sandboxContainerRef?.nativeElement;
+    if (!sandboxEl) {
+      this.isPaginating = false;
+      return;
+    }
+
+    sandboxEl.innerHTML = "";
+
+    const margins = this.documentData?.styles?.margins || {
+      top: 25,
+      right: 20,
+      bottom: 5,
+      left: 20,
+    };
+    const lineHeights = this.documentData?.styles?.lineHeights || {};
+
+    const createSandboxPage = (
+      pageIdx: number,
+    ): { pageEl: HTMLElement; casesListEl: HTMLElement } => {
+      const pageEl = document.createElement("div");
+      pageEl.className = "a4-canvas";
+      pageEl.style.width = "215.9mm";
+      pageEl.style.height = "355.6mm";
+      pageEl.style.overflow = "hidden";
+      pageEl.style.boxSizing = "border-box";
+      pageEl.style.paddingTop = `${margins.top || 25}mm`;
+      pageEl.style.paddingRight = `${margins.right || 20}mm`;
+      pageEl.style.paddingBottom = `${margins.bottom || 5}mm`;
+      pageEl.style.paddingLeft = `${margins.left || 20}mm`;
+      pageEl.style.position = "relative";
+      pageEl.style.display = "flex";
+      pageEl.style.flexDirection = "column";
+      pageEl.style.fontFamily = "'Tahoma', sans-serif";
+      pageEl.style.fontSize = "13pt";
+
+      if (pageIdx === 0) {
+        const headerEl = document.createElement("header");
+        headerEl.className = "doc-header";
+        headerEl.style.textAlign = "center";
+        headerEl.style.lineHeight = "1";
+        headerEl.innerHTML = `
+          <p class="m-resolucion-membrete" style="font-weight: bold; text-transform: uppercase; text-align: center; line-height: ${lineHeights.header || 1.75}; margin: 0;">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
+          <p class="m-resolucion-membrete" style="font-weight: bold; text-transform: uppercase; text-align: center; line-height: ${lineHeights.header || 1.75}; margin: 0;">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
+          <p class="m-resolucion-membrete" style="font-weight: bold; text-transform: uppercase; text-align: center; line-height: ${lineHeights.header || 1.75}; margin: 0;">DESPACHO DEL MINISTRO</p>
+          <div class="dynamic-row"><p class="m-resolucion-lugar-fecha" style="font-weight: bold; text-align: left; margin-top: 13pt; line-height: 1.15;">Caracas, ${this.documentData.header?.date || ""}</p></div>
+          <div class="dynamic-row"><p class="m-resolucion-data" style="font-weight: bold; text-align: right; line-height: 1.15;">${this.documentData.header?.anniversaries || ""}</p></div>
+          <div class="dynamic-row"><p class="m-resolucion-denominacion" style="font-weight: bold; text-transform: uppercase; text-align: center; margin-top: 13pt; line-height: 1.15;">RESOLUCIÓN N° ${this.documentData.header?.resolutionNum || ""}</p></div>
+        `;
+        pageEl.appendChild(headerEl);
+
+        const mainEl = document.createElement("main");
+        mainEl.className = "doc-body";
+        mainEl.style.textAlign = "justify";
+        mainEl.style.fontSize = "13pt";
+
+        const basamentoHtml =
+          this.documentData.body?.basamentoLegal ||
+          this.documentData.body?.preamble ||
+          "";
+        const basamentoP = document.createElement("p");
+        basamentoP.className = "m-resolucion-basamento";
+        basamentoP.style.textAlign = "justify";
+        basamentoP.style.lineHeight = `${lineHeights.basamento || 1.75}`;
+        basamentoP.style.marginTop = "13pt";
+        basamentoP.style.textIndent = "1cm";
+        basamentoP.innerHTML = basamentoHtml;
+        mainEl.appendChild(basamentoP);
+
+        const resuelveP = document.createElement("p");
+        resuelveP.className = "m-resolucion-resuelve";
+        resuelveP.style.fontWeight = "bold";
+        resuelveP.style.textTransform = "uppercase";
+        resuelveP.style.textAlign = "center";
+        resuelveP.style.marginTop = "13pt";
+        resuelveP.style.marginBottom = "13pt";
+        resuelveP.style.lineHeight = "1.35";
+        resuelveP.textContent = this.documentData.body?.action || "RESUELVE";
+        mainEl.appendChild(resuelveP);
+
+        const unicoHtml = this.documentData.body?.unicoParrafo || "";
+        const unicoP = document.createElement("p");
+        unicoP.className = "m-resolucion-unico";
+        unicoP.style.textAlign = "justify";
+        unicoP.style.lineHeight = `${lineHeights.unico || 1.35}`;
+        unicoP.style.marginTop = "13pt";
+        unicoP.innerHTML = unicoHtml;
+        mainEl.appendChild(unicoP);
+
+        const casesListEl = document.createElement("div");
+        casesListEl.className = "cases-list";
+        casesListEl.style.minHeight = "20px";
+        casesListEl.style.lineHeight = `${lineHeights.cases || 1.35}`;
+        mainEl.appendChild(casesListEl);
+
+        pageEl.appendChild(mainEl);
+        sandboxEl.appendChild(pageEl);
+        return { pageEl, casesListEl };
+      } else {
+        const headerEl = document.createElement("header");
+        headerEl.className = "doc-header";
+        headerEl.style.textAlign = "center";
+        headerEl.style.marginBottom = "20px";
+        headerEl.innerHTML = `
+          <p class="m-resolucion-membrete" style="font-weight: bold; text-transform: uppercase; text-align: center; line-height: 1.75; margin: 0;">
+            CONTINUACIÓN DE LA RESOLUCIÓN N° <u>${this.documentData.header?.resolutionNum || ""}</u> DE FECHA <u>${this.documentData.header?.date || ""}</u>
+          </p>
+        `;
+        pageEl.appendChild(headerEl);
+
+        const mainEl = document.createElement("main");
+        mainEl.className = "doc-body";
+        mainEl.style.textAlign = "justify";
+        mainEl.style.fontSize = "13pt";
+
+        const casesListEl = document.createElement("div");
+        casesListEl.className = "cases-list";
+        casesListEl.style.minHeight = "20px";
+        casesListEl.style.lineHeight = `${lineHeights.cases || 1.35}`;
+        mainEl.appendChild(casesListEl);
+
+        pageEl.appendChild(mainEl);
+        sandboxEl.appendChild(pageEl);
+        return { pageEl, casesListEl };
+      }
+    };
+
+    const newPages: {
+      pageIndex: number;
+      headerHtml: string;
+      casesHtml: string;
+      casesHtmlSafe: SafeHtml;
+    }[] = [];
+    let currentPageIdx = 0;
+    let currentSandbox = createSandboxPage(currentPageIdx);
 
     for (let p of paragraphs) {
-      let currentPageIdx = this.documentData.pages.length - 1;
-      this.documentData.pages[currentPageIdx].casesHtml += p;
-      this.documentData.pages[currentPageIdx].casesHtmlSafe =
-        this.sanitizer.bypassSecurityTrustHtml(
-          this.documentData.pages[currentPageIdx].casesHtml,
-        );
+      const tempWrapper = document.createElement("div");
+      tempWrapper.innerHTML = p;
+      const child = tempWrapper.firstElementChild || document.createTextNode(p);
+      currentSandbox.casesListEl.appendChild(child);
 
-      this.cdr.detectChanges();
+      const canvasRect = currentSandbox.pageEl.getBoundingClientRect();
+      const listRect = currentSandbox.casesListEl.getBoundingClientRect();
+      const isOverflow =
+        canvasRect.bottom - listRect.bottom < 76 ||
+        currentSandbox.pageEl.scrollHeight >
+          currentSandbox.pageEl.clientHeight + 2;
 
-      const canvases = this.el.nativeElement.querySelectorAll(".a4-canvas");
-      const currentCanvas = canvases[currentPageIdx] as HTMLElement;
-
-      let isOverflow = false;
-      if (currentCanvas) {
-        const casesList = currentCanvas.querySelector(".cases-list");
-        if (casesList) {
-          const canvasRect = currentCanvas.getBoundingClientRect();
-          const listRect = casesList.getBoundingClientRect();
-          // Cortar cuando el texto esté a 76 píxeles del borde inferior físico de la hoja
-          // (aprox 0.5cm antes del paginador que está a 15mm)
-          isOverflow = canvasRect.bottom - listRect.bottom < 76;
-        } else {
-          isOverflow =
-            currentCanvas.scrollHeight > currentCanvas.clientHeight + 2;
-        }
-      }
-
-      // Si se desborda, crear nueva página
-      if (isOverflow) {
-        const currentHtml = this.documentData.pages[currentPageIdx].casesHtml;
-        this.documentData.pages[currentPageIdx].casesHtml =
-          currentHtml.substring(0, currentHtml.length - p.length);
-        this.documentData.pages[currentPageIdx].casesHtmlSafe =
-          this.sanitizer.bypassSecurityTrustHtml(
-            this.documentData.pages[currentPageIdx].casesHtml,
-          );
-
-        this.documentData.pages.push({
-          pageIndex: currentPageIdx + 1,
+      if (isOverflow && currentSandbox.casesListEl.childNodes.length > 1) {
+        currentSandbox.casesListEl.removeChild(child);
+        const htmlForPage = currentSandbox.casesListEl.innerHTML;
+        newPages.push({
+          pageIndex: currentPageIdx,
           headerHtml: "",
-          casesHtml: p,
-          casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(p),
+          casesHtml: htmlForPage,
+          casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(htmlForPage),
         });
-        this.cdr.detectChanges();
+
+        currentPageIdx++;
+        currentSandbox = createSandboxPage(currentPageIdx);
+        currentSandbox.casesListEl.appendChild(child);
       }
     }
 
-    this.isPaginating = false;
-    this.updateSafeHtmls();
-    this.cdr.detectChanges();
+    const finalHtml = currentSandbox.casesListEl.innerHTML;
+    newPages.push({
+      pageIndex: currentPageIdx,
+      headerHtml: "",
+      casesHtml: finalHtml,
+      casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(finalHtml),
+    });
 
-    // Check if the final page overflows because of the newly restored footer
-    const finalCanvases = this.el.nativeElement.querySelectorAll(".a4-canvas");
-    const finalCanvas = finalCanvases[finalCanvases.length - 1] as HTMLElement;
+    // Evaluar desbordamiento del pie de página
+    const footerClone = document.createElement("footer");
+    footerClone.className = "doc-footer";
+    footerClone.style.marginTop = "0.5cm";
+    footerClone.style.minHeight = "35mm";
+    footerClone.innerHTML = `
+      <p class="m-resolucion-comuniquese" style="margin-left: 1cm; margin-bottom: 13pt;">Comuníquese y publíquese.</p>
+      <p class="m-resolucion-ejecutivo" style="margin-left: 1cm;">Por el Ejecutivo Nacional,</p>
+      <div class="m-resolucion-firma-container" style="margin-top: 20pt; margin-left: 35%; width: 65%; text-align: center;">
+        <div class="signatory-info">
+          <p class="m-resolucion-firma-text" style="font-weight: bold; line-height: 2.05;">${this.documentData.signatures?.mainSignatory || ""}</p>
+          <p class="m-resolucion-firma-text" style="font-weight: bold; line-height: 2.05;">${this.documentData.signatures?.signatoryTitle || ""}</p>
+          <p class="m-resolucion-firma-text" style="font-weight: bold; line-height: 2.05;">${this.documentData.signatures?.signatoryRole || ""}</p>
+        </div>
+      </div>
+    `;
+    currentSandbox.pageEl.appendChild(footerClone);
+
     if (
-      finalCanvas &&
-      finalCanvas.scrollHeight > finalCanvas.clientHeight + 2
+      currentSandbox.pageEl.scrollHeight >
+      currentSandbox.pageEl.clientHeight + 2
     ) {
-      this.documentData.pages.push({
-        pageIndex: this.documentData.pages.length,
+      newPages.push({
+        pageIndex: newPages.length,
         headerHtml: "",
         casesHtml: "",
         casesHtmlSafe: this.sanitizer.bypassSecurityTrustHtml(""),
       });
-      this.cdr.detectChanges();
     }
 
-    // Restaurar el cursor después de renderizar las nuevas páginas
-    setTimeout(() => {
-      this.restoreCaret();
-    }, 0);
+    sandboxEl.innerHTML = "";
+
+    const hasLengthChanged = newPages.length !== this.documentData.pages.length;
+    const hasContentChanged = newPages.some(
+      (np, idx) =>
+        !this.documentData.pages[idx] ||
+        np.casesHtml !== this.documentData.pages[idx].casesHtml,
+    );
+
+    if (hasLengthChanged || hasContentChanged) {
+      this.documentData.pages = newPages;
+      this.updateSafeHtmls();
+      this.cdr.detectChanges();
+
+      if (scrollContainer) {
+        scrollContainer.scrollTop = prevScrollTop;
+      }
+
+      setTimeout(() => {
+        this.restoreCaret();
+        if (scrollContainer) {
+          scrollContainer.scrollTop = prevScrollTop;
+        }
+      }, 0);
+    } else {
+      setTimeout(() => {
+        this.restoreCaret();
+      }, 0);
+    }
+
+    this.isPaginating = false;
   }
 
   private cleanHtmlNodes(node: Node) {
@@ -1570,10 +2135,34 @@ export class ResueltoCanvasComponent
       "H4",
       "H5",
       "H6",
+      "IMG",
     ];
 
     if (node.nodeType === Node.ELEMENT_NODE) {
       const el = node as HTMLElement;
+
+      if (el.tagName === "IMG") {
+        const src = el.getAttribute("src");
+        const width = el.style.width || el.getAttribute("width");
+        const height = el.style.height || el.getAttribute("height");
+        const display = el.style.display;
+        const margin = el.style.margin;
+        const float = el.style.float;
+
+        while (el.attributes.length > 0) {
+          el.removeAttribute(el.attributes[0].name);
+        }
+
+        if (src) el.setAttribute("src", src);
+        el.className = "resuelto-doc-image";
+        el.style.maxWidth = "100%";
+        if (width) el.style.width = width;
+        if (height) el.style.height = height;
+        if (display) el.style.display = display;
+        if (margin) el.style.margin = margin;
+        if (float) el.style.float = float;
+        return;
+      }
 
       if (!allowedTags.includes(el.tagName)) {
         // Remover etiqueta pero conservar contenido
@@ -1587,10 +2176,17 @@ export class ResueltoCanvasComponent
         const textAlign = el.style.textAlign;
         const textIndent = el.style.textIndent;
         const marginLeft = el.style.marginLeft;
+        const paddingLeft = el.style.paddingLeft;
+        const paddingRight = el.style.paddingRight;
         const fontFamily = el.style.fontFamily;
         const fontSize = el.style.fontSize;
+        const lineHeight = el.style.lineHeight;
+        const marginTop = el.style.marginTop;
+        const marginBottom = el.style.marginBottom;
 
-        const isUnderline = el.style.textDecoration.includes("underline");
+        const isUnderline =
+          el.style.textDecoration &&
+          el.style.textDecoration.includes("underline");
         const isBold =
           el.style.fontWeight === "bold" ||
           parseInt(el.style.fontWeight) >= 700;
@@ -1604,8 +2200,13 @@ export class ResueltoCanvasComponent
         if (textAlign) el.style.textAlign = textAlign;
         if (textIndent) el.style.textIndent = textIndent;
         if (marginLeft) el.style.marginLeft = marginLeft;
+        if (paddingLeft) el.style.paddingLeft = paddingLeft;
+        if (paddingRight) el.style.paddingRight = paddingRight;
         if (fontFamily) el.style.fontFamily = fontFamily;
         if (fontSize) el.style.fontSize = fontSize;
+        if (lineHeight) el.style.lineHeight = lineHeight;
+        if (marginTop) el.style.marginTop = marginTop;
+        if (marginBottom) el.style.marginBottom = marginBottom;
 
         if (isUnderline || el.tagName === "U")
           el.style.textDecoration = "underline";
@@ -1689,6 +2290,25 @@ export class ResueltoCanvasComponent
   }
 
   onPaste(event: ClipboardEvent) {
+    const items = event.clipboardData?.items;
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          event.preventDefault();
+          const file = items[i].getAsFile();
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const dataUrl = e.target?.result as string;
+              this.insertImageToDocument(dataUrl);
+            };
+            reader.readAsDataURL(file);
+            return;
+          }
+        }
+      }
+    }
+
     event.preventDefault();
     const text = event.clipboardData?.getData("text/plain") || "";
     const target = event.target as HTMLElement;
