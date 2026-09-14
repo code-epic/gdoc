@@ -121,8 +121,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         }
 
         // 3. Búsqueda por asunto
-        if (doc.asunto && doc.asunto.toLowerCase().includes(query))
-          return true;
+        if (doc.asunto && doc.asunto.toLowerCase().includes(query)) return true;
 
         // 4. Búsqueda en casos/integrantes internos
         if (doc.documentos && Array.isArray(doc.documentos)) {
@@ -845,7 +844,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
             if (grupo.documentos?.length > 0) {
               const d = grupo.documentos[0];
               grupo.numero_resol = d.numero_resol || d.numero_resuelto || null;
-              grupo.numero_resuelto = d.numero_resuelto || d.numero_resol || null;
+              grupo.numero_resuelto =
+                d.numero_resuelto || d.numero_resol || null;
               grupo.fecha_resolucion = d.fecha_resolucion || null;
               grupo.observacion = d.observacion || null;
               grupo.pub_observacion = d.pub_observacion || null;
@@ -2365,14 +2365,15 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
         },
       });
 
+      console.log(DocResoluciones);
       // 3. Lanzar la inserción recursiva
-      this.procesarResolucionRecursivo(
-        0,
-        DocResoluciones.length,
-        DocResoluciones,
-        doc,
-        taskObj,
-      );
+      // this.procesarResolucionRecursivo(
+      //   0,
+      //   DocResoluciones.length,
+      //   DocResoluciones,
+      //   doc,
+      //   taskObj,
+      // );
     } catch (e) {
       console.error("Error en saveProcessedCases:", e);
       this.ngxService.stopLoader("ld-fast");
@@ -2677,8 +2678,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
    * Ordena dos documentos por su número de resolución (numero_resol / numero_resuelto) de mayor a menor.
    */
   public compareDocsByResolucionDesc(a: any, b: any): number {
-    const numAStr = (a?.numero_resol || a?.numero_resuelto || "").toString().trim();
-    const numBStr = (b?.numero_resol || b?.numero_resuelto || "").toString().trim();
+    const numAStr = (a?.numero_resol || a?.numero_resuelto || "")
+      .toString()
+      .trim();
+    const numBStr = (b?.numero_resol || b?.numero_resuelto || "")
+      .toString()
+      .trim();
 
     const cleanA = numAStr.replace(/\D/g, "");
     const cleanB = numBStr.replace(/\D/g, "");
@@ -2713,7 +2718,11 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
   public tieneNumeroResolucion(doc: any): boolean {
     if (!doc) return false;
     const num = doc.numero_resol || doc.numero_resuelto;
-    return !!(num && num.toString().trim() !== "" && num.toString().trim() !== "null");
+    return !!(
+      num &&
+      num.toString().trim() !== "" &&
+      num.toString().trim() !== "null"
+    );
   }
 
   /**
