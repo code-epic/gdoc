@@ -514,4 +514,118 @@ export class ApiService {
     };
     return this.http.post<any>(url, body, options);
   }
+
+  /**
+   * Realiza una petición POST con consumo en streaming (NDJSON / SSE)
+   * Procesa cada fila en tiempo real a medida que el servidor envía datos.
+   *
+   * @param endpoint Ruta o endpoint relativo (ej: "crudstream")
+   * @param body Payload JSON a enviar
+   * @param onRow Callback que recibe cada elemento parseado
+   * @param signal Opcional: AbortSignal para cancelar la petición
+   */
+  public async postStream<T>(
+    endpoint: string,
+    body: unknown,
+    onRow: (row: T) => void,
+    signal?: AbortSignal,
+  ): Promise<void> {
+    const url = this._resolveUrl(endpoint);
+    console.info(`[ApiService] Iniciando stream hacia: ${url}`);
+
+    const token = sessionStorage.getItem("token");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/x-ndjson, text/event-stream, text/plain, */*",
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+        signal,
+      });
+
+      if (!response.ok) {
+        let errorBody = "";
+        try {
+          errorBody = await response.text();
+        } catch (_) {
+          errorBody = response.statusText;
+        }
+        throw new Error(
+          `[ApiService] Error HTTP ${response.status}: ${errorBody || response.statusText}`,
+        );
+      }
+
+      if (!response.body) {
+        throw new Error("[ApiService] El cuerpo de la respuesta no contiene un stream legible.");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let partialChunk = "";
+      let rowCount = 0;
+
+      const processLine = (rawLine: string) => {
+        let line = rawLine.trim();
+        if (!line) return;
+
+        // Soporte para formato SSE: ignorar comentarios o prefijo "data:"
+        if (line.startsWith(":")) return;
+        if (line.startsWith("data:")) {
+          line = line.replace(/^data:\s*/, "").trim();
+        }
+
+        if (!line || line === "[DONE]") return;
+
+        try {
+          const row = JSON.parse(line) as T;
+          rowCount++;
+          onRow(row);
+        } catch (parseError) {
+          console.warn("[ApiService] No se pudo parsear la línea JSON:", line, parseError);
+        }
+      };
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          // Procesar cualquier remanente que haya quedado en el buffer
+          const finalRemaining = partialChunk + decoder.decode();
+          if (finalRemaining.trim()) {
+            const finalLines = finalRemaining.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+            for (const line of finalLines) {
+              processLine(line);
+            }
+          }
+          console.info(`[ApiService] Stream finalizado con éxito. Total filas recibidas: ${rowCount}`);
+          break;
+        }
+
+        const chunk = partialChunk + decoder.decode(value, { stream: true });
+        const lines = chunk.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+
+        // El último elemento queda para el siguiente ciclo si la línea no está completa
+        partialChunk = lines.pop() || "";
+
+        for (const line of lines) {
+          processLine(line);
+        }
+      }
+    } catch (error: any) {
+      if (error?.name === "AbortError" || signal?.aborted) {
+        console.warn("[ApiService] Stream cancelado por el usuario.");
+        throw error;
+      }
+      console.error("[ApiService] Fallo en postStream:", error);
+      throw error;
+    }
+  }
 }
