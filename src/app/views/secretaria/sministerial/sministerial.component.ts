@@ -96,7 +96,7 @@ export class SministerialComponent implements OnInit {
     { 'valor': '2', 'texto': 'PRESIDENCIAL', 'visible': '1' },
     { 'valor': '3', 'texto': 'TRAMITACION POR ORDEN REGULAR', 'visible': '1' },
     { 'valor': '4', 'texto': 'OTROS DOCUMENTOS', 'visible': '1' },
-    { 'valor': '5', 'texto': 'OTROS DOCUMENTOS', 'visible': '1' },
+    { 'valor': '5', 'texto': 'RECLAMOS', 'visible': '0' },
     { 'valor': '6', 'texto': 'REDISTRIBUCION', 'visible': '0' },
   ]
 
@@ -216,6 +216,16 @@ export class SministerialComponent implements OnInit {
     } else {
       this.modalService.open(content)
     }
+  }
+
+  openClasificar(content, id) {
+    this.numControl = id;
+    this.hashcontrol = btoa("D" + this.numControl);
+    this.AccionTexto = "5";
+    this.Observacion = "";
+    this.clasificacion = false;
+    this.vplazo = false;
+    this.modalService.open(content);
   }
 
   seleccionNavegacion(e) {
@@ -377,6 +387,9 @@ export class SministerialComponent implements OnInit {
           case "1"://Rechazar en el estado inicial
             this.rechazarBuzon()
             break;
+          case "5":// Clasificar como RECLAMOS
+            this.redistribuir(16, 2)
+            break;
           case "6":// Enviar a otras areas
             this.redistribuir(0)
             break;
@@ -440,13 +453,14 @@ export class SministerialComponent implements OnInit {
 
   }
 
-  async redistribuir(destino: number = 0) {
+  async redistribuir(destino: number = 0, estatus = 2) {
     var dst = destino != 0 ? destino : this.cmbDestino
+    const est = destino != 0 ? estatus : 1
 
     this.xAPI = {} as IAPICore
     this.xAPI.funcion = "WKF_ARedistribuir"
     this.xAPI.valores = ''
-    this.xAPI.parametros = dst + ',' + dst + ',1,' + this.loginService.Usuario.id + ',' + this.numControl
+    this.xAPI.parametros = dst + ',' + dst + ',' + est + ',' + this.loginService.Usuario.id + ',' + this.numControl
     console.log(this.xAPI.parametros)
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {

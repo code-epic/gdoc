@@ -248,6 +248,10 @@ export class MinisterialComponent implements OnInit {
           this.lblDecision = "Decision del Presidente";
           this.lblBackUrl = "/spresidencial";
           this.lblTitulo = "PRESIDENCIAL";
+        } else if (elemento.tipo == "RECLAMOS") {
+          this.lblDecision = "Decision Ministerial";
+          this.lblBackUrl = "/sreclamos";
+          this.lblTitulo = "RECLAMOS";
         }
 
         if (this.doc.remi == "VICEPRESIDENCIAL") {
@@ -496,7 +500,7 @@ export class MinisterialComponent implements OnInit {
   }
 
   _atras() {
-    this.ruta.navigate(["/sministerial/ministeriales"]);
+    this.ruta.navigate([this.lblBackUrl || "/sministerial/ministeriales"]);
   }
 
   fileSelected(e) {

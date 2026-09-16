@@ -50,9 +50,7 @@
       <button class="tpv-btn-print" *ngIf="useCanvas && (profile === 'Edicion' || profile === 'Revision') && (jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')" (click)="printCanvasAdmin()" title="Generar Resuelto (ADMINISTRADOR)" style="margin-right: 10px; background: #fb6340; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
         <i class="fas fa-magic"></i> Generar Resuelto (ADMIN)
       </button>
-      <button class="tpv-btn-print" *ngIf="useCanvas && profile === 'Revision'" (click)="printCanvas()" title="Generar PDF" style="margin-right: 15px; background: #2dce89; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
-        <i class="fas fa-file-pdf"></i> Generar PDF
-      </button>
+    
       <span class="tpv-nav-user" *ngIf="activeDoc" style="font-weight: 600; font-size: 1rem;">
         Carpeta N°: <span class="tpv-nav-cedula" style="font-weight: bold; color: white;">{{ activeDoc.numero_carpeta || activeDoc.ncontrol || activeDoc.numc }}</span>
       </span>

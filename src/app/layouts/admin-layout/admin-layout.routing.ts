@@ -38,6 +38,7 @@ import { BuscadorComponent } from "src/app/views/buscador/buscador.component";
 import { PapeleraComponent } from "src/app/views/papelera/papelera.component";
 import { SbuzonComponent } from "src/app/views/secretaria/sbuzon/sbuzon.component";
 import { SministerialComponent } from "src/app/views/secretaria/sministerial/sministerial.component";
+import { SreclamosComponent } from "src/app/views/secretaria/sreclamos/sreclamos.component";
 import { OresolucionesComponent } from "src/app/views/resoluciones/rsprocesos/oresoluciones/oresoluciones.component";
 import { RsconsultaComponent } from "src/app/views/resoluciones/rsprocesos/rsconsulta/rsconsulta.component";
 import { SpresidencialComponent } from "src/app/views/secretaria/spresidencial/spresidencial.component";
@@ -176,6 +177,16 @@ export const AdminLayoutRoutes: Routes = [
   {
     path: "sministerial/:filtro",
     component: SministerialComponent,
+    canActivate: [AuthGuardGuard],
+  },
+  {
+    path: "sreclamos",
+    component: SreclamosComponent,
+    canActivate: [AuthGuardGuard],
+  },
+  {
+    path: "sreclamos/:filtro",
+    component: SreclamosComponent,
     canActivate: [AuthGuardGuard],
   },
   {

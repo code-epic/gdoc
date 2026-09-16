@@ -190,7 +190,7 @@
               <button class="btn-batch-tag"
                       *ngIf="selectedDocsCount > 0"
                       (click)="assignTagToSelectedDocs()"
-                      title="Agrupar puntos de cuenta seleccionados">
+                      [title]="'Agrupar ' + (selectedCarpeta?.id === 'RECLAMOS' ? 'reclamos' : 'puntos de cuenta') + ' seleccionados'">
                 <i class="fas fa-tags mr-1"></i>
                 Agrupar ({{ selectedDocsCount }})
               </button>
@@ -273,7 +273,7 @@
               <!-- Avatar: Carpeta de Agrupación por Etiqueta vs Carpeta Agrupada vs Foto Persona -->
               <ng-container *ngIf="e.isTagFolder; else normalAvatar">
                 <div class="doc-avatar-container tag-folder-avatar-container"
-                     title="Carpeta Agrupada por Etiqueta '{{ e.etiqueta }}' con {{ e.puntosDeCuenta.length }} Puntos de Cuenta">
+                     [title]="'Carpeta Agrupada por Etiqueta \'' + e.etiqueta + '\' con ' + e.puntosDeCuenta.length + ' ' + (selectedCarpeta?.id === 'RECLAMOS' ? 'Reclamos' : 'Puntos de Cuenta')">
                   <div class="folder-stack-icon">
                     <i class="fas fa-tags text-primary"></i>
                     <span class="folder-count-pill bg-primary text-white">{{ e.puntosDeCuenta.length }}</span>
@@ -315,7 +315,8 @@
                       <i class="fas fa-tags text-primary"></i> Agrupación: {{ e.etiqueta }}
                     </span>
                     <span class="doc-puntos-badge">
-                      <i class="fas fa-file-alt text-success"></i> {{ e.puntosDeCuenta.length }} Puntos de Cuenta
+                      <i [class]="selectedCarpeta?.id === 'RECLAMOS' ? 'fas fa-comments text-danger' : 'fas fa-file-alt text-success'"></i>
+                      {{ e.puntosDeCuenta.length }} {{ selectedCarpeta?.id === 'RECLAMOS' ? 'Reclamos' : 'Puntos de Cuenta' }}
                     </span>
                     <span class="doc-subcasos-badge" *ngIf="getSubcasos(e).length > 0">
                       <i class="fas fa-users text-primary"></i> {{ getSubcasos(e).length }} Personas agrupadas
@@ -331,7 +332,7 @@
                         <i class="fas fa-users text-primary"></i> {{ getSubcasos(e).length }} Personas agrupadas
                       </span>
                       <span class="doc-tdoc-badge" [title]="e.tdoc">
-                        {{ e.nombre_accion || e.tdoc || 'Trámite por Órgano Regular' }}
+                        {{ e.nombre_accion || e.tdoc || selectedCarpeta?.nombre || 'Trámite por Órgano Regular' }}
                       </span>
                     </ng-container>
 
@@ -345,7 +346,7 @@
                         {{ getNombre(e) }}
                       </span>
                       <span class="doc-tdoc-badge" [title]="e.tdoc">
-                        {{ e.nombre_accion || e.tdoc || '' }}
+                        {{ e.nombre_accion || e.tdoc || selectedCarpeta?.nombre || '' }}
                       </span>
                     </ng-template>
 
@@ -393,7 +394,7 @@
                     {{ e.numc }}
                   </span>
                   <span class="doc-hint-badge" *ngIf="e.isTagFolder">
-                    <i class="fas fa-chevron-right"></i> Clic para ver {{ e.puntosDeCuenta.length }} Punto(s) de Cuenta y {{ getSubcasos(e).length }} persona(s)
+                    <i class="fas fa-chevron-right"></i> Clic para ver {{ e.puntosDeCuenta.length }} {{ selectedCarpeta?.id === 'RECLAMOS' ? 'Reclamo(s)' : 'Punto(s) de Cuenta' }} y {{ getSubcasos(e).length }} persona(s)
                   </span>
                   <span class="doc-hint-badge" *ngIf="!e.isTagFolder && getSubcasos(e).length > 0">
                     <i class="fas fa-chevron-right"></i> Clic para ver {{ getSubcasos(e).length }} persona(s) y firmar
@@ -465,11 +466,11 @@
           </div>
           <div>
             <div class="modal-header-title d-flex align-items-center gap-2">
-              <span *ngIf="currentTagGroupFolder"><i class="fas fa-tags text-primary mr-1"></i> Agrupación: {{ currentTagGroupFolder.etiqueta }} &bull; Punto Nº {{ activeDoc.numc || activeDoc.ncontrol || activeDoc.cuenta || 'Sin Número' }}</span>
+              <span *ngIf="currentTagGroupFolder"><i class="fas fa-tags text-primary mr-1"></i> Agrupación: {{ currentTagGroupFolder.etiqueta }} &bull; {{ selectedCarpeta?.id === 'RECLAMOS' ? 'Reclamo' : 'Punto' }} Nº {{ activeDoc.numc || activeDoc.ncontrol || activeDoc.cuenta || 'Sin Número' }}</span>
               <span *ngIf="!currentTagGroupFolder">Expediente Nº {{ activeDoc.numc || activeDoc.ncontrol || activeDoc.cuenta || 'Sin Número' }}</span>
             </div>
             <div class="modal-header-sub">
-              <span *ngIf="currentTagGroupFolder">Caso {{ currentGroupCaseIndex + 1 }} de {{ groupCases.length }} del agrupado &bull; {{ activeDoc.tdoc || 'Punto de Cuenta' }}</span>
+              <span *ngIf="currentTagGroupFolder">Caso {{ currentGroupCaseIndex + 1 }} de {{ groupCases.length }} del agrupado &bull; {{ activeDoc.tdoc || selectedCarpeta?.nombre || 'Punto de Cuenta' }}</span>
               <span *ngIf="!currentTagGroupFolder">{{ selectedCarpeta?.nombre || 'Buzón de Documentos' }}</span>
             </div>
           </div>
@@ -507,7 +508,7 @@
                   *ngFor="let p of groupCases; let pIdx = index"
                   [class.active]="pIdx === currentGroupCaseIndex"
                   (click)="selectGroupCase(pIdx)">
-            <i class="fas fa-file-alt mr-1"></i> Punto Nº {{ p.numc || p.ncontrol || p.cuenta }}
+            <i [class]="selectedCarpeta?.id === 'RECLAMOS' ? 'fas fa-comments mr-1' : 'fas fa-file-alt mr-1'"></i> {{ selectedCarpeta?.id === 'RECLAMOS' ? 'Reclamo' : 'Punto' }} Nº {{ p.numc || p.ncontrol || p.cuenta }}
           </button>
         </div>
 
@@ -584,7 +585,7 @@
           <!-- Todos los Puntos del Agrupado si está dentro de un agrupado -->
           <div class="info-card-block" *ngIf="currentTagGroupFolder && groupCases.length > 1">
             <div class="block-title d-flex justify-content-between align-items-center">
-              <span><i class="fas fa-layer-group text-primary mr-1"></i> Todos los Puntos del Agrupado ({{ groupCases.length }})</span>
+              <span><i class="fas fa-layer-group text-primary mr-1"></i> {{ selectedCarpeta?.id === 'RECLAMOS' ? 'Todos los Reclamos del Agrupado' : 'Todos los Puntos del Agrupado' }} ({{ groupCases.length }})</span>
               <button class="btn btn-xs btn-outline-primary font-weight-bold" (click)="setDocTag(currentTagGroupFolder)">
                 <i class="fas fa-edit mr-1"></i> Cambiar Etiqueta
               </button>
@@ -597,8 +598,8 @@
                    style="cursor: pointer; transition: all 0.2s ease;">
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="font-weight-bold" [class.text-primary]="pIdx === currentGroupCaseIndex" style="font-size: 0.82rem;">
-                    <i class="fas fa-file-alt mr-1" [class.text-primary]="pIdx === currentGroupCaseIndex" [class.text-muted]="pIdx !== currentGroupCaseIndex"></i>
-                    Punto Nº {{ p.numc || p.ncontrol || p.cuenta }}
+                    <i [class]="selectedCarpeta?.id === 'RECLAMOS' ? 'fas fa-comments mr-1' : 'fas fa-file-alt mr-1'" [class.text-primary]="pIdx === currentGroupCaseIndex" [class.text-muted]="pIdx !== currentGroupCaseIndex"></i>
+                    {{ selectedCarpeta?.id === 'RECLAMOS' ? 'Reclamo' : 'Punto' }} Nº {{ p.numc || p.ncontrol || p.cuenta }}
                   </span>
                   <div class="d-flex align-items-center gap-1">
                     <span class="badge badge-primary text-white" *ngIf="pIdx === currentGroupCaseIndex" style="font-size: 0.68rem;">Activo</span>

@@ -59,6 +59,7 @@ import { SbuzonComponent } from './views/secretaria/sbuzon/sbuzon.component';
 import { SalertaComponent } from './views/secretaria/salerta/salerta.component';
 import { SministerialComponent } from './views/secretaria/sministerial/sministerial.component';
 import { SpresidencialComponent } from './views/secretaria/spresidencial/spresidencial.component';
+import { SreclamosComponent } from './views/secretaria/sreclamos/sreclamos.component';
 import { ChatbotComponent } from './views/chatbot/chatbot.component';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { OresolucionesComponent } from './views/resoluciones/rsprocesos/oresoluciones/oresoluciones.component';
@@ -227,6 +228,7 @@ const ngWizardConfig: NgWizardConfig = {
     SalertaComponent,
     SministerialComponent,
     SpresidencialComponent,
+    SreclamosComponent,
     OresolucionesComponent,
     RsconsultaComponent,
     EresolucionesComponent,

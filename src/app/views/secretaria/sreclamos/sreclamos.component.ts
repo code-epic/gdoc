@@ -1,33 +1,29 @@
 import { Component, OnInit } from "@angular/core";
 import { PageEvent } from "@angular/material/paginator";
-
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { NgbModalConfig, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ToastrService } from "ngx-toastr";
-import {
-  ApiService,
-  DocumentoAdjunto,
-  IAPICore,
-} from "src/app/services/apicore/api.service";
+import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
 import { IWKFAlerta } from "src/app/services/control/documentos.service";
 import { LoginService } from "src/app/services/seguridad/login.service";
 import { UtilService } from "src/app/services/util/util.service";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 
 @Component({
-  selector: "app-sbuzon",
-  templateUrl: "./sbuzon.component.html",
-  styleUrls: ["./sbuzon.component.scss"],
+  selector: "app-sreclamos",
+  templateUrl: "./sreclamos.component.html",
+  styleUrls: ["./sreclamos.component.scss"],
 })
-export class SbuzonComponent implements OnInit {
-  public estadoActual = 4;
-  public estadoOrigen = 1;
-  estatusOrigen = 1;
-  fecha_desde = "-09-01";
-  fecha_hasta = "-09-30";
-  xyear = "2024";
-  public lstMeses: any[] = [];
-  public lstYear: any[] = [];
+export class SreclamosComponent implements OnInit {
+  public titulo = "Reclamos";
+
+  public estadoActual = 16;
+  public estadoOrigen = 2;
+  fecha_desde = "-01-01";
+  fecha_hasta = "-12-31";
+  xyear = "2026";
+  public lstMeses = [];
+  public lstYear = [];
   public xmeses = "";
 
   public paginador = 10;
@@ -38,13 +34,7 @@ export class SbuzonComponent implements OnInit {
     valores: "",
   };
 
-  public archivos = [];
-
-  public DocAdjunto: DocumentoAdjunto = {
-    documento: "",
-    archivo: "",
-    usuario: "",
-  };
+  public filtro = 0;
 
   public WAlerta: IWKFAlerta = {
     documento: 0,
@@ -57,8 +47,7 @@ export class SbuzonComponent implements OnInit {
   };
 
   lst = [];
-  public lstEstatus: any[] = [];
-  public lstEstados: any[] = []; //Listar Estados
+  public lstEstados = []; //Listar Estados
 
   longitud = 0;
   pageSize = 25;
@@ -69,19 +58,17 @@ export class SbuzonComponent implements OnInit {
 
   selNav = 0;
 
-  public buzon: any[] = [];
-  public bzOriginal: any[] = [];
+  public buzon = [];
+  public buzonResoluciones = [];
+  public bzOriginal = [];
 
   public estilocheck = "none";
-
   public estiloclasificar = "none";
-
   public allComplete: boolean = false;
 
+  public hashcontrol = "";
   public numControl = "";
-
   public Observacion = "";
-
   public AccionTexto: string = "0";
 
   public clasificacion = false;
@@ -90,30 +77,27 @@ export class SbuzonComponent implements OnInit {
   public tministerial = "12";
 
   public cmbDestino = "";
-
-  public lstAcciones: any[] = [];
+  public lstAcciones = [];
 
   public cmbAcciones = [
-    { valor: "1", texto: "RECHAZAR", visible: "0" },
-    { valor: "0", texto: "MINISTERIAL", visible: "0" },
-    { valor: "2", texto: "PRESIDENCIAL", visible: "0" },
-    { valor: "5", texto: "RECLAMOS", visible: "0" },
-    { valor: "3", texto: "TRAMITACION POR ORDEN REGULAR", visible: "0" },
-    { valor: "4", texto: "OTROS DOCUMENTOS", visible: "0" },
+    { valor: "0", texto: "MINISTERIAL", visible: "1" },
+    { valor: "1", texto: "OTROS DOCUMENTOS", visible: "1" },
+    { valor: "2", texto: "PRESIDENCIAL", visible: "1" },
+    { valor: "3", texto: "TRAMITACION POR ORDEN REGULAR", visible: "1" },
+    { valor: "4", texto: "OTROS DOCUMENTOS", visible: "1" },
+    { valor: "5", texto: "RECLAMOS", visible: "1" },
+    { valor: "6", texto: "REDISTRIBUCION", visible: "0" },
   ];
 
-  public bzBusqueda: any[] = [];
-  public bzAlertasO: any[] = [];
-  public bzAlertas: any[] = [];
+  public bzBusqueda = [];
+  public bzAlertasO = [];
+  public bzAlertas = [];
   public buscar = "";
 
   public extender_plazo: any;
-
   public posicionPagina = 0;
   public placement = "bottom";
-  buttonEl: string | HTMLElement;
-  cmbEstatus: any;
-  cmbDecision: any;
+  public xTipo = "";
 
   constructor(
     private apiService: ApiService,
@@ -123,12 +107,11 @@ export class SbuzonComponent implements OnInit {
     private utilService: UtilService,
     private ngxService: NgxUiLoaderService,
     private loginService: LoginService,
+    private rutaActiva: ActivatedRoute,
     private modalService: NgbModal,
   ) {
-    // customize default values of modals used by this component tree
     config.backdrop = "static";
     config.keyboard = false;
-
     this.lstMeses = this.apiService.Xmeses;
     this.lstYear = this.apiService.Xyear;
   }
@@ -136,7 +119,28 @@ export class SbuzonComponent implements OnInit {
   ngOnInit(): void {
     this.xmeses = new Date().getMonth().toString();
     this.xyear = new Date().getFullYear().toString();
+
     this.listarEstados();
+
+    let ruta = this.rutaActiva.snapshot.params.filtro;
+    if (ruta == "tramitaciones-por-organo-regular") {
+      this.filtro = 1;
+      this.titulo = "Tramitaciones por Organo Regular";
+      this.estadoOrigen = 4;
+    } else if (ruta == "otros-documentos") {
+      this.filtro = 2;
+      this.titulo = "Otros Documentos";
+      this.estadoOrigen = 5;
+    } else if (ruta == "ministeriales") {
+      this.filtro = 3;
+      this.estadoOrigen = 2;
+      this.titulo = "Ministeriales";
+    } else {
+      this.filtro = 1;
+      this.titulo = "Reclamos";
+      this.estadoOrigen = 2;
+    }
+
     this.seleccionNavegacion(0);
   }
 
@@ -159,31 +163,36 @@ export class SbuzonComponent implements OnInit {
   async ConsultarAlertas() {
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "WKF_CAlertas";
-    this.xAPI.parametros = "4,2";
+    this.xAPI.parametros = `${this.estadoActual},${this.estadoOrigen}`;
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        this.bzAlertasO = data.Cuerpo.map((e) => {
-          e.color = e.contador >= 0 ? "text-red" : "text-yellow";
-          e.texto =
-            e.contador >= 0
-              ? `Tiene ${e.contador} Dias vencido`
-              : `Faltan ${e.contador * -1} Dia para vencer`;
-          e.texto = e.contador == 0 ? "Se vence hoy" : e.texto;
-          e.busqueda = this.utilService.ConvertirCadena(
-            e.ncontrol + e.remitente + e.plazo + e.texto,
-          );
-          return e;
-        });
-        this.bzBusqueda = this.bzAlertasO;
-        this.longitud = this.bzBusqueda.length;
-        this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize);
+        if (data && data.Cuerpo) {
+          this.bzAlertasO = data.Cuerpo.map((e) => {
+            e.color = e.contador >= 0 ? "text-red" : "text-yellow";
+            e.texto =
+              e.contador >= 0
+                ? `Tiene ${e.contador} Dias vencido`
+                : `Faltan ${e.contador * -1} Dia para vencer`;
+            e.texto = e.contador == 0 ? "Se vence hoy" : e.texto;
+            e.busqueda = this.utilService.ConvertirCadena(
+              e.ncontrol + e.remitente + e.plazo + e.texto,
+            );
+            return e;
+          });
+          this.bzBusqueda = this.bzAlertasO;
+          this.longitud = this.bzBusqueda.length;
+          this.bzAlertas = this.bzBusqueda.slice(0, this.pageSize);
+        }
       },
-      (error) => {},
+      (error) => {
+        console.error(error);
+      },
     );
   }
 
   open(content, id) {
     this.numControl = id;
+    this.hashcontrol = btoa("D" + this.numControl); // Cifrar documentos
     if (this.selNav == 1) {
       this.modalService.open(content, { size: "lg" });
     } else {
@@ -201,13 +210,14 @@ export class SbuzonComponent implements OnInit {
     this.tministerial = "4";
     this.fecha_desde = this.xyear + "-" + this.lstMeses[this.xmeses].desde;
     this.fecha_hasta = this.xyear + "-" + this.lstMeses[this.xmeses].hasta;
-
     this.cargarAcciones(e);
     switch (e) {
       case 0:
+        this.xTipo = "";
         this.clasificacion = false;
         this.vministerial = false;
         this.tministerial = "12";
+        this.filtro = 1;
         this.xAPI.parametros =
           this.estadoActual +
           "," +
@@ -219,6 +229,27 @@ export class SbuzonComponent implements OnInit {
         this.listarBuzon();
         break;
       case 1:
+        this.xAPI.funcion = "WKF_CDocSecretariaResoluciones";
+        this.filtro = 3;
+        this.xTipo = "PUNTO";
+        this.clasificacion = false;
+        this.vministerial = false;
+        this.tministerial = "12";
+        this.xAPI.parametros =
+          "3,1" + "," + this.fecha_desde + "," + this.fecha_hasta;
+        this.listarBuzon();
+        break;
+      case 2:
+        this.xTipo = "";
+        this.clasificacion = false;
+        this.vministerial = false;
+        this.tministerial = "12";
+        this.filtro = 1;
+        this.xAPI.parametros =
+          this.estadoActual + ",7," + this.fecha_desde + "," + this.fecha_hasta;
+        this.listarBuzon();
+        break;
+      case 3:
         this.ConsultarAlertas();
         break;
     }
@@ -235,7 +266,9 @@ export class SbuzonComponent implements OnInit {
           return e.esta == 1;
         });
       },
-      (error) => {},
+      (error) => {
+        console.error(error);
+      },
     );
   }
 
@@ -244,14 +277,37 @@ export class SbuzonComponent implements OnInit {
     this.ngxService.startLoader("loader-aceptar");
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        data.Cuerpo.forEach((e) => {
-          e.existe = e.anom != "" ? true : false;
-          e.privado = e.priv == 1 ? true : false;
-          e.completed = false;
-          e.nombre_accion = e.accion != null ? e.accion : ""; //this.cmbAcciones[e.accion].texto : ''
-          e.color = "warn";
-          bz.push(e);
-        }); //Registros recorridos como elementos
+        if (data && data.Cuerpo) {
+          data.Cuerpo.forEach((e) => {
+            e.edit =
+              e.tdoc &&
+              (e.tdoc.toLowerCase() == "punto de cuenta" ||
+                e.tdoc.toLowerCase().includes("reclamo"))
+                ? true
+                : false;
+            e.existe = e.anom != "" ? true : false;
+            e.privado = e.priv == 1 ? true : false;
+            e.completed = false;
+            e.color = "warn";
+
+            if (this.filtro == 3 && e.tdoc == "PUNTO DE CUENTA") {
+              bz.push(e);
+            } else if (this.filtro == 1) {
+              let text = "";
+              e.nombre_accion = "";
+              if (e.accion != null) {
+                text =
+                  this.cmbAcciones[e.accion]?.texto == undefined
+                    ? ""
+                    : this.cmbAcciones[e.accion].texto;
+                e.nombre_accion = text;
+              }
+              bz.push(e);
+            } else {
+              bz.push(e);
+            }
+          });
+        }
 
         this.longitud = bz.length;
         if (this.longitud > 0) {
@@ -272,15 +328,19 @@ export class SbuzonComponent implements OnInit {
     this.recorrerElementos(e.pageIndex);
   }
 
-  //recorrerElementos para paginar listados
+  // recorrerElementos para paginar listados
   recorrerElementos(pagina: number) {
     let pag = this.pageSize * pagina;
     this.buzon = this.bzOriginal.slice(pag, pag + this.pageSize);
   }
 
-  //editar
+  // editar
   editar(e) {
-    const base = btoa(JSON.stringify(e));
+    let el = {
+      tipo: "RECLAMOS",
+      objeto: e,
+    };
+    const base = btoa(JSON.stringify(el));
     this.ruta.navigate(["/ministerial", base]);
   }
 
@@ -290,7 +350,7 @@ export class SbuzonComponent implements OnInit {
     this.xAPI.funcion = "WKF_IDocumentoObservacion";
     this.xAPI.valores = JSON.stringify({
       documento: this.numControl,
-      estado: this.estadoActual, //Estado que ocupa
+      estado: this.estadoActual, // Estado que ocupa
       estatus: this.selNav + 1,
       observacion: this.Observacion.toUpperCase(),
       accion: this.AccionTexto,
@@ -300,34 +360,21 @@ export class SbuzonComponent implements OnInit {
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         switch (this.AccionTexto) {
-          case "0": //Aceptar y promover el documento
-            this.estatusOrigen = 1;
+          case "0": // Aceptar y promover el documento
             this.promoverBuzon(0, this.utilService.FechaActual());
             break;
-          case "1": //Rechazar en el estado inicial
+          case "1": // Rechazar en el estado inicial
             this.rechazarBuzon();
             break;
-          case "2": //Aceptar y promover el documento
-            this.estatusOrigen = 5; //mover al 6 de presidencial
-            this.promoverBuzon(0, this.utilService.FechaActual());
-            break;
-          case "3": //Aceptar y promover el documento
-            this.estatusOrigen = 3;
-            this.promoverBuzon(0, this.utilService.FechaActual());
-            break;
-          case "4": //Aceptar y promover el documento
-            this.estatusOrigen = 4;
-            this.promoverBuzon(0, this.utilService.FechaActual());
-            break;
-          case "5": //Aceptar y promover el documento
-            this.redistribuir(16);
+          case "6": // Enviar a otras areas
+            this.redistribuir(0);
             break;
         }
       },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DocumentoObservacion`);
       },
-    ); //
+    );
   }
 
   async rechazarBuzon() {
@@ -357,9 +404,7 @@ export class SbuzonComponent implements OnInit {
         : sfecha;
 
     var usuario = this.loginService.Usuario.id;
-    var i = 0;
-    var estatus = this.estatusOrigen; //NOTA DE ENTREGA
-    //Buscar en Wk de acuerdo al usuario y la app activa
+    var estatus = 1; // NOTA DE ENTREGA
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "WKF_APromoverEstatus";
     this.xAPI.valores = "";
@@ -379,17 +424,23 @@ export class SbuzonComponent implements OnInit {
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.PromoverDocumento`);
       },
-    ); //
+    );
   }
 
-  async redistribuir(destino: number = 0, estatus = 2) {
+  async redistribuir(destino: number = 0) {
     var dst = destino != 0 ? destino : this.cmbDestino;
 
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "WKF_ARedistribuir";
     this.xAPI.valores = "";
-    this.xAPI.parametros = `${dst},${dst},${estatus},${this.loginService.Usuario.id},${this.numControl}`;
-
+    this.xAPI.parametros =
+      dst +
+      "," +
+      dst +
+      ",1," +
+      this.loginService.Usuario.id +
+      "," +
+      this.numControl;
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         this.guardarAlerta(
@@ -425,10 +476,7 @@ export class SbuzonComponent implements OnInit {
       case "1":
         this.vplazo = false;
         break;
-      case "8":
-        this.clasificacion = true;
-        break;
-      case "10":
+      case "6":
         this.clasificacion = true;
         break;
       default:
@@ -436,14 +484,14 @@ export class SbuzonComponent implements OnInit {
     }
   }
 
-  //Consultar un enlace
+  // Consultar un enlace
   constancia(id: string) {
     const estado = 1;
     const estatus = 1;
     return btoa(estado + "," + estatus + "," + id);
   }
 
-  //Guardar la alerte define el momento y estadus
+  // Guardar la alerta define el momento y estatus
   guardarAlerta(activo: number, fecha: string) {
     this.WAlerta.activo = activo;
     this.WAlerta.documento = parseInt(this.numControl);
@@ -458,51 +506,23 @@ export class SbuzonComponent implements OnInit {
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.WAlerta);
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (alerData) => {},
+      async (alerData) => {
+        // Alerta registrada
+      },
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
       },
-    ); //
+    );
   }
 
   dwUrl(ncontrol: string, archivo: string): string {
-    return this.apiService.Dws(btoa("RS" + ncontrol) + "/" + archivo);
+    return this.apiService.Dws(btoa("D" + ncontrol) + "/" + archivo);
   }
 
-  fileSelected(e) {
-    this.archivos.push(e.target.files[0]);
-  }
-
-  async SubirArchivo() {
-    var frm = new FormData(document.forms.namedItem("forma"));
-    try {
-      await this.apiService.EnviarArchivos(frm).subscribe((data) => {
-        this.xAPI = {} as IAPICore;
-        this.xAPI.funcion = "WKF_ADocumentoAdjunto";
-        this.xAPI.parametros = "";
-        this.DocAdjunto.archivo = this.archivos[0].name;
-        this.DocAdjunto.usuario = this.loginService.Usuario.id;
-        this.DocAdjunto.documento = this.numControl;
-        this.xAPI.valores = JSON.stringify(this.DocAdjunto);
-
-        this.apiService.Ejecutar(this.xAPI).subscribe(
-          (xdata) => {
-            if (xdata.tipo == 1) {
-              this.toastrService.success(
-                "Tu archivo ha sido cargado con exito ",
-                `GDoc Registro`,
-              );
-            } else {
-              this.toastrService.info(xdata.msj, `GDoc Wkf.Documento.Adjunto`);
-            }
-          },
-          (error) => {
-            this.toastrService.error(error, `GDoc Wkf.Documento.Adjunto`);
-          },
-        );
-      });
-    } catch (error) {
-      console.error(error);
+  getDetalle(e): string {
+    if (e.s_cuenta == "") {
+      return e.numc;
     }
+    return e.tdoc == "PUNTO DE CUENTA" ? e.s_cuenta : e.numc;
   }
 }

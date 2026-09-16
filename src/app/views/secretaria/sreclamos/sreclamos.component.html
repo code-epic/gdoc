@@ -1,7 +1,7 @@
 <div class="header bg-pastel-gradient pb-8 pt-5 pt-md-8">
-    <div class="container-fluid">
-        <p></p>
-    </div>
+  <div class="container-fluid">
+    <p></p>
+  </div>
 </div>
 
 <div class="container-fluid mt--9">
@@ -13,7 +13,7 @@
           <div class="row align-items-center">
             <div class="col-md-11">
               <h6 class="text-uppercase text-muted ls-1 mb-1">Secretaria</h6>
-              <h2 class="mb-0">{{titulo}}</h2>
+              <h2 class="mb-0">{{ titulo }}</h2>
             </div>
             <div class="col-md-1">
               <div class="media align-items-center">
@@ -32,7 +32,7 @@
           <mat-tab>
             <ng-template mat-tab-label>
               <mat-icon class="mr-2">folder_shared</mat-icon>
-              MINISTERIAL
+              RECLAMOS
             </ng-template>
             <div class="table-responsive">
               <table class="table align-items-center table-flush">
@@ -47,14 +47,14 @@
                           <i class="ni ni-calendar-grid-58 filter-icon"></i>
                           <select class="custom-select custom-select-sm" [(ngModel)]="xyear"
                             (change)="seleccionNavegacion(0)">
-                            <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                            <option *ngFor="let e of lstYear;" [value]="e.id">{{ e.year }}</option>
                           </select>
                         </div>
                         <div class="filter-control-wrapper">
                           <i class="ni ni-collection filter-icon"></i>
                           <select class="custom-select custom-select-sm" [(ngModel)]="xmeses"
                             (change)="seleccionNavegacion(0)">
-                            <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                            <option *ngFor="let e of lstMeses;" [value]="e.id">{{ e.mes }}</option>
                           </select>
                         </div>
                       </div>
@@ -121,14 +121,14 @@
                           <i class="ni ni-calendar-grid-58 filter-icon"></i>
                           <select class="custom-select custom-select-sm" [(ngModel)]="xyear"
                             (change)="seleccionNavegacion(1)">
-                            <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                            <option *ngFor="let e of lstYear;" [value]="e.id">{{ e.year }}</option>
                           </select>
                         </div>
                         <div class="filter-control-wrapper">
                           <i class="ni ni-collection filter-icon"></i>
                           <select class="custom-select custom-select-sm" [(ngModel)]="xmeses"
                             (change)="seleccionNavegacion(1)">
-                            <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                            <option *ngFor="let e of lstMeses;" [value]="e.id">{{ e.mes }}</option>
                           </select>
                         </div>
                       </div>
@@ -155,7 +155,6 @@
                     </td>
                     <td class="text-right">
                       <div class="actions-container">
-                        
                         <button mat-icon-button matTooltip="Editar" (click)="editar(e)">
                           <mat-icon>edit_note</mat-icon>
                         </button>
@@ -172,8 +171,6 @@
             <mat-paginator [length]="longitud" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
-
-
 
           </mat-tab>
 
@@ -194,15 +191,15 @@
                         <div class="filter-control-wrapper mr-2">
                           <i class="ni ni-calendar-grid-58 filter-icon"></i>
                           <select class="custom-select custom-select-sm" [(ngModel)]="xyear"
-                            (change)="seleccionNavegacion(1)">
-                            <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                            (change)="seleccionNavegacion(2)">
+                            <option *ngFor="let e of lstYear;" [value]="e.id">{{ e.year }}</option>
                           </select>
                         </div>
                         <div class="filter-control-wrapper">
                           <i class="ni ni-collection filter-icon"></i>
                           <select class="custom-select custom-select-sm" [(ngModel)]="xmeses"
-                            (change)="seleccionNavegacion(1)">
-                            <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                            (change)="seleccionNavegacion(2)">
+                            <option *ngFor="let e of lstMeses;" [value]="e.id">{{ e.mes }}</option>
                           </select>
                         </div>
                       </div>
@@ -246,10 +243,7 @@
               [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
             </mat-paginator>
 
-
-
           </mat-tab>
-
 
         </mat-tab-group>
       </div>
@@ -267,15 +261,14 @@
       <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
         [(ngModel)]="Observacion"></textarea>
     </div>
-    <div class="form-group  col-md-12">
+    <div class="form-group col-md-12">
       <label>Acción</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
         (change)="selAccion()" id="slcaceptar">
-        <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+        <option *ngFor="let e of lstAcciones" value="{{ e.valor }}">{{ e.texto }}</option>
       </select>
-
     </div>
-    <div class="form-group  col-md-12" *ngIf="clasificacion">
+    <div class="form-group col-md-12" *ngIf="clasificacion">
       <label>Area</label>
       <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
         <option value="S">SELECCIONE</option>
@@ -283,7 +276,7 @@
       </select>
     </div>
 
-    <div class="form-group  col-md-12" *ngIf="vplazo">
+    <div class="form-group col-md-12" *ngIf="vplazo">
       <label for="tmsCreacion">Plazo / Alerta</label>
       <div class="form-group div-style">
         <div class="input-group div-style">
@@ -295,42 +288,15 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-pastel text-white " (click)="insertarObservacion();modal.close('Save')"
+    <button class="btn btn-pastel text-white" (click)="insertarObservacion();modal.close('Save')"
       id="btnaceptar">
-      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar
+    </button>
     <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="modal.dismiss('Close')">
-      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar
+    </button>
   </div>
 </ng-template>
-
-<ng-template #clasificar let-modal>
-  <div class="modal-header bg-pastel-gradient">
-    <h4 class="modal-title text-white" id="modal-clasificar-title">Clasificar Documento</h4>
-  </div>
-  <div class="modal-body">
-    <div class="form-group col-md-12">
-      <label for="txtobservacion">Observaciones</label>
-      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
-        [(ngModel)]="Observacion" placeholder="Observaciones..."></textarea>
-    </div>
-    <div class="form-group col-md-12">
-      <label>Acción</label>
-      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto">
-        <option value="5">RECLAMOS</option>
-      </select>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-pastel text-white" (click)="insertarObservacion();modal.close('Save')">
-      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
-    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="modal.dismiss('Close')">
-      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
-  </div>
-</ng-template>
-
-
-

@@ -209,11 +209,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       filtro: 1,
     },
     {
-      id: "OFICIOS",
-      nombre: "OFICIOS",
-      icono: "fas fa-envelope",
-      color: "#fb6340",
-      disponible: false,
+      id: "RECLAMOS",
+      nombre: "RECLAMOS",
+      icono: "fas fa-comments",
+      color: "#f5365c",
+      disponible: true,
+      funcion: "WKF_CDocumentosSecretariaReclamos",
+      estadoActual: 16,
+      estadoOrigen: 2,
+      filtro: 1,
     },
     {
       id: "RADIOGRAMAS",
@@ -223,17 +227,24 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       disponible: false,
     },
     {
-      id: "COMUNICACIONES",
-      nombre: "COMUNICACIONES",
-      icono: "fas fa-comments",
-      color: "#f5365c",
+      id: "OFICIOS",
+      nombre: "OFICIOS",
+      icono: "fas fa-envelope",
+      color: "#fb6340",
       disponible: false,
     },
     {
-      id: "TITULOS",
-      nombre: "TITULOS",
+      id: "DIPLOMAS",
+      nombre: "DIPLOMAS",
       icono: "fas fa-certificate",
       color: "#ffd600",
+      disponible: false,
+    },
+    {
+      id: "ACTIVIDADES EN EL EXTERIOR",
+      nombre: "ACTIVIDADES EN EL EXTERIOR",
+      icono: "fas fa-envelope",
+      color: "#fb6340",
       disponible: false,
     },
   ];
@@ -337,7 +348,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     this.carpetas.forEach((c) => {
       if (c.disponible) {
-        c.estadoActual = 4;
+        c.estadoActual = c.id === "RECLAMOS" ? c.estadoActual || 6 : 4;
         if (this.selectedEstadoBuzon === "firmados") {
           c.estadoOrigen = 7;
         } else if (this.currentProfile === "Direccion") {
@@ -345,8 +356,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         } else if (this.currentProfile === "Ministro") {
           c.estadoOrigen = 6;
         } else {
-          // Perfil inicial / JefeSecretaria: respeta estadoOrigen inicial propio del objeto (2 para Punto de Cuenta, 4 para TOR)
-          c.estadoOrigen = c.id === "PUNTO_DE_CUENTA" ? 2 : 4;
+          // Perfil inicial / JefeSecretaria: respeta estadoOrigen inicial propio del objeto (2 para Punto de Cuenta y Reclamos, 4 para TOR)
+          c.estadoOrigen =
+            c.id === "PUNTO_DE_CUENTA" || c.id === "RECLAMOS" ? 2 : 4;
         }
       }
     });
@@ -533,8 +545,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (!carpeta.funcion) return;
 
     this.updateEstadosFromProfile();
-    this.estadoActual = carpeta.estadoActual || 4;
-    this.estadoOrigen = carpeta.estadoOrigen || 4;
+    this.estadoActual =
+      carpeta.estadoActual || (carpeta.id === "RECLAMOS" ? 6 : 4);
+    this.estadoOrigen =
+      carpeta.estadoOrigen ||
+      (carpeta.id === "PUNTO_DE_CUENTA" || carpeta.id === "RECLAMOS" ? 2 : 4);
 
     this.loadingBuzon = true;
     this.ngxService.startLoader("loader-documentos");
@@ -553,7 +568,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
           data.Cuerpo.forEach((e: any) => {
             e.edit =
-              e.tdoc && e.tdoc.toLowerCase() === "punto de cuenta"
+              (e.tdoc &&
+                (e.tdoc.toLowerCase() === "punto de cuenta" ||
+                  e.tdoc.toLowerCase().includes("reclamo"))) ||
+              carpeta.id === "PUNTO_DE_CUENTA" ||
+              carpeta.id === "RECLAMOS"
                 ? true
                 : false;
             e.existe = e.anom && e.anom !== "" ? true : false;
@@ -692,7 +711,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
               rawFolders.push(folder);
             } else if (
               carpeta.filtro === 3 &&
-              folder.tdoc === "PUNTO DE CUENTA"
+              (folder.tdoc === "PUNTO DE CUENTA" ||
+                folder.tdoc === "RECLAMOS" ||
+                folder.tdoc === "RECLAMO" ||
+                carpeta.id === "RECLAMOS")
             ) {
               rawFolders.push(folder);
             } else {
@@ -1036,11 +1058,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       defaultVal = "__NEW__";
     }
 
+    const docTipo =
+      this.selectedCarpeta?.id === "RECLAMOS"
+        ? "este reclamo"
+        : "este punto de cuenta";
+
     Swal.fire({
       title: "Agrupar / Asignar Etiqueta",
       input: "select",
-      inputLabel:
-        "Seleccione una etiqueta existente o cree una nueva para agrupar este punto de cuenta",
+      inputLabel: `Seleccione una etiqueta existente o cree una nueva para agrupar ${docTipo}`,
       inputValue: defaultVal,
       inputOptions: options,
       showCancelButton: true,
@@ -1121,11 +1147,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     });
     options["__NEW__"] = "+ Crear Nueva Etiqueta...";
 
+    const docTipoPlural =
+      this.selectedCarpeta?.id === "RECLAMOS" ? "reclamos" : "puntos de cuenta";
+
     Swal.fire({
       title: `Agrupar / Asignar Etiqueta (${selected.length} seleccionados)`,
       input: "select",
-      inputLabel:
-        "Seleccione una etiqueta para agrupar los puntos de cuenta seleccionados",
+      inputLabel: `Seleccione una etiqueta para agrupar los ${docTipoPlural} seleccionados`,
       inputValue: "__NEW__",
       inputOptions: options,
       showCancelButton: true,
@@ -1199,11 +1227,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   public crearNuevaEtiquetaGeneral(): void {
+    const docTipoPlural =
+      this.selectedCarpeta?.id === "RECLAMOS" ? "reclamos" : "puntos de cuenta";
+
     Swal.fire({
       title: "Crear Nueva Etiqueta de Agrupación",
       input: "text",
-      inputLabel:
-        "Escriba el nombre de la nueva etiqueta para agrupar puntos de cuenta",
+      inputLabel: `Escriba el nombre de la nueva etiqueta para agrupar ${docTipoPlural}`,
       inputPlaceholder: "Ej: SECRETARIA GENERAL",
       showCancelButton: true,
       confirmButtonText: "Crear Etiqueta",
@@ -2208,7 +2238,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.WAlerta.documento = parseInt(this.activeDoc.numc);
     this.WAlerta.estado = this.estadoActual;
     this.WAlerta.usuario = this.jwtData.userId;
-    this.WAlerta.observacion = "PROCESO DE VALIDACION DEL TOR";
+    this.WAlerta.observacion = `PROCESO DE VALIDACION DEL ${this.selectedCarpeta?.id === "RECLAMOS" ? "RECLAMO" : this.selectedCarpeta?.nombre || "DOCUMENTO"}`;
     this.WAlerta.fecha = fecha;
 
     this.xAPI = {} as IAPICore;
