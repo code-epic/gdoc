@@ -94,7 +94,7 @@
                       <button mat-icon-button aria-label="Acciones" style="color: #475569;" (click)="open(observacion, e.idd)" matTooltip="Recibir Documento">
                         <mat-icon style="font-size: 1.3rem;">account_tree</mat-icon>
                       </button>
-                      <a [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer" class="pdf-icon-link" matTooltip="Descargar Documento (PDF)">
+                      <a [href]="dwUrl(e.numc, e.anom)" target="top" rel="noopener noreferrer" class="pdf-icon-link" matTooltip="Descargar Documento (PDF)">
                         <mat-icon class="text-danger">picture_as_pdf</mat-icon>
                       </a>
                     </div>
@@ -162,7 +162,7 @@
                   </div>
                   <div class="col-md-2 text-right">
                     <div class="hover-actions d-flex justify-content-end align-items-center">
-                      <a [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer" class="pdf-icon-link" matTooltip="Descargar Documento (PDF)">
+                      <a [href]="dwUrl(e.numc, e.anom)" target="top" rel="noopener noreferrer" class="pdf-icon-link" matTooltip="Descargar Documento (PDF)">
                         <mat-icon class="text-danger">picture_as_pdf</mat-icon>
                       </a>
                     </div>
@@ -232,7 +232,7 @@
                   </div>
                   <div class="col-md-2 text-right">
                     <div class="hover-actions d-flex justify-content-end align-items-center">
-                      <a [href]="dwUrl(e.numc, e.anom)" target="_top" rel="noopener noreferrer" class="pdf-icon-link" matTooltip="Descargar Documento (PDF)">
+                      <a [href]="dwUrl(e.numc, e.anom)" target="top" rel="noopener noreferrer" class="pdf-icon-link" matTooltip="Descargar Documento (PDF)">
                         <mat-icon class="text-danger">picture_as_pdf</mat-icon>
                       </a>
                     </div>
@@ -337,13 +337,25 @@
 </ng-template>
 
 <ng-template #detalleDocumento let-modal>
-    <div class="constancia-modal-card bg-white rounded-lg p-3 position-relative">
-        
-        <!-- Boton de Cierre superior estilizado -->
-        <button type="button" class="modal-close-btn" (click)="modal.dismiss('Cerrar')" title="Cerrar modal (Esc)">
-            <mat-icon>close</mat-icon>
-        </button>
+    <div class="modal-header border-bottom align-items-center" style="background: linear-gradient(90deg, #ffffff 0%, #f1f5f9 100%);">
+        <h5 class="modal-title font-weight-bold text-uppercase mb-0" style="font-size: 0.95rem; color: #334155; letter-spacing: 0.5px;">
+            <i class="fa fa-file-text-o mr-2 text-primary"></i>Expediente del Documento
+        </h5>
+        <div class="d-flex align-items-center ml-auto">
+            <button type="button" class="btn btn-sm btn-dark rounded-pill px-3 shadow-sm font-weight-bold mr-2" (click)="exportarPDF()">
+                <i class="fa fa-file-pdf-o mr-1"></i> PDF
+            </button>
+            <a [href]="dwUrl(docSeleccionado?.numc, docSeleccionado?.anom)" target="_blank" rel="noopener noreferrer" 
+               class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-sm font-weight-bold mr-3">
+                <i class="fa fa-download mr-1"></i> Original
+            </a>
+            <button type="button" class="close text-dark ml-2" aria-label="Close" (click)="modal.dismiss('Cerrar')" style="font-size: 1.5rem; outline: none; box-shadow: none;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
 
+    <div class="modal-body p-3 bg-white" style="max-height: 75vh; overflow-y: auto;">
         <!-- Estado de Carga -->
         <div class="text-center py-5" *ngIf="loadingConstancia">
             <div class="spinner-border text-success" role="status" style="width: 2.5rem; height: 2.5rem;">
@@ -527,28 +539,9 @@
                 </div>
 
             </div>
-
-            <!-- Footer con Botones de Acción (Exportar a PDF y Cancelar) -->
-            <div class="d-flex align-items-center justify-content-between pt-3 mt-3 border-top">
-                <div>
-                    <button type="button" class="btn btn-sm btn-dark rounded-pill px-4 shadow-sm font-weight-bold" (click)="exportarPDF()">
-                        <i class="fa fa-file-pdf-o mr-2"></i> Exportar a PDF (jsPDF)
-                    </button>
-                    <a [href]="dwUrl(docSeleccionado?.numc, docSeleccionado?.anom)" target="_blank" rel="noopener noreferrer" 
-                       class="btn btn-sm btn-outline-danger rounded-pill px-3 ml-2 shadow-xs font-weight-bold">
-                        <i class="fa fa-download mr-1"></i> Original
-                    </a>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-sm btn-secondary rounded-pill px-4 shadow-xs" (click)="modal.dismiss('Cancelar')">
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-
         </div>
-
     </div>
+
 </ng-template>
 
 
