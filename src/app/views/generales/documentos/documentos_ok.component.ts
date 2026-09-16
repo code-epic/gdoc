@@ -1587,6 +1587,51 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     return this.stripHtml(this.getAsunto(e));
   }
 
+  // ─── Parser para Datos de Reclamos ────────────────────────────────────────────
+  public getReclamosData(doc: any): any {
+    let jsonToParse = doc.detallejsonfinal || doc.detallefinaljson || doc.detalleJsonFinal || doc.detalleJson;
+    
+    if (!jsonToParse && doc.detalle && doc.detalle.includes("{")) {
+      try {
+        const parts = doc.detalle.split("|PR|");
+        jsonToParse = parts.length > 1 ? parts[1] : doc.detalle;
+      } catch (e) {}
+    }
+
+    if (jsonToParse && jsonToParse.includes("{")) {
+      try {
+        let safeJson = jsonToParse;
+        if (typeof safeJson === 'string') {
+           safeJson = safeJson.replace(/u003c/g, '<').replace(/u003e/g, '>');
+           safeJson = safeJson.replace(/="([^"]*)"/g, "='$1'"); 
+        }
+
+        let parsed = typeof safeJson === "string" ? JSON.parse(safeJson) : safeJson;
+        if (typeof parsed === "string") {
+          parsed = JSON.parse(parsed);
+        }
+        
+        let formValues = parsed.obse ? parsed.obse : parsed;
+        if (typeof formValues === "string") {
+          formValues = JSON.parse(formValues);
+        }
+        
+        return formValues;
+      } catch (e) {
+        console.error("Error parsing Reclamos JSON data", e);
+      }
+    }
+    
+    return null;
+  }
+
+  // ─── Verifica si el HTML tiene contenido real ──────────────────────────
+  public tieneContenido(html: string): boolean {
+    if (!html) return false;
+    const limpio = html.replace(/<[^>]*>?/gm, "").trim();
+    return limpio.length > 0;
+  }
+
   // ─── Cargar fotos de cédula via blob CDN ──────────────────────────────────────
   public cargarFotosBuzon(items: any[]): void {
     if (!items || items.length === 0) return;

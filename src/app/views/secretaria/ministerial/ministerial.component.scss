@@ -1,0 +1,43 @@
+/* Fix for Angular Editor missing FontAwesome icons when FA5/6 is used instead of FA4 */
+::ng-deep .angular-editor-toolbar i {
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 900 !important;
+}
+
+/* Fix some specific editor icons if they changed unicode */
+::ng-deep .angular-editor-toolbar .fa-header:before { content: "\f1dc" !important; }
+::ng-deep .angular-editor-toolbar .fa-font:before { content: "\f031" !important; }
+
+/* Modal styling improvements */
+::ng-deep .modal-punto-accordion .mat-expansion-panel {
+  margin-bottom: 12px;
+  border-radius: 8px !important;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+  overflow: hidden;
+}
+
+::ng-deep .modal-punto-accordion .mat-expansion-panel-header {
+  background-color: #f8fafc;
+  padding: 0 20px;
+  height: 55px !important;
+}
+
+::ng-deep .modal-punto-accordion .mat-expansion-panel-header:hover {
+  background-color: #f1f5f9 !important;
+}
+
+::ng-deep .modal-punto-accordion .mat-expansion-panel-header-title {
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+::ng-deep .angular-editor-toolbar {
+  border-radius: 6px 6px 0 0 !important;
+  background-color: #f8fafc !important;
+}
+
+::ng-deep .angular-editor-textarea {
+  border-radius: 0 0 6px 6px !important;
+}

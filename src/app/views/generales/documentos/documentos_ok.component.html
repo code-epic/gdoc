@@ -1,4 +1,48 @@
 <!-- Wrapper raíz para posicionamiento iOS-safe -->
+<style>
+.doc-informe-container {
+  background: #f4f5f7;
+}
+.informe-word-style {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 35px 40px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  overflow-y: auto;
+  color: #1a202c;
+  font-family: 'Tahoma', sans-serif;
+  counter-reset: informe-counter;
+  flex: 1;
+}
+.informe-section {
+  margin-bottom: 30px;
+}
+.informe-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: underline;
+  margin-bottom: 12px;
+  color: #000;
+  text-align: left;
+  counter-increment: informe-counter;
+}
+.informe-title::before {
+  content: counter(informe-counter) ". ";
+}
+.informe-content {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  text-align: justify;
+}
+.informe-content p {
+  margin-bottom: 10px;
+}
+.informe-content ul, .informe-content ol {
+  margin-left: 25px;
+  margin-bottom: 15px;
+}
+</style>
 <div class="documentos-root">
 
   <!-- Vista Principal: Explorador Master-Detail (Tablet-First) -->
@@ -536,8 +580,8 @@
         <!-- COLUMNA IZQUIERDA: Información del Expediente & Observaciones -->
         <div class="modal-col-left">
 
-          <!-- Identificación Card -->
-          <div class="info-card-block">
+          <!-- Identificación Card NORMAL -->
+          <div class="info-card-block" *ngIf="selectedCarpeta?.id !== 'RECLAMOS'">
             <div class="block-title">
               <i class="fas fa-info-circle text-primary mr-1"></i> Datos del Expediente
             </div>
@@ -582,6 +626,49 @@
             </div>
           </div>
 
+          <!-- Identificación Card RECLAMOS -->
+          <div class="info-card-block" *ngIf="selectedCarpeta?.id === 'RECLAMOS'">
+            <div class="block-title">
+              <i class="fas fa-info-circle text-primary mr-1"></i> Perfil del Solicitante
+            </div>
+            <div class="reclamos-profile-grid" style="display: flex; gap: 15px; align-items: center; margin-top: 15px; flex-wrap: wrap;">
+              <div class="reclamos-avatar" style="flex-shrink: 0; min-width: 90px;" *ngIf="getCedula(activeDoc)">
+                <img [src]="fotosCasos[getCedula(activeDoc)]"
+                     *ngIf="!loadingFotos[getCedula(activeDoc)] && fotosCasos[getCedula(activeDoc)]"
+                     style="width: 90px; height: 110px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 2px solid #fff;"
+                     alt="Avatar">
+                <div *ngIf="loadingFotos[getCedula(activeDoc)]" style="width: 90px; height: 110px; background: #f4f5f7; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-spinner fa-spin text-primary fa-2x"></i>
+                </div>
+                <div *ngIf="!loadingFotos[getCedula(activeDoc)] && !fotosCasos[getCedula(activeDoc)]" style="width: 90px; height: 110px; background: #e9ecef; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #adb5bd;">
+                  <i class="fas fa-user fa-3x"></i>
+                </div>
+              </div>
+              <div class="info-grid" style="flex: 1; grid-template-columns: 1fr; gap: 8px; min-width: 200px;">
+                <div class="info-item" *ngIf="getNombre(activeDoc)">
+                  <span class="info-label">Titular / Afiliado</span>
+                  <span class="info-val font-weight-bold" style="font-size: 1.05rem; line-height: 1.1;">{{ getNombre(activeDoc) }}</span>
+                </div>
+                <div class="info-item" *ngIf="getCedula(activeDoc)">
+                  <span class="info-label">Cédula Principal</span>
+                  <span class="info-val highlight">{{ getCedula(activeDoc) }}</span>
+                </div>
+                <div class="info-item" *ngIf="getCargo(activeDoc)">
+                  <span class="info-label">Grado / Cargo</span>
+                  <span class="info-val text-primary font-weight-bold" style="line-height: 1.1;">{{ getCargo(activeDoc) }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Nº Expediente</span>
+                  <span class="info-val">
+                    <span class="badge badge-warning text-dark py-1 px-2" style="font-size: 0.8rem;">
+                      {{ activeDoc.numc || activeDoc.ncontrol || activeDoc.cuenta || 'Sin Número' }}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Todos los Puntos del Agrupado si está dentro de un agrupado -->
           <div class="info-card-block" *ngIf="currentTagGroupFolder && groupCases.length > 1">
             <div class="block-title d-flex justify-content-between align-items-center">
@@ -615,7 +702,7 @@
             </div>
           </div>
 
-          <!-- Asunto Block -->
+          <!-- Asunto Block NORMAL (Siempre visible en la izquierda) -->
           <div class="info-card-block">
             <div class="block-title">
               <i class="fas fa-align-left text-primary mr-1"></i> Asunto / Objeto del Caso
@@ -645,16 +732,67 @@
         <!-- COLUMNA DERECHA: Integrantes / Subcasos Categorizados por Viñetas -->
         <div class="modal-col-right">
 
-          <div class="subcasos-header-bar mb-2">
-            <div class="d-flex align-items-center gap-2">
-              <i class="fas fa-users text-primary fa-lg"></i>
-              <span class="subcasos-main-title">Integrantes del Caso</span>
+          <!-- BLOQUE RECLAMOS: Muestra el informe en lugar de los integrantes -->
+          <div *ngIf="selectedCarpeta?.id === 'RECLAMOS' && getReclamosData(activeDoc)" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+            <div class="info-card-block doc-informe-container m-0 d-flex flex-column" style="flex: 1; overflow: hidden;">
+              <div class="block-title mb-3" style="flex-shrink: 0;">
+                <i class="fas fa-file-invoice text-primary mr-1"></i> Detalle del Reclamo
+              </div>
+              <div class="informe-word-style">
+                <ng-container *ngIf="getReclamosData(activeDoc) as rData">
+                  
+                  <div class="informe-section" *ngIf="tieneContenido(rData.situacion)">
+                    <h4 class="informe-title">SITUACIÓN</h4>
+                    <div class="informe-content" [innerHTML]="rData.situacion"></div>
+                  </div>
+
+                  <div class="informe-section" *ngIf="tieneContenido(rData.opinionComponente)">
+                    <h4 class="informe-title">OPINIÓN DEL COMPONENTE</h4>
+                    <div class="informe-content" [innerHTML]="rData.opinionComponente"></div>
+                  </div>
+
+                  <div class="informe-section" *ngIf="tieneContenido(rData.opinionConsultoriaComponente)">
+                    <h4 class="informe-title">OPINIÓN DE LA CONSULTORÍA JURÍDICA DEL COMPONENTE</h4>
+                    <div class="informe-content" [innerHTML]="rData.opinionConsultoriaComponente"></div>
+                  </div>
+
+                  <div class="informe-section" *ngIf="tieneContenido(rData.opinionJuntaAdHoc)">
+                    <h4 class="informe-title">OPINIÓN DE LA JUNTA AD-HOC</h4>
+                    <div class="informe-content" [innerHTML]="rData.opinionJuntaAdHoc"></div>
+                  </div>
+
+                  <div class="informe-section" *ngIf="tieneContenido(rData.opinionConsultoriaMPPD)">
+                    <h4 class="informe-title">OPINIÓN DE LA CONSULTORÍA JURÍDICA DEL MPPD</h4>
+                    <div class="informe-content" [innerHTML]="rData.opinionConsultoriaMPPD"></div>
+                  </div>
+
+                  <div class="informe-section" *ngIf="tieneContenido(rData.recomendacionDespacho)">
+                    <h4 class="informe-title">RECOMENDACIÓN DEL DESPACHO</h4>
+                    <div class="informe-content" [innerHTML]="rData.recomendacionDespacho"></div>
+                  </div>
+
+                  <div class="informe-section" *ngIf="tieneContenido(rData.otros)">
+                    <h4 class="informe-title">OTROS</h4>
+                    <div class="informe-content" [innerHTML]="rData.otros"></div>
+                  </div>
+
+                </ng-container>
+              </div>
             </div>
-            <span class="badge badge-primary px-3 py-1 font-weight-bold" style="font-size: 0.8rem; border-radius: 12px;"
-                  *ngIf="getSubcasos(activeDoc).length > 0">
-              {{ getSubcasos(activeDoc).length }} Personas
-            </span>
           </div>
+
+          <!-- BLOQUE NORMAL: Integrantes del Caso -->
+          <div *ngIf="selectedCarpeta?.id !== 'RECLAMOS' || !getReclamosData(activeDoc)">
+            <div class="subcasos-header-bar mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-users text-primary fa-lg"></i>
+                <span class="subcasos-main-title">Integrantes del Caso</span>
+              </div>
+              <span class="badge badge-primary px-3 py-1 font-weight-bold" style="font-size: 0.8rem; border-radius: 12px;"
+                    *ngIf="getSubcasos(activeDoc).length > 0">
+                {{ getSubcasos(activeDoc).length }} Personas
+              </span>
+            </div>
 
           <!-- Estado si no hay subcasos adicionales -->
           <div class="empty-subcasos-box text-center p-4" *ngIf="getSubcasos(activeDoc).length === 0">
@@ -809,6 +947,9 @@
               </div>
             </div>
           </div>
+
+          </div>
+          <!-- FIN BLOQUE NORMAL (Integrantes) -->
 
         </div>
         <!-- FIN COLUMNA DERECHA -->

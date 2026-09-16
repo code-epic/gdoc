@@ -220,8 +220,9 @@
                                   <span class="input-group-text icon-box"><mat-icon
                                       class="input-icon">info</mat-icon></span>
                                 </div>
-                                <select class="input-custom" id="{{i}}-text"
-                                  [value]="el.detalle==''?'PR':getDetalle(el.detalle) ">
+                                <select #actionSelect class="input-custom" id="{{i}}-text"
+                                  [value]="el.detalle==''?'PR':getDetalle(el)"
+                                  (change)="el.accionActual = $event.target.value; onSelectProcesar($event, el, i, modalPunto)">
                                   <option value="PE">PENDIENTE</option>
                                   <option value="PR">PROCESAR</option>
                                   <option value="NP">NO PROCESAR</option>
@@ -230,6 +231,11 @@
                                   <option value="CR">CODIGO ROJO</option>
                                   <option value="BD">NO PROCESAR POR ASCENSO</option>
                                 </select>
+                                <div class="input-group-append" *ngIf="actionSelect.value === 'PR' && doc.idestado == 16">
+                                  <button type="button" class="btn btn-sm btn-outline-primary px-3" style="border-radius: 0 4px 4px 0; border-color: #ced4da;" (click)="abrirModalPuntoEdicion(el, i, modalPunto)" title="Editar Detalles del Punto">
+                                    <i class="fas fa-edit"></i>
+                                  </button>
+                                </div>
                               </div>
                             </div>
 
@@ -552,3 +558,139 @@
       </section>
     </div>
   </div>
+
+<ng-template #modalPunto let-modal>
+  <div class="modal-header border-bottom" style="background: linear-gradient(90deg, #ffffff 0%, #f1f5f9 100%);">
+    <h5 class="modal-title font-weight-bold text-uppercase mb-0" style="font-size: 0.95rem; color: #334155; letter-spacing: 0.5px;">
+      <i class="fa fa-pencil-square-o mr-2 text-primary"></i>Datos del Punto
+    </h5>
+    <button type="button" class="close text-dark" aria-label="Close" (click)="cancelarEdicionPunto()" style="font-size: 1.5rem; outline: none; box-shadow: none;">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body p-4 bg-white" style="max-height: 75vh; overflow-y: auto; font-family: Tahoma, sans-serif; font-size: 13px;">
+    
+    <div class="alert alert-secondary mb-4 shadow-sm border-0 d-flex align-items-center" style="background-color: #f8fafc; color: #475569;">
+       <i class="fa fa-info-circle mr-3" style="font-size: 1.5rem; color: #64748b;"></i>
+       <div style="font-size: 0.85rem; line-height: 1.4;">
+         Complete las secciones requeridas. Puede utilizar las herramientas de formato para destacar texto importante.
+         No es necesario llenar todas las secciones si no aplican.
+       </div>
+    </div>
+
+    <mat-accordion class="modal-punto-accordion" multi="false">
+      <!-- Sección 1 -->
+      <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+             <i class="fa fa-check-circle text-success mr-2" *ngIf="tieneContenido(puntoForm.situacion)"></i>
+             <i class="fa fa-circle-o text-muted mr-2" *ngIf="!tieneContenido(puntoForm.situacion)"></i>
+             1. Situación
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="pt-2">
+          <angular-editor [placeholder]="'Detalle la situación...'" [config]="editorConfig" [(ngModel)]="puntoForm.situacion"></angular-editor>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Sección 2 -->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+             <i class="fa fa-check-circle text-success mr-2" *ngIf="tieneContenido(puntoForm.opinionConsultoriaComponente)"></i>
+             <i class="fa fa-circle-o text-muted mr-2" *ngIf="!tieneContenido(puntoForm.opinionConsultoriaComponente)"></i>
+             2. Opinión de la Consultoría Jurídica del Componente
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="pt-2">
+          <angular-editor [placeholder]="'Opinión...'" [config]="editorConfig" [(ngModel)]="puntoForm.opinionConsultoriaComponente"></angular-editor>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Sección 3 -->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+             <i class="fa fa-check-circle text-success mr-2" *ngIf="tieneContenido(puntoForm.opinionJuntaAdHoc)"></i>
+             <i class="fa fa-circle-o text-muted mr-2" *ngIf="!tieneContenido(puntoForm.opinionJuntaAdHoc)"></i>
+             3. Opinión de la Junta AD-HOC
+          </mat-panel-title>
+          <mat-panel-description class="justify-content-end align-items-center mr-3 m-0" (click)="$event.stopPropagation()">
+            <select class="custom-select custom-select-sm shadow-none font-weight-bold" style="width: auto; height: 26px; padding-top: 2px; padding-bottom: 2px; font-size: 0.75rem; border-color: #cbd5e1; color: #475569;" [(ngModel)]="puntoForm.aplicaJuntaAdHoc">
+              <option value="SI APLICA">SI APLICA</option>
+              <option value="NO APLICA">NO APLICA</option>
+            </select>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="pt-2">
+          <angular-editor [placeholder]="'Opinión...'" [config]="editorConfig" [(ngModel)]="puntoForm.opinionJuntaAdHoc"></angular-editor>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Sección 4 -->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+             <i class="fa fa-check-circle text-success mr-2" *ngIf="tieneContenido(puntoForm.opinionComponente)"></i>
+             <i class="fa fa-circle-o text-muted mr-2" *ngIf="!tieneContenido(puntoForm.opinionComponente)"></i>
+             4. Opinión del Componente
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="pt-2">
+          <angular-editor [placeholder]="'Opinión...'" [config]="editorConfig" [(ngModel)]="puntoForm.opinionComponente"></angular-editor>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Sección 5 -->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+             <i class="fa fa-check-circle text-success mr-2" *ngIf="tieneContenido(puntoForm.opinionConsultoriaMPPD)"></i>
+             <i class="fa fa-circle-o text-muted mr-2" *ngIf="!tieneContenido(puntoForm.opinionConsultoriaMPPD)"></i>
+             5. Opinión de la Consultoría Jurídica del MPPD
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="pt-2">
+          <angular-editor [placeholder]="'Opinión...'" [config]="editorConfig" [(ngModel)]="puntoForm.opinionConsultoriaMPPD"></angular-editor>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Sección 6 -->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+             <i class="fa fa-check-circle text-success mr-2" *ngIf="tieneContenido(puntoForm.otros)"></i>
+             <i class="fa fa-circle-o text-muted mr-2" *ngIf="!tieneContenido(puntoForm.otros)"></i>
+             6. Otros
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="pt-2">
+          <angular-editor [placeholder]="'Otros detalles...'" [config]="editorConfig" [(ngModel)]="puntoForm.otros"></angular-editor>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Sección 7 -->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+             <i class="fa fa-check-circle text-success mr-2" *ngIf="tieneContenido(puntoForm.recomendacionDespacho)"></i>
+             <i class="fa fa-circle-o text-muted mr-2" *ngIf="!tieneContenido(puntoForm.recomendacionDespacho)"></i>
+             7. Recomendación de la Dirección General del Despacho del MPPD
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="pt-2">
+          <angular-editor [placeholder]="'Recomendaciones...'" [config]="editorConfig" [(ngModel)]="puntoForm.recomendacionDespacho"></angular-editor>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+  </div>
+  <div class="modal-footer border-top" style="background-color: #f8fafc;">
+    <button type="button" class="btn btn-outline-secondary rounded-pill px-4 shadow-sm" (click)="cancelarEdicionPunto()">
+       <i class="fa fa-times mr-1"></i> Cancelar
+    </button>
+    <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm font-weight-bold" (click)="guardarPuntoJson()">
+       <i class="fa fa-save mr-1"></i> Aceptar
+    </button>
+  </div>
+</ng-template>

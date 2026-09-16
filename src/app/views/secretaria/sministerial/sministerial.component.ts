@@ -435,9 +435,9 @@ export class SministerialComponent implements OnInit, OnDestroy {
             break;
           case "5": // Clasificar como RECLAMOS
             this.redistribuir(16, 2);
+            break;
           case "6": // Clasificar como TRAMITE POR ORGANO REGULAR
             this.redistribuir(4, 4);
-
             break;
           case "6": // Enviar a otras areas
             this.redistribuir(0);

@@ -30,9 +30,9 @@ import {
   MatBottomSheetRef,
 } from "@angular/material/bottom-sheet";
 import { Md5 } from "md5-typescript";
-
 import Swal from "sweetalert2";
 import { DOCUMENT } from "@angular/common";
+import { AngularEditorConfig } from "@kolkov/angular-editor";
 
 export interface SubDocumento {
   subdocumento: number;
@@ -165,6 +165,34 @@ export class MinisterialComponent implements OnInit {
   public fecha_alerta: any;
   public fplazo: any;
   public dwValidate = false;
+
+  public editorConfig: AngularEditorConfig = {
+    editable: true,
+    spellcheck: true,
+    height: "8rem",
+    minHeight: "5rem",
+    placeholder: "Ingrese el texto aquí...",
+    translate: "no",
+    defaultParagraphSeparator: "p",
+    defaultFontName: "Arial",
+    toolbarHiddenButtons: [["insertImage", "insertVideo", "toggleEditorMode"]],
+  };
+
+  public puntoForm = {
+    situacion: "",
+    opinionConsultoriaComponente: "",
+    opinionJuntaAdHoc: "",
+    aplicaJuntaAdHoc: "SI APLICA",
+    opinionComponente: "",
+    opinionConsultoriaMPPD: "",
+    otros: "",
+    recomendacionDespacho: "",
+  };
+
+  public indexPuntoSeleccionado: number = -1;
+  public elPuntoSeleccionado: any = null;
+  public modalPuntoRef: any = null;
+
   public dwSub = false;
   public doc: any;
   public lstNotaEntrega: any[] = [];
@@ -641,13 +669,19 @@ export class MinisterialComponent implements OnInit {
         .value;
       const cargo = (<HTMLInputElement>document.getElementById(i + "-carg"))
         .value;
+
+      let observacionFinal = text;
+      if (text === "PR" && e.detallefinaljson) {
+        observacionFinal = e.detallefinaljson;
+      }
+
       if (text != "PE") {
         this.lstNotaEntrega.push({
           id: e.ids,
           nombre: nombre,
           cedula: cedula,
           numc: e.numc,
-          observacion: text,
+          observacion: observacionFinal,
           llave: llave,
           udep: e.udep,
           cuenta: e.cuenta,
@@ -729,12 +763,15 @@ export class MinisterialComponent implements OnInit {
     );
   }
 
-  getDetalle(e): string {
-    if (e == null || e == "null" || e == undefined) return "PE";
+  getDetalle(el: any): string {
+    if (el && el.detallejsonfinal) {
+      return "PR";
+    }
+    const e = el ? el.detalle : null;
+    if (e == null || e == "null" || e == undefined || e === "") return "PE";
     let text = "PR";
     let cont = e.split("|");
-    if (cont.length > 0) text = cont[1];
-
+    if (cont.length > 1) text = cont[1];
     return text;
   }
 
@@ -785,5 +822,208 @@ export class MinisterialComponent implements OnInit {
      `;
     ventana.print();
     ventana.close();
+  }
+  cancelarEdicionPunto() {
+    if (this.indexPuntoSeleccionado >= 0) {
+      // Revert select back to pending or the value it had before?
+      // Usually better to leave it or let user change it back manually.
+      // Here we'll just close.
+      const selectEl = <HTMLSelectElement>(
+        document.getElementById(this.indexPuntoSeleccionado + "-text")
+      );
+      if (selectEl) selectEl.value = "PE"; // Revert to PE as safety if canceled
+    }
+    this.modalPuntoRef.close();
+  }
+
+  onSelectProcesar(event: any, el: any, index: number, modal: any) {
+    const value = event.target.value;
+
+    // Check if doc estado is 16 (or doc.idestado, doc.estadoActual)
+    if (value === "PR" && this.doc.idestado == 16) {
+      this.indexPuntoSeleccionado = index;
+      this.elPuntoSeleccionado = el;
+
+      this.puntoForm = {
+        situacion: "",
+        opinionConsultoriaComponente: "",
+        opinionJuntaAdHoc: "",
+        aplicaJuntaAdHoc: "SI APLICA",
+        opinionComponente: "",
+        opinionConsultoriaMPPD: "",
+        otros: "",
+        recomendacionDespacho: "",
+      };
+
+      let jsonToParse = el.detallejsonfinal;
+
+      if (jsonToParse && jsonToParse.includes("{")) {
+        try {
+          // El backend puede estar limpiando los slashes (\). Limpiamos el string para que JSON.parse no falle.
+          let safeJson = jsonToParse;
+          if (typeof safeJson === "string") {
+            safeJson = safeJson.replace(/u003c/g, "<").replace(/u003e/g, ">");
+            safeJson = safeJson.replace(/="([^"]*)"/g, "='$1'"); // Cambia atributos HTML a comilla simple
+          }
+
+          let parsed =
+            typeof safeJson === "string" ? JSON.parse(safeJson) : safeJson;
+
+          if (typeof parsed === "string") {
+            parsed = JSON.parse(parsed);
+          }
+          let formValues = parsed.obse ? parsed.obse : parsed;
+          if (typeof formValues === "string") {
+            formValues = JSON.parse(formValues);
+          }
+          this.puntoForm = { ...this.puntoForm, ...formValues };
+        } catch (e) {
+          console.error("Error parsing JSON in onSelectProcesar", e);
+        }
+      }
+
+      this.modalPuntoRef = this.modalService.open(modal, {
+        size: "xl",
+        backdrop: "static",
+      });
+    }
+  }
+
+  abrirModalPuntoEdicion(el: any, index: number, modal: any) {
+    if (this.doc.idestado == 16) {
+      this.indexPuntoSeleccionado = index;
+      this.elPuntoSeleccionado = el;
+
+      this.puntoForm = {
+        situacion: "",
+        opinionConsultoriaComponente: "",
+        opinionJuntaAdHoc: "",
+        aplicaJuntaAdHoc: "SI APLICA",
+        opinionComponente: "",
+        opinionConsultoriaMPPD: "",
+        otros: "",
+        recomendacionDespacho: "",
+      };
+
+      let jsonToParse = el.detallejsonfinal;
+
+      if (jsonToParse && jsonToParse.includes("{")) {
+        try {
+          // El backend puede estar limpiando los slashes (\). Limpiamos el string para que JSON.parse no falle.
+          let safeJson = jsonToParse;
+          if (typeof safeJson === "string") {
+            safeJson = safeJson.replace(/u003c/g, "<").replace(/u003e/g, ">");
+            safeJson = safeJson.replace(/="([^"]*)"/g, "='$1'"); // Cambia atributos HTML a comilla simple
+          }
+
+          let parsed =
+            typeof safeJson === "string" ? JSON.parse(safeJson) : safeJson;
+
+          if (typeof parsed === "string") {
+            parsed = JSON.parse(parsed);
+          }
+          let formValues = parsed.obse ? parsed.obse : parsed;
+          if (typeof formValues === "string") {
+            formValues = JSON.parse(formValues);
+          }
+          this.puntoForm = { ...this.puntoForm, ...formValues };
+        } catch (e) {
+          console.error("Error parsing JSON in abrirModalPuntoEdicion", e);
+        }
+      }
+
+      this.modalPuntoRef = this.modalService.open(modal, {
+        size: "xl",
+        backdrop: "static",
+      });
+    }
+  }
+
+  guardarPuntoJson() {
+    const hasContent =
+      this.tieneContenido(this.puntoForm.situacion) ||
+      this.tieneContenido(this.puntoForm.opinionConsultoriaComponente) ||
+      this.tieneContenido(this.puntoForm.opinionJuntaAdHoc) ||
+      this.tieneContenido(this.puntoForm.opinionComponente) ||
+      this.tieneContenido(this.puntoForm.opinionConsultoriaMPPD) ||
+      this.tieneContenido(this.puntoForm.otros) ||
+      this.tieneContenido(this.puntoForm.recomendacionDespacho);
+
+    if (!hasContent) {
+      this.toastrService.warning(
+        "Debe llenar al menos una sección del punto para poder guardar.",
+        "Atención",
+      );
+      return;
+    }
+
+    if (this.indexPuntoSeleccionado >= 0 && this.elPuntoSeleccionado) {
+      // Sanitizar los datos para evitar problemas de comillas en el JSON y SQL del backend
+      let sanitizedForm: any = {};
+      for (const key of Object.keys(this.puntoForm)) {
+        let val = (this.puntoForm as any)[key];
+        if (typeof val === "string") {
+          // Cambiar comillas dobles por simples en el HTML (ej. face="Arial" -> face='Arial')
+          // para que no rompa el JSON cuando el backend elimine los backslashes
+          sanitizedForm[key] = val.replace(/"/g, "'");
+        } else {
+          sanitizedForm[key] = val;
+        }
+      }
+
+      const fullData = {
+        obse: sanitizedForm,
+        idd: this.elPuntoSeleccionado.idd,
+        numc: this.elPuntoSeleccionado.numc,
+        esta: 1,
+      };
+
+      let jsonStr = JSON.stringify(fullData);
+
+      // Duplicar comillas simples para escapar correctamente en la consulta SQL del backend
+      // (evita el error de sintaxis en UPDATE ... SET obse='...')
+      const sqlSafeJsonStr = jsonStr.replace(/'/g, "''");
+
+      // Evaluar si ya tiene el JSON cargado para saber si es un UPDATE (U) o un INSERT (I)
+      const yaExiste = this.elPuntoSeleccionado.detallejsonfinal;
+
+      const funcionNombre = yaExiste
+        ? "WKF_USecretariaReclamos"
+        : "WKF_ISecretariaReclamos";
+
+      // Actualizamos el objeto padre para que si se vuelve a abrir el modal, tenga los datos recientes
+      this.elPuntoSeleccionado.detallejsonfinal = jsonStr;
+
+      this.apiService
+        .Ejecutar({
+          funcion: funcionNombre,
+          parametros: "",
+          valores: sqlSafeJsonStr,
+        })
+        .subscribe(
+          (data) => {
+            // Confirmamos la actualización localmente tras el guardado exitoso
+            this.elPuntoSeleccionado.detallejsonfinal = jsonStr;
+
+            this.toastrService.success(
+              "Datos del punto guardados correctamente.",
+              "Atención",
+            );
+            this.modalPuntoRef.close();
+          },
+          (errot) => {
+            this.toastrService.error(errot, `Error en ${funcionNombre}`);
+          },
+        );
+
+      console.log(this.elPuntoSeleccionado.detallefinaljson);
+    }
+  }
+
+  tieneContenido(html: string): boolean {
+    if (!html) return false;
+    // Removemos espacios y etiquetas html vacias basicas que AngularEditor suele colocar
+    const limpio = html.replace(/<[^>]*>?/gm, "").trim();
+    return limpio.length > 0;
   }
 }
