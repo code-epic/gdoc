@@ -16,8 +16,9 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
+    const excludedNames = ["Ayudantia", "Acami", "Timonel", "Personal"];
     this.Menu = this.loginService.obtenerMenu().filter((e) => {
-      return e.url != "/principal";
+      return e.url != "/principal" && !excludedNames.includes(e.nombre);
     });
 
     if (sessionStorage.getItem("CEP_CUsuario") == undefined) {

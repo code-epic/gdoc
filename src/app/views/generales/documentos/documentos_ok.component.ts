@@ -220,6 +220,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       filtro: 1,
     },
     {
+      id: "PRESIDENCIALES",
+      nombre: "PRESIDENCIALES",
+      icono: "fas fa-file-alt",
+      color: "#2dce89",
+      disponible: true,
+      funcion: "WKF_CDocumentosSecretariaPresidenciales",
+      estadoActual: 4,
+      estadoOrigen: 3,
+      filtro: 1,
+    },
+    {
       id: "RADIOGRAMAS",
       nombre: "RADIOGRAMAS",
       icono: "fas fa-broadcast-tower",
@@ -1589,8 +1600,12 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   // ─── Parser para Datos de Reclamos ────────────────────────────────────────────
   public getReclamosData(doc: any): any {
-    let jsonToParse = doc.detallejsonfinal || doc.detallefinaljson || doc.detalleJsonFinal || doc.detalleJson;
-    
+    let jsonToParse =
+      doc.detallejsonfinal ||
+      doc.detallefinaljson ||
+      doc.detalleJsonFinal ||
+      doc.detalleJson;
+
     if (!jsonToParse && doc.detalle && doc.detalle.includes("{")) {
       try {
         const parts = doc.detalle.split("|PR|");
@@ -1601,27 +1616,28 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (jsonToParse && jsonToParse.includes("{")) {
       try {
         let safeJson = jsonToParse;
-        if (typeof safeJson === 'string') {
-           safeJson = safeJson.replace(/u003c/g, '<').replace(/u003e/g, '>');
-           safeJson = safeJson.replace(/="([^"]*)"/g, "='$1'"); 
+        if (typeof safeJson === "string") {
+          safeJson = safeJson.replace(/u003c/g, "<").replace(/u003e/g, ">");
+          safeJson = safeJson.replace(/="([^"]*)"/g, "='$1'");
         }
 
-        let parsed = typeof safeJson === "string" ? JSON.parse(safeJson) : safeJson;
+        let parsed =
+          typeof safeJson === "string" ? JSON.parse(safeJson) : safeJson;
         if (typeof parsed === "string") {
           parsed = JSON.parse(parsed);
         }
-        
+
         let formValues = parsed.obse ? parsed.obse : parsed;
         if (typeof formValues === "string") {
           formValues = JSON.parse(formValues);
         }
-        
+
         return formValues;
       } catch (e) {
         console.error("Error parsing Reclamos JSON data", e);
       }
     }
-    
+
     return null;
   }
 
