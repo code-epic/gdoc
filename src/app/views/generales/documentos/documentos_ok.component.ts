@@ -225,7 +225,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       icono: "fas fa-file-alt",
       color: "#2dce89",
       disponible: true,
-      funcion: "WKF_CDocumentosSecretariaPresidenciales",
+      funcion: "WKF_CDocumentosSecretariaPuntoPresidencial",
       estadoActual: 4,
       estadoOrigen: 3,
       filtro: 1,

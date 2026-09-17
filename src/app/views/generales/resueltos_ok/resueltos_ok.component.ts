@@ -450,6 +450,8 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     const perfilStr = (perfilVal || "").toUpperCase();
     const roleStr = (this.jwtData.userRole || "").toUpperCase();
 
+    console.log(perfilStr);
+
     if (perfilStr.includes("REDACTOR") || perfilStr === "RESOLUCION REDACTOR") {
       this.currentProfile = "Edicion";
     } else if (perfilStr.includes("JEFE") || perfilStr === "RESOLUCION JEFE") {
@@ -470,6 +472,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     } else if (
       perfilStr.includes("MINISTRO") ||
       perfilStr === "MINISTRO" ||
+      perfilStr.includes("APROB") ||
       roleStr.includes("APROB") ||
       roleStr.includes("MIN") ||
       roleStr.includes("FIRMAN")
@@ -623,6 +626,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     if (this.showingFirmados) {
       paramVal = "7766";
     } else {
+      console.log(this.currentProfile, "Existe....");
       if (this.currentProfile === "Aprobador") {
         paramVal = "880";
       } else if (this.currentProfile === "Secretaria") {
@@ -795,6 +799,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     if (this.showingFirmados) {
       paramVal = "7766";
     } else {
+      console.log(this.currentProfile);
       if (this.currentProfile === "Aprobador") {
         paramVal = "880";
       } else if (this.currentProfile === "Secretaria") {
@@ -2595,12 +2600,18 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     switch (e) {
       case 36:
         return "REDACTAR - EDICION";
+      case 55:
+        return "FRIMADO";
       case 776:
         return "FIRMADO";
       case 7776:
-        return "PUBLICADO POR EL MINISTRO";
+        return "FRIMADO POR EL MINISTRO";
       case 880:
         return "MINISTRO APROBADOR";
+      case 881:
+        return "DEVOLVER Y LIBERAR";
+      case 888:
+        return "FIRMADO Y PUBLICADO";
       case 930:
         return "SECRETARIA (JEFE)";
       case 990:
