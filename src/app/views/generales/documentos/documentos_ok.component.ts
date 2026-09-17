@@ -2169,7 +2169,14 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   async redistribuir(decision: any) {
-    const estadoDestino = Math.min(this.estadoOrigen + 1, 7);
+    let estadoDestino = Math.min(this.estadoOrigen + 1, 7);
+
+    // Flujo especial exclusivo para RECLAMOS
+    if (this.selectedCarpeta?.id === "RECLAMOS") {
+      if (this.estadoOrigen === 2) estadoDestino = 5;
+      else if (this.estadoOrigen === 5) estadoDestino = 6;
+      else if (this.estadoOrigen === 6) estadoDestino = 7;
+    }
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "WKF_ARedistribuir";
     this.xAPI.valores = "";
