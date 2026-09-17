@@ -313,7 +313,10 @@ export class RsindicadoresComponent
         const values: number[] = [];
 
         data.Cuerpo.forEach((item: any) => {
-          const count = parseInt(item.numero_resuelto, 10) || parseInt(item.numero, 10) || 0;
+          const count =
+            parseInt(item.numero_resuelto, 10) ||
+            parseInt(item.numero, 10) ||
+            0;
           totalFirmados += count;
           labels.push(item.tipo || item.des_resol || "OTRO");
           values.push(count);
@@ -329,7 +332,24 @@ export class RsindicadoresComponent
   }
 
   public async Rechazados(): Promise<void> {
-    // Extensible para futuros servicios de rechazados
+    try {
+      const payload = this.crearPayload("MPPD_CEPendienteMinistroRechazos");
+      const data: any = await firstValueFrom(this.apiService.Ejecutar(payload));
+      console.log("Rechazados:", data?.Cuerpo);
+      if (data?.Cuerpo && data.Cuerpo.length > 0) {
+        let totalRechazados = 0;
+
+        data.Cuerpo.forEach((item: any) => {
+          // Cada registro en el JSON es un rechazo individual
+          totalRechazados++;
+        });
+
+        this.kpis.rechazados = totalRechazados;
+        this.recalcularTotal();
+      }
+    } catch (error) {
+      console.error("Error en Rechazados:", error);
+    }
   }
 
   //MPPD_CEPendienteEnProceso
@@ -344,7 +364,10 @@ export class RsindicadoresComponent
         const values: number[] = [];
 
         data.Cuerpo.forEach((item: any) => {
-          const count = parseInt(item.numero, 10) || parseInt(item.numero_resuelto, 10) || 0;
+          const count =
+            parseInt(item.numero, 10) ||
+            parseInt(item.numero_resuelto, 10) ||
+            0;
           totalEnProceso += count;
           labels.push(item.tipo || item.des_resol || "OTRO");
           values.push(count);
@@ -369,7 +392,10 @@ export class RsindicadoresComponent
         let totalEnProcesoMinistro = 0;
 
         data.Cuerpo.forEach((item: any) => {
-          const count = parseInt(item.numero, 10) || parseInt(item.numero_resuelto, 10) || 0;
+          const count =
+            parseInt(item.numero, 10) ||
+            parseInt(item.numero_resuelto, 10) ||
+            0;
           totalEnProcesoMinistro += count;
         });
 
