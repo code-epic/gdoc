@@ -271,6 +271,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     { valor: "6", texto: "REDISTRIBUCION" },
   ];
 
+  public Componentes: any;
+  public Grados: any;
+  public Categorias: any;
+  public Clasificaciones: any;
+  public TipoEntradas: any;
+  public TipoResoluciones: any;
+  public Estados: any;
+  public Carpetas: any;
+  public OrdenNumero: any;
+
   constructor(
     private apiService: ApiService,
     public loginService: LoginService,
@@ -287,6 +297,43 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.Componentes =
+      sessionStorage.getItem("MPPD_CComponente") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CComponente")))
+        : [];
+    this.Grados =
+      sessionStorage.getItem("MPPD_CGrado") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CGrado")))
+        : [];
+    this.Categorias =
+      sessionStorage.getItem("MPPD_CCategorias") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCategorias")))
+        : [];
+    this.Clasificaciones =
+      sessionStorage.getItem("MPPD_CClasificacion") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CClasificacion")))
+        : [];
+    this.TipoEntradas =
+      sessionStorage.getItem("MPPD_CTipoEntrada") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoEntrada")))
+        : [];
+    this.TipoResoluciones =
+      sessionStorage.getItem("MPPD_CTipoResolucion") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CTipoResolucion")))
+        : [];
+    this.Estados =
+      sessionStorage.getItem("MPPD_CEstadoResolucion") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CEstadoResolucion")))
+        : [];
+    this.Carpetas =
+      sessionStorage.getItem("MPPD_CCarpetaEntrada") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_CCarpetaEntrada")))
+        : [];
+    this.OrdenNumero =
+      sessionStorage.getItem("MPPD_COrdenEntrada") != undefined
+        ? JSON.parse(atob(sessionStorage.getItem("MPPD_COrdenEntrada")))
+        : [];
+
     // Clase inmersiva para ocultar sidebar y navbar
     document.body.classList.add("immersive-active");
     document.documentElement.classList.add("immersive-active");
@@ -1753,6 +1800,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     } catch (err) {
       console.warn("[DocumentosOk] Error en cargarFotosBuzon:", err);
     }
+
+    if (this.selectedCarpeta?.id === "RECLAMOS") {
+      this.consultarDatosBasicos();
+    }
+
     this.changeDetector.markForCheck();
     this.changeDetector.detectChanges();
   }
@@ -1773,6 +1825,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     } catch (err) {
       console.warn("[DocumentosOk] Error en cargarFotosBuzon:", err);
     }
+
+    if (this.selectedCarpeta?.id === "RECLAMOS") {
+      this.consultarDatosBasicos();
+    }
+
     this.changeDetector.markForCheck();
     this.changeDetector.detectChanges();
   }
@@ -2349,5 +2406,54 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
       },
     ); //
+  }
+  public perfilSolicitante: any = null;
+
+  consultarDatosBasicos() {
+    this.perfilSolicitante = null;
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "MPPD_CDatosBasicos";
+    this.xAPI.parametros = this.activeDoc.sub_cedula || this.activeDoc.cedula;
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async (data) => {
+        if (data && data.Cuerpo && data.Cuerpo.length > 0) {
+          this.perfilSolicitante = data.Cuerpo[0];
+          this.changeDetector.detectChanges();
+        }
+      },
+      (errot) => {
+        this.toastrService.error(errot, `GDoc Wkf.DatosBasicos`);
+      },
+    ); 
+  }
+
+  getNombreCategoria(id: string): string {
+    if (!this.Categorias || !id) return id;
+    const cat = this.Categorias.find((c: any) => c.codigo == id || c.id == id || c.valor == id || c.cod_categoria == id);
+    return cat ? cat.nombre || cat.descripcion || cat.texto || cat.nombre_categoria || id : id;
+  }
+
+  getNombreClasificacion(id: string): string {
+    if (!this.Clasificaciones || !id) return id;
+    const clas = this.Clasificaciones.find((c: any) => c.codigo == id || c.id == id || c.valor == id || c.cod_clasificacion == id);
+    return clas ? clas.nombre || clas.descripcion || clas.texto || clas.nombre_clasificacion || id : id;
+  }
+
+  getNombreComponente(id: string): string {
+    if (!this.Componentes || !id) return id;
+    const comp = this.Componentes.find((c: any) => c.codigo == id || c.id == id || c.valor == id || c.cod_componente == id);
+    return comp ? comp.nombre || comp.descripcion || comp.texto || comp.nombre_componente || id : id;
+  }
+
+  formatDateSpanish(dateStr: string): string {
+    if (!dateStr || dateStr === '1900-01-01') return 'NO REGISTRA';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+    const monthIndex = parseInt(parts[1], 10) - 1;
+    if (monthIndex >= 0 && monthIndex < 12) {
+      return `${parts[2]}${months[monthIndex]}${parts[0]}`;
+    }
+    return dateStr;
   }
 }

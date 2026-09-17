@@ -631,44 +631,50 @@
           </div>
 
           <!-- Identificación Card RECLAMOS -->
-          <div class="info-card-block" *ngIf="selectedCarpeta?.id === 'RECLAMOS'">
-            <div class="block-title">
-              <i class="fas fa-info-circle text-primary mr-1"></i> Perfil del Solicitante
+          <div class="info-card-block" *ngIf="selectedCarpeta?.id === 'RECLAMOS'" style="overflow: hidden;">
+            <div class="block-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 5px; overflow: hidden;">
+              <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><i class="fas fa-info-circle text-primary mr-1"></i> Perfil del Solicitante</span>
+              <span class="badge badge-warning text-dark py-1 px-2" style="font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap; flex-shrink: 0;" *ngIf="perfilSolicitante?.ultimo_ascenso">
+                 ÚLT. ASCENSO: {{ formatDateSpanish(perfilSolicitante.ultimo_ascenso) }}
+              </span>
             </div>
-            <div class="reclamos-profile-grid" style="display: flex; gap: 15px; align-items: center; margin-top: 15px; flex-wrap: wrap;">
-              <div class="reclamos-avatar" style="flex-shrink: 0; min-width: 90px;" *ngIf="getCedula(activeDoc)">
-                <img [src]="fotosCasos[getCedula(activeDoc)]"
-                     *ngIf="!loadingFotos[getCedula(activeDoc)] && fotosCasos[getCedula(activeDoc)]"
-                     style="width: 90px; height: 110px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 2px solid #fff;"
-                     alt="Avatar">
-                <div *ngIf="loadingFotos[getCedula(activeDoc)]" style="width: 90px; height: 110px; background: #f4f5f7; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            
+            <!-- Nombre en cabecera alineado -->
+            <div class="text-center mt-3 mb-2 pb-2 border-bottom" *ngIf="getNombre(activeDoc)">
+               <h5 class="font-weight-bolder mb-0 text-uppercase" style="color: #0f172a; letter-spacing: 0.5px; word-break: break-word; font-size: 1.25rem; line-height: 1.2;">{{ getNombre(activeDoc) }}</h5>
+               <small class="text-primary font-weight-bold" style="letter-spacing: 1px; font-size: 0.8rem; text-transform: uppercase; margin-top: 4px; display: block;">
+                  {{ perfilSolicitante?.categoria ? getNombreCategoria(perfilSolicitante.categoria) : 'TITULAR / AFILIADO' }}
+               </small>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; margin-top: 15px;">
+              <!-- Foto clickeable centrada -->
+              <div class="reclamos-avatar mb-3" *ngIf="getCedula(activeDoc)">
+                <a [href]="fotosCasos[getCedula(activeDoc)]" target="_blank" title="Haz clic para ampliar" style="display: inline-block; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                  <img [src]="fotosCasos[getCedula(activeDoc)]"
+                       *ngIf="!loadingFotos[getCedula(activeDoc)] && fotosCasos[getCedula(activeDoc)]"
+                       style="width: 120px; height: 150px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 2px solid #fff;"
+                       alt="Avatar">
+                </a>
+                <div *ngIf="loadingFotos[getCedula(activeDoc)]" style="width: 120px; height: 150px; background: #f4f5f7; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
                   <i class="fas fa-spinner fa-spin text-primary fa-2x"></i>
                 </div>
-                <div *ngIf="!loadingFotos[getCedula(activeDoc)] && !fotosCasos[getCedula(activeDoc)]" style="width: 90px; height: 110px; background: #e9ecef; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #adb5bd;">
+                <div *ngIf="!loadingFotos[getCedula(activeDoc)] && !fotosCasos[getCedula(activeDoc)]" style="width: 120px; height: 150px; background: #e9ecef; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #adb5bd; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
                   <i class="fas fa-user fa-3x"></i>
                 </div>
               </div>
-              <div class="info-grid" style="flex: 1; grid-template-columns: 1fr; gap: 8px; min-width: 200px;">
-                <div class="info-item" *ngIf="getNombre(activeDoc)">
-                  <span class="info-label">Titular / Afiliado</span>
-                  <span class="info-val font-weight-bold" style="font-size: 1.05rem; line-height: 1.1;">{{ getNombre(activeDoc) }}</span>
-                </div>
-                <div class="info-item" *ngIf="getCedula(activeDoc)">
-                  <span class="info-label">Cédula Principal</span>
-                  <span class="info-val highlight">{{ getCedula(activeDoc) }}</span>
-                </div>
-                <div class="info-item" *ngIf="getCargo(activeDoc)">
-                  <span class="info-label">Grado / Cargo</span>
-                  <span class="info-val text-primary font-weight-bold" style="line-height: 1.1;">{{ getCargo(activeDoc) }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">Nº Expediente</span>
-                  <span class="info-val">
-                    <span class="badge badge-warning text-dark py-1 px-2" style="font-size: 0.8rem;">
-                      {{ activeDoc.numc || activeDoc.ncontrol || activeDoc.cuenta || 'Sin Número' }}
-                    </span>
-                  </span>
-                </div>
+            </div>
+
+            <!-- Lista de datos vertical -->
+            <div class="info-list" style="display: flex; flex-direction: column; gap: 8px;">
+              <div class="info-item d-flex justify-content-between align-items-center" *ngIf="getCedula(activeDoc)" style="background-color: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <span class="info-label text-muted" style="font-size: 0.75rem;">Cédula Principal</span>
+                <span class="info-val highlight font-weight-bold" style="font-size: 0.95rem;">{{ getCedula(activeDoc) }}</span>
+              </div>
+              
+              <div class="info-item" *ngIf="getCargo(activeDoc)" style="background-color: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <span class="info-label text-muted" style="font-size: 0.75rem; display: block; margin-bottom: 2px;">Grado / Cargo</span>
+                <span class="info-val text-primary font-weight-bold" style="font-size: 0.85rem; line-height: 1.3; display: block;">{{ getCargo(activeDoc) }}</span>
               </div>
             </div>
           </div>
