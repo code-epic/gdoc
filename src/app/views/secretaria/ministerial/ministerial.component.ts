@@ -913,6 +913,7 @@ export class MinisterialComponent implements OnInit {
           let safeJson = jsonToParse;
           if (typeof safeJson === "string") {
             safeJson = safeJson.replace(/u003c/g, "<").replace(/u003e/g, ">");
+            safeJson = safeJson.replace(/u0026/g, "&");
             safeJson = safeJson.replace(/="([^"]*)"/g, "='$1'"); // Cambia atributos HTML a comilla simple
           }
 

@@ -1623,6 +1623,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         let safeJson = jsonToParse;
         if (typeof safeJson === "string") {
           safeJson = safeJson.replace(/u003c/g, "<").replace(/u003e/g, ">");
+          safeJson = safeJson.replace(/u0026/g, "&");
           safeJson = safeJson.replace(/="([^"]*)"/g, "='$1'");
         }
 
