@@ -474,7 +474,12 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     const p = (perfilVal || "").toUpperCase();
     const r = (this.jwtData.userRole || "").toUpperCase();
 
-    if (p.includes("MINISTRO") || r.includes("MIN") || r.includes("FIRMAN")) {
+    if (
+      p.includes("MINISTRO") ||
+      p.includes("APROB") ||
+      r.includes("MIN") ||
+      r.includes("FIRMAN")
+    ) {
       this.currentProfile = "Ministro";
     } else if (p.includes("DIRECCION") || r.includes("DIR")) {
       this.currentProfile = "Direccion";
