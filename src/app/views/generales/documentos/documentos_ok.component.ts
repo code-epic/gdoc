@@ -414,9 +414,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         } else if (this.currentProfile === "Ministro") {
           c.estadoOrigen = 6;
         } else {
-          // Perfil inicial / JefeSecretaria: respeta estadoOrigen inicial propio del objeto (2 para Punto de Cuenta y Reclamos, 4 para TOR)
+          // Perfil inicial / JefeSecretaria: respeta estadoOrigen inicial propio del objeto (2 para Punto de Cuenta y Reclamos, 3 para Presidenciales, 4 para TOR)
           c.estadoOrigen =
-            c.id === "PUNTO_DE_CUENTA" || c.id === "RECLAMOS" ? 2 : 4;
+            c.id === "PUNTO_DE_CUENTA" || c.id === "RECLAMOS" ? 2 : (c.id === "PRESIDENCIALES" ? 3 : 4);
         }
       }
     });
@@ -612,7 +612,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       carpeta.estadoActual || (carpeta.id === "RECLAMOS" ? 6 : 4);
     this.estadoOrigen =
       carpeta.estadoOrigen ||
-      (carpeta.id === "PUNTO_DE_CUENTA" || carpeta.id === "RECLAMOS" ? 2 : 4);
+      (carpeta.id === "PUNTO_DE_CUENTA" || carpeta.id === "RECLAMOS" ? 2 : (carpeta.id === "PRESIDENCIALES" ? 3 : 4));
 
     this.loadingBuzon = true;
     this.ngxService.startLoader("loader-documentos");

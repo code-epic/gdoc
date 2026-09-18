@@ -640,9 +640,9 @@
             </div>
             
             <!-- Nombre en cabecera alineado -->
-            <div class="text-center mt-3 mb-2 pb-2 border-bottom" *ngIf="getNombre(activeDoc)">
-               <h5 class="font-weight-bolder mb-0 text-uppercase" style="color: #0f172a; letter-spacing: 0.5px; word-break: break-word; font-size: 1.25rem; line-height: 1.2;">{{ getNombre(activeDoc) }}</h5>
-               <small class="text-primary font-weight-bold" style="letter-spacing: 1px; font-size: 0.8rem; text-transform: uppercase; margin-top: 4px; display: block;">
+            <div class="text-center mt-3 mb-2 pb-2 border-bottom" *ngIf="getNombre(activeDoc)" style="overflow: hidden;">
+               <h5 class="font-weight-bolder mb-0 text-uppercase" style="color: #0f172a; letter-spacing: 0.5px; font-size: 1.25rem; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" [title]="getNombre(activeDoc)">{{ getNombre(activeDoc) }}</h5>
+               <small class="text-primary font-weight-bold" style="letter-spacing: 1px; font-size: 0.8rem; text-transform: uppercase; margin-top: 4px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" [title]="perfilSolicitante?.categoria ? getNombreCategoria(perfilSolicitante.categoria) : 'TITULAR / AFILIADO'">
                   {{ perfilSolicitante?.categoria ? getNombreCategoria(perfilSolicitante.categoria) : 'TITULAR / AFILIADO' }}
                </small>
             </div>
@@ -672,9 +672,20 @@
                 <span class="info-val highlight font-weight-bold" style="font-size: 0.95rem;">{{ getCedula(activeDoc) }}</span>
               </div>
               
-              <div class="info-item" *ngIf="getCargo(activeDoc)" style="background-color: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                <span class="info-label text-muted" style="font-size: 0.75rem; display: block; margin-bottom: 2px;">Grado / Cargo</span>
-                <span class="info-val text-primary font-weight-bold" style="font-size: 0.85rem; line-height: 1.3; display: block;">{{ getCargo(activeDoc) }}</span>
+              <!-- Grado (Sin etiqueta) -->
+              <div class="info-item text-center" *ngIf="getCargo(activeDoc)" style="background-color: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                <span class="info-val text-primary font-weight-bold" style="font-size: 0.78rem; line-height: 1.2; text-transform: uppercase;">{{ getCargo(activeDoc) }}</span>
+              </div>
+
+              <!-- Cargo (Sin etiqueta) -->
+              <div class="info-item text-center" *ngIf="perfilSolicitante?.cargo" style="background-color: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                <span class="info-val font-weight-bold" style="font-size: 0.78rem; line-height: 1.2; color: #475569; text-transform: uppercase;">{{ perfilSolicitante.cargo }}</span>
+              </div>
+
+              <!-- Contacto -->
+              <div class="info-item d-flex justify-content-between align-items-center" *ngIf="perfilSolicitante?.telefono" style="background-color: #f0fdf4; padding: 8px 12px; border-radius: 6px; border: 1px solid #bbf7d0;">
+                <span class="info-label text-success" style="font-size: 0.75rem;"><i class="fas fa-phone-alt mr-1"></i>Contacto</span>
+                <span class="info-val font-weight-bold text-dark" style="font-size: 0.95rem;">{{ perfilSolicitante.telefono }}</span>
               </div>
             </div>
           </div>
