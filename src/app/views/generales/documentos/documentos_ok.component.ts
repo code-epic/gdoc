@@ -231,6 +231,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       filtro: 1,
     },
     {
+      id: "ACTIVIDADES_EN_EL_EXTERIOR",
+      nombre: "ACTIVIDADES EN EL EXTERIOR",
+      icono: "fas fa-envelope",
+      color: "#fb6340",
+      disponible: true,
+      funcion: "WKF_CDocumentosGestionViajes",
+      estadoActual: 2,
+      estadoOrigen: 2,
+      filtro: 1,
+    },
+    {
       id: "RADIOGRAMAS",
       nombre: "RADIOGRAMAS",
       icono: "fas fa-broadcast-tower",
@@ -249,13 +260,6 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       nombre: "DIPLOMAS",
       icono: "fas fa-certificate",
       color: "#ffd600",
-      disponible: false,
-    },
-    {
-      id: "ACTIVIDADES EN EL EXTERIOR",
-      nombre: "ACTIVIDADES EN EL EXTERIOR",
-      icono: "fas fa-envelope",
-      color: "#fb6340",
       disponible: false,
     },
   ];
@@ -406,7 +410,12 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     this.carpetas.forEach((c) => {
       if (c.disponible) {
-        c.estadoActual = c.id === "RECLAMOS" ? c.estadoActual || 6 : 4;
+        c.estadoActual =
+          c.id === "RECLAMOS"
+            ? c.estadoActual || 6
+            : c.id === "ACTIVIDADES_EN_EL_EXTERIOR"
+              ? 2
+              : 4;
         if (this.selectedEstadoBuzon === "firmados") {
           c.estadoOrigen = 7;
         } else if (this.currentProfile === "Direccion") {
@@ -414,9 +423,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         } else if (this.currentProfile === "Ministro") {
           c.estadoOrigen = 6;
         } else {
-          // Perfil inicial / JefeSecretaria: respeta estadoOrigen inicial propio del objeto (2 para Punto de Cuenta y Reclamos, 3 para Presidenciales, 4 para TOR)
+          // Perfil inicial / JefeSecretaria: respeta estadoOrigen inicial propio del objeto (2 para Punto de Cuenta, Reclamos y Actividades, 3 para Presidenciales, 4 para TOR)
           c.estadoOrigen =
-            c.id === "PUNTO_DE_CUENTA" || c.id === "RECLAMOS" ? 2 : (c.id === "PRESIDENCIALES" ? 3 : 4);
+            c.id === "PUNTO_DE_CUENTA" ||
+            c.id === "RECLAMOS" ||
+            c.id === "ACTIVIDADES_EN_EL_EXTERIOR"
+              ? 2
+              : c.id === "PRESIDENCIALES"
+                ? 3
+                : 4;
         }
       }
     });
@@ -609,10 +624,21 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     this.updateEstadosFromProfile();
     this.estadoActual =
-      carpeta.estadoActual || (carpeta.id === "RECLAMOS" ? 6 : 4);
+      carpeta.estadoActual ||
+      (carpeta.id === "RECLAMOS"
+        ? 6
+        : carpeta.id === "ACTIVIDADES_EN_EL_EXTERIOR"
+          ? 2
+          : 4);
     this.estadoOrigen =
       carpeta.estadoOrigen ||
-      (carpeta.id === "PUNTO_DE_CUENTA" || carpeta.id === "RECLAMOS" ? 2 : (carpeta.id === "PRESIDENCIALES" ? 3 : 4));
+      (carpeta.id === "PUNTO_DE_CUENTA" ||
+      carpeta.id === "RECLAMOS" ||
+      carpeta.id === "ACTIVIDADES_EN_EL_EXTERIOR"
+        ? 2
+        : carpeta.id === "PRESIDENCIALES"
+          ? 3
+          : 4);
 
     this.loadingBuzon = true;
     this.ngxService.startLoader("loader-documentos");
@@ -2207,7 +2233,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   // ─── Acciones: Favorable / Diferido / Negado / Firmar ─────────────────────────
   public ejecutarAccion(
-    decision: "FAVORABLE" | "DIFERIDO" | "NEGADO" | "FIRMAR",
+    decision: "FAVORABLE" | "DIFERIDO" | "NEGADO" | "FIRMAR" | "ARCHIVAR",
   ): void {
     if (!this.activeDoc) return;
     if (
@@ -2226,19 +2252,47 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   async redistribuir(decision: any) {
-    let estadoDestino = Math.min(this.estadoOrigen + 1, 7);
+    if (decision === "ARCHIVAR") {
+      const confirm = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¿Estás seguro de archivar el documento? En cualquier otro momento puede ser recuperado.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, archivar",
+        cancelButtonText: "Cancelar",
+      });
 
-    // Flujo especial exclusivo para RECLAMOS
-    if (this.selectedCarpeta?.id === "RECLAMOS") {
-      if (this.estadoOrigen === 2) estadoDestino = 5;
-      else if (this.estadoOrigen === 5) estadoDestino = 6;
-      else if (this.estadoOrigen === 6) estadoDestino = 7;
+      if (!confirm.isConfirmed) {
+        this.loadingAction = false;
+        return;
+      }
+
+      let localEstadoActual = this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ? 11 : 14;
+      let localEstadoDestino = 1;
+
+      this.xAPI = {} as IAPICore;
+      this.xAPI.funcion = "WKF_ARedistribuir";
+      this.xAPI.valores = "";
+      this.xAPI.parametros = `${localEstadoActual},${localEstadoActual},${localEstadoDestino},${this.jwtData.userId},${this.activeDoc.idd}`;
+      console.log(this.xAPI.parametros);
+    } else {
+      let estadoDestino = Math.min(this.estadoOrigen + 1, 7);
+
+      // Flujo especial exclusivo para RECLAMOS
+      if (this.selectedCarpeta?.id === "RECLAMOS") {
+        if (this.estadoOrigen === 2) estadoDestino = 5;
+        else if (this.estadoOrigen === 5) estadoDestino = 6;
+        else if (this.estadoOrigen === 6) estadoDestino = 7;
+      }
+      this.xAPI = {} as IAPICore;
+      this.xAPI.funcion = "WKF_ARedistribuir";
+      this.xAPI.valores = "";
+      this.xAPI.parametros = `${this.estadoActual},${this.estadoActual},${estadoDestino},${this.jwtData.userId},${this.activeDoc.idd}`;
+      console.log(this.xAPI.parametros);
     }
-    this.xAPI = {} as IAPICore;
-    this.xAPI.funcion = "WKF_ARedistribuir";
-    this.xAPI.valores = "";
-    this.xAPI.parametros = `${this.estadoActual},${this.estadoActual},${estadoDestino},${this.jwtData.userId},${this.activeDoc.idd}`;
-    console.log(this.xAPI.parametros);
+
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         const msgLabel =
@@ -2424,35 +2478,333 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       (errot) => {
         this.toastrService.error(errot, `GDoc Wkf.DatosBasicos`);
       },
-    ); 
+    );
   }
 
   getNombreCategoria(id: string): string {
     if (!this.Categorias || !id) return id;
-    const cat = this.Categorias.find((c: any) => c.codigo == id || c.id == id || c.valor == id || c.cod_categoria == id);
-    return cat ? cat.nombre || cat.descripcion || cat.texto || cat.nombre_categoria || id : id;
+    const cat = this.Categorias.find(
+      (c: any) =>
+        c.codigo == id || c.id == id || c.valor == id || c.cod_categoria == id,
+    );
+    return cat
+      ? cat.nombre || cat.descripcion || cat.texto || cat.nombre_categoria || id
+      : id;
   }
 
   getNombreClasificacion(id: string): string {
     if (!this.Clasificaciones || !id) return id;
-    const clas = this.Clasificaciones.find((c: any) => c.codigo == id || c.id == id || c.valor == id || c.cod_clasificacion == id);
-    return clas ? clas.nombre || clas.descripcion || clas.texto || clas.nombre_clasificacion || id : id;
+    const clas = this.Clasificaciones.find(
+      (c: any) =>
+        c.codigo == id ||
+        c.id == id ||
+        c.valor == id ||
+        c.cod_clasificacion == id,
+    );
+    return clas
+      ? clas.nombre ||
+          clas.descripcion ||
+          clas.texto ||
+          clas.nombre_clasificacion ||
+          id
+      : id;
   }
 
   getNombreComponente(id: string): string {
     if (!this.Componentes || !id) return id;
-    const comp = this.Componentes.find((c: any) => c.codigo == id || c.id == id || c.valor == id || c.cod_componente == id);
-    return comp ? comp.nombre || comp.descripcion || comp.texto || comp.nombre_componente || id : id;
+    const comp = this.Componentes.find(
+      (c: any) =>
+        c.codigo == id || c.id == id || c.valor == id || c.cod_componente == id,
+    );
+    return comp
+      ? comp.nombre ||
+          comp.descripcion ||
+          comp.texto ||
+          comp.nombre_componente ||
+          id
+      : id;
   }
 
   formatDateSpanish(dateStr: string): string {
-    if (!dateStr || dateStr === '1900-01-01') return 'NO REGISTRA';
-    const parts = dateStr.split('-');
+    if (!dateStr || dateStr === "1900-01-01") return "NO REGISTRA";
+    const parts = dateStr.split("-");
     if (parts.length !== 3) return dateStr;
-    const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+    const months = [
+      "ENE",
+      "FEB",
+      "MAR",
+      "ABR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AGO",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DIC",
+    ];
     const monthIndex = parseInt(parts[1], 10) - 1;
     if (monthIndex >= 0 && monthIndex < 12) {
       return `${parts[2]}${months[monthIndex]}${parts[0]}`;
+    }
+    return dateStr;
+  }
+
+  // ─── Actividades en el Exterior ──────────────────────────────────────────────
+  public getViajesData(doc: any): any {
+    if (doc && doc.viajes_descripcion) {
+      if (doc._parsedViajesData) {
+        return doc._parsedViajesData;
+      }
+      try {
+        let data = doc.viajes_descripcion;
+        while (typeof data === "string") {
+          data = JSON.parse(data);
+        }
+        doc._parsedViajesData = data;
+        return data;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  public formatNgbDate(dateObj: any): string {
+    if (!dateObj || !dateObj.day || !dateObj.month || !dateObj.year)
+      return "No definida";
+    const day = dateObj.day < 10 ? "0" + dateObj.day : dateObj.day;
+    const months = [
+      "ENE",
+      "FEB",
+      "MAR",
+      "ABR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AGO",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DIC",
+    ];
+    const monthStr = months[dateObj.month - 1] || "???";
+    return `${day}${monthStr}${dateObj.year}`;
+  }
+
+  public getFlagUrl(countryName: string): string {
+    if (!countryName) return "assets/images/placeholder-flag.png";
+    const name = countryName.toLowerCase().trim();
+    const isoCode = this.countryToIsoMap[name];
+    if (isoCode) {
+      return `https://flagcdn.com/w160/${isoCode}.png`;
+    }
+    return "assets/images/placeholder-flag.png";
+  }
+
+  private readonly countryToIsoMap: { [key: string]: string } = {
+    afganistán: "af",
+    albania: "al",
+    alemania: "de",
+    andorra: "ad",
+    angola: "ao",
+    "antigua y barbuda": "ag",
+    "arabia saudita": "sa",
+    argelia: "dz",
+    argentina: "ar",
+    armenia: "am",
+    australia: "au",
+    austria: "at",
+    azerbaiyán: "az",
+    bahamas: "bs",
+    bangladés: "bd",
+    barbados: "bb",
+    baréin: "bh",
+    bélgica: "be",
+    belice: "bz",
+    benín: "bj",
+    bielorrusia: "by",
+    birmania: "mm",
+    bolivia: "bo",
+    "bosnia y herzegovina": "ba",
+    botsuana: "bw",
+    brasil: "br",
+    brunéi: "bn",
+    bulgaria: "bg",
+    "burkina faso": "bf",
+    burundi: "bi",
+    bután: "bt",
+    "cabo verde": "cv",
+    camboya: "kh",
+    camerún: "cm",
+    canadá: "ca",
+    catar: "qa",
+    chad: "td",
+    chile: "cl",
+    china: "cn",
+    chipre: "cy",
+    "ciudad del vaticano": "va",
+    colombia: "co",
+    comoras: "km",
+    "corea del norte": "kp",
+    "corea del sur": "kr",
+    "costa de marfil": "ci",
+    "costa rica": "cr",
+    croacia: "hr",
+    cuba: "cu",
+    dinamarca: "dk",
+    dominica: "dm",
+    ecuador: "ec",
+    egipto: "eg",
+    "el salvador": "sv",
+    "emiratos árabes unidos": "ae",
+    eritrea: "er",
+    eslovaquia: "sk",
+    eslovenia: "si",
+    españa: "es",
+    "estados unidos": "us",
+    estonia: "ee",
+    etiopía: "et",
+    filipinas: "ph",
+    finlandia: "fi",
+    fiyi: "fj",
+    francia: "fr",
+    gabón: "ga",
+    gambia: "gm",
+    georgia: "ge",
+    ghana: "gh",
+    granada: "gd",
+    grecia: "gr",
+    guatemala: "gt",
+    guyana: "gy",
+    guinea: "gn",
+    "guinea ecuatorial": "gq",
+    "guinea-bisáu": "gw",
+    haití: "ht",
+    honduras: "hn",
+    hungría: "hu",
+    india: "in",
+    indonesia: "id",
+    irak: "iq",
+    irán: "ir",
+    irlanda: "ie",
+    islandia: "is",
+    "islas marshall": "mh",
+    "islas salomón": "sb",
+    israel: "il",
+    italia: "it",
+    jamaica: "jm",
+    japón: "jp",
+    jordania: "jo",
+    kazajistán: "kz",
+    kenia: "ke",
+    kirguistán: "kg",
+    kiribati: "ki",
+    kuwait: "kw",
+    laos: "la",
+    lesoto: "ls",
+    letonia: "lv",
+    líbano: "lb",
+    liberia: "lr",
+    libia: "ly",
+    liechtenstein: "li",
+    lituania: "lt",
+    luxemburgo: "lu",
+    "macedonia del norte": "mk",
+    madagascar: "mg",
+    malasia: "my",
+    malaui: "mw",
+    maldivas: "mv",
+    malí: "ml",
+    malta: "mt",
+    marruecos: "ma",
+    mauricio: "mu",
+    mauritania: "mr",
+    méxico: "mx",
+    micronesia: "fm",
+    moldavia: "md",
+    mónaco: "mc",
+    mongolia: "mn",
+    montenegro: "me",
+    mozambique: "mz",
+    namibia: "na",
+    nauru: "nr",
+    nepal: "np",
+    nicaragua: "ni",
+    níger: "ne",
+    nigeria: "ng",
+    noruega: "no",
+    "nueva zelanda": "nz",
+    omán: "om",
+    "países bajos": "nl",
+    pakistán: "pk",
+    palaos: "pw",
+    panamá: "pa",
+    "papúa nueva guinea": "pg",
+    paraguay: "py",
+    perú: "pe",
+    polonia: "pl",
+    portugal: "pt",
+    "reino unido": "gb",
+    "república centroafricana": "cf",
+    "república checa": "cz",
+    "república del congo": "cg",
+    "república democrática del congo": "cd",
+    "república dominicana": "do",
+    ruanda: "rw",
+    rumanía: "ro",
+    rusia: "ru",
+    samoa: "ws",
+    "san cristóbal y nieves": "kn",
+    "san marino": "sm",
+    "san vicente y las granadinas": "vc",
+    "santa lucía": "lc",
+    "santo tomé y príncipe": "st",
+    senegal: "sn",
+    serbia: "rs",
+    seychelles: "sc",
+    "sierra leona": "sl",
+    singapur: "sg",
+    siria: "sy",
+    somalia: "so",
+    "sri lanka": "lk",
+    suazilandia: "sz",
+    sudáfrica: "za",
+    sudán: "sd",
+    "sudán del sur": "ss",
+    suecia: "se",
+    suiza: "ch",
+    surinam: "sr",
+    tailandia: "th",
+    tanzania: "tz",
+    tayikistán: "tj",
+    "timor oriental": "tl",
+    togo: "tg",
+    tonga: "to",
+    "trinidad y tobago": "tt",
+    túnez: "tn",
+    turkmenistán: "tm",
+    turquía: "tr",
+    tuvalu: "tv",
+    ucrania: "ua",
+    uganda: "ug",
+    uruguay: "uy",
+    uzbekistán: "uz",
+    vanuatu: "vu",
+    venezuela: "ve",
+    vietnam: "vn",
+    yemen: "ye",
+    yibuti: "dj",
+    zambia: "zm",
+    zimbabue: "zw",
+  };
+
+  public formatFechaRegistro(dateStr: string): string {
+    if (!dateStr || dateStr === "1900-01-01") return "—";
+    const cleanDate = dateStr.split(" ")[0]; // YYYY-MM-DD
+    const parts = cleanDate.split("-");
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
     return dateStr;
   }

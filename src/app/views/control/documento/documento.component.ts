@@ -184,6 +184,220 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     dependencias: "",
   };
 
+  // --- Actividades en el exterior ---
+  public esActividadExterior: boolean = false;
+  public paises: string[] = [
+    "Afganistán",
+    "Albania",
+    "Alemania",
+    "Andorra",
+    "Angola",
+    "Antigua y Barbuda",
+    "Arabia Saudita",
+    "Argelia",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaiyán",
+    "Bahamas",
+    "Bangladés",
+    "Barbados",
+    "Baréin",
+    "Bélgica",
+    "Belice",
+    "Benín",
+    "Bielorrusia",
+    "Birmania",
+    "Bolivia",
+    "Bosnia y Herzegovina",
+    "Botsuana",
+    "Brasil",
+    "Brunéi",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Bután",
+    "Cabo Verde",
+    "Camboya",
+    "Camerún",
+    "Canadá",
+    "Catar",
+    "Chad",
+    "Chile",
+    "China",
+    "Chipre",
+    "Ciudad del Vaticano",
+    "Colombia",
+    "Comoras",
+    "Corea del Norte",
+    "Corea del Sur",
+    "Costa de Marfil",
+    "Costa Rica",
+    "Croacia",
+    "Cuba",
+    "Dinamarca",
+    "Dominica",
+    "Ecuador",
+    "Egipto",
+    "El Salvador",
+    "Emiratos Árabes Unidos",
+    "Eritrea",
+    "Eslovaquia",
+    "Eslovenia",
+    "España",
+    "Estados Unidos",
+    "Estonia",
+    "Etiopía",
+    "Filipinas",
+    "Finlandia",
+    "Fiyi",
+    "Francia",
+    "Gabón",
+    "Gambia",
+    "Georgia",
+    "Ghana",
+    "Granada",
+    "Grecia",
+    "Guatemala",
+    "Guyana",
+    "Guinea",
+    "Guinea ecuatorial",
+    "Guinea-Bisáu",
+    "Haití",
+    "Honduras",
+    "Hungría",
+    "India",
+    "Indonesia",
+    "Irak",
+    "Irán",
+    "Irlanda",
+    "Islandia",
+    "Islas Marshall",
+    "Islas Salomón",
+    "Israel",
+    "Italia",
+    "Jamaica",
+    "Japón",
+    "Jordania",
+    "Kazajistán",
+    "Kenia",
+    "Kirguistán",
+    "Kiribati",
+    "Kuwait",
+    "Laos",
+    "Lesoto",
+    "Letonia",
+    "Líbano",
+    "Liberia",
+    "Libia",
+    "Liechtenstein",
+    "Lituania",
+    "Luxemburgo",
+    "Macedonia del Norte",
+    "Madagascar",
+    "Malasia",
+    "Malaui",
+    "Maldivas",
+    "Malí",
+    "Malta",
+    "Marruecos",
+    "Mauricio",
+    "Mauritania",
+    "México",
+    "Micronesia",
+    "Moldavia",
+    "Mónaco",
+    "Mongolia",
+    "Montenegro",
+    "Mozambique",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Nicaragua",
+    "Níger",
+    "Nigeria",
+    "Noruega",
+    "Nueva Zelanda",
+    "Omán",
+    "Países Bajos",
+    "Pakistán",
+    "Palaos",
+    "Panamá",
+    "Papúa Nueva Guinea",
+    "Paraguay",
+    "Perú",
+    "Polonia",
+    "Portugal",
+    "Reino Unido",
+    "República Centroafricana",
+    "República Checa",
+    "República del Congo",
+    "República Democrática del Congo",
+    "República Dominicana",
+    "Ruanda",
+    "Rumanía",
+    "Rusia",
+    "Samoa",
+    "San Cristóbal y Nieves",
+    "San Marino",
+    "San Vicente y las Granadinas",
+    "Santa Lucía",
+    "Santo Tomé y Príncipe",
+    "Senegal",
+    "Serbia",
+    "Seychelles",
+    "Sierra Leona",
+    "Singapur",
+    "Siria",
+    "Somalia",
+    "Sri Lanka",
+    "Suazilandia",
+    "Sudáfrica",
+    "Sudán",
+    "Sudán del Sur",
+    "Suecia",
+    "Suiza",
+    "Surinam",
+    "Tailandia",
+    "Tanzania",
+    "Tayikistán",
+    "Timor Oriental",
+    "Togo",
+    "Tonga",
+    "Trinidad y Tobago",
+    "Túnez",
+    "Turkmenistán",
+    "Turquía",
+    "Tuvalu",
+    "Ucrania",
+    "Uganda",
+    "Uruguay",
+    "Uzbekistán",
+    "Vanuatu",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Yibuti",
+    "Zambia",
+    "Zimbabue",
+  ];
+  public actividadesExt: any = {
+    pais: "",
+    motivo: "",
+    dirigido: "",
+    personas: "",
+    fechaInicio: null,
+    fechaFin: null,
+    fechaConfirmacion: null,
+    gastos: {
+      boletos: "",
+      alimentacion: "",
+      alojamiento: "",
+      transporte: "",
+    },
+  };
+
   public booDependencia = false;
 
   public lstT: any[] = []; //Objeto Tipo documento
@@ -423,6 +637,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.WAlerta.estatus = this.estadoOrigen;
             this.WAlerta.usuario = this.loginService.Usuario.id;
           }
+
+          if (e.viajes_descripcion) {
+            try {
+              this.actividadesExt = JSON.parse(e.viajes_descripcion);
+            } catch (err) {
+              console.error("Error parsing viajes_descripcion", err);
+            }
+          }
         });
 
         this.selTipoDocumento();
@@ -615,6 +837,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.obtenerDatos(data);
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (xdata) => {
+            //Evaluar si el tipodocumento es actividades en el exterior
+            if (
+              this.Doc.tipo.trim().toLowerCase() ===
+              "actividades en el exterior"
+            ) {
+              this.guardarActividadesExterior(this.Doc.wfdocumento);
+            }
+
             if (this.fplazo.year != undefined) {
               this.obtenerAlertaWorkFlow(xdata);
               this.apiService.Ejecutar(this.xAPI).subscribe(
@@ -661,6 +891,27 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         var mensaje = errot + " - " + this.xAPI.funcion;
         this.toastrService.error(mensaje, `GDoc Wkf.Documento`);
         this.ngxService.stopLoader("loader-aceptar");
+      },
+    );
+  }
+  guardarActividadesExterior(wfdocumento: number) {
+    let viaje = {
+      idd: wfdocumento,
+      observacion: this.actividadesExt,
+      estatus: 1,
+    };
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_IDocumentoViajes";
+    this.xAPI.valores = JSON.stringify(viaje);
+
+    console.log(this.xAPI);
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (ydata) => {
+        console.log(ydata);
+      },
+      (errot) => {
+        this.toastrService.error(`GDoc Wkf.Documento.Viajes al Exterior`);
       },
     );
   }
@@ -1133,6 +1384,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.puntocuenta = false;
     this.resolucion = false;
     this.booPuntoCuenta = false;
+    this.esActividadExterior = tipo === "actividades en el exterior";
 
     if (tipo.indexOf("punto") >= 0) {
       this.setDescripcionPunto();
@@ -1293,6 +1545,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           }
           this.nasociacion = this.Doc.ncontrol;
           this.Doc.ncontrol = "";
+
+          if (e.viajes_descripcion) {
+            try {
+              this.actividadesExt = JSON.parse(e.viajes_descripcion);
+            } catch (err) {
+              console.error("Error parsing viajes_descripcion", err);
+            }
+          }
         });
 
         this.Doc.norigen = dwf;

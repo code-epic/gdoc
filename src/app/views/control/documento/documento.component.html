@@ -203,6 +203,151 @@
                             </div>
                         </div>
 
+                        <!-- Bloque de ACTIVIDADES EN EL EXTERIOR -->
+                        <div *ngIf="esActividadExterior" class="form-row" style="background-color: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+                            <div class="col-12 mb-2">
+                                <h6 class="text-primary font-weight-bold"><i class="fas fa-plane-departure mr-2"></i>Detalles de Actividad en el Exterior</h6>
+                                <hr class="mt-1 mb-3">
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label class="form-label-custom">País que realiza la invitación</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">public</mat-icon></span>
+                                    </div>
+                                    <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.pais">
+                                        <option value="">Seleccione País</option>
+                                        <option *ngFor="let p of paises" [value]="p">{{ p }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label class="form-label-custom">Motivo de la invitación</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">flight_takeoff</mat-icon></span>
+                                    </div>
+                                    <input type="text" class="input-custom" placeholder="Motivo" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.motivo">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label class="form-label-custom">A quien va dirigida</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">person</mat-icon></span>
+                                    </div>
+                                    <input type="text" class="input-custom" placeholder="Destinatario" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.dirigido">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom">Personas que asisten</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">groups</mat-icon></span>
+                                    </div>
+                                    <input type="number" class="input-custom" placeholder="0" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.personas">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom">Fecha de Inicio</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box" (click)="fi.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event</mat-icon></span>
+                                    </div>
+                                    <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.fechaInicio" ngbDatepicker #fi="ngbDatepicker" readonly (click)="fi.toggle()">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom">Fecha de Fin</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box" (click)="ff.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event</mat-icon></span>
+                                    </div>
+                                    <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.fechaFin" ngbDatepicker #ff="ngbDatepicker" readonly (click)="ff.toggle()">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom">Fecha Confirmación</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box" (click)="fc_ext.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event_available</mat-icon></span>
+                                    </div>
+                                    <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.fechaConfirmacion" ngbDatepicker #fc_ext="ngbDatepicker" readonly (click)="fc_ext.toggle()">
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-2 mb-1">
+                                <h6 class="text-primary font-weight-bold" style="font-size: 0.85rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;"><i class="fas fa-wallet mr-1"></i>Gastos para la Comisión</h6>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom" title="Boletos Aéreos Ida y Vuelta">Boletos Aéreos</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">flight</mat-icon></span>
+                                    </div>
+                                    <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.gastos.boletos">
+                                        <option value="">Seleccione</option>
+                                        <option [value]="actividadesExt.pais | uppercase" *ngIf="actividadesExt.pais">{{ actividadesExt.pais | uppercase }}</option>
+                                        <option value="VENEZUELA">VENEZUELA</option>
+                                        <option value="NO ESPECIFICA">NO ESPECIFICA</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom">Alimentación</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">restaurant</mat-icon></span>
+                                    </div>
+                                    <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.gastos.alimentacion">
+                                        <option value="">Seleccione</option>
+                                        <option [value]="actividadesExt.pais | uppercase" *ngIf="actividadesExt.pais">{{ actividadesExt.pais | uppercase }}</option>
+                                        <option value="VENEZUELA">VENEZUELA</option>
+                                        <option value="NO ESPECIFICA">NO ESPECIFICA</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom">Alojamiento</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">hotel</mat-icon></span>
+                                    </div>
+                                    <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.gastos.alojamiento">
+                                        <option value="">Seleccione</option>
+                                        <option [value]="actividadesExt.pais | uppercase" *ngIf="actividadesExt.pais">{{ actividadesExt.pais | uppercase }}</option>
+                                        <option value="VENEZUELA">VENEZUELA</option>
+                                        <option value="NO ESPECIFICA">NO ESPECIFICA</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom">Transporte</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">directions_car</mat-icon></span>
+                                    </div>
+                                    <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.gastos.transporte">
+                                        <option value="">Seleccione</option>
+                                        <option [value]="actividadesExt.pais | uppercase" *ngIf="actividadesExt.pais">{{ actividadesExt.pais | uppercase }}</option>
+                                        <option value="VENEZUELA">VENEZUELA</option>
+                                        <option value="NO ESPECIFICA">NO ESPECIFICA</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-row" *ngIf="booPuntoCuenta">
                             <div class="form-group col-md-6">
                                 <label class="form-label-custom">Selecciona el/los punto de cuenta</label>

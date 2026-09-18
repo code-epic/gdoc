@@ -519,7 +519,10 @@
             </div>
             <div class="modal-header-sub">
               <span *ngIf="currentTagGroupFolder">Caso {{ currentGroupCaseIndex + 1 }} de {{ groupCases.length }} del agrupado &bull; {{ activeDoc.tdoc || selectedCarpeta?.nombre || 'Punto de Cuenta' }}</span>
-              <span *ngIf="!currentTagGroupFolder">{{ selectedCarpeta?.nombre || 'Buzón de Documentos' }}</span>
+              <span *ngIf="!currentTagGroupFolder && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'">{{ selectedCarpeta?.nombre || 'Buzón de Documentos' }}</span>
+              <span *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' && getAsuntoClean(activeDoc)" class="text-white mt-1 d-block" style="font-size: 0.9rem; max-width: 600px; white-space: normal; text-transform: uppercase; font-weight: bold;">
+                <i class="fas fa-align-left mr-1"></i> {{ getAsuntoClean(activeDoc) }}
+              </span>
             </div>
           </div>
         </div>
@@ -586,8 +589,12 @@
 
           <!-- Identificación Card NORMAL -->
           <div class="info-card-block" *ngIf="selectedCarpeta?.id !== 'RECLAMOS'">
-            <div class="block-title">
-              <i class="fas fa-info-circle text-primary mr-1"></i> Datos del Expediente
+            <div class="block-title d-flex justify-content-between align-items-center">
+              <span><i class="fas fa-info-circle text-primary mr-1"></i> Datos del Expediente</span>
+              <img *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' && getViajesData(activeDoc) as viaje" 
+                   [src]="getFlagUrl(viaje.invitado || viaje.pais)" 
+                   style="height: 36px; width: 54px; object-fit: cover; border-radius: 4px; box-shadow: 0 3px 8px rgba(0,0,0,0.25); border: 2px solid #fff;" 
+                   [title]="viaje.invitado || viaje.pais">
             </div>
             <div class="info-grid">
               <div class="info-item" *ngIf="getCedula(activeDoc)">
@@ -610,11 +617,11 @@
               </div>
               <div class="info-item">
                 <span class="info-label">Fecha Registro</span>
-                <span class="info-val">{{ getFecha(activeDoc) || '—' }}</span>
+                <span class="info-val">{{ selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' ? formatFechaRegistro(getFecha(activeDoc)) : (getFecha(activeDoc) || '—') }}</span>
               </div>
-              <div class="info-item" *ngIf="activeDoc.nombre_accion">
+              <div class="info-item">
                 <span class="info-label">Acción</span>
-                <span class="info-val">{{ activeDoc.nombre_accion }}</span>
+                <span class="info-val">{{ selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' ? 'CONTROL DE GESTION' : (activeDoc.nombre_accion || 'MINISTERIAL') }}</span>
               </div>
               <div class="info-item">
                 <span class="info-label">Etiqueta / Grupo</span>
@@ -648,8 +655,15 @@
             </div>
 
             <div style="display: flex; flex-direction: column; align-items: center; margin-top: 15px;">
-              <!-- Foto clickeable centrada -->
-              <div class="reclamos-avatar mb-3" *ngIf="getCedula(activeDoc)">
+              <!-- Bandera para Actividades en el Exterior -->
+              <div class="viajes-avatar mb-3" *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' && getViajesData(activeDoc) as viaje">
+                <img [src]="getFlagUrl(viaje.invitado || viaje.pais)"
+                     style="width: 150px; height: 100px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 2px solid #fff;"
+                     alt="Bandera de {{ viaje.invitado || viaje.pais }}">
+              </div>
+
+              <!-- Foto clickeable centrada (Perfil estándar) -->
+              <div class="reclamos-avatar mb-3" *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && getCedula(activeDoc)">
                 <a [href]="fotosCasos[getCedula(activeDoc)]" target="_blank" title="Haz clic para ampliar" style="display: inline-block; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
                   <img [src]="fotosCasos[getCedula(activeDoc)]"
                        *ngIf="!loadingFotos[getCedula(activeDoc)] && fotosCasos[getCedula(activeDoc)]"
@@ -667,26 +681,85 @@
 
             <!-- Lista de datos vertical -->
             <div class="info-list" style="display: flex; flex-direction: column; gap: 8px;">
-              <div class="info-item d-flex justify-content-between align-items-center" *ngIf="getCedula(activeDoc)" style="background-color: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                <span class="info-label text-muted" style="font-size: 0.75rem;">Cédula Principal</span>
-                <span class="info-val highlight font-weight-bold" style="font-size: 0.95rem;">{{ getCedula(activeDoc) }}</span>
-              </div>
-              
-              <!-- Grado (Sin etiqueta) -->
-              <div class="info-item text-center" *ngIf="getCargo(activeDoc)" style="background-color: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-                <span class="info-val text-primary font-weight-bold" style="font-size: 0.78rem; line-height: 1.2; text-transform: uppercase;">{{ getCargo(activeDoc) }}</span>
-              </div>
+              <!-- Datos estándar (Ocultos para Viajes) -->
+              <ng-container *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'">
+                <div class="info-item d-flex justify-content-between align-items-center" *ngIf="getCedula(activeDoc)" style="background-color: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  <span class="info-label text-muted" style="font-size: 0.75rem;">Cédula Principal</span>
+                  <span class="info-val highlight font-weight-bold" style="font-size: 0.95rem;">{{ getCedula(activeDoc) }}</span>
+                </div>
+                
+                <!-- Grado (Sin etiqueta) -->
+                <div class="info-item text-center" *ngIf="getCargo(activeDoc)" style="background-color: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                  <span class="info-val text-primary font-weight-bold" style="font-size: 0.78rem; line-height: 1.2; text-transform: uppercase;">{{ getCargo(activeDoc) }}</span>
+                </div>
 
-              <!-- Cargo (Sin etiqueta) -->
-              <div class="info-item text-center" *ngIf="perfilSolicitante?.cargo" style="background-color: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-                <span class="info-val font-weight-bold" style="font-size: 0.78rem; line-height: 1.2; color: #475569; text-transform: uppercase;">{{ perfilSolicitante.cargo }}</span>
-              </div>
+                <!-- Cargo (Sin etiqueta) -->
+                <div class="info-item text-center" *ngIf="perfilSolicitante?.cargo" style="background-color: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                  <span class="info-val font-weight-bold" style="font-size: 0.78rem; line-height: 1.2; color: #475569; text-transform: uppercase;">{{ perfilSolicitante.cargo }}</span>
+                </div>
 
-              <!-- Contacto -->
-              <div class="info-item d-flex justify-content-between align-items-center" *ngIf="perfilSolicitante?.telefono" style="background-color: #f0fdf4; padding: 8px 12px; border-radius: 6px; border: 1px solid #bbf7d0;">
-                <span class="info-label text-success" style="font-size: 0.75rem;"><i class="fas fa-phone-alt mr-1"></i>Contacto</span>
-                <span class="info-val font-weight-bold text-dark" style="font-size: 0.95rem;">{{ perfilSolicitante.telefono }}</span>
-              </div>
+                <!-- Contacto -->
+                <div class="info-item d-flex justify-content-between align-items-center" *ngIf="perfilSolicitante?.telefono" style="background-color: #f0fdf4; padding: 8px 12px; border-radius: 6px; border: 1px solid #bbf7d0;">
+                  <span class="info-label text-success" style="font-size: 0.75rem;"><i class="fas fa-phone-alt mr-1"></i>Contacto</span>
+                  <span class="info-val font-weight-bold text-dark" style="font-size: 0.95rem;">{{ perfilSolicitante.telefono }}</span>
+                </div>
+              </ng-container>
+
+              <!-- Detalles de Viaje -->
+              <ng-container *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' && getViajesData(activeDoc) as viaje">
+                
+                <!-- Dirigido a -->
+                <div class="info-item text-center" *ngIf="viaje.dirigido" style="background-color: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                  <span class="info-val text-primary font-weight-bold" style="font-size: 0.78rem; line-height: 1.2; text-transform: uppercase;"><i class="fas fa-user-tag mr-1"></i>{{ viaje.dirigido }}</span>
+                </div>
+
+                <!-- Personas -->
+                <div class="info-item d-flex justify-content-between align-items-center" *ngIf="viaje.personas" style="background-color: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  <span class="info-label text-muted" style="font-size: 0.75rem;"><i class="fas fa-users mr-1"></i>Personas</span>
+                  <span class="info-val font-weight-bold" style="font-size: 0.95rem; color: #0f172a;">{{ viaje.personas }}</span>
+                </div>
+
+                <!-- Motivo -->
+                <div class="info-item" *ngIf="viaje.motivo" style="background-color: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  <div class="info-label text-muted mb-1" style="font-size: 0.75rem;"><i class="fas fa-plane-departure mr-1"></i>Motivo del Viaje</div>
+                  <div class="info-val font-weight-bold" style="font-size: 0.85rem; color: #475569; text-transform: uppercase;">{{ viaje.motivo }}</div>
+                </div>
+
+                <!-- Fechas -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                  <div class="info-item text-center" *ngIf="viaje.fechaInicio" style="background-color: #f0fdf4; padding: 6px; border-radius: 6px; border: 1px solid #bbf7d0;">
+                    <div class="text-success" style="font-size: 0.65rem; text-transform: uppercase;">Inicio</div>
+                    <div class="font-weight-bold text-dark" style="font-size: 0.8rem;">{{ formatNgbDate(viaje.fechaInicio) }}</div>
+                  </div>
+                  <div class="info-item text-center" *ngIf="viaje.fechaFin" style="background-color: #fff1f2; padding: 6px; border-radius: 6px; border: 1px solid #fecdd3;">
+                    <div class="text-danger" style="font-size: 0.65rem; text-transform: uppercase;">Fin</div>
+                    <div class="font-weight-bold text-dark" style="font-size: 0.8rem;">{{ formatNgbDate(viaje.fechaFin) }}</div>
+                  </div>
+                </div>
+
+                <!-- Gastos -->
+                <div class="info-item mt-1" *ngIf="viaje.gastos" style="background-color: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  <div class="info-label text-primary font-weight-bold mb-2 pb-1 border-bottom" style="font-size: 0.75rem;"><i class="fas fa-wallet mr-1"></i>Gastos Cubiertos</div>
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div class="d-flex justify-content-between" style="font-size: 0.75rem;">
+                      <span class="text-muted"><i class="fas fa-plane mr-1"></i>Boletos</span>
+                      <span class="font-weight-bold">{{ viaje.gastos.boletos || 'N/A' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between" style="font-size: 0.75rem;">
+                      <span class="text-muted"><i class="fas fa-hotel mr-1"></i>Alojamiento</span>
+                      <span class="font-weight-bold">{{ viaje.gastos.alojamiento || 'N/A' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between" style="font-size: 0.75rem;">
+                      <span class="text-muted"><i class="fas fa-utensils mr-1"></i>Alimentación</span>
+                      <span class="font-weight-bold">{{ viaje.gastos.alimentacion || 'N/A' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between" style="font-size: 0.75rem;">
+                      <span class="text-muted"><i class="fas fa-car mr-1"></i>Transporte</span>
+                      <span class="font-weight-bold">{{ viaje.gastos.transporte || 'N/A' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
             </div>
           </div>
 
@@ -723,8 +796,8 @@
             </div>
           </div>
 
-          <!-- Asunto Block NORMAL (Siempre visible en la izquierda) -->
-          <div class="info-card-block">
+          <!-- Asunto Block NORMAL (Siempre visible en la izquierda excepto Viajes) -->
+          <div class="info-card-block" *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'">
             <div class="block-title">
               <i class="fas fa-align-left text-primary mr-1"></i> Asunto / Objeto del Caso
             </div>
@@ -803,7 +876,7 @@
           </div>
 
           <!-- BLOQUE NORMAL: Integrantes del Caso -->
-          <div *ngIf="selectedCarpeta?.id !== 'RECLAMOS' || !getReclamosData(activeDoc)">
+          <div *ngIf="(selectedCarpeta?.id !== 'RECLAMOS' || !getReclamosData(activeDoc)) && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'">
             <div class="subcasos-header-bar mb-2">
               <div class="d-flex align-items-center gap-2">
                 <i class="fas fa-users text-primary fa-lg"></i>
@@ -972,6 +1045,92 @@
           </div>
           <!-- FIN BLOQUE NORMAL (Integrantes) -->
 
+          <!-- BLOQUE ACTIVIDADES EN EL EXTERIOR -->
+          <div *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' && getViajesData(activeDoc) as viaje" style="display: flex; flex-direction: column; height: 100%; overflow: auto;">
+            <div class="info-card-block m-0 d-flex flex-column h-100">
+              <div class="block-title mb-4">
+                <i class="fas fa-plane text-primary mr-1"></i> Detalles del Viaje Institucional
+              </div>
+              
+              <div class="viaje-modal-content" style="padding: 10px;">
+                <div class="text-center mb-4">
+                  <h4 class="font-weight-bold text-uppercase" style="color: #0f172a; letter-spacing: 1px;"><i class="fas fa-map-marker-alt text-danger mr-2"></i>{{ viaje.invitado || viaje.pais }}</h4>
+                </div>
+                
+                <div class="info-list" style="display: flex; flex-direction: column; gap: 12px;">
+                  <!-- Dirigido a -->
+                  <div class="info-item" *ngIf="viaje.dirigido" style="background-color: #f8fafc; padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div class="info-label text-muted mb-1" style="font-size: 0.8rem;"><i class="fas fa-user-tag mr-1"></i>Dirigido A</div>
+                    <div class="info-val font-weight-bold" style="font-size: 1rem; color: #1e293b; text-transform: uppercase;">{{ viaje.dirigido }}</div>
+                  </div>
+
+                  <!-- Personas -->
+                  <div class="info-item d-flex justify-content-between align-items-center" *ngIf="viaje.personas" style="background-color: #f8fafc; padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <span class="info-label text-muted" style="font-size: 0.8rem;"><i class="fas fa-users mr-1"></i>Cantidad de Personas</span>
+                    <span class="info-val font-weight-bold" style="font-size: 1.1rem; color: #0f172a;">{{ viaje.personas }}</span>
+                  </div>
+
+                  <!-- Motivo -->
+                  <div class="info-item" *ngIf="viaje.motivo" style="background-color: #f8fafc; padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div class="info-label text-muted mb-1" style="font-size: 0.8rem;"><i class="fas fa-plane-departure mr-1"></i>Motivo del Viaje</div>
+                    <div class="info-val font-weight-bold" style="font-size: 0.95rem; color: #475569; text-transform: uppercase;">{{ viaje.motivo }}</div>
+                  </div>
+
+                  <!-- Fechas -->
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="info-item text-center" *ngIf="viaje.fechaInicio" style="background-color: #f0fdf4; padding: 12px; border-radius: 8px; border: 1px solid #bbf7d0;">
+                      <div class="text-success mb-1" style="font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Inicio del Viaje</div>
+                      <div class="font-weight-bold text-dark" style="font-size: 1.1rem;">{{ formatNgbDate(viaje.fechaInicio) }}</div>
+                    </div>
+                    <div class="info-item text-center" *ngIf="viaje.fechaFin" style="background-color: #fff1f2; padding: 12px; border-radius: 8px; border: 1px solid #fecdd3;">
+                      <div class="text-danger mb-1" style="font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Fin del Viaje</div>
+                      <div class="font-weight-bold text-dark" style="font-size: 1.1rem;">{{ formatNgbDate(viaje.fechaFin) }}</div>
+                    </div>
+                  </div>
+
+                  <!-- Gastos -->
+                  <div class="mt-4" *ngIf="viaje.gastos">
+                    <div class="mb-2" style="font-size: 0.85rem; text-transform: uppercase; font-weight: bold; color: #475569; letter-spacing: 0.5px;">
+                      <i class="fas fa-money-check-alt text-success mr-2"></i>Gastos Cubiertos Por
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: row; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: thin;">
+                      
+                      <!-- Boletos -->
+                      <div *ngIf="viaje.gastos.boletos" style="min-width: 140px; flex: 1; background: #ffffff; padding: 12px 10px; border-radius: 8px; border: 1px solid #cbd5e1; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <i class="fas fa-ticket-alt mb-2" style="font-size: 1.2rem; color: #3b82f6;"></i>
+                        <span style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Boletos Aéreos</span>
+                        <span class="font-weight-bold mt-1" [ngStyle]="{'color': viaje.gastos.boletos === 'NO ESPECIFICA' ? '#ef4444' : '#0f172a'}" style="font-size: 0.75rem; line-height: 1.2;">{{ viaje.gastos.boletos }}</span>
+                      </div>
+
+                      <!-- Alimentación -->
+                      <div *ngIf="viaje.gastos.alimentacion" style="min-width: 140px; flex: 1; background: #ffffff; padding: 12px 10px; border-radius: 8px; border: 1px solid #cbd5e1; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <i class="fas fa-utensils mb-2" style="font-size: 1.2rem; color: #f59e0b;"></i>
+                        <span style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Alimentación</span>
+                        <span class="font-weight-bold mt-1" [ngStyle]="{'color': viaje.gastos.alimentacion === 'NO ESPECIFICA' ? '#ef4444' : '#0f172a'}" style="font-size: 0.75rem; line-height: 1.2;">{{ viaje.gastos.alimentacion }}</span>
+                      </div>
+
+                      <!-- Alojamiento -->
+                      <div *ngIf="viaje.gastos.alojamiento" style="min-width: 140px; flex: 1; background: #ffffff; padding: 12px 10px; border-radius: 8px; border: 1px solid #cbd5e1; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <i class="fas fa-hotel mb-2" style="font-size: 1.2rem; color: #8b5cf6;"></i>
+                        <span style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Alojamiento</span>
+                        <span class="font-weight-bold mt-1" [ngStyle]="{'color': viaje.gastos.alojamiento === 'NO ESPECIFICA' ? '#ef4444' : '#0f172a'}" style="font-size: 0.75rem; line-height: 1.2;">{{ viaje.gastos.alojamiento }}</span>
+                      </div>
+
+                      <!-- Transporte -->
+                      <div *ngIf="viaje.gastos.transporte" style="min-width: 140px; flex: 1; background: #ffffff; padding: 12px 10px; border-radius: 8px; border: 1px solid #cbd5e1; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <i class="fas fa-bus mb-2" style="font-size: 1.2rem; color: #10b981;"></i>
+                        <span style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Transporte</span>
+                        <span class="font-weight-bold mt-1" [ngStyle]="{'color': viaje.gastos.transporte === 'NO ESPECIFICA' ? '#ef4444' : '#0f172a'}" style="font-size: 0.75rem; line-height: 1.2;">{{ viaje.gastos.transporte }}</span>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
         <!-- FIN COLUMNA DERECHA -->
 
@@ -992,6 +1151,7 @@
           </button>
 
           <button class="btn-modal-tool btn-ficha"
+                  *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'"
                   (click)="irAMinisterial(activeDoc)"
                   title="Ver ficha completa en Ministerial">
             <i class="fas fa-external-link-alt"></i>
@@ -1014,33 +1174,57 @@
           </ng-container>
 
           <ng-template #defaultDecisions>
-            <!-- FAVORABLE -->
-            <button class="btn-modal-decision btn-favorable"
-                    (click)="ejecutarAccion('FAVORABLE')"
-                    [disabled]="loadingAction"
-                    title="Registrar como Favorable">
-              <i class="fas fa-check-circle"></i>
-              <span>Favorable</span>
-              <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
-            </button>
+            <ng-container *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR'">
+              <!-- ACEPTAR VIAJE -->
+              <button class="btn-modal-decision btn-favorable"
+                      (click)="ejecutarAccion('FAVORABLE')"
+                      [disabled]="loadingAction"
+                      title="Aceptar Viaje Institucional">
+                <i class="fas fa-check-circle"></i>
+                <span>Aceptar</span>
+                <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
+              </button>
 
-            <!-- DIFERIDO -->
-            <button class="btn-modal-decision btn-diferido"
-                    (click)="ejecutarAccion('DIFERIDO')"
-                    [disabled]="loadingAction"
-                    title="Registrar como Diferido (Requiere Observación)">
-              <i class="fas fa-clock"></i>
-              <span>Diferido</span>
-            </button>
+              <!-- ARCHIVAR VIAJE -->
+              <button class="btn-modal-decision btn-negado"
+                      (click)="ejecutarAccion('ARCHIVAR')"
+                      [disabled]="loadingAction"
+                      title="Archivar Viaje Institucional">
+                <i class="fas fa-archive"></i>
+                <span>Archivar</span>
+                <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
+              </button>
+            </ng-container>
 
-            <!-- NEGADO -->
-            <button class="btn-modal-decision btn-negado"
-                    (click)="ejecutarAccion('NEGADO')"
-                    [disabled]="loadingAction"
-                    title="Registrar como Negado (Requiere Observación)">
-              <i class="fas fa-times-circle"></i>
-              <span>Negado</span>
-            </button>
+            <ng-container *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'">
+              <!-- FAVORABLE -->
+              <button class="btn-modal-decision btn-favorable"
+                      (click)="ejecutarAccion('FAVORABLE')"
+                      [disabled]="loadingAction"
+                      title="Registrar como Favorable">
+                <i class="fas fa-check-circle"></i>
+                <span>Favorable</span>
+                <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
+              </button>
+
+              <!-- DIFERIDO -->
+              <button class="btn-modal-decision btn-diferido"
+                      (click)="ejecutarAccion('DIFERIDO')"
+                      [disabled]="loadingAction"
+                      title="Registrar como Diferido (Requiere Observación)">
+                <i class="fas fa-clock"></i>
+                <span>Diferido</span>
+              </button>
+
+              <!-- NEGADO -->
+              <button class="btn-modal-decision btn-negado"
+                      (click)="ejecutarAccion('NEGADO')"
+                      [disabled]="loadingAction"
+                      title="Registrar como Negado (Requiere Observación)">
+                <i class="fas fa-times-circle"></i>
+                <span>Negado</span>
+              </button>
+            </ng-container>
           </ng-template>
         </div>
 

@@ -603,6 +603,7 @@ export class MinisterialComponent implements OnInit {
       this.ministerial.idd +
       "," +
       this.ministerial.cuenta;
+    console.log("pasatiempos");
     console.log(this.xAPI);
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {

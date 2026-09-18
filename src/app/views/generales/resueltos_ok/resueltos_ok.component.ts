@@ -361,7 +361,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
           const desc: string = (decoded.Usuario.descripcion || "")
             .trim()
             .toUpperCase();
-          this.isMinistro = desc === "MINISTRO";
+          this.isMinistro = desc === "MINISTRO" || desc.includes("APROB");
         }
       }
       if (!this.jwtData.userId && this.loginService.Usuario) {
