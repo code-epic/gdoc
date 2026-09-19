@@ -2269,7 +2269,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         return;
       }
 
-      let localEstadoActual = this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ? 11 : 14;
+      let localEstadoActual =
+        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ? 11 : 14;
       let localEstadoDestino = 1;
 
       this.xAPI = {} as IAPICore;
@@ -2391,7 +2392,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       this.xAPI = {} as IAPICore;
       this.xAPI.funcion = "WKF_ARedistribuir";
       this.xAPI.valores = "";
-      this.xAPI.parametros = `2,2,1,${userId},${docId}`;
+      this.xAPI.parametros = `4,4,8,${userId},${docId}`;
 
       this.apiService.Ejecutar(this.xAPI).subscribe({
         next: (data) => {

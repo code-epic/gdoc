@@ -58,6 +58,7 @@ import { PapeleraComponent } from './views/papelera/papelera.component';
 import { SbuzonComponent } from './views/secretaria/sbuzon/sbuzon.component';
 import { SalertaComponent } from './views/secretaria/salerta/salerta.component';
 import { SministerialComponent } from './views/secretaria/sministerial/sministerial.component';
+import { FirmadosComponent } from './views/secretaria/firmados/firmados.component';
 import { SpresidencialComponent } from './views/secretaria/spresidencial/spresidencial.component';
 import { SreclamosComponent } from './views/secretaria/sreclamos/sreclamos.component';
 import { ChatbotComponent } from './views/chatbot/chatbot.component';
@@ -227,6 +228,7 @@ const ngWizardConfig: NgWizardConfig = {
     SbuzonComponent,
     SalertaComponent,
     SministerialComponent,
+    FirmadosComponent,
     SpresidencialComponent,
     SreclamosComponent,
     OresolucionesComponent,

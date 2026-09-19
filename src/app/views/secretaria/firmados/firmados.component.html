@@ -1,0 +1,402 @@
+<div class="header bg-pastel-gradient pb-8 pt-5 pt-md-8">
+    <div class="container-fluid">
+        <p></p>
+    </div>
+</div>
+
+<div class="container-fluid mt--9">
+  <div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+      <div class="card shadow">
+        <ngx-ui-loader [loaderId]="'loader-aceptar'"></ngx-ui-loader>
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col-md-11">
+              <h6 class="text-uppercase text-muted ls-1 mb-1">Secretaria</h6>
+              <h2 class="mb-0">{{titulo}}</h2>
+            </div>
+            <div class="col-md-1">
+              <div class="media align-items-center">
+                <div class="example-button-row">
+                  <button mat-icon-button title="Volver Atrás" [routerLink]="['/secretaria']">
+                    <mat-icon>arrow_back</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="isStreaming" class="streaming-indicator-bar">
+          <div class="d-flex align-items-center">
+            <span class="spinner-grow spinner-grow-sm mr-2 text-teal" role="status"></span>
+            <span><strong>Sincronizando buzón:</strong> Primera página lista para interactuar mientras se reciben datos...</span>
+          </div>
+          <span class="streaming-count-badge">
+            <i class="fas fa-bolt mr-1"></i> {{ longitud }} documentos
+          </span>
+        </div>
+        <!-- Contenido principal del buzón -->
+        <div class="row w-100 align-items-center bg-light p-2" style="border-bottom: 2px solid #e2e8f0; margin: 0; padding-top: 12px; padding-bottom: 12px;">
+          <div class="col-md-4 font-weight-bold text-muted" style="font-size: 0.85rem; padding-left: 20px;">DOCUMENTO</div>
+          <div class="col-md-2 font-weight-bold text-muted" style="font-size: 0.85rem;">FECHA / ORIGEN</div>
+          <div class="col-md-4 font-weight-bold text-muted" style="font-size: 0.85rem;">
+            <span>DEPENDENCIA / ASUNTO</span>
+          </div>
+          <div class="col-md-2 text-right font-weight-bold text-muted" style="font-size: 0.85rem;">
+            <div class="d-flex justify-content-end align-items-center" style="gap: 10px;">
+              <div class="filter-control-wrapper">
+                <select class="custom-select custom-select-sm" [(ngModel)]="xyear" (change)="seleccionNavegacion(0)" style="width: auto;">
+                  <option *ngFor="let e of lstYear;" [value]="e.id">{{e.year}}</option>
+                </select>
+              </div>
+              <div class="filter-control-wrapper">
+                <select class="custom-select custom-select-sm" [(ngModel)]="xmeses" (change)="seleccionNavegacion(0)" style="width: auto;">
+                  <option *ngFor="let e of lstMeses;" [value]="e.id">{{e.mes}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="longitud > 0; else emptyState">
+          <mat-list style="margin-top: -10px; padding: 10px; width: 100%;">
+            <mat-list-item *ngFor="let e of buzon; let i=index" class="document-row-item" style="border-bottom: 1px #f1f5f9 solid; height: auto; padding-top: 6px; padding-bottom: 6px;">
+              <div class="row w-100 align-items-center">
+                <div class="col-md-4 texto-lista" style="padding-left: 20px;">
+                  <a href="javascript:void(0)" class="doc-code-link text-dark text-decoration-none" style="display: block;" (click)="openDetalleModal(detalleDocumento, e)" matTooltip="Ver detalle del documento">
+                    <span class="font-weight-bold">{{ getDetalle(e) }}</span>
+                    &nbsp;<font style="color:green">{{ e.simbolo}}</font>
+                    <div class="text-muted small mt-1">{{ e.numc }}</div>
+                  </a>
+                </div>
+                <div class="col-md-2 texto-lista text-muted" style="font-size: 0.82rem;">
+                  <i class="fa fa-calendar mr-1"></i> {{ e.fech | date : "dd/MM/yyyy hh:mm a" }} <br> <span class="font-weight-600 text-dark">{{ e.nori | uppercase }}</span>
+                </div>
+                <div class="col-md-4 texto-detalle text-truncate" matTooltip="{{ e.coma | uppercase }}">
+                  <strong class="text-dark mr-1">{{ e.udep | uppercase }}</strong>
+                  <span class="text-muted small d-block" *ngIf="e.coma">- {{ e.coma | uppercase }}</span>
+                </div>
+                <div class="col-md-2 text-right">
+                  <div class="hover-actions d-flex justify-content-end align-items-center">
+                    <button mat-icon-button aria-label="Acciones" style="color: #475569;" (click)="open(observacion, e.idd)" matTooltip="Redistribuir Documento">
+                      <mat-icon style="font-size: 1.3rem;">account_tree</mat-icon>
+                    </button>
+                    <a [href]="dwUrl(e.numc, e.anom)" target="top" rel="noopener noreferrer" class="pdf-icon-link" matTooltip="Descargar Documento (PDF)">
+                      <mat-icon class="text-danger">picture_as_pdf</mat-icon>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </mat-list-item>
+          </mat-list>
+
+          <mat-paginator [length]="longitud" [pageIndex]="pageIndex" (page)="pageChangeEvent($event)" [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions" (page)="pageEvent = $event" aria-label="Seleccionar">
+          </mat-paginator>
+        </div>
+
+        <ng-template #emptyState>
+          <div class="empty-state text-center p-5 m-3" style="background: linear-gradient(145deg, #f8f9fa, #ffffff); border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px dashed #ced4da;">
+            <div class="mb-3">
+              <i class="fa fa-file-signature text-muted" style="font-size: 3.5rem; opacity: 0.5;"></i>
+            </div>
+            <h4 class="text-muted font-weight-bold mb-2">Sin documentos firmados</h4>
+            <p class="text-muted mb-0" style="font-size: 0.95rem;">Actualmente no hay documentos en esta bandeja listos para descargar o redistribuir.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #observacion let-modal>
+  <div class="modal-header bg-pastel-gradient">
+    <h4 class="modal-title text-white" id="modal-basic-title">Acciones Generales</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-group col-md-12">
+      <label for="txtobservacion">Observaciones</label>
+      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="Observacion"></textarea>
+    </div>
+    <div class="form-group  col-md-12">
+      <label>Acción</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto"
+        (change)="selAccion()" id="slcaceptar">
+        <option *ngFor="let e of lstAcciones" value="{{e.valor}}">{{e.texto}}</option>
+      </select>
+
+    </div>
+    <div class="form-group  col-md-12" *ngIf="clasificacion">
+      <label>Area</label>
+      <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="cmbDestino">
+        <option value="S">SELECCIONE</option>
+        <option *ngFor="let x of lstEstados" value="{{ x.id }}">{{ x.nomb }}</option>
+      </select>
+    </div>
+
+    <div class="form-group  col-md-12" *ngIf="vplazo">
+      <label for="tmsCreacion">Plazo / Alerta</label>
+      <div class="form-group div-style">
+        <div class="input-group div-style">
+          <input class="form-control" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="extender_plazo" ngbDatepicker #fd="ngbDatepicker" [placement]="placement"
+            [positionTarget]="buttonEl" readonly>
+          <div class="input-group-append">
+            <button #buttonEl class="btn calendario" (click)="fd.toggle()" type="button" id="btnplazo"></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-pastel text-white " (click)="insertarObservacion();modal.close('Save')"
+      id="btnaceptar">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
+
+<ng-template #clasificarReclamoModal let-modal>
+  <div class="modal-header bg-pastel-gradient">
+    <h4 class="modal-title text-white" id="modal-clasificar-title">Clasificar Documento (RECLAMOS)</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-group col-md-12">
+      <label for="txtobservacion">Observaciones</label>
+      <textarea class="form-control" cols="30" rows="3" [ngModelOptions]="{standalone: true}"
+        [(ngModel)]="Observacion" placeholder="Observaciones..."></textarea>
+    </div>
+    <div class="form-group col-md-12">
+      <label>Acción</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text icon-box"><mat-icon class="input-icon">rule</mat-icon></span>
+        </div>
+        <select class="input-custom" [ngModelOptions]="{standalone: true}" [(ngModel)]="AccionTexto">
+          <option value="5">RECLAMOS</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-pastel text-white" (click)="insertarObservacion();modal.close('Save')">
+      <span class="fa fa-check"></span>&nbsp;&nbsp;Aceptar </button>
+    <button class="btn btn-pastel-cancel text-white" aria-label="Close" (click)="modal.dismiss('Close')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cancelar</button>
+  </div>
+</ng-template>
+
+<ng-template #detalleDocumento let-modal>
+    <div class="modal-header border-bottom align-items-center" style="background: linear-gradient(90deg, #ffffff 0%, #f1f5f9 100%);">
+        <h5 class="modal-title font-weight-bold text-uppercase mb-0" style="font-size: 0.95rem; color: #334155; letter-spacing: 0.5px;">
+            <i class="fa fa-file-text-o mr-2 text-primary"></i>Expediente del Documento
+        </h5>
+        <div class="d-flex align-items-center ml-auto">
+            <button type="button" class="btn btn-sm btn-dark rounded-pill px-3 shadow-sm font-weight-bold mr-2" (click)="exportarPDF()">
+                <i class="fa fa-file-pdf-o mr-1"></i> PDF
+            </button>
+            <a [href]="dwUrl(docSeleccionado?.numc, docSeleccionado?.anom)" target="_blank" rel="noopener noreferrer" 
+               class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-sm font-weight-bold mr-3">
+                <i class="fa fa-download mr-1"></i> Original
+            </a>
+            <button type="button" class="close text-dark ml-2" aria-label="Close" (click)="modal.dismiss('Cerrar')" style="font-size: 1.5rem; outline: none; box-shadow: none;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-body p-3 bg-white" style="max-height: 75vh; overflow-y: auto;">
+        <!-- Estado de Carga -->
+        <div class="text-center py-5" *ngIf="loadingConstancia">
+            <div class="spinner-border text-success" role="status" style="width: 2.5rem; height: 2.5rem;">
+                <span class="sr-only">Cargando constancia...</span>
+            </div>
+            <p class="text-muted mt-3 mb-0" style="font-size: 0.9rem;">Cargando expediente e historial del documento...</p>
+        </div>
+
+        <!-- Contenido de la Constancia / Documento Oficial -->
+        <div *ngIf="!loadingConstancia && (constanciaDoc || docSeleccionado)">
+            
+            <!-- LIENZO DEL DOCUMENTO OFICIAL A4 PARA EXPEDIENTE Y EXPORTACIÓN PDF -->
+            <div id="constanciaSheet" class="formal-doc-sheet bg-white p-4 mx-auto border rounded shadow-xs" style="max-width: 900px; color: #1a1a1a; font-family: 'Roboto', 'Arial', sans-serif;">
+                
+                <!-- Encabezado Institucional Formal -->
+                <div class="row align-items-center pb-3 mb-3 border-bottom border-dark" style="border-bottom-width: 2px !important;">
+                    <div class="col-3 text-center">
+                        <img src="assets/images/escudo.png" alt="Escudo MPPD" style="max-height: 75px;" onError="this.style.display='none'">
+                    </div>
+                    <div class="col-6 text-center">
+                        <h6 class="text-uppercase font-weight-bold mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px; color: #212529;">
+                            República Bolivariana de Venezuela
+                        </h6>
+                        <h6 class="text-uppercase font-weight-bold mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px; color: #212529;">
+                            Ministerio del Poder Popular para la Defensa
+                        </h6>
+                        <h5 class="text-uppercase font-weight-bold mt-2 mb-0" style="font-size: 1.05rem; color: #1e293b; letter-spacing: 0.8px;">
+                            Constancia de Traza y Control Documental
+                        </h5>
+                    </div>
+                    <div class="col-3 text-center">
+                        <!-- Código QR Validador -->
+                        <div class="qr-box p-1 bg-light border rounded d-inline-block text-center" style="box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <img *ngIf="totpQrCodeUrl" [src]="totpQrCodeUrl" alt="QR Validador" style="width: 70px; height: 70px;" />
+                            <div *ngIf="!totpQrCodeUrl" class="text-muted small py-2 px-1" style="font-size: 0.65rem;">Generando QR...</div>
+                            <div class="text-muted font-weight-bold mt-1" style="font-size: 0.6rem; text-transform: uppercase;">Validador QR</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen de Control Documental -->
+                <div class="mb-3">
+                    <div class="bg-light p-2 font-weight-bold text-uppercase border-bottom mb-2" style="font-size: 0.75rem; color: #334155; letter-spacing: 0.5px;">
+                        <i class="fa fa-info-circle mr-1"></i> I. Datos Generales del Documento
+                    </div>
+                    <div class="table-responsive">
+                        <table summary="" class="table table-bordered table-sm mb-0 formal-table" style="font-size: 0.82rem;">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light text-uppercase text-muted" style="width: 20%;">N° Control:</th>
+                                    <td class="font-weight-bold text-dark" style="width: 30%;">{{ (constanciaDoc?.ncontrol || docSeleccionado?.numc) | uppercase }}</td>
+                                    <th class="bg-light text-uppercase text-muted" style="width: 20%;">N° Origen:</th>
+                                    <td class="font-weight-bold" style="width: 30%;">{{ (constanciaDoc?.norigen || docSeleccionado?.nori || 'N/A') | uppercase }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light text-uppercase text-muted">Fecha Origen:</th>
+                                    <td>{{ constanciaDoc?.forigen || 'N/A' }}</td>
+                                    <th class="bg-light text-uppercase text-muted">Fecha Recepción:</th>
+                                    <td>{{ constanciaDoc?.fcreacion || (docSeleccionado?.fcre | date:'yyyy-MM-dd') }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light text-uppercase text-muted">Tipo Documento:</th>
+                                    <td><span class="badge badge-secondary px-2 py-1" style="font-size: 0.75rem;">{{ (constanciaDoc?.tipo || docSeleccionado?.tdoc) | uppercase }}</span></td>
+                                    <th class="bg-light text-uppercase text-muted">Remitente:</th>
+                                    <td>{{ (constanciaDoc?.remitente || 'N/A') | uppercase }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light text-uppercase text-muted">Dependencia / Unidad:</th>
+                                    <td colspan="3" class="font-weight-bold text-dark">{{ limpiarTexto(constanciaDoc?.unidad || docSeleccionado?.udep) | uppercase }}</td>
+                                </tr>
+                                <tr *ngIf="constanciaDoc?.comando">
+                                    <th class="bg-light text-uppercase text-muted">Comando:</th>
+                                    <td colspan="3">{{ limpiarTexto(constanciaDoc?.comando) | uppercase }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Contenido / Asunto del Trámite -->
+                <div class="mb-3">
+                    <div class="bg-light p-2 font-weight-bold text-uppercase border-bottom mb-2" style="font-size: 0.75rem; color: #334155; letter-spacing: 0.5px;">
+                        <i class="fa fa-file-text-o mr-1"></i> II. Asunto / Contenido del Trámite
+                    </div>
+                    <div class="p-3 bg-white border rounded text-justify" style="font-size: 0.85rem; line-height: 1.6; color: #2b2b2b;">
+                        {{ limpiarTexto(constanciaDoc?.contenido || docSeleccionado?.cont) || 'Sin contenido registrado.' }}
+                    </div>
+                </div>
+
+                <!-- Instrucciones del Despacho -->
+                <div class="mb-3" *ngIf="constanciaDoc?.instrucciones && constanciaDoc?.instrucciones != ''">
+                    <div class="bg-light p-2 font-weight-bold text-uppercase border-bottom mb-2" style="font-size: 0.75rem; color: #334155; letter-spacing: 0.5px;">
+                        <i class="fa fa-gavel mr-1"></i> III. Instrucciones
+                    </div>
+                    <div class="p-3 bg-white border rounded text-justify" style="font-size: 0.85rem; line-height: 1.6; color: #2b2b2b;">
+                        {{ limpiarTexto(constanciaDoc.instrucciones) }}
+                    </div>
+                </div>
+
+                <!-- Integrantes / Subcasos del Documento -->
+                <div class="mb-3" *ngIf="constanciaSubDoc && constanciaSubDoc.length > 0">
+                    <div class="bg-light p-2 font-weight-bold text-uppercase border-bottom mb-2 d-flex align-items-center justify-content-between" style="font-size: 0.75rem; color: #334155; letter-spacing: 0.5px;">
+                        <span><i class="fa fa-users mr-1"></i> IV. Integrantes o Personal Vinculado</span>
+                        <span class="badge badge-pill badge-secondary" style="font-size: 0.7rem;">Total: {{ constanciaSubDoc.length }}</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table summary="" class="table table-bordered table-striped table-sm mb-0 formal-table" style="font-size: 0.8rem;">
+                            <thead class="thead-light text-uppercase" style="font-size: 0.72rem;">
+                                <tr>
+                                    <th style="width: 35px;" class="text-center">#</th>
+                                    <th>Cédula</th>
+                                    <th>Nombres y Apellidos</th>
+                                    <th>Grado / Componente</th>
+                                    <th>Observación / Estatus</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of constanciaSubDoc; let i = index">
+                                    <td class="text-center font-weight-bold">{{ i + 1 }}</td>
+                                    <td class="font-weight-bold text-dark">{{ item.cedula | uppercase }}</td>
+                                    <td>{{ limpiarTexto(item.nmilitar || item.nombre || item.nombres_apellidos) | uppercase }}</td>
+                                    <td>{{ limpiarTexto(item.cargo || item.grado) | uppercase }}</td>
+                                    <td>{{ limpiarTexto(getDetalle(item.detalle)) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Historial de Trazas y Seguimiento -->
+                <div class="mb-3">
+                    <div class="bg-light p-2 font-weight-bold text-uppercase border-bottom mb-2 d-flex align-items-center justify-content-between" style="font-size: 0.75rem; color: #334155; letter-spacing: 0.5px;">
+                        <span><i class="fa fa-history mr-1"></i> V. Historial de Trazas y Seguimiento ({{ constanciaTraza.length }})</span>
+                    </div>
+                    <div class="table-responsive" *ngIf="constanciaTraza && constanciaTraza.length > 0; else sinTrazas">
+                        <table summary="" class="table table-bordered table-sm mb-0 formal-table" style="font-size: 0.78rem;">
+                            <thead class="thead-light text-uppercase" style="font-size: 0.72rem;">
+                                <tr>
+                                    <th style="width: 140px;">Fecha / Hora</th>
+                                    <th>Unidad / Departamento</th>
+                                    <th>Estatus / Estado</th>
+                                    <th>Observación / Movimiento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let t of constanciaTraza">
+                                    <td class="font-weight-bold text-nowrap" style="color: #495057;">
+                                        {{ t.fecha | date:'dd/MM/yyyy HH:mm' }}
+                                    </td>
+                                    <td>
+                                        <span class="font-weight-bold text-dark">{{ limpiarTexto(t.nombre_estado || t.usuario || 'N/A') | uppercase }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-light text-dark border px-2 py-1" style="font-size: 0.7rem;">
+                                            {{ limpiarTexto(t.nombre_estatus || 'PROCESADO') | uppercase }}
+                                        </span>
+                                    </td>
+                                    <td class="text-muted">
+                                        {{ limpiarTexto(t.observacion || 'SIN OBSERVACIÓN') | uppercase }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <ng-template #sinTrazas>
+                        <div class="p-3 bg-light text-center text-muted rounded border" style="font-size: 0.82rem;">
+                            <em>No se registra historial de trazas adicionales para este documento.</em>
+                        </div>
+                    </ng-template>
+                </div>
+
+                <!-- Pie de Página Formal y Autenticidad -->
+                <div class="pt-3 mt-4 border-top d-flex align-items-center justify-content-between text-muted" style="font-size: 0.72rem;">
+                    <div>
+                        <span>Sistema GDOC - Dirección de Resoluciones MPPD</span><br>
+                        <span>Documento verificado digitalmente vía Sistema de Gestión Documental</span>
+                    </div>
+                    <div class="text-right">
+                        <span>Fecha de Emisión: {{ currentFechaHoy || (docSeleccionado?.fcre | date:'dd/MM/yyyy') }}</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</ng-template>
+
+
+

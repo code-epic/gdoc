@@ -591,6 +591,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       return;
     }
 
+    await (document as any).fonts.ready;
+
     try {
       const pdf = new jsPDF({
         orientation: "p",
@@ -598,10 +600,19 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         format: [215.9, 330.2], // Oficio (8.5 x 13 pulgadas)
       });
 
+      const pageWidth = 215.9;
+      const pageHeight = 330.2; // Oficio
+
       const canvases = document.querySelectorAll(".a4-canvas");
       if (canvases.length > 0) {
         for (let i = 0; i < canvases.length; i++) {
           const canvasElement = canvases[i] as HTMLElement;
+
+          // Paso 1: Recolectar posiciones exactas de subrayado ANTES de quitar los estilos
+          const underlinePositions = this.collectUnderlinePositions(canvasElement, pageWidth, pageHeight);
+
+          // Paso 2: Quitar subrayados temporalmente del DOM para que html2canvas no los dibuje mal
+          const strippedUnderlines = this.stripUnderlines(canvasElement);
 
           const htmlCanvas = await html2canvas(canvasElement, {
             scale: 2,
@@ -611,15 +622,28 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
             backgroundColor: "#ffffff",
           });
 
-          const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
+          // Paso 3: Restaurar subrayados en el DOM (la vista queda igual que antes)
+          this.restoreUnderlines(strippedUnderlines);
 
-          const pageWidth = 215.9;
-          const pageHeight = 330.2; // Oficio
+          const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
 
           if (i > 0) {
             pdf.addPage();
           }
           pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, pageHeight);
+
+          // Paso 4: Dibujar subrayados con precisión en jsPDF
+          pdf.setDrawColor(0, 0, 0);
+          pdf.setLineWidth(0.25);
+          underlinePositions.forEach(pos => {
+            pdf.line(pos.x, pos.y, pos.x + pos.width, pos.y);
+          });
+
+          // Dibujar "M P P D" verticalmente en la esquina superior derecha en TODAS las páginas
+          pdf.setFont("helvetica", "bold");
+          pdf.setFontSize(10);
+          pdf.setTextColor(0, 0, 128);
+          pdf.text("M\nP\nP\nD", 210, 20);
         }
       }
 
@@ -636,11 +660,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         ? `${cleanNumc}.pdf`
         : `${new Date().getTime()}.pdf`;
 
-      // Dibujar "M P P D" verticalmente en la esquina superior derecha
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(10);
-      pdf.setTextColor(0, 0, 128);
-      pdf.text("M\nP\nP\nD", 195, 20);
+      // MPPD ya fue dibujado en cada pagina dentro del loop anterior
 
       // Generar el blob del PDF local original
       const pdfBlob = pdf.output("blob");
@@ -820,6 +840,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
 
     // Omitimos crearSemillero() para tomar los números y fecha de resolución de los datos ya en memoria.
 
+    await (document as any).fonts.ready;
+
     try {
       const pdf = new jsPDF({
         orientation: "p",
@@ -827,10 +849,19 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         format: [215.9, 330.2], // Oficio (8.5 x 13 pulgadas)
       });
 
+      const pageWidth = 215.9;
+      const pageHeight = 330.2; // Oficio
+
       const canvases = document.querySelectorAll(".a4-canvas");
       if (canvases.length > 0) {
         for (let i = 0; i < canvases.length; i++) {
           const canvasElement = canvases[i] as HTMLElement;
+
+          // Paso 1: Recolectar posiciones exactas de subrayado ANTES de quitar los estilos
+          const underlinePositions = this.collectUnderlinePositions(canvasElement, pageWidth, pageHeight);
+
+          // Paso 2: Quitar subrayados temporalmente del DOM para que html2canvas no los dibuje mal
+          const strippedUnderlines = this.stripUnderlines(canvasElement);
 
           const htmlCanvas = await html2canvas(canvasElement, {
             scale: 2,
@@ -840,15 +871,28 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
             backgroundColor: "#ffffff",
           });
 
-          const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
+          // Paso 3: Restaurar subrayados en el DOM
+          this.restoreUnderlines(strippedUnderlines);
 
-          const pageWidth = 215.9;
-          const pageHeight = 330.2; // Oficio
+          const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
 
           if (i > 0) {
             pdf.addPage();
           }
           pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, pageHeight);
+
+          // Paso 4: Dibujar subrayados con precisión en jsPDF
+          pdf.setDrawColor(0, 0, 0);
+          pdf.setLineWidth(0.25);
+          underlinePositions.forEach(pos => {
+            pdf.line(pos.x, pos.y, pos.x + pos.width, pos.y);
+          });
+
+          // Dibujar "M P P D" verticalmente en la esquina superior derecha en TODAS las páginas
+          pdf.setFont("helvetica", "bold");
+          pdf.setFontSize(10);
+          pdf.setTextColor(0, 0, 128);
+          pdf.text("M\nP\nP\nD", 210, 20);
         }
       }
 
@@ -861,11 +905,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         ? `${cleanNumc}.pdf`
         : `${new Date().getTime()}.pdf`;
 
-      // Dibujar "M P P D" verticalmente en la esquina superior derecha
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(10);
-      pdf.setTextColor(0, 0, 128);
-      pdf.text("M\nP\nP\nD", 195, 20);
+      // MPPD ya fue dibujado en cada pagina dentro del loop anterior
 
       // Generar el blob del PDF local original
       const pdfBlob = pdf.output("blob");
@@ -2029,12 +2069,24 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         const dateStr = `${day} ${month} ${year}`;
 
         if (this.canvasData && this.canvasData.header) {
-          this.canvasData.header.resolutionNum = cleanNumero;
-          this.canvasData.header.date = dateStr;
+          this.canvasData = {
+            ...this.canvasData,
+            header: {
+              ...this.canvasData.header,
+              resolutionNum: cleanNumero,
+              date: dateStr,
+            },
+          };
         }
         if (this.activeDoc) {
           this.activeDoc.numc = cleanNumero;
           this.activeDoc.fecha_resolucion = dateStr;
+          if (this.activeDoc.documentos && this.activeDoc.documentos.length > 0) {
+            this.activeDoc.documentos.forEach((d: any) => {
+              d.numc = cleanNumero;
+              d.fecha_resolucion = dateStr;
+            });
+          }
         }
         this.cdr.detectChanges();
 
@@ -2072,6 +2124,260 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       });
       throw err;
     }
+  }
+
+  /**
+   * Recolecta las posiciones exactas de cada LÍNEA de texto subrayado.
+   *
+   * Estrategia:
+   * 1. Caminar solo los NODOS DE TEXTO del DOM.
+   * 2. Filtrar si el nodo de texto tiene algún ancestro subrayado (<u>, style underline, etc.).
+   * 3. Medir palabra por palabra (\S+) para agrupar en líneas visuales exactas.
+   *    Esto evita que el Range del navegador se extienda hacia el margen derecho
+   *    al haber un salto de línea en párrafos de más de una línea.
+   * 4. Fusionar segmentos adyacentes de la misma línea (por ejemplo palabras contiguas).
+   */
+  private collectUnderlinePositions(
+    canvasElement: HTMLElement,
+    pageWidthMm: number,
+    pageHeightMm: number
+  ): Array<{ x: number; y: number; width: number }> {
+    const rawPositions: Array<{ x: number; y: number; width: number }> = [];
+    const canvasRect = canvasElement.getBoundingClientRect();
+    const scaleX = pageWidthMm / canvasRect.width;
+    const scaleY = pageHeightMm / canvasRect.height;
+
+    // Caminar solo los nodos de texto del DOM
+    const walker = document.createTreeWalker(canvasElement, NodeFilter.SHOW_TEXT);
+    let textNode = walker.nextNode() as Text;
+
+    while (textNode) {
+      const text = textNode.textContent;
+
+      if (text && text.trim().length > 0) {
+        if (this.isTextNodeUnderlined(textNode, canvasElement)) {
+          // Extraer cada palabra individual para delimitar exactamente las líneas visibles
+          const regex = /\S+/g;
+          let match: RegExpExecArray | null;
+
+          interface LineSegment {
+            top: number;
+            bottom: number;
+            left: number;
+            right: number;
+            height: number;
+          }
+          const lines: LineSegment[] = [];
+
+          while ((match = regex.exec(text)) !== null) {
+            const wordRange = document.createRange();
+            wordRange.setStart(textNode, match.index);
+            wordRange.setEnd(textNode, match.index + match[0].length);
+
+            const rects = wordRange.getClientRects();
+            if (rects.length > 0) {
+              const rect = rects[0];
+              if (
+                rect.width > 0 &&
+                rect.height > 0 &&
+                rect.bottom >= canvasRect.top &&
+                rect.top <= canvasRect.bottom
+              ) {
+                // Buscar si pertenece a una línea existente en la misma fila vertical
+                const existingLine = lines.find(
+                  (l) => Math.abs(l.bottom - rect.bottom) < Math.max(rect.height, l.height) * 0.5
+                );
+
+                if (existingLine) {
+                  existingLine.left = Math.min(existingLine.left, rect.left);
+                  existingLine.right = Math.max(existingLine.right, rect.right);
+                  existingLine.bottom = Math.max(existingLine.bottom, rect.bottom);
+                  existingLine.height = Math.max(existingLine.height, rect.height);
+                } else {
+                  lines.push({
+                    top: rect.top,
+                    bottom: rect.bottom,
+                    left: rect.left,
+                    right: rect.right,
+                    height: rect.height,
+                  });
+                }
+              }
+            }
+          }
+
+          lines.forEach((line) => {
+            const widthPx = line.right - line.left;
+            if (widthPx < 2) return;
+
+            // Offset para que la línea quede justo debajo del texto
+            const offsetPx = line.height * 0.08;
+
+            const x = (line.left - canvasRect.left) * scaleX;
+            const y = (line.bottom - canvasRect.top + offsetPx) * scaleY;
+            const width = widthPx * scaleX;
+
+            rawPositions.push({ x, y, width });
+          });
+        }
+      }
+
+      textNode = walker.nextNode() as Text;
+    }
+
+    return this.mergeUnderlinePositions(rawPositions);
+  }
+
+  /**
+   * Une segmentos adyacentes o superpuestos en la misma línea horizontal
+   * para dibujar líneas de subrayado continuas y sin huecos entre palabras.
+   */
+  private mergeUnderlinePositions(
+    positions: Array<{ x: number; y: number; width: number }>
+  ): Array<{ x: number; y: number; width: number }> {
+    if (positions.length <= 1) return positions;
+
+    // Ordenar primero por Y (arriba hacia abajo) y luego por X (izquierda a derecha)
+    positions.sort((a, b) => {
+      if (Math.abs(a.y - b.y) > 0.8) {
+        return a.y - b.y;
+      }
+      return a.x - b.x;
+    });
+
+    const merged: Array<{ x: number; y: number; width: number }> = [];
+    let current = { ...positions[0] };
+
+    for (let i = 1; i < positions.length; i++) {
+      const next = positions[i];
+      const sameLine = Math.abs(current.y - next.y) <= 0.8;
+      const currentRight = current.x + current.width;
+      // Adyacentes o separados como máximo por un espacio en blanco (3.5 mm)
+      const isAdjacentOrOverlapping = next.x <= currentRight + 3.5;
+
+      if (sameLine && isAdjacentOrOverlapping) {
+        const newRight = Math.max(currentRight, next.x + next.width);
+        current.width = newRight - current.x;
+        current.y = Math.max(current.y, next.y);
+      } else {
+        merged.push(current);
+        current = { ...next };
+      }
+    }
+    merged.push(current);
+
+    return merged;
+  }
+
+  /**
+   * Verifica si un nodo de texto debe ser subrayado comprobando sus ancestros.
+   */
+  private isTextNodeUnderlined(textNode: Text, boundary: HTMLElement): boolean {
+    let ancestor = textNode.parentElement;
+    while (ancestor && ancestor !== boundary) {
+      if (ancestor.tagName.toUpperCase() === "U") return true;
+      if (ancestor.classList.contains("underline")) return true;
+
+      const td = ancestor.style.textDecoration || "";
+      const tdl = (ancestor.style as any).textDecorationLine || "";
+
+      if (td.includes("none") || tdl.includes("none")) {
+        return false;
+      }
+      if (
+        td.includes("underline") ||
+        tdl.includes("underline") ||
+        ancestor.getAttribute("style")?.includes("underline")
+      ) {
+        return true;
+      }
+      ancestor = ancestor.parentElement;
+    }
+    return false;
+  }
+
+  /**
+   * Elimina TEMPORALMENTE todos los subrayados y bordes inferiores del canvas
+   * para que html2canvas genere la imagen completamente limpia de líneas.
+   */
+  private stripUnderlines(
+    canvasElement: HTMLElement
+  ): Array<{
+    el: HTMLElement;
+    originalDecoration: string;
+    originalLine: string;
+    originalBorderBottom: string;
+  }> {
+    const stripped: Array<{
+      el: HTMLElement;
+      originalDecoration: string;
+      originalLine: string;
+      originalBorderBottom: string;
+    }> = [];
+
+    const allEls = canvasElement.querySelectorAll("*");
+    allEls.forEach((el: Element) => {
+      const htmlEl = el as HTMLElement;
+      const isU = htmlEl.tagName.toUpperCase() === "U";
+      const isUnderlineClass = htmlEl.classList.contains("underline");
+      const styleDec = htmlEl.style.textDecoration || "";
+      const styleLine = (htmlEl.style as any).textDecorationLine || "";
+      const styleBB = htmlEl.style.borderBottom || "";
+      const attrStyle = htmlEl.getAttribute("style") || "";
+
+      const hasUnderline =
+        isU ||
+        isUnderlineClass ||
+        styleDec.includes("underline") ||
+        styleLine.includes("underline") ||
+        styleBB.includes("solid") ||
+        attrStyle.includes("underline");
+
+      if (hasUnderline) {
+        stripped.push({
+          el: htmlEl,
+          originalDecoration: htmlEl.style.textDecoration,
+          originalLine: (htmlEl.style as any).textDecorationLine || "",
+          originalBorderBottom: htmlEl.style.borderBottom,
+        });
+
+        htmlEl.style.setProperty("text-decoration", "none", "important");
+        htmlEl.style.setProperty("text-decoration-line", "none", "important");
+        htmlEl.style.setProperty("border-bottom", "none", "important");
+      }
+    });
+
+    return stripped;
+  }
+
+  /**
+   * Restaura los subrayados en el DOM después de que html2canvas ha capturado la imagen.
+   */
+  private restoreUnderlines(
+    stripped: Array<{
+      el: HTMLElement;
+      originalDecoration: string;
+      originalLine: string;
+      originalBorderBottom: string;
+    }>
+  ): void {
+    stripped.forEach(
+      ({ el, originalDecoration, originalLine, originalBorderBottom }) => {
+        el.style.removeProperty("text-decoration");
+        el.style.removeProperty("text-decoration-line");
+        el.style.removeProperty("border-bottom");
+
+        if (originalDecoration) {
+          el.style.textDecoration = originalDecoration;
+        }
+        if (originalLine) {
+          (el.style as any).textDecorationLine = originalLine;
+        }
+        if (originalBorderBottom) {
+          el.style.borderBottom = originalBorderBottom;
+        }
+      }
+    );
   }
 
   //Evaluar si existe el campo digital

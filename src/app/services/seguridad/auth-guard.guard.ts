@@ -62,6 +62,7 @@ export class AuthGuardGuard implements CanActivate {
         "/resueltos_ios",
         "/snuevo",
         "/sreclamos",
+        "/firmados",
         "/resueltos_ok",
         "/rsindicadores",
         "/mreportes",
