@@ -609,7 +609,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           const canvasElement = canvases[i] as HTMLElement;
 
           // Paso 1: Recolectar posiciones exactas de subrayado ANTES de quitar los estilos
-          const underlinePositions = this.collectUnderlinePositions(canvasElement, pageWidth, pageHeight);
+          const underlinePositions = this.collectUnderlinePositions(
+            canvasElement,
+            pageWidth,
+            pageHeight,
+          );
 
           // Paso 2: Quitar subrayados temporalmente del DOM para que html2canvas no los dibuje mal
           const strippedUnderlines = this.stripUnderlines(canvasElement);
@@ -635,15 +639,15 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           // Paso 4: Dibujar subrayados con precisión en jsPDF
           pdf.setDrawColor(0, 0, 0);
           pdf.setLineWidth(0.25);
-          underlinePositions.forEach(pos => {
+          underlinePositions.forEach((pos) => {
             pdf.line(pos.x, pos.y, pos.x + pos.width, pos.y);
           });
 
-          // Dibujar "M P P D" verticalmente en la esquina superior derecha en TODAS las páginas
+          // Dibujar "M P P D" verticalmente en la esquina superior derecha en TODAS las páginas (corrido 0.5cm a la izquierda para evitar corte en impresión)
           pdf.setFont("helvetica", "bold");
           pdf.setFontSize(10);
           pdf.setTextColor(0, 0, 128);
-          pdf.text("M\nP\nP\nD", 210, 20);
+          pdf.text("M\nP\nP\nD", 200, 20);
         }
       }
 
@@ -858,7 +862,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           const canvasElement = canvases[i] as HTMLElement;
 
           // Paso 1: Recolectar posiciones exactas de subrayado ANTES de quitar los estilos
-          const underlinePositions = this.collectUnderlinePositions(canvasElement, pageWidth, pageHeight);
+          const underlinePositions = this.collectUnderlinePositions(
+            canvasElement,
+            pageWidth,
+            pageHeight,
+          );
 
           // Paso 2: Quitar subrayados temporalmente del DOM para que html2canvas no los dibuje mal
           const strippedUnderlines = this.stripUnderlines(canvasElement);
@@ -884,15 +892,15 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
           // Paso 4: Dibujar subrayados con precisión en jsPDF
           pdf.setDrawColor(0, 0, 0);
           pdf.setLineWidth(0.25);
-          underlinePositions.forEach(pos => {
+          underlinePositions.forEach((pos) => {
             pdf.line(pos.x, pos.y, pos.x + pos.width, pos.y);
           });
 
-          // Dibujar "M P P D" verticalmente en la esquina superior derecha en TODAS las páginas
+          // Dibujar "M P P D" verticalmente en la esquina superior derecha en TODAS las páginas (corrido 0.5cm a la izquierda para evitar corte en impresión)
           pdf.setFont("helvetica", "bold");
           pdf.setFontSize(10);
           pdf.setTextColor(0, 0, 128);
-          pdf.text("M\nP\nP\nD", 210, 20);
+          pdf.text("M\nP\nP\nD", 200, 20);
         }
       }
 
@@ -2081,7 +2089,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         if (this.activeDoc) {
           this.activeDoc.numc = cleanNumero;
           this.activeDoc.fecha_resolucion = dateStr;
-          if (this.activeDoc.documentos && this.activeDoc.documentos.length > 0) {
+          if (
+            this.activeDoc.documentos &&
+            this.activeDoc.documentos.length > 0
+          ) {
             this.activeDoc.documentos.forEach((d: any) => {
               d.numc = cleanNumero;
               d.fecha_resolucion = dateStr;
@@ -2140,7 +2151,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   private collectUnderlinePositions(
     canvasElement: HTMLElement,
     pageWidthMm: number,
-    pageHeightMm: number
+    pageHeightMm: number,
   ): Array<{ x: number; y: number; width: number }> {
     const rawPositions: Array<{ x: number; y: number; width: number }> = [];
     const canvasRect = canvasElement.getBoundingClientRect();
@@ -2148,7 +2159,10 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     const scaleY = pageHeightMm / canvasRect.height;
 
     // Caminar solo los nodos de texto del DOM
-    const walker = document.createTreeWalker(canvasElement, NodeFilter.SHOW_TEXT);
+    const walker = document.createTreeWalker(
+      canvasElement,
+      NodeFilter.SHOW_TEXT,
+    );
     let textNode = walker.nextNode() as Text;
 
     while (textNode) {
@@ -2185,14 +2199,22 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
               ) {
                 // Buscar si pertenece a una línea existente en la misma fila vertical
                 const existingLine = lines.find(
-                  (l) => Math.abs(l.bottom - rect.bottom) < Math.max(rect.height, l.height) * 0.5
+                  (l) =>
+                    Math.abs(l.bottom - rect.bottom) <
+                    Math.max(rect.height, l.height) * 0.5,
                 );
 
                 if (existingLine) {
                   existingLine.left = Math.min(existingLine.left, rect.left);
                   existingLine.right = Math.max(existingLine.right, rect.right);
-                  existingLine.bottom = Math.max(existingLine.bottom, rect.bottom);
-                  existingLine.height = Math.max(existingLine.height, rect.height);
+                  existingLine.bottom = Math.max(
+                    existingLine.bottom,
+                    rect.bottom,
+                  );
+                  existingLine.height = Math.max(
+                    existingLine.height,
+                    rect.height,
+                  );
                 } else {
                   lines.push({
                     top: rect.top,
@@ -2233,7 +2255,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
    * para dibujar líneas de subrayado continuas y sin huecos entre palabras.
    */
   private mergeUnderlinePositions(
-    positions: Array<{ x: number; y: number; width: number }>
+    positions: Array<{ x: number; y: number; width: number }>,
   ): Array<{ x: number; y: number; width: number }> {
     if (positions.length <= 1) return positions;
 
@@ -2300,9 +2322,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
    * Elimina TEMPORALMENTE todos los subrayados y bordes inferiores del canvas
    * para que html2canvas genere la imagen completamente limpia de líneas.
    */
-  private stripUnderlines(
-    canvasElement: HTMLElement
-  ): Array<{
+  private stripUnderlines(canvasElement: HTMLElement): Array<{
     el: HTMLElement;
     originalDecoration: string;
     originalLine: string;
@@ -2359,7 +2379,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       originalDecoration: string;
       originalLine: string;
       originalBorderBottom: string;
-    }>
+    }>,
   ): void {
     stripped.forEach(
       ({ el, originalDecoration, originalLine, originalBorderBottom }) => {
@@ -2376,7 +2396,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
         if (originalBorderBottom) {
           el.style.borderBottom = originalBorderBottom;
         }
-      }
+      },
     );
   }
 
