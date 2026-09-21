@@ -2287,6 +2287,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         else if (this.estadoOrigen === 5) estadoDestino = 6;
         else if (this.estadoOrigen === 6) estadoDestino = 7;
       }
+      // Flujo especial exclusivo para PUNTO DE CUENTA
+      else if (this.selectedCarpeta?.id === "PUNTO_DE_CUENTA") {
+        estadoDestino = 5;
+      }
+
       this.xAPI = {} as IAPICore;
       this.xAPI.funcion = "WKF_ARedistribuir";
       this.xAPI.valores = "";
@@ -2306,10 +2311,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.actualizarBuzon();
 
         // this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
-        this.toastrService.success(
-          "El documento ha sido redistribuido segun su selección",
-          `GDoc Wkf.DocumentoObservacion`,
-        );
+        // this.toastrService.success(
+        //   "El documento ha sido redistribuido segun su selección",
+        //   `GDoc Wkf.DocumentoObservacion`,
+        // );
       },
       (error) => {
         console.error(error);
