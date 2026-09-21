@@ -323,14 +323,14 @@
                                                     <div class="d-flex align-items-center" style="gap: 6px;">
                                                         <span class="badge px-2 py-1 font-weight-bold text-white shadow-sm" style="font-size: 0.88rem; letter-spacing: 0.5px; background-color: #5eaaa8;" [title]="'Control: ' + (e.descripcion || 'N/A')">
                                                           
-                                                            <span *ngIf="e.descripcion && e.descripcion !== e.numero_resuelto" style="opacity: 0.85; font-size: 0.75rem;"> {{ e.descripcion }}</span>
+                                                            <span *ngIf="e.numero_resuelto" style="opacity: 0.85; font-size: 0.75rem;"> {{ e.numero_resuelto }}</span>
                                                         </span>
                                                         <button type="button" 
                                                                 class="btn btn-sm btn-outline-danger p-0 d-inline-flex align-items-center justify-content-center shadow-sm"
                                                                 style="width: 26px; height: 26px; border-radius: 4px;"
-                                                                *ngIf="e.numero_resuelto || e.descripcion"
-                                                                (click)="getResueltoId(e.numero_resuelto || e.descripcion)" 
-                                                                [title]="'Descargar PDF del resuelto ' + (e.numero_resuelto || e.descripcion)">
+                                                                *ngIf="e.numero_resuelto"
+                                                                (click)="getResueltoId(e.numero_resuelto)" 
+                                                                [title]="'Descargar PDF del resuelto ' + e.numero_resuelto">
                                                             <i class="fas fa-file-pdf" style="font-size: 0.85rem;"></i>
                                                         </button>
                                                     </div>

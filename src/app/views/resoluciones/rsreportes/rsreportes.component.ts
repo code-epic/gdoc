@@ -56,6 +56,10 @@ export class RsreportesComponent implements OnInit, OnDestroy {
   public pageIndex: number = 0;
   public pageSizeOptions: number[] = [10, 25, 50, 100];
 
+  // Control de streaming
+  public isStreaming: boolean = false;
+  public streamAbortController: AbortController | null = null;
+
   constructor(
     private excelService: ExcelService,
     private ngxService: NgxUiLoaderService,
@@ -222,7 +226,8 @@ export class RsreportesComponent implements OnInit, OnDestroy {
   // ==========================================
   // REPORTE 3: RESOLUCIONES FIRMADAS
   // ==========================================
-  consultarResolucionesFirmadas() {
+  async consultarResolucionesFirmadas() {
+    this.isStreaming = true;
     this.ngxService.startLoader("lbuscar");
     const funcionNombre =
       environment.funcion?.CONSULTAR_RESOLUCIONES_FIRMADAS ||
@@ -237,70 +242,81 @@ export class RsreportesComponent implements OnInit, OnDestroy {
     this.xAPI.parametros = param;
     this.xAPI.valores = "";
 
-    console.log("Invocando API Resoluciones Firmadas:", this.xAPI);
+    console.log("Invocando API Resoluciones Firmadas (Stream):", this.xAPI);
 
-    this.apiService.Ejecutar(this.xAPI).subscribe({
-      next: (data) => {
-        console.log("Respuesta Resoluciones Firmadas:", data);
-        this.lstFirmadasOriginal = (data?.Cuerpo || []).map((item: any) => ({
-          ...item,
-          numero_resuelto: item.numero_resuelto || item.total_resueltos || "",
-          tipo: item.tipo || item.des_resol || "RESOLUCIÓN",
-          descripcion: item.descripcion || item.numero || "",
-          contenido: item.contenido || item.asunto || "",
-          ultimo_firmado: item.ultimo_firmado || "",
-        }));
+    this.lstFirmadasOriginal = [];
+    this.lstFirmadas = [];
+    const setTipos = new Set<string>();
+    let initialLoaderStopped = false;
 
-        // Extraer lista única de tipos de resoluciones para el selector
-        const setTipos = new Set<string>();
-        this.lstFirmadasOriginal.forEach((item) => {
-          if (item.tipo && item.tipo.trim() !== "") {
-            setTipos.add(item.tipo.trim().toUpperCase());
+    const signal = this.streamAbortController
+      ? this.streamAbortController.signal
+      : undefined;
+
+    try {
+      await this.apiService.postStream(
+        "crudstream",
+        this.xAPI,
+        (item: any) => {
+          const mappedItem = {
+            ...item,
+            numero_resuelto: item.numero_resuelto || item.total_resueltos || "",
+            tipo: item.tipo || item.des_resol || "RESOLUCIÓN",
+            descripcion: item.descripcion || item.numero || "",
+            contenido: item.contenido || item.asunto || "",
+            ultimo_firmado: item.ultimo_firmado || "",
+          };
+          this.lstFirmadasOriginal.push(mappedItem);
+
+          if (mappedItem.tipo && mappedItem.tipo.trim() !== "") {
+            setTipos.add(mappedItem.tipo.trim().toUpperCase());
           }
-        });
-        this.tiposResolucion = Array.from(setTipos).sort();
 
-        this.aplicarFiltrosFirmadas();
-        this.ngxService.stopLoader("lbuscar");
-      },
-      error: (error) => {
-        console.error("Error en consultarResolucionesFirmadas con parámetros:", error);
-        // Fallback: Si el backend falla con el rango de fechas, intentar sin parámetros
-        if (param !== "") {
-          console.warn("Reintentando consultarResolucionesFirmadas sin parámetros...");
-          this.xAPI.parametros = "";
-          this.xAPI.valores = "";
-          this.apiService.Ejecutar(this.xAPI).subscribe({
-            next: (retryData) => {
-              console.log("Respuesta fallback Resoluciones Firmadas:", retryData);
-              this.lstFirmadasOriginal = (retryData?.Cuerpo || []).map((item: any) => ({
-                ...item,
-                numero_resuelto: item.numero_resuelto || item.total_resueltos || "",
-                tipo: item.tipo || item.des_resol || "RESOLUCIÓN",
-                descripcion: item.descripcion || item.numero || "",
-                contenido: item.contenido || item.asunto || "",
-                ultimo_firmado: item.ultimo_firmado || "",
-              }));
-              const setTipos = new Set<string>();
-              this.lstFirmadasOriginal.forEach((item) => {
-                if (item.tipo && item.tipo.trim() !== "") {
-                  setTipos.add(item.tipo.trim().toUpperCase());
-                }
-              });
-              this.tiposResolucion = Array.from(setTipos).sort();
-              this.aplicarFiltrosFirmadas();
-              this.ngxService.stopLoader("lbuscar");
-            },
-            error: (retryErr) => {
-              console.error("Error definitivo en consultarResolucionesFirmadas:", retryErr);
-              this.ngxService.stopLoader("lbuscar");
-            },
-          });
-        } else {
-          this.ngxService.stopLoader("lbuscar");
-        }
-      },
-    });
+          // Evaluación rápida de filtros para renderizado progresivo
+          const asuntoFilter = (this.filtroAsunto || "").trim().toLowerCase();
+          const numeroFilter = (this.filtroNumero || "").trim().toLowerCase();
+          const tipoFilter = (this.filtroTipo || "").trim().toLowerCase();
+
+          let match = true;
+          if (asuntoFilter) {
+            const cont = mappedItem.contenido ? mappedItem.contenido.toLowerCase() : "";
+            const asun = mappedItem.asunto ? mappedItem.asunto.toLowerCase() : "";
+            if (!cont.includes(asuntoFilter) && !asun.includes(asuntoFilter)) match = false;
+          }
+          if (match && numeroFilter) {
+            const numR = mappedItem.numero_resuelto ? mappedItem.numero_resuelto.toLowerCase() : "";
+            const desc = mappedItem.descripcion ? mappedItem.descripcion.toLowerCase() : "";
+            if (!numR.includes(numeroFilter) && !desc.includes(numeroFilter)) match = false;
+          }
+          if (match && tipoFilter) {
+            const tipo = mappedItem.tipo ? mappedItem.tipo.toLowerCase() : "";
+            if (!tipo.includes(tipoFilter)) match = false;
+          }
+
+          if (match) {
+            this.lstFirmadas.push(mappedItem);
+          }
+
+          // Liberar el loader bloqueante en cuanto haya registros listos
+          if (!initialLoaderStopped && this.lstFirmadas.length > 0) {
+            initialLoaderStopped = true;
+            this.ngxService.stopLoader("lbuscar");
+          }
+        },
+        signal
+      );
+
+      this.tiposResolucion = Array.from(setTipos).sort();
+      // Al finalizar, reaplicamos filtros para asegurar el ordenamiento final
+      this.aplicarFiltrosFirmadas();
+    } catch (error: any) {
+      if (error?.name !== "AbortError" && !signal?.aborted) {
+        console.error("Error en consultarResolucionesFirmadas:", error);
+      }
+    } finally {
+      this.isStreaming = false;
+      this.ngxService.stopLoader("lbuscar");
+    }
   }
 
   aplicarFiltrosFirmadas() {
@@ -475,7 +491,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
       this.lstFirmadas.forEach((e, i) => {
         xlsx.push({
           "#": i + 1,
-          "N° Resuelto": e.numero_resuelto || e.descripcion || "",
+          "N° Resuelto": e.numero_resuelto || "",
           Tipo: e.tipo || "",
           "Asunto / Contenido": e.contenido || e.asunto || "",
           "Último Firmado": e.ultimo_firmado || "",
@@ -525,7 +541,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
       this.lstFirmadas.forEach((e, i) => {
         data.push({
           "#": i + 1,
-          "N° Resuelto": e.numero_resuelto || e.descripcion || "",
+          "N° Resuelto": e.numero_resuelto || "",
           Tipo: e.tipo || "",
           "Asunto / Contenido": e.contenido || e.asunto || "",
           "Ultimo Firmado": e.ultimo_firmado || "",
@@ -567,7 +583,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
     // Filas para la tabla
     const tableBody = this.lstFirmadas.map((e, index) => [
       index + 1,
-      e.numero_resuelto || e.descripcion || "-",
+      e.numero_resuelto || "-",
       e.tipo || "-",
       e.contenido || e.asunto || "-",
       e.ultimo_firmado
