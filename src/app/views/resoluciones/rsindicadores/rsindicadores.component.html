@@ -31,7 +31,7 @@
           </div>
           <!-- En Proceso -->
           <div class="col-xl-3 col-md-6 mb-3 mb-xl-0">
-            <div class="kpi-block warning">
+            <div class="kpi-block warning" style="cursor: pointer;" (click)="abrirModalEnProceso(modalDetalles)" title="Ver detalles en proceso">
               <div class="kpi-icon"><i class="fas fa-spinner fa-spin"></i></div>
               <div class="kpi-value">{{kpis.enProceso | number}}</div>
               <div class="kpi-label">En Proceso ({{getPercentage(kpis.enProceso)}}%)</div>
@@ -102,3 +102,114 @@
     </div>
   </div>
 </div>
+
+<style>
+  ::ng-deep .rs-modal-top {
+    z-index: 100001 !important;
+  }
+  ::ng-deep .rs-modal-backdrop-top {
+    z-index: 100000 !important;
+  }
+</style>
+
+<!-- Template para Modal de Detalles -->
+<ng-template #modalDetalles let-modal>
+  <div class="modal-header border-bottom-0 pb-0">
+    <h4 class="modal-title text-dark font-weight-bold" id="modal-basic-title">
+      <i class="fas fa-chart-pie text-warning mr-2"></i>Detalles de Resoluciones en Proceso
+    </h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body pt-2">
+    <div class="row">
+      <!-- Gráfica de Barras -->
+      <div class="col-md-12 mb-4">
+        
+        <!-- Navegación dinámica de gráfica -->
+        <div class="d-flex justify-content-between align-items-center mb-2 px-1" *ngIf="isDetalleExpandido()">
+           <h5 class="text-primary mb-0 font-weight-bold" style="font-size: 1rem; color: #0f172a !important;">
+             <i class="fas fa-search-plus mr-1" style="color: #64748b;"></i> Explorando Detalle
+           </h5>
+           <button class="btn btn-sm shadow-sm rounded-pill px-4 py-2 font-weight-bold d-flex align-items-center" (click)="colapsarTodo()" style="background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; transition: all 0.2s ease;">
+             <i class="fas fa-arrow-left mr-2 text-primary"></i> Volver al Resumen Global
+           </button>
+        </div>
+
+        <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+          <canvas id="chartModalDetalle"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tabla de Estatus -->
+    <div class="table-responsive bg-white rounded shadow-sm border border-light" style="max-height: 400px; overflow-y: auto;">
+      <table class="table align-items-center table-flush table-hover mb-0">
+        <thead class="thead-light sticky-top" style="z-index: 1;">
+          <tr>
+            <th scope="col" style="width: 40px;"></th>
+            <th scope="col">ESTATUS DEL TRÁMITE</th>
+            <th scope="col" class="text-center">CANTIDAD</th>
+            <th scope="col" class="text-center">PORCENTAJE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let item of detallesEnProceso">
+            <!-- Fila Principal (Agrupada) -->
+            <tr style="cursor: pointer; background-color: #fcfcfc; transition: all 0.2s ease;" (click)="toggleDetalle(item)" [ngStyle]="{'background-color': item.expanded ? '#f8fafc' : '#ffffff'}">
+              <td class="text-center text-muted py-3">
+                <i class="fas" [ngClass]="item.expanded ? 'fa-chevron-down text-primary' : 'fa-chevron-right'"></i>
+              </td>
+              <td class="font-weight-bold text-dark py-3" style="font-size: 0.95rem;">
+                <span class="badge badge-pill shadow-sm px-3 py-2" [ngStyle]="{'background-color': item.color, 'color': '#14532d', 'font-size': '0.75rem'}">
+                  {{item.descripcion_estatus}}
+                </span>
+              </td>
+              <td class="text-center font-weight-bold text-dark py-3" style="font-size: 1.15rem;">{{item.total | number}}</td>
+              <td class="text-center py-3">
+                <div class="d-flex align-items-center justify-content-center">
+                  <span class="mr-2 text-muted small" style="width: 35px; text-align: right;">{{getPercentageOfProcess(item.total)}}%</span>
+                  <div>
+                    <div class="progress" style="width: 50px; height: 5px; background-color: #f1f5f9;">
+                      <div class="progress-bar" role="progressbar" [ngStyle]="{'background-color': item.color, 'width': getPercentageOfProcess(item.total) + '%'}"></div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            
+            <!-- Filas de Detalle (Expandidas) -->
+            <ng-container *ngIf="item.expanded">
+              <tr *ngFor="let det of item.detalles" style="background-color: #f8fafc; border-left: 3px solid #64748b;">
+                <td class="py-3"></td>
+                <td class="text-secondary font-weight-bold py-3 pl-4" style="font-size: 0.9rem;">
+                  <i class="fas fa-level-up-alt fa-rotate-90 text-muted mr-2"></i> 
+                  <span class="text-dark">{{det.descripcion}}</span>
+                </td>
+                <td class="text-center text-primary font-weight-bold py-3" style="font-size: 1rem;">{{det.numero | number}}</td>
+                <td class="py-3"></td>
+              </tr>
+            </ng-container>
+          </ng-container>
+
+          <tr *ngIf="detallesEnProceso.length === 0">
+            <td colspan="4" class="text-center py-4 text-muted">
+              No hay datos disponibles en este momento.
+            </td>
+          </tr>
+        </tbody>
+        <tfoot class="bg-light" *ngIf="detallesEnProceso.length > 0">
+          <tr>
+            <th colspan="3" class="text-right font-weight-bold">TOTAL EN PROCESO:</th>
+            <th class="text-center font-weight-bold text-dark" style="font-size: 1.1rem;">{{kpis.enProceso | number}}</th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="modal-footer border-top-0 pt-3 pb-3">
+    <button type="button" class="btn btn-outline-secondary shadow-sm px-4" style="border-radius: 6px;" (click)="modal.close('Close click')">Cerrar</button>
+  </div>
+</ng-template>

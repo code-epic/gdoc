@@ -53,6 +53,9 @@ export class RsindicadoresComponent
     total: 0,
   };
 
+  public detallesEnProceso: any[] = [];
+  public chartDetalle: any;
+
   // Mock data temporal
   private mockDataMonths = {
     labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago"],
@@ -405,5 +408,259 @@ export class RsindicadoresComponent
     } catch (error) {
       console.error("Error en EnProcesoMinistro:", error);
     }
+  }
+
+  //MPPD_CEPendienteEnProcesoDetalles
+  public async EnProcesoDetalles(): Promise<void> {
+    try {
+      const payload = this.crearPayload("MPPD_CEPendienteEnProcesoDetalle");
+      const data: any = await firstValueFrom(this.apiService.Ejecutar(payload));
+      console.log("Firmados en Proceso Detalle:", data?.Cuerpo);
+      if (data?.Cuerpo && data.Cuerpo.length > 0) {
+        let totalEnProceso = 0;
+
+        // Mapeo de Estatus a Descripciones Legibles
+        const mapEstatus: any = {
+          36: "ENTRADAS / REDACCIÓN",
+          990: "REVISIÓN",
+          991: "RESOLUCIÓN (JEFE)",
+          930: "SECRETARÍA (JEFE)",
+          340: "DIRECCIÓN",
+          776: "FIRMADO",
+          880: "MINISTRO APROBADOR",
+          881: "DEVOLVER / LIBERAR",
+          888: "FIRMADO Y PUBLICADO",
+        };
+
+        const mapColors: any = {
+          36: "#e2f0d9", // Inicio (muy claro)
+          340: "#c5e0b4", // Dirección
+          776: "#a9d18e", // Firmado
+          880: "#70ad47", // Ministro
+          930: "#548235", // Secretaría
+          990: "#fff2cc", // Revisión (Amarillo pastel)
+          991: "#375623", // Resolución (Más oscuro)
+          888: "#1e8449", // Publicado (Verde Éxito Fuerte)
+          881: "#f8d7da", // Devolver / Liberar (Rojo/Rosa pastel)
+        };
+
+        const agrupado: any = {};
+
+        data.Cuerpo.forEach((item: any) => {
+          const count =
+            parseInt(item.numero, 10) ||
+            parseInt(item.numero_resuelto, 10) ||
+            0;
+          totalEnProceso += count;
+          const st = item.estatus;
+
+          if (!agrupado[st]) {
+            agrupado[st] = {
+              estatus: st,
+              descripcion_estatus: mapEstatus[st] || `ESTATUS ${st}`,
+              color: mapColors[st] || "#e2e8f0",
+              total: 0,
+              expanded: false,
+              detalles: [],
+            };
+          }
+          agrupado[st].total += count;
+          agrupado[st].detalles.push({
+            descripcion: item.descripcion || item.tipo || "OTRO",
+            numero: count,
+          });
+        });
+
+        // Convertir el objeto agrupado a array y ordenar por el orden específico solicitado
+        const ordenDeseado = [36, 990, 991, 930, 340, 776, 880, 881, 888];
+
+        this.detallesEnProceso = Object.values(agrupado).sort(
+          (a: any, b: any) => {
+            const idxA = ordenDeseado.indexOf(parseInt(a.estatus));
+            const idxB = ordenDeseado.indexOf(parseInt(b.estatus));
+            const orderA = idxA !== -1 ? idxA : 999;
+            const orderB = idxB !== -1 ? idxB : 999;
+            return orderA - orderB;
+          },
+        );
+
+        this.kpis.enProceso = totalEnProceso;
+        this.recalcularTotal();
+      }
+    } catch (error) {
+      console.error("Error en EnProcesoDetalles:", error);
+    }
+  }
+
+  public getPercentageOfProcess(value: number): number {
+    if (this.kpis.enProceso === 0) return 0;
+    return Math.round((value / this.kpis.enProceso) * 100);
+  }
+
+  public async abrirModalEnProceso(content: any): Promise<void> {
+    if (this.detallesEnProceso.length === 0) {
+      await this.EnProcesoDetalles();
+    }
+
+    if (this.kpis.enProceso === 0 || this.detallesEnProceso.length === 0) {
+      this.toastrService.info(
+        "No hay detalles en proceso para mostrar.",
+        "Información",
+      );
+      return;
+    }
+
+    this.modalService
+      .open(content, {
+        size: "lg",
+        centered: true,
+        windowClass: "rs-modal-top",
+        backdropClass: "rs-modal-backdrop-top",
+        scrollable: true,
+      })
+      .shown.subscribe(() => {
+        // Asegurarnos de que ninguno esté expandido por defecto al abrir
+        this.detallesEnProceso.forEach((d) => (d.expanded = false));
+        this.renderizarGraficoDetalles();
+      });
+  }
+
+  public toggleDetalle(item: any): void {
+    const wasExpanded = item.expanded;
+    // Efecto acordeón: cerramos todos
+    this.detallesEnProceso.forEach((d) => (d.expanded = false));
+
+    // Si no estaba expandido, lo expandimos
+    item.expanded = !wasExpanded;
+
+    // Actualizamos la gráfica
+    this.renderizarGraficoDetalles();
+  }
+
+  public isDetalleExpandido(): boolean {
+    return this.detallesEnProceso.some(d => d.expanded);
+  }
+
+  public colapsarTodo(): void {
+    this.detallesEnProceso.forEach(d => d.expanded = false);
+    this.renderizarGraficoDetalles();
+  }
+
+  public renderizarGraficoDetalles(): void {
+    if (this.chartDetalle) {
+      this.chartDetalle.destroy();
+    }
+
+    const canvas = document.getElementById(
+      "chartModalDetalle",
+    ) as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Lógica dinámica: mostrar el desglose si hay alguno expandido
+    const itemExpandido = this.detallesEnProceso.find((d) => d.expanded);
+
+    let labels: string[] = [];
+    let data: number[] = [];
+    let labelTitle = "";
+    let bgColor: any = "";
+
+    if (itemExpandido) {
+      labels = itemExpandido.detalles.map((d: any) => d.descripcion);
+      data = itemExpandido.detalles.map((d: any) => d.numero);
+      labelTitle = `Subdetalle: ${itemExpandido.descripcion_estatus}`;
+      bgColor = itemExpandido.color; // Mantenemos el color del estatus para sus subdetalles
+    } else {
+      labels = this.detallesEnProceso.map((item) => item.descripcion_estatus);
+      data = this.detallesEnProceso.map((item) => item.total);
+      labelTitle = "Cantidad en Proceso";
+      bgColor = this.detallesEnProceso.map((item) => item.color); // Array de colores
+    }
+
+    this.chartDetalle = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: labelTitle,
+            data: data,
+            backgroundColor: bgColor, // Color dinámico (string o array)
+            borderRadius: 6,
+            barThickness: "flex",
+            maxBarThickness: 45,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        onClick: (event: any, elements: any[]) => {
+          if (elements && elements.length > 0) {
+            const idx = elements[0].index !== undefined ? elements[0].index : elements[0]._index;
+            if (idx !== undefined) {
+              if (itemExpandido) {
+                // Si estamos en subdetalle, volvemos a la vista global
+                setTimeout(() => this.toggleDetalle(itemExpandido), 0);
+              } else {
+                // Expandimos el estatus clickeado
+                const item = this.detallesEnProceso[idx];
+                if (item) {
+                  setTimeout(() => this.toggleDetalle(item), 0);
+                }
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            backgroundColor: "rgba(255,255,255,0.9)",
+            titleColor: "#172b4d",
+            bodyColor: "#525f7f",
+            borderColor: "#e9ecef",
+            borderWidth: 1,
+            padding: 12,
+            boxPadding: 6,
+            usePointStyle: true,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              color: "#8898aa",
+            },
+            grid: {
+              color: "#e9ecef",
+              drawBorder: false,
+              borderDash: [5, 5],
+            },
+          },
+          x: {
+            ticks: {
+              color: "#8898aa",
+              maxRotation: 45,
+              minRotation: 0,
+              callback: function (value: any, index: number, values: any) {
+                const label = this.getLabelForValue(value);
+                // Si el label es muy largo, lo truncamos
+                return label.length > 15
+                  ? label.substring(0, 15) + "..."
+                  : label;
+              },
+            },
+            grid: {
+              display: false,
+              drawBorder: false,
+            },
+          },
+        },
+      },
+    });
   }
 }
