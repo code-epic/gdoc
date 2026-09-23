@@ -1216,6 +1216,17 @@
                 <span>Diferido</span>
               </button>
 
+              <!-- ARCHIVAR (TRAMITE_ORGANO_REGULAR, PUNTO_DE_CUENTA, PRESIDENCIALES) -->
+              <button class="btn-modal-decision btn-archivar"
+                      *ngIf="currentProfile === 'JefeSecretaria' && (selectedCarpeta?.id === 'TRAMITE_ORGANO_REGULAR' || selectedCarpeta?.id === 'PUNTO_DE_CUENTA' || selectedCarpeta?.id === 'PRESIDENCIALES')"
+                      (click)="ejecutarAccion('ARCHIVAR')"
+                      [disabled]="loadingAction"
+                      title="Archivar Documento">
+                <i class="fas fa-archive"></i>
+                <span>Archivar</span>
+                <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
+              </button>
+
               <!-- NEGADO -->
               <button class="btn-modal-decision btn-negado"
                       (click)="ejecutarAccion('NEGADO')"

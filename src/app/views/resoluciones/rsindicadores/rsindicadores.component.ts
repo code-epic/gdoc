@@ -19,6 +19,8 @@ import { UtilService } from "src/app/services/util/util.service";
 import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { firstValueFrom } from "rxjs";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 @Component({
   selector: "app-rsindicadores",
@@ -127,6 +129,95 @@ export class RsindicadoresComponent
     this.updateLineChart();
   }
 
+  public exportarGraficoPDF(): void {
+    const canvas = document.getElementById("barChart") as HTMLCanvasElement;
+    if (!canvas || !this.barChart || !this.barChart.data.labels) {
+      this.toastrService.error("No se pudo obtener la gráfica para exportar.", "Error");
+      return;
+    }
+
+    // Datos para la tabla
+    const labels = this.barChart.data.labels as string[];
+    const dataValues = this.barChart.data.datasets[0].data as number[];
+    const totalCount = dataValues.reduce((acc, val) => acc + val, 0);
+
+    const tableBody = labels.map((label, index) => [
+      label,
+      dataValues[index]
+    ]);
+    // Añadimos fila de total al final
+    tableBody.push(["TOTAL DE RESOLUCIONES FIRMADAS", totalCount]);
+
+    // Crear un canvas temporal con fondo blanco para evitar fondo negro en PDF
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const ctx = tempCanvas.getContext("2d");
+    if (ctx) {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      ctx.drawImage(canvas, 0, 0);
+    }
+
+    const imgData = tempCanvas.toDataURL("image/png", 1.0);
+
+    // p = portrait, pt = points, letter = tamaño carta
+    const pdf = new jsPDF("p", "pt", "letter");
+    
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    
+    const margin = 40;
+    const imgWidth = pdfWidth - (margin * 2);
+    const ratio = canvas.width / canvas.height;
+    const imgHeight = imgWidth / ratio;
+
+    // Título del informe
+    pdf.setFontSize(20);
+    pdf.setTextColor(40, 40, 40);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("INFORME DE DISTRIBUCIÓN OPERATIVA", pdfWidth / 2, margin + 10, { align: "center" });
+
+    pdf.setFontSize(14);
+    pdf.setFont("helvetica", "normal");
+    pdf.text("Tipo de Resolución (Firmados)", pdfWidth / 2, margin + 30, { align: "center" });
+    
+    // Si la imagen es muy alta, la ajustamos
+    const maxImgHeight = 300; 
+    const finalHeight = imgHeight > maxImgHeight ? maxImgHeight : imgHeight;
+    const finalWidth = finalHeight * ratio;
+    const xOffset = (pdfWidth - finalWidth) / 2; // Centrar gráfica
+
+    // Agregar Gráfica
+    const chartY = margin + 50;
+    pdf.addImage(imgData, "PNG", xOffset, chartY, finalWidth, finalHeight);
+    
+    // Agregar Tabla de Detalles con autoTable
+    const tableStartY = chartY + finalHeight + 30;
+    
+    autoTable(pdf, {
+      startY: tableStartY,
+      head: [["TIPO DE RESOLUCIÓN", "CANTIDAD"]],
+      body: tableBody,
+      theme: "striped",
+      headStyles: { fillColor: [45, 206, 137], halign: "center" },
+      columnStyles: {
+        0: { halign: "left", fontStyle: "bold" },
+        1: { halign: "center" }
+      },
+      didParseCell: function(data) {
+        // Resaltar la fila de TOTAL
+        if (data.row.index === tableBody.length - 1) {
+          data.cell.styles.fillColor = [241, 245, 249];
+          data.cell.styles.textColor = [15, 23, 42];
+          data.cell.styles.fontStyle = "bold";
+        }
+      }
+    });
+
+    const fechaStr = new Date().toISOString().split('T')[0];
+    pdf.save(`Informe_Distribucion_Resoluciones_${fechaStr}.pdf`);
+  }
+
   public recalcularTotal() {
     this.kpis.total =
       this.kpis.firmados +
@@ -157,6 +248,16 @@ export class RsindicadoresComponent
     if (this.barChart && labels.length > 0) {
       this.barChart.data.labels = labels;
       this.barChart.data.datasets[0].data = values;
+
+      // Paleta dinámica para ver todos los detalles con mejores colores
+      const palette = [
+        "#2dce89", "#5e72e4", "#11cdef", "#fb6340", "#f5365c",
+        "#8965e0", "#ff6b81", "#7bed9f", "#70a1ff", "#eccc68", 
+        "#ff7f50", "#2ed573", "#1e90ff", "#3742fa", "#d1e7dd"
+      ];
+      const dynamicColors = labels.map((_, i) => palette[i % palette.length]);
+      this.barChart.data.datasets[0].backgroundColor = dynamicColors;
+
       this.barChart.update();
     }
   }
@@ -240,11 +341,13 @@ export class RsindicadoresComponent
   }
 
   private updateLineChart() {
+    // Ya no usamos mock data, el gráfico se actualiza dinámicamente desde FirmadosPorDia
+  }
+
+  private actualizarGraficoLineasDinamico(labels: string[], data: number[]) {
     if (!this.lineChart) return;
-    const data =
-      this.viewMode === "month" ? this.mockDataMonths : this.mockDataWeeks;
-    this.lineChart.data.labels = data.labels;
-    this.lineChart.data.datasets[0].data = data.data;
+    this.lineChart.data.labels = labels;
+    this.lineChart.data.datasets[0].data = data;
     this.lineChart.update();
   }
 
@@ -312,8 +415,9 @@ export class RsindicadoresComponent
       console.log("Firmados por día:", data?.Cuerpo);
       if (data?.Cuerpo && data.Cuerpo.length > 0) {
         let totalFirmados = 0;
-        const labels: string[] = [];
-        const values: number[] = [];
+        
+        const agrupadoPorTipo: any = {};
+        const agrupadoPorFecha: any = {};
 
         data.Cuerpo.forEach((item: any) => {
           const count =
@@ -321,13 +425,39 @@ export class RsindicadoresComponent
             parseInt(item.numero, 10) ||
             0;
           totalFirmados += count;
-          labels.push(item.tipo || item.des_resol || "OTRO");
-          values.push(count);
+
+          // Agrupación para gráfica de barras (Tipos)
+          const tipo = item.tipo || item.des_resol || "OTRO";
+          if (!agrupadoPorTipo[tipo]) agrupadoPorTipo[tipo] = 0;
+          agrupadoPorTipo[tipo] += count;
+
+          // Agrupación para gráfica de líneas (Fechas)
+          if (item.ultimo_firmado) {
+            // Extraer solo la fecha (YYYY-MM-DD)
+            const fechaStr = item.ultimo_firmado.split('T')[0].split(' ')[0];
+            if (!agrupadoPorFecha[fechaStr]) agrupadoPorFecha[fechaStr] = 0;
+            agrupadoPorFecha[fechaStr] += count;
+          }
         });
+
+        // Actualizar Bar Chart
+        const labelsTipos = Object.keys(agrupadoPorTipo);
+        const valuesTipos = labelsTipos.map(t => agrupadoPorTipo[t]);
+        this.actualizarGraficoBarras(labelsTipos, valuesTipos);
+
+        // Actualizar Line Chart
+        const fechasOrdenadas = Object.keys(agrupadoPorFecha).sort();
+        const labelsFechas = fechasOrdenadas.map(f => {
+          // Formatear para mejor lectura (ej. DD/MM)
+          const partes = f.split('-');
+          if (partes.length === 3) return `${partes[2]}/${partes[1]}`;
+          return f;
+        });
+        const valuesFechas = fechasOrdenadas.map(f => agrupadoPorFecha[f]);
+        this.actualizarGraficoLineasDinamico(labelsFechas, valuesFechas);
 
         this.kpis.firmados = totalFirmados;
         this.recalcularTotal();
-        this.actualizarGraficoBarras(labels, values);
       }
     } catch (error) {
       console.error("Error en FirmadosPorDia:", error);
@@ -378,7 +508,6 @@ export class RsindicadoresComponent
 
         this.kpis.enProceso = totalEnProceso;
         this.recalcularTotal();
-        this.actualizarGraficoBarras(labels, values);
       }
     } catch (error) {
       console.error("Error en EnProceso:", error);

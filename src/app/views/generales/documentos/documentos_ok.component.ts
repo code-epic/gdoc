@@ -285,16 +285,50 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public Carpetas: any;
   public OrdenNumero: any;
 
+  public toastrService: {
+    success: (msg?: string, title?: string, opt?: any) => any;
+    error: (msg?: string, title?: string, opt?: any) => any;
+    info: (msg?: string, title?: string, opt?: any) => any;
+    warning: (msg?: string, title?: string, opt?: any) => any;
+    clear: (id?: number) => void;
+    remove: (id: number) => boolean;
+  };
+
   constructor(
     private apiService: ApiService,
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
-    private toastrService: ToastrService,
+    private rawToastr: ToastrService,
     public router: Router,
     private changeDetector: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
     private encriptarService: EncriptarSDC,
   ) {
+    const toastDefaults = {
+      positionClass: "toast-bottom-center",
+      toastClass: "ngx-toastr toast-glass-doc",
+      timeOut: 4500,
+      progressBar: true,
+      closeButton: false,
+    };
+
+    this.toastrService = {
+      success: (msg?: string, title?: string, opt?: any) =>
+        this.rawToastr.success(msg, title, { ...toastDefaults, ...opt }),
+      error: (msg?: string, title?: string, opt?: any) =>
+        this.rawToastr.error(msg, title, {
+          ...toastDefaults,
+          timeOut: 5500,
+          ...opt,
+        }),
+      info: (msg?: string, title?: string, opt?: any) =>
+        this.rawToastr.info(msg, title, { ...toastDefaults, ...opt }),
+      warning: (msg?: string, title?: string, opt?: any) =>
+        this.rawToastr.warning(msg, title, { ...toastDefaults, ...opt }),
+      clear: (id?: number) => this.rawToastr.clear(id),
+      remove: (id: number) => this.rawToastr.remove(id),
+    };
+
     // Fechas fijas: agosto → diciembre del año en curso
     this.fecha_desde = this.xyear + "-06-01";
     this.fecha_hasta = this.xyear + "-12-31";
@@ -2239,7 +2273,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (
       !this.observacion.trim() &&
       decision !== "FAVORABLE" &&
-      decision !== "FIRMAR"
+      decision !== "FIRMAR" &&
+      decision !== "ARCHIVAR"
     ) {
       this.toastrService.warning(
         "Debe ingresar una observación.",
@@ -2281,15 +2316,14 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     } else {
       let estadoDestino = Math.min(this.estadoOrigen + 1, 7);
 
-      // Flujo especial exclusivo para RECLAMOS
-      if (this.selectedCarpeta?.id === "RECLAMOS") {
+      // Flujo especial para RECLAMOS y PUNTO DE CUENTA
+      if (
+        this.selectedCarpeta?.id === "RECLAMOS" ||
+        this.selectedCarpeta?.id === "PUNTO_DE_CUENTA"
+      ) {
         if (this.estadoOrigen === 2) estadoDestino = 5;
         else if (this.estadoOrigen === 5) estadoDestino = 6;
         else if (this.estadoOrigen === 6) estadoDestino = 7;
-      }
-      // Flujo especial exclusivo para PUNTO DE CUENTA
-      else if (this.selectedCarpeta?.id === "PUNTO_DE_CUENTA") {
-        estadoDestino = 5;
       }
 
       this.xAPI = {} as IAPICore;
@@ -2302,9 +2336,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
         const msgLabel =
-          decision === "FIRMAR"
+          decision === "FIRMAR" || decision === "APROBADO"
             ? "Documento firmado"
-            : `Decisión '${decision}' registrada`;
+            : decision === "ARCHIVAR"
+              ? "Documento archivado"
+              : `Decisión ${decision} registrada`;
         this.toastrService.success(`${msgLabel} correctamente.`, "Documentos");
         this.loadingAction = false;
         this.closeDetail();
