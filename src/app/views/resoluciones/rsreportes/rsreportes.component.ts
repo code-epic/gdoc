@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
-import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
+import { DomSanitizer, SafeUrl, SafeHtml } from "@angular/platform-browser";
 import { PageEvent } from "@angular/material/paginator";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ToastrService } from "ngx-toastr";
@@ -121,6 +121,80 @@ export class RsreportesComponent implements OnInit, OnDestroy {
     this.bmenu = true;
     this.tipoReporte = 0;
     this.titulo = "Reportes";
+  }
+
+  /**
+   * Procesa el asunto para soportar HTML (<SPAN>, <br>, <b>, etc.)
+   * y decodificar entidades como &#176; (°)
+   */
+  public procesarAsuntoHtml(texto: any): SafeHtml {
+    if (!texto) {
+      return this.sanitizer.bypassSecurityTrustHtml(
+        '<span class="text-muted font-italic">Sin asunto registrado</span>'
+      );
+    }
+    let html = typeof texto === "string" ? texto : String(texto);
+
+    // Decodificar entidades específicas como &#176;, &amp;#176;, &deg;
+    html = html
+      .replace(/&amp;#176;/gi, "°")
+      .replace(/&#176;/gi, "°")
+      .replace(/&deg;/gi, "°");
+
+    // Si viene escapado con &lt;SPAN o &lt;span, decodificar etiquetas básicas
+    if (
+      html.includes("&lt;") &&
+      /&lt;\/?(span|p|b|i|u|strong|em|br|div|font)/i.test(html)
+    ) {
+      html = html
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+    }
+
+    // Normalizar saltos de línea excesivos
+    html = html.replace(/(<br\s*\/?>\s*){3,}/gi, "<br><br>");
+
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  /**
+   * Extrae texto plano para tooltips, ordenamiento, filtros y exportaciones
+   */
+  public extraerTextoPlano(texto: any): string {
+    if (!texto) return "";
+    let plain = typeof texto === "string" ? texto : String(texto);
+
+    plain = plain
+      .replace(/&amp;#176;/gi, "°")
+      .replace(/&#176;/gi, "°")
+      .replace(/&deg;/gi, "°");
+
+    // Si tiene tags HTML escapadas
+    if (
+      plain.includes("&lt;") &&
+      /&lt;\/?(span|p|b|i|u|strong|em|br|div|font)/i.test(plain)
+    ) {
+      plain = plain.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+    }
+
+    // Convertir saltos de bloque en espacio
+    plain = plain
+      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<\/(p|div)>/gi, " ");
+
+    // Eliminar etiquetas HTML
+    plain = plain.replace(/<[^>]*>/g, "");
+
+    // Decodificar entidades comunes
+    plain = plain
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/gi, "'")
+      .replace(/&amp;/gi, "&");
+
+    return plain.replace(/\s+/g, " ").trim();
   }
 
   // ==========================================
@@ -258,12 +332,15 @@ export class RsreportesComponent implements OnInit, OnDestroy {
         "crudstream",
         this.xAPI,
         (item: any) => {
+          const rawContenido = item.contenido || item.asunto || "";
           const mappedItem = {
             ...item,
             numero_resuelto: item.numero_resuelto || item.total_resueltos || "",
             tipo: item.tipo || item.des_resol || "RESOLUCIÓN",
             descripcion: item.descripcion || item.numero || "",
-            contenido: item.contenido || item.asunto || "",
+            contenido: rawContenido,
+            contenido_html: this.procesarAsuntoHtml(rawContenido),
+            contenido_plano: this.extraerTextoPlano(rawContenido),
             ultimo_firmado: item.ultimo_firmado || "",
           };
           this.lstFirmadasOriginal.push(mappedItem);
@@ -279,8 +356,8 @@ export class RsreportesComponent implements OnInit, OnDestroy {
 
           let match = true;
           if (asuntoFilter) {
-            const cont = mappedItem.contenido ? mappedItem.contenido.toLowerCase() : "";
-            const asun = mappedItem.asunto ? mappedItem.asunto.toLowerCase() : "";
+            const cont = (mappedItem.contenido_plano || mappedItem.contenido || "").toLowerCase();
+            const asun = (mappedItem.asunto || "").toLowerCase();
             if (!cont.includes(asuntoFilter) && !asun.includes(asuntoFilter)) match = false;
           }
           if (match && numeroFilter) {
@@ -327,7 +404,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
     this.lstFirmadas = this.lstFirmadasOriginal.filter((item) => {
       const matchAsunto =
         !asuntoFilter ||
-        (item.contenido && item.contenido.toLowerCase().includes(asuntoFilter)) ||
+        (item.contenido_plano && item.contenido_plano.toLowerCase().includes(asuntoFilter)) ||
         (item.asunto && item.asunto.toLowerCase().includes(asuntoFilter));
 
       const matchNumero =
@@ -367,8 +444,8 @@ export class RsreportesComponent implements OnInit, OnDestroy {
 
       switch (this.ordenColumna) {
         case "asunto":
-          valA = (a.contenido || a.asunto || "").toLowerCase();
-          valB = (b.contenido || b.asunto || "").toLowerCase();
+          valA = (a.contenido_plano || a.contenido || a.asunto || "").toLowerCase();
+          valB = (b.contenido_plano || b.contenido || b.asunto || "").toLowerCase();
           break;
         case "numero":
           valA = (a.numero_resuelto || a.descripcion || "").toLowerCase();
@@ -493,7 +570,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
           "#": i + 1,
           "N° Resuelto": e.numero_resuelto || "",
           Tipo: e.tipo || "",
-          "Asunto / Contenido": e.contenido || e.asunto || "",
+          "Asunto / Contenido": e.contenido_plano || e.contenido || e.asunto || "",
           "Último Firmado": e.ultimo_firmado || "",
         });
       });
@@ -543,7 +620,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
           "#": i + 1,
           "N° Resuelto": e.numero_resuelto || "",
           Tipo: e.tipo || "",
-          "Asunto / Contenido": e.contenido || e.asunto || "",
+          "Asunto / Contenido": e.contenido_plano || e.contenido || e.asunto || "",
           "Ultimo Firmado": e.ultimo_firmado || "",
         });
       });
@@ -585,7 +662,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
       index + 1,
       e.numero_resuelto || "-",
       e.tipo || "-",
-      e.contenido || e.asunto || "-",
+      e.contenido_plano || e.contenido || e.asunto || "-",
       e.ultimo_firmado
         ? e.ultimo_firmado.includes("T")
           ? e.ultimo_firmado.replace("T", " ").substring(0, 19)
