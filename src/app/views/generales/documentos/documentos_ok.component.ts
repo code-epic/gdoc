@@ -231,6 +231,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       filtro: 1,
     },
     {
+      id: "CUADRO_DECISORIO",
+      nombre: "CUADRO DECISORIO",
+      icono: "fas fa-file-alt",
+      color: "#652dceff",
+      disponible: true,
+      funcion: "WKF_CDocumentosSecretariaCuadro",
+      estadoActual: 17,
+      estadoOrigen: 2,
+      filtro: 1,
+    },
+    {
       id: "ACTIVIDADES_EN_EL_EXTERIOR",
       nombre: "ACTIVIDADES EN EL EXTERIOR",
       icono: "fas fa-envelope",
@@ -2265,10 +2276,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.redistribuir(decisionSeleccionada);
   }
 
-  // ─── Acciones: Favorable / Diferido / Negado / Firmar ─────────────────────────
-  public ejecutarAccion(
-    decision: "FAVORABLE" | "DIFERIDO" | "NEGADO" | "FIRMAR" | "ARCHIVAR",
-  ): void {
+  // ─── Acciones: Favorable / Firmar ─────────────────────────
+  public ejecutarAccion(decision: "FAVORABLE" | "FIRMAR" | "ARCHIVAR"): void {
     if (!this.activeDoc) return;
     if (
       !this.observacion.trim() &&
@@ -2284,6 +2293,51 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     }
     this.loadingAction = true;
     this.redistribuir(decision);
+  }
+
+  async ActualizarUbicacionSecretaria() {
+    if (!this.activeDoc) return;
+
+    const confirm = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Deseas devolver este documento al analista?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#f39c12",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, devolver",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!confirm.isConfirmed) {
+      return;
+    }
+
+    this.loadingAction = true;
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_AUbicacionSecretaria";
+    this.xAPI.parametros = `16,${this.activeDoc.idd}`;
+    this.xAPI.valores = "";
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (data) => {
+        this.toastrService.success(
+          "Documento devuelto al analista correctamente.",
+          "Documentos",
+        );
+        this.loadingAction = false;
+        this.closeDetail();
+        this.actualizarBuzon();
+      },
+      (error) => {
+        this.loadingAction = false;
+        console.error("Error al devolver al analista", error);
+        this.toastrService.error(
+          "Ocurrió un error al devolver el documento al analista.",
+          "Error",
+        );
+      },
+    );
   }
 
   async redistribuir(decision: any) {

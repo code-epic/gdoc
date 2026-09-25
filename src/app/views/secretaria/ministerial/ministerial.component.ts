@@ -89,6 +89,7 @@ export class MinisterialComponent implements OnInit {
     { valor: "9", texto: "DIRECCION GENERAL", visible: "1" },
     { valor: "10", texto: "DESPACHO DEL MPPD", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
     { valor: "11", texto: "ARCHIVO", visible: "1" },
+    { valor: "16", texto: "DEVUELTO PARA REVISION", visible: "1" }, //7/5/3 Asociado a los plazos en las alertas
   ];
 
   public extender_plazo: any;

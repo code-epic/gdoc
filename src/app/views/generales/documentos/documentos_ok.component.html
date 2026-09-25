@@ -1207,13 +1207,15 @@
                 <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
               </button>
 
-              <!-- DIFERIDO -->
-              <button class="btn-modal-decision btn-diferido"
-                      (click)="ejecutarAccion('DIFERIDO')"
+              <!-- ENVIAR AL ANALISTA -->
+              <button class="btn-modal-decision btn-warning"
+                      *ngIf="currentProfile === 'JefeSecretaria'"
+                      (click)="ActualizarUbicacionSecretaria()"
                       [disabled]="loadingAction"
-                      title="Registrar como Diferido (Requiere Observación)">
-                <i class="fas fa-clock"></i>
-                <span>Diferido</span>
+                      title="Devolver al Analista">
+                <i class="fas fa-undo"></i>
+                <span>Enviar al Analista</span>
+                <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
               </button>
 
               <!-- ARCHIVAR (TRAMITE_ORGANO_REGULAR, PUNTO_DE_CUENTA, PRESIDENCIALES) -->
@@ -1225,15 +1227,6 @@
                 <i class="fas fa-archive"></i>
                 <span>Archivar</span>
                 <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
-              </button>
-
-              <!-- NEGADO -->
-              <button class="btn-modal-decision btn-negado"
-                      (click)="ejecutarAccion('NEGADO')"
-                      [disabled]="loadingAction"
-                      title="Registrar como Negado (Requiere Observación)">
-                <i class="fas fa-times-circle"></i>
-                <span>Negado</span>
               </button>
             </ng-container>
           </ng-template>
