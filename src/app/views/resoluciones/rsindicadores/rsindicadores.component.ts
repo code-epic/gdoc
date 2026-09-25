@@ -55,6 +55,7 @@ export class RsindicadoresComponent
     total: 0,
   };
 
+  public totalDetallesEnProceso: number = 0;
   public detallesEnProceso: any[] = [];
   public chartDetalle: any;
 
@@ -613,8 +614,7 @@ export class RsindicadoresComponent
           },
         );
 
-        this.kpis.enProceso = totalEnProceso;
-        this.recalcularTotal();
+        this.totalDetallesEnProceso = totalEnProceso;
       }
     } catch (error) {
       console.error("Error en EnProcesoDetalles:", error);
@@ -622,8 +622,8 @@ export class RsindicadoresComponent
   }
 
   public getPercentageOfProcess(value: number): number {
-    if (this.kpis.enProceso === 0) return 0;
-    return Math.round((value / this.kpis.enProceso) * 100);
+    if (this.totalDetallesEnProceso === 0) return 0;
+    return Math.round((value / this.totalDetallesEnProceso) * 100);
   }
 
   public async abrirModalEnProceso(content: any): Promise<void> {
@@ -631,7 +631,7 @@ export class RsindicadoresComponent
       await this.EnProcesoDetalles();
     }
 
-    if (this.kpis.enProceso === 0 || this.detallesEnProceso.length === 0) {
+    if (this.detallesEnProceso.length === 0) {
       this.toastrService.info(
         "No hay detalles en proceso para mostrar.",
         "Información",

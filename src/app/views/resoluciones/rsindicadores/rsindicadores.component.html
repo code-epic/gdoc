@@ -166,8 +166,8 @@
               <td class="text-center text-muted py-3">
                 <i class="fas" [ngClass]="item.expanded ? 'fa-chevron-down text-primary' : 'fa-chevron-right'"></i>
               </td>
-              <td class="font-weight-bold text-dark py-3" style="font-size: 0.95rem;">
-                <span class="badge badge-pill shadow-sm px-3 py-2" [ngStyle]="{'background-color': item.color, 'color': '#14532d', 'font-size': '0.75rem'}">
+              <td class="py-3" style="vertical-align: middle;">
+                <span class="font-weight-600 text-dark" style="font-size: 0.9rem;">
                   {{item.descripcion_estatus}}
                 </span>
               </td>
@@ -186,14 +186,15 @@
             
             <!-- Filas de Detalle (Expandidas) -->
             <ng-container *ngIf="item.expanded">
-              <tr *ngFor="let det of item.detalles" style="background-color: #f8fafc; border-left: 3px solid #64748b;">
-                <td class="py-3"></td>
-                <td class="text-secondary font-weight-bold py-3 pl-4" style="font-size: 0.9rem;">
-                  <i class="fas fa-level-up-alt fa-rotate-90 text-muted mr-2"></i> 
-                  <span class="text-dark">{{det.descripcion}}</span>
+              <tr *ngFor="let det of item.detalles" style="background-color: #f8fafc;">
+                <td class="text-center py-2">
+                  <i class="fas fa-level-up-alt fa-rotate-90 text-muted" style="font-size: 0.75rem;"></i>
                 </td>
-                <td class="text-center text-primary font-weight-bold py-3" style="font-size: 1rem;">{{det.numero | number}}</td>
-                <td class="py-3"></td>
+                <td class="py-2 pl-3" style="vertical-align: middle;">
+                  <span class="text-muted font-weight-normal" style="font-size: 0.88rem;">{{det.descripcion}}</span>
+                </td>
+                <td class="text-center font-weight-bold text-secondary py-2" style="font-size: 0.95rem;">{{det.numero | number}}</td>
+                <td class="py-2"></td>
               </tr>
             </ng-container>
           </ng-container>
@@ -206,8 +207,8 @@
         </tbody>
         <tfoot class="bg-light" *ngIf="detallesEnProceso.length > 0">
           <tr>
-            <th colspan="3" class="text-right font-weight-bold">TOTAL EN PROCESO:</th>
-            <th class="text-center font-weight-bold text-dark" style="font-size: 1.1rem;">{{kpis.enProceso | number}}</th>
+            <th colspan="2" class="text-right font-weight-bold">TOTAL EN PROCESO:</th>
+            <th class="text-center font-weight-bold text-dark" style="font-size: 1.1rem;">{{totalDetallesEnProceso | number}}</th>
             <th></th>
           </tr>
         </tfoot>
