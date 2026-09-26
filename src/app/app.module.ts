@@ -103,6 +103,7 @@ import { TinderPdfViewerComponent } from './components/tinder-pdf-viewer/tinder-
 import { ResueltoCanvasComponent } from './views/generales/resuelto_canvas/resuelto_canvas.component';
 import { RsindicadoresComponent } from './views/resoluciones/rsindicadores/rsindicadores.component';
 import { DocumentosOkComponent } from './views/generales/documentos/documentos_ok.component';
+import { ScuadroDecisorioComponent } from './views/secretaria/scuadro-decisorio/scuadro-decisorio.component';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -262,6 +263,7 @@ const ngWizardConfig: NgWizardConfig = {
     TinderPdfViewerComponent,
     RsindicadoresComponent,
     DocumentosOkComponent,
+    ScuadroDecisorioComponent,
   ],
   providers: [
     {

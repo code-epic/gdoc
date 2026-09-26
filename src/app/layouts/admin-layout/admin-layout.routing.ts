@@ -69,6 +69,7 @@ import { CodigosrojoComponent } from "src/app/views/resoluciones/codigosrojo/cod
 import { ErrorComponent } from "src/app/pages/error/error.component";
 import { RsindicadoresComponent } from "src/app/views/resoluciones/rsindicadores/rsindicadores.component";
 import { DocumentosOkComponent } from "src/app/views/generales/documentos/documentos_ok.component";
+import { ScuadroDecisorioComponent } from "src/app/views/secretaria/scuadro-decisorio/scuadro-decisorio.component";
 
 export const AdminLayoutRoutes: Routes = [
   {
@@ -198,6 +199,11 @@ export const AdminLayoutRoutes: Routes = [
   {
     path: "spresidencial",
     component: SpresidencialComponent,
+    canActivate: [AuthGuardGuard],
+  },
+  {
+    path: "scuadro_decisorio",
+    component: ScuadroDecisorioComponent,
     canActivate: [AuthGuardGuard],
   },
   {

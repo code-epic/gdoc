@@ -60,6 +60,7 @@ export class AuthGuardGuard implements CanActivate {
       const staticWhitelist = [
         "/resueltos_tinder",
         "/resueltos_ios",
+        "/scuadro_decisorio",
         "/snuevo",
         "/sreclamos",
         "/firmados",

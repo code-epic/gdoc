@@ -10,6 +10,7 @@ import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { ToastrService } from "ngx-toastr";
 import { NgxUiLoaderService } from "ngx-ui-loader";
 import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
+import { FileService } from "src/app/services/apicore/file.service";
 import { LoginService } from "src/app/services/seguridad/login.service";
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { environment } from "src/environments/environment";
@@ -17,6 +18,10 @@ import Swal from "sweetalert2";
 import { IWKFAlerta } from "src/app/services/control/documentos.service";
 import { toBase64String } from "@angular/compiler/src/output/source_map";
 import { EncriptarSDC } from "src/app/services/seguridad/encriptar-sdc.service";
+import jsPDF from "jspdf";
+import { HttpEventType } from "@angular/common/http";
+import { Md5 } from "md5-typescript";
+import { firstValueFrom } from "rxjs";
 
 // ─── Interface para Agrupación de Etiquetas WKF ────────────────────────────────
 export interface IWKFEtiqueta {
@@ -307,6 +312,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   constructor(
     private apiService: ApiService,
+    private fileService: FileService,
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
     private rawToastr: ToastrService,
@@ -460,7 +466,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             ? c.estadoActual || 6
             : c.id === "ACTIVIDADES_EN_EL_EXTERIOR"
               ? 2
-              : 4;
+              : c.id === "CUADRO_DECISORIO"
+                ? 17
+                : 4;
         if (this.selectedEstadoBuzon === "firmados") {
           c.estadoOrigen = 7;
         } else if (this.currentProfile === "Direccion") {
@@ -468,11 +476,12 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         } else if (this.currentProfile === "Ministro") {
           c.estadoOrigen = 6;
         } else {
-          // Perfil inicial / JefeSecretaria: respeta estadoOrigen inicial propio del objeto (2 para Punto de Cuenta, Reclamos y Actividades, 3 para Presidenciales, 4 para TOR)
+          // Perfil inicial / JefeSecretaria: respeta estadoOrigen inicial propio del objeto
           c.estadoOrigen =
             c.id === "PUNTO_DE_CUENTA" ||
             c.id === "RECLAMOS" ||
-            c.id === "ACTIVIDADES_EN_EL_EXTERIOR"
+            c.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
+            c.id === "CUADRO_DECISORIO"
               ? 2
               : c.id === "PRESIDENCIALES"
                 ? 3
@@ -1599,8 +1608,52 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     return val || "APROBADO";
   }
 
+  // ─── Evaluar si un caso interno es Aprobado ──────────────────────────────────
+  public isAprobado(item: any): boolean {
+    if (!item) return false;
+    const raw = (
+      item.sub_detalle ||
+      item.detalle ||
+      item.s_estatus ||
+      item.sub_estatus ||
+      item.estatus ||
+      item.estado ||
+      ""
+    )
+      .toString()
+      .trim()
+      .toUpperCase();
+
+    if (
+      raw === "NP" ||
+      raw === "NEGADO" ||
+      raw === "NO PROCESAR" ||
+      raw.startsWith("NP") ||
+      raw.includes("NEGADO") ||
+      raw.includes("RECHAZADO")
+    ) {
+      return false;
+    }
+
+    if (!this.esDocFirmado(this.activeDoc) && (raw === "ES" || raw === "EN ESPERA")) {
+      return false;
+    }
+
+    const val = this.getEstatusFromDetalle(item);
+    return (
+      val === "1" ||
+      val === "PR" ||
+      val === "PROCESAR" ||
+      val === "PROCESADO" ||
+      val === "APROBADO"
+    );
+  }
+
   // ─── Evaluar si un caso interno es Negado / No Procesar / Código Rojo ─────────
   public isNoProcesar(item: any): boolean {
+    if (this.esDocFirmado(this.activeDoc)) {
+      return !this.isAprobado(item);
+    }
     const val = this.getEstatusFromDetalle(item);
     if (
       !val ||
@@ -1631,6 +1684,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   // ─── Evaluar si un caso interno está Pendiente / Diferido ─────────────────────
   public isPendiente(item: any): boolean {
+    if (this.esDocFirmado(this.activeDoc)) return false;
     const val = this.getEstatusFromDetalle(item);
     return (
       val === "PE" ||
@@ -1641,11 +1695,33 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     );
   }
 
+  public isEnEspera(item: any): boolean {
+    if (this.esDocFirmado(this.activeDoc)) return false;
+    const val = this.getEstatusFromDetalle(item);
+    return val === "ES" || val === "EN ESPERA";
+  }
+
+  public getMinisterialSwitchLabel(item: any): string {
+    if (this.esDocFirmado(this.activeDoc)) {
+      return this.isAprobado(item) ? "APROBADO" : "NEGADO";
+    }
+    if (this.isEnEspera(item)) return "EN ESPERA";
+    if (this.isNoProcesar(item)) return "NEGADO";
+    return "APROBADO";
+  }
+
   // ─── Obtener subcasos APROBADOS / PROCESAR ─────────────────────────────────────
   public getSubcasosProcesar(e: any): any[] {
     if (!e) return [];
     try {
       const list = this.getSubcasos(e) || [];
+      // En CUADRO_DECISORIO para Ministro (o si está firmado), mostrar todos los integrantes juntos para evaluación / visualización de resultados
+      if (
+        this.selectedCarpeta?.id === "CUADRO_DECISORIO" &&
+        (this.currentProfile === "Ministro" || this.esDocFirmado(e))
+      ) {
+        return list;
+      }
       return list.filter(
         (item) => item && !this.isNoProcesar(item) && !this.isPendiente(item),
       );
@@ -1658,6 +1734,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public getSubcasosNoProcesar(e: any): any[] {
     if (!e) return [];
     try {
+      // En CUADRO_DECISORIO para Ministro (o si está firmado), no dividir en bloque aparte para evitar que salten de bloque al decidir
+      if (
+        this.selectedCarpeta?.id === "CUADRO_DECISORIO" &&
+        (this.currentProfile === "Ministro" || this.esDocFirmado(e))
+      ) {
+        return [];
+      }
       const list = this.getSubcasos(e) || [];
       return list.filter(
         (item) => item && (this.isNoProcesar(item) || this.isPendiente(item)),
@@ -2051,19 +2134,65 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         item.sub_detalle || item.detalle || item.estatus || item.estado || "PR";
       const obs = item.observacion || item.sub_observacion || item.obse || "";
 
-      return {
-        ...item,
-        cedula: ced,
-        sub_cedula: ced,
-        nombre: nom,
-        sub_nombre: nom,
-        cargo: car,
-        sub_cargo: car,
-        detalle: det,
-        sub_detalle: det,
-        observacion: obs,
-        sub_observacion: obs,
-      };
+      item.cedula = ced;
+      item.sub_cedula = ced;
+      item.nombre = nom;
+      item.sub_nombre = nom;
+      item.cargo = car;
+      item.sub_cargo = car;
+      item.detalle = det;
+      item.sub_detalle = det;
+      item.observacion = obs;
+      item.sub_observacion = obs;
+
+      // ── Lógica Exclusiva para Ministro en CUADRO_DECISORIO: todos por defecto en "ES" SOLO si NO está firmado ──
+      if (
+        this.currentProfile === "Ministro" &&
+        this.selectedCarpeta?.id === "CUADRO_DECISORIO" &&
+        !this.esDocFirmado(e)
+      ) {
+        const rawEstatus = this.getEstatusFromDetalle(item);
+
+        const isDefault =
+          rawEstatus === "" ||
+          rawEstatus === "1" ||
+          rawEstatus === "0" ||
+          rawEstatus === "4" ||
+          rawEstatus === "PR" ||
+          rawEstatus === "PROCESAR" ||
+          rawEstatus === "PROCESADO" ||
+          rawEstatus === "APROBADO";
+
+        if (isDefault && !item.__minister_touched) {
+          item.sub_detalle = "ES";
+          item.detalle = "ES";
+          item.s_estatus = "ES";
+          item.sub_estatus = "ES";
+          item.estatus = "ES";
+          item.estado = "ES";
+        }
+      } else if (this.esDocFirmado(e)) {
+        // En documento firmado, el estatus es APROBADO ("PR") o NEGADO ("NP") solamente
+        const rawEstatus = this.getEstatusFromDetalle(item);
+        if (
+          rawEstatus === "ES" ||
+          rawEstatus === "EN ESPERA" ||
+          !this.isAprobado(item)
+        ) {
+          item.sub_detalle = "NP";
+          item.detalle = "NP";
+          item.s_estatus = "NP";
+          item.sub_estatus = "NP";
+          item.estatus = "NP";
+          item.estado = "NP";
+        }
+      }
+
+      return item;
+    }).sort((a: any, b: any) => {
+      const idA = parseInt(a.cedula || a.sub_cedula || "0", 10);
+      const idB = parseInt(b.cedula || b.sub_cedula || "0", 10);
+      return idB - idA;
     });
   }
 
@@ -2092,7 +2221,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (this.selectedEstadoBuzon === "firmados" || this.estadoOrigen === 7)
       return true;
     if (!doc) return false;
-    return doc.estado === 7 || doc.idestado === 7 || doc.idestado === "7";
+    return (
+      doc.estado === 7 ||
+      doc.idestado === 7 ||
+      doc.idestado === "7" ||
+      doc.estatus === 7 ||
+      doc.estatus === "7" ||
+      doc.idestado === 18 || // Cuadro decisorio firmado/promovido
+      doc.estado === 18 ||
+      !!doc.anom_firmado ||
+      !!doc.archivo_firmado
+    );
   }
 
   // ─── URL del PDF del documento ────────────────────────────────────────────────
@@ -2120,17 +2259,51 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   // ─── Alternar Estatus de Subcaso / Integrante (Solo en Nivel Ministro) ────────
-  public toggleSubcasoEstatus(item: any): void {
+  public toggleSubcasoEstatus(item: any, event?: any): void {
     if (this.currentProfile !== "Ministro") return;
-    const isCurrentlyNoProcesar = this.isNoProcesar(item);
-    const newStatus = isCurrentlyNoProcesar ? "PR" : "NP";
 
+    let isCurrentlyNoProcesar = this.isNoProcesar(item);
+    if (event && event.target && event.target.checked !== undefined) {
+      // Si vino del input checkbox, checked true = APROBADO (no procesar false), false = NEGADO (no procesar true)
+      isCurrentlyNoProcesar = !event.target.checked;
+    } else {
+      // Si vino de clic en el texto o sin evento nativo:
+      // Si estaba en ESPERA o NEGADO -> pasa a APROBADO (isCurrentlyNoProcesar = false)
+      // Si estaba en APROBADO -> pasa a NEGADO (isCurrentlyNoProcesar = true)
+      const currentLabel = this.getMinisterialSwitchLabel(item);
+      isCurrentlyNoProcesar = currentLabel === "APROBADO";
+    }
+    const newStatus = isCurrentlyNoProcesar ? "NP" : "PR";
+
+    item.__minister_touched = true;
     item.sub_detalle = newStatus;
     item.detalle = newStatus;
     item.s_estatus = newStatus;
     item.sub_estatus = newStatus;
     item.estatus = newStatus;
     item.estado = newStatus;
+
+    // ── En CUADRO_DECISORIO: se permite seleccionar MÁS DE UN integrante a la vez.
+    // Al aprobar uno ("PR"), sólo los integrantes que aún estén "EN ESPERA" (sin decisión previa)
+    // pasan automáticamente a "NP" (NEGADO), respetando a los que ya fueron previamente aprobados.
+    if (
+      this.selectedCarpeta?.id === "CUADRO_DECISORIO" &&
+      newStatus === "PR" &&
+      this.activeDoc
+    ) {
+      const allItems = this.getSubcasos(this.activeDoc);
+      allItems.forEach((sibling) => {
+        if (sibling !== item && this.isEnEspera(sibling)) {
+          sibling.__minister_touched = true;
+          sibling.sub_detalle = "NP";
+          sibling.detalle = "NP";
+          sibling.s_estatus = "NP";
+          sibling.sub_estatus = "NP";
+          sibling.estatus = "NP";
+          sibling.estado = "NP";
+        }
+      });
+    }
 
     this.changeDetector.detectChanges();
   }
@@ -2219,7 +2392,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     if (!decisionSeleccionada) return;
 
-    let observacionFinal = this.observacion.trim();
+    let observacionFinal = this.observacion.trim().toUpperCase();
 
     if (decisionSeleccionada === "OTRO") {
       const { value: comentarioOtro } = await Swal.fire({
@@ -2241,7 +2414,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       });
 
       if (!comentarioOtro) return;
-      observacionFinal = comentarioOtro.trim();
+      observacionFinal = comentarioOtro.trim().toUpperCase();
     } else if (
       decisionSeleccionada === "DIFERIDO" ||
       decisionSeleccionada === "NEGADO"
@@ -2266,7 +2439,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         });
 
         if (!comentarioReq) return;
-        observacionFinal = comentarioReq.trim();
+        observacionFinal = comentarioReq.trim().toUpperCase();
       }
     }
 
@@ -2274,6 +2447,976 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.observacion = observacionFinal;
     this.loadingAction = true;
     this.redistribuir(decisionSeleccionada);
+  }
+
+  // ─── Utilidades para PDF de Punto de Cuenta ──────────────────────────────────
+  private async cargarImagenParaPDF(
+    url: string,
+    maxDim: number = 500,
+    isJpeg: boolean = false,
+    timeoutMs: number = 6000
+  ): Promise<string | null> {
+    if (!url) return null;
+    return new Promise((resolve) => {
+      let resolved = false;
+      const timer = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          console.warn("[cargarImagenParaPDF] Timeout cargando:", url);
+          resolve(null);
+        }
+      }, timeoutMs);
+
+      const img = new Image();
+      if (url.startsWith("http://") || url.startsWith("https://")) {
+        img.crossOrigin = "Anonymous";
+      }
+      img.onload = () => {
+        if (resolved) return;
+        resolved = true;
+        clearTimeout(timer);
+        try {
+          let origW = img.naturalWidth || img.width || 300;
+          let origH = img.naturalHeight || img.height || 300;
+          let targetW = origW;
+          let targetH = origH;
+          if (origW > maxDim || origH > maxDim) {
+            if (origW >= origH) {
+              targetH = Math.round((origH * maxDim) / origW);
+              targetW = maxDim;
+            } else {
+              targetW = Math.round((origW * maxDim) / origH);
+              targetH = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            if (isJpeg) {
+              ctx.fillStyle = "#ffffff";
+              ctx.fillRect(0, 0, targetW, targetH);
+            }
+            ctx.drawImage(img, 0, 0, targetW, targetH);
+            if (isJpeg) {
+              resolve(canvas.toDataURL("image/jpeg", 0.78));
+            } else {
+              resolve(canvas.toDataURL("image/png"));
+            }
+          } else {
+            resolve(null);
+          }
+        } catch (e) {
+          console.warn("[cargarImagenParaPDF] Error al procesar en canvas:", e);
+          resolve(null);
+        }
+      };
+      img.onerror = () => {
+        if (resolved) return;
+        resolved = true;
+        clearTimeout(timer);
+        console.warn("[cargarImagenParaPDF] Error cargando imagen:", url);
+        resolve(null);
+      };
+      img.src = url;
+    });
+  }
+
+  private formatFechaPuntoCuenta(d: any): string {
+    let date = new Date();
+    if (d) {
+      const parsed = new Date(d);
+      if (!isNaN(parsed.getTime())) date = parsed;
+    }
+    const day = String(date.getDate()).padStart(2, "0");
+    const meses = [
+      "ENE", "FEB", "MAR", "ABR", "MAY", "JUN",
+      "JUL", "AGO", "SEP", "OCT", "NOV", "DIC",
+    ];
+    const month = meses[date.getMonth()] || "SEP";
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}${month}${year}`;
+  }
+
+  // ─── Generación de PDF Exclusivo para CUADRO_DECISORIO (PUNTO DE CUENTA) ────────
+  public async generarPuntoDeCuentaPDF(): Promise<void> {
+    if (!this.activeDoc) return;
+
+    // 1. Confirmar firma y revisar comentarios oficiales para el MPPD
+    // Transcribir observaciones existentes (del campo 'Observación para Decisión' o subcasos) en mayúsculas
+    let comentarioInicial = (this.observacion || this.activeDoc?.observacion || "").toString().trim();
+    if (!comentarioInicial) {
+      const subObsList = (this.getSubcasos(this.activeDoc) || [])
+        .filter((c: any) => (c.observacion || c.sub_observacion || "").toString().trim())
+        .map((c: any) => {
+          const nom = (c.nombre || c.nombres || c.cedula || "Candidato").toString().trim();
+          const obs = (c.observacion || c.sub_observacion).toString().trim();
+          return `${nom}: ${obs}`;
+        });
+      if (subObsList.length > 0) {
+        comentarioInicial = subObsList.join(" | ");
+      }
+    }
+    comentarioInicial = comentarioInicial.toUpperCase();
+    const tieneObservacion = !!comentarioInicial;
+
+    const modalHtml = `
+      <div style="text-align: left; font-size: 0.88rem; color: #1e293b; line-height: 1.5;">
+        <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #8e1c26; padding: 12px 14px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="font-weight: 700; color: #8e1c26; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+            <i class="fas fa-file-signature mr-1"></i> Emisión de Cuadro Decisorio Ministerial
+          </div>
+          <div style="font-size: 0.82rem; color: #475569;">
+            Se procederá a generar el <b>Papel de Trabajo oficial (Carta)</b> con firma y sello del General en Jefe Ministro del Poder Popular para la Defensa y decisiones de los integrantes.
+          </div>
+        </div>
+
+        ${
+          tieneObservacion
+            ? `
+          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 14px; margin-top: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-size: 0.72rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="fas fa-comment-alt text-danger mr-1"></i> Observación para Decisión Registrada:
+              </span>
+              <span style="font-size: 0.65rem; font-weight: 700; color: #15803d; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">CARGADA</span>
+            </div>
+            <div style="font-size: 0.82rem; font-weight: 600; color: #0f172a; line-height: 1.4; word-break: break-word; text-transform: uppercase;">
+              ${comentarioInicial}
+            </div>
+          </div>
+        `
+            : `
+          <div style="margin-top: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label for="swal-mppd-comentario" style="font-weight: 700; font-size: 0.75rem; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
+                <i class="fas fa-pen-fancy text-danger mr-1"></i> Comentarios del MPPD (Opcional):
+              </label>
+              <span style="font-size: 0.65rem; font-weight: 700; color: #64748b; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">EN MAYÚSCULAS</span>
+            </div>
+            <textarea id="swal-mppd-comentario"
+                      rows="3"
+                      style="width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 0.82rem; font-family: inherit; border: 1.5px solid #cbd5e1; border-radius: 6px; resize: vertical; text-transform: uppercase; outline: none; transition: border-color 0.2s;"
+                      placeholder="OBSERVACIONES O INSTRUCCIONES DEL MINISTRO..."
+                      onfocus="this.style.borderColor='#8e1c26'"
+                      onblur="this.style.borderColor='#cbd5e1'"
+                      oninput="this.value = this.value.toUpperCase()"></textarea>
+          </div>
+        `
+        }
+      </div>
+    `;
+
+    const confirmacion = await Swal.fire({
+      title: "Cuadro Decisorio - Ministro",
+      html: modalHtml,
+      showCancelButton: true,
+      confirmButtonColor: "#8e1c26",
+      cancelButtonColor: "#64748b",
+      confirmButtonText: '<i class="fas fa-file-signature mr-1"></i> Firmar y Subir',
+      cancelButtonText: "Cancelar",
+      preConfirm: () => {
+        if (tieneObservacion) {
+          return comentarioInicial;
+        }
+        const el = document.getElementById("swal-mppd-comentario") as HTMLTextAreaElement;
+        return el ? el.value.trim().toUpperCase() : "";
+      },
+    });
+
+    if (!confirmacion.isConfirmed) {
+      return;
+    }
+
+    if (confirmacion.value !== undefined) {
+      this.observacion = confirmacion.value.toString().trim().toUpperCase();
+      if (this.activeDoc) {
+        this.activeDoc.observacion = this.observacion;
+      }
+    }
+
+    // 2. Indicador de progreso
+    Swal.fire({
+      title: "Generando Cuadro Decisorio...",
+      html: "Confeccionando documento ministerial tamaño Carta, fotografías y sellos oficiales...",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    // 3. Obtener subcasos (candidatos) y asegurar carga de fotos
+    const subcasos = this.getSubcasos(this.activeDoc);
+    const candidates = subcasos.length > 0 ? subcasos : [this.activeDoc];
+    this.cargarFotosBuzon(candidates);
+
+    // Esperar brevemente por si alguna foto de la CDN está descargando
+    await new Promise((resolve) => setTimeout(resolve, 600));
+
+    // 4. Cargar recursos gráficos institucionales con optimización de tamaño y rutas de respaldo
+    const [escudoImg, firmaImg, selloImg] = await Promise.all([
+      this.cargarImagenParaPDF("assets/img/brand/escudo.png", 300, false, 5000)
+        .then((res) => res || this.cargarImagenParaPDF("assets/images/escudo.png", 300, false, 5000))
+        .then((res) => res || this.cargarImagenParaPDF("assets/img/mppd/escudos/100.jpeg", 300, false, 5000)),
+      this.cargarImagenParaPDF("assets/img/mppd/firma_mppd.png", 600, false, 6000)
+        .then((res) => res || this.cargarImagenParaPDF("./assets/img/mppd/firma_mppd.png", 600, false, 6000)),
+      this.cargarImagenParaPDF("assets/img/mppd/sello_mppd.png", 500, false, 6000)
+        .then((res) => res || this.cargarImagenParaPDF("./assets/img/mppd/sello_mppd.png", 500, false, 6000))
+        .then((res) => res || this.cargarImagenParaPDF("/assets/img/mppd/sello_mppd.png", 500, false, 6000)),
+    ]);
+
+    // 5. Configurar documento jsPDF formato Carta (Letter: 215.9 x 279.4 mm) con compresión activa
+    const pageWidth = 215.9;
+    const pageHeight = 279.4; // Formato Carta
+    const margin = 10;
+    const contentWidth = pageWidth - margin * 2; // 195.9 mm
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: [pageWidth, pageHeight],
+      compress: true,
+    });
+
+    // 5.1 Marca de agua "PAPEL DE TRABAJO" (sin líneas de marco exterior)
+    try {
+      (pdf as any).saveGraphicsState();
+    } catch (e) {}
+    pdf.setTextColor(240, 240, 240);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(38);
+    try {
+      pdf.text("PAPEL DE TRABAJO", pageWidth / 2, 140, {
+        align: "center",
+        angle: 45,
+      } as any);
+    } catch (e) {
+      pdf.text("PAPEL DE TRABAJO", pageWidth / 2, 140, { align: "center" });
+    }
+    try {
+      (pdf as any).restoreGraphicsState();
+    } catch (e) {}
+
+    // 5.2 Marca institucional vertical "MPPD" (esquina superior derecha, posición 207mm para despeje total)
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(9);
+    pdf.setTextColor(0, 32, 96);
+    pdf.text("M\nP\nP\nD", 207, 16);
+
+    // 5.3 Encabezado: Escudo y membrete izquierdo
+    if (escudoImg) {
+      try {
+        pdf.addImage(escudoImg, "PNG", 28, 12, 14, 14, undefined, "FAST");
+      } catch (e) {}
+    }
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(5.5);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text("República Bolivariana de Venezuela", 35, 27.5, { align: "center" });
+    pdf.text("Ministerio del Poder Popular para la Defensa", 35, 30, { align: "center" });
+    pdf.text("Dirección General del Despacho del MPPD", 35, 32.5, { align: "center" });
+
+    // Cuadro de Número de Control / Expediente
+    const numControl = (
+      this.activeDoc.numc ||
+      this.activeDoc.ncontrol ||
+      this.activeDoc.cuenta ||
+      "012-26"
+    ).toString().trim();
+    const borderGray = [115, 115, 115];
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.setLineWidth(0.35);
+    pdf.rect(20, 34.5, 30, 6, "S");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8.5);
+    pdf.text(`Nº ${numControl}`, 35, 38.7, { align: "center" });
+
+    // 5.4 Título Central: CUADRO DECISORIO (Fuente 13 / Tahoma Style)
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(13);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text("CUADRO DECISORIO AL GENERAL EN JEFE MINISTRO DEL", 135, 14.5, { align: "center" });
+    pdf.text("PODER POPULAR PARA LA DEFENSA", 135, 19.5, { align: "center" });
+
+    // 5.5 Cuadro Presentante / Fecha / Página
+    const boxX = 65;
+    const boxY = 22;
+    const boxW = 137;
+    const boxH = 17.5;
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(boxX, boxY, boxW, boxH, "S");
+    pdf.line(152, boxY, 152, boxY + boxH);
+    pdf.line(180, boxY, 180, boxY + boxH);
+
+    // Presentante
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.5);
+    pdf.text("Presentante:", boxX + 2, boxY + 3.8);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.2);
+    pdf.text("LUÍS ADOLFO ROSALES MOLINA", 108.5, boxY + 6.8, { align: "center" });
+    pdf.setFontSize(6.8);
+    pdf.text("MAYOR GENERAL", 108.5, boxY + 10.5, { align: "center" });
+    pdf.setFontSize(6.2);
+    pdf.text("DIRECTOR GENERAL DEL DESPACHO DEL MPPD", 108.5, boxY + 14.2, { align: "center" });
+
+    // Fecha (Fecha oficial del día de la firma ministerial)
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.5);
+    pdf.text("Fecha:", 166, boxY + 4, { align: "center" });
+    pdf.line(152, boxY + 6, 180, boxY + 6);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    const fechaDoc = this.formatFechaPuntoCuenta(new Date());
+    pdf.text(fechaDoc, 166, boxY + 12.5, { align: "center" });
+
+    // Página
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.5);
+    pdf.text("Página:", 191, boxY + 4, { align: "center" });
+    pdf.line(180, boxY + 6, boxX + boxW, boxY + 6);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.text("1/1", 191, boxY + 12.5, { align: "center" });
+
+    // 5.6 Franja ASUNTO
+    const redColor = [225, 0, 0];
+    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, 41, contentWidth, 4, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("ASUNTO:", margin + 2, 44);
+
+    // Contenido ASUNTO
+    pdf.setFillColor(255, 255, 255);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, 45, contentWidth, 8, "FD");
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7);
+    const asuntoRaw = (this.activeDoc.asunto || this.activeDoc.cont || "PROPUESTA DE NOMBRAMIENTO").toUpperCase();
+    const splitAsunto = pdf.splitTextToSize(asuntoRaw, contentWidth - 4);
+    pdf.text(splitAsunto, margin + 2, 48.5);
+
+    // 5.7 Franja ARGUMENTACIÓN
+    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, 54, contentWidth, 4, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("ARGUMENTACIÓN:", margin + 2, 57);
+
+    // Contenido ARGUMENTACIÓN
+    pdf.setFillColor(255, 255, 255);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, 58, contentWidth, 5, "FD");
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.8);
+    const argumentacion = this.activeDoc.argumentacion ||
+      "Se somete a consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, el siguiente nombramiento:";
+    pdf.text(argumentacion, margin + 2, 61.8);
+
+    // 5.8 Encabezado de Tabla de Decisiones
+    const tableY = 64;
+    const colW = [7, 23, 33, 20, 48, 34, 30.9];
+    const colX: number[] = [margin];
+    for (let i = 0; i < colW.length; i++) {
+      colX.push(colX[i] + colW[i]);
+    }
+
+    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, tableY, contentWidth, 5.5, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(5.8);
+    pdf.setTextColor(255, 255, 255);
+
+    pdf.text("Nº", colX[0] + colW[0] / 2, tableY + 3.8, { align: "center" });
+    pdf.text("ACTUAL", colX[1] + colW[1] / 2, tableY + 3.8, { align: "center" });
+    pdf.text("GRADO, NOMBRES\nY APELLIDOS", colX[2] + colW[2] / 2, tableY + 2.4, { align: "center" });
+    pdf.text("CANDIDATO\nPROPUESTO", colX[3] + colW[3] / 2, tableY + 2.4, { align: "center" });
+    pdf.text("GRADO, NOMBRES\nY APELLIDOS", colX[4] + colW[4] / 2, tableY + 2.4, { align: "center" });
+    pdf.text("DECISIÓN", colX[5] + colW[5] / 2, tableY + 3.8, { align: "center" });
+    pdf.text("OBSERVACIONES", colX[6] + colW[6] / 2, tableY + 3.8, { align: "center" });
+
+    // Líneas divisorias en cabecera
+    pdf.setDrawColor(240, 240, 240);
+    for (let i = 1; i < colX.length - 1; i++) {
+      pdf.line(colX[i], tableY, colX[i], tableY + 5.5);
+    }
+
+    // 5.9 Filas de Candidatos / Decisión (Altura 22mm para que 3 candidatos quepan con holgura en Hoja Carta)
+    const startBodyY = tableY + 5.5;
+    const rowH = 22; // 3 candidatos = 66 mm
+    const totalTableH = rowH * candidates.length;
+
+    // Columna 1: Nº ("01") unificada para el bloque con borde gris suave
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.setLineWidth(0.35);
+    pdf.rect(colX[0], startBodyY, colW[0], totalTableH, "S");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text("01", colX[0] + colW[0] / 2, startBodyY + totalTableH / 2 + 1.5, { align: "center" });
+
+    // Columna 2 & 3: "PLAZA VACANTE" unificada para el bloque con borde gris suave
+    const plazaW = colW[1] + colW[2];
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(colX[1], startBodyY, plazaW, totalTableH, "S");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8);
+    const cargoActual = (this.activeDoc.actual || this.activeDoc.cargo_actual || "PLAZA VACANTE").toUpperCase();
+    pdf.text(cargoActual, colX[1] + plazaW / 2, startBodyY + totalTableH / 2 + 1.5, { align: "center" });
+
+    // Recorrer cada candidato para las columnas 4, 5, 6 y 7
+    for (let idx = 0; idx < candidates.length; idx++) {
+      const item = candidates[idx];
+      const yCand = startBodyY + idx * rowH;
+
+      // Columna 4: CANDIDATO PROPUESTO (Foto optimizada en JPEG liviano)
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(colX[3], yCand, colW[3], rowH, "S");
+      const cleanCed = (this.getCedula(item) || "").replace(/\./g, "").trim();
+      let photoImg = null;
+      if (cleanCed && this.rawUrlsMap[cleanCed]) {
+        // Redimensionar foto a 250px en JPEG (peso ~15KB en vez de 10MB)
+        photoImg = await this.cargarImagenParaPDF(this.rawUrlsMap[cleanCed], 250, true, 4000);
+      }
+      const pW = 15;
+      const pH = 19;
+      const pX = colX[3] + (colW[3] - pW) / 2;
+      const pY = yCand + (rowH - pH) / 2;
+
+      if (photoImg) {
+        try {
+          pdf.addImage(photoImg, "JPEG", pX, pY, pW, pH, undefined, "FAST");
+          pdf.setDrawColor(180, 180, 180);
+          pdf.rect(pX, pY, pW, pH, "S");
+        } catch (e) {
+          pdf.setFillColor(240, 240, 240);
+          pdf.rect(pX, pY, pW, pH, "FD");
+        }
+      } else {
+        pdf.setFillColor(242, 242, 242);
+        pdf.setDrawColor(200, 200, 200);
+        pdf.rect(pX, pY, pW, pH, "FD");
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(5);
+        pdf.setTextColor(140, 140, 140);
+        pdf.text("FOTO", pX + pW / 2, pY + pH / 2 + 1, { align: "center" });
+      }
+
+      // Columna 5: GRADO, NOMBRES Y APELLIDOS / DATOS
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(colX[4], yCand, colW[4], rowH, "S");
+      const cNom = this.getNombre(item);
+      const cCed = this.getCedula(item);
+      const cGrado = (item.grado || item.sub_grado || "").toUpperCase();
+      const cCargo = (this.getCargo(item) || "").toUpperCase();
+      const cPromo = (item.promocion || item.sub_promocion || "").toUpperCase();
+
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(6.5);
+      let curY = yCand + 3.8;
+      const fullName = `${cGrado ? cGrado + " " : ""}${cNom}`.trim();
+      const splitName = pdf.splitTextToSize(fullName, colW[4] - 4);
+      pdf.text(splitName, colX[4] + 2, curY);
+      curY += splitName.length * 2.6 + 0.4;
+
+      pdf.setFontSize(5.8);
+      pdf.text(`C.I. Nº ${cCed || "N/A"}`, colX[4] + 2, curY);
+      curY += 2.6;
+
+      if (cPromo) {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(5);
+        const splitPromo = pdf.splitTextToSize(`PROMOCIÓN: ${cPromo}`, colW[4] - 4);
+        pdf.text(splitPromo, colX[4] + 2, curY);
+        curY += splitPromo.length * 2.1;
+      }
+
+      if (cCargo && cCargo !== "S/C") {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(5);
+        const splitCargo = pdf.splitTextToSize(`CARGO ACTUAL: ${cCargo}`, colW[4] - 4);
+        pdf.text(splitCargo, colX[4] + 2, curY);
+      }
+
+      // Columna 6: DECISIÓN (Casillas Aprobado / Negado con bordes suaves)
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(colX[5], yCand, colW[5], rowH, "S");
+      const estatusStr = this.getMinisterialSwitchLabel(item);
+      const isAprobado = estatusStr === "APROBADO";
+
+      const boxSize = 5.5;
+      const boxY = yCand + rowH / 2 - 4;
+
+      // Casilla APROBADO
+      const apX = colX[5] + 5;
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.setLineWidth(0.35);
+      pdf.rect(apX, boxY, boxSize, boxSize, "S");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(5);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text("APROBADO", apX + boxSize / 2, boxY + boxSize + 2.8, { align: "center" });
+
+      // Casilla NEGADO
+      const negX = colX[5] + 20;
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(negX, boxY, boxSize, boxSize, "S");
+      pdf.text("NEGADO", negX + boxSize / 2, boxY + boxSize + 2.8, { align: "center" });
+
+      // Marcar según la decisión tomada con colores MATE pastel secos
+      if (isAprobado) {
+        pdf.setDrawColor(85, 134, 100); // Verde salvia mate pastel seco
+        pdf.setLineWidth(0.85);
+        pdf.line(apX + 1.0, boxY + 2.8, apX + 2.2, boxY + 4.5);
+        pdf.line(apX + 2.2, boxY + 4.5, apX + 4.6, boxY + 1.0);
+      } else {
+        pdf.setDrawColor(182, 98, 90); // Terracota / ladrillo mate pastel seco
+        pdf.setLineWidth(0.85);
+        pdf.line(negX + 1.0, boxY + 1.0, negX + 4.5, boxY + 4.5);
+        pdf.line(negX + 4.5, boxY + 1.0, negX + 1.0, boxY + 4.5);
+      }
+
+      // Columna 7: OBSERVACIONES (en Mayúsculas y formato elegante)
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.setLineWidth(0.35);
+      pdf.rect(colX[6], yCand, colW[6], rowH, "S");
+      const obs = (item.observacion || item.sub_observacion || "").toString().trim().toUpperCase();
+      if (obs) {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(5);
+        pdf.setTextColor(30, 30, 30);
+        const splitObs = pdf.splitTextToSize(obs, colW[6] - 4);
+        pdf.text(splitObs, colX[6] + 2, yCand + 3.8);
+      }
+    }
+
+    // 5.10 Franja COMENTARIOS DEL MPPD
+    const comY = startBodyY + totalTableH + 2.5;
+    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, comY, contentWidth, 4, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("COMENTARIOS DEL MPPD:", margin + 2, comY + 2.8);
+
+    // Contenedor de Comentarios del MPPD
+    const comBoxH = 13;
+    pdf.setFillColor(255, 255, 255);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, comY + 4, contentWidth, comBoxH, "FD");
+    if (this.observacion) {
+      pdf.setTextColor(20, 20, 20);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(6.8);
+      const splitComentarios = pdf.splitTextToSize(this.observacion.toUpperCase(), contentWidth - 4);
+      pdf.text(splitComentarios, margin + 2, comY + 8);
+    }
+
+    // 5.11 Firma Oficial del Ministro y Sello 5x5 cm (Centrada, amplia y con sello oficial)
+    const sigLineY = 222;
+    const centerX = pageWidth / 2;
+
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.setLineWidth(0.4);
+    pdf.line(centerX - 42, sigLineY, centerX + 42, sigLineY);
+
+    // Texto con +2 puntos de tamaño para presencia jerárquica
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10.5);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text("GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ", centerX, sigLineY + 5, { align: "center" });
+    pdf.setFontSize(10);
+    pdf.text("General en Jefe", centerX, sigLineY + 9.5, { align: "center" });
+    pdf.setFontSize(9.5);
+    pdf.text("Ministro del Poder Popular para la Defensa", centerX, sigLineY + 14, { align: "center" });
+
+    // Estampar Sello Oficial en el lado izquierdo (55 x 55 mm, desplazado más a la izquierda)
+    if (selloImg) {
+      try {
+        pdf.addImage(selloImg, "PNG", centerX - 68, sigLineY - 37, 55, 55, undefined, "FAST");
+      } catch (e) {
+        console.warn("[PuntoDeCuenta] Aviso al estampar sello:", e);
+      }
+    }
+
+    // Estampar Firma Oficial del Ministro (95 x 41 mm, desplazada un poco más a la derecha)
+    if (firmaImg) {
+      try {
+        pdf.addImage(firmaImg, "PNG", centerX - 39, sigLineY - 27, 95, 41, undefined, "FAST");
+      } catch (e) {
+        console.warn("[PuntoDeCuenta] Aviso al estampar firma:", e);
+      }
+    }
+
+    // 5.12 Iniciales de redacción (al pie de la página Carta)
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.5);
+    pdf.setTextColor(60, 60, 60);
+    pdf.text("RESA/WJBF/fabm", margin + 2, 271);
+
+    // 6. Generar Blob del PDF y preparar nombre de archivo oficial con patron PC-cleanNumc.pdf
+    const pdfBlob = pdf.output("blob");
+    const cleanNumc = (
+      this.activeDoc?.numc ||
+      this.activeDoc?.ncontrol ||
+      numControl
+    )
+      .toString()
+      .replace(/[\r\n\t /]+/g, "_")
+      .trim();
+    const filename = `PC-${cleanNumc}.pdf`;
+
+    // 7. Descargar copia local preliminar para el usuario
+    pdf.save(filename);
+
+    // 8. Construir formulario multipart siguiendo el patrón de tinder-pdf-viewer
+    const formData = new FormData();
+    formData.append("archivos", pdfBlob, filename);
+    formData.append(
+      "nombre",
+      this.activeDoc?.signatures?.mainSignatory || "MINISTRO DE LA DEFENSA",
+    );
+    formData.append("locacion", "Caracas, Venezuela");
+    formData.append("razon", "Punto de Cuenta Ministerial - Cuadro Decisorio");
+    formData.append("contacto", "MPPD");
+    formData.append("codigo", filename);
+    formData.append("return", "true"); // <-- Solicitar retorno de archivo PDF firmado directamente
+
+    // Firma digital visible en cabecera (esquina superior derecha, sutil ~2cm)
+    formData.append("visible", "true");
+
+    // --- NUEVOS PARÁMETROS PARA EL BACKEND EN GO ---
+    formData.append("transparente", "true"); // El Widget Annotation será INVISIBLE
+    formData.append("page", "1"); // Página donde se ubicará el Widget interactivo
+
+    // Coordenadas PDF (en puntos, no mm) para colocar el Widget Annotation
+    // Arriba a la derecha: x ~ 195mm (550pts), y ~ 20mm desde arriba (930pts desde abajo)
+    formData.append("llx", "540"); // Margen izquierdo
+    formData.append("lly", "910"); // Margen inferior
+    formData.append("urx", "580"); // Margen derecho
+    formData.append("ury", "970"); // Margen superior
+
+    // 9. Consumir servicio Go de firma con barras de progreso de subida
+    let signedPdfBlob: Blob = pdfBlob;
+    try {
+      signedPdfBlob = await new Promise<Blob>(
+        (resolvePromise, rejectPromise) => {
+          this.fileService.FirmarPDFProgress(formData).subscribe({
+            next: (event: any) => {
+              if (event.type === HttpEventType.UploadProgress) {
+                const progress = Math.round(100 * (event.loaded / event.total));
+                Swal.update({
+                  title: "Enviando al servidor...",
+                  html: `Progreso de subida: <b>${progress}%</b><br><div style="width: 100%; background: #e9ecef; border-radius: 4px; overflow: hidden; margin-top: 10px;"><div style="width: ${progress}%; height: 8px; background: #2dce89; transition: width 0.1s ease;"></div></div>`,
+                });
+              } else if (event.type === HttpEventType.Response) {
+                if (event.body) {
+                  resolvePromise(event.body);
+                } else {
+                  resolvePromise(pdfBlob);
+                }
+              }
+            },
+            error: (err: any) => {
+              console.warn("[PuntoDeCuenta] Advertencia al firmar PDF:", err);
+              resolvePromise(pdfBlob);
+            },
+          });
+        },
+      );
+    } catch (errSign) {
+      console.warn("[PuntoDeCuenta] Excepción en FirmarPDFProgress:", errSign);
+      signedPdfBlob = pdfBlob;
+    }
+
+    // 10. Subir archivo a la carpeta oficial del caso mediante subirarchivos (identificador encriptado)
+    try {
+      const uploadForm = new FormData();
+      uploadForm.append("identificador", btoa("D" + numControl));
+      uploadForm.append("return", "true");
+      uploadForm.append("archivos", signedPdfBlob, filename);
+
+      await new Promise((resolve) => {
+        this.apiService.EnviarArchivos(uploadForm).subscribe({
+          next: (data) => {
+            console.log("[PuntoDeCuenta] Respuesta EnviarArchivos:", data);
+            resolve(data);
+          },
+          error: (err) => {
+            console.warn("[PuntoDeCuenta] Aviso al subir archivo:", err);
+            resolve(null);
+          },
+        });
+        setTimeout(() => resolve(null), 4000);
+      });
+    } catch (errUp) {
+      console.warn("[PuntoDeCuenta] Error al subir archivo a la ruta:", errUp);
+    }
+
+    // 11. Registrar adjunto en el Workflow (WKF_ADocumentoAdjunto)
+    try {
+      const docAdjunto = {
+        archivo: filename,
+        usuario: this.loginService?.Usuario?.id || "",
+        documento: numControl,
+      };
+      const xAPI: IAPICore = {
+        funcion: "WKF_ADocumentoAdjunto",
+        parametros: "",
+        valores: JSON.stringify(docAdjunto),
+      };
+      await new Promise((resolve) => {
+        this.apiService.Ejecutar(xAPI).subscribe({
+          next: (data) => {
+            console.log("[PuntoDeCuenta] Respuesta WKF_ADocumentoAdjunto:", data);
+            resolve(data);
+          },
+          error: (err) => resolve(null),
+        });
+        setTimeout(() => resolve(null), 3000);
+      });
+    } catch (errAdj) {
+      console.warn("[PuntoDeCuenta] Aviso al registrar adjunto:", errAdj);
+    }
+
+    // 12. Actualizar referencias del documento y ejecutar firma ministerial
+    this.activeDoc.numc = numControl;
+    this.activeDoc.anom = filename;
+    this.activeDoc.archivo = filename;
+    this.activeDoc.archivo_firmado = filename;
+    try {
+      this.fnxFirmaMinistro();
+    } catch (errFnx) {
+      console.warn("[PuntoDeCuenta] Aviso en fnxFirmaMinistro:", errFnx);
+    }
+
+    // 12.1 Actualizar en base de datos el estatus de los subdocumentos según la selección de los casos (WKF_APromoverSubDocumento)
+    try {
+      await this.actualizarBaseDatosSubcasosDecisorios();
+    } catch (errBdSub) {
+      console.warn("[PuntoDeCuenta] Aviso al actualizar subdocumentos en BD:", errBdSub);
+    }
+
+    Swal.close();
+    this.toastrService.success(
+      "Documento Cuadro Decisorio (Papel de Trabajo) tamaño Carta generado, firmado y subido al servidor exitosamente.",
+      "GDoc Cuadro Decisorio"
+    );
+
+    // 13. Avanzar flujo a FAVORABLE
+    this.loadingAction = true;
+    this.redistribuir("FAVORABLE");
+  }
+
+  // ─── Actualizar estado de subcasos/cuentas en Base de Datos (WKF_APromoverSubDocumento) ────
+  public async actualizarBaseDatosSubcasosDecisorios(): Promise<void> {
+    if (!this.activeDoc) return;
+    const docId = (
+      this.activeDoc.wfdocumento ||
+      this.activeDoc.idd ||
+      this.activeDoc.id ||
+      ""
+    ).toString();
+    const numControl = (
+      this.activeDoc.numc ||
+      this.activeDoc.ncontrol ||
+      this.activeDoc.cuenta ||
+      ""
+    )
+      .toString()
+      .trim();
+    const fecha = new Date().toISOString();
+    const llave = Md5.init(numControl + fecha);
+    const usuario =
+      this.loginService?.Usuario?.cedula ||
+      this.jwtData?.userCedula ||
+      "MINISTRO";
+
+    // 1. Obtener la lista de integrantes del caso
+    const subcasosEvaluados = this.getSubcasos(this.activeDoc);
+    if (!subcasosEvaluados || subcasosEvaluados.length === 0) return;
+
+    // 2. Consultar registros reales de la BD para asegurar los 'ids' oficiales
+    let dbSubcasos: any[] = [];
+    if (docId) {
+      try {
+        const xAPISub: IAPICore = {
+          funcion: "WKF_CSubDocumentoID",
+          parametros: docId,
+          valores: "",
+        };
+        const resp: any = await firstValueFrom(this.apiService.Ejecutar(xAPISub));
+        if (resp && resp.Cuerpo && Array.isArray(resp.Cuerpo)) {
+          dbSubcasos = resp.Cuerpo;
+        }
+      } catch (err) {
+        console.warn(
+          "[actualizarBaseDatosSubcasosDecisorios] Error consultando WKF_CSubDocumentoID:",
+          err,
+        );
+      }
+    }
+
+    // 3. Mapear y preparar notas de entrega para cada integrante evaluado
+    const lstNotaEntrega: any[] = [];
+    for (let i = 0; i < subcasosEvaluados.length; i++) {
+      const evalItem = subcasosEvaluados[i];
+      const cedula = (
+        this.getCedula(evalItem) ||
+        evalItem.cedula ||
+        evalItem.sub_cedula ||
+        ""
+      )
+        .toString()
+        .trim();
+
+      // Buscar id en BD por cédula o por índice o en el propio objeto
+      let subId = evalItem.ids || evalItem.id || evalItem.sub_id;
+      let dbMatch = dbSubcasos.find((dbItem: any) => {
+        const dbCed = (dbItem.cedula || dbItem.sub_cedula || "").toString().trim();
+        return dbCed && cedula && dbCed === cedula;
+      });
+      if (!dbMatch && dbSubcasos[i]) {
+        dbMatch = dbSubcasos[i];
+      }
+      if (dbMatch && dbMatch.ids) {
+        subId = dbMatch.ids;
+      }
+
+      if (!subId) {
+        console.warn(
+          "[actualizarBaseDatosSubcasosDecisorios] No se encontró subId para integrante:",
+          evalItem,
+        );
+        continue;
+      }
+
+      // Determinar decisión ministerial: "PR" (Aprobado) o "NP" (Negado)
+      const label = this.getMinisterialSwitchLabel(evalItem);
+      const decisionCode = label === "APROBADO" ? "PR" : "NP";
+      let observacionFinal = decisionCode;
+      if (evalItem.detallefinaljson && decisionCode === "PR") {
+        observacionFinal = evalItem.detallefinaljson;
+      } else if (evalItem.observacion || evalItem.sub_observacion) {
+        observacionFinal = `${decisionCode} - ${(
+          evalItem.observacion || evalItem.sub_observacion
+        )
+          .toString()
+          .trim()
+          .toUpperCase()}`;
+      }
+
+      lstNotaEntrega.push({
+        id: subId,
+        nombre: evalItem.nombre || evalItem.sub_nombre || "",
+        cedula: cedula,
+        numc: numControl,
+        observacion: observacionFinal,
+        llave: llave,
+        udep: evalItem.udep || "",
+        cuenta: evalItem.cuenta || "",
+        cargo: this.getCargo(evalItem) || evalItem.cargo || "",
+      });
+    }
+
+    if (lstNotaEntrega.length === 0) return;
+
+    // 4. Promover cada subdocumento en BD utilizando WKF_APromoverSubDocumento
+    const destino = 3;
+    const estatus = 1;
+    for (const e of lstNotaEntrega) {
+      try {
+        const xAPI: IAPICore = {
+          funcion: "WKF_APromoverSubDocumento",
+          valores: "",
+          parametros: `${destino},${estatus},${e.llave}|${e.observacion},${usuario},1,${e.id}`,
+        };
+        await firstValueFrom(this.apiService.Ejecutar(xAPI));
+        console.log(
+          `[actualizarBaseDatosSubcasosDecisorios] Subdocumento ${e.id} promovido como ${e.observacion}`,
+        );
+      } catch (errPromover) {
+        console.error(
+          `[actualizarBaseDatosSubcasosDecisorios] Error promoviendo subdocumento ${e.id}:`,
+          errPromover,
+        );
+      }
+    }
+  }
+
+  // ─── Descargar Documento Firmado desde resueltos/ (PC-numc) ─────────────────
+  public descargarDocumentoFirmadoCuadroDecisorio(doc?: any): void {
+    const targetDoc = doc || this.activeDoc;
+    if (!targetDoc) return;
+
+    const rawNumc = (
+      targetDoc.numc ||
+      targetDoc.ncontrol ||
+      targetDoc.cuenta ||
+      ""
+    )
+      .toString()
+      .replace(/[\r\n\t /]+/g, "_")
+      .trim();
+
+    if (!rawNumc) {
+      this.toastrService.warning(
+        "El documento no posee un número de control asignado.",
+        "Aviso",
+      );
+      return;
+    }
+
+    const cleanNumc = rawNumc.startsWith("PC-") ? rawNumc : `PC-${rawNumc}`;
+    const cleanName = cleanNumc.replace(/\.pdf$/i, "");
+
+    const payload = {
+      ruta: "resueltos/",
+      archivo: `${cleanName}.pdf`,
+    };
+
+    Swal.fire({
+      title: "Cargando Documento Firmado...",
+      text: "Descargando Cuadro Decisorio oficial desde el servidor...",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    this.apiService.postBlob("dwscdn", payload).subscribe({
+      next: (data: Blob) => {
+        Swal.close();
+        const fileURL = URL.createObjectURL(data);
+        window.open(fileURL, "_blank");
+      },
+      error: (error) => {
+        Swal.close();
+        console.error("Error al descargar el PDF firmado:", error);
+        const fallbackUrl = this.getDwsUrl(targetDoc);
+        if (fallbackUrl) {
+          window.open(fallbackUrl, "_blank");
+        } else {
+          this.toastrService.error(
+            "No se pudo obtener el archivo firmado desde el servidor de almacenamiento.",
+            "Error",
+          );
+        }
+      },
+    });
   }
 
   // ─── Acciones: Favorable / Firmar ─────────────────────────
@@ -2359,7 +3502,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       }
 
       let localEstadoActual =
-        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ? 11 : 14;
+        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ? 11 : 
+        this.selectedCarpeta?.id === "CUADRO_DECISORIO" ? 17 : 14;
       let localEstadoDestino = 1;
 
       this.xAPI = {} as IAPICore;
@@ -2370,10 +3514,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     } else {
       let estadoDestino = Math.min(this.estadoOrigen + 1, 7);
 
-      // Flujo especial para RECLAMOS y PUNTO DE CUENTA
+      // Flujo especial para RECLAMOS, PUNTO DE CUENTA y CUADRO DECISORIO
       if (
         this.selectedCarpeta?.id === "RECLAMOS" ||
-        this.selectedCarpeta?.id === "PUNTO_DE_CUENTA"
+        this.selectedCarpeta?.id === "PUNTO_DE_CUENTA" ||
+        this.selectedCarpeta?.id === "CUADRO_DECISORIO"
       ) {
         if (this.estadoOrigen === 2) estadoDestino = 5;
         else if (this.estadoOrigen === 5) estadoDestino = 6;
@@ -2686,6 +3831,18 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     ];
     const monthStr = months[dateObj.month - 1] || "???";
     return `${day}${monthStr}${dateObj.year}`;
+  }
+
+  public getDiasViaje(inicio: any, fin: any): string {
+    if (!inicio || !fin || !inicio.year || !fin.year) return "";
+    
+    const dateInicio = new Date(inicio.year, inicio.month - 1, inicio.day);
+    const dateFin = new Date(fin.year, fin.month - 1, fin.day);
+    
+    const diffTime = Math.abs(dateFin.getTime() - dateInicio.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return (diffDays + 1) + " DÍAS";
   }
 
   public getFlagUrl(countryName: string): string {

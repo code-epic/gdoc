@@ -59,6 +59,7 @@ export class MinisterialComponent implements OnInit {
   public estadoActual = 4;
   public estadoOrigen = 2;
   public original = "";
+  public originalSubDocumento: any = null;
   public xAPI: IAPICore = {
     funcion: "",
     parametros: "",
@@ -406,6 +407,7 @@ export class MinisterialComponent implements OnInit {
         if (data.Cuerpo != undefined && data.Cuerpo.length > 0) {
           this.SubDocumento = data.Cuerpo[0];
           this.original = btoa(JSON.stringify(data.Cuerpo[0]));
+          this.originalSubDocumento = JSON.parse(JSON.stringify(data.Cuerpo[0]));
 
           this.blUpdate = this.SubDocumento.historico == "" ? false : true;
           this.dwSub = this.SubDocumento.nombre_archivo != "" ? true : false;
@@ -455,6 +457,15 @@ export class MinisterialComponent implements OnInit {
     this.xAPI.valores = JSON.stringify(this.SubDocumento);
 
     this.ngxService.startLoader("loader-aceptar");
+    //actualizar o vigilar cambios
+    console.log(this.SubDocumento.estatus, "Control...");
+    if (
+      this.originalSubDocumento &&
+      this.originalSubDocumento.estatus != null &&
+      this.originalSubDocumento.estatus !== ""
+    ) {
+      this.blUpdate = true;
+    }
 
     if (this.blUpdate == false) {
       this.xAPI.funcion = "WKF_ISubDocVariante";

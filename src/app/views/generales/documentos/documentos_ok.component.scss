@@ -1276,6 +1276,7 @@ $dok-shadow:        rgba(94, 114, 228, 0.12);
   resize: vertical;
   min-height: 75px;
   font-family: inherit;
+  text-transform: uppercase;
 
   &:focus {
     outline: none;
@@ -1635,11 +1636,23 @@ $dok-shadow:        rgba(94, 114, 228, 0.12);
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
   }
 
-  // Sombreado sutil rojo de fondo y borde para "No Procesar" / "Código Rojo"
+  // Sombreado sutil rojo de fondo y borde para "No Procesar" / "Código Rojo" / "Negado"
   &.subcaso-no-procesar {
-    background-color: rgba(239, 83, 80, 0.09) !important;
+    background-color: rgba(239, 83, 80, 0.08) !important;
     border-color: rgba(239, 83, 80, 0.25) !important;
     border-left: 4px solid #ef5350 !important;
+  }
+
+  &.subcaso-aprobado {
+    background-color: rgba(16, 185, 129, 0.05) !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+    border-left: 4px solid #10b981 !important;
+  }
+
+  &.subcaso-espera {
+    background-color: rgba(245, 176, 65, 0.06) !important;
+    border-color: rgba(245, 176, 65, 0.25) !important;
+    border-left: 4px solid #f5b041 !important;
   }
 
   &.subcaso-pendiente {
@@ -2093,6 +2106,14 @@ $dok-shadow:        rgba(94, 114, 228, 0.12);
 
     input:checked + .slider:before {
       transform: translateX(20px);
+    }
+
+    .slider.slider-espera {
+      background-color: #f5b041 !important; // En Espera (Amarillo/Naranja)
+      
+      &:before {
+        left: 13px; // Center it visually? or leave at left
+      }
     }
   }
 }

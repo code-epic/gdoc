@@ -434,12 +434,20 @@ export class SnuevoComponent implements OnInit {
 
   //obtenerWorkFlow Permite generar los primeros valores de la red del documento
   obtenerWorkFlow() {
+    let observ = "Creando Presidencial";
+
+    if (this.Doc.remitente === "CUADRO DECISORIO") {
+      this.estadoActual = 17;
+      this.estatusOrigen = 2;
+      observ = "Creando Cuadro Decisorio";
+    }
+
     this.WkDoc = {
       nombre: "Control de Gestion",
       workflow: 2,
       estado: this.estadoActual,
       estatus: this.estatusOrigen,
-      observacion: "Creando Presidencial",
+      observacion: observ,
       usuario: this.loginService.Usuario.id,
     };
     this.xAPI = {} as IAPICore;

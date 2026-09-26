@@ -810,11 +810,13 @@
           <div class="info-card-block">
             <div class="block-title d-flex justify-content-between align-items-center">
               <span><i class="fas fa-comment-alt text-primary mr-1"></i> Observación para Decisión</span>
-              <small class="text-muted font-weight-normal" style="font-size: 0.72rem;">* Requerido para Diferido / Negado</small>
+              <small class="text-muted font-weight-normal" style="font-size: 0.72rem;">* Requerido para Diferido / Negado (EN MAYÚSCULAS)</small>
             </div>
             <textarea class="modal-textarea"
-                      [(ngModel)]="observacion"
-                      placeholder="Ingrese una observación o motivo de la decisión..."
+                      [ngModel]="observacion"
+                      (ngModelChange)="observacion = $event ? $event.toUpperCase() : ''"
+                      style="text-transform: uppercase;"
+                      placeholder="INGRESE UNA OBSERVACIÓN O MOTIVO DE LA DECISIÓN..."
                       rows="3"
                       [disabled]="loadingAction">
             </textarea>
@@ -878,9 +880,9 @@
           <!-- BLOQUE NORMAL: Integrantes del Caso -->
           <div *ngIf="(selectedCarpeta?.id !== 'RECLAMOS' || !getReclamosData(activeDoc)) && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'">
             <div class="subcasos-header-bar mb-2">
-              <div class="d-flex align-items-center gap-2">
-                <i class="fas fa-users text-primary fa-lg"></i>
-                <span class="subcasos-main-title">Integrantes del Caso</span>
+              <div class="d-flex align-items-center">
+                <i class="fas fa-users text-primary fa-lg mr-2"></i>
+                <span class="subcasos-main-title font-weight-bold" style="font-size: 0.9rem;">Integrantes del Caso</span>
               </div>
               <span class="badge badge-primary px-3 py-1 font-weight-bold" style="font-size: 0.8rem; border-radius: 12px;"
                     *ngIf="getSubcasos(activeDoc).length > 0">
@@ -894,30 +896,35 @@
             <p class="text-muted m-0" style="font-size: 0.85rem;">Trámite individual sin integrantes adicionales agrupados.</p>
           </div>
 
-          <!-- 🟢 CATEGORÍA 1: Integrantes Aprobados -->
+          <!-- 🟢 CATEGORÍA 1: Integrantes Aprobados / En Evaluación -->
           <div class="subcasos-category-block mb-3" *ngIf="getSubcasosProcesar(activeDoc).length > 0">
             <div class="category-header category-header-procesar">
-              <div class="d-flex align-items-center gap-2">
-                <i class="fas fa-check-circle text-success"></i>
-                <span class="category-title">Integrantes Aprobados</span>
+              <div class="d-flex align-items-center">
+                <i class="fas mr-2" [ngClass]="selectedCarpeta?.id === 'CUADRO_DECISORIO' && currentProfile === 'Ministro' && !esDocFirmado(activeDoc) ? 'fa-hourglass-half text-warning' : 'fa-check-circle text-success'"></i>
+                <span class="category-title">
+                  {{ selectedCarpeta?.id === 'CUADRO_DECISORIO' && currentProfile === 'Ministro' && !esDocFirmado(activeDoc) ? 'Integrantes en Evaluación' : (selectedCarpeta?.id === 'CUADRO_DECISORIO' ? 'Resultados de Integrantes (Firmado)' : 'Integrantes Aprobados') }}
+                </span>
               </div>
-              <span class="category-count-badge badge-success-light">
-                {{ getSubcasosProcesar(activeDoc).length }} Aprobado(s)
+              <span class="category-count-badge" [ngClass]="selectedCarpeta?.id === 'CUADRO_DECISORIO' && currentProfile === 'Ministro' && !esDocFirmado(activeDoc) ? 'badge-warning-light' : 'badge-success-light'">
+                {{ getSubcasosProcesar(activeDoc).length }} {{ selectedCarpeta?.id === 'CUADRO_DECISORIO' && currentProfile === 'Ministro' && !esDocFirmado(activeDoc) ? 'En Evaluación' : 'Evaluado(s)' }}
               </span>
             </div>
 
             <div class="subcasos-list-container p-2">
-              <div class="subcaso-card-item subcaso-procesar mb-2"
-                   *ngFor="let item of getSubcasosProcesar(activeDoc); let idx = index; trackBy: trackBySubcaso">
+              <div class="subcaso-card-item mb-2"
+                   *ngFor="let item of getSubcasosProcesar(activeDoc); let idx = index; trackBy: trackBySubcaso"
+                   [class.subcaso-aprobado]="getMinisterialSwitchLabel(item) === 'APROBADO'"
+                   [class.subcaso-no-procesar]="getMinisterialSwitchLabel(item) === 'NEGADO'"
+                   [class.subcaso-espera]="getMinisterialSwitchLabel(item) === 'EN ESPERA'">
 
                 <!-- Avatar -->
                 <div class="subcaso-avatar"
                      *ngIf="getCedula(item)"
                      (click)="verFotoAmpliada(getCedula(item)); $event.stopPropagation()"
                      title="Clic para ver foto ampliada">
-                  <img [src]="fotosCasos[getCedula(item)]"
-                       *ngIf="!loadingFotos[getCedula(item)] && fotosCasos[getCedula(item)]"
-                       alt="Avatar">
+                   <img [src]="fotosCasos[getCedula(item)]"
+                        *ngIf="!loadingFotos[getCedula(item)] && fotosCasos[getCedula(item)]"
+                        alt="Avatar">
                   <i class="fas fa-spinner fa-spin text-primary" *ngIf="loadingFotos[getCedula(item)]"></i>
                   <i class="fas fa-user" *ngIf="!loadingFotos[getCedula(item)] && !fotosCasos[getCedula(item)]"></i>
                 </div>
@@ -935,30 +942,39 @@
                       <i class="fas fa-user-tie"></i> {{ getCargo(item) }}
                     </span>
                   </div>
-                  <div class="subcaso-obs text-muted mt-1" *ngIf="item.observacion || item.sub_observacion || item.obse">
+                  <div class="subcaso-obs text-muted mt-1" style="text-transform: uppercase;" *ngIf="item.observacion || item.sub_observacion || item.obse">
                     {{ item.observacion || item.sub_observacion || item.obse }}
                   </div>
                 </div>
 
-                <!-- Estatus / Chip o Switch (Solo en Perfil Ministro) -->
+                <!-- Estatus / Chip o Switch (Solo en Perfil Ministro y NO firmado) -->
                 <div class="subcaso-status-badge">
-                  <ng-container *ngIf="currentProfile === 'Ministro'; else defaultBadge1">
+                  <ng-container *ngIf="currentProfile === 'Ministro' && !esDocFirmado(activeDoc); else defaultBadge1">
                     <div class="minister-toggle-wrapper">
                       <label class="toggle-switch-custom" title="Cambiar estatus del integrante">
                         <input type="checkbox"
-                               [checked]="!isNoProcesar(item)"
-                               (change)="toggleSubcasoEstatus(item)">
-                        <span class="slider"></span>
+                               [checked]="!isNoProcesar(item) && !isEnEspera(item)"
+                               (change)="toggleSubcasoEstatus(item, $event)">
+                        <span class="slider" [class.slider-espera]="isEnEspera(item)"></span>
                       </label>
-                      <span class="switch-label" [class.text-success]="!isNoProcesar(item)" [class.text-danger]="isNoProcesar(item)">
-                        {{ isNoProcesar(item) ? 'NEGADO' : 'APROBADO' }}
+                      <span class="switch-label"
+                            style="cursor: pointer;"
+                            (click)="toggleSubcasoEstatus(item)"
+                            [class.text-success]="!isNoProcesar(item) && !isEnEspera(item)"
+                            [class.text-danger]="isNoProcesar(item)"
+                            [class.text-warning]="isEnEspera(item)">
+                        {{ getMinisterialSwitchLabel(item) }}
                       </span>
                     </div>
                   </ng-container>
 
                   <ng-template #defaultBadge1>
-                    <span class="badge-status-chip chip-procesar">
-                      <i class="fas fa-check mr-1"></i> {{ getDetalleLabel(item) }}
+                    <span class="badge-status-chip"
+                          [class.chip-procesar]="getMinisterialSwitchLabel(item) === 'APROBADO'"
+                          [class.chip-no-procesar]="getMinisterialSwitchLabel(item) === 'NEGADO'"
+                          [class.chip-pendiente]="getMinisterialSwitchLabel(item) === 'EN ESPERA'">
+                      <i class="fas mr-1" [ngClass]="getMinisterialSwitchLabel(item) === 'APROBADO' ? 'fa-check-circle' : (getMinisterialSwitchLabel(item) === 'EN ESPERA' ? 'fa-hourglass-half' : 'fa-times-circle')"></i>
+                      <span>{{ getMinisterialSwitchLabel(item) }}</span>
                     </span>
                   </ng-template>
                 </div>
@@ -969,8 +985,8 @@
           <!-- 🔴 CATEGORÍA 2: Integrantes Negados / Con Observación -->
           <div class="subcasos-category-block mb-3" *ngIf="getSubcasosNoProcesar(activeDoc).length > 0">
             <div class="category-header category-header-noprocesar">
-              <div class="d-flex align-items-center gap-2">
-                <i class="fas fa-times-circle text-danger"></i>
+              <div class="d-flex align-items-center">
+                <i class="fas fa-times-circle text-danger mr-2"></i>
                 <span class="category-title">Integrantes Negados / Con Observación</span>
               </div>
               <span class="category-count-badge badge-danger-light">
@@ -1013,27 +1029,29 @@
                   </div>
                 </div>
 
-                <!-- Estatus / Chip o Switch (Solo en Perfil Ministro) -->
+                <!-- Estatus / Chip o Switch (Solo en Perfil Ministro y NO firmado) -->
                 <div class="subcaso-status-badge">
-                  <ng-container *ngIf="currentProfile === 'Ministro'; else defaultBadge2">
+                  <ng-container *ngIf="currentProfile === 'Ministro' && !esDocFirmado(activeDoc); else defaultBadge2">
                     <div class="minister-toggle-wrapper">
                       <label class="toggle-switch-custom" title="Cambiar estatus del integrante">
                         <input type="checkbox"
-                               [checked]="!isNoProcesar(item)"
-                               (change)="toggleSubcasoEstatus(item)">
-                        <span class="slider"></span>
+                               [checked]="!isNoProcesar(item) && !isEnEspera(item)"
+                               (change)="toggleSubcasoEstatus(item, $event)">
+                        <span class="slider" [class.slider-espera]="isEnEspera(item)"></span>
                       </label>
-                      <span class="switch-label" [class.text-success]="!isNoProcesar(item)" [class.text-danger]="isNoProcesar(item)">
-                        {{ isNoProcesar(item) ? 'NEGADO' : 'APROBADO' }}
+                      <span class="switch-label" [class.text-success]="!isNoProcesar(item) && !isEnEspera(item)" [class.text-danger]="isNoProcesar(item)" [class.text-warning]="isEnEspera(item)">
+                        {{ getMinisterialSwitchLabel(item) }}
                       </span>
                     </div>
                   </ng-container>
 
                   <ng-template #defaultBadge2>
                     <span class="badge-status-chip"
-                          [class.chip-no-procesar]="isNoProcesar(item)"
-                          [class.chip-pendiente]="isPendiente(item)">
-                      {{ getDetalleLabel(item) }}
+                          [class.chip-procesar]="getMinisterialSwitchLabel(item) === 'APROBADO'"
+                          [class.chip-no-procesar]="getMinisterialSwitchLabel(item) === 'NEGADO'"
+                          [class.chip-pendiente]="getMinisterialSwitchLabel(item) === 'EN ESPERA'">
+                      <i class="fas mr-1" [ngClass]="getMinisterialSwitchLabel(item) === 'APROBADO' ? 'fa-check-circle' : (getMinisterialSwitchLabel(item) === 'EN ESPERA' ? 'fa-hourglass-half' : 'fa-times-circle')"></i>
+                      <span>{{ getMinisterialSwitchLabel(item) }}</span>
                     </span>
                   </ng-template>
                 </div>
@@ -1077,7 +1095,7 @@
                   </div>
 
                   <!-- Fechas -->
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
                     <div class="info-item text-center" *ngIf="viaje.fechaInicio" style="background-color: #f0fdf4; padding: 12px; border-radius: 8px; border: 1px solid #bbf7d0;">
                       <div class="text-success mb-1" style="font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Inicio del Viaje</div>
                       <div class="font-weight-bold text-dark" style="font-size: 1.1rem;">{{ formatNgbDate(viaje.fechaInicio) }}</div>
@@ -1085,6 +1103,10 @@
                     <div class="info-item text-center" *ngIf="viaje.fechaFin" style="background-color: #fff1f2; padding: 12px; border-radius: 8px; border: 1px solid #fecdd3;">
                       <div class="text-danger mb-1" style="font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Fin del Viaje</div>
                       <div class="font-weight-bold text-dark" style="font-size: 1.1rem;">{{ formatNgbDate(viaje.fechaFin) }}</div>
+                    </div>
+                    <div class="info-item text-center" *ngIf="viaje.fechaInicio && viaje.fechaFin" style="background-color: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                      <div class="text-primary mb-1" style="font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Duración</div>
+                      <div class="font-weight-bold text-dark" style="font-size: 1.1rem;">{{ getDiasViaje(viaje.fechaInicio, viaje.fechaFin) }}</div>
                     </div>
                   </div>
 
@@ -1142,12 +1164,34 @@
 
         <!-- Herramientas del Documento (PDF y Ficha) -->
         <div class="modal-footer-tools">
+
+          <!-- En CUADRO_DECISORIO firmado: botón Ver PDF original al inicio -->
           <button class="btn-modal-tool btn-pdf"
+                  *ngIf="selectedCarpeta?.id === 'CUADRO_DECISORIO' && esDocFirmado(activeDoc)"
                   (click)="verPDF(activeDoc)"
                   [disabled]="!getDwsUrl(activeDoc)"
-                  [title]="esDocFirmado(activeDoc) ? 'Documento Firmado' : 'Ver documento en PDF'">
+                  title="Ver documento original en PDF">
             <i class="fas fa-file-pdf"></i>
-            <span>{{ esDocFirmado(activeDoc) ? 'Documento Firmado' : 'Ver PDF' }}</span>
+            <span>Ver PDF</span>
+          </button>
+
+          <!-- Botón Documento Firmado (para Cuadro Decisorio apunta a resueltos/ con PC-numc, para otros verPDF) -->
+          <button class="btn-modal-tool btn-pdf"
+                  *ngIf="esDocFirmado(activeDoc)"
+                  (click)="selectedCarpeta?.id === 'CUADRO_DECISORIO' ? descargarDocumentoFirmadoCuadroDecisorio(activeDoc) : verPDF(activeDoc)"
+                  title="Ver Documento Oficial Firmado">
+            <i class="fas fa-file-signature text-success"></i>
+            <span>Documento Firmado</span>
+          </button>
+
+          <!-- Botón estándar Ver PDF cuando NO está firmado -->
+          <button class="btn-modal-tool btn-pdf"
+                  *ngIf="!esDocFirmado(activeDoc)"
+                  (click)="verPDF(activeDoc)"
+                  [disabled]="!getDwsUrl(activeDoc)"
+                  title="Ver documento en PDF">
+            <i class="fas fa-file-pdf"></i>
+            <span>Ver PDF</span>
           </button>
 
           <button class="btn-modal-tool btn-ficha"
@@ -1164,7 +1208,7 @@
           <ng-container *ngIf="currentProfile === 'Ministro'; else defaultDecisions">
             <!-- ÚNICO BOTÓN FIRMAR EN PERFIL MINISTRO -->
             <button class="btn-modal-decision btn-favorable btn-firmar-ministro"
-                    (click)="solicitarFirmaMinistro()"
+                    (click)="selectedCarpeta?.id === 'CUADRO_DECISORIO' ? generarPuntoDeCuentaPDF() : solicitarFirmaMinistro()"
                     [disabled]="loadingAction"
                     title="Iniciar decisión y firma ministerial">
               <i class="fas fa-file-signature"></i>
