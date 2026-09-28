@@ -3412,6 +3412,772 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.redistribuir("FAVORABLE");
   }
 
+  // ─── Generación de PDF Exclusivo para ACTIVIDADES EN EL EXTERIOR ────────────
+  public async generarActividadesExteriorPDF(): Promise<void> {
+    if (!this.activeDoc) return;
+
+    // 1. Confirmar firma y revisar comentarios oficiales para el MPPD
+    const viaje = this.getViajesData(this.activeDoc) || {};
+    const pais = (viaje.invitado || viaje.pais || "EXTERIOR").toString().toUpperCase().trim();
+    const dirigidoA = (viaje.dirigido || "OFICIAL DESIGNADO").toString().toUpperCase().trim();
+    const cantPersonas = viaje.personas || 1;
+    const motivoViaje = (viaje.motivo || this.getAsuntoClean(this.activeDoc) || this.activeDoc.cont || "COMISIÓN DE SERVICIO AL EXTERIOR").toString().toUpperCase().trim();
+    const fechaInicioStr = this.formatNgbDate(viaje.fechaInicio);
+    const fechaFinStr = this.formatNgbDate(viaje.fechaFin);
+    const duracionDias = this.getDiasViaje(viaje.fechaInicio, viaje.fechaFin) || "—";
+    const gastos = viaje.gastos || {};
+    const gastosBoletos = (gastos.boletos || "NO ESPECIFICA").toString().toUpperCase();
+    const gastosAlojamiento = (gastos.alojamiento || "NO ESPECIFICA").toString().toUpperCase();
+    const gastosAlimentacion = (gastos.alimentacion || "NO ESPECIFICA").toString().toUpperCase();
+    const gastosTransporte = (gastos.transporte || "NO ESPECIFICA").toString().toUpperCase();
+
+    let comentarioInicial = (
+      this.observacion ||
+      this.activeDoc?.observacion ||
+      ""
+    )
+      .toString()
+      .trim()
+      .toUpperCase();
+    const tieneObservacion = !!comentarioInicial;
+
+    const modalHtml = `
+      <div style="text-align: left; font-size: 0.88rem; color: #1e293b; line-height: 1.5;">
+        <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #8e1c26; padding: 12px 14px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="font-weight: 700; color: #8e1c26; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+            <i class="fas fa-globe-americas mr-1"></i> Autorización de Actividades en el Exterior
+          </div>
+          <div style="font-size: 0.82rem; color: #475569;">
+            Se procederá a generar el <b>Documento Oficial Ministerial (Carta)</b> con firma y sello del General en Jefe Ministro del Poder Popular para la Defensa y aprobación del viaje a <b>${pais}</b>.
+          </div>
+        </div>
+
+        ${
+          tieneObservacion
+            ? `
+          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 14px; margin-top: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-size: 0.72rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="fas fa-comment-alt text-danger mr-1"></i> Observación Registrada:
+              </span>
+              <span style="font-size: 0.65rem; font-weight: 700; color: #15803d; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">CARGADA</span>
+            </div>
+            <div style="font-size: 0.82rem; font-weight: 600; color: #0f172a; line-height: 1.4; word-break: break-word; text-transform: uppercase;">
+              ${comentarioInicial}
+            </div>
+          </div>
+        `
+            : `
+          <div style="margin-top: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label for="swal-mppd-comentario-ext" style="font-weight: 700; font-size: 0.75rem; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
+                <i class="fas fa-pen-fancy text-danger mr-1"></i> Comentarios / Instrucciones del Ministro:
+              </label>
+              <span style="font-size: 0.65rem; font-weight: 700; color: #64748b; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">EN MAYÚSCULAS</span>
+            </div>
+            <textarea id="swal-mppd-comentario-ext"
+                      rows="3"
+                      style="width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 0.82rem; font-family: inherit; border: 1.5px solid #cbd5e1; border-radius: 6px; resize: vertical; text-transform: uppercase; outline: none; transition: border-color 0.2s;"
+                      placeholder="INSTRUCCIONES U OBSERVACIONES PARA EL VIAJE AL EXTERIOR..."
+                      onfocus="this.style.borderColor='#8e1c26'"
+                      onblur="this.style.borderColor='#cbd5e1'"
+                      oninput="this.value = this.value.toUpperCase()"></textarea>
+          </div>
+        `
+        }
+      </div>
+    `;
+
+    const confirmacion = await Swal.fire({
+      title: "Actividades en el Exterior - Ministro",
+      html: modalHtml,
+      showCancelButton: true,
+      confirmButtonColor: "#8e1c26",
+      cancelButtonColor: "#64748b",
+      confirmButtonText: '<i class="fas fa-file-signature mr-1"></i> Firmar y Subir',
+      cancelButtonText: "Cancelar",
+      preConfirm: () => {
+        if (tieneObservacion) {
+          return comentarioInicial;
+        }
+        const el = document.getElementById(
+          "swal-mppd-comentario-ext",
+        ) as HTMLTextAreaElement;
+        return el ? el.value.trim().toUpperCase() : "";
+      },
+    });
+
+    if (!confirmacion.isConfirmed) {
+      return;
+    }
+
+    if (confirmacion.value !== undefined) {
+      this.observacion = confirmacion.value.toString().trim().toUpperCase();
+      if (this.activeDoc) {
+        this.activeDoc.observacion = this.observacion;
+      }
+    }
+
+    // 2. Indicador de progreso
+    Swal.fire({
+      title: "Generando Actividades en el Exterior...",
+      html: "Confeccionando documento ministerial tamaño Carta, itinerario, gastos y sellos oficiales...",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    // 3. Cargar recursos gráficos institucionales con optimización de tamaño y rutas de respaldo
+    const [escudoImg, firmaImg, selloImg, banderaImg] = await Promise.all([
+      this.cargarImagenParaPDF("assets/img/brand/escudo.png", 300, false, 5000)
+        .then(
+          (res) =>
+            res ||
+            this.cargarImagenParaPDF(
+              "assets/images/escudo.png",
+              300,
+              false,
+              5000,
+            ),
+        )
+        .then(
+          (res) =>
+            res ||
+            this.cargarImagenParaPDF(
+              "assets/img/mppd/escudos/100.jpeg",
+              300,
+              false,
+              5000,
+            ),
+        ),
+      this.cargarImagenParaPDF(
+        "assets/img/mppd/firma_mppd.png",
+        600,
+        false,
+        6000,
+      ).then(
+        (res) =>
+          res ||
+          this.cargarImagenParaPDF(
+            "./assets/img/mppd/firma_mppd.png",
+            600,
+            false,
+            6000,
+          ),
+      ),
+      this.cargarImagenParaPDF(
+        "assets/img/mppd/sello_mppd.png",
+        500,
+        false,
+        6000,
+      )
+        .then(
+          (res) =>
+            res ||
+            this.cargarImagenParaPDF(
+              "./assets/img/mppd/sello_mppd.png",
+              500,
+              false,
+              6000,
+            ),
+        )
+        .then(
+          (res) =>
+            res ||
+            this.cargarImagenParaPDF(
+              "/assets/img/mppd/sello_mppd.png",
+              500,
+              false,
+              6000,
+            ),
+        ),
+      this.cargarImagenParaPDF(this.getFlagUrl(pais), 200, false, 3000).catch(
+        () => null,
+      ),
+    ]);
+
+    // 4. Configurar documento jsPDF formato Carta (Letter: 215.9 x 279.4 mm)
+    const pageWidth = 215.9;
+    const pageHeight = 279.4;
+    const margin = 10;
+    const contentWidth = pageWidth - margin * 2; // 195.9 mm
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: [pageWidth, pageHeight],
+      compress: true,
+    });
+
+    // 4.1 Marca de agua "PAPEL DE TRABAJO"
+    try {
+      (pdf as any).saveGraphicsState();
+    } catch (e) {}
+    pdf.setTextColor(240, 240, 240);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(38);
+    try {
+      pdf.text("PAPEL DE TRABAJO", pageWidth / 2, 140, {
+        align: "center",
+        angle: 45,
+      } as any);
+    } catch (e) {
+      pdf.text("PAPEL DE TRABAJO", pageWidth / 2, 140, { align: "center" });
+    }
+    try {
+      (pdf as any).restoreGraphicsState();
+    } catch (e) {}
+
+    // 4.2 Marca institucional vertical "MPPD" (esquina superior derecha, posición 207mm)
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(9);
+    pdf.setTextColor(0, 32, 96);
+    pdf.text("M\nP\nP\nD", 207, 16);
+
+    // 4.3 Encabezado: Escudo y membrete izquierdo
+    if (escudoImg) {
+      try {
+        pdf.addImage(escudoImg, "PNG", 28, 12, 14, 14, undefined, "FAST");
+      } catch (e) {}
+    }
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(5.5);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text("República Bolivariana de Venezuela", 35, 27.5, {
+      align: "center",
+    });
+    pdf.text("Ministerio del Poder Popular para la Defensa", 35, 30, {
+      align: "center",
+    });
+    pdf.text("Dirección General del Despacho del MPPD", 35, 32.5, {
+      align: "center",
+    });
+
+    // Cuadro de Número de Control / Expediente
+    const numControl = (
+      this.activeDoc.numc ||
+      this.activeDoc.ncontrol ||
+      this.activeDoc.cuenta ||
+      "012-26"
+    )
+      .toString()
+      .trim();
+    const borderGray = [115, 115, 115];
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.setLineWidth(0.35);
+    pdf.rect(20, 34.5, 30, 6, "S");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8.5);
+    pdf.text(`Nº ${numControl}`, 35, 38.7, { align: "center" });
+
+    // 4.4 Título Central: ACTIVIDADES EN EL EXTERIOR
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(12);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text("ACTIVIDADES EN EL EXTERIOR AL GENERAL EN JEFE MINISTRO DEL", 135, 14.5, {
+      align: "center",
+    });
+    pdf.text("PODER POPULAR PARA LA DEFENSA", 135, 19.5, { align: "center" });
+
+    // 4.5 Cuadro Presentante / Fecha / Página
+    const boxX = 65;
+    const boxY = 22;
+    const boxW = 137;
+    const boxH = 17.5;
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(boxX, boxY, boxW, boxH, "S");
+    pdf.line(152, boxY, 152, boxY + boxH);
+    pdf.line(180, boxY, 180, boxY + boxH);
+
+    // Presentante
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.5);
+    pdf.text("Presentante:", boxX + 2, boxY + 3.8);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.2);
+    pdf.text("LUÍS ADOLFO ROSALES MOLINA", 108.5, boxY + 6.8, {
+      align: "center",
+    });
+    pdf.setFontSize(6.8);
+    pdf.text("MAYOR GENERAL", 108.5, boxY + 10.5, { align: "center" });
+    pdf.setFontSize(6.2);
+    pdf.text("DIRECTOR GENERAL DEL DESPACHO DEL MPPD", 108.5, boxY + 14.2, {
+      align: "center",
+    });
+
+    // Fecha
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.5);
+    pdf.text("Fecha:", 166, boxY + 4, { align: "center" });
+    pdf.line(152, boxY + 6, 180, boxY + 6);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    const fechaDoc = this.formatFechaPuntoCuenta(new Date());
+    pdf.text(fechaDoc, 166, boxY + 12.5, { align: "center" });
+
+    // Página
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.5);
+    pdf.text("Página:", 191, boxY + 4, { align: "center" });
+    pdf.line(180, boxY + 6, boxX + boxW, boxY + 6);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.text("1/1", 191, boxY + 12.5, { align: "center" });
+
+    // 4.6 Franja ASUNTO
+    const redColor = [225, 0, 0];
+    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, 41, contentWidth, 4, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("ASUNTO:", margin + 2, 44);
+
+    // Contenido ASUNTO
+    pdf.setFillColor(255, 255, 255);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, 45, contentWidth, 8, "FD");
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7);
+    const asuntoRaw = `ACTIVIDAD EN EL EXTERIOR - ${motivoViaje}`;
+    const splitAsunto = pdf.splitTextToSize(asuntoRaw, contentWidth - 4);
+    pdf.text(splitAsunto, margin + 2, 48.5);
+
+    // 4.7 Franja DATOS DE LA COMISIÓN Y PAÍS ANFITRIÓN
+    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, 55, contentWidth, 4, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("DATOS DE LA COMISIÓN Y PAÍS ANFITRIÓN:", margin + 2, 58);
+
+    // Contenedor de Datos de Comisión
+    pdf.setFillColor(255, 255, 255);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, 59, contentWidth, 26, "FD");
+
+    // Fila 1: País Destino y Delegación
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(6);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text("PAÍS DESTINO / ANFITRIÓN:", margin + 3, 63);
+
+    pdf.setFontSize(9);
+    pdf.setTextColor(15, 23, 42);
+    pdf.text(pais, margin + 3, 68);
+
+    // Estampar Bandera si cargó
+    if (banderaImg) {
+      try {
+        const textW = pdf.getTextWidth(pais);
+        pdf.addImage(banderaImg, "PNG", margin + 5 + textW, 63.5, 9, 6, undefined, "FAST");
+      } catch (e) {}
+    }
+
+    pdf.setFontSize(6);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text("CANTIDAD DE PERSONAS:", margin + 130, 63);
+
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(15, 23, 42);
+    pdf.text(`${cantPersonas} PERSONA(S)`, margin + 130, 68);
+
+    // Línea divisoria interna
+    pdf.setDrawColor(226, 232, 240);
+    pdf.line(margin + 2, 71, margin + contentWidth - 2, 71);
+
+    // Fila 2: Dirigido a, Fecha Inicio, Fecha Fin, Duración
+    // Dirigido A
+    pdf.setFontSize(5.8);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text("DIRIGIDO A / DESIGNADO:", margin + 3, 75);
+
+    pdf.setFontSize(7.2);
+    pdf.setTextColor(15, 23, 42);
+    const splitDirigido = pdf.splitTextToSize(dirigidoA, 62);
+    pdf.text(splitDirigido, margin + 3, 79.5);
+
+    // Fecha Inicio
+    pdf.setFontSize(5.8);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text("FECHA INICIO:", margin + 70, 75);
+
+    pdf.setFontSize(7.8);
+    pdf.setTextColor(22, 101, 52); // Verde esmeralda
+    pdf.text(fechaInicioStr, margin + 70, 79.5);
+
+    // Fecha Retorno
+    pdf.setFontSize(5.8);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text("FECHA RETORNO:", margin + 115, 75);
+
+    pdf.setFontSize(7.8);
+    pdf.setTextColor(185, 28, 28); // Rojo
+    pdf.text(fechaFinStr, margin + 115, 79.5);
+
+    // Duración
+    pdf.setFontSize(5.8);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text("DURACIÓN:", margin + 160, 75);
+
+    pdf.setFontSize(7.8);
+    pdf.setTextColor(30, 64, 175); // Azul real
+    pdf.text(duracionDias, margin + 160, 79.5);
+
+    // 4.8 Franja COBERTURA DE GASTOS Y LOGÍSTICA
+    const gastosY = 87;
+    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, gastosY, contentWidth, 4, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("COBERTURA DE GASTOS Y LOGÍSTICA:", margin + 2, gastosY + 2.8);
+
+    // Tabla de Gastos (4 columnas iguales)
+    const tableGastosY = gastosY + 4;
+    const colGW = contentWidth / 4; // ~48.975 mm cada columna
+    const headerGH = 5;
+    const rowGH = 8;
+
+    pdf.setFillColor(241, 245, 249);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, tableGastosY, contentWidth, headerGH, "FD");
+
+    pdf.setFontSize(5.8);
+    pdf.setTextColor(51, 65, 85);
+    pdf.text("BOLETOS AÉREOS", margin + colGW * 0 + colGW / 2, tableGastosY + 3.4, { align: "center" });
+    pdf.text("HOSPEDAJE / ALOJAMIENTO", margin + colGW * 1 + colGW / 2, tableGastosY + 3.4, { align: "center" });
+    pdf.text("ALIMENTACIÓN", margin + colGW * 2 + colGW / 2, tableGastosY + 3.4, { align: "center" });
+    pdf.text("TRANSPORTE INTERNO", margin + colGW * 3 + colGW / 2, tableGastosY + 3.4, { align: "center" });
+
+    // Fila Valores de Gastos
+    const valGH = tableGastosY + headerGH;
+    pdf.setFillColor(255, 255, 255);
+    pdf.rect(margin, valGH, contentWidth, rowGH, "FD");
+
+    pdf.setFontSize(6.8);
+    pdf.setTextColor(15, 23, 42);
+    pdf.text(gastosBoletos, margin + colGW * 0 + colGW / 2, valGH + 5.2, { align: "center" });
+    pdf.text(gastosAlojamiento, margin + colGW * 1 + colGW / 2, valGH + 5.2, { align: "center" });
+    pdf.text(gastosAlimentacion, margin + colGW * 2 + colGW / 2, valGH + 5.2, { align: "center" });
+    pdf.text(gastosTransporte, margin + colGW * 3 + colGW / 2, valGH + 5.2, { align: "center" });
+
+    // Líneas divisorias verticales en tabla de gastos
+    for (let i = 1; i < 4; i++) {
+      const lineX = margin + colGW * i;
+      pdf.line(lineX, tableGastosY, lineX, valGH + rowGH);
+    }
+
+    // 4.9 Franja ARGUMENTACIÓN Y JUSTIFICACIÓN
+    const argY = 106;
+    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, argY, contentWidth, 4, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("ARGUMENTACIÓN Y JUSTIFICACIÓN INSTITUCIONAL:", margin + 2, argY + 2.8);
+
+    // Contenido ARGUMENTACIÓN
+    pdf.setFillColor(255, 255, 255);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, argY + 4, contentWidth, 16, "FD");
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.8);
+    const argumentacion =
+      this.activeDoc.argumentacion ||
+      "Se somete a la consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, la participación institucional en la actividad en el exterior descrita, para dar cumplimiento a los objetivos estratégicos, compromisos de cooperación técnico-militar y representación oficial de la Fuerza Armada Nacional Bolivariana.";
+    const splitArg = pdf.splitTextToSize(argumentacion, contentWidth - 4);
+    pdf.text(splitArg, margin + 2, argY + 8);
+
+    // 4.10 Franja DECISIÓN DEL CIUDADANO MINISTRO
+    const decY = 128;
+    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, decY, contentWidth, 4, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("DECISIÓN DEL CIUDADANO MINISTRO:", margin + 2, decY + 2.8);
+
+    // Contenido DECISIÓN
+    pdf.setFillColor(255, 255, 255);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, decY + 4, contentWidth, 18, "FD");
+
+    const boxSize = 5.5;
+    const apX = margin + 30;
+    const negX = margin + 110;
+    const decBoxY = decY + 7;
+
+    // Casilla APROBADO (Marcada)
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.setLineWidth(0.35);
+    pdf.rect(apX, decBoxY, boxSize, boxSize, "S");
+
+    pdf.setDrawColor(85, 134, 100); // Verde salvia mate pastel
+    pdf.setLineWidth(0.9);
+    pdf.line(apX + 1.0, decBoxY + 2.8, apX + 2.2, decBoxY + 4.5);
+    pdf.line(apX + 2.2, decBoxY + 4.5, apX + 4.6, decBoxY + 1.0);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text("APROBADO", apX + 8, decBoxY + 4.2);
+
+    // Casilla NEGADO (Sin marcar)
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.setLineWidth(0.35);
+    pdf.rect(negX, decBoxY, boxSize, boxSize, "S");
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(140, 140, 140);
+    pdf.text("NEGADO", negX + 8, decBoxY + 4.2);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(6.2);
+    pdf.setTextColor(71, 85, 105);
+    pdf.text("AUTORIZADA LA COMISIÓN DE SERVICIO AL EXTERIOR SEGÚN ITINERARIO DESCRITO.", pageWidth / 2, decBoxY + 11.5, { align: "center" });
+
+    // 4.11 Franja OBSERVACIONES / INSTRUCCIONES DEL MPPD
+    const obsY = 152;
+    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, obsY, contentWidth, 4, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("INSTRUCCIONES Y OBSERVACIONES DEL MPPD:", margin + 2, obsY + 2.8);
+
+    // Contenido OBSERVACIONES
+    const obsBoxH = 20;
+    pdf.setFillColor(255, 255, 255);
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.rect(margin, obsY + 4, contentWidth, obsBoxH, "FD");
+
+    const textoObs = (
+      this.observacion ||
+      "CÚMPLASE CONFORME A LA DOCTRINA MILITAR Y DISPOSICIONES VIGENTES DE LA FUERZA ARMADA NACIONAL BOLIVARIANA."
+    ).toUpperCase();
+
+    pdf.setTextColor(20, 20, 20);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7);
+    const splitObs = pdf.splitTextToSize(textoObs, contentWidth - 4);
+    pdf.text(splitObs, margin + 2, obsY + 9);
+
+    // 4.12 Firma Oficial del Ministro y Sello Oficial
+    const sigLineY = 222;
+    const centerX = pageWidth / 2;
+
+    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+    pdf.setLineWidth(0.4);
+    pdf.line(centerX - 42, sigLineY, centerX + 42, sigLineY);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10.5);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text("GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ", centerX, sigLineY + 5, {
+      align: "center",
+    });
+    pdf.setFontSize(10);
+    pdf.text("General en Jefe", centerX, sigLineY + 9.5, { align: "center" });
+    pdf.setFontSize(9.5);
+    pdf.text(
+      "Ministro del Poder Popular para la Defensa",
+      centerX,
+      sigLineY + 14,
+      { align: "center" },
+    );
+
+    // Estampar Sello Oficial en el lado izquierdo (55 x 55 mm)
+    if (selloImg) {
+      try {
+        pdf.addImage(
+          selloImg,
+          "PNG",
+          centerX - 68,
+          sigLineY - 37,
+          55,
+          55,
+          undefined,
+          "FAST",
+        );
+      } catch (e) {
+        console.warn("[ActividadesExterior] Aviso al estampar sello:", e);
+      }
+    }
+
+    // Estampar Firma Oficial del Ministro (95 x 41 mm)
+    if (firmaImg) {
+      try {
+        pdf.addImage(
+          firmaImg,
+          "PNG",
+          centerX - 39,
+          sigLineY - 27,
+          95,
+          41,
+          undefined,
+          "FAST",
+        );
+      } catch (e) {
+        console.warn("[ActividadesExterior] Aviso al estampar firma:", e);
+      }
+    }
+
+    // 4.13 Iniciales de redacción (pie de página Carta)
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.5);
+    pdf.setTextColor(60, 60, 60);
+    pdf.text("RESA/WJBF/fabm", margin + 2, 271);
+
+    // 5. Generar Blob del PDF y preparar nombre de archivo oficial con patron EXT-cleanNumc.pdf
+    const pdfBlob = pdf.output("blob");
+    const cleanNumc = (
+      this.activeDoc?.numc ||
+      this.activeDoc?.ncontrol ||
+      numControl
+    )
+      .toString()
+      .replace(/[\r\n\t /]+/g, "_")
+      .trim();
+    const filename = `EXT-${cleanNumc}.pdf`;
+
+    // 6. Descargar copia local preliminar para el usuario
+    pdf.save(filename);
+
+    // 7. Construir formulario multipart para el servicio Go de firma digital
+    const formData = new FormData();
+    formData.append("archivos", pdfBlob, filename);
+    formData.append(
+      "nombre",
+      this.activeDoc?.signatures?.mainSignatory || "MINISTRO DE LA DEFENSA",
+    );
+    formData.append("locacion", "Caracas, Venezuela");
+    formData.append("razon", "Actividades en el Exterior - Aprobación Ministerial");
+    formData.append("contacto", "MPPD");
+    formData.append("codigo", filename);
+    formData.append("return", "true");
+    formData.append("visible", "true");
+    formData.append("transparente", "true");
+    formData.append("page", "1");
+    formData.append("llx", "540");
+    formData.append("lly", "910");
+    formData.append("urx", "580");
+    formData.append("ury", "970");
+
+    // 8. Consumir servicio Go de firma con barras de progreso de subida
+    let signedPdfBlob: Blob = pdfBlob;
+    try {
+      signedPdfBlob = await new Promise<Blob>((resolvePromise) => {
+        this.fileService.FirmarPDFProgress(formData).subscribe({
+          next: (event: any) => {
+            if (event.type === HttpEventType.UploadProgress) {
+              const progress = Math.round(100 * (event.loaded / event.total));
+              Swal.update({
+                title: "Enviando al servidor...",
+                html: `Progreso de subida: <b>${progress}%</b><br><div style="width: 100%; background: #e9ecef; border-radius: 4px; overflow: hidden; margin-top: 10px;"><div style="width: ${progress}%; height: 8px; background: #2dce89; transition: width 0.1s ease;"></div></div>`,
+              });
+            } else if (event.type === HttpEventType.Response) {
+              if (event.body) {
+                resolvePromise(event.body);
+              } else {
+                resolvePromise(pdfBlob);
+              }
+            }
+          },
+          error: (err: any) => {
+            console.warn("[ActividadesExterior] Advertencia al firmar PDF:", err);
+            resolvePromise(pdfBlob);
+          },
+        });
+      });
+    } catch (errSign) {
+      console.warn("[ActividadesExterior] Excepción en FirmarPDFProgress:", errSign);
+      signedPdfBlob = pdfBlob;
+    }
+
+    // 9. Subir archivo a la carpeta oficial del caso mediante EnviarArchivos
+    try {
+      const uploadForm = new FormData();
+      uploadForm.append("identificador", btoa("D" + numControl));
+      uploadForm.append("return", "true");
+      uploadForm.append("archivos", signedPdfBlob, filename);
+
+      await new Promise((resolve) => {
+        this.apiService.EnviarArchivos(uploadForm).subscribe({
+          next: (data) => {
+            console.log("[ActividadesExterior] Respuesta EnviarArchivos:", data);
+            resolve(data);
+          },
+          error: (err) => {
+            console.warn("[ActividadesExterior] Aviso al subir archivo:", err);
+            resolve(null);
+          },
+        });
+        setTimeout(() => resolve(null), 4000);
+      });
+    } catch (errUp) {
+      console.warn("[ActividadesExterior] Error al subir archivo a la ruta:", errUp);
+    }
+
+    // 10. Registrar adjunto en el Workflow (WKF_ADocumentoAdjunto)
+    try {
+      const docAdjunto = {
+        archivo: filename,
+        usuario: this.loginService?.Usuario?.id || "",
+        documento: numControl,
+      };
+      const xAPI: IAPICore = {
+        funcion: "WKF_ADocumentoAdjunto",
+        parametros: "",
+        valores: JSON.stringify(docAdjunto),
+      };
+      await new Promise((resolve) => {
+        this.apiService.Ejecutar(xAPI).subscribe({
+          next: (data) => {
+            console.log("[ActividadesExterior] Respuesta WKF_ADocumentoAdjunto:", data);
+            resolve(data);
+          },
+          error: (err) => resolve(null),
+        });
+        setTimeout(() => resolve(null), 3000);
+      });
+    } catch (errAdj) {
+      console.warn("[ActividadesExterior] Aviso al registrar adjunto:", errAdj);
+    }
+
+    // 11. Actualizar referencias del documento y ejecutar firma ministerial
+    this.activeDoc.numc = numControl;
+    this.activeDoc.anom = filename;
+    this.activeDoc.archivo = filename;
+    this.activeDoc.archivo_firmado = filename;
+    try {
+      this.fnxFirmaMinistro();
+    } catch (errFnx) {
+      console.warn("[ActividadesExterior] Aviso en fnxFirmaMinistro:", errFnx);
+    }
+
+    Swal.close();
+    this.toastrService.success(
+      "Documento de Actividades en el Exterior tamaño Carta generado, firmado y subido al servidor exitosamente.",
+      "GDoc Actividades en el Exterior",
+    );
+
+    // 12. Avanzar flujo a FAVORABLE
+    this.loadingAction = true;
+    this.redistribuir("FAVORABLE");
+  }
+
   // ─── Actualizar estado de subcasos/cuentas en Base de Datos (WKF_APromoverSubDocumento) ────
   public async actualizarBaseDatosSubcasosDecisorios(): Promise<void> {
     if (!this.activeDoc) return;
@@ -3615,6 +4381,69 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ─── Descargar Documento Firmado Actividades Exterior desde resueltos/ (EXT-numc) ────
+  public descargarDocumentoFirmadoActividadesExterior(doc?: any): void {
+    const targetDoc = doc || this.activeDoc;
+    if (!targetDoc) return;
+
+    const rawNumc = (
+      targetDoc.numc ||
+      targetDoc.ncontrol ||
+      targetDoc.cuenta ||
+      ""
+    )
+      .toString()
+      .replace(/[\r\n\t /]+/g, "_")
+      .trim();
+
+    if (!rawNumc) {
+      this.toastrService.warning(
+        "El documento no posee un número de control asignado.",
+        "Aviso",
+      );
+      return;
+    }
+
+    const cleanNumc = rawNumc.startsWith("EXT-") ? rawNumc : `EXT-${rawNumc}`;
+    const cleanName = cleanNumc.replace(/\.pdf$/i, "");
+
+    const payload = {
+      ruta: "resueltos/",
+      archivo: `${cleanName}.pdf`,
+    };
+
+    Swal.fire({
+      title: "Cargando Documento Firmado...",
+      text: "Descargando Actividades en el Exterior oficial desde el servidor...",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    this.apiService.postBlob("dwscdn", payload).subscribe({
+      next: (data: Blob) => {
+        Swal.close();
+        const fileURL = URL.createObjectURL(data);
+        window.open(fileURL, "_blank");
+      },
+      error: (error) => {
+        Swal.close();
+        console.error("Error al descargar el PDF firmado:", error);
+        const fallbackUrl = this.getDwsUrl(targetDoc);
+        if (fallbackUrl) {
+          window.open(fallbackUrl, "_blank");
+        } else {
+          this.toastrService.error(
+            "No se pudo obtener el archivo firmado desde el servidor de almacenamiento.",
+            "Error",
+          );
+        }
+      },
+    });
+  }
+
   // ─── Acciones: Favorable / Firmar ─────────────────────────
   public ejecutarAccion(decision: "FAVORABLE" | "FIRMAR" | "ARCHIVAR"): void {
     if (!this.activeDoc) return;
@@ -3702,7 +4531,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           ? 11
           : this.selectedCarpeta?.id === "CUADRO_DECISORIO"
             ? 17
-            : 14;
+            : this.selectedCarpeta?.id === "PRESIDENCIALES"
+              ? 4
+              : 14;
       let localEstadoDestino = 1;
 
       this.xAPI = {} as IAPICore;
@@ -3713,13 +4544,21 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     } else {
       let estadoDestino = Math.min(this.estadoOrigen + 1, 7);
 
-      // Flujo especial para RECLAMOS, PUNTO DE CUENTA y CUADRO DECISORIO
+      // Flujo especial para RECLAMOS, PUNTO DE CUENTA, CUADRO DECISORIO y ACTIVIDADES EN EL EXTERIOR
       if (
         this.selectedCarpeta?.id === "RECLAMOS" ||
         this.selectedCarpeta?.id === "PUNTO_DE_CUENTA" ||
-        this.selectedCarpeta?.id === "CUADRO_DECISORIO"
+        this.selectedCarpeta?.id === "CUADRO_DECISORIO" ||
+        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR"
       ) {
         if (this.estadoOrigen === 2) estadoDestino = 5;
+        else if (this.estadoOrigen === 5) estadoDestino = 6;
+        else if (this.estadoOrigen === 6) estadoDestino = 7;
+      }
+
+      // Flujo específico para PRESIDENCIALES: va del 4,3 al 4,5 y luego 4,6 y 4,7 final
+      if (this.selectedCarpeta?.id === "PRESIDENCIALES") {
+        if (this.estadoOrigen === 3) estadoDestino = 5;
         else if (this.estadoOrigen === 5) estadoDestino = 6;
         else if (this.estadoOrigen === 6) estadoDestino = 7;
       }

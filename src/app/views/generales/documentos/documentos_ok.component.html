@@ -1173,9 +1173,9 @@
         <!-- Herramientas del Documento (PDF y Ficha) -->
         <div class="modal-footer-tools">
 
-          <!-- En CUADRO_DECISORIO firmado: botón Ver PDF original al inicio -->
+          <!-- En CUADRO_DECISORIO o ACTIVIDADES_EN_EL_EXTERIOR firmado: botón Ver PDF original al inicio -->
           <button class="btn-modal-tool btn-pdf"
-                  *ngIf="selectedCarpeta?.id === 'CUADRO_DECISORIO' && esDocFirmado(activeDoc)"
+                  *ngIf="(selectedCarpeta?.id === 'CUADRO_DECISORIO' || selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR') && esDocFirmado(activeDoc)"
                   (click)="verPDF(activeDoc)"
                   [disabled]="!getDwsUrl(activeDoc)"
                   title="Ver documento original en PDF">
@@ -1183,10 +1183,10 @@
             <span>Ver PDF</span>
           </button>
 
-          <!-- Botón Documento Firmado (para Cuadro Decisorio apunta a resueltos/ con PC-numc, para otros verPDF) -->
+          <!-- Botón Documento Firmado (para Cuadro Decisorio apunta a resueltos/ con PC-numc, para Actividades en el Exterior apunta a resueltos/ con EXT-numc, para otros verPDF) -->
           <button class="btn-modal-tool btn-pdf"
                   *ngIf="esDocFirmado(activeDoc)"
-                  (click)="selectedCarpeta?.id === 'CUADRO_DECISORIO' ? descargarDocumentoFirmadoCuadroDecisorio(activeDoc) : verPDF(activeDoc)"
+                  (click)="selectedCarpeta?.id === 'CUADRO_DECISORIO' ? descargarDocumentoFirmadoCuadroDecisorio(activeDoc) : (selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' ? descargarDocumentoFirmadoActividadesExterior(activeDoc) : verPDF(activeDoc))"
                   title="Ver Documento Oficial Firmado">
             <i class="fas fa-file-signature text-success"></i>
             <span>Documento Firmado</span>
@@ -1216,7 +1216,7 @@
           <ng-container *ngIf="currentProfile === 'Ministro'; else defaultDecisions">
             <!-- ÚNICO BOTÓN FIRMAR EN PERFIL MINISTRO -->
             <button class="btn-modal-decision btn-favorable btn-firmar-ministro"
-                    (click)="selectedCarpeta?.id === 'CUADRO_DECISORIO' ? generarPuntoDeCuentaPDF() : solicitarFirmaMinistro()"
+                    (click)="selectedCarpeta?.id === 'CUADRO_DECISORIO' ? generarPuntoDeCuentaPDF() : (selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' ? generarActividadesExteriorPDF() : solicitarFirmaMinistro())"
                     [disabled]="loadingAction"
                     title="Iniciar decisión y firma ministerial">
               <i class="fas fa-file-signature"></i>
