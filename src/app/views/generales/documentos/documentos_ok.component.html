@@ -84,8 +84,8 @@
           </select>
         </div>
 
-        <!-- Selector de Perfil (Solo Admins) -->
-        <div *ngIf="isAdmin()" style="display: flex; align-items: center; gap: 8px;">
+        <!-- Selector de Perfil (Solo Admins y sólo cuando NO está en Documentos Firmados) -->
+        <div *ngIf="isAdmin() && selectedEstadoBuzon !== 'firmados'" style="display: flex; align-items: center; gap: 8px;">
           <select class="profile-select-custom"
                   [(ngModel)]="currentProfile"
                   (change)="onProfileChange()">
@@ -1195,7 +1195,7 @@
           </button>
 
           <button class="btn-modal-tool btn-ficha"
-                  *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'"
+                  *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && !esDocFirmado(activeDoc) && selectedEstadoBuzon !== 'firmados' && currentProfile !== 'Ministro' && currentProfile !== 'Direccion'"
                   (click)="irAMinisterial(activeDoc)"
                   title="Ver ficha completa en Ministerial">
             <i class="fas fa-external-link-alt"></i>

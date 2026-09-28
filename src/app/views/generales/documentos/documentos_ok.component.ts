@@ -22,6 +22,7 @@ import jsPDF from "jspdf";
 import { HttpEventType } from "@angular/common/http";
 import { Md5 } from "md5-typescript";
 import { firstValueFrom } from "rxjs";
+import { UtilService } from "src/app/services/util/util.service";
 
 // ─── Interface para Agrupación de Etiquetas WKF ────────────────────────────────
 export interface IWKFEtiqueta {
@@ -320,6 +321,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     private changeDetector: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
     private encriptarService: EncriptarSDC,
+    private utilService: UtilService,
   ) {
     const toastDefaults = {
       positionClass: "toast-bottom-center",
@@ -1635,7 +1637,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    if (!this.esDocFirmado(this.activeDoc) && (raw === "ES" || raw === "EN ESPERA")) {
+    if (
+      !this.esDocFirmado(this.activeDoc) &&
+      (raw === "ES" || raw === "EN ESPERA")
+    ) {
       return false;
     }
 
@@ -2105,95 +2110,101 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     }
 
     // 6. Normalizar campos en cada integrante para asegurar que la vista siempre tenga los valores
-    return list.map((item: any) => {
-      if (!item) return item;
-      const ced = (item.sub_cedula || item.cedula || item.cuenta || "")
-        .toString()
-        .trim();
-      const nom = (
-        item.sub_nombre ||
-        item.nombre ||
-        item.nombres_apellidos ||
-        item.nom ||
-        ""
-      )
-        .toString()
-        .trim()
-        .toUpperCase();
-      const car = (
-        item.sub_cargo ||
-        item.cargo ||
-        item.grado ||
-        item.puesto ||
-        ""
-      )
-        .toString()
-        .trim()
-        .toUpperCase();
-      const det =
-        item.sub_detalle || item.detalle || item.estatus || item.estado || "PR";
-      const obs = item.observacion || item.sub_observacion || item.obse || "";
+    return list
+      .map((item: any) => {
+        if (!item) return item;
+        const ced = (item.sub_cedula || item.cedula || item.cuenta || "")
+          .toString()
+          .trim();
+        const nom = (
+          item.sub_nombre ||
+          item.nombre ||
+          item.nombres_apellidos ||
+          item.nom ||
+          ""
+        )
+          .toString()
+          .trim()
+          .toUpperCase();
+        const car = (
+          item.sub_cargo ||
+          item.cargo ||
+          item.grado ||
+          item.puesto ||
+          ""
+        )
+          .toString()
+          .trim()
+          .toUpperCase();
+        const det =
+          item.sub_detalle ||
+          item.detalle ||
+          item.estatus ||
+          item.estado ||
+          "PR";
+        const obs = item.observacion || item.sub_observacion || item.obse || "";
 
-      item.cedula = ced;
-      item.sub_cedula = ced;
-      item.nombre = nom;
-      item.sub_nombre = nom;
-      item.cargo = car;
-      item.sub_cargo = car;
-      item.detalle = det;
-      item.sub_detalle = det;
-      item.observacion = obs;
-      item.sub_observacion = obs;
+        item.cedula = ced;
+        item.sub_cedula = ced;
+        item.nombre = nom;
+        item.sub_nombre = nom;
+        item.cargo = car;
+        item.sub_cargo = car;
+        item.detalle = det;
+        item.sub_detalle = det;
+        item.observacion = obs;
+        item.sub_observacion = obs;
 
-      // ── Lógica Exclusiva para Ministro en CUADRO_DECISORIO: todos por defecto en "ES" SOLO si NO está firmado ──
-      if (
-        this.currentProfile === "Ministro" &&
-        this.selectedCarpeta?.id === "CUADRO_DECISORIO" &&
-        !this.esDocFirmado(e)
-      ) {
-        const rawEstatus = this.getEstatusFromDetalle(item);
-
-        const isDefault =
-          rawEstatus === "" ||
-          rawEstatus === "1" ||
-          rawEstatus === "0" ||
-          rawEstatus === "4" ||
-          rawEstatus === "PR" ||
-          rawEstatus === "PROCESAR" ||
-          rawEstatus === "PROCESADO" ||
-          rawEstatus === "APROBADO";
-
-        if (isDefault && !item.__minister_touched) {
-          item.sub_detalle = "ES";
-          item.detalle = "ES";
-          item.s_estatus = "ES";
-          item.sub_estatus = "ES";
-          item.estatus = "ES";
-          item.estado = "ES";
-        }
-      } else if (this.esDocFirmado(e)) {
-        // En documento firmado, el estatus es APROBADO ("PR") o NEGADO ("NP") solamente
-        const rawEstatus = this.getEstatusFromDetalle(item);
+        // ── Lógica Exclusiva para Ministro en CUADRO_DECISORIO: todos por defecto en "ES" SOLO si NO está firmado ──
         if (
-          rawEstatus === "ES" ||
-          rawEstatus === "EN ESPERA" ||
-          !this.isAprobado(item)
+          this.currentProfile === "Ministro" &&
+          this.selectedCarpeta?.id === "CUADRO_DECISORIO" &&
+          !this.esDocFirmado(e)
         ) {
-          item.sub_detalle = "NP";
-          item.detalle = "NP";
-          item.s_estatus = "NP";
-          item.sub_estatus = "NP";
-          item.estatus = "NP";
-          item.estado = "NP";
-        }
-      }
+          const rawEstatus = this.getEstatusFromDetalle(item);
 
-      return item;
-    }).sort((a: any, b: any) => {
-      const idA = parseInt(a.cedula || a.sub_cedula || "0", 10);
-      const idB = parseInt(b.cedula || b.sub_cedula || "0", 10);
-      return idB - idA;
-    });
+          const isDefault =
+            rawEstatus === "" ||
+            rawEstatus === "1" ||
+            rawEstatus === "0" ||
+            rawEstatus === "4" ||
+            rawEstatus === "PR" ||
+            rawEstatus === "PROCESAR" ||
+            rawEstatus === "PROCESADO" ||
+            rawEstatus === "APROBADO";
+
+          if (isDefault && !item.__minister_touched) {
+            item.sub_detalle = "ES";
+            item.detalle = "ES";
+            item.s_estatus = "ES";
+            item.sub_estatus = "ES";
+            item.estatus = "ES";
+            item.estado = "ES";
+          }
+        } else if (this.esDocFirmado(e)) {
+          // En documento firmado, el estatus es APROBADO ("PR") o NEGADO ("NP") solamente
+          const rawEstatus = this.getEstatusFromDetalle(item);
+          if (
+            rawEstatus === "ES" ||
+            rawEstatus === "EN ESPERA" ||
+            !this.isAprobado(item)
+          ) {
+            item.sub_detalle = "NP";
+            item.detalle = "NP";
+            item.s_estatus = "NP";
+            item.sub_estatus = "NP";
+            item.estatus = "NP";
+            item.estado = "NP";
+          }
+        }
+
+        return item;
+      })
+      .sort((a: any, b: any) => {
+        const idA = parseInt(a.cedula || a.sub_cedula || "0", 10);
+        const idB = parseInt(b.cedula || b.sub_cedula || "0", 10);
+        return idB - idA;
+      });
   }
 
   // ─── TrackBy para optimizar y forzar re-render de integrantes ────────────────
@@ -2454,7 +2465,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     url: string,
     maxDim: number = 500,
     isJpeg: boolean = false,
-    timeoutMs: number = 6000
+    timeoutMs: number = 6000,
   ): Promise<string | null> {
     if (!url) return null;
     return new Promise((resolve) => {
@@ -2531,8 +2542,18 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     }
     const day = String(date.getDate()).padStart(2, "0");
     const meses = [
-      "ENE", "FEB", "MAR", "ABR", "MAY", "JUN",
-      "JUL", "AGO", "SEP", "OCT", "NOV", "DIC",
+      "ENE",
+      "FEB",
+      "MAR",
+      "ABR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AGO",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DIC",
     ];
     const month = meses[date.getMonth()] || "SEP";
     const year = String(date.getFullYear()).slice(-2);
@@ -2545,12 +2566,22 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     // 1. Confirmar firma y revisar comentarios oficiales para el MPPD
     // Transcribir observaciones existentes (del campo 'Observación para Decisión' o subcasos) en mayúsculas
-    let comentarioInicial = (this.observacion || this.activeDoc?.observacion || "").toString().trim();
+    let comentarioInicial = (
+      this.observacion ||
+      this.activeDoc?.observacion ||
+      ""
+    )
+      .toString()
+      .trim();
     if (!comentarioInicial) {
       const subObsList = (this.getSubcasos(this.activeDoc) || [])
-        .filter((c: any) => (c.observacion || c.sub_observacion || "").toString().trim())
+        .filter((c: any) =>
+          (c.observacion || c.sub_observacion || "").toString().trim(),
+        )
         .map((c: any) => {
-          const nom = (c.nombre || c.nombres || c.cedula || "Candidato").toString().trim();
+          const nom = (c.nombre || c.nombres || c.cedula || "Candidato")
+            .toString()
+            .trim();
           const obs = (c.observacion || c.sub_observacion).toString().trim();
           return `${nom}: ${obs}`;
         });
@@ -2614,13 +2645,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       showCancelButton: true,
       confirmButtonColor: "#8e1c26",
       cancelButtonColor: "#64748b",
-      confirmButtonText: '<i class="fas fa-file-signature mr-1"></i> Firmar y Subir',
+      confirmButtonText:
+        '<i class="fas fa-file-signature mr-1"></i> Firmar y Subir',
       cancelButtonText: "Cancelar",
       preConfirm: () => {
         if (tieneObservacion) {
           return comentarioInicial;
         }
-        const el = document.getElementById("swal-mppd-comentario") as HTMLTextAreaElement;
+        const el = document.getElementById(
+          "swal-mppd-comentario",
+        ) as HTMLTextAreaElement;
         return el ? el.value.trim().toUpperCase() : "";
       },
     });
@@ -2658,13 +2692,67 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     // 4. Cargar recursos gráficos institucionales con optimización de tamaño y rutas de respaldo
     const [escudoImg, firmaImg, selloImg] = await Promise.all([
       this.cargarImagenParaPDF("assets/img/brand/escudo.png", 300, false, 5000)
-        .then((res) => res || this.cargarImagenParaPDF("assets/images/escudo.png", 300, false, 5000))
-        .then((res) => res || this.cargarImagenParaPDF("assets/img/mppd/escudos/100.jpeg", 300, false, 5000)),
-      this.cargarImagenParaPDF("assets/img/mppd/firma_mppd.png", 600, false, 6000)
-        .then((res) => res || this.cargarImagenParaPDF("./assets/img/mppd/firma_mppd.png", 600, false, 6000)),
-      this.cargarImagenParaPDF("assets/img/mppd/sello_mppd.png", 500, false, 6000)
-        .then((res) => res || this.cargarImagenParaPDF("./assets/img/mppd/sello_mppd.png", 500, false, 6000))
-        .then((res) => res || this.cargarImagenParaPDF("/assets/img/mppd/sello_mppd.png", 500, false, 6000)),
+        .then(
+          (res) =>
+            res ||
+            this.cargarImagenParaPDF(
+              "assets/images/escudo.png",
+              300,
+              false,
+              5000,
+            ),
+        )
+        .then(
+          (res) =>
+            res ||
+            this.cargarImagenParaPDF(
+              "assets/img/mppd/escudos/100.jpeg",
+              300,
+              false,
+              5000,
+            ),
+        ),
+      this.cargarImagenParaPDF(
+        "assets/img/mppd/firma_mppd.png",
+        600,
+        false,
+        6000,
+      ).then(
+        (res) =>
+          res ||
+          this.cargarImagenParaPDF(
+            "./assets/img/mppd/firma_mppd.png",
+            600,
+            false,
+            6000,
+          ),
+      ),
+      this.cargarImagenParaPDF(
+        "assets/img/mppd/sello_mppd.png",
+        500,
+        false,
+        6000,
+      )
+        .then(
+          (res) =>
+            res ||
+            this.cargarImagenParaPDF(
+              "./assets/img/mppd/sello_mppd.png",
+              500,
+              false,
+              6000,
+            ),
+        )
+        .then(
+          (res) =>
+            res ||
+            this.cargarImagenParaPDF(
+              "/assets/img/mppd/sello_mppd.png",
+              500,
+              false,
+              6000,
+            ),
+        ),
     ]);
 
     // 5. Configurar documento jsPDF formato Carta (Letter: 215.9 x 279.4 mm) con compresión activa
@@ -2714,9 +2802,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(5.5);
     pdf.setTextColor(0, 0, 0);
-    pdf.text("República Bolivariana de Venezuela", 35, 27.5, { align: "center" });
-    pdf.text("Ministerio del Poder Popular para la Defensa", 35, 30, { align: "center" });
-    pdf.text("Dirección General del Despacho del MPPD", 35, 32.5, { align: "center" });
+    pdf.text("República Bolivariana de Venezuela", 35, 27.5, {
+      align: "center",
+    });
+    pdf.text("Ministerio del Poder Popular para la Defensa", 35, 30, {
+      align: "center",
+    });
+    pdf.text("Dirección General del Despacho del MPPD", 35, 32.5, {
+      align: "center",
+    });
 
     // Cuadro de Número de Control / Expediente
     const numControl = (
@@ -2724,7 +2818,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       this.activeDoc.ncontrol ||
       this.activeDoc.cuenta ||
       "012-26"
-    ).toString().trim();
+    )
+      .toString()
+      .trim();
     const borderGray = [115, 115, 115];
     pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
     pdf.setLineWidth(0.35);
@@ -2737,7 +2833,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(13);
     pdf.setTextColor(0, 0, 0);
-    pdf.text("CUADRO DECISORIO AL GENERAL EN JEFE MINISTRO DEL", 135, 14.5, { align: "center" });
+    pdf.text("CUADRO DECISORIO AL GENERAL EN JEFE MINISTRO DEL", 135, 14.5, {
+      align: "center",
+    });
     pdf.text("PODER POPULAR PARA LA DEFENSA", 135, 19.5, { align: "center" });
 
     // 5.5 Cuadro Presentante / Fecha / Página
@@ -2756,11 +2854,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.text("Presentante:", boxX + 2, boxY + 3.8);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(7.2);
-    pdf.text("LUÍS ADOLFO ROSALES MOLINA", 108.5, boxY + 6.8, { align: "center" });
+    pdf.text("LUÍS ADOLFO ROSALES MOLINA", 108.5, boxY + 6.8, {
+      align: "center",
+    });
     pdf.setFontSize(6.8);
     pdf.text("MAYOR GENERAL", 108.5, boxY + 10.5, { align: "center" });
     pdf.setFontSize(6.2);
-    pdf.text("DIRECTOR GENERAL DEL DESPACHO DEL MPPD", 108.5, boxY + 14.2, { align: "center" });
+    pdf.text("DIRECTOR GENERAL DEL DESPACHO DEL MPPD", 108.5, boxY + 14.2, {
+      align: "center",
+    });
 
     // Fecha (Fecha oficial del día de la firma ministerial)
     pdf.setFont("helvetica", "normal");
@@ -2798,7 +2900,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setTextColor(0, 0, 0);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(7);
-    const asuntoRaw = (this.activeDoc.asunto || this.activeDoc.cont || "PROPUESTA DE NOMBRAMIENTO").toUpperCase();
+    const asuntoRaw = (
+      this.activeDoc.asunto ||
+      this.activeDoc.cont ||
+      "PROPUESTA DE NOMBRAMIENTO"
+    ).toUpperCase();
     const splitAsunto = pdf.splitTextToSize(asuntoRaw, contentWidth - 4);
     pdf.text(splitAsunto, margin + 2, 48.5);
 
@@ -2818,7 +2924,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setTextColor(0, 0, 0);
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(6.8);
-    const argumentacion = this.activeDoc.argumentacion ||
+    const argumentacion =
+      this.activeDoc.argumentacion ||
       "Se somete a consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, el siguiente nombramiento:";
     pdf.text(argumentacion, margin + 2, 61.8);
 
@@ -2838,12 +2945,30 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setTextColor(255, 255, 255);
 
     pdf.text("Nº", colX[0] + colW[0] / 2, tableY + 3.8, { align: "center" });
-    pdf.text("ACTUAL", colX[1] + colW[1] / 2, tableY + 3.8, { align: "center" });
-    pdf.text("GRADO, NOMBRES\nY APELLIDOS", colX[2] + colW[2] / 2, tableY + 2.4, { align: "center" });
-    pdf.text("CANDIDATO\nPROPUESTO", colX[3] + colW[3] / 2, tableY + 2.4, { align: "center" });
-    pdf.text("GRADO, NOMBRES\nY APELLIDOS", colX[4] + colW[4] / 2, tableY + 2.4, { align: "center" });
-    pdf.text("DECISIÓN", colX[5] + colW[5] / 2, tableY + 3.8, { align: "center" });
-    pdf.text("OBSERVACIONES", colX[6] + colW[6] / 2, tableY + 3.8, { align: "center" });
+    pdf.text("ACTUAL", colX[1] + colW[1] / 2, tableY + 3.8, {
+      align: "center",
+    });
+    pdf.text(
+      "GRADO, NOMBRES\nY APELLIDOS",
+      colX[2] + colW[2] / 2,
+      tableY + 2.4,
+      { align: "center" },
+    );
+    pdf.text("CANDIDATO\nPROPUESTO", colX[3] + colW[3] / 2, tableY + 2.4, {
+      align: "center",
+    });
+    pdf.text(
+      "GRADO, NOMBRES\nY APELLIDOS",
+      colX[4] + colW[4] / 2,
+      tableY + 2.4,
+      { align: "center" },
+    );
+    pdf.text("DECISIÓN", colX[5] + colW[5] / 2, tableY + 3.8, {
+      align: "center",
+    });
+    pdf.text("OBSERVACIONES", colX[6] + colW[6] / 2, tableY + 3.8, {
+      align: "center",
+    });
 
     // Líneas divisorias en cabecera
     pdf.setDrawColor(240, 240, 240);
@@ -2863,7 +2988,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(8);
     pdf.setTextColor(0, 0, 0);
-    pdf.text("01", colX[0] + colW[0] / 2, startBodyY + totalTableH / 2 + 1.5, { align: "center" });
+    pdf.text("01", colX[0] + colW[0] / 2, startBodyY + totalTableH / 2 + 1.5, {
+      align: "center",
+    });
 
     // Columna 2 & 3: "PLAZA VACANTE" unificada para el bloque con borde gris suave
     const plazaW = colW[1] + colW[2];
@@ -2871,8 +2998,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.rect(colX[1], startBodyY, plazaW, totalTableH, "S");
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(8);
-    const cargoActual = (this.activeDoc.actual || this.activeDoc.cargo_actual || "PLAZA VACANTE").toUpperCase();
-    pdf.text(cargoActual, colX[1] + plazaW / 2, startBodyY + totalTableH / 2 + 1.5, { align: "center" });
+    const cargoActual = (
+      this.activeDoc.actual ||
+      this.activeDoc.cargo_actual ||
+      "PLAZA VACANTE"
+    ).toUpperCase();
+    pdf.text(
+      cargoActual,
+      colX[1] + plazaW / 2,
+      startBodyY + totalTableH / 2 + 1.5,
+      { align: "center" },
+    );
 
     // Recorrer cada candidato para las columnas 4, 5, 6 y 7
     for (let idx = 0; idx < candidates.length; idx++) {
@@ -2886,7 +3022,12 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       let photoImg = null;
       if (cleanCed && this.rawUrlsMap[cleanCed]) {
         // Redimensionar foto a 250px en JPEG (peso ~15KB en vez de 10MB)
-        photoImg = await this.cargarImagenParaPDF(this.rawUrlsMap[cleanCed], 250, true, 4000);
+        photoImg = await this.cargarImagenParaPDF(
+          this.rawUrlsMap[cleanCed],
+          250,
+          true,
+          4000,
+        );
       }
       const pW = 15;
       const pH = 19;
@@ -2937,7 +3078,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       if (cPromo) {
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(5);
-        const splitPromo = pdf.splitTextToSize(`PROMOCIÓN: ${cPromo}`, colW[4] - 4);
+        const splitPromo = pdf.splitTextToSize(
+          `PROMOCIÓN: ${cPromo}`,
+          colW[4] - 4,
+        );
         pdf.text(splitPromo, colX[4] + 2, curY);
         curY += splitPromo.length * 2.1;
       }
@@ -2945,7 +3089,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       if (cCargo && cCargo !== "S/C") {
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(5);
-        const splitCargo = pdf.splitTextToSize(`CARGO ACTUAL: ${cCargo}`, colW[4] - 4);
+        const splitCargo = pdf.splitTextToSize(
+          `CARGO ACTUAL: ${cCargo}`,
+          colW[4] - 4,
+        );
         pdf.text(splitCargo, colX[4] + 2, curY);
       }
 
@@ -2966,13 +3113,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(5);
       pdf.setTextColor(0, 0, 0);
-      pdf.text("APROBADO", apX + boxSize / 2, boxY + boxSize + 2.8, { align: "center" });
+      pdf.text("APROBADO", apX + boxSize / 2, boxY + boxSize + 2.8, {
+        align: "center",
+      });
 
       // Casilla NEGADO
       const negX = colX[5] + 20;
       pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
       pdf.rect(negX, boxY, boxSize, boxSize, "S");
-      pdf.text("NEGADO", negX + boxSize / 2, boxY + boxSize + 2.8, { align: "center" });
+      pdf.text("NEGADO", negX + boxSize / 2, boxY + boxSize + 2.8, {
+        align: "center",
+      });
 
       // Marcar según la decisión tomada con colores MATE pastel secos
       if (isAprobado) {
@@ -2991,7 +3142,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
       pdf.setLineWidth(0.35);
       pdf.rect(colX[6], yCand, colW[6], rowH, "S");
-      const obs = (item.observacion || item.sub_observacion || "").toString().trim().toUpperCase();
+      const obs = (item.observacion || item.sub_observacion || "")
+        .toString()
+        .trim()
+        .toUpperCase();
       if (obs) {
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(5);
@@ -3020,7 +3174,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       pdf.setTextColor(20, 20, 20);
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(6.8);
-      const splitComentarios = pdf.splitTextToSize(this.observacion.toUpperCase(), contentWidth - 4);
+      const splitComentarios = pdf.splitTextToSize(
+        this.observacion.toUpperCase(),
+        contentWidth - 4,
+      );
       pdf.text(splitComentarios, margin + 2, comY + 8);
     }
 
@@ -3036,16 +3193,32 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(10.5);
     pdf.setTextColor(0, 0, 0);
-    pdf.text("GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ", centerX, sigLineY + 5, { align: "center" });
+    pdf.text("GUSTAVO ENRIQUE GONZÁLEZ LÓPEZ", centerX, sigLineY + 5, {
+      align: "center",
+    });
     pdf.setFontSize(10);
     pdf.text("General en Jefe", centerX, sigLineY + 9.5, { align: "center" });
     pdf.setFontSize(9.5);
-    pdf.text("Ministro del Poder Popular para la Defensa", centerX, sigLineY + 14, { align: "center" });
+    pdf.text(
+      "Ministro del Poder Popular para la Defensa",
+      centerX,
+      sigLineY + 14,
+      { align: "center" },
+    );
 
     // Estampar Sello Oficial en el lado izquierdo (55 x 55 mm, desplazado más a la izquierda)
     if (selloImg) {
       try {
-        pdf.addImage(selloImg, "PNG", centerX - 68, sigLineY - 37, 55, 55, undefined, "FAST");
+        pdf.addImage(
+          selloImg,
+          "PNG",
+          centerX - 68,
+          sigLineY - 37,
+          55,
+          55,
+          undefined,
+          "FAST",
+        );
       } catch (e) {
         console.warn("[PuntoDeCuenta] Aviso al estampar sello:", e);
       }
@@ -3054,7 +3227,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     // Estampar Firma Oficial del Ministro (95 x 41 mm, desplazada un poco más a la derecha)
     if (firmaImg) {
       try {
-        pdf.addImage(firmaImg, "PNG", centerX - 39, sigLineY - 27, 95, 41, undefined, "FAST");
+        pdf.addImage(
+          firmaImg,
+          "PNG",
+          centerX - 39,
+          sigLineY - 27,
+          95,
+          41,
+          undefined,
+          "FAST",
+        );
       } catch (e) {
         console.warn("[PuntoDeCuenta] Aviso al estampar firma:", e);
       }
@@ -3180,7 +3362,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       await new Promise((resolve) => {
         this.apiService.Ejecutar(xAPI).subscribe({
           next: (data) => {
-            console.log("[PuntoDeCuenta] Respuesta WKF_ADocumentoAdjunto:", data);
+            console.log(
+              "[PuntoDeCuenta] Respuesta WKF_ADocumentoAdjunto:",
+              data,
+            );
             resolve(data);
           },
           error: (err) => resolve(null),
@@ -3206,13 +3391,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     try {
       await this.actualizarBaseDatosSubcasosDecisorios();
     } catch (errBdSub) {
-      console.warn("[PuntoDeCuenta] Aviso al actualizar subdocumentos en BD:", errBdSub);
+      console.warn(
+        "[PuntoDeCuenta] Aviso al actualizar subdocumentos en BD:",
+        errBdSub,
+      );
     }
 
     Swal.close();
     this.toastrService.success(
       "Documento Cuadro Decisorio (Papel de Trabajo) tamaño Carta generado, firmado y subido al servidor exitosamente.",
-      "GDoc Cuadro Decisorio"
+      "GDoc Cuadro Decisorio",
     );
 
     // 13. Avanzar flujo a FAVORABLE
@@ -3257,7 +3445,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           parametros: docId,
           valores: "",
         };
-        const resp: any = await firstValueFrom(this.apiService.Ejecutar(xAPISub));
+        const resp: any = await firstValueFrom(
+          this.apiService.Ejecutar(xAPISub),
+        );
         if (resp && resp.Cuerpo && Array.isArray(resp.Cuerpo)) {
           dbSubcasos = resp.Cuerpo;
         }
@@ -3285,7 +3475,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       // Buscar id en BD por cédula o por índice o en el propio objeto
       let subId = evalItem.ids || evalItem.id || evalItem.sub_id;
       let dbMatch = dbSubcasos.find((dbItem: any) => {
-        const dbCed = (dbItem.cedula || dbItem.sub_cedula || "").toString().trim();
+        const dbCed = (dbItem.cedula || dbItem.sub_cedula || "")
+          .toString()
+          .trim();
         return dbCed && cedula && dbCed === cedula;
       });
       if (!dbMatch && dbSubcasos[i]) {
@@ -3502,8 +3694,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       }
 
       let localEstadoActual =
-        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ? 11 : 
-        this.selectedCarpeta?.id === "CUADRO_DECISORIO" ? 17 : 14;
+        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR"
+          ? 11
+          : this.selectedCarpeta?.id === "CUADRO_DECISORIO"
+            ? 17
+            : 14;
       let localEstadoDestino = 1;
 
       this.xAPI = {} as IAPICore;
@@ -3545,7 +3740,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.closeDetail();
         this.actualizarBuzon();
 
-        // this.guardarAlerta(1, this.utilService.ConvertirFecha(this.extender_plazo))
+        this.guardarAlerta(1, this.utilService.ConvertirFecha(null));
         // this.toastrService.success(
         //   "El documento ha sido redistribuido segun su selección",
         //   `GDoc Wkf.DocumentoObservacion`,
@@ -3835,14 +4030,14 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   public getDiasViaje(inicio: any, fin: any): string {
     if (!inicio || !fin || !inicio.year || !fin.year) return "";
-    
+
     const dateInicio = new Date(inicio.year, inicio.month - 1, inicio.day);
     const dateFin = new Date(fin.year, fin.month - 1, fin.day);
-    
+
     const diffTime = Math.abs(dateFin.getTime() - dateInicio.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    return (diffDays + 1) + " DÍAS";
+
+    return diffDays + 1 + " DÍAS";
   }
 
   public getFlagUrl(countryName: string): string {
