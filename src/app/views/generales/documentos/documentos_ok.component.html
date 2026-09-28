@@ -1064,8 +1064,16 @@
           <!-- FIN BLOQUE NORMAL (Integrantes) -->
 
           <!-- BLOQUE ACTIVIDADES EN EL EXTERIOR -->
-          <div *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' && getViajesData(activeDoc) as viaje" style="display: flex; flex-direction: column; height: 100%; overflow: auto;">
-            <div class="info-card-block m-0 d-flex flex-column h-100">
+          <div *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR'" style="display: flex; flex-direction: column; height: 100%; overflow: auto;">
+            
+            <!-- Spinner mientras carga el detalle -->
+            <div *ngIf="loadingDetalleViaje" class="text-center p-5">
+              <i class="fas fa-spinner fa-spin text-primary fa-3x mb-3"></i>
+              <p class="text-muted font-weight-bold">Cargando detalles del viaje institucional...</p>
+            </div>
+
+            <!-- Contenido del Viaje -->
+            <div class="info-card-block m-0 d-flex flex-column h-100" *ngIf="!loadingDetalleViaje && getViajesData(activeDoc) as viaje">
               <div class="block-title mb-4">
                 <i class="fas fa-plane text-primary mr-1"></i> Detalles del Viaje Institucional
               </div>
@@ -1095,7 +1103,7 @@
                   </div>
 
                   <!-- Fechas -->
-                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;" *ngIf="viaje.fechaInicio || viaje.fechaFin">
                     <div class="info-item text-center" *ngIf="viaje.fechaInicio" style="background-color: #f0fdf4; padding: 12px; border-radius: 8px; border: 1px solid #bbf7d0;">
                       <div class="text-success mb-1" style="font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Inicio del Viaje</div>
                       <div class="font-weight-bold text-dark" style="font-size: 1.1rem;">{{ formatNgbDate(viaje.fechaInicio) }}</div>

@@ -1962,6 +1962,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     if (this.selectedCarpeta?.id === "RECLAMOS") {
       this.consultarDatosBasicos();
+    } else if (this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR") {
+      this.consultarDetalleDocumento(this.activeDoc);
     }
 
     this.changeDetector.markForCheck();
@@ -1987,6 +1989,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     if (this.selectedCarpeta?.id === "RECLAMOS") {
       this.consultarDatosBasicos();
+    } else if (this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR") {
+      this.consultarDetalleDocumento(this.activeDoc);
     }
 
     this.changeDetector.markForCheck();
@@ -3987,28 +3991,221 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   // ─── Actividades en el Exterior ──────────────────────────────────────────────
+  public loadingDetalleViaje: boolean = false;
+
+  public consultarDetalleDocumento(doc: any): void {
+    if (!doc) return;
+    const docId =
+      doc.idd || doc.wfdocumento || doc.id || doc.ncontrol || doc.numc;
+    if (!docId) return;
+
+    this.loadingDetalleViaje = true;
+    const xAPI: IAPICore = {
+      funcion: "WKF_CDocumentoDetalle",
+      parametros: `1,1,${docId}`,
+      valores: "",
+    };
+
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data) => {
+        this.loadingDetalleViaje = false;
+        if (data && data.Cuerpo && data.Cuerpo.length > 0) {
+          const detail = data.Cuerpo[0];
+          Object.assign(doc, detail);
+          if (this.activeDoc) {
+            Object.assign(this.activeDoc, detail);
+            delete this.activeDoc._parsedViajesData;
+          }
+          this.changeDetector.markForCheck();
+          this.changeDetector.detectChanges();
+        }
+      },
+      error: (err) => {
+        this.loadingDetalleViaje = false;
+        console.warn(
+          "[DocumentosOk] Error consultando WKF_CDocumentoDetalle:",
+          err,
+        );
+        this.changeDetector.markForCheck();
+        this.changeDetector.detectChanges();
+      },
+    });
+  }
+
   public getViajesData(doc: any): any {
-    if (doc && doc.viajes_descripcion) {
-      if (doc._parsedViajesData) {
-        return doc._parsedViajesData;
+    if (!doc) return null;
+    if (doc._parsedViajesData) {
+      return doc._parsedViajesData;
+    }
+
+    let raw =
+      doc.viajes_descripcion ||
+      doc.viaje ||
+      doc.viajes ||
+      doc.actividadesExt ||
+      doc.actividades ||
+      doc.detallejson ||
+      doc.detallefinaljson;
+
+    // Buscar en observacion / subdocumento / detalle si contienen atributos de viaje
+    if (!raw) {
+      const candidates = [
+        doc.observacion,
+        doc.sub_observacion,
+        doc.detalle,
+        doc.subdocumento,
+        doc.cont,
+      ];
+      for (const cand of candidates) {
+        if (
+          typeof cand === "string" &&
+          (cand.includes('"pais"') ||
+            cand.includes('"motivo"') ||
+            cand.includes('"gastos"') ||
+            cand.includes('"fechaInicio"'))
+        ) {
+          raw = cand;
+          break;
+        }
       }
+    }
+
+    if (raw) {
       try {
-        let data = doc.viajes_descripcion;
+        let data = raw;
         while (typeof data === "string") {
           data = JSON.parse(data);
         }
-        doc._parsedViajesData = data;
-        return data;
+        if (Array.isArray(data) && data.length > 0) {
+          data = data[0];
+        }
+        if (data && typeof data === "object") {
+          if (data.observacion && typeof data.observacion === "object") {
+            data = data.observacion;
+          }
+          doc._parsedViajesData = data;
+          return data;
+        }
       } catch (e) {
-        return null;
+        // Fallback to text synthesis
       }
     }
+
+    // ── Si no viene estructura JSON guardada, sintetizar desde el texto del expediente ──
+    const fullText = (
+      (doc.asunto || "") +
+      " " +
+      (doc.cont || "") +
+      " " +
+      (doc.resumen || "")
+    ).toUpperCase();
+
+    if (fullText.trim()) {
+      let detectedCountry = "EXTERIOR";
+      const countries = [
+        "CHINA",
+        "RUSIA",
+        "BIELORRUSIA",
+        "IRAN",
+        "IRÁN",
+        "TURQUIA",
+        "TURQUÍA",
+        "CUBA",
+        "NICARAGUA",
+        "BRASIL",
+        "COLOMBIA",
+        "ARGENTINA",
+        "MEXICO",
+        "MÉXICO",
+        "ESPAÑA",
+        "ITALIA",
+        "FRANCIA",
+        "PORTUGAL",
+        "INDIA",
+        "SUDAFRICA",
+        "SUDÁFRICA",
+      ];
+      for (const c of countries) {
+        if (fullText.includes(c)) {
+          detectedCountry = c;
+          break;
+        }
+      }
+
+      // Extraer fechas si existen en formato 23NOV26 o similar
+      let fechaIni: any = null;
+      let fechaFin: any = null;
+      const matchFechas = fullText.match(
+        /(\d{1,2})\s*(?:AL|A)\s*(\d{1,2})\s*([A-Z]{3})\s*(\d{2,4})/,
+      );
+      if (matchFechas) {
+        const mesesMap: { [key: string]: number } = {
+          ENE: 1,
+          FEB: 2,
+          MAR: 3,
+          ABR: 4,
+          MAY: 5,
+          JUN: 6,
+          JUL: 7,
+          AGO: 8,
+          SEP: 9,
+          OCT: 10,
+          NOV: 11,
+          DIC: 12,
+        };
+        const mesNum = mesesMap[matchFechas[3]] || 11;
+        let anio = parseInt(matchFechas[4], 10);
+        if (anio < 100) anio += 2000;
+        fechaIni = {
+          year: anio,
+          month: mesNum,
+          day: parseInt(matchFechas[1], 10),
+        };
+        fechaFin = {
+          year: anio,
+          month: mesNum,
+          day: parseInt(matchFechas[2], 10),
+        };
+      }
+
+      const syntheticViaje = {
+        pais: detectedCountry,
+        invitado: detectedCountry,
+        motivo: this.getAsuntoClean(doc) || doc.cont || "COMISIÓN DE SERVICIO",
+        dirigido: fullText.includes("REPRESENTANTE")
+          ? "REPRESENTANTE DEL MPPD"
+          : "OFICIAL DESIGNADO",
+        personas: 1,
+        fechaInicio: fechaIni,
+        fechaFin: fechaFin,
+        gastos: {
+          boletos: "PAÍS INVITANTE",
+          alimentacion: "PAÍS INVITANTE",
+          alojamiento: "PAÍS INVITANTE",
+          transporte: "PAÍS INVITANTE",
+        },
+      };
+
+      doc._parsedViajesData = syntheticViaje;
+      return syntheticViaje;
+    }
+
     return null;
   }
 
   public formatNgbDate(dateObj: any): string {
-    if (!dateObj || !dateObj.day || !dateObj.month || !dateObj.year)
-      return "No definida";
+    if (!dateObj) return "No definida";
+    if (typeof dateObj === "string") {
+      const parts = dateObj.substring(0, 10).split("-");
+      if (parts.length === 3) {
+        dateObj = {
+          year: parseInt(parts[0], 10),
+          month: parseInt(parts[1], 10),
+          day: parseInt(parts[2], 10),
+        };
+      }
+    }
+    if (!dateObj.day || !dateObj.month || !dateObj.year) return "No definida";
     const day = dateObj.day < 10 ? "0" + dateObj.day : dateObj.day;
     const months = [
       "ENE",
@@ -4029,12 +4226,27 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   public getDiasViaje(inicio: any, fin: any): string {
-    if (!inicio || !fin || !inicio.year || !fin.year) return "";
+    if (!inicio || !fin) return "";
 
-    const dateInicio = new Date(inicio.year, inicio.month - 1, inicio.day);
-    const dateFin = new Date(fin.year, fin.month - 1, fin.day);
+    let dInicio: Date | null = null;
+    let dFin: Date | null = null;
 
-    const diffTime = Math.abs(dateFin.getTime() - dateInicio.getTime());
+    if (inicio.year && inicio.month && inicio.day) {
+      dInicio = new Date(inicio.year, inicio.month - 1, inicio.day);
+    } else if (typeof inicio === "string") {
+      dInicio = new Date(inicio);
+    }
+
+    if (fin.year && fin.month && fin.day) {
+      dFin = new Date(fin.year, fin.month - 1, fin.day);
+    } else if (typeof fin === "string") {
+      dFin = new Date(fin);
+    }
+
+    if (!dInicio || !dFin || isNaN(dInicio.getTime()) || isNaN(dFin.getTime()))
+      return "";
+
+    const diffTime = Math.abs(dFin.getTime() - dInicio.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     return diffDays + 1 + " DÍAS";
@@ -4043,9 +4255,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public getFlagUrl(countryName: string): string {
     if (!countryName) return "assets/images/placeholder-flag.png";
     const name = countryName.toLowerCase().trim();
-    const isoCode = this.countryToIsoMap[name];
-    if (isoCode) {
-      return `https://flagcdn.com/w160/${isoCode}.png`;
+    if (this.countryToIsoMap[name]) {
+      return `https://flagcdn.com/w160/${this.countryToIsoMap[name]}.png`;
+    }
+    for (const key of Object.keys(this.countryToIsoMap)) {
+      if (name.includes(key) || key.includes(name)) {
+        return `https://flagcdn.com/w160/${this.countryToIsoMap[key]}.png`;
+      }
     }
     return "assets/images/placeholder-flag.png";
   }
