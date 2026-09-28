@@ -5067,28 +5067,55 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public getDiasViaje(inicio: any, fin: any): string {
     if (!inicio || !fin) return "";
 
-    let dInicio: Date | null = null;
-    let dFin: Date | null = null;
+    const parseToDate = (val: any): Date | null => {
+      if (!val) return null;
+      if (val instanceof Date) return val;
+      if (val.year && val.month && val.day) {
+        return new Date(val.year, val.month - 1, val.day);
+      }
+      if (typeof val === "string") {
+        const partsIso = val.substring(0, 10).split("-");
+        if (partsIso.length === 3) {
+          const y = parseInt(partsIso[0], 10);
+          const m = parseInt(partsIso[1], 10);
+          const d = parseInt(partsIso[2], 10);
+          if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+            return new Date(y, m - 1, d);
+          }
+        }
+        const partsSlash = val.substring(0, 10).split("/");
+        if (partsSlash.length === 3) {
+          const d = parseInt(partsSlash[0], 10);
+          const m = parseInt(partsSlash[1], 10);
+          const y = parseInt(partsSlash[2], 10);
+          if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+            return new Date(y, m - 1, d);
+          }
+        }
+        const dParsed = new Date(val);
+        if (!isNaN(dParsed.getTime())) return dParsed;
+      }
+      return null;
+    };
 
-    if (inicio.year && inicio.month && inicio.day) {
-      dInicio = new Date(inicio.year, inicio.month - 1, inicio.day);
-    } else if (typeof inicio === "string") {
-      dInicio = new Date(inicio);
-    }
+    const dInicio = parseToDate(inicio);
+    const dFin = parseToDate(fin);
 
-    if (fin.year && fin.month && fin.day) {
-      dFin = new Date(fin.year, fin.month - 1, fin.day);
-    } else if (typeof fin === "string") {
-      dFin = new Date(fin);
-    }
-
-    if (!dInicio || !dFin || isNaN(dInicio.getTime()) || isNaN(dFin.getTime()))
+    if (!dInicio || !dFin || isNaN(dInicio.getTime()) || isNaN(dFin.getTime())) {
       return "";
+    }
 
-    const diffTime = Math.abs(dFin.getTime() - dInicio.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // Normalizar a UTC para evitar desfases horarios
+    const tInicio = Date.UTC(dInicio.getFullYear(), dInicio.getMonth(), dInicio.getDate());
+    const tFin = Date.UTC(dFin.getFullYear(), dFin.getMonth(), dFin.getDate());
 
-    return diffDays + 1 + " DÍAS";
+    const diffTime = Math.abs(tFin - tInicio);
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return "1 DÍA";
+    }
+    return `${diffDays} ${diffDays === 1 ? "DÍA" : "DÍAS"}`;
   }
 
   public getFlagUrl(countryName: string): string {
