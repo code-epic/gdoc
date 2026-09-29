@@ -1953,6 +1953,14 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       this.activeDoc = { ...e };
     }
 
+    this.editandoContenido = false;
+    this.contenidoEditado = (
+      this.getAsuntoClean(this.activeDoc) ||
+      this.activeDoc?.asunto ||
+      this.activeDoc?.cont ||
+      ""
+    ).toUpperCase();
+
     try {
       const subcasos = this.getSubcasos(this.activeDoc) || [];
       this.cargarFotosBuzon([this.activeDoc, ...subcasos]);
@@ -1980,6 +1988,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.observacion = "";
     this.showPdf = false;
     this.pdfUrl = null;
+    this.editandoContenido = false;
+    this.contenidoEditado = (
+      this.getAsuntoClean(this.activeDoc) ||
+      this.activeDoc?.asunto ||
+      this.activeDoc?.cont ||
+      ""
+    ).toUpperCase();
     try {
       const subcasos = this.getSubcasos(this.activeDoc) || [];
       this.cargarFotosBuzon([this.activeDoc, ...subcasos]);
@@ -2227,6 +2242,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.observacion = "";
     this.showPdf = false;
     this.pdfUrl = null;
+    this.editandoContenido = false;
+    this.contenidoEditado = "";
     this.changeDetector.detectChanges();
   }
 
@@ -2458,7 +2475,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.fnxFirmaMinistro();
+    this.fnxFirmaMinistro(decisionSeleccionada);
     this.observacion = observacionFinal;
     this.loadingAction = true;
     this.redistribuir(decisionSeleccionada);
@@ -3386,7 +3403,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.activeDoc.archivo = filename;
     this.activeDoc.archivo_firmado = filename;
     try {
-      this.fnxFirmaMinistro();
+      this.fnxFirmaMinistro("APROBADO");
     } catch (errFnx) {
       console.warn("[PuntoDeCuenta] Aviso en fnxFirmaMinistro:", errFnx);
     }
@@ -3418,18 +3435,41 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     // 1. Confirmar firma y revisar comentarios oficiales para el MPPD
     const viaje = this.getViajesData(this.activeDoc) || {};
-    const pais = (viaje.invitado || viaje.pais || "EXTERIOR").toString().toUpperCase().trim();
-    const dirigidoA = (viaje.dirigido || "OFICIAL DESIGNADO").toString().toUpperCase().trim();
+    const pais = (viaje.invitado || viaje.pais || "EXTERIOR")
+      .toString()
+      .toUpperCase()
+      .trim();
+    const dirigidoA = (viaje.dirigido || "OFICIAL DESIGNADO")
+      .toString()
+      .toUpperCase()
+      .trim();
     const cantPersonas = viaje.personas || 1;
-    const motivoViaje = (viaje.motivo || this.getAsuntoClean(this.activeDoc) || this.activeDoc.cont || "COMISIÓN DE SERVICIO AL EXTERIOR").toString().toUpperCase().trim();
+    const motivoViaje = (
+      viaje.motivo ||
+      this.getAsuntoClean(this.activeDoc) ||
+      this.activeDoc.cont ||
+      "COMISIÓN DE SERVICIO AL EXTERIOR"
+    )
+      .toString()
+      .toUpperCase()
+      .trim();
     const fechaInicioStr = this.formatNgbDate(viaje.fechaInicio);
     const fechaFinStr = this.formatNgbDate(viaje.fechaFin);
-    const duracionDias = this.getDiasViaje(viaje.fechaInicio, viaje.fechaFin) || "—";
+    const duracionDias =
+      this.getDiasViaje(viaje.fechaInicio, viaje.fechaFin) || "—";
     const gastos = viaje.gastos || {};
-    const gastosBoletos = (gastos.boletos || "NO ESPECIFICA").toString().toUpperCase();
-    const gastosAlojamiento = (gastos.alojamiento || "NO ESPECIFICA").toString().toUpperCase();
-    const gastosAlimentacion = (gastos.alimentacion || "NO ESPECIFICA").toString().toUpperCase();
-    const gastosTransporte = (gastos.transporte || "NO ESPECIFICA").toString().toUpperCase();
+    const gastosBoletos = (gastos.boletos || "NO ESPECIFICA")
+      .toString()
+      .toUpperCase();
+    const gastosAlojamiento = (gastos.alojamiento || "NO ESPECIFICA")
+      .toString()
+      .toUpperCase();
+    const gastosAlimentacion = (gastos.alimentacion || "NO ESPECIFICA")
+      .toString()
+      .toUpperCase();
+    const gastosTransporte = (gastos.transporte || "NO ESPECIFICA")
+      .toString()
+      .toUpperCase();
 
     let comentarioInicial = (
       this.observacion ||
@@ -3494,7 +3534,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       showCancelButton: true,
       confirmButtonColor: "#8e1c26",
       cancelButtonColor: "#64748b",
-      confirmButtonText: '<i class="fas fa-file-signature mr-1"></i> Firmar y Subir',
+      confirmButtonText:
+        '<i class="fas fa-file-signature mr-1"></i> Firmar y Subir',
       cancelButtonText: "Cancelar",
       preConfirm: () => {
         if (tieneObservacion) {
@@ -3676,9 +3717,14 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(12);
     pdf.setTextColor(0, 0, 0);
-    pdf.text("ACTIVIDADES EN EL EXTERIOR AL GENERAL EN JEFE MINISTRO DEL", 135, 14.5, {
-      align: "center",
-    });
+    pdf.text(
+      "ACTIVIDADES EN EL EXTERIOR AL GENERAL EN JEFE MINISTRO DEL",
+      135,
+      14.5,
+      {
+        align: "center",
+      },
+    );
     pdf.text("PODER POPULAR PARA LA DEFENSA", 135, 19.5, { align: "center" });
 
     // 4.5 Cuadro Presentante / Fecha / Página
@@ -3775,7 +3821,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (banderaImg) {
       try {
         const textW = pdf.getTextWidth(pais);
-        pdf.addImage(banderaImg, "PNG", margin + 5 + textW, 63.5, 9, 6, undefined, "FAST");
+        pdf.addImage(
+          banderaImg,
+          "PNG",
+          margin + 5 + textW,
+          63.5,
+          9,
+          6,
+          undefined,
+          "FAST",
+        );
       } catch (e) {}
     }
 
@@ -3851,10 +3906,30 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     pdf.setFontSize(5.8);
     pdf.setTextColor(51, 65, 85);
-    pdf.text("BOLETOS AÉREOS", margin + colGW * 0 + colGW / 2, tableGastosY + 3.4, { align: "center" });
-    pdf.text("HOSPEDAJE / ALOJAMIENTO", margin + colGW * 1 + colGW / 2, tableGastosY + 3.4, { align: "center" });
-    pdf.text("ALIMENTACIÓN", margin + colGW * 2 + colGW / 2, tableGastosY + 3.4, { align: "center" });
-    pdf.text("TRANSPORTE INTERNO", margin + colGW * 3 + colGW / 2, tableGastosY + 3.4, { align: "center" });
+    pdf.text(
+      "BOLETOS AÉREOS",
+      margin + colGW * 0 + colGW / 2,
+      tableGastosY + 3.4,
+      { align: "center" },
+    );
+    pdf.text(
+      "HOSPEDAJE / ALOJAMIENTO",
+      margin + colGW * 1 + colGW / 2,
+      tableGastosY + 3.4,
+      { align: "center" },
+    );
+    pdf.text(
+      "ALIMENTACIÓN",
+      margin + colGW * 2 + colGW / 2,
+      tableGastosY + 3.4,
+      { align: "center" },
+    );
+    pdf.text(
+      "TRANSPORTE INTERNO",
+      margin + colGW * 3 + colGW / 2,
+      tableGastosY + 3.4,
+      { align: "center" },
+    );
 
     // Fila Valores de Gastos
     const valGH = tableGastosY + headerGH;
@@ -3863,10 +3938,18 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     pdf.setFontSize(6.8);
     pdf.setTextColor(15, 23, 42);
-    pdf.text(gastosBoletos, margin + colGW * 0 + colGW / 2, valGH + 5.2, { align: "center" });
-    pdf.text(gastosAlojamiento, margin + colGW * 1 + colGW / 2, valGH + 5.2, { align: "center" });
-    pdf.text(gastosAlimentacion, margin + colGW * 2 + colGW / 2, valGH + 5.2, { align: "center" });
-    pdf.text(gastosTransporte, margin + colGW * 3 + colGW / 2, valGH + 5.2, { align: "center" });
+    pdf.text(gastosBoletos, margin + colGW * 0 + colGW / 2, valGH + 5.2, {
+      align: "center",
+    });
+    pdf.text(gastosAlojamiento, margin + colGW * 1 + colGW / 2, valGH + 5.2, {
+      align: "center",
+    });
+    pdf.text(gastosAlimentacion, margin + colGW * 2 + colGW / 2, valGH + 5.2, {
+      align: "center",
+    });
+    pdf.text(gastosTransporte, margin + colGW * 3 + colGW / 2, valGH + 5.2, {
+      align: "center",
+    });
 
     // Líneas divisorias verticales en tabla de gastos
     for (let i = 1; i < 4; i++) {
@@ -3882,7 +3965,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(7.5);
     pdf.setTextColor(255, 255, 255);
-    pdf.text("ARGUMENTACIÓN Y JUSTIFICACIÓN INSTITUCIONAL:", margin + 2, argY + 2.8);
+    pdf.text(
+      "ARGUMENTACIÓN Y JUSTIFICACIÓN INSTITUCIONAL:",
+      margin + 2,
+      argY + 2.8,
+    );
 
     // Contenido ARGUMENTACIÓN
     pdf.setFillColor(255, 255, 255);
@@ -3945,7 +4032,12 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(6.2);
     pdf.setTextColor(71, 85, 105);
-    pdf.text("AUTORIZADA LA COMISIÓN DE SERVICIO AL EXTERIOR SEGÚN ITINERARIO DESCRITO.", pageWidth / 2, decBoxY + 11.5, { align: "center" });
+    pdf.text(
+      "AUTORIZADA LA COMISIÓN DE SERVICIO AL EXTERIOR SEGÚN ITINERARIO DESCRITO.",
+      pageWidth / 2,
+      decBoxY + 11.5,
+      { align: "center" },
+    );
 
     // 4.11 Franja OBSERVACIONES / INSTRUCCIONES DEL MPPD
     const obsY = 152;
@@ -4063,7 +4155,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       this.activeDoc?.signatures?.mainSignatory || "MINISTRO DE LA DEFENSA",
     );
     formData.append("locacion", "Caracas, Venezuela");
-    formData.append("razon", "Actividades en el Exterior - Aprobación Ministerial");
+    formData.append(
+      "razon",
+      "Actividades en el Exterior - Aprobación Ministerial",
+    );
     formData.append("contacto", "MPPD");
     formData.append("codigo", filename);
     formData.append("return", "true");
@@ -4096,13 +4191,19 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             }
           },
           error: (err: any) => {
-            console.warn("[ActividadesExterior] Advertencia al firmar PDF:", err);
+            console.warn(
+              "[ActividadesExterior] Advertencia al firmar PDF:",
+              err,
+            );
             resolvePromise(pdfBlob);
           },
         });
       });
     } catch (errSign) {
-      console.warn("[ActividadesExterior] Excepción en FirmarPDFProgress:", errSign);
+      console.warn(
+        "[ActividadesExterior] Excepción en FirmarPDFProgress:",
+        errSign,
+      );
       signedPdfBlob = pdfBlob;
     }
 
@@ -4116,7 +4217,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       await new Promise((resolve) => {
         this.apiService.EnviarArchivos(uploadForm).subscribe({
           next: (data) => {
-            console.log("[ActividadesExterior] Respuesta EnviarArchivos:", data);
+            console.log(
+              "[ActividadesExterior] Respuesta EnviarArchivos:",
+              data,
+            );
             resolve(data);
           },
           error: (err) => {
@@ -4127,7 +4231,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         setTimeout(() => resolve(null), 4000);
       });
     } catch (errUp) {
-      console.warn("[ActividadesExterior] Error al subir archivo a la ruta:", errUp);
+      console.warn(
+        "[ActividadesExterior] Error al subir archivo a la ruta:",
+        errUp,
+      );
     }
 
     // 10. Registrar adjunto en el Workflow (WKF_ADocumentoAdjunto)
@@ -4145,7 +4252,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       await new Promise((resolve) => {
         this.apiService.Ejecutar(xAPI).subscribe({
           next: (data) => {
-            console.log("[ActividadesExterior] Respuesta WKF_ADocumentoAdjunto:", data);
+            console.log(
+              "[ActividadesExterior] Respuesta WKF_ADocumentoAdjunto:",
+              data,
+            );
             resolve(data);
           },
           error: (err) => resolve(null),
@@ -4162,7 +4272,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.activeDoc.archivo = filename;
     this.activeDoc.archivo_firmado = filename;
     try {
-      this.fnxFirmaMinistro();
+      this.fnxFirmaMinistro("APROBADO");
     } catch (errFnx) {
       console.warn("[ActividadesExterior] Aviso en fnxFirmaMinistro:", errFnx);
     }
@@ -4444,6 +4554,127 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ─── Edición de Contenido/Asunto (Jefe de Secretaría) ───────────────────────
+  public loadingEditContenido: boolean = false;
+  public editandoContenido: boolean = false;
+  public contenidoEditado: string = "";
+
+  public activarEdicionContenido(): void {
+    this.editandoContenido = true;
+    if (!this.contenidoEditado && this.activeDoc) {
+      this.contenidoEditado = (
+        this.getAsuntoClean(this.activeDoc) ||
+        this.activeDoc.asunto ||
+        this.activeDoc.cont ||
+        ""
+      ).toUpperCase();
+    }
+    this.changeDetector.detectChanges();
+  }
+
+  public cancelarEdicionContenido(): void {
+    this.editandoContenido = false;
+    if (this.activeDoc) {
+      this.contenidoEditado = (
+        this.getAsuntoClean(this.activeDoc) ||
+        this.activeDoc.asunto ||
+        this.activeDoc.cont ||
+        ""
+      ).toUpperCase();
+    }
+    this.changeDetector.detectChanges();
+  }
+
+  public editarContenidoDocumento(): void {
+    if (!this.activeDoc) return;
+
+    const numc = (
+      this.activeDoc.numc ||
+      this.activeDoc.ncontrol ||
+      this.activeDoc.cuenta ||
+      ""
+    )
+      .toString()
+      .trim();
+
+    if (!numc) {
+      this.toastrService.warning(
+        "El documento no posee un número de control asignado.",
+        "Aviso",
+      );
+      return;
+    }
+
+    const contenido = (this.contenidoEditado || "").toString().trim().toUpperCase();
+    if (!contenido) {
+      this.toastrService.warning(
+        "El contenido del documento no puede estar vacío.",
+        "Campo requerido",
+      );
+      return;
+    }
+
+    this.loadingEditContenido = true;
+    const xAPI: IAPICore = {
+      funcion: "WKF_UDocumentoSecretaria",
+      parametros: `${numc},${contenido}`,
+      valores: "",
+    };
+
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data: any) => {
+        this.loadingEditContenido = false;
+        this.editandoContenido = false;
+
+        // Actualizar datos del activeDoc localmente
+        this.activeDoc.asunto = contenido;
+        this.activeDoc.cont = contenido;
+        if (this.activeDoc.resumen !== undefined) {
+          this.activeDoc.resumen = contenido;
+        }
+
+        // Actualizar en el caso agrupado si aplica
+        if (
+          this.currentGroupCaseIndex >= 0 &&
+          this.groupCases &&
+          this.groupCases[this.currentGroupCaseIndex]
+        ) {
+          this.groupCases[this.currentGroupCaseIndex].asunto = contenido;
+          this.groupCases[this.currentGroupCaseIndex].cont = contenido;
+        }
+
+        // Actualizar en la lista del buzón
+        if (this.buzon && Array.isArray(this.buzon)) {
+          const itemBuzon = this.buzon.find(
+            (b: any) =>
+              (b.numc || b.ncontrol || b.cuenta || "").toString().trim() === numc,
+          );
+          if (itemBuzon) {
+            itemBuzon.asunto = contenido;
+            itemBuzon.cont = contenido;
+          }
+        }
+
+        this.toastrService.success(
+          "Asunto / Contenido del documento actualizado correctamente.",
+          "Documento Modificado",
+        );
+        this.changeDetector.markForCheck();
+        this.changeDetector.detectChanges();
+      },
+      error: (err: any) => {
+        this.loadingEditContenido = false;
+        console.error("[editarContenidoDocumento] Error:", err);
+        this.toastrService.error(
+          "Ocurrió un error al actualizar el contenido del documento.",
+          "Error WKF_UDocumentoSecretaria",
+        );
+        this.changeDetector.markForCheck();
+        this.changeDetector.detectChanges();
+      },
+    });
+  }
+
   // ─── Acciones: Favorable / Firmar ─────────────────────────
   public ejecutarAccion(decision: "FAVORABLE" | "FIRMAR" | "ARCHIVAR"): void {
     if (!this.activeDoc) return;
@@ -4720,15 +4951,38 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     ); //
   }
 
-  public fnxFirmaMinistro() {
+  public fnxFirmaMinistro(decision: string = "") {
     let numero_control = btoa("D" + this.activeDoc.numc);
     let archivo = this.activeDoc.anom;
+
+    let dec = (
+      decision ||
+      this.activeDoc?.decision ||
+      ""
+    )
+      .toString()
+      .trim()
+      .toUpperCase();
+
+    if (!dec) {
+      if (
+        this.selectedCarpeta?.id === "CUADRO_DECISORIO" ||
+        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR"
+      ) {
+        dec = "APROBADO";
+      }
+    }
+
+    if (this.activeDoc) {
+      this.activeDoc.decision = dec;
+    }
 
     let fnx = {
       funcion: "Fnx_FirmarPuntos",
       codigo: this.encriptarService.GCodeEncrypt(numero_control),
       archivo: archivo,
       puntos: 1,
+      decision: dec,
     };
 
     this.apiService.ExecFnx(fnx).subscribe(
@@ -5101,12 +5355,21 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     const dInicio = parseToDate(inicio);
     const dFin = parseToDate(fin);
 
-    if (!dInicio || !dFin || isNaN(dInicio.getTime()) || isNaN(dFin.getTime())) {
+    if (
+      !dInicio ||
+      !dFin ||
+      isNaN(dInicio.getTime()) ||
+      isNaN(dFin.getTime())
+    ) {
       return "";
     }
 
     // Normalizar a UTC para evitar desfases horarios
-    const tInicio = Date.UTC(dInicio.getFullYear(), dInicio.getMonth(), dInicio.getDate());
+    const tInicio = Date.UTC(
+      dInicio.getFullYear(),
+      dInicio.getMonth(),
+      dInicio.getDate(),
+    );
     const tFin = Date.UTC(dFin.getFullYear(), dFin.getMonth(), dFin.getDate());
 
     const diffTime = Math.abs(tFin - tInicio);

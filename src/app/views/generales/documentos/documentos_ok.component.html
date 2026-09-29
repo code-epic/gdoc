@@ -798,12 +798,70 @@
 
           <!-- Asunto Block NORMAL (Siempre visible en la izquierda excepto Viajes) -->
           <div class="info-card-block" *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'">
-            <div class="block-title">
-              <i class="fas fa-align-left text-primary mr-1"></i> Asunto / Objeto del Caso
+            <div class="block-title d-flex justify-content-between align-items-center">
+              <span><i class="fas fa-align-left text-primary mr-1"></i> Asunto / Objeto del Caso</span>
+
+              <!-- Botón Editar / Guardar a nivel de trámite para Jefe de Secretaría (no firmado) -->
+              <ng-container *ngIf="currentProfile === 'JefeSecretaria' && !esDocFirmado(activeDoc)">
+                <button type="button"
+                        class="btn btn-xs btn-outline-primary font-weight-bold"
+                        *ngIf="!editandoContenido"
+                        (click)="activarEdicionContenido()"
+                        title="Activar edición del Asunto">
+                  <i class="fas fa-edit mr-1"></i> Editar
+                </button>
+                <div class="d-flex align-items-center gap-1" *ngIf="editandoContenido">
+                  <button type="button"
+                          class="btn btn-xs btn-success font-weight-bold"
+                          (click)="editarContenidoDocumento()"
+                          [disabled]="loadingEditContenido || !contenidoEditado?.trim()"
+                          title="Guardar Contenido del Documento">
+                    <i class="fas fa-save mr-1" *ngIf="!loadingEditContenido"></i>
+                    <span class="spinner-border spinner-border-sm mr-1" *ngIf="loadingEditContenido"></span>
+                    Guardar
+                  </button>
+                  <button type="button"
+                          class="btn btn-xs btn-outline-secondary font-weight-bold"
+                          (click)="cancelarEdicionContenido()"
+                          [disabled]="loadingEditContenido"
+                          title="Cancelar edición">
+                    <i class="fas fa-times mr-1"></i> Cancelar
+                  </button>
+                </div>
+              </ng-container>
             </div>
-            <div class="asunto-text-box">
-              {{ getAsuntoClean(activeDoc) || 'Sin descripción disponible.' }}
-            </div>
+
+            <!-- Textarea editable en mayúsculas para Jefe de Secretaría -->
+            <ng-container *ngIf="currentProfile === 'JefeSecretaria' && !esDocFirmado(activeDoc); else viewAsuntoReadOnly">
+              <textarea class="modal-textarea"
+                        rows="3"
+                        [(ngModel)]="contenidoEditado"
+                        (ngModelChange)="contenidoEditado = $event ? $event.toUpperCase() : ''"
+                        [readonly]="!editandoContenido"
+                        (click)="!editandoContenido && activarEdicionContenido()"
+                        [style.border-color]="editandoContenido ? '#5e72e4' : '#cbd5e1'"
+                        [style.background-color]="editandoContenido ? '#ffffff' : '#f8fafc'"
+                        [style.cursor]="editandoContenido ? 'text' : 'pointer'"
+                        style="text-transform: uppercase;"
+                        placeholder="INGRESE EL ASUNTO / CONTENIDO DEL DOCUMENTO..."
+                        [title]="!editandoContenido ? 'Haga clic para activar la edición del contenido' : ''">
+              </textarea>
+              <div class="d-flex justify-content-between align-items-center mt-1" style="font-size: 0.7rem;">
+                <span class="text-primary font-weight-bold" *ngIf="editandoContenido">
+                  <i class="fas fa-pencil-alt mr-1"></i> Modo Edición Activo (EN MAYÚSCULAS)
+                </span>
+                <span class="text-muted" *ngIf="!editandoContenido">
+                  <i class="fas fa-info-circle mr-1"></i> Pulse Editar para modificar el asunto
+                </span>
+              </div>
+            </ng-container>
+
+            <!-- Vista de sólo lectura para otros perfiles o documentos firmados -->
+            <ng-template #viewAsuntoReadOnly>
+              <div class="asunto-text-box">
+                {{ getAsuntoClean(activeDoc) || 'Sin descripción disponible.' }}
+              </div>
+            </ng-template>
           </div>
 
           <!-- Observación Textarea Block -->
