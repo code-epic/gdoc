@@ -4982,7 +4982,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       codigo: this.encriptarService.GCodeEncrypt(numero_control),
       archivo: archivo,
       puntos: 1,
-      decision: "${dec}",
+      decision: dec,
     };
 
     this.apiService.ExecFnx(fnx).subscribe(
