@@ -4605,7 +4605,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const contenido = (this.contenidoEditado || "").toString().trim().toUpperCase();
+    const contenido = (this.contenidoEditado || "")
+      .toString()
+      .trim()
+      .toUpperCase();
     if (!contenido) {
       this.toastrService.warning(
         "El contenido del documento no puede estar vacío.",
@@ -4647,7 +4650,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         if (this.buzon && Array.isArray(this.buzon)) {
           const itemBuzon = this.buzon.find(
             (b: any) =>
-              (b.numc || b.ncontrol || b.cuenta || "").toString().trim() === numc,
+              (b.numc || b.ncontrol || b.cuenta || "").toString().trim() ===
+              numc,
           );
           if (itemBuzon) {
             itemBuzon.asunto = contenido;
@@ -4955,11 +4959,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     let numero_control = btoa("D" + this.activeDoc.numc);
     let archivo = this.activeDoc.anom;
 
-    let dec = (
-      decision ||
-      this.activeDoc?.decision ||
-      ""
-    )
+    let dec = (decision || this.activeDoc?.decision || "")
       .toString()
       .trim()
       .toUpperCase();
@@ -4982,7 +4982,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       codigo: this.encriptarService.GCodeEncrypt(numero_control),
       archivo: archivo,
       puntos: 1,
-      decision: dec,
+      decision: "${dec}",
     };
 
     this.apiService.ExecFnx(fnx).subscribe(
