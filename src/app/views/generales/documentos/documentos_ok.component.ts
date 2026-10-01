@@ -2475,8 +2475,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.fnxFirmaMinistro(decisionSeleccionada);
     this.observacion = observacionFinal;
+    this.fnxFirmaMinistro(decisionSeleccionada, observacionFinal);
     this.loadingAction = true;
     this.redistribuir(decisionSeleccionada);
   }
@@ -3403,7 +3403,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.activeDoc.archivo = filename;
     this.activeDoc.archivo_firmado = filename;
     try {
-      this.fnxFirmaMinistro("APROBADO");
+      this.fnxFirmaMinistro(
+        "APROBADO",
+        this.observacion || this.activeDoc?.observacion || "",
+      );
     } catch (errFnx) {
       console.warn("[PuntoDeCuenta] Aviso en fnxFirmaMinistro:", errFnx);
     }
@@ -4272,7 +4275,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.activeDoc.archivo = filename;
     this.activeDoc.archivo_firmado = filename;
     try {
-      this.fnxFirmaMinistro("APROBADO");
+      this.fnxFirmaMinistro(
+        "APROBADO",
+        this.observacion || this.activeDoc?.observacion || "",
+      );
     } catch (errFnx) {
       console.warn("[ActividadesExterior] Aviso en fnxFirmaMinistro:", errFnx);
     }
@@ -4955,9 +4961,20 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     ); //
   }
 
-  public fnxFirmaMinistro(decision: string = "") {
-    let numero_control = btoa("D" + this.activeDoc.numc);
-    let archivo = this.activeDoc.anom;
+  public fnxFirmaMinistro(decision: string = "", comentario: string = "") {
+    if (!this.activeDoc) {
+      console.warn("[fnxFirmaMinistro] No hay documento activo para firmar.");
+      return;
+    }
+
+    let numc = this.activeDoc.numc || this.activeDoc.ncontrol || "";
+    let numero_control = btoa("D" + numc);
+    let archivo =
+      this.activeDoc.anom ||
+      this.activeDoc.archivo ||
+      this.activeDoc.archivo_firmado ||
+      this.activeDoc.anom_firmado ||
+      "";
 
     let dec = (decision || this.activeDoc?.decision || "")
       .toString()
@@ -4977,6 +4994,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       this.activeDoc.decision = dec;
     }
 
+    const observacionFinal = (
+      comentario ||
+      this.observacion ||
+      this.activeDoc?.observacion ||
+      ""
+    )
+      .toString()
+      .trim()
+      .toUpperCase();
+
     let fnx = {
       funcion: "Fnx_FirmarPuntos",
       codigo: this.encriptarService.GCodeEncrypt(numero_control),
@@ -4987,12 +5014,60 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     this.apiService.ExecFnx(fnx).subscribe(
       async (data) => {
-        console.log(data);
+        console.log("Fnx_FirmarPuntos respuesta:", data);
+        this.registrarDocumentoFirmado(dec, observacionFinal);
       },
       (errot) => {
-        this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
+        console.error("Error en Fnx_FirmarPuntos:", errot);
+        this.toastrService.error(errot, `GDoc Wkf.FirmarPuntos`);
       },
     ); //
+  }
+
+  /**
+   * Envía registro a WKF_IDocumentoFirmados tras la firma ministerial
+   * @param decision APROBADO, NEGADO, DIFERIDO, VISTO, OTRO
+   * @param comentario Observaciones o justificación
+   */
+  public registrarDocumentoFirmado(
+    decision: string = "APROBADO",
+    comentario: string = "",
+  ) {
+    if (!this.activeDoc) return;
+
+    const numc = this.activeDoc.numc || this.activeDoc.ncontrol || "";
+    const estatus = (decision || this.activeDoc.decision || "APROBADO")
+      .toString()
+      .trim()
+      .toUpperCase();
+    const usuario =
+      this.jwtData?.userId ||
+      this.loginService.Usuario?.usuario ||
+      this.loginService.Usuario?.id ||
+      "";
+    const obs = (
+      comentario ||
+      this.observacion ||
+      this.activeDoc?.observacion ||
+      ""
+    )
+      .toString()
+      .trim()
+      .toUpperCase();
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_IDocumentoFirmados";
+    this.xAPI.parametros = `${numc},${estatus},${usuario},${obs}`;
+
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      async (data) => {
+        console.log("WKF_IDocumentoFirmados registrado exitosamente:", data);
+      },
+      (error) => {
+        console.error("Error en WKF_IDocumentoFirmados:", error);
+        this.toastrService.error(error, `GDoc Wkf.IDocumentosFirmados`);
+      },
+    );
   }
   public perfilSolicitante: any = null;
 
