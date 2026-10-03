@@ -249,7 +249,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     },
     {
       id: "ACTIVIDADES_EN_EL_EXTERIOR",
-      nombre: "ACTIVIDADES EN EL EXTERIOR",
+      nombre: "ACTIVIDADES VARIAS",
       icono: "fas fa-envelope",
       color: "#fb6340",
       disponible: true,
@@ -3482,17 +3482,30 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       .toString()
       .trim()
       .toUpperCase();
-    const tieneObservacion = !!comentarioInicial;
+    const tieneObservacion = comentarioInicial.length > 0;
+    const esVarias = this.isActividadVarias(this.activeDoc);
+    const tituloModal = esVarias
+      ? "Actividades Varias - Ministro"
+      : "Actividades en el Exterior - Ministro";
 
     const modalHtml = `
       <div style="text-align: left; font-size: 0.88rem; color: #1e293b; line-height: 1.5;">
         <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #8e1c26; padding: 12px 14px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-          <div style="font-weight: 700; color: #8e1c26; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
-            <i class="fas fa-globe-americas mr-1"></i> Autorización de Actividades en el Exterior
-          </div>
-          <div style="font-size: 0.82rem; color: #475569;">
-            Se procederá a generar el <b>Documento Oficial Ministerial (Carta)</b> con firma y sello del General en Jefe Ministro del Poder Popular para la Defensa y aprobación del viaje a <b>${pais}</b>.
-          </div>
+          ${
+            esVarias
+              ? `<div style="font-weight: 700; color: #8e1c26; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                   <i class="fas fa-file-invoice mr-1"></i> Aprobación de Actividades Varias
+                 </div>
+                 <div style="font-size: 0.82rem; color: #475569;">
+                   Se procederá a generar el <b>Documento Oficial Ministerial (Informe/Carta)</b> con firma y sello del General en Jefe Ministro del Poder Popular para la Defensa.
+                 </div>`
+              : `<div style="font-weight: 700; color: #8e1c26; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                   <i class="fas fa-globe-americas mr-1"></i> Autorización de Actividades en el Exterior
+                 </div>
+                 <div style="font-size: 0.82rem; color: #475569;">
+                   Se procederá a generar el <b>Documento Oficial Ministerial (Carta)</b> con firma y sello del General en Jefe Ministro del Poder Popular para la Defensa y aprobación del viaje a <b>${pais}</b>.
+                 </div>`
+          }
         </div>
 
         ${
@@ -3521,7 +3534,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             <textarea id="swal-mppd-comentario-ext"
                       rows="3"
                       style="width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 0.82rem; font-family: inherit; border: 1.5px solid #cbd5e1; border-radius: 6px; resize: vertical; text-transform: uppercase; outline: none; transition: border-color 0.2s;"
-                      placeholder="INSTRUCCIONES U OBSERVACIONES PARA EL VIAJE AL EXTERIOR..."
+                      placeholder="${esVarias ? 'INSTRUCCIONES U OBSERVACIONES PARA EL INFORME DE ACTIVIDADES VARIAS...' : 'INSTRUCCIONES U OBSERVACIONES PARA EL VIAJE AL EXTERIOR...'}"
                       onfocus="this.style.borderColor='#8e1c26'"
                       onblur="this.style.borderColor='#cbd5e1'"
                       oninput="this.value = this.value.toUpperCase()"></textarea>
@@ -3532,7 +3545,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     `;
 
     const confirmacion = await Swal.fire({
-      title: "Actividades en el Exterior - Ministro",
+      title: tituloModal,
       html: modalHtml,
       showCancelButton: true,
       confirmButtonColor: "#8e1c26",
@@ -4528,9 +4541,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       archivo: `${cleanName}.pdf`,
     };
 
+    const esVarias = this.isActividadVarias(targetDoc);
+
     Swal.fire({
       title: "Cargando Documento Firmado...",
-      text: "Descargando Actividades en el Exterior oficial desde el servidor...",
+      text: esVarias
+        ? "Descargando Actividades Varias oficial desde el servidor..."
+        : "Descargando Actividades en el Exterior oficial desde el servidor...",
       allowOutsideClick: false,
       showConfirmButton: false,
       didOpen: () => {
@@ -5200,6 +5217,195 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     });
   }
 
+  public decodeHtmlEntities(text: string): string {
+    if (!text || typeof text !== "string") return text || "";
+    let str = text;
+    str = str.replace(/<br\s*[\/]?>/gi, "\n");
+    str = str.replace(/<\/p>/gi, "\n");
+    str = str.replace(/<[^>]*>/g, "");
+
+    str = str.replace(/&#(\d+);/g, (_, dec) => {
+      try {
+        return String.fromCharCode(parseInt(dec, 10));
+      } catch {
+        return _;
+      }
+    });
+    str = str.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => {
+      try {
+        return String.fromCharCode(parseInt(hex, 16));
+      } catch {
+        return _;
+      }
+    });
+
+    const entities: { [key: string]: string } = {
+      "&aacute;": "á", "&Aacute;": "Á",
+      "&eacute;": "é", "&Eacute;": "É",
+      "&iacute;": "í", "&Iacute;": "Í",
+      "&oacute;": "ó", "&Oacute;": "Ó",
+      "&uacute;": "ú", "&Uacute;": "Ú",
+      "&ntilde;": "ñ", "&Ntilde;": "Ñ",
+      "&uuml;": "ü",   "&Uuml;": "Ü",
+      "&quot;": '"',   "&apos;": "'",
+      "&amp;": "&",    "&lt;": "<",
+      "&gt;": ">",     "&nbsp;": " ",
+      "&#160;": " ",
+    };
+
+    for (const key in entities) {
+      if (str.includes(key)) {
+        str = str.split(key).join(entities[key]);
+      }
+    }
+
+    return str.trim();
+  }
+
+  public robustJsonParse(raw: any): any {
+    if (!raw) return null;
+    if (typeof raw === "object") return raw;
+    if (typeof raw !== "string") return null;
+
+    let str = raw.trim();
+    if (!str) return null;
+
+    if (str.startsWith('"') && str.endsWith('"') && str.length > 2) {
+      if (str.includes('""')) {
+        str = str.substring(1, str.length - 1);
+      }
+    }
+
+    if (str.includes('{"') || str.includes('""')) {
+      if (str.includes('{\"\"') || str.includes('\"\":') || str.includes(':\"\"')) {
+        str = str.replace(/""/g, '"');
+      }
+    }
+
+    try {
+      const res = JSON.parse(str);
+      if (typeof res === "string") return this.robustJsonParse(res);
+      return res;
+    } catch (e1) {}
+
+    try {
+      const sanitized = str.replace(/[\r\n\t]+/g, " ");
+      const res = JSON.parse(sanitized);
+      if (typeof res === "string") return this.robustJsonParse(res);
+      return res;
+    } catch (e2) {}
+
+    try {
+      const fixedQuotes = str
+        .replace(/([^\\])""/g, '$1\\"')
+        .replace(/[\r\n\t]+/g, " ");
+      const res = JSON.parse(fixedQuotes);
+      if (typeof res === "string") return this.robustJsonParse(res);
+      return res;
+    } catch (e3) {}
+
+    try {
+      const extracted: any = {};
+      const strFields = [
+        "tipo", "solicitud", "motivo", "dirigido", "pais",
+        "opinionDe", "opinion_de", "opinion", "opinionTexto",
+        "recomendacion", "recomendacionDireccion",
+      ];
+      for (const field of strFields) {
+        const reg = new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`, "i");
+        const match = reg.exec(str);
+        if (match && match[1] !== undefined) {
+          let val = match[1].replace(/""/g, '"').trim();
+          if (val.startsWith('"') && val.endsWith('"') && val.length > 1) {
+            val = val.substring(1, val.length - 1);
+          }
+          extracted[field] = val;
+        }
+      }
+      const numFields = ["personas", "id", "idd", "estatus"];
+      for (const field of numFields) {
+        const reg = new RegExp(`"${field}"\\s*:\\s*(\\d+)`, "i");
+        const match = reg.exec(str);
+        if (match && match[1] !== undefined) {
+          extracted[field] = parseInt(match[1], 10);
+        }
+      }
+      const objFields = ["fechaInicio", "fechaFin", "fechaLimiteRespuesta", "fechaConfirmacion", "gastos"];
+      for (const field of objFields) {
+        const reg = new RegExp(`"${field}"\\s*:\\s*({[\\s\\S]*?})(?=\\s*,\\s*"|\\s*})`, "i");
+        const match = reg.exec(str);
+        if (match && match[1] !== undefined) {
+          try {
+            extracted[field] = JSON.parse(match[1]);
+          } catch {
+            extracted[field] = match[1];
+          }
+        }
+      }
+      if (Object.keys(extracted).length > 0) return extracted;
+    } catch (e4) {}
+
+    return null;
+  }
+
+  public isActividadVarias(doc: any): boolean {
+    if (!doc) return false;
+    const tdoc = (doc.tdoc || doc.tipo || "").toString().trim().toUpperCase();
+    if (
+      tdoc === "ACTIVIDADES VARIAS" ||
+      tdoc.includes("ACTIVIDAD VARIAS") ||
+      tdoc.includes("ACTIVIDADES VARIAS") ||
+      tdoc.includes("VARIAS")
+    ) {
+      return true;
+    }
+    if (
+      tdoc === "ACTIVIDADES EN EL EXTERIOR" ||
+      tdoc.includes("EXTERIOR")
+    ) {
+      return false;
+    }
+    const data = this.getViajesData(doc);
+    if (data) {
+      const tipoData = (data.tdoc || data.tipo || "").toString().trim().toUpperCase();
+      if (tipoData.includes("VARIAS")) return true;
+      if (tipoData.includes("EXTERIOR")) return false;
+      if (
+        data.solicitud ||
+        data.opinionDe ||
+        data.opinion ||
+        data.recomendacion ||
+        data.fechaLimiteRespuesta
+      ) {
+        if (!data.pais && !data.gastos?.boletos) {
+          return true;
+        }
+        if (data.opinion || data.recomendacion || data.opinionDe) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public isActividadExterior(doc: any): boolean {
+    if (!doc) return false;
+    const tdoc = (doc.tdoc || doc.tipo || "").toString().trim().toUpperCase();
+    if (
+      tdoc === "ACTIVIDADES EN EL EXTERIOR" ||
+      tdoc.includes("EXTERIOR")
+    ) {
+      return true;
+    }
+    if (
+      tdoc === "ACTIVIDADES VARIAS" ||
+      tdoc.includes("VARIAS")
+    ) {
+      return false;
+    }
+    return !this.isActividadVarias(doc);
+  }
+
   public getViajesData(doc: any): any {
     if (!doc) return null;
     if (doc._parsedViajesData) {
@@ -5230,7 +5436,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           (cand.includes('"pais"') ||
             cand.includes('"motivo"') ||
             cand.includes('"gastos"') ||
-            cand.includes('"fechaInicio"'))
+            cand.includes('"fechaInicio"') ||
+            cand.includes('"solicitud"') ||
+            cand.includes('"opinion"') ||
+            cand.includes('"recomendacion"') ||
+            cand.includes('"fechaLimiteRespuesta"') ||
+            cand.includes("ACTIVIDADES VARIAS") ||
+            cand.includes("actividades varias"))
         ) {
           raw = cand;
           break;
@@ -5240,17 +5452,45 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     if (raw) {
       try {
-        let data = raw;
-        while (typeof data === "string") {
-          data = JSON.parse(data);
-        }
+        let data = this.robustJsonParse(raw);
         if (Array.isArray(data) && data.length > 0) {
           data = data[0];
         }
         if (data && typeof data === "object") {
-          if (data.observacion && typeof data.observacion === "object") {
-            data = data.observacion;
+          if (data.observacion) {
+            let obs = this.robustJsonParse(data.observacion);
+            if (obs && typeof obs === "object") {
+              data = obs;
+            }
           }
+
+          // Si es Actividades Varias según tdoc o estructura, decodificar entidades y campos
+          const docTdoc = (doc.tdoc || doc.tipo || "").toString().trim().toUpperCase();
+          if (
+            docTdoc === "ACTIVIDADES VARIAS" ||
+            docTdoc.includes("VARIAS") ||
+            (data.tdoc && data.tdoc.toUpperCase().includes("VARIAS")) ||
+            (data.tipo && data.tipo.toUpperCase().includes("VARIAS")) ||
+            data.solicitud ||
+            data.opinionDe ||
+            data.opinion ||
+            data.recomendacion
+          ) {
+            data.tdoc = data.tdoc || doc.tdoc || "ACTIVIDADES VARIAS";
+            data.tipo = data.tipo || doc.tdoc || "ACTIVIDADES VARIAS";
+            data.solicitud = this.decodeHtmlEntities(data.solicitud || data.motivo || "");
+            data.motivo = this.decodeHtmlEntities(data.motivo || data.solicitud || "");
+            data.dirigido = this.decodeHtmlEntities(data.dirigido || "");
+            data.opinionDe = this.decodeHtmlEntities(data.opinionDe || data.opinion_de || "");
+            data.opinion = this.decodeHtmlEntities(data.opinion || data.opinionTexto || "");
+            data.recomendacion = this.decodeHtmlEntities(data.recomendacion || data.recomendacionDireccion || "");
+          } else {
+            // Actividades en el exterior
+            data.pais = this.decodeHtmlEntities(data.pais || "");
+            data.motivo = this.decodeHtmlEntities(data.motivo || "");
+            data.dirigido = this.decodeHtmlEntities(data.dirigido || "");
+          }
+
           doc._parsedViajesData = data;
           return data;
         }
@@ -5457,8 +5697,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   public getFlagUrl(countryName: string): string {
-    if (!countryName) return "assets/images/placeholder-flag.png";
+    if (!countryName) return "";
     const name = countryName.toLowerCase().trim();
+    if (name === "undefined" || name === "null" || name === "") return "";
     if (this.countryToIsoMap[name]) {
       return `https://flagcdn.com/w160/${this.countryToIsoMap[name]}.png`;
     }
@@ -5467,7 +5708,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         return `https://flagcdn.com/w160/${this.countryToIsoMap[key]}.png`;
       }
     }
-    return "assets/images/placeholder-flag.png";
+    return "";
   }
 
   private readonly countryToIsoMap: { [key: string]: string } = {

@@ -348,6 +348,131 @@
                             </div>
                         </div>
 
+                        <!-- Bloque de ACTIVIDADES VARIAS -->
+                        <div *ngIf="esActividadVarias" class="form-row" style="background-color: #f8fafc; padding: 18px 15px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                            <div class="col-12 mb-2">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap">
+                                    <h6 class="text-primary font-weight-bold mb-0">
+                                        <i class="fas fa-tasks mr-2 text-primary"></i>Detalles de Actividades Varias
+                                    </h6>
+                                    <span class="badge badge-primary px-3 py-1 font-weight-normal" style="font-size: 0.78rem;">
+                                        Control de Gestión Ministerial
+                                    </span>
+                                </div>
+                                <hr class="mt-2 mb-3">
+                            </div>
+
+                            <!-- 1. Solicitud ó Requerimiento (manual) -->
+                            <div class="form-group col-md-6">
+                                <label class="form-label-custom font-weight-bold">
+                                    Solicitud ó Requerimiento <span class="text-muted font-italic">(Manual)</span> (*)
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">assignment</mat-icon></span>
+                                    </div>
+                                    <textarea rows="2" class="input-custom" placeholder="Redacte aquí la solicitud o requerimiento..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.solicitud"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 2. A quien va Dirigido (manual) -->
+                            <div class="form-group col-md-6">
+                                <label class="form-label-custom font-weight-bold">
+                                    A quien va Dirigido <span class="text-muted font-italic">(Manual)</span>
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">person</mat-icon></span>
+                                    </div>
+                                    <input type="text" class="input-custom" placeholder="Destinatario / A quien va dirigido..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.dirigido">
+                                </div>
+                            </div>
+
+                            <!-- 3. Cantidad de Participantes (opcional) -->
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom">
+                                    Cantidad de Participantes <span class="text-muted font-italic">(Opcional)</span>
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">groups</mat-icon></span>
+                                    </div>
+                                    <input type="number" min="0" class="input-custom" placeholder="0" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.personas">
+                                </div>
+                            </div>
+
+                            <!-- 4. Fecha de Inicio (opcional) -->
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom">
+                                    Fecha de Inicio <span class="text-muted font-italic">(Opcional)</span>
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box" (click)="fi_var.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event</mat-icon></span>
+                                    </div>
+                                    <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.fechaInicio" ngbDatepicker #fi_var="ngbDatepicker" readonly (click)="fi_var.toggle()">
+                                </div>
+                            </div>
+
+                            <!-- 5. Fecha Final (opcional) -->
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom">
+                                    Fecha Final <span class="text-muted font-italic">(Opcional)</span>
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box" (click)="ff_var.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event</mat-icon></span>
+                                    </div>
+                                    <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.fechaFin" ngbDatepicker #ff_var="ngbDatepicker" readonly (click)="ff_var.toggle()">
+                                </div>
+                            </div>
+
+                            <!-- 6. Fecha Limite de Respuesta (obligatorio) -->
+                            <div class="form-group col-md-3">
+                                <label class="form-label-custom text-danger font-weight-bold">
+                                    Fecha Límite de Respuesta (*)
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box" (click)="flr.toggle()" style="cursor: pointer; background-color: #fee2e2; color: #dc2626;"><mat-icon class="input-icon">event_available</mat-icon></span>
+                                    </div>
+                                    <input class="input-custom border-danger" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.fechaLimiteRespuesta" (ngModelChange)="onFechaLimiteRespuestaChange($event)" ngbDatepicker #flr="ngbDatepicker" readonly (click)="flr.toggle()">
+                                </div>
+                            </div>
+
+                            <!-- 7. Opinión de: [ _________ ] -->
+                            <div class="form-group col-md-6">
+                                <label class="form-label-custom font-weight-bold">
+                                    Opinión de: <span class="text-primary font-italic ml-1">(Dirección, Dependencia o Funcionario)</span>
+                                </label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">account_circle</mat-icon></span>
+                                    </div>
+                                    <input type="text" class="input-custom font-weight-bold text-primary" placeholder="Ej: Consultoría Jurídica, Dirección General, etc." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.opinionDe">
+                                </div>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">rate_review</mat-icon></span>
+                                    </div>
+                                    <textarea rows="3" class="input-custom" placeholder="Redacte aquí el texto de la opinión emitida..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.opinion"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 8. Recomendación de la Dirección General -->
+                            <div class="form-group col-md-6">
+                                <label class="form-label-custom font-weight-bold">
+                                    Recomendación de la Dirección General
+                                </label>
+                                <div class="input-group" style="height: calc(100% - 32px);">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">recommend</mat-icon></span>
+                                    </div>
+                                    <textarea rows="4" class="input-custom h-100" placeholder="Redacte aquí la recomendación oficial de la Dirección General..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.recomendacion"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-row" *ngIf="booPuntoCuenta">
                             <div class="form-group col-md-6">
                                 <label class="form-label-custom">Selecciona el/los punto de cuenta</label>

@@ -184,8 +184,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     dependencias: "",
   };
 
-  // --- Actividades en el exterior ---
+  // --- Actividades en el exterior y Actividades Varias ---
   public esActividadExterior: boolean = false;
+  public esActividadVarias: boolean = false;
   public paises: string[] = [
     "Afganistán",
     "Albania",
@@ -398,6 +399,21 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     },
   };
 
+  public actividadesVarias: any = {
+    tipo: "ACTIVIDADES VARIAS",
+    solicitud: "",
+    motivo: "",
+    dirigido: "",
+    personas: "",
+    fechaInicio: null,
+    fechaFin: null,
+    fechaLimiteRespuesta: null,
+    fechaConfirmacion: null,
+    opinionDe: "",
+    opinion: "",
+    recomendacion: "",
+  };
+
   public booDependencia = false;
 
   public lstT: any[] = []; //Objeto Tipo documento
@@ -583,6 +599,13 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           break;
       }
     });
+
+    const tieneActividadesVarias = this.lstT.some(
+      (e) => e.nomb && e.nomb.trim().toUpperCase() === "ACTIVIDADES VARIAS",
+    );
+    if (!tieneActividadesVarias) {
+      this.lstT.push({ nomb: "ACTIVIDADES VARIAS", tipo: "1" });
+    }
   }
 
   limpiarDoc() {
@@ -605,6 +628,22 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.fcreacion = NgbDate.from(this.formatter.parse(fechaActual));
 
     this.nasociacion = "";
+    this.esActividadExterior = false;
+    this.esActividadVarias = false;
+    this.actividadesVarias = {
+      tipo: "ACTIVIDADES VARIAS",
+      solicitud: "",
+      motivo: "",
+      dirigido: "",
+      personas: "",
+      fechaInicio: null,
+      fechaFin: null,
+      fechaLimiteRespuesta: null,
+      fechaConfirmacion: null,
+      opinionDe: "",
+      opinion: "",
+      recomendacion: "",
+    };
   }
 
   /**
@@ -638,16 +677,29 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.WAlerta.usuario = this.loginService.Usuario.id;
           }
 
-          if (e.viajes_descripcion) {
-            try {
-              this.actividadesExt = JSON.parse(e.viajes_descripcion);
-            } catch (err) {
-              console.error("Error parsing viajes_descripcion", err);
-            }
-          }
+          this.extraerYAsignarActividades(e);
         });
 
         this.selTipoDocumento();
+
+        // Fallback: Si es Actividad y no se cargaron los campos, consultar detalle directo
+        const docId = this.Doc.wfdocumento || (this.Doc as any).idd || this.Doc.id;
+        const tipoActual = (this.Doc.tipo || "").toLowerCase();
+        const esAct = tipoActual.includes("actividad") || tipoActual.includes("exterior");
+        if (esAct && !this.actividadesVarias.solicitud && !this.actividadesExt.pais && docId) {
+          const xAPIDetalle: IAPICore = {
+            funcion: "WKF_CDocumentoDetalle",
+            parametros: `1,1,${docId}`,
+            valores: "",
+          };
+          this.apiService.Ejecutar(xAPIDetalle).subscribe((detData) => {
+            if (detData && detData.Cuerpo && detData.Cuerpo.length > 0) {
+              this.extraerYAsignarActividades(detData.Cuerpo[0]);
+              this.selTipoDocumento();
+            }
+          });
+        }
+
         const punto_cuenta =
           this.Doc.subdocumento != null
             ? JSON.parse(this.Doc.subdocumento)
@@ -738,6 +790,22 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   validarCamposObligatorios(): boolean {
+    if (this.esActividadVarias) {
+      if (this.actividadesVarias.solicitud && !this.Doc.contenido) {
+        this.Doc.contenido = this.actividadesVarias.solicitud;
+      }
+      if (this.actividadesVarias.fechaLimiteRespuesta && !this.fplazo) {
+        this.fplazo = this.actividadesVarias.fechaLimiteRespuesta;
+      }
+      if (!this.actividadesVarias.fechaLimiteRespuesta) {
+        this.toastrService.error(
+          "Fecha Límite de Respuesta es obligatoria para Actividades Varias",
+          "Campo requerido",
+        );
+        return true;
+      }
+    }
+
     // Validar campos comunes
     if (
       this.fcreacion == "" ||
@@ -837,12 +905,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.obtenerDatos(data);
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (xdata) => {
-            //Evaluar si el tipodocumento es actividades en el exterior
-            if (
-              this.Doc.tipo.trim().toLowerCase() ===
-              "actividades en el exterior"
-            ) {
+            // Evaluar si el tipodocumento es actividades en el exterior o actividades varias
+            const tdoc = this.Doc.tipo ? this.Doc.tipo.trim().toLowerCase() : "";
+            if (tdoc === "actividades en el exterior") {
               this.guardarActividadesExterior(this.Doc.wfdocumento);
+            } else if (
+              tdoc === "actividades varias" ||
+              tdoc.indexOf("actividades varias") >= 0
+            ) {
+              this.guardarActividadesVarias(this.Doc.wfdocumento);
             }
 
             if (this.fplazo.year != undefined) {
@@ -914,6 +985,372 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.toastrService.error(`GDoc Wkf.Documento.Viajes al Exterior`);
       },
     );
+  }
+
+  guardarActividadesVarias(wfdocumento: number) {
+    if (
+      this.actividadesVarias.fechaLimiteRespuesta &&
+      !this.actividadesVarias.fechaConfirmacion
+    ) {
+      this.actividadesVarias.fechaConfirmacion =
+        this.actividadesVarias.fechaLimiteRespuesta;
+    }
+    if (this.actividadesVarias.solicitud && !this.actividadesVarias.motivo) {
+      this.actividadesVarias.motivo = this.actividadesVarias.solicitud;
+    }
+
+    const payload = {
+      tipo: "ACTIVIDADES VARIAS",
+      solicitud: this.decodeHtmlEntities(this.actividadesVarias.solicitud || ""),
+      motivo: this.decodeHtmlEntities(this.actividadesVarias.motivo || this.actividadesVarias.solicitud || ""),
+      dirigido: this.decodeHtmlEntities(this.actividadesVarias.dirigido || ""),
+      personas: Number(this.actividadesVarias.personas) || 0,
+      fechaInicio: this.actividadesVarias.fechaInicio,
+      fechaFin: this.actividadesVarias.fechaFin,
+      fechaLimiteRespuesta: this.actividadesVarias.fechaLimiteRespuesta,
+      fechaConfirmacion:
+        this.actividadesVarias.fechaConfirmacion ||
+        this.actividadesVarias.fechaLimiteRespuesta,
+      opinionDe: this.decodeHtmlEntities(this.actividadesVarias.opinionDe || ""),
+      opinion: this.decodeHtmlEntities(this.actividadesVarias.opinion || ""),
+      recomendacion: this.decodeHtmlEntities(this.actividadesVarias.recomendacion || ""),
+    };
+
+    let viaje = {
+      idd: wfdocumento,
+      observacion: payload,
+      estatus: 1,
+    };
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_IDocumentoViajes";
+    this.xAPI.valores = JSON.stringify(viaje);
+
+    console.log("Guardando Actividades Varias:", this.xAPI);
+    this.apiService.Ejecutar(this.xAPI).subscribe(
+      (ydata) => {
+        console.log("Actividades Varias registradas:", ydata);
+      },
+      (errot) => {
+        this.toastrService.error(`GDoc Wkf.Documento.Actividades Varias`);
+      },
+    );
+  }
+
+  onFechaLimiteRespuestaChange(fecha: any) {
+    if (fecha) {
+      this.fplazo = fecha;
+      this.actividadesVarias.fechaConfirmacion = fecha;
+    }
+  }
+
+  decodeHtmlEntities(text: string): string {
+    if (!text || typeof text !== "string") return text || "";
+    let str = text;
+    str = str.replace(/<br\s*[\/]?>/gi, "\n");
+    str = str.replace(/<\/p>/gi, "\n");
+    str = str.replace(/<[^>]*>/g, "");
+
+    // Entidades numéricas &#123; y &#xABC;
+    str = str.replace(/&#(\d+);/g, (_, dec) => {
+      try {
+        return String.fromCharCode(parseInt(dec, 10));
+      } catch {
+        return _;
+      }
+    });
+    str = str.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => {
+      try {
+        return String.fromCharCode(parseInt(hex, 16));
+      } catch {
+        return _;
+      }
+    });
+
+    const entities: { [key: string]: string } = {
+      "&aacute;": "á", "&Aacute;": "Á",
+      "&eacute;": "é", "&Eacute;": "É",
+      "&iacute;": "í", "&Iacute;": "Í",
+      "&oacute;": "ó", "&Oacute;": "Ó",
+      "&uacute;": "ú", "&Uacute;": "Ú",
+      "&ntilde;": "ñ", "&Ntilde;": "Ñ",
+      "&uuml;": "ü",   "&Uuml;": "Ü",
+      "&quot;": '"',   "&apos;": "'",
+      "&amp;": "&",    "&lt;": "<",
+      "&gt;": ">",     "&nbsp;": " ",
+      "&#160;": " "
+    };
+
+    for (const key in entities) {
+      if (str.includes(key)) {
+        str = str.split(key).join(entities[key]);
+      }
+    }
+
+    return str.trim();
+  }
+
+  robustJsonParse(raw: any): any {
+    if (!raw) return null;
+    if (typeof raw === "object") return raw;
+    if (typeof raw !== "string") return null;
+
+    let str = raw.trim();
+    if (!str) return null;
+
+    // Si viene envuelto entre comillas externas
+    if (str.startsWith('"') && str.endsWith('"') && str.length > 2) {
+      if (str.includes('""')) {
+        str = str.substring(1, str.length - 1);
+      }
+    }
+
+    // Si viene escapado estilo CSV con comillas dobles {""key"":""val""}
+    if (str.includes('{\\"\\"\\"') || str.includes('{\\"\\"') || str.includes('{\\"') || str.includes('{\\""') || str.includes('{\\"') || str.includes('""')) {
+      if (str.includes('{\\"') || str.includes('""')) {
+        // normalizar
+      }
+    }
+    if (str.includes('{\\""') || str.includes('{\\"') || str.includes('""')) {
+      if (str.includes('{\\"') || str.includes('""')) {
+        // normalizar
+      }
+    }
+    if (str.includes('{\\"') || str.includes('""')) {
+      if (str.includes('{\\"') || str.includes('""')) {
+        // ok
+      }
+    }
+    if (str.includes('{\\"') || str.includes('""')) {
+      // Si tiene formato de comillas duplicadas de CSV
+      if (str.includes('{\\"\\"\\"') || str.includes('{\\"\\"') || str.includes('{\\""') || str.includes('{\\"') || str.includes('""')) {
+        if (str.includes('{\\""') || str.includes('{\\"') || str.includes('""')) {
+          if (str.includes('""')) {
+            if (str.includes('{\"\"') || str.includes('\"\":') || str.includes(':\"\"')) {
+              str = str.replace(/""/g, '"');
+            }
+          }
+        }
+      }
+    }
+
+    // Estrategia 1: Parse directo estándar
+    try {
+      const res = JSON.parse(str);
+      if (typeof res === "string") return this.robustJsonParse(res);
+      return res;
+    } catch (e1) {}
+
+    // Estrategia 2: Limpieza de saltos de línea literales en cadenas
+    try {
+      const sanitized = str.replace(/[\r\n\t]+/g, " ");
+      const res = JSON.parse(sanitized);
+      if (typeof res === "string") return this.robustJsonParse(res);
+      return res;
+    } catch (e2) {}
+
+    // Estrategia 3: Comillas internas duplicadas
+    try {
+      const fixedQuotes = str
+        .replace(/([^\\])""/g, '$1\\"')
+        .replace(/[\r\n\t]+/g, " ");
+      const res = JSON.parse(fixedQuotes);
+      if (typeof res === "string") return this.robustJsonParse(res);
+      return res;
+    } catch (e3) {}
+
+    // Estrategia 4: Extracción manual de propiedades vía Regex
+    try {
+      const extracted: any = {};
+      const strFields = [
+        "tipo", "solicitud", "motivo", "dirigido", "pais",
+        "opinionDe", "opinion_de", "opinion", "opinionTexto",
+        "recomendacion", "recomendacionDireccion"
+      ];
+      for (const field of strFields) {
+        const reg = new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`, "i");
+        const match = reg.exec(str);
+        if (match && match[1] !== undefined) {
+          let val = match[1].replace(/""/g, '"').trim();
+          if (val.startsWith('"') && val.endsWith('"') && val.length > 1) {
+            val = val.substring(1, val.length - 1);
+          }
+          extracted[field] = val;
+        }
+      }
+      const numFields = ["personas", "id", "idd", "estatus"];
+      for (const field of numFields) {
+        const reg = new RegExp(`"${field}"\\s*:\\s*(\\d+)`, "i");
+        const match = reg.exec(str);
+        if (match && match[1] !== undefined) {
+          extracted[field] = parseInt(match[1], 10);
+        }
+      }
+      const objFields = ["fechaInicio", "fechaFin", "fechaLimiteRespuesta", "fechaConfirmacion", "gastos"];
+      for (const field of objFields) {
+        const reg = new RegExp(`"${field}"\\s*:\\s*({[\\s\\S]*?})(?=\\s*,\\s*"|\\s*})`, "i");
+        const match = reg.exec(str);
+        if (match && match[1] !== undefined) {
+          try {
+            extracted[field] = JSON.parse(match[1]);
+          } catch {
+            extracted[field] = match[1];
+          }
+        }
+      }
+      if (Object.keys(extracted).length > 0) return extracted;
+    } catch (e4) {}
+
+    return null;
+  }
+
+  parseDateToNgb(val: any): NgbDate | null {
+    if (!val) return null;
+    if (typeof val === "object") {
+      if (val.year && val.month && val.day) {
+        return new NgbDate(Number(val.year), Number(val.month), Number(val.day));
+      }
+    }
+    if (typeof val === "string") {
+      const clean = val.trim().substring(0, 10);
+      const parts = clean.split("-");
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const d = parseInt(parts[2], 10);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+          return new NgbDate(y, m, d);
+        }
+      }
+      const parsed = this.formatter.parse(clean);
+      return parsed ? NgbDate.from(parsed) : null;
+    }
+    return null;
+  }
+
+  extraerYAsignarActividades(e: any) {
+    if (!e) return;
+
+    let raw: any =
+      e.viajes_descripcion ||
+      e.viaje ||
+      e.viajes ||
+      e.actividadesExt ||
+      e.actividades ||
+      e.actividadesVarias ||
+      e.detallejson ||
+      e.detallefinaljson;
+
+    if (!raw) {
+      const candidates = [
+        e.observacion,
+        e.sub_observacion,
+        e.detalle,
+        e.subdocumento,
+        e.cont,
+      ];
+      for (const cand of candidates) {
+        if (
+          typeof cand === "string" &&
+          (cand.includes('"solicitud"') ||
+            cand.includes('"opinion"') ||
+            cand.includes('"recomendacion"') ||
+            cand.includes('"fechaLimiteRespuesta"') ||
+            cand.includes('"pais"') ||
+            cand.includes('"motivo"') ||
+            cand.includes('"gastos"') ||
+            cand.includes('"fechaInicio"') ||
+            cand.includes("ACTIVIDADES VARIAS") ||
+            cand.includes("actividades varias"))
+        ) {
+          raw = cand;
+          break;
+        }
+      }
+    }
+
+    if (!raw && typeof e.observacion === "object") {
+      raw = e.observacion;
+    }
+
+    if (raw) {
+      try {
+        let data = this.robustJsonParse(raw);
+        if (Array.isArray(data) && data.length > 0) {
+          data = data[0];
+        }
+        if (data && typeof data === "object") {
+          if (data.observacion) {
+            let obs = this.robustJsonParse(data.observacion);
+            if (obs && typeof obs === "object") {
+              data = obs;
+            }
+          }
+
+          // Asignar Actividades en el Exterior
+          this.actividadesExt = {
+            pais: this.decodeHtmlEntities(data.pais || ""),
+            motivo: this.decodeHtmlEntities(data.motivo || ""),
+            dirigido: this.decodeHtmlEntities(data.dirigido || ""),
+            personas: data.personas !== undefined && data.personas !== null ? data.personas : "",
+            fechaInicio: this.parseDateToNgb(data.fechaInicio),
+            fechaFin: this.parseDateToNgb(data.fechaFin),
+            fechaConfirmacion: this.parseDateToNgb(data.fechaConfirmacion),
+            gastos: data.gastos || {
+              boletos: "",
+              alimentacion: "",
+              alojamiento: "",
+              transporte: "",
+            },
+          };
+
+          // Asignar Actividades Varias
+          const sol = data.solicitud || data.motivo || "";
+          const mot = data.motivo || data.solicitud || "";
+          this.actividadesVarias = {
+            tipo: data.tipo || "ACTIVIDADES VARIAS",
+            solicitud: this.decodeHtmlEntities(sol),
+            motivo: this.decodeHtmlEntities(mot),
+            dirigido: this.decodeHtmlEntities(data.dirigido || ""),
+            personas: data.personas !== undefined && data.personas !== null ? data.personas : 0,
+            fechaInicio: this.parseDateToNgb(data.fechaInicio),
+            fechaFin: this.parseDateToNgb(data.fechaFin),
+            fechaLimiteRespuesta: this.parseDateToNgb(
+              data.fechaLimiteRespuesta || data.fechaConfirmacion || e.alerta,
+            ),
+            fechaConfirmacion: this.parseDateToNgb(
+              data.fechaConfirmacion || data.fechaLimiteRespuesta || e.alerta,
+            ),
+            opinionDe: this.decodeHtmlEntities(data.opinionDe || data.opinion_de || ""),
+            opinion: this.decodeHtmlEntities(data.opinion || data.opinionTexto || ""),
+            recomendacion: this.decodeHtmlEntities(
+              data.recomendacion || data.recomendacionDireccion || "",
+            ),
+          };
+
+          if (this.actividadesVarias.fechaLimiteRespuesta && !this.fplazo) {
+            this.fplazo = this.actividadesVarias.fechaLimiteRespuesta;
+          }
+
+          // Si el tipo no estaba asignado, inferir del contenido parseado
+          const t = (this.Doc.tipo || "").toLowerCase();
+          if (
+            (data.tipo === "ACTIVIDADES VARIAS" ||
+              data.solicitud ||
+              data.opinionDe ||
+              data.opinion ||
+              data.recomendacion) &&
+            t !== "actividades en el exterior"
+          ) {
+            if (!this.Doc.tipo || this.Doc.tipo === "0") {
+              this.Doc.tipo = "ACTIVIDADES VARIAS";
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error extrayendo actividades:", err);
+      }
+    }
   }
 
   //Obtener los dados de Documento
@@ -1038,6 +1475,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.ruta.navigate(["/salidas"]);
         } else {
           console.log(this.Doc);
+          const tdoc = this.Doc.tipo ? this.Doc.tipo.trim().toLowerCase() : "";
+          if (tdoc === "actividades en el exterior") {
+            this.guardarActividadesExterior(wfd);
+          } else if (
+            tdoc === "actividades varias" ||
+            tdoc.indexOf("actividades varias") >= 0
+          ) {
+            this.guardarActividadesVarias(wfd);
+          }
 
           const cant = this.lstCuenta.length;
 
@@ -1380,11 +1826,39 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   selTipoDocumento() {
-    const tipo = this.Doc.tipo.toLowerCase();
+    const tipo = (this.Doc.tipo || "").toLowerCase().trim();
     this.puntocuenta = false;
     this.resolucion = false;
     this.booPuntoCuenta = false;
-    this.esActividadExterior = tipo === "actividades en el exterior";
+    this.esActividadExterior =
+      tipo === "actividades en el exterior" ||
+      tipo.indexOf("actividades en el exterior") >= 0;
+    this.esActividadVarias =
+      tipo === "actividades varias" ||
+      tipo.indexOf("actividades varias") >= 0 ||
+      tipo.indexOf("actividad varias") >= 0 ||
+      tipo.indexOf("actividades varia") >= 0 ||
+      (this.actividadesVarias &&
+        this.actividadesVarias.tipo === "ACTIVIDADES VARIAS" &&
+        !this.esActividadExterior &&
+        !!(this.actividadesVarias.solicitud || this.actividadesVarias.dirigido || this.actividadesVarias.opinionDe || this.actividadesVarias.recomendacion));
+
+    if (this.esActividadVarias) {
+      if (
+        !this.actividadesVarias.solicitud &&
+        !this.actividadesVarias.dirigido &&
+        !this.actividadesVarias.opinion &&
+        this.Doc.contenido
+      ) {
+        this.actividadesVarias.solicitud = this.decodeHtmlEntities(this.Doc.contenido);
+      }
+      if (!this.actividadesVarias.fechaLimiteRespuesta && this.fplazo) {
+        this.actividadesVarias.fechaLimiteRespuesta = this.parseDateToNgb(this.fplazo);
+      }
+      if (this.actividadesVarias.fechaLimiteRespuesta && !this.fplazo) {
+        this.fplazo = this.actividadesVarias.fechaLimiteRespuesta;
+      }
+    }
 
     if (tipo.indexOf("punto") >= 0) {
       this.setDescripcionPunto();
@@ -1546,13 +2020,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.nasociacion = this.Doc.ncontrol;
           this.Doc.ncontrol = "";
 
-          if (e.viajes_descripcion) {
-            try {
-              this.actividadesExt = JSON.parse(e.viajes_descripcion);
-            } catch (err) {
-              console.error("Error parsing viajes_descripcion", err);
-            }
-          }
+          this.extraerYAsignarActividades(e);
         });
 
         this.Doc.norigen = dwf;

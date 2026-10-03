@@ -1,22 +1,29 @@
-import { Component, OnInit, Output, EventEmitter, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { ROUTES } from '../sidebar/sidebar.component';
-import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { Component, OnInit, Output, EventEmitter, Inject } from "@angular/core";
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+} from "@angular/forms";
+import { ROUTES } from "../sidebar/sidebar.component";
+import { Location } from "@angular/common";
+import { Router } from "@angular/router";
 
-import { LoginService } from 'src/app/services/seguridad/login.service';
-import { MensajeService } from 'src/app/services/util/mensaje.service';
-import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
-import { UtilService } from 'src/app/services/util/util.service';
-import { Sha256Service } from 'src/app/services/util/sha256';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { environment } from 'src/environments/environment';
-import { WsSandraService } from 'src/app/services/seguridad/ws-sandra.service';
-import { DOCUMENT } from '@angular/common';
-import { registerLocaleData } from '@angular/common';
-import localeEs from '@angular/common/locales/es';
+import { LoginService } from "src/app/services/seguridad/login.service";
+import { MensajeService } from "src/app/services/util/mensaje.service";
+import { ApiService, IAPICore } from "src/app/services/apicore/api.service";
+import { UtilService } from "src/app/services/util/util.service";
+import { Sha256Service } from "src/app/services/util/sha256";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { environment } from "src/environments/environment";
+import { WsSandraService } from "src/app/services/seguridad/ws-sandra.service";
+import { DOCUMENT } from "@angular/common";
+import { registerLocaleData } from "@angular/common";
+import localeEs from "@angular/common/locales/es";
+
+import { JwtHelperService } from "@auth0/angular-jwt";
+
 registerLocaleData(localeEs);
-
 
 interface Change {
   usuario: string;
@@ -26,25 +33,21 @@ interface Change {
 }
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  selector: "app-navbar",
+  templateUrl: "./navbar.component.html",
+  styleUrls: ["./navbar.component.scss"],
 })
 export class NavbarComponent implements OnInit {
   public focus;
   public listTitles: any[];
   public location: Location;
   @Output() onChange = new EventEmitter<any>();
-  public nombre: string = 'Analista'
-  public alerta: boolean = false
-  public usuario: string = ''
-  public cedula: string = '';
-  public correo: string = '';
+  public nombre: string = "Analista";
+  public alerta: boolean = false;
+  public usuario: string = "";
+  public cedula: string = "";
+  public correo: string = "";
   public fecha: Date = new Date();
-
-
-
-
 
   public showClave = false;
   public showNueva = false;
@@ -57,32 +60,33 @@ export class NavbarComponent implements OnInit {
     clave: "",
     nueva: "",
     repite: "",
-  }
-
+  };
 
   // Password Strength properties
   public passwordStrength: number = 0;
-  public passwordStrengthLabel: string = 'Sin seguridad';
-  public passwordStrengthColor: string = '';
+  public passwordStrengthLabel: string = "Sin seguridad";
+  public passwordStrengthColor: string = "";
   public passwordStrengthWidth: number = 0;
-
 
   // Agrega estas propiedades a tu clase NavbarComponent
   public showTotpSection: boolean = false;
-  public totpQrCodeUrl: string = '';
-  public totpSecret: string = '';
+  public totpQrCodeUrl: string = "";
+  public totpSecret: string = "";
   public isTotpSecretCopied: boolean = false;
   public isTotpActive: boolean = false;
   public booleanIsSidenav = false;
 
   public xAPI: IAPICore = {
-    funcion: '',
-    parametros: ''
+    funcion: "",
+    parametros: "",
   };
 
+  public token;
+  public tipo;
+  public blCargando = false;
 
-
-  constructor(location: Location,
+  constructor(
+    location: Location,
     private msj: MensajeService,
     private fb: FormBuilder,
     private loginService: LoginService,
@@ -92,19 +96,19 @@ export class NavbarComponent implements OnInit {
     private sha256: Sha256Service,
     private ws: WsSandraService,
     private router: Router,
-    @Inject(DOCUMENT) private document: Document) {
+    @Inject(DOCUMENT) private document: Document,
+  ) {
     this.location = location;
   }
 
   ngOnInit() {
-
     this.initForm();
 
-    this.listTitles = ROUTES.filter(listTitle => listTitle);
+    this.listTitles = ROUTES.filter((listTitle) => listTitle);
 
-    this.nombre = this.loginService.Usuario.nombre
-    this.cedula = this.loginService.Usuario.cedula
-    this.correo = this.loginService.Usuario.correo
+    this.nombre = this.loginService.Usuario.nombre;
+    this.cedula = this.loginService.Usuario.cedula;
+    this.correo = this.loginService.Usuario.correo;
 
     setInterval(() => {
       this.fecha = new Date();
@@ -112,63 +116,71 @@ export class NavbarComponent implements OnInit {
 
     this.verificarDepartamentoResoluciones();
 
-    this.msj.contenido$.subscribe(e => {
+    this.msj.contenido$.subscribe((e) => {
       // console.log(e)
-      this.alerta = e.valor
+      this.alerta = e.valor;
 
       // Guardar el estado en sessionStorage para persistencia
       if (this.estaEnResoluciones()) {
         this.alerta = e.valor;
-        sessionStorage.setItem('alertaEstado', JSON.stringify(e.valor));
+        sessionStorage.setItem("alertaEstado", JSON.stringify(e.valor));
       }
     });
 
     // Recuperar el estado guardado si existe
     if (this.estaEnResoluciones()) {
-      const estadoGuardado = sessionStorage.getItem('alertaEstado');
+      const estadoGuardado = sessionStorage.getItem("alertaEstado");
       if (estadoGuardado) {
         this.alerta = JSON.parse(estadoGuardado);
       }
     } else {
       // Si no estamos en resoluciones, forzar a false
       this.alerta = false;
-      sessionStorage.removeItem('alertaEstado');
+      sessionStorage.removeItem("alertaEstado");
     }
+
+    this.accionesGenerales();
   }
 
   initForm() {
-    this.changePasswordForm = this.fb.group({
-      clave: ['', Validators.required],
-      nueva: ['', [
-        Validators.required,
-        Validators.minLength(8),
-        Validators.maxLength(16),
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/)
-      ]],
-      repite: ['', Validators.required]
-    }, {
-      validators: this.checkPasswords // Nota: es 'validators' en plural para FormBuilder
-    });
+    this.changePasswordForm = this.fb.group(
+      {
+        clave: ["", Validators.required],
+        nueva: [
+          "",
+          [
+            Validators.required,
+            Validators.minLength(8),
+            Validators.maxLength(16),
+            Validators.pattern(
+              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/,
+            ),
+          ],
+        ],
+        repite: ["", Validators.required],
+      },
+      {
+        validators: this.checkPasswords, // Nota: es 'validators' en plural para FormBuilder
+      },
+    );
 
     // Suscribirse a cambios para que la validación de "Repetir" sea instantánea al cambiar "Nueva"
-    this.changePasswordForm.get('nueva').valueChanges.subscribe(() => {
-      this.changePasswordForm.get('repite').updateValueAndValidity();
+    this.changePasswordForm.get("nueva").valueChanges.subscribe(() => {
+      this.changePasswordForm.get("repite").updateValueAndValidity();
     });
   }
 
   checkPasswords(group: AbstractControl) {
-    const nueva = group.get('nueva').value;
-    const repite = group.get('repite').value;
+    const nueva = group.get("nueva").value;
+    const repite = group.get("repite").value;
     return nueva === repite ? null : { notSame: true };
   }
 
   // Método para verificar si estamos en el departamento de resoluciones
   private verificarDepartamentoResoluciones(): void {
-
-
     if (!this.estaEnResoluciones()) {
       this.alerta = false;
-      sessionStorage.removeItem('alertaEstado');
+      sessionStorage.removeItem("alertaEstado");
     }
   }
 
@@ -176,9 +188,11 @@ export class NavbarComponent implements OnInit {
   private estaEnResoluciones(): boolean {
     const currentPath = this.location.path();
     // Ajusta estas rutas según tus necesidades exactas
-    return currentPath.includes('/resoluciones') ||
-      currentPath.includes('/rsalertas') ||
-      currentPath.includes('/rsconsulta');
+    return (
+      currentPath.includes("/resoluciones") ||
+      currentPath.includes("/rsalertas") ||
+      currentPath.includes("/rsconsulta")
+    );
   }
 
   open(content) {
@@ -187,7 +201,7 @@ export class NavbarComponent implements OnInit {
 
   getTitle() {
     var titlee = this.location.prepareExternalUrl(this.location.path());
-    if (titlee.charAt(0) === '#') {
+    if (titlee.charAt(0) === "#") {
       titlee = titlee.slice(1);
     }
 
@@ -196,9 +210,8 @@ export class NavbarComponent implements OnInit {
         return this.listTitles[item].title;
       }
     }
-    return 'Principal';
+    return "Principal";
   }
-
 
   onChangeSidenav() {
     this.booleanIsSidenav = !this.booleanIsSidenav;
@@ -209,84 +222,88 @@ export class NavbarComponent implements OnInit {
     this.loginService.logout();
   }
 
-
-
-
   // 3. Asegura que el Modal inicialice todo correctamente
   ModalChangePassword(modal) {
     this.changePasswordForm.reset();
     // Reiniciamos valores de fuerza de contraseña
     this.passwordStrengthWidth = 0;
-    this.passwordStrengthLabel = 'Sin seguridad';
-    this.passwordStrengthColor = '';
+    this.passwordStrengthLabel = "Sin seguridad";
+    this.passwordStrengthColor = "";
 
     this.Change.usuario = this.loginService.Usuario.usuario;
 
     this.modalService.open(modal, {
       centered: true,
       size: "md",
-      backdrop: 'static', // Cambiado a static para evitar cierres accidentales
+      backdrop: "static", // Cambiado a static para evitar cierres accidentales
       keyboard: false,
-      windowClass: 'fondo-modal'
+      windowClass: "fondo-modal",
     });
   }
 
   async ChangesPassword() {
     if (this.changePasswordForm.invalid) {
-      this.utilservice.AlertMini("top-end", "error", "Verifique los campos del formulario", 3000);
+      this.utilservice.AlertMini(
+        "top-end",
+        "error",
+        "Verifique los campos del formulario",
+        3000,
+      );
       this.changePasswordForm.markAllAsTouched();
       return;
     }
 
     if (!this.Change.usuario) {
-      this.utilservice.AlertMini("top-end", "error", "No existe un usuario", 3000);
+      this.utilservice.AlertMini(
+        "top-end",
+        "error",
+        "No existe un usuario",
+        3000,
+      );
       return;
     }
 
     const formValues = this.changePasswordForm.value;
-    let claveHash = '';
-    let nuevaHash = '';
+    let claveHash = "";
+    let nuevaHash = "";
 
-    await this.sha256.hash(formValues.clave).then(hash => {
-      claveHash = hash
-    })
+    await this.sha256.hash(formValues.clave).then((hash) => {
+      claveHash = hash;
+    });
 
-    await this.sha256.hash(formValues.nueva).then(hash => {
-      nuevaHash = hash
-    })
-
+    await this.sha256.hash(formValues.nueva).then((hash) => {
+      nuevaHash = hash;
+    });
 
     let xApi = {
       funcion: environment.funcion.ACTUALIZAR_CLAVE_USUARIO,
       parametros: `${this.Change.usuario},${claveHash},${nuevaHash}`,
-    }
+    };
 
     this.apiService.Ejecutar(xApi).subscribe(
       (data) => {
         this.clearModal();
         if (data.ModifiedCount > 0) {
-          this.utilservice.AlertMini("top-end", "success", "Contraseña actualizada exitosamente", 3000);
-          this.cerrar()
+          this.utilservice.AlertMini(
+            "top-end",
+            "success",
+            "Contraseña actualizada exitosamente",
+            3000,
+          );
+          this.cerrar();
         }
-        
       },
       (error) => {
         // console.log(error)
         this.clearModal();
-      }
-    )
-
-
+      },
+    );
   }
 
   clearModal() {
     this.changePasswordForm.reset();
     this.modalService.dismissAll();
   }
-
-
-
-
 
   // ... (dentro de la clase NavbarComponent)
 
@@ -312,44 +329,47 @@ export class NavbarComponent implements OnInit {
    */
   async generateTotp() {
     // Muestra un spinner mientras se genera el código
-    this.totpQrCodeUrl = '';
-    this.totpSecret = '';
+    this.totpQrCodeUrl = "";
+    this.totpSecret = "";
 
     // NOTA: La siguiente sección es un EJEMPLO. Debes reemplazarla con la llamada real a tu API.
     // Asumo que tienes una función en tu API para esto.
 
-    this.apiService.GenerarQR_TOTP('base64').subscribe(
+    this.apiService.GenerarQR_TOTP("base64").subscribe(
       (data) => {
         // Asumiendo que tu API devuelve un objeto con 'qrCode' (sdata URL) y 'secret' (la clave)
         this.totpQrCodeUrl = data.contenido;
         this.totpSecret = data.msj;
       },
       (error) => {
-        console.error('Error al generar el código TOTP', error);
-        this.utilservice.AlertMini('top-end', 'error', 'No se pudo generar el código.', 4000);
+        console.error("Error al generar el código TOTP", error);
+        this.utilservice.AlertMini(
+          "top-end",
+          "error",
+          "No se pudo generar el código.",
+          4000,
+        );
         this.showTotpSection = false; // Oculta la sección si hay un error
-      }
+      },
     );
   }
 
   async limpiarTotp() {
-
     this.showTotpSection = false;
-    this.xAPI = {} as IAPICore
-    this.xAPI.funcion = environment.funcion.ACTUALIZAR_TOTP
-    this.xAPI.parametros = this.totpSecret
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = environment.funcion.ACTUALIZAR_TOTP;
+    this.xAPI.parametros = this.totpSecret;
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       (data) => {
-        console.log(data)
-        this.totpQrCodeUrl = ''
-        this.totpSecret = ''
+        console.log(data);
+        this.totpQrCodeUrl = "";
+        this.totpSecret = "";
       },
       (error) => {
-        console.log(error)
-      }
-    )
-
+        console.log(error);
+      },
+    );
   }
 
   /**
@@ -358,29 +378,36 @@ export class NavbarComponent implements OnInit {
   copyTotpSecret() {
     if (!this.totpSecret) return;
 
-    navigator.clipboard.writeText(this.totpSecret).then(() => {
-      this.isTotpSecretCopied = true;
-      setTimeout(() => {
-        this.isTotpSecretCopied = false;
-      }, 2500);
-    }).catch(err => {
-      console.error('Error al copiar la clave TOTP:', err);
-      this.utilservice.AlertMini('top-end', 'error', 'No se pudo copiar la clave.', 3000);
-    });
+    navigator.clipboard
+      .writeText(this.totpSecret)
+      .then(() => {
+        this.isTotpSecretCopied = true;
+        setTimeout(() => {
+          this.isTotpSecretCopied = false;
+        }, 2500);
+      })
+      .catch((err) => {
+        console.error("Error al copiar la clave TOTP:", err);
+        this.utilservice.AlertMini(
+          "top-end",
+          "error",
+          "No se pudo copiar la clave.",
+          3000,
+        );
+      });
   }
 
-
   /**
-* Check Password Strength
-* @param password 
-*/
+   * Check Password Strength
+   * @param password
+   */
   checkPasswordStrength(password: string): void {
     const checks = [
-      /.{8,}/,       // Mínimo 8 caracteres
-      /[A-Z]/,       // Al menos una mayúscula
-      /[a-z]/,       // Al menos una minúscula
-      /[0-9]/,       // Al menos un número
-      /[@$!%*?&]/    // Al menos un símbolo
+      /.{8,}/, // Mínimo 8 caracteres
+      /[A-Z]/, // Al menos una mayúscula
+      /[a-z]/, // Al menos una minúscula
+      /[0-9]/, // Al menos un número
+      /[@$!%*?&]/, // Al menos un símbolo
     ];
 
     const result = checks.reduce((score, regex) => {
@@ -390,36 +417,64 @@ export class NavbarComponent implements OnInit {
     this.passwordStrengthWidth = result;
 
     if (result < 40) {
-      this.passwordStrengthLabel = 'Débil';
-      this.passwordStrengthColor = 'bg-danger';
+      this.passwordStrengthLabel = "Débil";
+      this.passwordStrengthColor = "bg-danger";
     } else if (result < 80) {
-      this.passwordStrengthLabel = 'Media';
-      this.passwordStrengthColor = 'bg-warning';
+      this.passwordStrengthLabel = "Media";
+      this.passwordStrengthColor = "bg-warning";
     } else if (result < 100) {
-      this.passwordStrengthLabel = 'Buena';
-      this.passwordStrengthColor = 'bg-info';
+      this.passwordStrengthLabel = "Buena";
+      this.passwordStrengthColor = "bg-info";
     } else {
-      this.passwordStrengthLabel = 'Fuerte';
-      this.passwordStrengthColor = 'bg-success';
+      this.passwordStrengthLabel = "Fuerte";
+      this.passwordStrengthColor = "bg-success";
     }
   }
-
 
   activarSinEvento() {
     this.isTotpActive = true;
     this.apiService.GetImageQR(this.totpSecret).subscribe(
       (data) => {
-        console.log(data)
+        console.log(data);
         this.totpQrCodeUrl = data.contenido;
       },
       (error) => {
-        console.error('Error al generar el código TOTP', error);
-      }
-    )
+        console.error("Error al generar el código TOTP", error);
+      },
+    );
   }
 
+  accionesGenerales() {
+    const token = sessionStorage.getItem("token");
+    if (token !== null) {
+      try {
+        const helper = new JwtHelperService();
+        const decodedToken = helper.decodeToken(token);
+        this.token = decodedToken;
+        this.usuario = this.token.Usuario;
 
+        // this.token = jwt_decode(token);
+        // this.usuario = this.token.Usuario.usuario;
+        this.tipo = this.token.Usuario.nombre;
+        if (
+          this.token.Usuario.token !== undefined &&
+          this.token.Usuario.token !== ""
+        ) {
+          this.showTotpSection = true;
+          this.totpSecret = this.token.Usuario.token;
+          this.activarSinEvento();
+        }
 
-
-
+        // console.log(this.token.Usuario)
+        this.ws.Run(this.token.usuario);
+      } catch (error) {
+        console.error("Error decoding token in Navbar:", error);
+        // Optional: Redirect to login or handle invalid session
+      }
+    } else {
+      // Handle case where there is no token (e.g. redirect to login)
+      // For now, ensure variables used later are safe
+      this.usuario = "";
+    }
+  }
 }
