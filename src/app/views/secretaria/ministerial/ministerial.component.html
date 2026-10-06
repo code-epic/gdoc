@@ -14,7 +14,14 @@
             <div class="col-md-9">
               <h6 class="text-uppercase ls-1 mb-1" style="color: #5eaaa8; font-weight: 600;">{{ lblTitulo }} / {{ numControl
                 }}</h6>
-              <h2 class="mb-0" style="color: #5eaaa8;">Punto de Cuenta</h2>
+              <div class="d-flex align-items-center flex-wrap">
+                <h2 class="mb-0 mr-2" style="color: #5eaaa8;">Punto de Cuenta</h2>
+                <span class="badge text-uppercase shadow-sm" *ngIf="lstRechazos && lstRechazos.length > 0"
+                      style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; font-weight: 700; font-size: 0.74rem; padding: 4px 8px; border-radius: 6px;"
+                      title="Documento devuelto con observaciones de secretaría">
+                  <i class="fas fa-undo-alt mr-1"></i> Trámite Devuelto ({{ lstRechazos.length }})
+                </span>
+              </div>
             </div>
 
             <div class="col-md-1">
@@ -48,6 +55,74 @@
         </div>
 
         <div class="card-body">
+
+          <!-- ── Banner Elegante de Observaciones / Rechazos del Documento ── -->
+          <div *ngIf="lstRechazos && lstRechazos.length > 0" class="rechazos-banner mb-4">
+            <div class="rechazos-banner-header">
+              <div class="rechazos-banner-title">
+                <div class="rechazos-icon-box">
+                  <i class="fas fa-undo-alt"></i>
+                </div>
+                <div>
+                  <h5 class="mb-0 font-weight-bold" style="color: #92400e; font-size: 1.05rem;">
+                    Observación de Devolución de Secretaría
+                  </h5>
+                  <small style="color: #b45309;">
+                    Este documento fue devuelto para su revisión o subsanación con las siguientes observaciones:
+                  </small>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="badge mr-2" style="background: #ffffff; color: #b45309; border: 1px solid #fde68a; font-weight: 700; font-size: 0.75rem; padding: 5px 10px; border-radius: 6px;">
+                  <i class="fas fa-history mr-1"></i> {{ lstRechazos.length }} {{ lstRechazos.length === 1 ? 'Devolución' : 'Devoluciones' }}
+                </span>
+                <button type="button" class="btn btn-sm btn-outline-warning" *ngIf="lstRechazos.length > 1" (click)="mostrarHistorialRechazos = !mostrarHistorialRechazos"
+                        style="font-size: 0.75rem; font-weight: 600; border-radius: 6px;">
+                  <i class="fas mr-1" [ngClass]="mostrarHistorialRechazos ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                  {{ mostrarHistorialRechazos ? 'Ocultar anteriores' : 'Ver anteriores (' + (lstRechazos.length - 1) + ')' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Última Observación Destacada -->
+            <div class="rechazos-content-card mt-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-uppercase font-weight-bold" style="font-size: 0.72rem; color: #d97706; letter-spacing: 0.5px;">
+                  <i class="fas fa-comment-dots mr-1"></i> Motivo de Devolución {{ lstRechazos.length > 1 ? '(Más Reciente)' : '' }}
+                </span>
+                <span class="text-muted" style="font-size: 0.75rem;" *ngIf="getUltimoRechazo()?.fecha">
+                  <i class="far fa-calendar-alt mr-1"></i> {{ getUltimoRechazo()?.fecha }}
+                </span>
+              </div>
+              <div class="rechazos-texto">
+                <i class="fas fa-quote-left mr-2" style="color: #f59e0b; font-size: 0.8rem;"></i>
+                {{ getUltimoRechazo()?.observacion || 'DOCUMENTO DEVUELTO AL ANALISTA' }}
+              </div>
+            </div>
+
+            <!-- Historial expandible si hay más de 1 rechazo -->
+            <div *ngIf="mostrarHistorialRechazos && lstRechazos.length > 1" class="rechazos-historial mt-3">
+              <h6 class="text-uppercase font-weight-bold mb-2" style="font-size: 0.7rem; color: #64748b; letter-spacing: 0.5px;">
+                <i class="fas fa-layer-group mr-1"></i> Historial de Devoluciones Anteriores:
+              </h6>
+              <div class="rechazos-timeline">
+                <div *ngFor="let r of getRechazosAnteriores(); let idx = index" class="rechazos-item">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="font-weight-bold" style="font-size: 0.72rem; color: #475569;">
+                      <i class="fas fa-step-backward mr-1"></i> Devolución #{{ lstRechazos.length - 1 - idx }}
+                    </span>
+                    <small class="text-muted" *ngIf="r.fecha">
+                      <i class="far fa-clock mr-1"></i> {{ r.fecha }}
+                    </small>
+                  </div>
+                  <div class="rechazos-texto-anterior">
+                    {{ r.observacion }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <form>
             <div class="form-row">
 

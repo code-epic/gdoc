@@ -3534,7 +3534,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             <textarea id="swal-mppd-comentario-ext"
                       rows="3"
                       style="width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 0.82rem; font-family: inherit; border: 1.5px solid #cbd5e1; border-radius: 6px; resize: vertical; text-transform: uppercase; outline: none; transition: border-color 0.2s;"
-                      placeholder="${esVarias ? 'INSTRUCCIONES U OBSERVACIONES PARA EL INFORME DE ACTIVIDADES VARIAS...' : 'INSTRUCCIONES U OBSERVACIONES PARA EL VIAJE AL EXTERIOR...'}"
+                      placeholder="${esVarias ? "INSTRUCCIONES U OBSERVACIONES PARA EL INFORME DE ACTIVIDADES VARIAS..." : "INSTRUCCIONES U OBSERVACIONES PARA EL VIAJE AL EXTERIOR..."}"
                       onfocus="this.style.borderColor='#8e1c26'"
                       onblur="this.style.borderColor='#cbd5e1'"
                       oninput="this.value = this.value.toUpperCase()"></textarea>
@@ -4724,38 +4724,247 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   async ActualizarUbicacionSecretaria() {
     if (!this.activeDoc) return;
 
-    const confirm = await Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¿Deseas devolver este documento al analista?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#f39c12",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, devolver",
-      cancelButtonText: "Cancelar",
-    });
+    const numControl =
+      this.activeDoc.numc ||
+      this.activeDoc.ncontrol ||
+      this.activeDoc.cuenta ||
+      "Sin Número";
+    const rawAsunto = this.getAsuntoClean
+      ? this.getAsuntoClean(this.activeDoc)
+      : this.activeDoc.asunto || "";
+    const asuntoDoc = (rawAsunto || "")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
 
-    if (!confirm.isConfirmed) {
-      return;
-    }
+    const modalHtml = `
+      <div style="font-family: inherit; text-align: left;">
+        <!-- Header con Icono y Títulos -->
+        <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px;">
+          <div style="
+            width: 46px;
+            height: 46px;
+            min-width: 46px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid #fcd34d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d97706;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.15);
+          ">
+            <i class="fas fa-undo-alt"></i>
+          </div>
+          <div style="flex: 1;">
+            <h3 style="margin: 0 0 4px 0; font-size: 1.15rem; font-weight: 800; color: #0f172a; letter-spacing: -0.2px;">
+              Devolver Trámite al Analista
+            </h3>
+            <p style="margin: 0; font-size: 0.8rem; color: #64748b; line-height: 1.4;">
+              El documento regresará a la bandeja del analista para su debida corrección o subsanación.
+            </p>
+          </div>
+        </div>
+
+        <!-- Ficha de Expediente -->
+        <div style="
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 10px 14px;
+          margin-bottom: 16px;
+        ">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${asuntoDoc ? "4px" : "0"};">
+            <span style="font-size: 0.72rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fas fa-file-alt text-warning mr-1"></i> Expediente
+            </span>
+            <span style="font-size: 0.75rem; font-weight: 700; color: #0f172a; background: #ffffff; border: 1px solid #cbd5e1; padding: 2px 8px; border-radius: 6px;">
+              ${numControl}
+            </span>
+          </div>
+          ${
+            asuntoDoc
+              ? `<div style="font-size: 0.78rem; color: #334155; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <strong>Asunto:</strong> ${asuntoDoc}
+                </div>`
+              : ""
+          }
+        </div>
+
+        <!-- Input Textarea Elegante -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label for="swal-devolucion-observacion" style="font-weight: 700; font-size: 0.76rem; color: #334155; text-transform: uppercase; letter-spacing: 0.4px; margin: 0; display: flex; align-items: center; gap: 4px;">
+              <i class="fas fa-comment-dots text-warning"></i>
+              <span>Motivo / Observación de Devolución</span>
+              <span style="color: #ef4444; font-size: 0.85rem;">*</span>
+            </label>
+            <span style="font-size: 0.65rem; font-weight: 700; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; padding: 2px 6px; border-radius: 4px;">
+              EN MAYÚSCULAS
+            </span>
+          </div>
+
+          <textarea id="swal-devolucion-observacion"
+                    rows="4"
+                    style="
+                      width: 100%;
+                      box-sizing: border-box;
+                      padding: 10px 12px;
+                      font-size: 0.84rem;
+                      font-family: inherit;
+                      color: #0f172a;
+                      font-weight: 500;
+                      border: 1.5px solid #cbd5e1;
+                      border-radius: 10px;
+                      resize: vertical;
+                      text-transform: uppercase;
+                      outline: none;
+                      line-height: 1.45;
+                      background: #ffffff;
+                      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                    "
+                    placeholder="ESCRIBA EL MOTIVO DETALLADO DE LA DEVOLUCIÓN O INSTRUCCIONES PARA EL ANALISTA..."></textarea>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+            <span style="font-size: 0.7rem; color: #94a3b8;">
+              Se registrará en el historial de rechazos de secretaría.
+            </span>
+            <span id="swal-devolucion-count" style="font-size: 0.7rem; font-weight: 600; color: #94a3b8;">0 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Botones de Acción Directos -->
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 20px;">
+          <button id="btn-swal-cancelar-dev" type="button" class="swal-btn-cancel-devolucion">
+            <i class="fas fa-times mr-1"></i> Cancelar
+          </button>
+          <button id="btn-swal-confirmar-dev" type="button" class="swal-btn-confirm-devolucion">
+            <i class="fas fa-undo-alt mr-1"></i> Sí, Devolver al Analista
+          </button>
+        </div>
+      </div>
+    `;
+
+    Swal.fire({
+      html: modalHtml,
+      showConfirmButton: false,
+      showCancelButton: false,
+      showCloseButton: false,
+      customClass: {
+        popup: "swal-modal-devolucion-popup",
+      },
+      didOpen: () => {
+        const popup = Swal.getPopup();
+        if (!popup) return;
+
+        const textarea = popup.querySelector(
+          "#swal-devolucion-observacion",
+        ) as HTMLTextAreaElement;
+        const countSpan = popup.querySelector(
+          "#swal-devolucion-count",
+        ) as HTMLElement;
+        const btnCancel = popup.querySelector(
+          "#btn-swal-cancelar-dev",
+        ) as HTMLButtonElement;
+        const btnConfirm = popup.querySelector(
+          "#btn-swal-confirmar-dev",
+        ) as HTMLButtonElement;
+
+        if (textarea) {
+          textarea.focus();
+          textarea.addEventListener("focus", () => {
+            textarea.style.borderColor = "#f59e0b";
+            textarea.style.boxShadow = "0 0 0 3px rgba(245, 158, 11, 0.15)";
+          });
+          textarea.addEventListener("blur", () => {
+            textarea.style.borderColor = "#cbd5e1";
+            textarea.style.boxShadow = "none";
+          });
+          textarea.addEventListener("input", () => {
+            textarea.value = textarea.value.toUpperCase();
+            if (countSpan) {
+              const len = textarea.value.trim().length;
+              countSpan.innerText = `${len} caracter${len === 1 ? "" : "es"}`;
+            }
+          });
+        }
+
+        if (btnCancel) {
+          btnCancel.onclick = (ev) => {
+            ev.preventDefault();
+            Swal.close();
+          };
+        }
+
+        if (btnConfirm) {
+          btnConfirm.onclick = (ev) => {
+            ev.preventDefault();
+            const observacion = textarea
+              ? textarea.value.trim().toUpperCase()
+              : "";
+            btnConfirm.disabled = true;
+            btnConfirm.innerHTML =
+              '<i class="fas fa-spinner fa-spin mr-1"></i> Procesando...';
+            Swal.close();
+            this.procesarDevolucion(observacion || "DEVUELTO AL ANALISTA");
+          };
+        }
+      },
+    });
+  }
+
+  public procesarDevolucion(observacion: string) {
+    if (!this.activeDoc) return;
+
+    const docId =
+      this.activeDoc.idd ||
+      this.activeDoc.id ||
+      this.activeDoc.wfdocumento ||
+      "";
 
     this.loadingAction = true;
+
+    // 1. Guardar rechazo en WKF_ISecretariaRechazos (idd, status siempre 1, observacion)
+    const xAPIRechazo = {} as IAPICore;
+    xAPIRechazo.funcion = "WKF_ISecretariaRechazos";
+    xAPIRechazo.parametros = ``;
+    xAPIRechazo.valores = JSON.stringify({
+      idd: docId,
+      estatus: 1,
+      observacion: observacion,
+    });
+
+    this.apiService.Ejecutar(xAPIRechazo).subscribe({
+      next: (data) => {
+        this.ejecutarDevolucionUbicacion(docId);
+      },
+      error: (error) => {
+        console.warn(
+          "Error al registrar WKF_ISecretariaRechazos, procediendo con la devolución:",
+          error,
+        );
+        this.ejecutarDevolucionUbicacion(docId);
+      },
+    });
+  }
+
+  ejecutarDevolucionUbicacion(docId: any) {
+    // 2. Actualizar Ubicación en Secretaría
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "WKF_AUbicacionSecretaria";
-    this.xAPI.parametros = `16,${this.activeDoc.idd}`;
+    this.xAPI.parametros = `16,${docId}`;
     this.xAPI.valores = "";
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+    this.apiService.Ejecutar(this.xAPI).subscribe({
+      next: (data) => {
         this.toastrService.success(
           "Documento devuelto al analista correctamente.",
           "Documentos",
         );
-        this.loadingAction = false;
-        this.closeDetail();
-        this.actualizarBuzon();
+        this.moverADevueltos(docId);
       },
-      (error) => {
+      error: (error) => {
         this.loadingAction = false;
         console.error("Error al devolver al analista", error);
         this.toastrService.error(
@@ -4763,7 +4972,58 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           "Error",
         );
       },
-    );
+    });
+  }
+
+  moverADevueltos(idDoc?: any) {
+    const targetId =
+      idDoc ||
+      this.activeDoc?.idd ||
+      this.activeDoc?.id ||
+      this.activeDoc?.wfdocumento ||
+      "";
+
+    let prefijo = "4,4,10";
+    const carpetaId = (this.selectedCarpeta?.id || "").toUpperCase();
+
+    if (
+      carpetaId === "TRAMITE_ORGANO_REGULAR" ||
+      carpetaId === "PUNTO_DE_CUENTA"
+    ) {
+      prefijo = "4,4,10";
+    } else if (carpetaId === "RECLAMOS") {
+      prefijo = "16,16,10";
+    } else if (carpetaId === "PRESIDENCIALES") {
+      prefijo = "4,4,10";
+    } else if (carpetaId === "CUADRO_DECISORIO") {
+      prefijo = "17,17,10";
+    } else if (
+      carpetaId === "ACTIVIDADES_EN_EL_EXTERIOR" ||
+      carpetaId.includes("ACTIVIDAD")
+    ) {
+      prefijo = "2,2,10";
+    }
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_ARedistribuir";
+    this.xAPI.valores = "";
+    this.xAPI.parametros = `${prefijo},${this.jwtData.userId},${targetId}`;
+
+    this.apiService.Ejecutar(this.xAPI).subscribe({
+      next: (data) => {
+        this.loadingAction = false;
+        this.closeDetail();
+        this.actualizarBuzon();
+      },
+      error: (error) => {
+        this.loadingAction = false;
+        console.error("Error al redistribuir al devolver al analista", error);
+        this.toastrService.error(
+          "Ocurrió un error al devolver el documento al analista.",
+          "Error",
+        );
+      },
+    });
   }
 
   async redistribuir(decision: any) {
@@ -5240,16 +5500,26 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     });
 
     const entities: { [key: string]: string } = {
-      "&aacute;": "á", "&Aacute;": "Á",
-      "&eacute;": "é", "&Eacute;": "É",
-      "&iacute;": "í", "&Iacute;": "Í",
-      "&oacute;": "ó", "&Oacute;": "Ó",
-      "&uacute;": "ú", "&Uacute;": "Ú",
-      "&ntilde;": "ñ", "&Ntilde;": "Ñ",
-      "&uuml;": "ü",   "&Uuml;": "Ü",
-      "&quot;": '"',   "&apos;": "'",
-      "&amp;": "&",    "&lt;": "<",
-      "&gt;": ">",     "&nbsp;": " ",
+      "&aacute;": "á",
+      "&Aacute;": "Á",
+      "&eacute;": "é",
+      "&Eacute;": "É",
+      "&iacute;": "í",
+      "&Iacute;": "Í",
+      "&oacute;": "ó",
+      "&Oacute;": "Ó",
+      "&uacute;": "ú",
+      "&Uacute;": "Ú",
+      "&ntilde;": "ñ",
+      "&Ntilde;": "Ñ",
+      "&uuml;": "ü",
+      "&Uuml;": "Ü",
+      "&quot;": '"',
+      "&apos;": "'",
+      "&amp;": "&",
+      "&lt;": "<",
+      "&gt;": ">",
+      "&nbsp;": " ",
       "&#160;": " ",
     };
 
@@ -5277,7 +5547,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     }
 
     if (str.includes('{"') || str.includes('""')) {
-      if (str.includes('{\"\"') || str.includes('\"\":') || str.includes(':\"\"')) {
+      if (
+        str.includes('{\"\"') ||
+        str.includes('\"\":') ||
+        str.includes(':\"\"')
+      ) {
         str = str.replace(/""/g, '"');
       }
     }
@@ -5307,12 +5581,23 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     try {
       const extracted: any = {};
       const strFields = [
-        "tipo", "solicitud", "motivo", "dirigido", "pais",
-        "opinionDe", "opinion_de", "opinion", "opinionTexto",
-        "recomendacion", "recomendacionDireccion",
+        "tipo",
+        "solicitud",
+        "motivo",
+        "dirigido",
+        "pais",
+        "opinionDe",
+        "opinion_de",
+        "opinion",
+        "opinionTexto",
+        "recomendacion",
+        "recomendacionDireccion",
       ];
       for (const field of strFields) {
-        const reg = new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`, "i");
+        const reg = new RegExp(
+          `"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`,
+          "i",
+        );
         const match = reg.exec(str);
         if (match && match[1] !== undefined) {
           let val = match[1].replace(/""/g, '"').trim();
@@ -5330,9 +5615,18 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           extracted[field] = parseInt(match[1], 10);
         }
       }
-      const objFields = ["fechaInicio", "fechaFin", "fechaLimiteRespuesta", "fechaConfirmacion", "gastos"];
+      const objFields = [
+        "fechaInicio",
+        "fechaFin",
+        "fechaLimiteRespuesta",
+        "fechaConfirmacion",
+        "gastos",
+      ];
       for (const field of objFields) {
-        const reg = new RegExp(`"${field}"\\s*:\\s*({[\\s\\S]*?})(?=\\s*,\\s*"|\\s*})`, "i");
+        const reg = new RegExp(
+          `"${field}"\\s*:\\s*({[\\s\\S]*?})(?=\\s*,\\s*"|\\s*})`,
+          "i",
+        );
         const match = reg.exec(str);
         if (match && match[1] !== undefined) {
           try {
@@ -5359,15 +5653,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     ) {
       return true;
     }
-    if (
-      tdoc === "ACTIVIDADES EN EL EXTERIOR" ||
-      tdoc.includes("EXTERIOR")
-    ) {
+    if (tdoc === "ACTIVIDADES EN EL EXTERIOR" || tdoc.includes("EXTERIOR")) {
       return false;
     }
     const data = this.getViajesData(doc);
     if (data) {
-      const tipoData = (data.tdoc || data.tipo || "").toString().trim().toUpperCase();
+      const tipoData = (data.tdoc || data.tipo || "")
+        .toString()
+        .trim()
+        .toUpperCase();
       if (tipoData.includes("VARIAS")) return true;
       if (tipoData.includes("EXTERIOR")) return false;
       if (
@@ -5391,16 +5685,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public isActividadExterior(doc: any): boolean {
     if (!doc) return false;
     const tdoc = (doc.tdoc || doc.tipo || "").toString().trim().toUpperCase();
-    if (
-      tdoc === "ACTIVIDADES EN EL EXTERIOR" ||
-      tdoc.includes("EXTERIOR")
-    ) {
+    if (tdoc === "ACTIVIDADES EN EL EXTERIOR" || tdoc.includes("EXTERIOR")) {
       return true;
     }
-    if (
-      tdoc === "ACTIVIDADES VARIAS" ||
-      tdoc.includes("VARIAS")
-    ) {
+    if (tdoc === "ACTIVIDADES VARIAS" || tdoc.includes("VARIAS")) {
       return false;
     }
     return !this.isActividadVarias(doc);
@@ -5465,7 +5753,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           }
 
           // Si es Actividades Varias según tdoc o estructura, decodificar entidades y campos
-          const docTdoc = (doc.tdoc || doc.tipo || "").toString().trim().toUpperCase();
+          const docTdoc = (doc.tdoc || doc.tipo || "")
+            .toString()
+            .trim()
+            .toUpperCase();
           if (
             docTdoc === "ACTIVIDADES VARIAS" ||
             docTdoc.includes("VARIAS") ||
@@ -5478,12 +5769,22 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           ) {
             data.tdoc = data.tdoc || doc.tdoc || "ACTIVIDADES VARIAS";
             data.tipo = data.tipo || doc.tdoc || "ACTIVIDADES VARIAS";
-            data.solicitud = this.decodeHtmlEntities(data.solicitud || data.motivo || "");
-            data.motivo = this.decodeHtmlEntities(data.motivo || data.solicitud || "");
+            data.solicitud = this.decodeHtmlEntities(
+              data.solicitud || data.motivo || "",
+            );
+            data.motivo = this.decodeHtmlEntities(
+              data.motivo || data.solicitud || "",
+            );
             data.dirigido = this.decodeHtmlEntities(data.dirigido || "");
-            data.opinionDe = this.decodeHtmlEntities(data.opinionDe || data.opinion_de || "");
-            data.opinion = this.decodeHtmlEntities(data.opinion || data.opinionTexto || "");
-            data.recomendacion = this.decodeHtmlEntities(data.recomendacion || data.recomendacionDireccion || "");
+            data.opinionDe = this.decodeHtmlEntities(
+              data.opinionDe || data.opinion_de || "",
+            );
+            data.opinion = this.decodeHtmlEntities(
+              data.opinion || data.opinionTexto || "",
+            );
+            data.recomendacion = this.decodeHtmlEntities(
+              data.recomendacion || data.recomendacionDireccion || "",
+            );
           } else {
             // Actividades en el exterior
             data.pais = this.decodeHtmlEntities(data.pais || "");

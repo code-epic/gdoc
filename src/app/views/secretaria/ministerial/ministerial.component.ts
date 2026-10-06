@@ -58,6 +58,9 @@ export class MinisterialComponent implements OnInit {
   public lstHzAdjuntoSub = [];
   public estadoActual = 4;
   public estadoOrigen = 2;
+  public lstRechazos: any[] = [];
+  public cargandoRechazos: boolean = false;
+  public mostrarHistorialRechazos: boolean = false;
   public original = "";
   public originalSubDocumento: any = null;
   public xAPI: IAPICore = {
@@ -273,6 +276,7 @@ export class MinisterialComponent implements OnInit {
 
         this.listarEstados();
         this.listarDatos();
+        this.consultarRechazosDocumentos(this.doc.idd);
 
         if (elemento.tipo == "PRESIDENCIAL") {
           this.lblDecision = "Decision del Presidente";
@@ -407,7 +411,9 @@ export class MinisterialComponent implements OnInit {
         if (data.Cuerpo != undefined && data.Cuerpo.length > 0) {
           this.SubDocumento = data.Cuerpo[0];
           this.original = btoa(JSON.stringify(data.Cuerpo[0]));
-          this.originalSubDocumento = JSON.parse(JSON.stringify(data.Cuerpo[0]));
+          this.originalSubDocumento = JSON.parse(
+            JSON.stringify(data.Cuerpo[0]),
+          );
 
           this.blUpdate = this.SubDocumento.historico == "" ? false : true;
           this.dwSub = this.SubDocumento.nombre_archivo != "" ? true : false;
@@ -446,6 +452,9 @@ export class MinisterialComponent implements OnInit {
 
   aceptar() {
     this.selFecha();
+
+    console.log("Estado de redireccion general: ", this.doc.idestado);
+
     this.xAPI = {} as IAPICore;
     this.SubDocumento.accion = this.SubDocumento.accion.toUpperCase();
     this.SubDocumento.historico = this.SubDocumento.historico.toUpperCase();
@@ -497,10 +506,37 @@ export class MinisterialComponent implements OnInit {
         this.xAPI.funcion = "WKF_ASubDocumentoAlerta";
         await this.guardarAlerta(91, this.fecha_alerta);
         this.ngxService.stopLoader("loader-aceptar");
+        this.moverADevueltos();
         this._aceptar("");
       },
       (error) => {},
     );
+  }
+
+  moverADevueltos() {
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = "WKF_ARedistribuir";
+    this.xAPI.valores = "";
+    this.xAPI.parametros = `${this.doc.idestado},${this.doc.idestado},2,${this.loginService.Usuario.id},${this.doc.idd}`;
+    console.log(
+      "vamos a mover el documento a: ",
+      this.xAPI.parametros,
+      this.SubDocumento.estatus,
+    );
+    if (this.SubDocumento.estatus == "14") {
+      this.apiService.Ejecutar(this.xAPI).subscribe({
+        next: (data) => {
+          this.toastrService.success("Documento devuelto al analista.");
+        },
+        error: (error) => {
+          console.error("Error al redistribuir al devolver al analista", error);
+          this.toastrService.error(
+            "Ocurrió un error al devolver el documento al analista.",
+            "Error",
+          );
+        },
+      });
+    }
   }
 
   /**Guardar la alerte define el momento y estadus*/
@@ -615,8 +651,6 @@ export class MinisterialComponent implements OnInit {
       this.ministerial.idd +
       "," +
       this.ministerial.cuenta;
-    console.log("pasatiempos");
-    console.log(this.xAPI);
     await this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
         this.toastrService.success(
@@ -1039,5 +1073,49 @@ export class MinisterialComponent implements OnInit {
     // Removemos espacios y etiquetas html vacias basicas que AngularEditor suele colocar
     const limpio = html.replace(/<[^>]*>?/gm, "").trim();
     return limpio.length > 0;
+  }
+
+  consultarRechazosDocumentos(idd?: any) {
+    const docId = idd || this.doc?.idd;
+    if (!docId) return;
+
+    this.cargandoRechazos = true;
+    const xAPI: IAPICore = {
+      funcion: "WKF_CSecretariaRechazos",
+      parametros: `${docId}`,
+      valores: "",
+    };
+
+    this.apiService.Ejecutar(xAPI).subscribe({
+      next: (data) => {
+        this.cargandoRechazos = false;
+        if (data && data.Cuerpo && Array.isArray(data.Cuerpo)) {
+          this.lstRechazos = data.Cuerpo;
+          this.ordenarRechazos();
+        } else {
+          this.lstRechazos = [];
+        }
+        console.log("Rechazos del documento:", this.lstRechazos);
+      },
+      error: (error) => {
+        this.cargandoRechazos = false;
+        console.error("Error al consultar rechazos:", error);
+      },
+    });
+  }
+
+  public ordenarRechazos() {
+    if (!this.lstRechazos || this.lstRechazos.length === 0) return;
+    this.lstRechazos.sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0));
+  }
+
+  public getUltimoRechazo(): any {
+    if (!this.lstRechazos || this.lstRechazos.length === 0) return null;
+    return this.lstRechazos[this.lstRechazos.length - 1];
+  }
+
+  public getRechazosAnteriores(): any[] {
+    if (!this.lstRechazos || this.lstRechazos.length <= 1) return [];
+    return this.lstRechazos.slice(0, -1).reverse();
   }
 }

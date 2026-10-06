@@ -287,7 +287,7 @@ export class SministerialComponent implements OnInit, OnDestroy {
         this.tministerial = "12";
         this.filtro = 1;
         this.xAPI.parametros =
-          this.estadoActual + ",7," + this.fecha_desde + "," + this.fecha_hasta;
+          "4,10," + this.fecha_desde + "," + this.fecha_hasta;
         this.listarBuzon();
         break;
       case 3:

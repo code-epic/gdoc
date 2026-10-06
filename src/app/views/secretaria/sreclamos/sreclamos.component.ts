@@ -246,7 +246,11 @@ export class SreclamosComponent implements OnInit {
         this.tministerial = "12";
         this.filtro = 1;
         this.xAPI.parametros =
-          this.estadoActual + ",7," + this.fecha_desde + "," + this.fecha_hasta;
+          this.estadoActual +
+          ",10," +
+          this.fecha_desde +
+          "," +
+          this.fecha_hasta;
         this.listarBuzon();
         break;
       case 3:

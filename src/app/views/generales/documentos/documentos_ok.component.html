@@ -1479,7 +1479,7 @@
 
               <!-- ENVIAR AL ANALISTA -->
               <button class="btn-modal-decision btn-warning"
-                      *ngIf="currentProfile === 'JefeSecretaria'"
+                      *ngIf="currentProfile === 'JefeSecretaria' || currentProfile === 'Direccion'"
                       (click)="ActualizarUbicacionSecretaria()"
                       [disabled]="loadingAction"
                       title="Devolver al Analista">
