@@ -658,6 +658,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.apiService.Ejecutar(this.xAPI).subscribe(
       async (data) => {
+        let actividadesCargadas = false;
         data.Cuerpo.forEach((e) => {
           this.Doc = e;
           this.fcreacion = NgbDate.from(
@@ -677,16 +678,18 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             this.WAlerta.usuario = this.loginService.Usuario.id;
           }
 
-          this.extraerYAsignarActividades(e);
+          if (this.extraerYAsignarActividades(e)) {
+            actividadesCargadas = true;
+          }
         });
 
         this.selTipoDocumento();
 
-        // Fallback: Si es Actividad y no se cargaron los campos, consultar detalle directo
+        // Fallback: Solo si NO se encontró ninguna actividad en ningún registro de Cuerpo
         const docId = this.Doc.wfdocumento || (this.Doc as any).idd || this.Doc.id;
         const tipoActual = (this.Doc.tipo || "").toLowerCase();
         const esAct = tipoActual.includes("actividad") || tipoActual.includes("exterior");
-        if (esAct && !this.actividadesVarias.solicitud && !this.actividadesExt.pais && docId) {
+        if (esAct && !actividadesCargadas && docId) {
           const xAPIDetalle: IAPICore = {
             funcion: "WKF_CDocumentoDetalle",
             parametros: `1,1,${docId}`,
@@ -791,18 +794,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
   validarCamposObligatorios(): boolean {
     if (this.esActividadVarias) {
-      if (this.actividadesVarias.solicitud && !this.Doc.contenido) {
-        this.Doc.contenido = this.actividadesVarias.solicitud;
+      if (this.actividadesVarias.solicitud) {
+        this.actividadesVarias.solicitud = this.actividadesVarias.solicitud.toUpperCase();
+        if (!this.Doc.contenido) {
+          this.Doc.contenido = this.actividadesVarias.solicitud;
+        }
       }
       if (this.actividadesVarias.fechaLimiteRespuesta && !this.fplazo) {
         this.fplazo = this.actividadesVarias.fechaLimiteRespuesta;
-      }
-      if (!this.actividadesVarias.fechaLimiteRespuesta) {
-        this.toastrService.error(
-          "Fecha Límite de Respuesta es obligatoria para Actividades Varias",
-          "Campo requerido",
-        );
-        return true;
       }
     }
 
@@ -995,25 +994,31 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       this.actividadesVarias.fechaConfirmacion =
         this.actividadesVarias.fechaLimiteRespuesta;
     }
-    if (this.actividadesVarias.solicitud && !this.actividadesVarias.motivo) {
-      this.actividadesVarias.motivo = this.actividadesVarias.solicitud;
-    }
+
+    // Asegurar que las propiedades queden guardadas limpias de fragmentos JSON y en mayúsculas
+    this.actividadesVarias.solicitud = this.limpiarValorFragmento(this.actividadesVarias.solicitud);
+    this.actividadesVarias.motivo = this.limpiarValorFragmento(this.actividadesVarias.motivo);
+    this.actividadesVarias.dirigido = this.limpiarValorFragmento(this.actividadesVarias.dirigido);
+    this.actividadesVarias.opinionDe = this.limpiarValorFragmento(this.actividadesVarias.opinionDe);
+    this.actividadesVarias.opinion = this.limpiarValorFragmento(this.actividadesVarias.opinion);
+    this.actividadesVarias.recomendacion = this.limpiarValorFragmento(this.actividadesVarias.recomendacion);
 
     const payload = {
       tipo: "ACTIVIDADES VARIAS",
-      solicitud: this.decodeHtmlEntities(this.actividadesVarias.solicitud || ""),
-      motivo: this.decodeHtmlEntities(this.actividadesVarias.motivo || this.actividadesVarias.solicitud || ""),
-      dirigido: this.decodeHtmlEntities(this.actividadesVarias.dirigido || ""),
+      solicitud: this.actividadesVarias.solicitud || "",
+      motivo: this.actividadesVarias.motivo || this.actividadesVarias.solicitud || "",
+      dirigido: this.actividadesVarias.dirigido || "",
       personas: Number(this.actividadesVarias.personas) || 0,
-      fechaInicio: this.actividadesVarias.fechaInicio,
-      fechaFin: this.actividadesVarias.fechaFin,
-      fechaLimiteRespuesta: this.actividadesVarias.fechaLimiteRespuesta,
+      fechaInicio: this.actividadesVarias.fechaInicio || null,
+      fechaFin: this.actividadesVarias.fechaFin || null,
+      fechaLimiteRespuesta: this.actividadesVarias.fechaLimiteRespuesta || null,
       fechaConfirmacion:
         this.actividadesVarias.fechaConfirmacion ||
-        this.actividadesVarias.fechaLimiteRespuesta,
-      opinionDe: this.decodeHtmlEntities(this.actividadesVarias.opinionDe || ""),
-      opinion: this.decodeHtmlEntities(this.actividadesVarias.opinion || ""),
-      recomendacion: this.decodeHtmlEntities(this.actividadesVarias.recomendacion || ""),
+        this.actividadesVarias.fechaLimiteRespuesta ||
+        null,
+      opinionDe: this.actividadesVarias.opinionDe || "",
+      opinion: this.actividadesVarias.opinion || "",
+      recomendacion: this.actividadesVarias.recomendacion || "",
     };
 
     let viaje = {
@@ -1168,7 +1173,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         "recomendacion", "recomendacionDireccion"
       ];
       for (const field of strFields) {
-        const reg = new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`, "i");
+        const reg = new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"[a-zA-Z0-9_]+"\\s*:|\\s*})`, "i");
         const match = reg.exec(str);
         if (match && match[1] !== undefined) {
           let val = match[1].replace(/""/g, '"').trim();
@@ -1228,8 +1233,22 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  extraerYAsignarActividades(e: any) {
-    if (!e) return;
+  limpiarValorFragmento(val: any): string {
+    if (!val || typeof val !== "string") return "";
+    let s = this.decodeHtmlEntities(val).trim();
+    // Si contiene fragmentos de sintaxis JSON residuales provocados por parseo o serialización previa:
+    // Ej: ,"OPINIONDE":"MIA o ,"SOLICITUD":"RETIRO INDEBIDO... o fragmentos con comas iniciales
+    if (/^,?\s*"?[A-Za-z0-9_]+"?\s*:/i.test(s)) {
+      return "";
+    }
+    if (s.startsWith('","') || s.startsWith(',"') || s.startsWith('",')) {
+      return "";
+    }
+    return s.toUpperCase();
+  }
+
+  extraerYAsignarActividades(e: any): boolean {
+    if (!e) return false;
 
     let raw: any =
       e.viajes_descripcion ||
@@ -1289,9 +1308,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
           // Asignar Actividades en el Exterior
           this.actividadesExt = {
-            pais: this.decodeHtmlEntities(data.pais || ""),
-            motivo: this.decodeHtmlEntities(data.motivo || ""),
-            dirigido: this.decodeHtmlEntities(data.dirigido || ""),
+            pais: this.limpiarValorFragmento(data.pais || ""),
+            motivo: this.limpiarValorFragmento(data.motivo || ""),
+            dirigido: this.limpiarValorFragmento(data.dirigido || ""),
             personas: data.personas !== undefined && data.personas !== null ? data.personas : "",
             fechaInicio: this.parseDateToNgb(data.fechaInicio),
             fechaFin: this.parseDateToNgb(data.fechaFin),
@@ -1304,14 +1323,12 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             },
           };
 
-          // Asignar Actividades Varias
-          const sol = data.solicitud || data.motivo || "";
-          const mot = data.motivo || data.solicitud || "";
+          // Asignar Actividades Varias limpiando fragmentos JSON corruptos
           this.actividadesVarias = {
             tipo: data.tipo || "ACTIVIDADES VARIAS",
-            solicitud: this.decodeHtmlEntities(sol),
-            motivo: this.decodeHtmlEntities(mot),
-            dirigido: this.decodeHtmlEntities(data.dirigido || ""),
+            solicitud: this.limpiarValorFragmento(data.solicitud || data.motivo || ""),
+            motivo: this.limpiarValorFragmento(data.motivo || data.solicitud || ""),
+            dirigido: this.limpiarValorFragmento(data.dirigido || ""),
             personas: data.personas !== undefined && data.personas !== null ? data.personas : 0,
             fechaInicio: this.parseDateToNgb(data.fechaInicio),
             fechaFin: this.parseDateToNgb(data.fechaFin),
@@ -1321,9 +1338,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             fechaConfirmacion: this.parseDateToNgb(
               data.fechaConfirmacion || data.fechaLimiteRespuesta || e.alerta,
             ),
-            opinionDe: this.decodeHtmlEntities(data.opinionDe || data.opinion_de || ""),
-            opinion: this.decodeHtmlEntities(data.opinion || data.opinionTexto || ""),
-            recomendacion: this.decodeHtmlEntities(
+            opinionDe: this.limpiarValorFragmento(data.opinionDe || data.opinion_de || ""),
+            opinion: this.limpiarValorFragmento(data.opinion || data.opinionTexto || ""),
+            recomendacion: this.limpiarValorFragmento(
               data.recomendacion || data.recomendacionDireccion || "",
             ),
           };
@@ -1336,21 +1353,23 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           const t = (this.Doc.tipo || "").toLowerCase();
           if (
             (data.tipo === "ACTIVIDADES VARIAS" ||
-              data.solicitud ||
-              data.opinionDe ||
-              data.opinion ||
-              data.recomendacion) &&
+              this.actividadesVarias.solicitud ||
+              this.actividadesVarias.opinionDe ||
+              this.actividadesVarias.opinion ||
+              this.actividadesVarias.recomendacion) &&
             t !== "actividades en el exterior"
           ) {
             if (!this.Doc.tipo || this.Doc.tipo === "0") {
               this.Doc.tipo = "ACTIVIDADES VARIAS";
             }
           }
+          return true;
         }
       } catch (err) {
         console.error("Error extrayendo actividades:", err);
       }
     }
+    return false;
   }
 
   //Obtener los dados de Documento
@@ -1844,14 +1863,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         !!(this.actividadesVarias.solicitud || this.actividadesVarias.dirigido || this.actividadesVarias.opinionDe || this.actividadesVarias.recomendacion));
 
     if (this.esActividadVarias) {
-      if (
-        !this.actividadesVarias.solicitud &&
-        !this.actividadesVarias.dirigido &&
-        !this.actividadesVarias.opinion &&
-        this.Doc.contenido
-      ) {
-        this.actividadesVarias.solicitud = this.decodeHtmlEntities(this.Doc.contenido);
-      }
       if (!this.actividadesVarias.fechaLimiteRespuesta && this.fplazo) {
         this.actividadesVarias.fechaLimiteRespuesta = this.parseDateToNgb(this.fplazo);
       }

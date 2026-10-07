@@ -5532,6 +5532,18 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     return str.trim();
   }
 
+  limpiarValorFragmento(val: any): string {
+    if (!val || typeof val !== "string") return "";
+    let s = this.decodeHtmlEntities(val).trim();
+    if (/^,?\s*"?[A-Za-z0-9_]+"?\s*:/i.test(s)) {
+      return "";
+    }
+    if (s.startsWith('","') || s.startsWith(',"') || s.startsWith('",')) {
+      return "";
+    }
+    return s.toUpperCase();
+  }
+
   public robustJsonParse(raw: any): any {
     if (!raw) return null;
     if (typeof raw === "object") return raw;
@@ -5595,7 +5607,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       ];
       for (const field of strFields) {
         const reg = new RegExp(
-          `"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`,
+          `"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"[a-zA-Z0-9_]+"\\s*:|\\s*})`,
           "i",
         );
         const match = reg.exec(str);
@@ -5769,27 +5781,27 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           ) {
             data.tdoc = data.tdoc || doc.tdoc || "ACTIVIDADES VARIAS";
             data.tipo = data.tipo || doc.tdoc || "ACTIVIDADES VARIAS";
-            data.solicitud = this.decodeHtmlEntities(
+            data.solicitud = this.limpiarValorFragmento(
               data.solicitud || data.motivo || "",
             );
-            data.motivo = this.decodeHtmlEntities(
+            data.motivo = this.limpiarValorFragmento(
               data.motivo || data.solicitud || "",
             );
-            data.dirigido = this.decodeHtmlEntities(data.dirigido || "");
-            data.opinionDe = this.decodeHtmlEntities(
+            data.dirigido = this.limpiarValorFragmento(data.dirigido || "");
+            data.opinionDe = this.limpiarValorFragmento(
               data.opinionDe || data.opinion_de || "",
             );
-            data.opinion = this.decodeHtmlEntities(
+            data.opinion = this.limpiarValorFragmento(
               data.opinion || data.opinionTexto || "",
             );
-            data.recomendacion = this.decodeHtmlEntities(
+            data.recomendacion = this.limpiarValorFragmento(
               data.recomendacion || data.recomendacionDireccion || "",
             );
           } else {
             // Actividades en el exterior
-            data.pais = this.decodeHtmlEntities(data.pais || "");
-            data.motivo = this.decodeHtmlEntities(data.motivo || "");
-            data.dirigido = this.decodeHtmlEntities(data.dirigido || "");
+            data.pais = this.limpiarValorFragmento(data.pais || "");
+            data.motivo = this.limpiarValorFragmento(data.motivo || "");
+            data.dirigido = this.limpiarValorFragmento(data.dirigido || "");
           }
 
           doc._parsedViajesData = data;

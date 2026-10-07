@@ -365,26 +365,26 @@
                             <!-- 1. Solicitud ó Requerimiento (manual) -->
                             <div class="form-group col-md-6">
                                 <label class="form-label-custom font-weight-bold">
-                                    Solicitud ó Requerimiento <span class="text-muted font-italic">(Manual)</span> (*)
+                                    Solicitud ó Requerimiento <span class="text-muted font-italic">(Manual / Opcional)</span>
                                 </label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text icon-box"><mat-icon class="input-icon">assignment</mat-icon></span>
                                     </div>
-                                    <textarea rows="2" class="input-custom" placeholder="Redacte aquí la solicitud o requerimiento..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.solicitud"></textarea>
+                                    <textarea rows="2" class="input-custom text-uppercase" style="text-transform: uppercase;" placeholder="REDACTE AQUÍ LA SOLICITUD O REQUERIMIENTO..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.solicitud" (input)="actividadesVarias.solicitud = actividadesVarias.solicitud ? actividadesVarias.solicitud.toUpperCase() : ''"></textarea>
                                 </div>
                             </div>
 
                             <!-- 2. A quien va Dirigido (manual) -->
                             <div class="form-group col-md-6">
                                 <label class="form-label-custom font-weight-bold">
-                                    A quien va Dirigido <span class="text-muted font-italic">(Manual)</span>
+                                    A quien va Dirigido <span class="text-muted font-italic">(Manual / Opcional)</span>
                                 </label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text icon-box"><mat-icon class="input-icon">person</mat-icon></span>
                                     </div>
-                                    <input type="text" class="input-custom" placeholder="Destinatario / A quien va dirigido..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.dirigido">
+                                    <input type="text" class="input-custom text-uppercase" style="text-transform: uppercase;" placeholder="DESTINATARIO / A QUIEN VA DIRIGIDO..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.dirigido" (input)="actividadesVarias.dirigido = actividadesVarias.dirigido ? actividadesVarias.dirigido.toUpperCase() : ''">
                                 </div>
                             </div>
 
@@ -427,16 +427,16 @@
                                 </div>
                             </div>
 
-                            <!-- 6. Fecha Limite de Respuesta (obligatorio) -->
+                            <!-- 6. Fecha Limite de Respuesta (opcional) -->
                             <div class="form-group col-md-3">
-                                <label class="form-label-custom text-danger font-weight-bold">
-                                    Fecha Límite de Respuesta (*)
+                                <label class="form-label-custom">
+                                    Fecha Límite de Respuesta <span class="text-muted font-italic">(Opcional)</span>
                                 </label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text icon-box" (click)="flr.toggle()" style="cursor: pointer; background-color: #fee2e2; color: #dc2626;"><mat-icon class="input-icon">event_available</mat-icon></span>
+                                        <span class="input-group-text icon-box" (click)="flr.toggle()" style="cursor: pointer;"><mat-icon class="input-icon">event_available</mat-icon></span>
                                     </div>
-                                    <input class="input-custom border-danger" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.fechaLimiteRespuesta" (ngModelChange)="onFechaLimiteRespuestaChange($event)" ngbDatepicker #flr="ngbDatepicker" readonly (click)="flr.toggle()">
+                                    <input class="input-custom" placeholder="AAAA-MM-DD" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.fechaLimiteRespuesta" (ngModelChange)="onFechaLimiteRespuestaChange($event)" ngbDatepicker #flr="ngbDatepicker" readonly (click)="flr.toggle()">
                                 </div>
                             </div>
 
@@ -449,13 +449,13 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text icon-box"><mat-icon class="input-icon">account_circle</mat-icon></span>
                                     </div>
-                                    <input type="text" class="input-custom font-weight-bold text-primary" placeholder="Ej: Consultoría Jurídica, Dirección General, etc." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.opinionDe">
+                                    <input type="text" class="input-custom font-weight-bold text-primary text-uppercase" style="text-transform: uppercase;" placeholder="EJ: CONSULTORÍA JURÍDICA, DIRECCIÓN GENERAL, ETC." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.opinionDe" (input)="actividadesVarias.opinionDe = actividadesVarias.opinionDe ? actividadesVarias.opinionDe.toUpperCase() : ''">
                                 </div>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text icon-box"><mat-icon class="input-icon">rate_review</mat-icon></span>
                                     </div>
-                                    <textarea rows="3" class="input-custom" placeholder="Redacte aquí el texto de la opinión emitida..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.opinion"></textarea>
+                                    <textarea rows="3" class="input-custom text-uppercase" style="text-transform: uppercase;" placeholder="REDACTE AQUÍ EL TEXTO DE LA OPINIÓN EMITIDA..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.opinion" (input)="actividadesVarias.opinion = actividadesVarias.opinion ? actividadesVarias.opinion.toUpperCase() : ''"></textarea>
                                 </div>
                             </div>
 
@@ -468,7 +468,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text icon-box"><mat-icon class="input-icon">recommend</mat-icon></span>
                                     </div>
-                                    <textarea rows="4" class="input-custom h-100" placeholder="Redacte aquí la recomendación oficial de la Dirección General..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.recomendacion"></textarea>
+                                    <textarea rows="4" class="input-custom h-100 text-uppercase" style="text-transform: uppercase;" placeholder="REDACTE AQUÍ LA RECOMENDACIÓN OFICIAL DE LA DIRECCIÓN GENERAL..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.recomendacion" (input)="actividadesVarias.recomendacion = actividadesVarias.recomendacion ? actividadesVarias.recomendacion.toUpperCase() : ''"></textarea>
                                 </div>
                             </div>
                         </div>
