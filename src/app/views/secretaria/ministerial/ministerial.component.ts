@@ -523,6 +523,13 @@ export class MinisterialComponent implements OnInit {
         ? 4
         : 2;
 
+    if (
+      this.doc.tdoc.toUpperCase() == "PUNTO DE CUENTA" &&
+      this.doc.remi.toUpperCase() == "PRESIDENCIAL"
+    ) {
+      idestatus = 3;
+    }
+
     this.xAPI.parametros = `${this.doc.idestado},${this.doc.idestado},${idestatus},${this.loginService.Usuario.id},${this.doc.idd}`;
     console.log(
       "vamos a mover el documento a: ",
