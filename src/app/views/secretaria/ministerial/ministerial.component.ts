@@ -517,12 +517,19 @@ export class MinisterialComponent implements OnInit {
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "WKF_ARedistribuir";
     this.xAPI.valores = "";
-    this.xAPI.parametros = `${this.doc.idestado},${this.doc.idestado},2,${this.loginService.Usuario.id},${this.doc.idd}`;
+    let idestatus =
+      this.doc.tdoc == "TRAMITACION POR ORGANO REGULAR" &&
+      this.doc.idestado == "4"
+        ? 4
+        : 2;
+
+    this.xAPI.parametros = `${this.doc.idestado},${this.doc.idestado},${idestatus},${this.loginService.Usuario.id},${this.doc.idd}`;
     console.log(
       "vamos a mover el documento a: ",
       this.xAPI.parametros,
       this.SubDocumento.estatus,
     );
+
     if (this.SubDocumento.estatus == "14") {
       this.apiService.Ejecutar(this.xAPI).subscribe({
         next: (data) => {
