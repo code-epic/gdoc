@@ -987,7 +987,7 @@
           </div>
 
           <!-- BLOQUE NORMAL: Integrantes del Caso -->
-          <div *ngIf="(selectedCarpeta?.id !== 'RECLAMOS' || !getReclamosData(activeDoc)) && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'">
+          <div *ngIf="(selectedCarpeta?.id !== 'RECLAMOS' || !getReclamosData(activeDoc)) && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS'">
             <div class="subcasos-header-bar mb-2">
               <div class="d-flex align-items-center">
                 <i class="fas fa-users text-primary fa-lg mr-2"></i>
@@ -1379,6 +1379,118 @@
             </div>
           </div>
 
+          <!-- BLOQUE OFICIOS: Formato Oficio Elegante -->
+          <div *ngIf="selectedCarpeta?.id === 'OFICIOS'" class="oficio-modal-container">
+
+            <!-- Barra Superior del Bloque -->
+            <div class="subcasos-header-bar mb-3">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-envelope-open-text text-info fa-lg mr-2"></i>
+                <span class="subcasos-main-title font-weight-bold" style="font-size: 0.92rem; letter-spacing: 0.3px;">
+                  Formato de Oficio Institucional
+                </span>
+              </div>
+              <span class="badge badge-info px-3 py-1 font-weight-bold" style="font-size: 0.75rem; border-radius: 12px; letter-spacing: 0.5px;">
+                <i class="fas fa-certificate mr-1"></i> OFICIO MPPD
+              </span>
+            </div>
+
+            <!-- Hoja Oficial Estilo Oficio Elegante -->
+            <div class="oficio-sheet-card">
+              <!-- Franja de acento superior tricolor/ejecutivo -->
+              <div class="oficio-top-accent"></div>
+
+              <!-- Cabecera Institucional del Oficio -->
+              <div class="oficio-header-institutional">
+                <div class="oficio-seal-watermark">
+                  <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="oficio-country-title">REPÚBLICA BOLIVARIANA DE VENEZUELA</div>
+                <div class="oficio-ministry-title">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</div>
+              </div>
+
+              <!-- 1. UNIDAD O DEPENDENCIA (RESALTADA) -->
+              <div class="oficio-highlight-box mb-3">
+                <div class="oficio-highlight-header">
+                  <div class="d-flex align-items-center">
+                    <span class="oficio-pulse-icon mr-2">
+                      <i class="fas fa-building"></i>
+                    </span>
+                    <span class="oficio-highlight-title">UNIDAD O DEPENDENCIA</span>
+                  </div>
+                  <span class="oficio-origin-badge">
+                    <i class="fas fa-paper-plane mr-1"></i> DESTINO / ORIGEN
+                  </span>
+                </div>
+                <div class="oficio-unidad-content">
+                  <div class="oficio-unidad-text">
+                    {{ getOficioUnidad(activeDoc) || 'DIRECCIÓN DEL DESPACHO / MPPD' }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. ASUNTO / CONTENIDO DEL OFICIO -->
+              <div class="oficio-asunto-section mb-3">
+                <div class="oficio-section-header mb-2">
+                  <i class="fas fa-align-left text-primary mr-2"></i>
+                  <span class="oficio-section-title">ASUNTO / CONTENIDO DEL OFICIO</span>
+                </div>
+                <div class="oficio-asunto-card">
+                  <div class="oficio-asunto-quote-bar"></div>
+                  <div class="oficio-asunto-body">
+                    {{ getOficioAsunto(activeDoc) || 'SIN CONTENIDO O ASUNTO REGISTRADO EN ESTE OFICIO.' }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. INSTRUCCIONES EN EL CENTRO EN FORMATO OFICIO ELEGANTE -->
+              <div class="oficio-instrucciones-section mb-3">
+                <div class="oficio-instrucciones-card">
+                  <div class="oficio-instrucciones-top-badge">
+                    <i class="fas fa-stamp mr-1"></i>
+                    <span>INSTRUCCIONES Y DISPOSICIONES DEL DESPACHO</span>
+                  </div>
+
+                  <div class="oficio-instrucciones-inner">
+                    <div class="oficio-instrucciones-content" *ngIf="getOficioInstrucciones(activeDoc); else sinInstruccionesOficio">
+                      <div class="oficio-watermark-icon">
+                        <i class="fas fa-tasks"></i>
+                      </div>
+                      <p class="oficio-instrucciones-text">
+                        {{ getOficioInstrucciones(activeDoc) }}
+                      </p>
+                    </div>
+
+                    <ng-template #sinInstruccionesOficio>
+                      <div class="oficio-instrucciones-empty py-3 text-center">
+                        <i class="fas fa-feather-alt text-warning fa-2x mb-2"></i>
+                        <div class="font-weight-bold" style="color: #854d0e; font-size: 0.88rem;">
+                          Sin Instrucciones Específicas Registradas
+                        </div>
+                        <p class="text-muted mb-0" style="font-size: 0.78rem;">
+                          El documento continúa el flujo regular de trámite y despacho ministerial.
+                        </p>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pie Oficial del Documento -->
+              <div class="oficio-footer-stamp d-flex justify-content-between align-items-center pt-2 mt-2">
+                <div class="d-flex align-items-center text-muted" style="font-size: 0.72rem;">
+                  <i class="fas fa-shield-alt text-success mr-1"></i>
+                  <span>Registro Oficial GDOC MPPD</span>
+                </div>
+                <div class="text-muted font-italic" style="font-size: 0.72rem;">
+                  Expediente {{ activeDoc.numc || activeDoc.ncontrol }} • {{ getOficioFecha(activeDoc) }}
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
         <!-- FIN COLUMNA DERECHA -->
 
@@ -1421,7 +1533,7 @@
           </button>
 
           <button class="btn-modal-tool btn-ficha"
-                  *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && !esDocFirmado(activeDoc) && selectedEstadoBuzon !== 'firmados' && currentProfile !== 'Ministro' && currentProfile !== 'Direccion'"
+                  *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS' && !esDocFirmado(activeDoc) && selectedEstadoBuzon !== 'firmados' && currentProfile !== 'Ministro' && currentProfile !== 'Direccion'"
                   (click)="irAMinisterial(activeDoc)"
                   title="Ver ficha completa en Ministerial">
             <i class="fas fa-external-link-alt"></i>
@@ -1432,13 +1544,24 @@
         <!-- Botones Principales de Decisión Executive (Ocultos en documentos firmados) -->
         <div class="modal-footer-decisions" *ngIf="!esDocFirmado(activeDoc)">
           <ng-container *ngIf="currentProfile === 'Ministro'; else defaultDecisions">
-            <!-- ÚNICO BOTÓN FIRMAR EN PERFIL MINISTRO -->
+            <!-- BOTÓN FIRMAR / APROBAR EN PERFIL MINISTRO -->
             <button class="btn-modal-decision btn-favorable btn-firmar-ministro"
-                    (click)="selectedCarpeta?.id === 'CUADRO_DECISORIO' ? generarPuntoDeCuentaPDF() : (selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' ? generarActividadesExteriorPDF() : solicitarFirmaMinistro())"
+                    (click)="selectedCarpeta?.id === 'CUADRO_DECISORIO' ? generarPuntoDeCuentaPDF() : (selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' ? generarActividadesExteriorPDF() : (selectedCarpeta?.id === 'OFICIOS' ? firmarMinistroOficio() : solicitarFirmaMinistro()))"
                     [disabled]="loadingAction"
                     title="Iniciar decisión y firma ministerial">
               <i class="fas fa-file-signature"></i>
-              <span>Firmar Documento</span>
+              <span>{{ selectedCarpeta?.id === 'OFICIOS' ? 'Aprobar' : 'Firmar Documento' }}</span>
+              <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
+            </button>
+
+            <!-- BOTÓN RECHAZAR EXCLUSIVO PARA MINISTRO EN OFICIOS -->
+            <button class="btn-modal-decision btn-negado"
+                    *ngIf="selectedCarpeta?.id === 'OFICIOS'"
+                    (click)="rechazarOficioMinistro()"
+                    [disabled]="loadingAction"
+                    title="Rechazar y devolver Oficio">
+              <i class="fas fa-times-circle"></i>
+              <span>Rechazar</span>
               <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
             </button>
           </ng-container>
@@ -1479,7 +1602,7 @@
 
               <!-- ENVIAR AL ANALISTA -->
               <button class="btn-modal-decision btn-warning"
-                      *ngIf="currentProfile === 'JefeSecretaria' || currentProfile === 'Direccion'"
+                      *ngIf="selectedCarpeta?.id !== 'OFICIOS' && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && (currentProfile === 'JefeSecretaria' || currentProfile === 'Direccion')"
                       (click)="ActualizarUbicacionSecretaria()"
                       [disabled]="loadingAction"
                       title="Devolver al Analista">
@@ -1488,9 +1611,9 @@
                 <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
               </button>
 
-              <!-- ARCHIVAR (TRAMITE_ORGANO_REGULAR, PUNTO_DE_CUENTA, PRESIDENCIALES) -->
+              <!-- ARCHIVAR (TRAMITE_ORGANO_REGULAR, PUNTO_DE_CUENTA, PRESIDENCIALES, OFICIOS) -->
               <button class="btn-modal-decision btn-archivar"
-                      *ngIf="currentProfile === 'JefeSecretaria' && (selectedCarpeta?.id === 'TRAMITE_ORGANO_REGULAR' || selectedCarpeta?.id === 'PUNTO_DE_CUENTA' || selectedCarpeta?.id === 'PRESIDENCIALES')"
+                      *ngIf="selectedCarpeta?.id === 'OFICIOS' || (currentProfile === 'JefeSecretaria' && (selectedCarpeta?.id === 'TRAMITE_ORGANO_REGULAR' || selectedCarpeta?.id === 'PUNTO_DE_CUENTA' || selectedCarpeta?.id === 'PRESIDENCIALES'))"
                       (click)="ejecutarAccion('ARCHIVAR')"
                       [disabled]="loadingAction"
                       title="Archivar Documento">
@@ -1502,9 +1625,11 @@
           </ng-template>
         </div>
 
-        <!-- Botones Principales en documentos firmados (Enviar a Resoluciones / Enviar a Oficio) -->
+        <!-- Botones Principales en documentos firmados (Enviar a Resoluciones / Enviar a Oficio / Archivar) -->
         <div class="modal-footer-decisions" *ngIf="esDocFirmado(activeDoc)">
+          <!-- Enviar a Resoluciones: Oculto en ACTIVIDADES_EN_EL_EXTERIOR y OFICIOS -->
           <button class="btn-modal-decision btn-favorable"
+                  *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS'"
                   (click)="enviarAResoluciones(activeDoc)"
                   [disabled]="loadingAction"
                   title="Enviar trámite a Resoluciones">
@@ -1513,13 +1638,26 @@
             <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
           </button>
 
+          <!-- Enviar a Oficio: Oculto en OFICIOS y ACTIVIDADES_EN_EL_EXTERIOR -->
           <button class="btn-modal-decision btn-diferido"
+                  *ngIf="selectedCarpeta?.id !== 'OFICIOS' && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'"
                   (click)="enviarAOficio(activeDoc)"
                   [disabled]="loadingAction"
                   title="Enviar trámite a Oficio"
                   style="background: linear-gradient(135deg, #11cdef 0%, #1171ef 100%); color: #ffffff; border: none;">
             <i class="fas fa-paper-plane"></i>
             <span>Enviar a Oficio</span>
+            <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
+          </button>
+
+          <!-- Archivar para ACTIVIDADES_EN_EL_EXTERIOR y OFICIOS cuando estén firmados -->
+          <button class="btn-modal-decision btn-archivar"
+                  *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' || selectedCarpeta?.id === 'OFICIOS'"
+                  (click)="ejecutarAccion('ARCHIVAR')"
+                  [disabled]="loadingAction"
+                  title="Archivar Documento">
+            <i class="fas fa-archive"></i>
+            <span>Archivar</span>
             <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
           </button>
         </div>

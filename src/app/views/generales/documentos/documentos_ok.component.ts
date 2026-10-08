@@ -258,18 +258,23 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       estadoOrigen: 2,
       filtro: 1,
     },
+
+    {
+      id: "OFICIOS",
+      nombre: "OFICIOS",
+      icono: "fas fa-envelope",
+      color: "#2d969bff",
+      funcion: "WKF_CDocumentosGestionOficios",
+      disponible: true,
+      estadoActual: 2,
+      estadoOrigen: 2,
+      filtro: 1,
+    },
     {
       id: "RADIOGRAMAS",
       nombre: "RADIOGRAMAS",
       icono: "fas fa-broadcast-tower",
       color: "#11cdef",
-      disponible: false,
-    },
-    {
-      id: "OFICIOS",
-      nombre: "OFICIOS",
-      icono: "fas fa-envelope",
-      color: "#fb6340",
       disponible: false,
     },
     {
@@ -466,7 +471,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         c.estadoActual =
           c.id === "RECLAMOS"
             ? c.estadoActual || 6
-            : c.id === "ACTIVIDADES_EN_EL_EXTERIOR"
+            : c.id === "ACTIVIDADES_EN_EL_EXTERIOR" || c.id === "OFICIOS"
               ? 2
               : c.id === "CUADRO_DECISORIO"
                 ? 17
@@ -483,6 +488,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             c.id === "PUNTO_DE_CUENTA" ||
             c.id === "RECLAMOS" ||
             c.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
+            c.id === "OFICIOS" ||
             c.id === "CUADRO_DECISORIO"
               ? 2
               : c.id === "PRESIDENCIALES"
@@ -1970,7 +1976,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     if (this.selectedCarpeta?.id === "RECLAMOS") {
       this.consultarDatosBasicos();
-    } else if (this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR") {
+    } else if (
+      this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
+      this.selectedCarpeta?.id === "OFICIOS"
+    ) {
       this.consultarDetalleDocumento(this.activeDoc);
     }
 
@@ -2004,7 +2013,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     if (this.selectedCarpeta?.id === "RECLAMOS") {
       this.consultarDatosBasicos();
-    } else if (this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR") {
+    } else if (
+      this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
+      this.selectedCarpeta?.id === "OFICIOS"
+    ) {
       this.consultarDetalleDocumento(this.activeDoc);
     }
 
@@ -2479,6 +2491,202 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.fnxFirmaMinistro(decisionSeleccionada, observacionFinal);
     this.loadingAction = true;
     this.redistribuir(decisionSeleccionada);
+  }
+
+  // ─── Firma de OFICIOS por el Ministro (Solo APROBADO / FAVORABLE) ─────────────
+  public async firmarMinistroOficio(): Promise<void> {
+    if (!this.activeDoc) return;
+
+    const numControl = this.activeDoc.numc || this.activeDoc.ncontrol || "";
+    const comentarioActual = (
+      this.observacion ||
+      this.activeDoc?.observacion ||
+      ""
+    )
+      .toString()
+      .trim()
+      .toUpperCase();
+
+    const { value: comentario, isConfirmed } = await Swal.fire({
+      title: "Aprobar y Firmar Oficio",
+      html: `
+        <div style="text-align: left; font-size: 0.88rem; color: #1e293b;">
+          <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #16a34a; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
+            <div style="font-weight: 800; color: #15803d; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;">
+              <i class="fas fa-check-circle mr-1"></i> Aprobación Ministerial del Oficio
+            </div>
+            <div style="font-size: 0.8rem; color: #334155;">
+              Expediente: <strong>Nº ${numControl}</strong> • Se registrará la decisión <strong>APROBADO</strong>.
+            </div>
+          </div>
+          <div style="margin-top: 10px;">
+            <label style="font-size: 0.76rem; font-weight: 700; color: #475569; text-transform: uppercase;">
+              <i class="fas fa-pen-fancy text-primary mr-1"></i> Instrucciones / Observaciones del Ministro (Opcional):
+            </label>
+            <textarea id="swal-obs-oficio-aprobado" class="form-control" rows="3"
+                      style="font-size: 0.82rem; text-transform: uppercase;"
+                      placeholder="INSTRUCCIONES U OBSERVACIONES DEL MINISTRO..."
+                      oninput="this.value = this.value.toUpperCase()">${comentarioActual}</textarea>
+          </div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonColor: "#2dce89",
+      cancelButtonColor: "#8898aa",
+      confirmButtonText:
+        '<i class="fas fa-check-circle mr-1"></i> Sí, Aprobar y Firmar',
+      cancelButtonText: "Cancelar",
+      customClass: {
+        popup: "swal-executive-popup",
+      },
+      preConfirm: () => {
+        const el = document.getElementById(
+          "swal-obs-oficio-aprobado",
+        ) as HTMLTextAreaElement;
+        return el ? el.value.trim().toUpperCase() : "";
+      },
+    });
+
+    if (!isConfirmed) return;
+
+    const observacionFinal = (comentario || "").toString().trim().toUpperCase();
+    this.observacion = observacionFinal;
+    if (this.activeDoc) {
+      this.activeDoc.observacion = observacionFinal;
+      this.activeDoc.decision = "FAVORABLE";
+    }
+
+    this.loadingAction = true;
+    this.fnxFirmaMinistro("FAVORABLE", observacionFinal);
+    this.redistribuir("FAVORABLE");
+  }
+
+  // ─── Rechazo de OFICIOS por el Ministro (Prefijo 2,2,10 y WKF_IDocumentoFirmados) ───
+  public async rechazarOficioMinistro(): Promise<void> {
+    if (!this.activeDoc) return;
+
+    const numControl = this.activeDoc.numc || this.activeDoc.ncontrol || "";
+
+    const { value: obsRechazo, isConfirmed } = await Swal.fire({
+      title: "Rechazar Oficio",
+      html: `
+        <div style="text-align: left; font-size: 0.88rem; color: #1e293b;">
+          <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 4px solid #dc2626; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
+            <div style="font-weight: 800; color: #b91c1c; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;">
+              <i class="fas fa-times-circle mr-1"></i> Devolución por Rechazo Ministerial
+            </div>
+            <div style="font-size: 0.8rem; color: #7f1d1d;">
+              El oficio <strong>Nº ${numControl}</strong> será rechazado y devuelto a la bandeja inicial.
+            </div>
+          </div>
+          <div style="margin-top: 10px;">
+            <label style="font-size: 0.76rem; font-weight: 700; color: #475569; text-transform: uppercase;">
+              <i class="fas fa-exclamation-triangle text-danger mr-1"></i> Motivo del Rechazo (Obligatorio):
+            </label>
+            <textarea id="swal-obs-oficio-rechazo" class="form-control" rows="3"
+                      style="font-size: 0.82rem; text-transform: uppercase;"
+                      placeholder="INDIQUE EL MOTIVO U OBSERVACIÓN DEL RECHAZO..."
+                      oninput="this.value = this.value.toUpperCase()"></textarea>
+          </div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonColor: "#f5365c",
+      cancelButtonColor: "#8898aa",
+      confirmButtonText:
+        '<i class="fas fa-times-circle mr-1"></i> Confirmar Rechazo y Devolver',
+      cancelButtonText: "Cancelar",
+      customClass: {
+        popup: "swal-executive-popup",
+      },
+      preConfirm: () => {
+        const el = document.getElementById(
+          "swal-obs-oficio-rechazo",
+        ) as HTMLTextAreaElement;
+        const val = el ? el.value.trim().toUpperCase() : "";
+        if (!val) {
+          Swal.showValidationMessage(
+            "Debe ingresar el motivo u observación para registrar el rechazo.",
+          );
+          return false;
+        }
+        return val;
+      },
+    });
+
+    if (!isConfirmed || !obsRechazo) return;
+
+    const observacionFinal = obsRechazo.toString().trim().toUpperCase();
+    this.observacion = observacionFinal;
+    if (this.activeDoc) {
+      this.activeDoc.observacion = observacionFinal;
+      this.activeDoc.decision = "RECHAZADO";
+    }
+
+    this.loadingAction = true;
+
+    // 1. Invocar WKF_IDocumentoFirmados para registrar el rechazo en base de datos
+    const numc = this.activeDoc.numc || this.activeDoc.ncontrol || "";
+    const estatus = "RECHAZADO";
+    const usuario =
+      this.jwtData?.userId ||
+      this.loginService.Usuario?.usuario ||
+      this.loginService.Usuario?.id ||
+      "";
+
+    const xAPIFirmados: IAPICore = {
+      funcion: "WKF_IDocumentoFirmados",
+      parametros: `${numc},${estatus},${usuario},${observacionFinal}`,
+      valores: "",
+    };
+
+    this.apiService.Ejecutar(xAPIFirmados).subscribe({
+      next: (data) => {
+        console.log(
+          "WKF_IDocumentoFirmados (Rechazo) registrado exitosamente:",
+          data,
+        );
+      },
+      error: (err) => {
+        console.error(
+          "Error al registrar WKF_IDocumentoFirmados para rechazo:",
+          err,
+        );
+      },
+    });
+
+    // 2. Mover a devueltos con prefijo 2,2,10 para OFICIOS
+    const targetId =
+      this.activeDoc?.idd ||
+      this.activeDoc?.id ||
+      this.activeDoc?.wfdocumento ||
+      "";
+
+    const xAPIRedist: IAPICore = {
+      funcion: "WKF_ARedistribuir",
+      parametros: `2,2,10,${this.jwtData.userId},${targetId}`,
+      valores: "",
+    };
+
+    this.apiService.Ejecutar(xAPIRedist).subscribe({
+      next: () => {
+        this.loadingAction = false;
+        this.toastrService.warning(
+          "El oficio ha sido rechazado y devuelto exitosamente.",
+          "Oficio Rechazado",
+        );
+        this.closeDetail();
+        this.actualizarBuzon();
+      },
+      error: (error) => {
+        this.loadingAction = false;
+        console.error("Error al redistribuir oficio rechazado:", error);
+        this.toastrService.error(
+          "Ocurrió un error al devolver el oficio rechazado.",
+          "Error",
+        );
+      },
+    });
   }
 
   // ─── Utilidades para PDF de Punto de Cuenta ──────────────────────────────────
@@ -3404,7 +3612,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.activeDoc.archivo_firmado = filename;
     try {
       this.fnxFirmaMinistro(
-        "APROBADO",
+        "FAVORABLE",
         this.observacion || this.activeDoc?.observacion || "",
       );
     } catch (errFnx) {
@@ -3474,6 +3682,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       .toString()
       .toUpperCase();
 
+    const numControl = (
+      this.activeDoc?.numc ||
+      this.activeDoc?.ncontrol ||
+      this.activeDoc?.cuenta ||
+      "012-26"
+    )
+      .toString()
+      .trim();
+
     let comentarioInicial = (
       this.observacion ||
       this.activeDoc?.observacion ||
@@ -3485,100 +3702,149 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     const tieneObservacion = comentarioInicial.length > 0;
     const esVarias = this.isActividadVarias(this.activeDoc);
     const tituloModal = esVarias
-      ? "Actividades Varias - Ministro"
-      : "Actividades en el Exterior - Ministro";
+      ? "Decisión y Firma: Actividades Varias"
+      : "Decisión y Firma: Actividades en el Exterior";
 
-    const modalHtml = `
-      <div style="text-align: left; font-size: 0.88rem; color: #1e293b; line-height: 1.5;">
-        <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #8e1c26; padding: 12px 14px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-          ${
-            esVarias
-              ? `<div style="font-weight: 700; color: #8e1c26; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
-                   <i class="fas fa-file-invoice mr-1"></i> Aprobación de Actividades Varias
-                 </div>
-                 <div style="font-size: 0.82rem; color: #475569;">
-                   Se procederá a generar el <b>Documento Oficial Ministerial (Informe/Carta)</b> con firma y sello del General en Jefe Ministro del Poder Popular para la Defensa.
-                 </div>`
-              : `<div style="font-weight: 700; color: #8e1c26; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
-                   <i class="fas fa-globe-americas mr-1"></i> Autorización de Actividades en el Exterior
-                 </div>
-                 <div style="font-size: 0.82rem; color: #475569;">
-                   Se procederá a generar el <b>Documento Oficial Ministerial (Carta)</b> con firma y sello del General en Jefe Ministro del Poder Popular para la Defensa y aprobación del viaje a <b>${pais}</b>.
-                 </div>`
-          }
-        </div>
+    (Swal as any).selectedDecision = "APROBADO";
 
-        ${
-          tieneObservacion
-            ? `
-          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 14px; margin-top: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <span style="font-size: 0.72rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">
-                <i class="fas fa-comment-alt text-danger mr-1"></i> Observación Registrada:
-              </span>
-              <span style="font-size: 0.65rem; font-weight: 700; color: #15803d; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">CARGADA</span>
+    const confirmacion = await Swal.fire({
+      title: tituloModal,
+      html: `
+        <div style="text-align: left; font-size: 0.88rem; color: #1e293b;">
+          <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #8e1c26; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-weight: 800; color: #8e1c26; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;">
+              <i class="${esVarias ? "fas fa-file-invoice" : "fas fa-globe-americas"} mr-1"></i>
+              ${esVarias ? "INFORME DE ACTIVIDADES VARIAS" : "ACTIVIDAD EN EL EXTERIOR - " + pais}
             </div>
-            <div style="font-size: 0.82rem; font-weight: 600; color: #0f172a; line-height: 1.4; word-break: break-word; text-transform: uppercase;">
-              ${comentarioInicial}
+            <div style="font-size: 0.8rem; color: #475569;">
+              Expediente: <strong>Nº ${numControl}</strong> • Generación oficial en formato Carta con firma y sellos ministeriales.
             </div>
           </div>
-        `
-            : `
-          <div style="margin-top: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <label for="swal-mppd-comentario-ext" style="font-weight: 700; font-size: 0.75rem; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
-                <i class="fas fa-pen-fancy text-danger mr-1"></i> Comentarios / Instrucciones del Ministro:
+
+          <label style="font-weight: 800; font-size: 0.76rem; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">
+            <i class="fas fa-vote-yea text-primary mr-1"></i> Decisión del Ciudadano Ministro:
+          </label>
+          <div class="swal-decision-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 0; margin-bottom: 14px;">
+            <button id="btn-act-aprobado" class="swal-decision-btn btn-swal-aprobado active" type="button" style="border-width: 2.5px;">
+              <i class="fas fa-check-circle"></i>
+              <span>APROBADO</span>
+            </button>
+            <button id="btn-act-negado" class="swal-decision-btn btn-swal-negado" type="button" style="border-width: 2.5px;">
+              <i class="fas fa-times-circle"></i>
+              <span>NEGADO</span>
+            </button>
+            <button id="btn-act-visto" class="swal-decision-btn btn-swal-visto" type="button" style="border-width: 2.5px;">
+              <i class="fas fa-eye"></i>
+              <span>VISTO</span>
+            </button>
+          </div>
+
+          <div style="margin-top: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+              <label for="swal-mppd-comentario-ext" style="font-weight: 800; font-size: 0.75rem; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
+                <i class="fas fa-pen-fancy text-danger mr-1"></i> Instrucciones / Observaciones del Ministro:
               </label>
               <span style="font-size: 0.65rem; font-weight: 700; color: #64748b; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">EN MAYÚSCULAS</span>
             </div>
             <textarea id="swal-mppd-comentario-ext"
                       rows="3"
-                      style="width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 0.82rem; font-family: inherit; border: 1.5px solid #cbd5e1; border-radius: 6px; resize: vertical; text-transform: uppercase; outline: none; transition: border-color 0.2s;"
-                      placeholder="${esVarias ? "INSTRUCCIONES U OBSERVACIONES PARA EL INFORME DE ACTIVIDADES VARIAS..." : "INSTRUCCIONES U OBSERVACIONES PARA EL VIAJE AL EXTERIOR..."}"
-                      onfocus="this.style.borderColor='#8e1c26'"
-                      onblur="this.style.borderColor='#cbd5e1'"
-                      oninput="this.value = this.value.toUpperCase()"></textarea>
+                      style="width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 0.82rem; font-family: inherit; border: 1.5px solid #cbd5e1; border-radius: 6px; resize: vertical; text-transform: uppercase; outline: none;"
+                      placeholder="${esVarias ? "INSTRUCCIONES U OBSERVACIONES PARA LA ACTIVIDAD VARIA..." : "INSTRUCCIONES U OBSERVACIONES PARA EL VIAJE AL EXTERIOR..."}"
+                      oninput="this.value = this.value.toUpperCase()">${comentarioInicial}</textarea>
           </div>
-        `
-        }
-      </div>
-    `;
-
-    const confirmacion = await Swal.fire({
-      title: tituloModal,
-      html: modalHtml,
+        </div>
+      `,
       showCancelButton: true,
       confirmButtonColor: "#8e1c26",
       cancelButtonColor: "#64748b",
       confirmButtonText:
-        '<i class="fas fa-file-signature mr-1"></i> Firmar y Subir',
+        '<i class="fas fa-file-signature mr-1"></i> Firmar y Generar Documento',
       cancelButtonText: "Cancelar",
+      customClass: {
+        popup: "swal-executive-popup",
+      },
+      didOpen: () => {
+        const popup = Swal.getPopup();
+        if (!popup) return;
+
+        let activeDecision = "APROBADO";
+        (Swal as any).selectedDecision = activeDecision;
+
+        const updateVisuals = () => {
+          ["aprobado", "negado", "visto"].forEach((k) => {
+            const btn = popup.querySelector(`#btn-act-${k}`);
+            if (btn) {
+              if (k.toUpperCase() === activeDecision) {
+                btn.classList.add("active");
+                (btn as HTMLElement).style.boxShadow =
+                  "0 0 0 3px rgba(142, 28, 38, 0.3)";
+                (btn as HTMLElement).style.transform = "scale(1.02)";
+              } else {
+                btn.classList.remove("active");
+                (btn as HTMLElement).style.boxShadow = "none";
+                (btn as HTMLElement).style.transform = "scale(1)";
+              }
+            }
+          });
+        };
+
+        const setupBtn = (id: string, val: string) => {
+          const btn = popup.querySelector(id);
+          if (btn) {
+            btn.addEventListener("click", () => {
+              activeDecision = val;
+              (Swal as any).selectedDecision = val;
+              updateVisuals();
+            });
+          }
+        };
+
+        setupBtn("#btn-act-aprobado", "APROBADO");
+        setupBtn("#btn-act-negado", "NEGADO");
+        setupBtn("#btn-act-visto", "VISTO");
+
+        updateVisuals();
+      },
       preConfirm: () => {
-        if (tieneObservacion) {
-          return comentarioInicial;
-        }
+        const decisionSel = (Swal as any).selectedDecision || "APROBADO";
         const el = document.getElementById(
           "swal-mppd-comentario-ext",
         ) as HTMLTextAreaElement;
-        return el ? el.value.trim().toUpperCase() : "";
+        const obsVal = el ? el.value.trim().toUpperCase() : "";
+
+        if (decisionSel === "NEGADO" && !obsVal) {
+          Swal.showValidationMessage(
+            "La observación es obligatoria al seleccionar la decisión NEGADO.",
+          );
+          return false;
+        }
+
+        return {
+          decision: decisionSel,
+          observacion: obsVal,
+        };
       },
     });
 
-    if (!confirmacion.isConfirmed) {
+    if (!confirmacion.isConfirmed || !confirmacion.value) {
       return;
     }
 
-    if (confirmacion.value !== undefined) {
-      this.observacion = confirmacion.value.toString().trim().toUpperCase();
-      if (this.activeDoc) {
-        this.activeDoc.observacion = this.observacion;
-      }
+    const decisionSeleccionada = confirmacion.value.decision || "APROBADO";
+    this.observacion = confirmacion.value.observacion || "";
+    if (this.activeDoc) {
+      this.activeDoc.observacion = this.observacion;
+      this.activeDoc.decision = decisionSeleccionada;
     }
 
     // 2. Indicador de progreso
     Swal.fire({
-      title: "Generando Actividades en el Exterior...",
-      html: "Confeccionando documento ministerial tamaño Carta, itinerario, gastos y sellos oficiales...",
+      title: esVarias
+        ? "Generando Actividades Varias..."
+        : "Generando Actividades en el Exterior...",
+      html: esVarias
+        ? "Confeccionando informe ministerial tamaño Carta, requerimiento, parámetros, opinión y recomendación..."
+        : "Confeccionando documento ministerial tamaño Carta, itinerario, gastos y sellos oficiales...",
       allowOutsideClick: false,
       showConfirmButton: false,
       didOpen: () => {
@@ -3713,14 +3979,6 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     });
 
     // Cuadro de Número de Control / Expediente
-    const numControl = (
-      this.activeDoc.numc ||
-      this.activeDoc.ncontrol ||
-      this.activeDoc.cuenta ||
-      "012-26"
-    )
-      .toString()
-      .trim();
     const borderGray = [115, 115, 115];
     pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
     pdf.setLineWidth(0.35);
@@ -3729,18 +3987,29 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setFontSize(8.5);
     pdf.text(`Nº ${numControl}`, 35, 38.7, { align: "center" });
 
-    // 4.4 Título Central: ACTIVIDADES EN EL EXTERIOR
+    // 4.4 Título Central: ACTIVIDADES EN EL EXTERIOR vs ACTIVIDADES VARIAS
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(12);
+    pdf.setFontSize(esVarias ? 11 : 12);
     pdf.setTextColor(0, 0, 0);
-    pdf.text(
-      "ACTIVIDADES EN EL EXTERIOR AL GENERAL EN JEFE MINISTRO DEL",
-      135,
-      14.5,
-      {
-        align: "center",
-      },
-    );
+    if (esVarias) {
+      pdf.text(
+        "INFORME DE ACTIVIDADES VARIAS AL GENERAL EN JEFE MINISTRO DEL",
+        135,
+        14.5,
+        {
+          align: "center",
+        },
+      );
+    } else {
+      pdf.text(
+        "ACTIVIDADES EN EL EXTERIOR AL GENERAL EN JEFE MINISTRO DEL",
+        135,
+        14.5,
+        {
+          align: "center",
+        },
+      );
+    }
     pdf.text("PODER POPULAR PARA LA DEFENSA", 135, 19.5, { align: "center" });
 
     // 4.5 Cuadro Presentante / Fecha / Página
@@ -3788,300 +4057,647 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     pdf.setFontSize(7.5);
     pdf.text("1/1", 191, boxY + 12.5, { align: "center" });
 
-    // 4.6 Franja ASUNTO
+    // 4.6 Contenido según Tipo de Trámite (Formato A: Exterior / Formato B: Varias)
     const redColor = [225, 0, 0];
-    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, 41, contentWidth, 4, "FD");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text("ASUNTO:", margin + 2, 44);
 
-    // Contenido ASUNTO
-    pdf.setFillColor(255, 255, 255);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, 45, contentWidth, 8, "FD");
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7);
-    const asuntoRaw = `ACTIVIDAD EN EL EXTERIOR - ${motivoViaje}`;
-    const splitAsunto = pdf.splitTextToSize(asuntoRaw, contentWidth - 4);
-    pdf.text(splitAsunto, margin + 2, 48.5);
+    if (esVarias) {
+      // ═════════════════════════════════════════════════════════════════════════
+      // FORMATO B: INFORME DE ACTIVIDADES VARIAS (TAMAÑO CARTA PIXEL-PERFECT)
+      // ═════════════════════════════════════════════════════════════════════════
+      const solicitudTexto = (
+        viaje.solicitud ||
+        viaje.motivo ||
+        this.getAsuntoClean(this.activeDoc) ||
+        this.activeDoc.cont ||
+        "SOLICITUD DE ACTIVIDAD INSTITUCIONAL"
+      )
+        .toString()
+        .toUpperCase()
+        .trim();
 
-    // 4.7 Franja DATOS DE LA COMISIÓN Y PAÍS ANFITRIÓN
-    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, 55, contentWidth, 4, "FD");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text("DATOS DE LA COMISIÓN Y PAÍS ANFITRIÓN:", margin + 2, 58);
+      const opinionDeTitulo = (viaje.opinionDe || viaje.opinion_de || "")
+        .toString()
+        .toUpperCase()
+        .trim();
 
-    // Contenedor de Datos de Comisión
-    pdf.setFillColor(255, 255, 255);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, 59, contentWidth, 26, "FD");
+      const opinionTexto = (
+        viaje.opinion ||
+        viaje.opinionTexto ||
+        "SIN OBSERVACIONES NI OBJECIONES TÉCNICAS REGISTRADAS."
+      )
+        .toString()
+        .toUpperCase()
+        .trim();
 
-    // Fila 1: País Destino y Delegación
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(6);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text("PAÍS DESTINO / ANFITRIÓN:", margin + 3, 63);
+      const recomendacionTexto = (
+        viaje.recomendacion ||
+        viaje.recomendacionDireccion ||
+        "SE RECOMIENDA PROCEDER DE ACUERDO CON LO ESTABLECIDO Y AUTORIZAR LA ACTIVIDAD PROPUESTA."
+      )
+        .toString()
+        .toUpperCase()
+        .trim();
 
-    pdf.setFontSize(9);
-    pdf.setTextColor(15, 23, 42);
-    pdf.text(pais, margin + 3, 68);
+      const fechaLimiteStr = (
+        viaje.fechaLimiteRespuesta || viaje.fechaConfirmacion
+          ? this.formatNgbDate(
+              viaje.fechaLimiteRespuesta || viaje.fechaConfirmacion,
+            )
+          : this.activeDoc?.alerta
+            ? this.formatFechaPuntoCuenta(new Date(this.activeDoc.alerta))
+            : "NO ESPECIFICADA"
+      )
+        .toString()
+        .toUpperCase();
 
-    // Estampar Bandera si cargó
-    if (banderaImg) {
-      try {
-        const textW = pdf.getTextWidth(pais);
-        pdf.addImage(
-          banderaImg,
-          "PNG",
-          margin + 5 + textW,
-          63.5,
-          9,
-          6,
-          undefined,
-          "FAST",
-        );
-      } catch (e) {}
+      // 4.6-B Franja SOLICITUD Ó REQUERIMIENTO INSTITUCIONAL
+      const solY = 41;
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, solY, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(
+        "SOLICITUD Ó REQUERIMIENTO INSTITUCIONAL:",
+        margin + 2,
+        solY + 2.8,
+      );
+
+      // Contenedor Solicitud
+      const solBoxH = 26;
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, solY + 4, contentWidth, solBoxH, "FD");
+      pdf.setTextColor(15, 23, 42);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.2);
+      const splitSol = pdf.splitTextToSize(solicitudTexto, contentWidth - 4);
+      pdf.text(splitSol, margin + 2, solY + 8.5);
+
+      // 4.7-B Franja PARÁMETROS DEL TRÁMITE Y EJECUCIÓN
+      const parY = 73;
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, parY, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("PARÁMETROS DEL TRÁMITE Y EJECUCIÓN:", margin + 2, parY + 2.8);
+
+      // Contenedor Parámetros (4 columnas con divisores)
+      const parBoxH = 20;
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, parY + 4, contentWidth, parBoxH, "FD");
+
+      const c1W = 54;
+      const c2W = 32;
+      const c3W = 58;
+      const c4W = contentWidth - c1W - c2W - c3W; // ~51.9 mm
+
+      const x1 = margin;
+      const x2 = x1 + c1W;
+      const x3 = x2 + c2W;
+      const x4 = x3 + c3W;
+
+      // Divisores verticales
+      pdf.setDrawColor(226, 232, 240);
+      pdf.line(x2, parY + 4, x2, parY + 4 + parBoxH);
+      pdf.line(x3, parY + 4, x3, parY + 4 + parBoxH);
+      pdf.line(x4, parY + 4, x4, parY + 4 + parBoxH);
+
+      // Col 1: Dirigido A
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(5.8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("DIRIGIDO A / DESTINATARIO:", x1 + 2, parY + 8);
+      pdf.setFontSize(6.8);
+      pdf.setTextColor(15, 23, 42);
+      const splitDir = pdf.splitTextToSize(dirigidoA, c1W - 4);
+      pdf.text(splitDir, x1 + 2, parY + 12);
+
+      // Col 2: Cantidad de Participantes
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(5.8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("PARTICIPANTES:", x2 + 2, parY + 8);
+      pdf.setFontSize(8.2);
+      pdf.setTextColor(15, 23, 42);
+      pdf.text(`${cantPersonas} PERSONA(S)`, x2 + 2, parY + 14);
+
+      // Col 3: Período y Duración
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(5.8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("PERÍODO / EJECUCIÓN:", x3 + 2, parY + 8);
+      pdf.setFontSize(6.8);
+      pdf.setTextColor(22, 101, 52); // Verde
+      pdf.text(`${fechaInicioStr} AL ${fechaFinStr}`, x3 + 2, parY + 12.5);
+      pdf.setFontSize(6.2);
+      pdf.setTextColor(30, 64, 175); // Azul
+      pdf.text(`DURACIÓN: ${duracionDias}`, x3 + 2, parY + 17.5);
+
+      // Col 4: Límite de Respuesta
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(5.8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("LÍMITE DE RESPUESTA:", x4 + 2, parY + 8);
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(185, 28, 28); // Rojo
+      pdf.text(fechaLimiteStr, x4 + 2, parY + 14);
+
+      // 4.8-B Franja OPINIÓN TÉCNICA EMITIDA
+      const opY = 99;
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, opY, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      const opTitulo = opinionDeTitulo
+        ? `OPINIÓN EMITIDA (${opinionDeTitulo}):`
+        : "OPINIÓN TÉCNICA / INSTITUCIONAL EMITIDA:";
+      pdf.text(opTitulo, margin + 2, opY + 2.8);
+
+      // Contenedor Opinión
+      const opBoxH = 28;
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, opY + 4, contentWidth, opBoxH, "FD");
+      pdf.setTextColor(15, 23, 42);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(7);
+      const splitOp = pdf.splitTextToSize(opinionTexto, contentWidth - 4);
+      pdf.text(splitOp, margin + 2, opY + 9);
+
+      // 4.9-B Franja DECISIÓN DEL CIUDADANO MINISTRO
+      const decY = 133;
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, decY, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("DECISIÓN DEL CIUDADANO MINISTRO:", margin + 2, decY + 2.8);
+
+      // Contenedor Decisión
+      const decBoxH = 20;
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, decY + 4, contentWidth, decBoxH, "FD");
+
+      const boxSize = 5.5;
+      const decBoxY = decY + 7;
+      const apX = margin + 20;
+      const negX = margin + 82;
+      const visX = margin + 144;
+
+      // Casilla 1: APROBADO
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.setLineWidth(0.35);
+      pdf.rect(apX, decBoxY, boxSize, boxSize, "S");
+      if (decisionSeleccionada === "APROBADO") {
+        pdf.setDrawColor(85, 134, 100);
+        pdf.setLineWidth(0.9);
+        pdf.line(apX + 1.0, decBoxY + 2.8, apX + 2.2, decBoxY + 4.5);
+        pdf.line(apX + 2.2, decBoxY + 4.5, apX + 4.6, decBoxY + 1.0);
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(0, 0, 0);
+      } else {
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(140, 140, 140);
+      }
+      pdf.setFontSize(7.5);
+      pdf.text("APROBADO", apX + 8, decBoxY + 4.2);
+
+      // Casilla 2: NEGADO
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.setLineWidth(0.35);
+      pdf.rect(negX, decBoxY, boxSize, boxSize, "S");
+      if (decisionSeleccionada === "NEGADO") {
+        pdf.setDrawColor(185, 28, 28);
+        pdf.setLineWidth(0.9);
+        pdf.line(negX + 1.0, decBoxY + 2.8, negX + 2.2, decBoxY + 4.5);
+        pdf.line(negX + 2.2, decBoxY + 4.5, negX + 4.6, decBoxY + 1.0);
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(0, 0, 0);
+      } else {
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(140, 140, 140);
+      }
+      pdf.setFontSize(7.5);
+      pdf.text("NEGADO", negX + 8, decBoxY + 4.2);
+
+      // Casilla 3: VISTO
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.setLineWidth(0.35);
+      pdf.rect(visX, decBoxY, boxSize, boxSize, "S");
+      if (decisionSeleccionada === "VISTO") {
+        pdf.setDrawColor(3, 105, 161);
+        pdf.setLineWidth(0.9);
+        pdf.line(visX + 1.0, decBoxY + 2.8, visX + 2.2, decBoxY + 4.5);
+        pdf.line(visX + 2.2, decBoxY + 4.5, visX + 4.6, decBoxY + 1.0);
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(0, 0, 0);
+      } else {
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(140, 140, 140);
+      }
+      pdf.setFontSize(7.5);
+      pdf.text("VISTO", visX + 8, decBoxY + 4.2);
+
+      // Leyenda
+      let leyendaVarias =
+        "AUTORIZADA LA ACTIVIDAD INSTITUCIONAL CONFORME A LO EXPUESTO.";
+      if (decisionSeleccionada === "NEGADO") {
+        leyendaVarias =
+          "NO AUTORIZADA LA ACTIVIDAD INSTITUCIONAL CONFORME A LO EXPUESTO.";
+      } else if (decisionSeleccionada === "VISTO") {
+        leyendaVarias =
+          "VISTO POR EL GENERAL EN JEFE MINISTRO DEL PODER POPULAR PARA LA DEFENSA.";
+      }
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(6.2);
+      pdf.setTextColor(71, 85, 105);
+      pdf.text(leyendaVarias, pageWidth / 2, decBoxY + 12.5, {
+        align: "center",
+      });
+
+      // 4.10-B Franja INSTRUCCIONES Y OBSERVACIONES DEL MPPD
+      const obsY = 159;
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, obsY, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(
+        "INSTRUCCIONES Y OBSERVACIONES DEL MPPD:",
+        margin + 2,
+        obsY + 2.8,
+      );
+
+      // Contenedor Observaciones
+      const obsBoxH = 26;
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, obsY + 4, contentWidth, obsBoxH, "FD");
+
+      const textoObs = (this.observacion || "").toString().trim().toUpperCase();
+
+      if (textoObs) {
+        pdf.setTextColor(20, 20, 20);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(7);
+        const splitObs = pdf.splitTextToSize(textoObs, contentWidth - 4);
+        pdf.text(splitObs, margin + 2, obsY + 9);
+      }
+    } else {
+      // ═════════════════════════════════════════════════════════════════════════
+      // FORMATO A: ACTIVIDADES EN EL EXTERIOR (INTACTO)
+      // ═════════════════════════════════════════════════════════════════════════
+      // 4.6 Franja ASUNTO
+      const redColor = [225, 0, 0];
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, 41, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("ASUNTO:", margin + 2, 44);
+
+      // Contenido ASUNTO
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, 45, contentWidth, 8, "FD");
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7);
+      const asuntoRaw = `ACTIVIDAD EN EL EXTERIOR - ${motivoViaje}`;
+      const splitAsunto = pdf.splitTextToSize(asuntoRaw, contentWidth - 4);
+      pdf.text(splitAsunto, margin + 2, 48.5);
+
+      // 4.7 Franja DATOS DE LA COMISIÓN Y PAÍS ANFITRIÓN
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, 55, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("DATOS DE LA COMISIÓN Y PAÍS ANFITRIÓN:", margin + 2, 58);
+
+      // Contenedor de Datos de Comisión
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, 59, contentWidth, 26, "FD");
+
+      // Fila 1: País Destino y Delegación
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(6);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("PAÍS DESTINO / ANFITRIÓN:", margin + 3, 63);
+
+      pdf.setFontSize(9);
+      pdf.setTextColor(15, 23, 42);
+      pdf.text(pais, margin + 3, 68);
+
+      // Estampar Bandera si cargó
+      if (banderaImg) {
+        try {
+          const textW = pdf.getTextWidth(pais);
+          pdf.addImage(
+            banderaImg,
+            "PNG",
+            margin + 5 + textW,
+            63.5,
+            9,
+            6,
+            undefined,
+            "FAST",
+          );
+        } catch (e) {}
+      }
+
+      pdf.setFontSize(6);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("CANTIDAD DE PERSONAS:", margin + 130, 63);
+
+      pdf.setFontSize(8.5);
+      pdf.setTextColor(15, 23, 42);
+      pdf.text(`${cantPersonas} PERSONA(S)`, margin + 130, 68);
+
+      // Línea divisoria interna
+      pdf.setDrawColor(226, 232, 240);
+      pdf.line(margin + 2, 71, margin + contentWidth - 2, 71);
+
+      // Fila 2: Dirigido a, Fecha Inicio, Fecha Fin, Duración
+      // Dirigido A
+      pdf.setFontSize(5.8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("DIRIGIDO A / DESIGNADO:", margin + 3, 75);
+
+      pdf.setFontSize(7.2);
+      pdf.setTextColor(15, 23, 42);
+      const splitDirigido = pdf.splitTextToSize(dirigidoA, 62);
+      pdf.text(splitDirigido, margin + 3, 79.5);
+
+      // Fecha Inicio
+      pdf.setFontSize(5.8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("FECHA INICIO:", margin + 70, 75);
+
+      pdf.setFontSize(7.8);
+      pdf.setTextColor(22, 101, 52); // Verde esmeralda
+      pdf.text(fechaInicioStr, margin + 70, 79.5);
+
+      // Fecha Retorno
+      pdf.setFontSize(5.8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("FECHA RETORNO:", margin + 115, 75);
+
+      pdf.setFontSize(7.8);
+      pdf.setTextColor(185, 28, 28); // Rojo
+      pdf.text(fechaFinStr, margin + 115, 79.5);
+
+      // Duración
+      pdf.setFontSize(5.8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("DURACIÓN:", margin + 160, 75);
+
+      pdf.setFontSize(7.8);
+      pdf.setTextColor(30, 64, 175); // Azul real
+      pdf.text(duracionDias, margin + 160, 79.5);
+
+      // 4.8 Franja COBERTURA DE GASTOS Y LOGÍSTICA
+      const gastosY = 87;
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, gastosY, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("COBERTURA DE GASTOS Y LOGÍSTICA:", margin + 2, gastosY + 2.8);
+
+      // Tabla de Gastos (4 columnas iguales)
+      const tableGastosY = gastosY + 4;
+      const colGW = contentWidth / 4; // ~48.975 mm cada columna
+      const headerGH = 5;
+      const rowGH = 8;
+
+      pdf.setFillColor(241, 245, 249);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, tableGastosY, contentWidth, headerGH, "FD");
+
+      pdf.setFontSize(5.8);
+      pdf.setTextColor(51, 65, 85);
+      pdf.text(
+        "BOLETOS AÉREOS",
+        margin + colGW * 0 + colGW / 2,
+        tableGastosY + 3.4,
+        { align: "center" },
+      );
+      pdf.text(
+        "HOSPEDAJE / ALOJAMIENTO",
+        margin + colGW * 1 + colGW / 2,
+        tableGastosY + 3.4,
+        { align: "center" },
+      );
+      pdf.text(
+        "ALIMENTACIÓN",
+        margin + colGW * 2 + colGW / 2,
+        tableGastosY + 3.4,
+        { align: "center" },
+      );
+      pdf.text(
+        "TRANSPORTE INTERNO",
+        margin + colGW * 3 + colGW / 2,
+        tableGastosY + 3.4,
+        { align: "center" },
+      );
+
+      // Fila Valores de Gastos
+      const valGH = tableGastosY + headerGH;
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(margin, valGH, contentWidth, rowGH, "FD");
+
+      pdf.setFontSize(6.8);
+      pdf.setTextColor(15, 23, 42);
+      pdf.text(gastosBoletos, margin + colGW * 0 + colGW / 2, valGH + 5.2, {
+        align: "center",
+      });
+      pdf.text(gastosAlojamiento, margin + colGW * 1 + colGW / 2, valGH + 5.2, {
+        align: "center",
+      });
+      pdf.text(
+        gastosAlimentacion,
+        margin + colGW * 2 + colGW / 2,
+        valGH + 5.2,
+        {
+          align: "center",
+        },
+      );
+      pdf.text(gastosTransporte, margin + colGW * 3 + colGW / 2, valGH + 5.2, {
+        align: "center",
+      });
+
+      // Líneas divisorias verticales en tabla de gastos
+      for (let i = 1; i < 4; i++) {
+        const lineX = margin + colGW * i;
+        pdf.line(lineX, tableGastosY, lineX, valGH + rowGH);
+      }
+
+      // 4.9 Franja ARGUMENTACIÓN Y JUSTIFICACIÓN
+      const argY = 106;
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, argY, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(
+        "ARGUMENTACIÓN Y JUSTIFICACIÓN INSTITUCIONAL:",
+        margin + 2,
+        argY + 2.8,
+      );
+
+      // Contenido ARGUMENTACIÓN
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, argY + 4, contentWidth, 16, "FD");
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(6.8);
+      const argumentacion =
+        this.activeDoc.argumentacion ||
+        "Se somete a la consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, la participación institucional en la actividad en el exterior descrita, para dar cumplimiento a los objetivos estratégicos, compromisos de cooperación técnico-militar y representación oficial de la Fuerza Armada Nacional Bolivariana.";
+      const splitArg = pdf.splitTextToSize(argumentacion, contentWidth - 4);
+      pdf.text(splitArg, margin + 2, argY + 8);
+
+      // 4.10 Franja DECISIÓN DEL CIUDADANO MINISTRO
+      const decY = 128;
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, decY, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("DECISIÓN DEL CIUDADANO MINISTRO:", margin + 2, decY + 2.8);
+
+      // Contenido DECISIÓN
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, decY + 4, contentWidth, 18, "FD");
+
+      const boxSize = 5.5;
+      const decBoxY = decY + 7;
+      const apX = margin + 20;
+      const negX = margin + 82;
+      const visX = margin + 144;
+
+      // Casilla 1: APROBADO
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.setLineWidth(0.35);
+      pdf.rect(apX, decBoxY, boxSize, boxSize, "S");
+      if (decisionSeleccionada === "APROBADO") {
+        pdf.setDrawColor(85, 134, 100);
+        pdf.setLineWidth(0.9);
+        pdf.line(apX + 1.0, decBoxY + 2.8, apX + 2.2, decBoxY + 4.5);
+        pdf.line(apX + 2.2, decBoxY + 4.5, apX + 4.6, decBoxY + 1.0);
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(0, 0, 0);
+      } else {
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(140, 140, 140);
+      }
+      pdf.setFontSize(7.5);
+      pdf.text("APROBADO", apX + 8, decBoxY + 4.2);
+
+      // Casilla 2: NEGADO
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.setLineWidth(0.35);
+      pdf.rect(negX, decBoxY, boxSize, boxSize, "S");
+      if (decisionSeleccionada === "NEGADO") {
+        pdf.setDrawColor(185, 28, 28);
+        pdf.setLineWidth(0.9);
+        pdf.line(negX + 1.0, decBoxY + 2.8, negX + 2.2, decBoxY + 4.5);
+        pdf.line(negX + 2.2, decBoxY + 4.5, negX + 4.6, decBoxY + 1.0);
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(0, 0, 0);
+      } else {
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(140, 140, 140);
+      }
+      pdf.setFontSize(7.5);
+      pdf.text("NEGADO", negX + 8, decBoxY + 4.2);
+
+      // Casilla 3: VISTO
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.setLineWidth(0.35);
+      pdf.rect(visX, decBoxY, boxSize, boxSize, "S");
+      if (decisionSeleccionada === "VISTO") {
+        pdf.setDrawColor(3, 105, 161);
+        pdf.setLineWidth(0.9);
+        pdf.line(visX + 1.0, decBoxY + 2.8, visX + 2.2, decBoxY + 4.5);
+        pdf.line(visX + 2.2, decBoxY + 4.5, visX + 4.6, decBoxY + 1.0);
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(0, 0, 0);
+      } else {
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(140, 140, 140);
+      }
+      pdf.setFontSize(7.5);
+      pdf.text("VISTO", visX + 8, decBoxY + 4.2);
+
+      // Leyenda según decisión
+      let leyendaExterior =
+        "AUTORIZADA LA COMISIÓN DE SERVICIO AL EXTERIOR SEGÚN ITINERARIO DESCRITO.";
+      if (decisionSeleccionada === "NEGADO") {
+        leyendaExterior = "NO AUTORIZADA LA COMISIÓN DE SERVICIO AL EXTERIOR.";
+      } else if (decisionSeleccionada === "VISTO") {
+        leyendaExterior =
+          "VISTO POR EL GENERAL EN JEFE MINISTRO DEL PODER POPULAR PARA LA DEFENSA.";
+      }
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(6.2);
+      pdf.setTextColor(71, 85, 105);
+      pdf.text(leyendaExterior, pageWidth / 2, decBoxY + 11.5, {
+        align: "center",
+      });
+
+      // 4.11 Franja OBSERVACIONES / INSTRUCCIONES DEL MPPD
+      const obsY = 152;
+      pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, obsY, contentWidth, 4, "FD");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(
+        "INSTRUCCIONES Y OBSERVACIONES DEL MPPD:",
+        margin + 2,
+        obsY + 2.8,
+      );
+
+      // Contenido OBSERVACIONES
+      const obsBoxH = 20;
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
+      pdf.rect(margin, obsY + 4, contentWidth, obsBoxH, "FD");
+
+      const textoObs = (
+        this.observacion ||
+        "CÚMPLASE CONFORME A LA DOCTRINA MILITAR Y DISPOSICIONES VIGENTES DE LA FUERZA ARMADA NACIONAL BOLIVARIANA."
+      ).toUpperCase();
+
+      pdf.setTextColor(20, 20, 20);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7);
+      const splitObs = pdf.splitTextToSize(textoObs, contentWidth - 4);
+      pdf.text(splitObs, margin + 2, obsY + 9);
     }
-
-    pdf.setFontSize(6);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text("CANTIDAD DE PERSONAS:", margin + 130, 63);
-
-    pdf.setFontSize(8.5);
-    pdf.setTextColor(15, 23, 42);
-    pdf.text(`${cantPersonas} PERSONA(S)`, margin + 130, 68);
-
-    // Línea divisoria interna
-    pdf.setDrawColor(226, 232, 240);
-    pdf.line(margin + 2, 71, margin + contentWidth - 2, 71);
-
-    // Fila 2: Dirigido a, Fecha Inicio, Fecha Fin, Duración
-    // Dirigido A
-    pdf.setFontSize(5.8);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text("DIRIGIDO A / DESIGNADO:", margin + 3, 75);
-
-    pdf.setFontSize(7.2);
-    pdf.setTextColor(15, 23, 42);
-    const splitDirigido = pdf.splitTextToSize(dirigidoA, 62);
-    pdf.text(splitDirigido, margin + 3, 79.5);
-
-    // Fecha Inicio
-    pdf.setFontSize(5.8);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text("FECHA INICIO:", margin + 70, 75);
-
-    pdf.setFontSize(7.8);
-    pdf.setTextColor(22, 101, 52); // Verde esmeralda
-    pdf.text(fechaInicioStr, margin + 70, 79.5);
-
-    // Fecha Retorno
-    pdf.setFontSize(5.8);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text("FECHA RETORNO:", margin + 115, 75);
-
-    pdf.setFontSize(7.8);
-    pdf.setTextColor(185, 28, 28); // Rojo
-    pdf.text(fechaFinStr, margin + 115, 79.5);
-
-    // Duración
-    pdf.setFontSize(5.8);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text("DURACIÓN:", margin + 160, 75);
-
-    pdf.setFontSize(7.8);
-    pdf.setTextColor(30, 64, 175); // Azul real
-    pdf.text(duracionDias, margin + 160, 79.5);
-
-    // 4.8 Franja COBERTURA DE GASTOS Y LOGÍSTICA
-    const gastosY = 87;
-    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, gastosY, contentWidth, 4, "FD");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text("COBERTURA DE GASTOS Y LOGÍSTICA:", margin + 2, gastosY + 2.8);
-
-    // Tabla de Gastos (4 columnas iguales)
-    const tableGastosY = gastosY + 4;
-    const colGW = contentWidth / 4; // ~48.975 mm cada columna
-    const headerGH = 5;
-    const rowGH = 8;
-
-    pdf.setFillColor(241, 245, 249);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, tableGastosY, contentWidth, headerGH, "FD");
-
-    pdf.setFontSize(5.8);
-    pdf.setTextColor(51, 65, 85);
-    pdf.text(
-      "BOLETOS AÉREOS",
-      margin + colGW * 0 + colGW / 2,
-      tableGastosY + 3.4,
-      { align: "center" },
-    );
-    pdf.text(
-      "HOSPEDAJE / ALOJAMIENTO",
-      margin + colGW * 1 + colGW / 2,
-      tableGastosY + 3.4,
-      { align: "center" },
-    );
-    pdf.text(
-      "ALIMENTACIÓN",
-      margin + colGW * 2 + colGW / 2,
-      tableGastosY + 3.4,
-      { align: "center" },
-    );
-    pdf.text(
-      "TRANSPORTE INTERNO",
-      margin + colGW * 3 + colGW / 2,
-      tableGastosY + 3.4,
-      { align: "center" },
-    );
-
-    // Fila Valores de Gastos
-    const valGH = tableGastosY + headerGH;
-    pdf.setFillColor(255, 255, 255);
-    pdf.rect(margin, valGH, contentWidth, rowGH, "FD");
-
-    pdf.setFontSize(6.8);
-    pdf.setTextColor(15, 23, 42);
-    pdf.text(gastosBoletos, margin + colGW * 0 + colGW / 2, valGH + 5.2, {
-      align: "center",
-    });
-    pdf.text(gastosAlojamiento, margin + colGW * 1 + colGW / 2, valGH + 5.2, {
-      align: "center",
-    });
-    pdf.text(gastosAlimentacion, margin + colGW * 2 + colGW / 2, valGH + 5.2, {
-      align: "center",
-    });
-    pdf.text(gastosTransporte, margin + colGW * 3 + colGW / 2, valGH + 5.2, {
-      align: "center",
-    });
-
-    // Líneas divisorias verticales en tabla de gastos
-    for (let i = 1; i < 4; i++) {
-      const lineX = margin + colGW * i;
-      pdf.line(lineX, tableGastosY, lineX, valGH + rowGH);
-    }
-
-    // 4.9 Franja ARGUMENTACIÓN Y JUSTIFICACIÓN
-    const argY = 106;
-    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, argY, contentWidth, 4, "FD");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(
-      "ARGUMENTACIÓN Y JUSTIFICACIÓN INSTITUCIONAL:",
-      margin + 2,
-      argY + 2.8,
-    );
-
-    // Contenido ARGUMENTACIÓN
-    pdf.setFillColor(255, 255, 255);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, argY + 4, contentWidth, 16, "FD");
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(6.8);
-    const argumentacion =
-      this.activeDoc.argumentacion ||
-      "Se somete a la consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, la participación institucional en la actividad en el exterior descrita, para dar cumplimiento a los objetivos estratégicos, compromisos de cooperación técnico-militar y representación oficial de la Fuerza Armada Nacional Bolivariana.";
-    const splitArg = pdf.splitTextToSize(argumentacion, contentWidth - 4);
-    pdf.text(splitArg, margin + 2, argY + 8);
-
-    // 4.10 Franja DECISIÓN DEL CIUDADANO MINISTRO
-    const decY = 128;
-    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, decY, contentWidth, 4, "FD");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text("DECISIÓN DEL CIUDADANO MINISTRO:", margin + 2, decY + 2.8);
-
-    // Contenido DECISIÓN
-    pdf.setFillColor(255, 255, 255);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, decY + 4, contentWidth, 18, "FD");
-
-    const boxSize = 5.5;
-    const apX = margin + 30;
-    const negX = margin + 110;
-    const decBoxY = decY + 7;
-
-    // Casilla APROBADO (Marcada)
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.setLineWidth(0.35);
-    pdf.rect(apX, decBoxY, boxSize, boxSize, "S");
-
-    pdf.setDrawColor(85, 134, 100); // Verde salvia mate pastel
-    pdf.setLineWidth(0.9);
-    pdf.line(apX + 1.0, decBoxY + 2.8, apX + 2.2, decBoxY + 4.5);
-    pdf.line(apX + 2.2, decBoxY + 4.5, apX + 4.6, decBoxY + 1.0);
-
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(0, 0, 0);
-    pdf.text("APROBADO", apX + 8, decBoxY + 4.2);
-
-    // Casilla NEGADO (Sin marcar)
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.setLineWidth(0.35);
-    pdf.rect(negX, decBoxY, boxSize, boxSize, "S");
-
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(140, 140, 140);
-    pdf.text("NEGADO", negX + 8, decBoxY + 4.2);
-
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(6.2);
-    pdf.setTextColor(71, 85, 105);
-    pdf.text(
-      "AUTORIZADA LA COMISIÓN DE SERVICIO AL EXTERIOR SEGÚN ITINERARIO DESCRITO.",
-      pageWidth / 2,
-      decBoxY + 11.5,
-      { align: "center" },
-    );
-
-    // 4.11 Franja OBSERVACIONES / INSTRUCCIONES DEL MPPD
-    const obsY = 152;
-    pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, obsY, contentWidth, 4, "FD");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text("INSTRUCCIONES Y OBSERVACIONES DEL MPPD:", margin + 2, obsY + 2.8);
-
-    // Contenido OBSERVACIONES
-    const obsBoxH = 20;
-    pdf.setFillColor(255, 255, 255);
-    pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-    pdf.rect(margin, obsY + 4, contentWidth, obsBoxH, "FD");
-
-    const textoObs = (
-      this.observacion ||
-      "CÚMPLASE CONFORME A LA DOCTRINA MILITAR Y DISPOSICIONES VIGENTES DE LA FUERZA ARMADA NACIONAL BOLIVARIANA."
-    ).toUpperCase();
-
-    pdf.setTextColor(20, 20, 20);
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7);
-    const splitObs = pdf.splitTextToSize(textoObs, contentWidth - 4);
-    pdf.text(splitObs, margin + 2, obsY + 9);
-
     // 4.12 Firma Oficial del Ministro y Sello Oficial
     const sigLineY = 222;
     const centerX = pageWidth / 2;
@@ -4158,7 +4774,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       .toString()
       .replace(/[\r\n\t /]+/g, "_")
       .trim();
-    const filename = `EXT-${cleanNumc}.pdf`;
+    const filename = `${esVarias ? "VAR" : "EXT"}-${cleanNumc}.pdf`;
 
     // 6. Descargar copia local preliminar para el usuario
     pdf.save(filename);
@@ -4173,7 +4789,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     formData.append("locacion", "Caracas, Venezuela");
     formData.append(
       "razon",
-      "Actividades en el Exterior - Aprobación Ministerial",
+      esVarias
+        ? "Actividades Varias - Aprobación Ministerial"
+        : "Actividades en el Exterior - Aprobación Ministerial",
     );
     formData.append("contacto", "MPPD");
     formData.append("codigo", filename);
@@ -4289,7 +4907,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.activeDoc.archivo_firmado = filename;
     try {
       this.fnxFirmaMinistro(
-        "APROBADO",
+        decisionSeleccionada,
         this.observacion || this.activeDoc?.observacion || "",
       );
     } catch (errFnx) {
@@ -4298,13 +4916,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     Swal.close();
     this.toastrService.success(
-      "Documento de Actividades en el Exterior tamaño Carta generado, firmado y subido al servidor exitosamente.",
-      "GDoc Actividades en el Exterior",
+      esVarias
+        ? "Informe de Actividades Varias tamaño Carta generado, firmado y subido al servidor exitosamente."
+        : "Documento de Actividades en el Exterior tamaño Carta generado, firmado y subido al servidor exitosamente.",
+      esVarias ? "GDoc Actividades Varias" : "GDoc Actividades en el Exterior",
     );
 
-    // 12. Avanzar flujo a FAVORABLE
+    // 12. Avanzar flujo según decisión ministerial
     this.loadingAction = true;
-    this.redistribuir("FAVORABLE");
+    this.redistribuir(decisionSeleccionada);
   }
 
   // ─── Actualizar estado de subcasos/cuentas en Base de Datos (WKF_APromoverSubDocumento) ────
@@ -4533,15 +5153,18 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const cleanNumc = rawNumc.startsWith("EXT-") ? rawNumc : `EXT-${rawNumc}`;
+    const esVarias = this.isActividadVarias(targetDoc);
+    const prefix = esVarias ? "VAR" : "EXT";
+    const cleanNumc =
+      rawNumc.startsWith("EXT-") || rawNumc.startsWith("VAR-")
+        ? rawNumc
+        : `${prefix}-${rawNumc}`;
     const cleanName = cleanNumc.replace(/\.pdf$/i, "");
 
     const payload = {
       ruta: "resueltos/",
       archivo: `${cleanName}.pdf`,
     };
-
-    const esVarias = this.isActividadVarias(targetDoc);
 
     Swal.fire({
       title: "Cargando Documento Firmado...",
@@ -4561,18 +5184,32 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         const fileURL = URL.createObjectURL(data);
         window.open(fileURL, "_blank");
       },
-      error: (error) => {
-        Swal.close();
-        console.error("Error al descargar el PDF firmado:", error);
-        const fallbackUrl = this.getDwsUrl(targetDoc);
-        if (fallbackUrl) {
-          window.open(fallbackUrl, "_blank");
-        } else {
-          this.toastrService.error(
-            "No se pudo obtener el archivo firmado desde el servidor de almacenamiento.",
-            "Error",
-          );
-        }
+      error: () => {
+        // Intento resiliente con el prefijo alternativo (VAR <-> EXT)
+        const altPrefix = cleanName.startsWith("VAR-") ? "EXT-" : "VAR-";
+        const altName = altPrefix + cleanName.replace(/^(VAR-|EXT-)/, "");
+        this.apiService
+          .postBlob("dwscdn", { ruta: "resueltos/", archivo: `${altName}.pdf` })
+          .subscribe({
+            next: (altData: Blob) => {
+              Swal.close();
+              const fileURL = URL.createObjectURL(altData);
+              window.open(fileURL, "_blank");
+            },
+            error: (errFinal) => {
+              Swal.close();
+              console.error("Error al descargar el PDF firmado:", errFinal);
+              const fallbackUrl = this.getDwsUrl(targetDoc);
+              if (fallbackUrl) {
+                window.open(fallbackUrl, "_blank");
+              } else {
+                this.toastrService.error(
+                  "No se pudo obtener el archivo firmado desde el servidor de almacenamiento.",
+                  "Error",
+                );
+              }
+            },
+          });
       },
     });
   }
@@ -4999,7 +5636,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       prefijo = "17,17,10";
     } else if (
       carpetaId === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-      carpetaId.includes("ACTIVIDAD")
+      carpetaId.includes("ACTIVIDAD") ||
+      carpetaId === "OFICIOS"
     ) {
       prefijo = "2,2,10";
     }
@@ -5008,6 +5646,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.xAPI.funcion = "WKF_ARedistribuir";
     this.xAPI.valores = "";
     this.xAPI.parametros = `${prefijo},${this.jwtData.userId},${targetId}`;
+    console.log(this.xAPI.parametros);
 
     this.apiService.Ejecutar(this.xAPI).subscribe({
       next: (data) => {
@@ -5044,30 +5683,60 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         return;
       }
 
-      let localEstadoActual =
-        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR"
-          ? 11
-          : this.selectedCarpeta?.id === "CUADRO_DECISORIO"
-            ? 17
-            : this.selectedCarpeta?.id === "PRESIDENCIALES"
-              ? 4
-              : 14;
+      const targetId =
+        this.activeDoc?.idd ||
+        this.activeDoc?.id ||
+        this.activeDoc?.wfdocumento ||
+        "";
+
+      let localEstadoActual = 14;
       let localEstadoDestino = 1;
+
+      if (
+        this.selectedCarpeta?.id === "OFICIOS" ||
+        this.activeDoc?.tdoc === "OFICIOS" ||
+        this.activeDoc?.tipo_documento === "OFICIOS" ||
+        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
+        this.selectedCarpeta?.id?.includes("ACTIVIDAD") ||
+        this.isActividadExterior(this.activeDoc) ||
+        this.isActividadVarias(this.activeDoc)
+      ) {
+        // En OFICIOS y ACTIVIDADES, tras venir de 2,2,7 (firmados) se archiva enviando al 2,2,9
+        localEstadoActual = 2;
+        localEstadoDestino = 9;
+      } else if (
+        this.selectedEstadoBuzon === "firmados" ||
+        this.estadoOrigen === 7 ||
+        this.esDocFirmado(this.activeDoc)
+      ) {
+        localEstadoActual = 7;
+        localEstadoDestino = 1;
+      } else if (this.selectedCarpeta?.id === "CUADRO_DECISORIO") {
+        localEstadoActual = 17;
+        localEstadoDestino = 1;
+      } else if (this.selectedCarpeta?.id === "PRESIDENCIALES") {
+        localEstadoActual = 4;
+        localEstadoDestino = 1;
+      } else {
+        localEstadoActual = 14;
+        localEstadoDestino = 1;
+      }
 
       this.xAPI = {} as IAPICore;
       this.xAPI.funcion = "WKF_ARedistribuir";
       this.xAPI.valores = "";
-      this.xAPI.parametros = `${localEstadoActual},${localEstadoActual},${localEstadoDestino},${this.jwtData.userId},${this.activeDoc.idd}`;
+      this.xAPI.parametros = `${localEstadoActual},${localEstadoActual},${localEstadoDestino},${this.jwtData.userId},${targetId}`;
       console.log(this.xAPI.parametros);
     } else {
       let estadoDestino = Math.min(this.estadoOrigen + 1, 7);
 
-      // Flujo especial para RECLAMOS, PUNTO DE CUENTA, CUADRO DECISORIO y ACTIVIDADES EN EL EXTERIOR
+      // Flujo especial para RECLAMOS, PUNTO DE CUENTA, CUADRO DECISORIO, ACTIVIDADES EN EL EXTERIOR y OFICIOS
       if (
         this.selectedCarpeta?.id === "RECLAMOS" ||
         this.selectedCarpeta?.id === "PUNTO_DE_CUENTA" ||
         this.selectedCarpeta?.id === "CUADRO_DECISORIO" ||
-        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR"
+        this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
+        this.selectedCarpeta?.id === "OFICIOS"
       ) {
         if (this.estadoOrigen === 2) estadoDestino = 5;
         else if (this.estadoOrigen === 5) estadoDestino = 6;
@@ -5263,7 +5932,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.selectedCarpeta?.id === "CUADRO_DECISORIO" ||
         this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR"
       ) {
-        dec = "APROBADO";
+        dec = "FAVORABLE";
       }
     }
 
@@ -5307,13 +5976,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
    * @param comentario Observaciones o justificación
    */
   public registrarDocumentoFirmado(
-    decision: string = "APROBADO",
+    decision: string = "FAVORABLE",
     comentario: string = "",
   ) {
     if (!this.activeDoc) return;
 
     const numc = this.activeDoc.numc || this.activeDoc.ncontrol || "";
-    const estatus = (decision || this.activeDoc.decision || "APROBADO")
+    const estatus = (decision || this.activeDoc.decision || "FAVORABLE")
       .toString()
       .trim()
       .toUpperCase();
@@ -5544,6 +6213,75 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     return s.toUpperCase();
   }
 
+  // ─── Métodos Auxiliares para OFICIOS ──────────────────────────────────────────
+  public getOficioUnidad(doc: any): string {
+    if (!doc) return "";
+    const u =
+      doc.udep ||
+      doc.unidad ||
+      doc.dependencias ||
+      doc.dependencia ||
+      doc.coma ||
+      doc.comando ||
+      doc.remitente ||
+      doc.remi ||
+      "";
+    return this.stripHtml(u).toUpperCase().trim();
+  }
+
+  public getOficioComando(doc: any): string {
+    if (!doc) return "";
+    const c = doc.coma || doc.comando || "";
+    return this.stripHtml(c).toUpperCase().trim();
+  }
+
+  public getOficioInstrucciones(doc: any): string {
+    if (!doc) return "";
+    const ins =
+      doc.instrucciones ||
+      doc.inst ||
+      doc.ins ||
+      doc.instruccion ||
+      doc.observacion ||
+      "";
+    return this.stripHtml(ins).trim();
+  }
+
+  public getOficioAsunto(doc: any): string {
+    if (!doc) return "";
+    const asu =
+      this.contenidoEditado ||
+      this.getAsuntoClean(doc) ||
+      doc.asunto ||
+      doc.cont ||
+      doc.contenido ||
+      doc.resumen ||
+      "";
+    return this.stripHtml(asu).toUpperCase().trim();
+  }
+
+  public getOficioNroOrigen(doc: any): string {
+    if (!doc) return "";
+    const n = doc.norigen || doc.nori || doc.numc || doc.ncontrol || "";
+    return this.stripHtml(n).toUpperCase().trim();
+  }
+
+  public getOficioFecha(doc: any): string {
+    if (!doc) return "";
+    const f =
+      doc.forigen || doc.fori || doc.fcreacion || doc.fecha || doc.fech || "";
+    if (typeof f === "string" && f.length >= 10) {
+      return f.substring(0, 10);
+    }
+    return f ? this.stripHtml(f).trim() : "";
+  }
+
+  public getOficioRemitente(doc: any): string {
+    if (!doc) return "";
+    const r = doc.remitente || doc.remi || doc.creador || doc.usuario || "";
+    return this.stripHtml(r).toUpperCase().trim();
+  }
+
   public robustJsonParse(raw: any): any {
     if (!raw) return null;
     if (typeof raw === "object") return raw;
@@ -5658,10 +6396,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (!doc) return false;
     const tdoc = (doc.tdoc || doc.tipo || "").toString().trim().toUpperCase();
     if (
+      tdoc === "ACTIVIDAD VARIA" ||
       tdoc === "ACTIVIDADES VARIAS" ||
+      tdoc === "ACTIVIDAD VARIAS" ||
+      tdoc.includes("ACTIVIDAD VARIA") ||
       tdoc.includes("ACTIVIDAD VARIAS") ||
       tdoc.includes("ACTIVIDADES VARIAS") ||
-      tdoc.includes("VARIAS")
+      (tdoc.includes("VARIA") && !tdoc.includes("EXTERIOR"))
     ) {
       return true;
     }
@@ -5674,7 +6415,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         .toString()
         .trim()
         .toUpperCase();
-      if (tipoData.includes("VARIAS")) return true;
+      if (tipoData.includes("VARIA")) return true;
       if (tipoData.includes("EXTERIOR")) return false;
       if (
         data.solicitud ||
@@ -5700,7 +6441,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (tdoc === "ACTIVIDADES EN EL EXTERIOR" || tdoc.includes("EXTERIOR")) {
       return true;
     }
-    if (tdoc === "ACTIVIDADES VARIAS" || tdoc.includes("VARIAS")) {
+    if (
+      tdoc === "ACTIVIDAD VARIA" ||
+      tdoc === "ACTIVIDADES VARIAS" ||
+      tdoc === "ACTIVIDAD VARIAS" ||
+      tdoc.includes("ACTIVIDAD VARIA") ||
+      tdoc.includes("VARIA")
+    ) {
       return false;
     }
     return !this.isActividadVarias(doc);
@@ -5771,16 +6518,18 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             .toUpperCase();
           if (
             docTdoc === "ACTIVIDADES VARIAS" ||
-            docTdoc.includes("VARIAS") ||
-            (data.tdoc && data.tdoc.toUpperCase().includes("VARIAS")) ||
-            (data.tipo && data.tipo.toUpperCase().includes("VARIAS")) ||
+            docTdoc === "ACTIVIDAD VARIA" ||
+            docTdoc === "ACTIVIDAD VARIAS" ||
+            docTdoc.includes("VARIA") ||
+            (data.tdoc && data.tdoc.toUpperCase().includes("VARIA")) ||
+            (data.tipo && data.tipo.toUpperCase().includes("VARIA")) ||
             data.solicitud ||
             data.opinionDe ||
             data.opinion ||
             data.recomendacion
           ) {
-            data.tdoc = data.tdoc || doc.tdoc || "ACTIVIDADES VARIAS";
-            data.tipo = data.tipo || doc.tdoc || "ACTIVIDADES VARIAS";
+            data.tdoc = data.tdoc || doc.tdoc || "ACTIVIDAD VARIA";
+            data.tipo = data.tipo || doc.tdoc || "ACTIVIDAD VARIA";
             data.solicitud = this.limpiarValorFragmento(
               data.solicitud || data.motivo || "",
             );

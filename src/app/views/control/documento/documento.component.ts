@@ -601,10 +601,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     });
 
     const tieneActividadesVarias = this.lstT.some(
-      (e) => e.nomb && e.nomb.trim().toUpperCase() === "ACTIVIDADES VARIAS",
+      (e) =>
+        e.nomb &&
+        (e.nomb.trim().toUpperCase() === "ACTIVIDADES VARIAS" ||
+          e.nomb.trim().toUpperCase() === "ACTIVIDAD VARIA" ||
+          e.nomb.trim().toUpperCase().includes("VARIA")),
     );
     if (!tieneActividadesVarias) {
       this.lstT.push({ nomb: "ACTIVIDADES VARIAS", tipo: "1" });
+      this.lstT.push({ nomb: "ACTIVIDAD VARIA", tipo: "1" });
     }
   }
 
@@ -904,13 +909,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.obtenerDatos(data);
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (xdata) => {
-            // Evaluar si el tipodocumento es actividades en el exterior o actividades varias
+            // Evaluar si el tipodocumento es actividades en el exterior o actividades varias / actividad varia
             const tdoc = this.Doc.tipo ? this.Doc.tipo.trim().toLowerCase() : "";
-            if (tdoc === "actividades en el exterior") {
+            if (tdoc === "actividades en el exterior" || (tdoc.indexOf("exterior") >= 0 && tdoc.indexOf("actividad") >= 0)) {
               this.guardarActividadesExterior(this.Doc.wfdocumento);
             } else if (
               tdoc === "actividades varias" ||
-              tdoc.indexOf("actividades varias") >= 0
+              tdoc === "actividad varia" ||
+              tdoc.indexOf("actividades varias") >= 0 ||
+              tdoc.indexOf("actividad varia") >= 0 ||
+              (tdoc.indexOf("varia") >= 0 && tdoc.indexOf("exterior") < 0)
             ) {
               this.guardarActividadesVarias(this.Doc.wfdocumento);
             }
@@ -1353,6 +1361,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           const t = (this.Doc.tipo || "").toLowerCase();
           if (
             (data.tipo === "ACTIVIDADES VARIAS" ||
+              data.tipo === "ACTIVIDAD VARIA" ||
+              (data.tipo && data.tipo.toUpperCase().includes("VARIA")) ||
               this.actividadesVarias.solicitud ||
               this.actividadesVarias.opinionDe ||
               this.actividadesVarias.opinion ||
@@ -1360,7 +1370,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             t !== "actividades en el exterior"
           ) {
             if (!this.Doc.tipo || this.Doc.tipo === "0") {
-              this.Doc.tipo = "ACTIVIDADES VARIAS";
+              this.Doc.tipo = data.tipo || "ACTIVIDADES VARIAS";
             }
           }
           return true;
@@ -1495,11 +1505,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         } else {
           console.log(this.Doc);
           const tdoc = this.Doc.tipo ? this.Doc.tipo.trim().toLowerCase() : "";
-          if (tdoc === "actividades en el exterior") {
+          if (tdoc === "actividades en el exterior" || (tdoc.indexOf("exterior") >= 0 && tdoc.indexOf("actividad") >= 0)) {
             this.guardarActividadesExterior(wfd);
           } else if (
             tdoc === "actividades varias" ||
-            tdoc.indexOf("actividades varias") >= 0
+            tdoc === "actividad varia" ||
+            tdoc.indexOf("actividades varias") >= 0 ||
+            tdoc.indexOf("actividad varia") >= 0 ||
+            (tdoc.indexOf("varia") >= 0 && tdoc.indexOf("exterior") < 0)
           ) {
             this.guardarActividadesVarias(wfd);
           }
@@ -1854,11 +1867,18 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       tipo.indexOf("actividades en el exterior") >= 0;
     this.esActividadVarias =
       tipo === "actividades varias" ||
+      tipo === "actividad varia" ||
+      tipo === "actividades varia" ||
+      tipo === "actividad varias" ||
       tipo.indexOf("actividades varias") >= 0 ||
       tipo.indexOf("actividad varias") >= 0 ||
       tipo.indexOf("actividades varia") >= 0 ||
+      tipo.indexOf("actividad varia") >= 0 ||
+      (tipo.indexOf("varia") >= 0 && tipo.indexOf("exterior") < 0) ||
       (this.actividadesVarias &&
-        this.actividadesVarias.tipo === "ACTIVIDADES VARIAS" &&
+        (this.actividadesVarias.tipo === "ACTIVIDADES VARIAS" ||
+          this.actividadesVarias.tipo === "ACTIVIDAD VARIA" ||
+          (this.actividadesVarias.tipo && this.actividadesVarias.tipo.toUpperCase().includes("VARIA"))) &&
         !this.esActividadExterior &&
         !!(this.actividadesVarias.solicitud || this.actividadesVarias.dirigido || this.actividadesVarias.opinionDe || this.actividadesVarias.recomendacion));
 
