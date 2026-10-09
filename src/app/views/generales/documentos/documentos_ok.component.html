@@ -95,6 +95,20 @@
           </select>
         </div>
 
+        <!-- Botón Campana Inteligente Asíncrona (Solo visible a nivel del Jefe y en trámites) -->
+        <div class="smart-bell-container" *ngIf="currentProfile === 'JefeSecretaria' && selectedEstadoBuzon === 'por_procesar'">
+          <button class="rt-icon-btn rt-bell-btn"
+                  [class.is-checking]="isCheckingFirmados"
+                  (click)="manualCheckFirmadosStream()"
+                  [title]="getBellTooltipText()">
+            <i class="fas fa-bell" [class.fa-bell-ringing]="totalFirmadosCount > 0 && !isCheckingFirmados"></i>
+            <span class="bell-spinner-ring" *ngIf="isCheckingFirmados"></span>
+            <span class="bell-badge" *ngIf="totalFirmadosCount > 0 && !isCheckingFirmados">
+              {{ totalFirmadosCount }}
+            </span>
+          </button>
+        </div>
+
         <!-- Botón Circular de Cerrar -->
         <button class="rt-icon-btn rt-close-btn" (click)="exitComponent()" title="Salir del Buzón de Documentos">
           <i class="fas fa-times"></i>
@@ -145,6 +159,14 @@
                 <i class="fas fa-clock mr-1"></i>
                 Próximamente
               </div>
+            </div>
+
+            <!-- Contador de Firmados por el Ministro (en trámite a nivel de Jefe) -->
+            <div class="folder-firmados-badge"
+                 *ngIf="currentProfile === 'JefeSecretaria' && selectedEstadoBuzon === 'por_procesar' && (carpeta.contadorFirmados || 0) > 0"
+                 [title]="carpeta.contadorFirmados + ' documento(s) firmados por el Ministro listos para revisión'">
+              <i class="fas fa-file-signature mr-1"></i>
+              <span>{{ carpeta.contadorFirmados }}</span>
             </div>
 
             <!-- Indicador de activa -->
