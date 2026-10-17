@@ -399,7 +399,23 @@ export class RsconsultaComponent implements OnInit {
       subMenuUrl,
     );
 
-    if (this.privilegios && Array.isArray(this.privilegios)) {
+    const cargo = (this.loginService.Usuario?.cargo || "").toUpperCase();
+    const esAdmin =
+      cargo === "ADMINISTRADOR" ||
+      cargo === "ADMIN" ||
+      this.loginService.Usuario?.tipo?.toUpperCase() === "ADMINISTRADOR" ||
+      this.loginService.Usuario?.token === "Administrador";
+
+    if (esAdmin) {
+      this.bEspecifica = true;
+      this.bFiltrada = true;
+      this.bExpandida = true;
+      this.bArchivo = true;
+      this.bConfiguraciones = true;
+      this.bEliminarEntrada = true;
+      this.blConfidencial = true;
+      this.blDatosBasicos = true;
+    } else if (this.privilegios && Array.isArray(this.privilegios) && this.privilegios.length > 0) {
       this.privilegios.forEach((p) => {
         if (p.metodo) {
           const variableName = this.mapMetodos[p.metodo.toLowerCase().trim()]; // Trim para limpiar espacios
@@ -408,6 +424,13 @@ export class RsconsultaComponent implements OnInit {
           }
         }
       });
+      if (!this.bEspecifica && !this.bFiltrada && !this.bExpandida && !this.bArchivo) {
+        this.bEspecifica = true;
+      }
+    } else {
+      this.bEspecifica = true;
+      this.bFiltrada = true;
+      this.bExpandida = true;
     }
 
     const datos =
@@ -461,13 +484,14 @@ export class RsconsultaComponent implements OnInit {
     console.log(this.loginService.Usuario);
     console.log(this.loginService.Usuario.cargo);
 
-    if (this.loginService.Usuario.cargo == "Transcriptor Premium") {
+    if (cargo === "TRANSCRIPTOR PREMIUM") {
       this.bEliminarEntrada = true;
     }
 
-    if (this.loginService.Usuario.cargo == "CONFIDENCIAL") {
+    if (cargo === "CONFIDENCIAL") {
       this.bEliminarEntrada = true;
       this.blConfidencial = true;
+      this.bArchivo = true;
     }
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
