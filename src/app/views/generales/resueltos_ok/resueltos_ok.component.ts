@@ -219,6 +219,12 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     | "Aprobador" = "Edicion";
   public showingFirmados: boolean = false;
 
+  // ─── Campana Inteligente de Resoluciones Firmadas (Background Stream) ─────────
+  public isCheckingFirmados: boolean = false;
+  public totalFirmadosCount: number = 0;
+  private firmadosAbortController?: AbortController;
+  private firmadosPorCarpetaMap = new Map<string, number>();
+
   // --- PROCESAMIENTO DE CASOS ---
   public isProcessModalOpen: boolean = false;
   public selectedDocForProcessing: any = null;
@@ -303,9 +309,14 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       console.error("Error loading document tags:", e);
     }
     this.loadFolders();
+    this.verificarYDispararEvaluacionFirmados();
   }
 
   ngOnDestroy() {
+    if (this.firmadosAbortController) {
+      this.firmadosAbortController.abort();
+    }
+
     // Desactiva la clase inmersiva al destruir el componente
     document.body.classList.remove("immersive-active");
     document.documentElement.classList.remove("immersive-active");
@@ -424,6 +435,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
                   this.jwtData.perfil = rolDesc;
                   this.mapProfile(rolDesc);
                   this.loadFolders(); // Recargar carpetas ahora con el perfil correcto
+                  this.verificarYDispararEvaluacionFirmados();
                 }
               } catch (e) {
                 console.error("Error procesando perfil de DB:", e);
@@ -504,6 +516,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.selectedFolder = null;
     this.documents = [];
     this.loadFolders();
+    this.verificarYDispararEvaluacionFirmados();
   }
 
   public toggleShowingFirmados(): void {
@@ -511,6 +524,7 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
     this.selectedFolder = null;
     this.documents = [];
     this.loadFolders();
+    this.verificarYDispararEvaluacionFirmados();
   }
 
   // --- MODAL DE DISTRIBUCIÓN ---
@@ -656,6 +670,13 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
               fecha: e.fecha,
             }));
             // console.log(this.allFolders);
+            if (this.firmadosPorCarpetaMap.size > 0 && this.allFolders) {
+              this.allFolders.forEach((folder) => {
+                const fCode = (folder.codigo || "").toString().trim();
+                folder.contadorFirmados =
+                  this.firmadosPorCarpetaMap.get(fCode) || 0;
+              });
+            }
             this.filterAndPaginateFolders();
           }
         } catch (error) {
@@ -2810,5 +2831,245 @@ export class ResueltosOkComponent implements OnInit, OnDestroy {
       return "0 3px 10px rgba(46, 125, 50, 0.07), 0 1px 3px rgba(0, 0, 0, 0.03)";
     }
     return "0 1px 3px rgba(0,0,0,0.01)";
+  }
+
+  // ═════════════════════════════════════════════════════════════════════════════
+  // ─── Campana Inteligente: Métodos de Evaluación Asíncrona con postStream ─────
+  // ═════════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Recalcula el total de documentos firmados sumando los contadores por carpeta.
+   */
+  public recalcularTotalFirmados(): void {
+    let total = 0;
+    this.firmadosPorCarpetaMap.forEach((count) => {
+      total += count;
+    });
+    this.totalFirmadosCount = total;
+
+    // Sincronizar en allFolders para que cada tarjeta de buzón muestre su contador
+    if (this.allFolders && this.allFolders.length > 0) {
+      this.allFolders.forEach((folder) => {
+        const fCode = (folder.codigo || "").toString().trim();
+        folder.contadorFirmados = this.firmadosPorCarpetaMap.get(fCode) || 0;
+      });
+    }
+  }
+
+  /**
+   * Inicia la evaluación asíncrona en segundo plano de resoluciones firmadas (estatus 7766)
+   * para la matriz del buzón de resueltos_ok mediante MPPD_CEntradasProcesoTotal.
+   * Solo opera a nivel de Jefe y en estado de trámite (no showingFirmados).
+   */
+  public async iniciarEvaluacionFirmadosStream(esManual: boolean = false): Promise<void> {
+    if (this.currentProfile === "Aprobador") {
+      this.limpiarContadoresFirmados();
+      return;
+    }
+
+    if (this.showingFirmados) {
+      this.limpiarContadoresFirmados();
+      return;
+    }
+
+    console.info(
+      "[ResueltosOk] Iniciando stream de firmados con MPPD_CEntradasProcesoTotal 7766...",
+    );
+
+    if (this.isCheckingFirmados) {
+      if (esManual) {
+        this.toastrService.info(
+          "La verificación de resoluciones firmadas ya está en curso en segundo plano.",
+          "Campana de Alerta",
+        );
+      }
+      return;
+    }
+
+    if (this.firmadosAbortController) {
+      this.firmadosAbortController.abort();
+    }
+    this.firmadosAbortController = new AbortController();
+    const signal = this.firmadosAbortController.signal;
+
+    this.isCheckingFirmados = true;
+    this.firmadosPorCarpetaMap.clear();
+
+    // Resetear contadores de las carpetas actuales
+    if (this.allFolders) {
+      this.allFolders.forEach((f) => {
+        f.contadorFirmados = 0;
+      });
+    }
+    this.totalFirmadosCount = 0;
+
+    const xAPIReq: IAPICore = {
+      funcion: "MPPD_CEntradasProcesoTotal",
+      parametros: "7766",
+      valores: "",
+    };
+
+    const folderDocsMap = new Map<string, Set<string>>();
+    let uniqueRowIndex = 0;
+
+    try {
+      await this.apiService.postStream(
+        "crudstream",
+        xAPIReq,
+        (row: any) => {
+          if (signal.aborted) return;
+          if (row) {
+            console.info("[ResueltosOk] Fila de firmados recibida:", row);
+            const folderCode = (
+              row.codigo ||
+              row.c_tipo_id ||
+              row.tipo ||
+              ""
+            )
+              .toString()
+              .trim();
+
+            // Patrón de agrupación del documento / resolución
+            const docKey = (
+              row.numero_carpeta ||
+              row.ncontrol ||
+              row.numc ||
+              row.id ||
+              row.idd ||
+              row.numero_resol ||
+              row.numero_resuelto ||
+              `row_${++uniqueRowIndex}`
+            )
+              .toString()
+              .trim();
+
+            if (!folderDocsMap.has(folderCode)) {
+              folderDocsMap.set(folderCode, new Set<string>());
+            }
+            folderDocsMap.get(folderCode)!.add(docKey);
+
+            // Si la fila provee un c_tipo numérico agrupado del servidor, respetarlo; de lo contrario usar el tamaño del Set
+            const cTipoParsed =
+              row.c_tipo != null ? parseInt(row.c_tipo, 10) : 0;
+            const finalCount =
+              cTipoParsed > 0
+                ? cTipoParsed
+                : folderDocsMap.get(folderCode)!.size;
+
+            this.firmadosPorCarpetaMap.set(folderCode, finalCount);
+
+            // Sincronizar en allFolders
+            if (this.allFolders) {
+              const matchingFolder = this.allFolders.find(
+                (f) => (f.codigo || "").toString().trim() === folderCode,
+              );
+              if (matchingFolder) {
+                matchingFolder.contadorFirmados = finalCount;
+              }
+            }
+
+            this.recalcularTotalFirmados();
+            this.changeDetector.detectChanges();
+          }
+        },
+        signal,
+      );
+    } catch (errStream: any) {
+      if (errStream?.name !== "AbortError" && !signal?.aborted) {
+        console.warn(
+          "[CampanaFirmados Resueltos] Error en postStream:",
+          errStream,
+        );
+      }
+    } finally {
+      if (!signal.aborted) {
+        this.isCheckingFirmados = false;
+        this.recalcularTotalFirmados();
+        this.changeDetector.detectChanges();
+
+        console.info(
+          "[ResueltosOk] Stream completado. Total firmados detectados:",
+          this.totalFirmadosCount,
+        );
+
+        if (esManual) {
+          if (this.totalFirmadosCount > 0) {
+            this.toastrService.success(
+              `Se detectaron ${this.totalFirmadosCount} resolución(es) firmada(s) por el Ministro en el buzón.`,
+              "Campana de Alerta",
+            );
+          } else {
+            this.toastrService.info(
+              "No se detectaron resoluciones firmadas pendientes en este momento.",
+              "Campana de Alerta",
+            );
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Limpia los contadores de firmados de todas las carpetas.
+   */
+  public limpiarContadoresFirmados(): void {
+    if (this.firmadosAbortController) {
+      this.firmadosAbortController.abort();
+    }
+    this.isCheckingFirmados = false;
+    this.totalFirmadosCount = 0;
+    this.firmadosPorCarpetaMap.clear();
+    if (this.allFolders) {
+      this.allFolders.forEach((f) => {
+        f.contadorFirmados = 0;
+      });
+    }
+  }
+
+  /**
+   * Disparo manual al hacer clic en la campana de alerta.
+   */
+  public manualCheckFirmadosStream(): void {
+    if (this.currentProfile === "Aprobador") {
+      return;
+    }
+    if (this.isCheckingFirmados) {
+      this.toastrService.info(
+        "Verificación de resoluciones firmadas en curso...",
+        "Campana de Alerta",
+      );
+      return;
+    }
+    this.toastrService.info(
+      "Consultando resoluciones firmadas por el Ministro en segundo plano...",
+      "Campana de Alerta",
+    );
+    this.iniciarEvaluacionFirmadosStream(true);
+  }
+
+  /**
+   * Obtiene el texto informativo para el tooltip de la campana.
+   */
+  public getBellTooltipText(): string {
+    if (this.isCheckingFirmados) {
+      return "Consultando resoluciones firmadas por el Ministro en segundo plano...";
+    }
+    if (this.totalFirmadosCount > 0) {
+      return `Alerta: ${this.totalFirmadosCount} resolución(es) firmada(s) por el Ministro. Clic para actualizar contadores.`;
+    }
+    return "Campana de Alerta: Sin resoluciones firmadas pendientes. Clic para verificar.";
+  }
+
+  /**
+   * Verifica el perfil y estado del buzón para disparar la evaluación si corresponde.
+   */
+  public verificarYDispararEvaluacionFirmados(): void {
+    if (this.currentProfile === "Aprobador") {
+      this.limpiarContadoresFirmados();
+      return;
+    }
+    setTimeout(() => {
+      this.iniciarEvaluacionFirmadosStream(false);
+    }, 500);
   }
 }

@@ -146,8 +146,11 @@ export class LoginService {
     let Prv: any;
     let lst = this.obtenerSubMenu(menu);
     lst.forEach((e) => {
-      if (e.url === subMenu && e.url != "") {
-        if (e.Privilegios.length > 0) Prv = e.Privilegios;
+      if (
+        (e.url === subMenu || (e.url !== "" && (subMenu.startsWith(e.url + "/") || subMenu.startsWith(e.url + "?")))) &&
+        e.url != ""
+      ) {
+        if (e.Privilegios && e.Privilegios.length > 0) Prv = e.Privilegios;
       }
     });
     return Prv;

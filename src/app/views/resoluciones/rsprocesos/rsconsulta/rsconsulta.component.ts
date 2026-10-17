@@ -392,9 +392,11 @@ export class RsconsultaComponent implements OnInit {
     this.xdia = new Date().getDate().toString();
 
     this.resetPrivilegios();
+    const urlConsulta = "/rsprocesos/rsconsulta";
+    const subMenuUrl = this.router.url.startsWith(urlConsulta) ? urlConsulta : this.router.url;
     this.privilegios = this.loginService.obtenerPrivilegiosMenu(
       "/resoluciones",
-      this.router.url,
+      subMenuUrl,
     );
 
     if (this.privilegios && Array.isArray(this.privilegios)) {
@@ -641,18 +643,17 @@ export class RsconsultaComponent implements OnInit {
           if (data != undefined && data.Cuerpo.length > 0) {
             this.Resolucion = data.Cuerpo[0];
 
-            this.Resolucion.componente = this.Componentes.filter((e) => {
-              return e.cod_componente == this.Resolucion.componente;
-            })[0].nombre_componente;
-            this.Resolucion.categoria = this.Categorias.filter((e) => {
-              return e.cod_categoria == this.Resolucion.categoria;
-            })[0].nombre_categoria;
-            this.Resolucion.clasificacion = this.Clasificaciones.filter((e) => {
-              return e.cod_clasificacion == this.Resolucion.clasificacion;
-            })[0].des_clasificacion;
-            this.Resolucion.grado = this.Grados.filter((e) => {
-              return e.cod_grado == this.Resolucion.grado;
-            })[0].nombres_grado;
+            const comp = this.Componentes.find((e) => e.cod_componente == this.Resolucion.componente);
+            if (comp) this.Resolucion.componente = comp.nombre_componente;
+
+            const cat = this.Categorias.find((e) => e.cod_categoria == this.Resolucion.categoria);
+            if (cat) this.Resolucion.categoria = cat.nombre_categoria;
+
+            const clas = this.Clasificaciones.find((e) => e.cod_clasificacion == this.Resolucion.clasificacion);
+            if (clas) this.Resolucion.clasificacion = clas.des_clasificacion;
+
+            const gr = this.Grados.find((e) => e.cod_grado == this.Resolucion.grado);
+            if (gr) this.Resolucion.grado = gr.nombres_grado;
 
             if (
               data.Cuerpo[0].resoluciones != undefined &&

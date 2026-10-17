@@ -220,6 +220,36 @@
               </div>
             </div>
 
+            <!-- Reloj Contador y Resumen de Tiempos (ACTIVIDADES_EN_EL_EXTERIOR) -->
+            <div class="reloj-header-container animate-fade-in" *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR'">
+              <!-- Reloj Digital en Vivo -->
+              <div class="reloj-digital-pill" title="Hora Oficial y Fecha del Sistema">
+                <div class="reloj-pulse-icon">
+                  <i class="fas fa-clock fa-spin-pulse"></i>
+                </div>
+                <div class="reloj-time-text">
+                  <span class="reloj-time">{{ currentDateTime | date:'hh:mm:ss a' }}</span>
+                  <span class="reloj-date">{{ currentDateTime | date:'dd MMM yyyy' | uppercase }}</span>
+                </div>
+              </div>
+
+              <!-- Contador de Tiempos / Métricas de la Sección -->
+              <div class="tiempos-metricas-group d-none d-lg-flex align-items-center gap-2">
+                <span class="tiempo-stat-badge stat-en-plazo" title="Trámites dentro del plazo establecido">
+                  <i class="fas fa-check-circle mr-1"></i>
+                  <strong>{{ getEstadisticasTiempos().enPlazo }}</strong> En Plazo
+                </span>
+                <span class="tiempo-stat-badge stat-por-vencer" *ngIf="getEstadisticasTiempos().porVencer > 0" title="Trámites próximos a vencer (< 48 hrs)">
+                  <i class="fas fa-hourglass-half mr-1 fa-bounce"></i>
+                  <strong>{{ getEstadisticasTiempos().porVencer }}</strong> Por Vencer
+                </span>
+                <span class="tiempo-stat-badge stat-vencidos" *ngIf="getEstadisticasTiempos().vencidos > 0" title="Trámites con plazo vencido">
+                  <i class="fas fa-exclamation-triangle mr-1"></i>
+                  <strong>{{ getEstadisticasTiempos().vencidos }}</strong> Vencidos
+                </span>
+              </div>
+            </div>
+
             <!-- Acciones -->
             <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
               <!-- Botón Actualizar -->
@@ -463,6 +493,14 @@
                     <i class="fas fa-hashtag"></i>
                     {{ e.numc }}
                   </span>
+                  <!-- Contador de Tiempo a nivel de ítem/tarjeta (ACTIVIDADES_EN_EL_EXTERIOR) -->
+                  <span class="doc-timer-chip"
+                        *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' && getContadorTiempoDoc(e) as timerInfo"
+                        [ngClass]="timerInfo.claseColor"
+                        [title]="timerInfo.textoDetallado">
+                    <i [class]="timerInfo.icon + ' mr-1'"></i>
+                    <span>{{ timerInfo.textoBadge }}</span>
+                  </span>
                   <span class="doc-hint-badge" *ngIf="e.isTagFolder">
                     <i class="fas fa-chevron-right"></i> Clic para ver {{ e.puntosDeCuenta.length }} {{ selectedCarpeta?.id === 'RECLAMOS' ? 'Reclamo(s)' : 'Punto(s) de Cuenta' }} y {{ getSubcasos(e).length }} persona(s)
                   </span>
@@ -557,6 +595,24 @@
           <span class="tally-pill tally-denied" *ngIf="getSubcasosNoProcesar(activeDoc).length > 0">
             <i class="fas fa-times-circle mr-1"></i> {{ getSubcasosNoProcesar(activeDoc).length }} Negado(s)
           </span>
+        </div>
+
+        <!-- Reloj Contador en la Barra de Título del Modal (ACTIVIDADES_EN_EL_EXTERIOR) -->
+        <div class="modal-reloj-contador-box d-none d-md-flex align-items-center"
+             *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' && getContadorTiempoDoc(activeDoc) as docTimer">
+          <!-- Reloj Digital en Vivo -->
+          <div class="modal-clock-pill" title="Hora Oficial y Fecha del Sistema">
+            <i class="fas fa-clock fa-spin-pulse text-warning mr-1"></i>
+            <span class="modal-clock-text">{{ currentDateTime | date:'hh:mm:ss a' }}</span>
+          </div>
+
+          <div class="modal-clock-sep"></div>
+
+          <!-- Contador de Tiempo del Trámite Simplificado -->
+          <div class="modal-timer-pill" [ngClass]="docTimer.claseColor" [title]="docTimer.textoDetallado">
+            <i [class]="docTimer.icon + ' mr-1'"></i>
+            <span>{{ docTimer.textoBadge }}</span>
+          </div>
         </div>
 
         <button class="modal-close-btn ml-3" (click)="closeDetail()" title="Cerrar modal (Esc)">
@@ -807,10 +863,27 @@
                     <span class="info-val font-weight-bold" style="font-size: 0.95rem; color: #0f172a;">{{ viaje.personas }}</span>
                   </div>
 
-                  <!-- Fecha Límite de Respuesta -->
-                  <div class="info-item" *ngIf="viaje.fechaLimiteRespuesta" style="background-color: #fef2f2; padding: 8px 12px; border-radius: 6px; border: 1px solid #fecaca;">
-                    <div class="text-danger font-weight-bold mb-1" style="font-size: 0.72rem; text-transform: uppercase;"><i class="fas fa-clock mr-1"></i>Plazo de Respuesta</div>
-                    <div class="font-weight-bold text-dark" style="font-size: 0.88rem;">{{ formatNgbDate(viaje.fechaLimiteRespuesta) }}</div>
+                  <!-- Fecha Límite de Respuesta con Contador -->
+                  <div class="info-item" *ngIf="getContadorTiempoDoc(activeDoc) as tLeft"
+                       [style.background-color]="tLeft.vencido ? '#fef2f2' : (tLeft.proximoAVencer ? '#fffbeb' : '#f0fdf4')"
+                       [style.border]="tLeft.vencido ? '1px solid #fecaca' : (tLeft.proximoAVencer ? '1px solid #fde68a' : '1px solid #bbf7d0')"
+                       style="padding: 8px 12px; border-radius: 6px;">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <span class="font-weight-bold"
+                            [style.color]="tLeft.vencido ? '#dc2626' : (tLeft.proximoAVencer ? '#d97706' : '#16a34a')"
+                            style="font-size: 0.72rem; text-transform: uppercase;">
+                        <i [class]="tLeft.icon + ' mr-1'"></i>{{ tLeft.tipo === 'limite' ? (tLeft.vencido ? 'Plazo Vencido' : 'Plazo de Respuesta') : 'Tiempo Transcurrido' }}
+                      </span>
+                      <span class="badge" [ngClass]="tLeft.claseColor" style="font-size: 0.65rem;">
+                        {{ tLeft.textoBadge }}
+                      </span>
+                    </div>
+                    <div class="font-weight-bold" style="font-size: 0.82rem; font-family: monospace; color: #0f172a;">
+                      {{ tLeft.textoTiempo }}
+                    </div>
+                    <div class="text-muted mt-1" style="font-size: 0.7rem;" *ngIf="viaje.fechaLimiteRespuesta">
+                      Límite: {{ formatNgbDate(viaje.fechaLimiteRespuesta) }}
+                    </div>
                   </div>
 
                   <!-- Período de Ejecución si existe -->
@@ -1311,12 +1384,30 @@
                     </div>
                   </div>
 
-                  <!-- Fecha Límite de Respuesta Badge -->
-                  <div *ngIf="viaje.fechaLimiteRespuesta" style="background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; padding: 6px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 3px rgba(239,68,68,0.08);">
-                    <i class="fas fa-hourglass-half text-danger" style="font-size: 0.95rem;"></i>
-                    <div>
-                      <div style="font-size: 0.62rem; font-weight: 800; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.5px;">Límite Respuesta</div>
-                      <div style="font-size: 0.85rem; font-weight: 800; color: #dc2626;">{{ formatNgbDate(viaje.fechaLimiteRespuesta) }}</div>
+                  <!-- Fecha Límite de Respuesta / Reloj Contador Activo -->
+                  <div *ngIf="getContadorTiempoDoc(activeDoc) as timerInfo"
+                       class="informe-timer-live-badge"
+                       [ngClass]="timerInfo.claseColor"
+                       [title]="timerInfo.textoDetallado">
+                    <div class="timer-badge-left">
+                      <div class="timer-badge-icon">
+                        <i [class]="timerInfo.icon"></i>
+                      </div>
+                      <div class="timer-badge-info">
+                        <span class="timer-badge-title">
+                          {{ timerInfo.tipo === 'limite' ? (timerInfo.vencido ? 'PLAZO VENCIDO' : 'PLAZO DE RESPUESTA') : 'TIEMPO EN TRÁMITE' }}
+                        </span>
+                        <div class="timer-badge-val">
+                          {{ timerInfo.textoBadge }}
+                        </div>
+                        <div class="timer-badge-sub">
+                          <i class="far fa-clock mr-1"></i> {{ timerInfo.textoTiempo }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="timer-badge-right" *ngIf="viaje.fechaLimiteRespuesta">
+                      <span class="timer-badge-date-lbl">Fecha Límite</span>
+                      <strong class="timer-badge-date-val">{{ formatNgbDate(viaje.fechaLimiteRespuesta) }}</strong>
                     </div>
                   </div>
                 </div>
