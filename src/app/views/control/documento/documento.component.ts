@@ -631,6 +631,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.Doc.remitente = "0";
     this.Doc.unidad = "0";
     this.Doc.creador = "";
+    this.Doc.lugar = "";
     let fechaActual = new Date().toISOString().substring(0, 10);
     this.fcreacion = NgbDate.from(this.formatter.parse(fechaActual));
 
@@ -690,6 +691,18 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           if (this.extraerYAsignarActividades(e)) {
             actividadesCargadas = true;
           }
+          if (!this.actividadesVarias.lugar) {
+            const extLugar =
+              (this.Doc && (this.Doc.lugar || (this.Doc as any).Lugar)) ||
+              (e && ((e as any).lugar || (e as any).Lugar || (e as any).destino || (e as any).sitio || (e as any).ubicacion || (e as any).pais)) ||
+              "";
+            if (extLugar) {
+              this.actividadesVarias.lugar = this.limpiarValorFragmento(extLugar);
+            }
+          }
+          if (this.actividadesVarias.lugar && this.Doc) {
+            this.Doc.lugar = this.actividadesVarias.lugar;
+          }
         });
 
         this.selTipoDocumento();
@@ -707,6 +720,16 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.apiService.Ejecutar(xAPIDetalle).subscribe((detData) => {
             if (detData && detData.Cuerpo && detData.Cuerpo.length > 0) {
               this.extraerYAsignarActividades(detData.Cuerpo[0]);
+              if (!this.actividadesVarias.lugar) {
+                const extLugar =
+                  (detData.Cuerpo[0] as any).lugar ||
+                  (detData.Cuerpo[0] as any).Lugar ||
+                  (this.Doc && ((this.Doc as any).lugar || (this.Doc as any).Lugar)) ||
+                  "";
+                if (extLugar) {
+                  this.actividadesVarias.lugar = this.limpiarValorFragmento(extLugar);
+                }
+              }
               this.selTipoDocumento();
             }
           });
@@ -928,11 +951,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.obtenerDatos(data);
         this.apiService.Ejecutar(this.xAPI).subscribe(
           (xdata) => {
-            // Evaluar si el tipodocumento es actividades en el exterior o actividades varias / actividad varia
             const tdoc = this.Doc.tipo ? this.Doc.tipo.trim().toLowerCase() : "";
-            if (tdoc === "actividades en el exterior" || (tdoc.indexOf("exterior") >= 0 && tdoc.indexOf("actividad") >= 0)) {
+            if (
+              this.esActividadExterior ||
+              tdoc === "actividades en el exterior" ||
+              (tdoc.indexOf("exterior") >= 0 && tdoc.indexOf("actividad") >= 0)
+            ) {
               this.guardarActividadesExterior(this.Doc.wfdocumento);
             } else if (
+              this.esActividadVarias ||
               tdoc === "actividades varias" ||
               tdoc === "actividad varia" ||
               tdoc.indexOf("actividades varias") >= 0 ||
@@ -1040,6 +1067,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       motivo: this.actividadesVarias.motivo || this.actividadesVarias.solicitud || "",
       dirigido: this.actividadesVarias.dirigido || "",
       lugar: this.actividadesVarias.lugar || "",
+      Lugar: this.actividadesVarias.lugar || "",
+      destino: this.actividadesVarias.lugar || "",
+      sitio: this.actividadesVarias.lugar || "",
+      ubicacion: this.actividadesVarias.lugar || "",
       unidad: this.actividadesVarias.unidad || (this.Doc.unidad && this.Doc.unidad !== "0" ? this.Doc.unidad : "") || "",
       personas: Number(this.actividadesVarias.personas) || 0,
       fechaInicio: this.actividadesVarias.fechaInicio || null,
@@ -1054,11 +1085,17 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       recomendacion: this.actividadesVarias.recomendacion || "",
     };
 
+    const idDoc = wfdocumento || this.Doc.wfdocumento || (this.Doc as any).idd || this.Doc.id;
     let viaje = {
-      idd: wfdocumento,
+      idd: Number(idDoc) || idDoc,
       observacion: payload,
       estatus: 1,
     };
+
+    if (this.Doc) {
+      this.Doc.sub_observacion = JSON.stringify(payload);
+      this.Doc.lugar = this.actividadesVarias.lugar || "";
+    }
 
     this.xAPI = {} as IAPICore;
     this.xAPI.funcion = "WKF_IDocumentoViajes";
@@ -1203,7 +1240,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       const strFields = [
         "tipo", "solicitud", "motivo", "dirigido", "pais",
         "opinionDe", "opinion_de", "opinion", "opinionTexto",
-        "recomendacion", "recomendacionDireccion"
+        "recomendacion", "recomendacionDireccion",
+        "lugar", "Lugar", "LUGAR", "destino", "Destino", "DESTINO",
+        "sitio", "Sitio", "ubicacion", "Ubicacion", "unidad", "dependencia", "sede", "ciudad"
       ];
       for (const field of strFields) {
         const reg = new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"[a-zA-Z0-9_]+"\\s*:|\\s*})`, "i");
@@ -1267,11 +1306,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
   }
 
   limpiarValorFragmento(val: any): string {
-    if (!val || typeof val !== "string") return "";
-    let s = this.decodeHtmlEntities(val).trim();
-    // Si contiene fragmentos de sintaxis JSON residuales provocados por parseo o serialización previa:
-    // Ej: ,"OPINIONDE":"MIA o ,"SOLICITUD":"RETIRO INDEBIDO... o fragmentos con comas iniciales
-    if (/^,?\s*"?[A-Za-z0-9_]+"?\s*:/i.test(s)) {
+    if (val === null || val === undefined) return "";
+    if (typeof val === "object") {
+      val = val.lugar || val.destino || val.sitio || val.ubicacion || val.pais || "";
+    }
+    let s = (typeof val === "string" ? val : String(val)).trim();
+    s = this.decodeHtmlEntities(s).trim();
+    // Solo descartar si es un fragmento JSON roto que empieza con coma y comillas (ej: ,"SOLICITUD":...)
+    if (/^,\s*"[A-Za-z0-9_]+"\s*:/i.test(s)) {
       return "";
     }
     if (s.startsWith('","') || s.startsWith(',"') || s.startsWith('",')) {
@@ -1295,8 +1337,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     if (!raw) {
       const candidates = [
-        e.observacion,
         e.sub_observacion,
+        e.observacion,
         e.detalle,
         e.subdocumento,
         e.cont,
@@ -1312,6 +1354,9 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             cand.includes('"motivo"') ||
             cand.includes('"gastos"') ||
             cand.includes('"fechaInicio"') ||
+            cand.includes('"lugar"') ||
+            cand.includes('"dirigido"') ||
+            cand.includes('"unidad"') ||
             cand.includes("ACTIVIDADES VARIAS") ||
             cand.includes("actividades varias"))
         ) {
@@ -1335,13 +1380,36 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           if (data.observacion) {
             let obs = this.robustJsonParse(data.observacion);
             if (obs && typeof obs === "object") {
-              data = obs;
+              data = { ...data, ...obs };
+            }
+          }
+
+          // Merge complementario desde e.sub_observacion, e.observacion o e.detalle para obtener campos actualizados
+          const altSources = [e.sub_observacion, e.observacion, e.detalle, e.subdocumento];
+          for (const alt of altSources) {
+            if (alt && alt !== raw) {
+              try {
+                const altParsed = typeof alt === "object" ? alt : this.robustJsonParse(alt);
+                if (altParsed && typeof altParsed === "object") {
+                  const inner = altParsed.observacion && typeof altParsed.observacion === "object" ? altParsed.observacion : altParsed;
+                  data = { ...inner, ...data };
+                  if (!data.lugar) {
+                    data.lugar = inner.lugar || inner.Lugar || inner.LUGAR || inner.destino || inner.sitio || inner.ubicacion || "";
+                  }
+                  if (!data.dirigido) data.dirigido = inner.dirigido || "";
+                  if (!data.solicitud) data.solicitud = inner.solicitud || inner.motivo || "";
+                  if (!data.opinion) data.opinion = inner.opinion || "";
+                  if (!data.opinionDe) data.opinionDe = inner.opinionDe || "";
+                  if (!data.recomendacion) data.recomendacion = inner.recomendacion || "";
+                  if (!data.fechaLimiteRespuesta) data.fechaLimiteRespuesta = inner.fechaLimiteRespuesta || inner.fechaConfirmacion || null;
+                }
+              } catch (_) {}
             }
           }
 
           // Asignar Actividades en el Exterior
           this.actividadesExt = {
-            pais: this.limpiarValorFragmento(data.pais || ""),
+            pais: this.limpiarValorFragmento(data.pais || data.lugar || data.destino || ""),
             motivo: this.limpiarValorFragmento(data.motivo || ""),
             dirigido: this.limpiarValorFragmento(data.dirigido || ""),
             personas: data.personas !== undefined && data.personas !== null ? data.personas : "",
@@ -1356,13 +1424,72 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             },
           };
 
+          // Buscar lugar en todas las posibles variantes de clave
+          let lugarDetectado =
+            data.lugar ||
+            data.Lugar ||
+            data.LUGAR ||
+            data.destino ||
+            data.Destino ||
+            data.DESTINO ||
+            data.sitio ||
+            data.Sitio ||
+            data.SITIO ||
+            data.ubicacion ||
+            data.Ubicacion ||
+            data.UBICACION ||
+            data.pais ||
+            data.Pais ||
+            data.PAIS ||
+            data.sede ||
+            data.Sede ||
+            data.direccion ||
+            data.ciudad ||
+            (e as any).lugar ||
+            (e as any).Lugar ||
+            (e as any).destino ||
+            (e as any).sitio ||
+            (e as any).ubicacion ||
+            (e as any).pais ||
+            (this.Doc as any).lugar ||
+            (this.Doc as any).Lugar ||
+            "";
+
+          // Si aún no se encontró lugar, buscar en sub_observacion, observacion o subdocumento
+          if (!lugarDetectado) {
+            const candList = [e.sub_observacion, e.observacion, e.detalle, e.subdocumento];
+            for (const cand of candList) {
+              if (cand) {
+                try {
+                  const p = typeof cand === "object" ? cand : this.robustJsonParse(cand);
+                  if (p && typeof p === "object") {
+                    const subObj = p.observacion && typeof p.observacion === "object" ? p.observacion : p;
+                    const subLugar =
+                      subObj.lugar ||
+                      subObj.Lugar ||
+                      subObj.LUGAR ||
+                      subObj.destino ||
+                      subObj.sitio ||
+                      subObj.ubicacion ||
+                      subObj.pais ||
+                      subObj.sede;
+                    if (subLugar) {
+                      lugarDetectado = subLugar;
+                      break;
+                    }
+                  }
+                } catch (_) {}
+              }
+            }
+          }
+
           // Asignar Actividades Varias limpiando fragmentos JSON corruptos
           this.actividadesVarias = {
             tipo: data.tipo || "ACTIVIDADES VARIAS",
             solicitud: this.limpiarValorFragmento(data.solicitud || data.motivo || ""),
             motivo: this.limpiarValorFragmento(data.motivo || data.solicitud || ""),
             dirigido: this.limpiarValorFragmento(data.dirigido || ""),
-            lugar: this.limpiarValorFragmento(data.lugar || ""),
+            lugar: this.limpiarValorFragmento(lugarDetectado),
             personas: data.personas !== undefined && data.personas !== null ? data.personas : 0,
             fechaInicio: this.parseDateToNgb(data.fechaInicio),
             fechaFin: this.parseDateToNgb(data.fechaFin),
@@ -1379,6 +1506,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             ),
           };
 
+          if (this.Doc && this.actividadesVarias.lugar) {
+            this.Doc.lugar = this.actividadesVarias.lugar;
+          }
+
           if (this.actividadesVarias.fechaLimiteRespuesta && !this.fplazo) {
             this.fplazo = this.actividadesVarias.fechaLimiteRespuesta;
           }
@@ -1390,6 +1521,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
               data.tipo === "ACTIVIDAD VARIA" ||
               (data.tipo && data.tipo.toUpperCase().includes("VARIA")) ||
               this.actividadesVarias.solicitud ||
+              this.actividadesVarias.motivo ||
+              this.actividadesVarias.lugar ||
               this.actividadesVarias.opinionDe ||
               this.actividadesVarias.opinion ||
               this.actividadesVarias.recomendacion) &&
@@ -1435,6 +1568,52 @@ export class DocumentoComponent implements OnInit, OnDestroy {
 
     this.Doc.contenido = this.Doc.contenido.toUpperCase();
     this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase();
+
+    const tdoc = this.Doc.tipo ? this.Doc.tipo.trim().toLowerCase() : "";
+    const esVaria =
+      this.esActividadVarias ||
+      tdoc === "actividades varias" ||
+      tdoc === "actividad varia" ||
+      tdoc.indexOf("actividades varias") >= 0 ||
+      tdoc.indexOf("actividad varia") >= 0 ||
+      (tdoc.indexOf("varia") >= 0 && tdoc.indexOf("exterior") < 0);
+
+    if (esVaria) {
+      if (this.actividadesVarias.lugar) {
+        this.actividadesVarias.lugar = this.actividadesVarias.lugar.toUpperCase();
+      }
+      this.Doc.lugar = this.actividadesVarias.lugar || "";
+      if (this.actividadesVarias.solicitud && !this.Doc.contenido) {
+        this.Doc.contenido = this.actividadesVarias.solicitud.toUpperCase();
+      }
+      const payload = {
+        tipo: "ACTIVIDADES VARIAS",
+        solicitud: this.actividadesVarias.solicitud || "",
+        motivo: this.actividadesVarias.motivo || this.actividadesVarias.solicitud || "",
+        dirigido: this.actividadesVarias.dirigido || "",
+        lugar: this.actividadesVarias.lugar || "",
+        Lugar: this.actividadesVarias.lugar || "",
+        destino: this.actividadesVarias.lugar || "",
+        sitio: this.actividadesVarias.lugar || "",
+        ubicacion: this.actividadesVarias.lugar || "",
+        unidad:
+          this.actividadesVarias.unidad ||
+          (this.Doc.unidad && this.Doc.unidad !== "0" ? this.Doc.unidad : "") ||
+          "",
+        personas: Number(this.actividadesVarias.personas) || 0,
+        fechaInicio: this.actividadesVarias.fechaInicio || null,
+        fechaFin: this.actividadesVarias.fechaFin || null,
+        fechaLimiteRespuesta: this.actividadesVarias.fechaLimiteRespuesta || null,
+        fechaConfirmacion:
+          this.actividadesVarias.fechaConfirmacion ||
+          this.actividadesVarias.fechaLimiteRespuesta ||
+          null,
+        opinionDe: this.actividadesVarias.opinionDe || "",
+        opinion: this.actividadesVarias.opinion || "",
+        recomendacion: this.actividadesVarias.recomendacion || "",
+      };
+      this.Doc.sub_observacion = JSON.stringify(payload);
+    }
 
     this.Doc.creador = this.loginService.Usuario.id;
 
@@ -1491,7 +1670,52 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       );
       return;
     }
-    let wfd = this.Doc.wfdocumento;
+    let wfd = this.Doc.wfdocumento || (this.Doc as any).idd || this.Doc.id;
+    const tdoc = this.Doc.tipo ? this.Doc.tipo.trim().toLowerCase() : "";
+    const esVaria =
+      this.esActividadVarias ||
+      tdoc === "actividades varias" ||
+      tdoc === "actividad varia" ||
+      tdoc.indexOf("actividades varias") >= 0 ||
+      tdoc.indexOf("actividad varia") >= 0 ||
+      (tdoc.indexOf("varia") >= 0 && tdoc.indexOf("exterior") < 0);
+
+    if (esVaria) {
+      if (this.actividadesVarias.lugar) {
+        this.actividadesVarias.lugar = this.actividadesVarias.lugar.toUpperCase();
+      }
+      this.Doc.lugar = this.actividadesVarias.lugar || "";
+      if (this.actividadesVarias.solicitud) {
+        this.Doc.contenido = this.actividadesVarias.solicitud.toUpperCase();
+      }
+      const payload = {
+        tipo: "ACTIVIDADES VARIAS",
+        solicitud: this.actividadesVarias.solicitud || "",
+        motivo: this.actividadesVarias.motivo || this.actividadesVarias.solicitud || "",
+        dirigido: this.actividadesVarias.dirigido || "",
+        lugar: this.actividadesVarias.lugar || "",
+        Lugar: this.actividadesVarias.lugar || "",
+        destino: this.actividadesVarias.lugar || "",
+        sitio: this.actividadesVarias.lugar || "",
+        ubicacion: this.actividadesVarias.lugar || "",
+        unidad:
+          this.actividadesVarias.unidad ||
+          (this.Doc.unidad && this.Doc.unidad !== "0" ? this.Doc.unidad : "") ||
+          "",
+        personas: Number(this.actividadesVarias.personas) || 0,
+        fechaInicio: this.actividadesVarias.fechaInicio || null,
+        fechaFin: this.actividadesVarias.fechaFin || null,
+        fechaLimiteRespuesta: this.actividadesVarias.fechaLimiteRespuesta || null,
+        fechaConfirmacion:
+          this.actividadesVarias.fechaConfirmacion ||
+          this.actividadesVarias.fechaLimiteRespuesta ||
+          null,
+        opinionDe: this.actividadesVarias.opinionDe || "",
+        opinion: this.actividadesVarias.opinion || "",
+        recomendacion: this.actividadesVarias.recomendacion || "",
+      };
+      this.Doc.sub_observacion = JSON.stringify(payload);
+    }
 
     this.Doc.fcreacion =
       typeof this.fcreacion === "object"
@@ -1531,9 +1755,14 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         } else {
           console.log(this.Doc);
           const tdoc = this.Doc.tipo ? this.Doc.tipo.trim().toLowerCase() : "";
-          if (tdoc === "actividades en el exterior" || (tdoc.indexOf("exterior") >= 0 && tdoc.indexOf("actividad") >= 0)) {
+          if (
+            this.esActividadExterior ||
+            tdoc === "actividades en el exterior" ||
+            (tdoc.indexOf("exterior") >= 0 && tdoc.indexOf("actividad") >= 0)
+          ) {
             this.guardarActividadesExterior(wfd);
           } else if (
+            this.esActividadVarias ||
             tdoc === "actividades varias" ||
             tdoc === "actividad varia" ||
             tdoc.indexOf("actividades varias") >= 0 ||
@@ -1906,7 +2135,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.actividadesVarias.tipo === "ACTIVIDAD VARIA" ||
           (this.actividadesVarias.tipo && this.actividadesVarias.tipo.toUpperCase().includes("VARIA"))) &&
         !this.esActividadExterior &&
-        !!(this.actividadesVarias.solicitud || this.actividadesVarias.dirigido || this.actividadesVarias.opinionDe || this.actividadesVarias.recomendacion));
+        !!(this.actividadesVarias.solicitud || this.actividadesVarias.motivo || this.actividadesVarias.dirigido || this.actividadesVarias.lugar || this.actividadesVarias.opinionDe || this.actividadesVarias.recomendacion));
 
     if (this.esActividadVarias) {
       if (!this.actividadesVarias.fechaLimiteRespuesta && this.fplazo) {
@@ -2078,6 +2307,15 @@ export class DocumentoComponent implements OnInit, OnDestroy {
           this.Doc.ncontrol = "";
 
           this.extraerYAsignarActividades(e);
+          if (!this.actividadesVarias.lugar) {
+            const extLugar =
+              (this.Doc && (this.Doc.lugar || (this.Doc as any).Lugar)) ||
+              (e && ((e as any).lugar || (e as any).Lugar || (e as any).destino || (e as any).sitio || (e as any).ubicacion || (e as any).pais)) ||
+              "";
+            if (extLugar) {
+              this.actividadesVarias.lugar = this.limpiarValorFragmento(extLugar);
+            }
+          }
         });
 
         this.Doc.norigen = dwf;

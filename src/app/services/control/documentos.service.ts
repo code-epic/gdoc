@@ -37,6 +37,8 @@ export interface IDocumento {
   usuario_doc?: string 
   nombre_doc?: string 
   fecha_doc?: string 
+  lugar?: string 
+  sub_observacion?: string 
 }
 
 //documento del WorkFlow

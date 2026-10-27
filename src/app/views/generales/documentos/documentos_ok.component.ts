@@ -5225,7 +5225,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public loadingEditContenido: boolean = false;
   public editandoContenido: boolean = false;
   public contenidoEditado: string = "";
-
+  // ─── Edición de Contenido / Asunto ──────────────────────────────────────────
   public activarEdicionContenido(): void {
     this.editandoContenido = true;
     if (!this.contenidoEditado && this.activeDoc) {
@@ -6132,9 +6132,56 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.loadingDetalleViaje = false;
         if (data && data.Cuerpo && data.Cuerpo.length > 0) {
           const detail = data.Cuerpo[0];
+          const prevViaje =
+            doc.viajes_descripcion ||
+            (doc._parsedViajesData ? doc._parsedViajesData : null);
+          const prevLugar =
+            doc.lugar ||
+            (doc._parsedViajesData && doc._parsedViajesData.lugar) ||
+            (this.activeDoc && this.activeDoc.lugar);
+
+          let detailLugar = detail.lugar || detail.Lugar || "";
+          if (!detailLugar && detail.sub_observacion) {
+            try {
+              const parsedSub =
+                typeof detail.sub_observacion === "object"
+                  ? detail.sub_observacion
+                  : this.robustJsonParse(detail.sub_observacion);
+              if (parsedSub && typeof parsedSub === "object") {
+                const inner =
+                  parsedSub.observacion &&
+                  typeof parsedSub.observacion === "object"
+                    ? parsedSub.observacion
+                    : parsedSub;
+                detailLugar =
+                  inner.lugar ||
+                  inner.Lugar ||
+                  inner.LUGAR ||
+                  inner.destino ||
+                  inner.sitio ||
+                  inner.ubicacion ||
+                  "";
+              }
+            } catch (_) {}
+          }
+          const finalLugar = detailLugar || prevLugar || "";
+
           Object.assign(doc, detail);
+          if (prevViaje && !doc.viajes_descripcion) {
+            doc.viajes_descripcion = prevViaje;
+          }
+          if (finalLugar) {
+            doc.lugar = finalLugar;
+          }
+
           if (this.activeDoc) {
             Object.assign(this.activeDoc, detail);
+            if (prevViaje && !this.activeDoc.viajes_descripcion) {
+              this.activeDoc.viajes_descripcion = prevViaje;
+            }
+            if (finalLugar) {
+              this.activeDoc.lugar = finalLugar;
+            }
             delete this.activeDoc._parsedViajesData;
           }
           this.changeDetector.markForCheck();
@@ -6383,6 +6430,20 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         "opinionTexto",
         "recomendacion",
         "recomendacionDireccion",
+        "lugar",
+        "Lugar",
+        "LUGAR",
+        "destino",
+        "Destino",
+        "DESTINO",
+        "sitio",
+        "Sitio",
+        "ubicacion",
+        "Ubicacion",
+        "unidad",
+        "dependencia",
+        "sede",
+        "ciudad",
       ];
       for (const field of strFields) {
         const reg = new RegExp(
@@ -6497,6 +6558,67 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   public getViajesData(doc: any): any {
     if (!doc) return null;
     if (doc._parsedViajesData) {
+      if (!doc._parsedViajesData.lugar) {
+        let fallbackLugar =
+          doc.lugar ||
+          (doc as any).Lugar ||
+          (doc as any).destino ||
+          (doc as any).sitio ||
+          (doc as any).ubicacion ||
+          "";
+        if (
+          !fallbackLugar &&
+          (doc.sub_observacion ||
+            doc.observacion ||
+            doc.detalle ||
+            doc.subdocumento)
+        ) {
+          const cands = [
+            doc.sub_observacion,
+            doc.observacion,
+            doc.detalle,
+            doc.subdocumento,
+          ];
+          for (const cand of cands) {
+            if (cand) {
+              try {
+                const parsed =
+                  typeof cand === "object"
+                    ? cand
+                    : this.robustJsonParse(cand);
+                if (parsed && typeof parsed === "object") {
+                  const inner =
+                    parsed.observacion &&
+                    typeof parsed.observacion === "object"
+                      ? parsed.observacion
+                      : parsed;
+                  const found =
+                    inner.lugar ||
+                    inner.Lugar ||
+                    inner.LUGAR ||
+                    inner.destino ||
+                    inner.sitio ||
+                    inner.ubicacion;
+                  if (found) {
+                    fallbackLugar = found;
+                    break;
+                  }
+                }
+              } catch (_) {}
+            }
+          }
+        }
+        if (fallbackLugar) {
+          doc._parsedViajesData.lugar = this.limpiarValorFragmento(fallbackLugar);
+          doc.lugar = doc._parsedViajesData.lugar;
+          if (
+            this.activeDoc &&
+            (this.activeDoc.idd === doc.idd || this.activeDoc.numc === doc.numc)
+          ) {
+            this.activeDoc.lugar = doc._parsedViajesData.lugar;
+          }
+        }
+      }
       return doc._parsedViajesData;
     }
 
@@ -6506,6 +6628,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       doc.viajes ||
       doc.actividadesExt ||
       doc.actividades ||
+      doc.actividadesVarias ||
       doc.detallejson ||
       doc.detallefinaljson;
 
@@ -6529,6 +6652,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             cand.includes('"opinion"') ||
             cand.includes('"recomendacion"') ||
             cand.includes('"fechaLimiteRespuesta"') ||
+            cand.includes('"lugar"') ||
+            cand.includes('"dirigido"') ||
+            cand.includes('"unidad"') ||
             cand.includes("ACTIVIDADES VARIAS") ||
             cand.includes("actividades varias"))
         ) {
@@ -6538,17 +6664,80 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       }
     }
 
+    if (!raw && doc.actividadesVarias) {
+      raw = doc.actividadesVarias;
+    }
+    if (!raw && typeof doc.observacion === "object") {
+      raw = doc.observacion;
+    }
+    if (!raw && typeof doc.subdocumento === "object") {
+      raw = doc.subdocumento;
+    }
+    if (!raw && typeof doc.detalle === "object") {
+      raw = doc.detalle;
+    }
+
     if (raw) {
       try {
-        let data = this.robustJsonParse(raw);
+        let data =
+          typeof raw === "object" ? { ...raw } : this.robustJsonParse(raw);
         if (Array.isArray(data) && data.length > 0) {
           data = data[0];
         }
         if (data && typeof data === "object") {
           if (data.observacion) {
-            let obs = this.robustJsonParse(data.observacion);
+            let obs =
+              typeof data.observacion === "object"
+                ? data.observacion
+                : this.robustJsonParse(data.observacion);
             if (obs && typeof obs === "object") {
-              data = obs;
+              data = { ...data, ...obs };
+            }
+          }
+
+          // Merge complementario desde doc.sub_observacion, doc.observacion, etc. para asegurar datos actualizados
+          const altSources = [
+            doc.sub_observacion,
+            doc.observacion,
+            doc.detalle,
+            doc.subdocumento,
+          ];
+          for (const alt of altSources) {
+            if (alt && alt !== raw) {
+              try {
+                const altParsed =
+                  typeof alt === "object" ? alt : this.robustJsonParse(alt);
+                if (altParsed && typeof altParsed === "object") {
+                  const inner =
+                    altParsed.observacion &&
+                    typeof altParsed.observacion === "object"
+                      ? altParsed.observacion
+                      : altParsed;
+                  data = { ...inner, ...data };
+                  if (!data.lugar) {
+                    data.lugar =
+                      inner.lugar ||
+                      inner.Lugar ||
+                      inner.LUGAR ||
+                      inner.destino ||
+                      inner.sitio ||
+                      inner.ubicacion ||
+                      "";
+                  }
+                  if (!data.dirigido) data.dirigido = inner.dirigido || "";
+                  if (!data.solicitud)
+                    data.solicitud = inner.solicitud || inner.motivo || "";
+                  if (!data.opinion) data.opinion = inner.opinion || "";
+                  if (!data.opinionDe) data.opinionDe = inner.opinionDe || "";
+                  if (!data.recomendacion)
+                    data.recomendacion = inner.recomendacion || "";
+                  if (!data.fechaLimiteRespuesta)
+                    data.fechaLimiteRespuesta =
+                      inner.fechaLimiteRespuesta ||
+                      inner.fechaConfirmacion ||
+                      null;
+                }
+              } catch (_) {}
             }
           }
 
@@ -6567,7 +6756,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             data.solicitud ||
             data.opinionDe ||
             data.opinion ||
-            data.recomendacion
+            data.recomendacion ||
+            data.lugar ||
+            doc.lugar
           ) {
             data.tdoc = data.tdoc || doc.tdoc || "ACTIVIDAD VARIA";
             data.tipo = data.tipo || doc.tdoc || "ACTIVIDAD VARIA";
@@ -6578,7 +6769,20 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
               data.motivo || data.solicitud || "",
             );
             data.dirigido = this.limpiarValorFragmento(data.dirigido || "");
-            data.lugar = this.limpiarValorFragmento(data.lugar || "");
+            data.lugar = this.limpiarValorFragmento(
+              data.lugar ||
+                data.Lugar ||
+                data.LUGAR ||
+                data.destino ||
+                data.Destino ||
+                data.sitio ||
+                data.ubicacion ||
+                data.Ubicacion ||
+                doc.lugar ||
+                (doc as any).Lugar ||
+                (this.activeDoc && this.activeDoc.lugar) ||
+                "",
+            );
             data.unidad = this.limpiarValorFragmento(
               data.unidad || data.dependencia || "",
             );
@@ -6596,6 +6800,30 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             data.pais = this.limpiarValorFragmento(data.pais || "");
             data.motivo = this.limpiarValorFragmento(data.motivo || "");
             data.dirigido = this.limpiarValorFragmento(data.dirigido || "");
+            data.lugar = this.limpiarValorFragmento(
+              data.lugar ||
+                data.Lugar ||
+                data.LUGAR ||
+                data.destino ||
+                data.Destino ||
+                data.sitio ||
+                data.ubicacion ||
+                data.Ubicacion ||
+                doc.lugar ||
+                (doc as any).Lugar ||
+                (this.activeDoc && this.activeDoc.lugar) ||
+                "",
+            );
+          }
+
+          if (data.lugar) {
+            doc.lugar = data.lugar;
+            if (
+              this.activeDoc &&
+              (this.activeDoc.idd === doc.idd || this.activeDoc.numc === doc.numc)
+            ) {
+              this.activeDoc.lugar = data.lugar;
+            }
           }
 
           doc._parsedViajesData = data;
