@@ -4323,24 +4323,6 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       pdf.setFontSize(7.5);
       pdf.text("VISTO", visX + 8, decBoxY + 4.2);
 
-      // Leyenda
-      let leyendaVarias =
-        "AUTORIZADA LA ACTIVIDAD INSTITUCIONAL CONFORME A LO EXPUESTO.";
-      if (decisionSeleccionada === "NEGADO") {
-        leyendaVarias =
-          "NO AUTORIZADA LA ACTIVIDAD INSTITUCIONAL CONFORME A LO EXPUESTO.";
-      } else if (decisionSeleccionada === "VISTO") {
-        leyendaVarias =
-          "VISTO POR EL GENERAL EN JEFE MINISTRO DEL PODER POPULAR PARA LA DEFENSA.";
-      }
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(6.2);
-      pdf.setTextColor(71, 85, 105);
-      pdf.text(leyendaVarias, pageWidth / 2, decBoxY + 12.5, {
-        align: "center",
-      });
-
       // 4.10-B Franja INSTRUCCIONES Y OBSERVACIONES DEL MPPD
       const obsY = 159;
       pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
@@ -4666,23 +4648,6 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       pdf.setFontSize(7.5);
       pdf.text("VISTO", visX + 8, decBoxY + 4.2);
 
-      // Leyenda según decisión
-      let leyendaExterior =
-        "AUTORIZADA LA COMISIÓN DE SERVICIO AL EXTERIOR SEGÚN ITINERARIO DESCRITO.";
-      if (decisionSeleccionada === "NEGADO") {
-        leyendaExterior = "NO AUTORIZADA LA COMISIÓN DE SERVICIO AL EXTERIOR.";
-      } else if (decisionSeleccionada === "VISTO") {
-        leyendaExterior =
-          "VISTO POR EL GENERAL EN JEFE MINISTRO DEL PODER POPULAR PARA LA DEFENSA.";
-      }
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(6.2);
-      pdf.setTextColor(71, 85, 105);
-      pdf.text(leyendaExterior, pageWidth / 2, decBoxY + 11.5, {
-        align: "center",
-      });
-
       // 4.11 Franja OBSERVACIONES / INSTRUCCIONES DEL MPPD
       const obsY = 152;
       pdf.setFillColor(redColor[0], redColor[1], redColor[2]);
@@ -4703,16 +4668,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       pdf.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
       pdf.rect(margin, obsY + 4, contentWidth, obsBoxH, "FD");
 
-      const textoObs = (
-        this.observacion ||
-        "CÚMPLASE CONFORME A LA DOCTRINA MILITAR Y DISPOSICIONES VIGENTES DE LA FUERZA ARMADA NACIONAL BOLIVARIANA."
-      ).toUpperCase();
+      const textoObs = (this.observacion || "").toString().trim().toUpperCase();
 
-      pdf.setTextColor(20, 20, 20);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(7);
-      const splitObs = pdf.splitTextToSize(textoObs, contentWidth - 4);
-      pdf.text(splitObs, margin + 2, obsY + 9);
+      if (textoObs) {
+        pdf.setTextColor(20, 20, 20);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(7);
+        const splitObs = pdf.splitTextToSize(textoObs, contentWidth - 4);
+        pdf.text(splitObs, margin + 2, obsY + 9);
+      }
     }
     // 4.12 Firma Oficial del Ministro y Sello Oficial
     const sigLineY = 222;
@@ -6229,7 +6193,41 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     return s.toUpperCase();
   }
 
-  // ─── Métodos Auxiliares para OFICIOS ──────────────────────────────────────────
+  // ─── Métodos Auxiliares para OFICIOS Y ACTIVIDADES VARIAS ──────────────────
+  public getActividadUnidad(doc: any, viaje?: any): string {
+    if (viaje) {
+      const uViaje = viaje.unidad || viaje.dependencia || viaje.udep || "";
+      if (
+        uViaje &&
+        typeof uViaje === "string" &&
+        uViaje.trim() !== "" &&
+        uViaje.trim() !== "0"
+      ) {
+        return this.stripHtml(uViaje).toUpperCase().trim();
+      }
+    }
+    const fromDoc = this.getOficioUnidad(doc);
+    return fromDoc || "";
+  }
+
+  public getFormatoPeriodo(fechaInicio: any, fechaFin: any): string {
+    const fIni = fechaInicio ? this.formatNgbDate(fechaInicio) : "";
+    const fFin = fechaFin ? this.formatNgbDate(fechaFin) : "";
+    const hasIni = !!(fIni && fIni !== "No definida" && fIni !== "—");
+    const hasFin = !!(fFin && fFin !== "No definida" && fFin !== "—");
+
+    if (hasIni && hasFin) {
+      return `${fIni} AL ${fFin}`;
+    }
+    if (hasIni) {
+      return fIni;
+    }
+    if (hasFin) {
+      return `HASTA ${fFin}`;
+    }
+    return "NO ESPECIFICADA";
+  }
+
   public getOficioUnidad(doc: any): string {
     if (!doc) return "";
     const u =
@@ -6553,6 +6551,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
               data.motivo || data.solicitud || "",
             );
             data.dirigido = this.limpiarValorFragmento(data.dirigido || "");
+            data.lugar = this.limpiarValorFragmento(data.lugar || "");
+            data.unidad = this.limpiarValorFragmento(
+              data.unidad || data.dependencia || "",
+            );
             data.opinionDe = this.limpiarValorFragmento(
               data.opinionDe || data.opinion_de || "",
             );

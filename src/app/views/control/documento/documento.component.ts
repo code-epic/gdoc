@@ -404,6 +404,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     solicitud: "",
     motivo: "",
     dirigido: "",
+    lugar: "",
+    unidad: "",
     personas: "",
     fechaInicio: null,
     fechaFin: null,
@@ -640,6 +642,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       solicitud: "",
       motivo: "",
       dirigido: "",
+      lugar: "",
+      unidad: "",
       personas: "",
       fechaInicio: null,
       fechaFin: null,
@@ -804,6 +808,21 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         if (!this.Doc.contenido) {
           this.Doc.contenido = this.actividadesVarias.solicitud;
         }
+      }
+      if (this.actividadesVarias.dirigido) {
+        this.actividadesVarias.dirigido = this.actividadesVarias.dirigido.toUpperCase();
+      }
+      if (this.actividadesVarias.lugar) {
+        this.actividadesVarias.lugar = this.actividadesVarias.lugar.toUpperCase();
+      }
+      if (this.actividadesVarias.opinionDe) {
+        this.actividadesVarias.opinionDe = this.actividadesVarias.opinionDe.toUpperCase();
+      }
+      if (this.actividadesVarias.opinion) {
+        this.actividadesVarias.opinion = this.actividadesVarias.opinion.toUpperCase();
+      }
+      if (this.actividadesVarias.recomendacion) {
+        this.actividadesVarias.recomendacion = this.actividadesVarias.recomendacion.toUpperCase();
       }
       if (this.actividadesVarias.fechaLimiteRespuesta && !this.fplazo) {
         this.fplazo = this.actividadesVarias.fechaLimiteRespuesta;
@@ -1007,6 +1026,10 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.actividadesVarias.solicitud = this.limpiarValorFragmento(this.actividadesVarias.solicitud);
     this.actividadesVarias.motivo = this.limpiarValorFragmento(this.actividadesVarias.motivo);
     this.actividadesVarias.dirigido = this.limpiarValorFragmento(this.actividadesVarias.dirigido);
+    this.actividadesVarias.lugar = this.limpiarValorFragmento(this.actividadesVarias.lugar);
+    this.actividadesVarias.unidad = this.limpiarValorFragmento(
+      this.actividadesVarias.unidad || (this.Doc.unidad && this.Doc.unidad !== "0" ? this.Doc.unidad : "") || ""
+    );
     this.actividadesVarias.opinionDe = this.limpiarValorFragmento(this.actividadesVarias.opinionDe);
     this.actividadesVarias.opinion = this.limpiarValorFragmento(this.actividadesVarias.opinion);
     this.actividadesVarias.recomendacion = this.limpiarValorFragmento(this.actividadesVarias.recomendacion);
@@ -1016,6 +1039,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       solicitud: this.actividadesVarias.solicitud || "",
       motivo: this.actividadesVarias.motivo || this.actividadesVarias.solicitud || "",
       dirigido: this.actividadesVarias.dirigido || "",
+      lugar: this.actividadesVarias.lugar || "",
+      unidad: this.actividadesVarias.unidad || (this.Doc.unidad && this.Doc.unidad !== "0" ? this.Doc.unidad : "") || "",
       personas: Number(this.actividadesVarias.personas) || 0,
       fechaInicio: this.actividadesVarias.fechaInicio || null,
       fechaFin: this.actividadesVarias.fechaFin || null,
@@ -1337,6 +1362,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             solicitud: this.limpiarValorFragmento(data.solicitud || data.motivo || ""),
             motivo: this.limpiarValorFragmento(data.motivo || data.solicitud || ""),
             dirigido: this.limpiarValorFragmento(data.dirigido || ""),
+            lugar: this.limpiarValorFragmento(data.lugar || ""),
             personas: data.personas !== undefined && data.personas !== null ? data.personas : 0,
             fechaInicio: this.parseDateToNgb(data.fechaInicio),
             fechaFin: this.parseDateToNgb(data.fechaFin),

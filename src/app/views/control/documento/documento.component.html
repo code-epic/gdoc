@@ -362,8 +362,8 @@
                                 <hr class="mt-2 mb-3">
                             </div>
 
-                            <!-- 1. Solicitud ó Requerimiento (manual) -->
-                            <div class="form-group col-md-6">
+                            <!-- 1. Solicitud ó Requerimiento (ancho completo para texto largo) -->
+                            <div class="form-group col-md-12">
                                 <label class="form-label-custom font-weight-bold">
                                     Solicitud ó Requerimiento <span class="text-muted font-italic">(Manual / Opcional)</span>
                                 </label>
@@ -371,7 +371,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text icon-box"><mat-icon class="input-icon">assignment</mat-icon></span>
                                     </div>
-                                    <textarea rows="2" class="input-custom text-uppercase" style="text-transform: uppercase;" placeholder="REDACTE AQUÍ LA SOLICITUD O REQUERIMIENTO..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.solicitud" (input)="actividadesVarias.solicitud = actividadesVarias.solicitud ? actividadesVarias.solicitud.toUpperCase() : ''"></textarea>
+                                    <textarea rows="2" class="input-custom text-uppercase" style="text-transform: uppercase;" placeholder="REDACTE AQUÍ LA SOLICITUD O REQUERIMIENTO..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.solicitud" (blur)="actividadesVarias.solicitud = actividadesVarias.solicitud ? actividadesVarias.solicitud.toUpperCase() : ''"></textarea>
                                 </div>
                             </div>
 
@@ -384,11 +384,24 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text icon-box"><mat-icon class="input-icon">person</mat-icon></span>
                                     </div>
-                                    <input type="text" class="input-custom text-uppercase" style="text-transform: uppercase;" placeholder="DESTINATARIO / A QUIEN VA DIRIGIDO..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.dirigido" (input)="actividadesVarias.dirigido = actividadesVarias.dirigido ? actividadesVarias.dirigido.toUpperCase() : ''">
+                                    <input type="text" class="input-custom text-uppercase" style="text-transform: uppercase;" placeholder="DESTINATARIO / A QUIEN VA DIRIGIDO..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.dirigido" (blur)="actividadesVarias.dirigido = actividadesVarias.dirigido ? actividadesVarias.dirigido.toUpperCase() : ''">
                                 </div>
                             </div>
 
-                            <!-- 3. Cantidad de Participantes (opcional) -->
+                            <!-- 3. Lugar (manual / opcional) -->
+                            <div class="form-group col-md-6">
+                                <label class="form-label-custom font-weight-bold">
+                                    Lugar <span class="text-muted font-italic">(Manual / Opcional)</span>
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text icon-box"><mat-icon class="input-icon">location_on</mat-icon></span>
+                                    </div>
+                                    <input type="text" class="input-custom text-uppercase" style="text-transform: uppercase;" placeholder="LUGAR DE LA ACTIVIDAD..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.lugar" (blur)="actividadesVarias.lugar = actividadesVarias.lugar ? actividadesVarias.lugar.toUpperCase() : ''">
+                                </div>
+                            </div>
+
+                            <!-- 4. Cantidad de Participantes (opcional) -->
                             <div class="form-group col-md-3">
                                 <label class="form-label-custom">
                                     Cantidad de Participantes <span class="text-muted font-italic">(Opcional)</span>
@@ -401,7 +414,7 @@
                                 </div>
                             </div>
 
-                            <!-- 4. Fecha de Inicio (opcional) -->
+                            <!-- 5. Fecha de Inicio (opcional) -->
                             <div class="form-group col-md-3">
                                 <label class="form-label-custom">
                                     Fecha de Inicio <span class="text-muted font-italic">(Opcional)</span>
@@ -414,7 +427,7 @@
                                 </div>
                             </div>
 
-                            <!-- 5. Fecha Final (opcional) -->
+                            <!-- 6. Fecha Final (opcional) -->
                             <div class="form-group col-md-3">
                                 <label class="form-label-custom">
                                     Fecha Final <span class="text-muted font-italic">(Opcional)</span>
@@ -427,7 +440,7 @@
                                 </div>
                             </div>
 
-                            <!-- 6. Fecha Limite de Respuesta (opcional) -->
+                            <!-- 7. Fecha Limite de Respuesta (opcional) -->
                             <div class="form-group col-md-3">
                                 <label class="form-label-custom">
                                     Fecha Límite de Respuesta <span class="text-muted font-italic">(Opcional)</span>
@@ -440,7 +453,7 @@
                                 </div>
                             </div>
 
-                            <!-- 7. Opinión de: [ _________ ] -->
+                            <!-- 8. Opinión de: [ _________ ] -->
                             <div class="form-group col-md-6">
                                 <label class="form-label-custom font-weight-bold">
                                     Opinión de: <span class="text-primary font-italic ml-1">(Dirección, Dependencia o Funcionario)</span>
@@ -449,17 +462,17 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text icon-box"><mat-icon class="input-icon">account_circle</mat-icon></span>
                                     </div>
-                                    <input type="text" class="input-custom font-weight-bold text-primary text-uppercase" style="text-transform: uppercase;" placeholder="EJ: CONSULTORÍA JURÍDICA, DIRECCIÓN GENERAL, ETC." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.opinionDe" (input)="actividadesVarias.opinionDe = actividadesVarias.opinionDe ? actividadesVarias.opinionDe.toUpperCase() : ''">
+                                    <input type="text" class="input-custom font-weight-bold text-primary text-uppercase" style="text-transform: uppercase;" placeholder="EJ: CONSULTORÍA JURÍDICA, DIRECCIÓN GENERAL, ETC." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.opinionDe" (blur)="actividadesVarias.opinionDe = actividadesVarias.opinionDe ? actividadesVarias.opinionDe.toUpperCase() : ''">
                                 </div>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text icon-box"><mat-icon class="input-icon">rate_review</mat-icon></span>
                                     </div>
-                                    <textarea rows="3" class="input-custom text-uppercase" style="text-transform: uppercase;" placeholder="REDACTE AQUÍ EL TEXTO DE LA OPINIÓN EMITIDA..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.opinion" (input)="actividadesVarias.opinion = actividadesVarias.opinion ? actividadesVarias.opinion.toUpperCase() : ''"></textarea>
+                                    <textarea rows="3" class="input-custom text-uppercase" style="text-transform: uppercase;" placeholder="REDACTE AQUÍ EL TEXTO DE LA OPINIÓN EMITIDA..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.opinion" (blur)="actividadesVarias.opinion = actividadesVarias.opinion ? actividadesVarias.opinion.toUpperCase() : ''"></textarea>
                                 </div>
                             </div>
 
-                            <!-- 8. Recomendación de la Dirección General -->
+                            <!-- 9. Recomendación de la Dirección General -->
                             <div class="form-group col-md-6">
                                 <label class="form-label-custom font-weight-bold">
                                     Recomendación de la Dirección General
@@ -468,7 +481,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text icon-box"><mat-icon class="input-icon">recommend</mat-icon></span>
                                     </div>
-                                    <textarea rows="4" class="input-custom h-100 text-uppercase" style="text-transform: uppercase;" placeholder="REDACTE AQUÍ LA RECOMENDACIÓN OFICIAL DE LA DIRECCIÓN GENERAL..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.recomendacion" (input)="actividadesVarias.recomendacion = actividadesVarias.recomendacion ? actividadesVarias.recomendacion.toUpperCase() : ''"></textarea>
+                                    <textarea rows="4" class="input-custom h-100 text-uppercase" style="text-transform: uppercase;" placeholder="REDACTE AQUÍ LA RECOMENDACIÓN OFICIAL DE LA DIRECCIÓN GENERAL..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesVarias.recomendacion" (blur)="actividadesVarias.recomendacion = actividadesVarias.recomendacion ? actividadesVarias.recomendacion.toUpperCase() : ''"></textarea>
                                 </div>
                             </div>
                         </div>
