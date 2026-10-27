@@ -8,6 +8,7 @@ import { ApiService, IAPICore } from 'src/app/services/apicore/api.service';
 import { RsconsultaSessionService } from 'src/app/services/resoluciones/rsconsulta-session.service';
 import { ExcelService } from 'src/app/services/util/excel.service';
 import { MensajeService } from 'src/app/services/util/mensaje.service';
+import { UtilService } from 'src/app/services/util/util.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -38,6 +39,7 @@ export class RsalertasComponent implements OnInit {
   Grados = []
   Categorias = []
   Clasificaciones = []
+  UbicacionCarpetas = []
 
   componente = ''
   situacion = ''
@@ -64,7 +66,9 @@ export class RsalertasComponent implements OnInit {
     private excelService: ExcelService,
     private toastrService: ToastrService,
     private modalService: NgbModal,
-    private apiService: ApiService,) { }
+    private apiService: ApiService,
+    private utilService: UtilService,
+  ) { }
 
   ngOnInit(): void {
 
@@ -73,6 +77,7 @@ export class RsalertasComponent implements OnInit {
     this.Grados = datos.Grados;
     this.Categorias = datos.Categorias;
     this.Clasificaciones = datos.Clasificaciones;
+    this.UbicacionCarpetas = datos.UbicacionCarpetas || [];
   
     let alertas = {
       'tipo': 'alerta',
@@ -164,8 +169,54 @@ export class RsalertasComponent implements OnInit {
 
  
 
-    dwUrl(e){
+    verFicha(e: any): void {
+      if (!e || !e.cedula) return;
       this.router.navigate(['/rsprocesos/rsconsulta/', e.cedula]);
+    }
+
+    dwUrl(e: any): void {
+      console.log('dwUrl Alertas:', e);
+      if (!e) return;
+      const fecha = e.fecha_resolucion || e.fecha_resol;
+      if (fecha != undefined && fecha != "") {
+        console.log(this.utilService.esFechaAntesMarzo2025(fecha));
+        if (this.utilService.esFechaAntesMarzo2025(fecha)) {
+          this.descargarAntes2025(e);
+        } else {
+          if (e.archivo != undefined && e.archivo != "") {
+            let cedula = e.cedula != undefined ? e.cedula : "";
+            this.apiService.DwsResol(btoa("R" + cedula) + "/" + e.archivo);
+          } else {
+            this.descargarAntes2025(e);
+          }
+        }
+      } else if (e.cedula && !e.numero_resol) {
+        this.verFicha(e);
+      } else {
+        this.descargarAntes2025(e);
+      }
+    }
+
+    descargarAntes2025(e: any): void {
+      let anio = e.fecha_resolucion || e.fecha_resol || "";
+      let codigo = e.numero_resol || e.numero;
+      if (!codigo) return;
+      if (e.distribucion == 2) {
+        codigo = codigo + " NO PUBLICAR";
+      }
+
+      anio = (anio || "").substring(0, 4);
+      console.log(anio, codigo, this.UbicacionCarpetas);
+      if (this.UbicacionCarpetas && Array.isArray(this.UbicacionCarpetas)) {
+        this.UbicacionCarpetas.forEach((folder: any) => {
+          if (folder.anio == anio) {
+            let peticion = folder.nombre + "/" + codigo + ".pdf";
+            console.log("Peticion DwsCdn Alertas:", peticion);
+            this.apiService.DwsCdn(peticion);
+            return;
+          }
+        });
+      }
     } 
 
 

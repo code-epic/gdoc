@@ -69,13 +69,18 @@
                           <td style="text-align: center;">{{e.ngrado}} </td>
                           <td>{{ e.nombres_apellidos }}</td>
                           <td>
-                            <a class="enlace" (click)="dwUrl(e)" style="font-weight: bold; color: brown;">
+                            <a class="enlace" (click)="verFicha(e)" style="font-weight: bold; color: brown; cursor: pointer;">
                               {{ e.cedula }} </a>
                           </td>
                           <td [innerHTML]="e.asunto"></td>
                           <td>{{e.des_resol}}</td>
                           <td>{{e.fin_comision | date:"dd/MM/yyyy" }}</td>
-                          <td>{{e.numero_resol}}</td>
+                          <td>
+                            <a *ngIf="e.numero_resol" class="enlace" (click)="dwUrl(e)" style="font-weight: bold; color: #11cdef; cursor: pointer;" title="Descargar Resolución">
+                              {{e.numero_resol}}
+                            </a>
+                            <span *ngIf="!e.numero_resol">-</span>
+                          </td>
                           <td>{{e.dias_restantes}}</td>
                           <td style="text-align: center;">
                             <button mat-icon-button aria-label="Editar" (click)="abrirModal(observacion, e, i);">
@@ -127,12 +132,17 @@
                           <td style="text-align: center;">{{e.ngrado}} </td>
                           <td>{{ e.nombres_apellidos }}</td>
                           <td>
-                            <a class="enlace" (click)="dwUrl(e)" style="font-weight: bold; color: brown;">
+                            <a class="enlace" (click)="verFicha(e)" style="font-weight: bold; color: brown; cursor: pointer;">
                               {{ e.cedula }} </a>
                           </td>
                           <td [innerHTML]="e.asunto"></td>
                           <td>{{e.fin_comision | date:"dd/MM/yyyy" }}</td>
-                          <td>{{e.numero_resol}}</td>
+                          <td>
+                            <a *ngIf="e.numero_resol" class="enlace" (click)="dwUrl(e)" style="font-weight: bold; color: #11cdef; cursor: pointer;" title="Descargar Resolución">
+                              {{e.numero_resol}}
+                            </a>
+                            <span *ngIf="!e.numero_resol">-</span>
+                          </td>
                           <td>{{e.dias_restantes}}</td>
                         </tr>
                       </tbody>

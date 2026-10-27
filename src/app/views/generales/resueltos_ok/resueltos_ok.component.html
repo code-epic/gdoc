@@ -19,8 +19,8 @@
       <p>Gestión, clasificación y firma digital de resoluciones y expedientes ministeriales.</p>
     </div>
     <div style="display: flex; gap: 15px; align-items: center;">
-      <!-- Botón "Documentos Firmados" (Solo visible si no es Aprobador) -->
-      <div *ngIf="currentProfile !== 'Aprobador'" class="signed-docs-toggle-container">
+      <!-- Botón "Documentos Firmados" -->
+      <div class="signed-docs-toggle-container">
         <button class="btn-firmados" [class.active]="showingFirmados" (click)="toggleShowingFirmados()">
           <i class="fas fa-file-signature"></i>
           <span>Firmados</span>
@@ -42,10 +42,24 @@
         </select>
       </div>
 
-      <!-- Botón de Búsqueda Avanzada -->
+      <!-- Botón de Búsqueda Avanzada (Lupa) -->
       <button class="rt-icon-btn rt-search-btn" (click)="openAdvancedSearch()" title="Búsqueda Avanzada Global">
         <i class="fas fa-search"></i>
       </button>
+
+      <!-- Botón Campana Inteligente Asíncrona (Solo visible en Redactor, Jefe, Revision, Secretaria, Direccion) -->
+      <div class="smart-bell-container" *ngIf="currentProfile !== 'Aprobador'">
+        <button class="rt-icon-btn rt-bell-btn"
+                [class.is-checking]="isCheckingFirmados"
+                (click)="manualCheckFirmadosStream()"
+                [title]="getBellTooltipText()">
+          <i class="fas fa-bell" [class.fa-bell-ringing]="totalFirmadosCount > 0 && !isCheckingFirmados"></i>
+          <span class="bell-spinner-ring" *ngIf="isCheckingFirmados"></span>
+          <span class="bell-badge" *ngIf="totalFirmadosCount > 0 && !isCheckingFirmados">
+            {{ totalFirmadosCount }}
+          </span>
+        </button>
+      </div>
 
       <!-- Botón Circular de Cerrar -->
       <button class="rt-icon-btn rt-close-btn" (click)="exitComponent()" title="Salir del Buzón de Resueltos">
@@ -131,6 +145,14 @@
             <div class="date"><i class="far fa-calendar-alt mr-1"></i>{{ folder.fecha | date:'dd/MM/yyyy' }}</div>
           </div>
           
+          <!-- Badge Contador de Firmados Ministro (en trámite) -->
+          <div class="folder-firmados-badge"
+               *ngIf="currentProfile !== 'Aprobador' && !showingFirmados && (folder.contadorFirmados || 0) > 0"
+               [title]="folder.contadorFirmados + ' resolución(es) firmada(s) por el Ministro'">
+            <i class="fas fa-file-signature mr-1"></i>
+            <span>{{ folder.contadorFirmados }}</span>
+          </div>
+
           <span class="folder-badge-compact">{{ folder.c_tipo || 0 }}</span>
         </div>
       </div>

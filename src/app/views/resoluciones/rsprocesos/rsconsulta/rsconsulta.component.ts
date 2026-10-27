@@ -392,12 +392,30 @@ export class RsconsultaComponent implements OnInit {
     this.xdia = new Date().getDate().toString();
 
     this.resetPrivilegios();
+    const urlConsulta = "/rsprocesos/rsconsulta";
+    const subMenuUrl = this.router.url.startsWith(urlConsulta) ? urlConsulta : this.router.url;
     this.privilegios = this.loginService.obtenerPrivilegiosMenu(
       "/resoluciones",
-      this.router.url,
+      subMenuUrl,
     );
 
-    if (this.privilegios && Array.isArray(this.privilegios)) {
+    const cargo = (this.loginService.Usuario?.cargo || "").toUpperCase();
+    const esAdmin =
+      cargo === "ADMINISTRADOR" ||
+      cargo === "ADMIN" ||
+      this.loginService.Usuario?.tipo?.toUpperCase() === "ADMINISTRADOR" ||
+      this.loginService.Usuario?.token === "Administrador";
+
+    if (esAdmin) {
+      this.bEspecifica = true;
+      this.bFiltrada = true;
+      this.bExpandida = true;
+      this.bArchivo = true;
+      this.bConfiguraciones = true;
+      this.bEliminarEntrada = true;
+      this.blConfidencial = true;
+      this.blDatosBasicos = true;
+    } else if (this.privilegios && Array.isArray(this.privilegios) && this.privilegios.length > 0) {
       this.privilegios.forEach((p) => {
         if (p.metodo) {
           const variableName = this.mapMetodos[p.metodo.toLowerCase().trim()]; // Trim para limpiar espacios
@@ -406,6 +424,13 @@ export class RsconsultaComponent implements OnInit {
           }
         }
       });
+      if (!this.bEspecifica && !this.bFiltrada && !this.bExpandida && !this.bArchivo) {
+        this.bEspecifica = true;
+      }
+    } else {
+      this.bEspecifica = true;
+      this.bFiltrada = true;
+      this.bExpandida = true;
     }
 
     const datos =
@@ -459,13 +484,14 @@ export class RsconsultaComponent implements OnInit {
     console.log(this.loginService.Usuario);
     console.log(this.loginService.Usuario.cargo);
 
-    if (this.loginService.Usuario.cargo == "Transcriptor Premium") {
+    if (cargo === "TRANSCRIPTOR PREMIUM") {
       this.bEliminarEntrada = true;
     }
 
-    if (this.loginService.Usuario.cargo == "CONFIDENCIAL") {
+    if (cargo === "CONFIDENCIAL") {
       this.bEliminarEntrada = true;
       this.blConfidencial = true;
+      this.bArchivo = true;
     }
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
@@ -641,18 +667,17 @@ export class RsconsultaComponent implements OnInit {
           if (data != undefined && data.Cuerpo.length > 0) {
             this.Resolucion = data.Cuerpo[0];
 
-            this.Resolucion.componente = this.Componentes.filter((e) => {
-              return e.cod_componente == this.Resolucion.componente;
-            })[0].nombre_componente;
-            this.Resolucion.categoria = this.Categorias.filter((e) => {
-              return e.cod_categoria == this.Resolucion.categoria;
-            })[0].nombre_categoria;
-            this.Resolucion.clasificacion = this.Clasificaciones.filter((e) => {
-              return e.cod_clasificacion == this.Resolucion.clasificacion;
-            })[0].des_clasificacion;
-            this.Resolucion.grado = this.Grados.filter((e) => {
-              return e.cod_grado == this.Resolucion.grado;
-            })[0].nombres_grado;
+            const comp = this.Componentes.find((e) => e.cod_componente == this.Resolucion.componente);
+            if (comp) this.Resolucion.componente = comp.nombre_componente;
+
+            const cat = this.Categorias.find((e) => e.cod_categoria == this.Resolucion.categoria);
+            if (cat) this.Resolucion.categoria = cat.nombre_categoria;
+
+            const clas = this.Clasificaciones.find((e) => e.cod_clasificacion == this.Resolucion.clasificacion);
+            if (clas) this.Resolucion.clasificacion = clas.des_clasificacion;
+
+            const gr = this.Grados.find((e) => e.cod_grado == this.Resolucion.grado);
+            if (gr) this.Resolucion.grado = gr.nombres_grado;
 
             if (
               data.Cuerpo[0].resoluciones != undefined &&

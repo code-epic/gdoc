@@ -321,6 +321,34 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
   margin-left: 0.5rem;
 }
 
+// Badge Contador de Firmados en Tarjeta de Carpeta
+.folder-firmados-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  color: #5b21b6;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  margin-left: auto;
+  margin-right: 4px;
+  box-shadow: 0 2px 6px rgba(139, 92, 246, 0.2);
+  border: 1px solid #c4b5fd;
+  animation: bell-badge-pop 0.3s ease;
+  flex-shrink: 0;
+
+  i {
+    font-size: 0.65rem;
+    color: #7c3aed;
+  }
+
+  span {
+    letter-spacing: 0.3px;
+  }
+}
+
 .folder-info-compact {
   flex: 1 1 auto;
   min-width: 0;
@@ -2254,6 +2282,123 @@ $ok-shadow:       rgba(93, 190, 142, 0.12);
     border-color: rgba(255, 255, 255, 0.35);
     transform: translateY(-2px);
     box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// ── Campana Inteligente Asíncrona (Glassmorphic) ──────────────────────────────
+.smart-bell-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rt-bell-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1.05rem;
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  position: relative;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.is-checking {
+    background: rgba(255, 255, 255, 0.28);
+    cursor: wait;
+  }
+}
+
+// Anillo giratorio de carga para la campana
+.bell-spinner-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: #ffffff;
+  border-right-color: rgba(255, 255, 255, 0.7);
+  animation: bell-spin-ring 0.8s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes bell-spin-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Animación de campana con alertas activas
+.fa-bell-ringing {
+  animation: bell-ring-anim 2.8s infinite ease-in-out;
+  transform-origin: top center;
+  color: #ffeb3b;
+  text-shadow: 0 0 10px rgba(255, 235, 59, 0.6);
+}
+
+@keyframes bell-ring-anim {
+  0% { transform: rotate(0); }
+  4% { transform: rotate(15deg); }
+  8% { transform: rotate(-15deg); }
+  12% { transform: rotate(12deg); }
+  16% { transform: rotate(-12deg); }
+  20% { transform: rotate(8deg); }
+  24% { transform: rotate(-8deg); }
+  28% { transform: rotate(0); }
+  100% { transform: rotate(0); }
+}
+
+// Badge numérico flotante en la campana
+.bell-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  color: #5b21b6;
+  font-size: 0.68rem;
+  font-weight: 800;
+  min-width: 19px;
+  height: 19px;
+  border-radius: 10px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+  animation: bell-badge-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+@keyframes bell-badge-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 

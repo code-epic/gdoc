@@ -24,6 +24,23 @@ import { Md5 } from "md5-typescript";
 import { firstValueFrom } from "rxjs";
 import { UtilService } from "src/app/services/util/util.service";
 
+// ─── Interface para Contador de Tiempo de Actividades ──────────────────────────
+export interface ContadorTiempoDoc {
+  tipo: "limite" | "transcurrido" | "viaje" | "ninguno";
+  dias: number;
+  horas: number;
+  minutos: number;
+  segundos: number;
+  vencido: boolean;
+  proximoAVencer: boolean;
+  textoTiempo: string;
+  textoBadge: string;
+  textoDetallado: string;
+  fechaReferencia: string;
+  claseColor: string;
+  icon: string;
+}
+
 // ─── Interface para Agrupación de Etiquetas WKF ────────────────────────────────
 export interface IWKFEtiqueta {
   autor: string;
@@ -56,6 +73,10 @@ export interface CarpetaDocumento {
   styleUrls: ["./documentos_ok.component.scss"],
 })
 export class DocumentosOkComponent implements OnInit, OnDestroy {
+  // ─── Reloj Contador y Cronometraje en Tiempo Real ──────────────────────────
+  public currentDateTime: Date = new Date();
+  public relojTimerId: any = null;
+
   // ─── Keyboard shortcuts ──────────────────────────────────────────────────────
   @HostListener("window:keydown", ["$event"])
   onWindowKeyDown(event: KeyboardEvent) {
@@ -416,9 +437,15 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     }
 
     this.verificarYDispararEvaluacionFirmados();
+    this.iniciarRelojContador();
   }
 
   ngOnDestroy(): void {
+    if (this.relojTimerId) {
+      clearInterval(this.relojTimerId);
+      this.relojTimerId = null;
+    }
+
     if (this.firmadosAbortController) {
       this.firmadosAbortController.abort();
     }
@@ -7212,6 +7239,270 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     } else {
       this.limpiarContadoresFirmados();
     }
+  }
+
+  // ═════════════════════════════════════════════════════════════════════════════
+  // ─── Reloj Contador y Cronometraje de Tiempos (ACTIVIDADES_EN_EL_EXTERIOR) ──
+  // ═════════════════════════════════════════════════════════════════════════════
+
+  public iniciarRelojContador(): void {
+    this.currentDateTime = new Date();
+    if (this.relojTimerId) {
+      clearInterval(this.relojTimerId);
+    }
+    this.relojTimerId = setInterval(() => {
+      this.currentDateTime = new Date();
+      this.changeDetector.markForCheck();
+    }, 1000);
+  }
+
+  public parseToDate(val: any): Date | null {
+    if (!val) return null;
+    if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+    if (typeof val === "object" && val.year && val.month && val.day) {
+      return new Date(val.year, val.month - 1, val.day, 23, 59, 59);
+    }
+    if (typeof val === "string") {
+      const trimmed = val.trim();
+      if (!trimmed || trimmed.startsWith("1900-01-01")) return null;
+      const dateParts = trimmed.split(" ")[0].split("-");
+      if (dateParts.length === 3) {
+        const y = parseInt(dateParts[0], 10);
+        const m = parseInt(dateParts[1], 10) - 1;
+        const d = parseInt(dateParts[2], 10);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+          return new Date(y, m, d, 23, 59, 59);
+        }
+      }
+      const parsed = new Date(trimmed);
+      return isNaN(parsed.getTime()) ? null : parsed;
+    }
+    return null;
+  }
+
+  public getContadorTiempoDoc(doc: any): ContadorTiempoDoc {
+    if (!doc) {
+      return {
+        tipo: "ninguno",
+        dias: 0,
+        horas: 0,
+        minutos: 0,
+        segundos: 0,
+        vencido: false,
+        proximoAVencer: false,
+        textoTiempo: "00:00:00",
+        textoBadge: "Sin fecha",
+        textoDetallado: "No hay fechas registradas",
+        fechaReferencia: "",
+        claseColor: "badge-tiempo-gris",
+        icon: "fas fa-clock",
+      };
+    }
+
+    const viaje = this.getViajesData(doc);
+    const deadlineRaw =
+      viaje?.fechaLimiteRespuesta ||
+      doc?.fplazo ||
+      doc?.alerta ||
+      viaje?.fechaConfirmacion;
+    const deadlineDate = this.parseToDate(deadlineRaw);
+
+    if (deadlineDate) {
+      const diffMs = deadlineDate.getTime() - this.currentDateTime.getTime();
+      const fechaStr = this.formatNgbDate(deadlineRaw);
+      if (diffMs >= 0) {
+        const totalSeconds = Math.floor(diffMs / 1000);
+        const dias = Math.floor(totalSeconds / 86400);
+        const horas = Math.floor((totalSeconds % 86400) / 3600);
+        const minutos = Math.floor((totalSeconds % 3600) / 60);
+        const segundos = totalSeconds % 60;
+        const proximoAVencer = dias <= 2;
+        const padH = horas.toString().padStart(2, "0");
+        const padM = minutos.toString().padStart(2, "0");
+        const padS = segundos.toString().padStart(2, "0");
+
+        const textoBadge =
+          dias > 1
+            ? `Quedan ${dias} días para vencerse`
+            : dias === 1
+              ? `Queda 1 día para vencerse`
+              : horas > 0
+                ? `Quedan ${horas}h ${minutos}m para vencerse`
+                : `Quedan ${minutos}m ${segundos}s para vencerse`;
+
+        return {
+          tipo: "limite",
+          dias,
+          horas,
+          minutos,
+          segundos,
+          vencido: false,
+          proximoAVencer,
+          textoTiempo: `${dias}d ${padH}h ${padM}m ${padS}s`,
+          textoBadge,
+          textoDetallado: `Fecha límite de respuesta: ${fechaStr} - Tiempo restante: ${dias} días, ${horas} horas, ${minutos} minutos, ${segundos} segundos`,
+          fechaReferencia: fechaStr,
+          claseColor: proximoAVencer
+            ? "badge-tiempo-naranja"
+            : "badge-tiempo-verde",
+          icon: proximoAVencer
+            ? "fas fa-hourglass-half fa-bounce"
+            : "fas fa-hourglass-start",
+        };
+      } else {
+        const diffAbs = Math.abs(diffMs);
+        const totalSeconds = Math.floor(diffAbs / 1000);
+        const dias = Math.floor(totalSeconds / 86400);
+        const horas = Math.floor((totalSeconds % 86400) / 3600);
+        const minutos = Math.floor((totalSeconds % 3600) / 60);
+        const segundos = totalSeconds % 60;
+        const padH = horas.toString().padStart(2, "0");
+        const padM = minutos.toString().padStart(2, "0");
+        const padS = segundos.toString().padStart(2, "0");
+
+        const textoBadge =
+          dias > 1
+            ? `Vencido hace ${dias} días`
+            : dias === 1
+              ? `Vencido hace 1 día`
+              : `Vence hoy (hace ${horas}h ${minutos}m)`;
+
+        return {
+          tipo: "limite",
+          dias,
+          horas,
+          minutos,
+          segundos,
+          vencido: true,
+          proximoAVencer: false,
+          textoTiempo: `${dias}d ${padH}h ${padM}m ${padS}s`,
+          textoBadge,
+          textoDetallado: `El plazo venció el ${fechaStr} (hace ${dias} días, ${horas}h ${minutos}m)`,
+          fechaReferencia: fechaStr,
+          claseColor: "badge-tiempo-rojo",
+          icon: "fas fa-exclamation-triangle",
+        };
+      }
+    }
+
+    // Si tiene fechas de viaje (fechaInicio)
+    if (viaje?.fechaInicio) {
+      const inicioDate = this.parseToDate(viaje.fechaInicio);
+      if (inicioDate) {
+        const diffIni = inicioDate.getTime() - this.currentDateTime.getTime();
+        const fechaIniStr = this.formatNgbDate(viaje.fechaInicio);
+        if (diffIni > 0) {
+          const totalSec = Math.floor(diffIni / 1000);
+          const dias = Math.floor(totalSec / 86400);
+          const horas = Math.floor((totalSec % 86400) / 3600);
+          return {
+            tipo: "viaje",
+            dias,
+            horas,
+            minutos: 0,
+            segundos: 0,
+            vencido: false,
+            proximoAVencer: dias <= 3,
+            textoTiempo: `${dias}d ${horas}h`,
+            textoBadge: `Inicia en ${dias}d ${horas}h`,
+            textoDetallado: `Inicio previsto del viaje: ${fechaIniStr}`,
+            fechaReferencia: fechaIniStr,
+            claseColor: dias <= 3 ? "badge-tiempo-naranja" : "badge-tiempo-azul",
+            icon: "fas fa-plane-departure",
+          };
+        }
+      }
+    }
+
+    // Tiempo transcurrido en trámite desde fecha de creación o registro
+    const fcreacionRaw =
+      doc?.fregistro ||
+      doc?.fcreacion ||
+      doc?.fecha ||
+      this.getFecha(doc);
+    const fcreacionDate = this.parseToDate(fcreacionRaw);
+    if (fcreacionDate) {
+      const elapsedMs = Math.max(
+        0,
+        this.currentDateTime.getTime() - fcreacionDate.getTime(),
+      );
+      const totalSeconds = Math.floor(elapsedMs / 1000);
+      const dias = Math.floor(totalSeconds / 86400);
+      const horas = Math.floor((totalSeconds % 86400) / 3600);
+      const minutos = Math.floor((totalSeconds % 3600) / 60);
+      const segundos = totalSeconds % 60;
+      const padH = horas.toString().padStart(2, "0");
+      const padM = minutos.toString().padStart(2, "0");
+      const padS = segundos.toString().padStart(2, "0");
+      const fStr = this.formatFechaRegistro(this.getFecha(doc));
+
+      return {
+        tipo: "transcurrido",
+        dias,
+        horas,
+        minutos,
+        segundos,
+        vencido: false,
+        proximoAVencer: false,
+        textoTiempo: `${dias}d ${padH}h ${padM}m ${padS}s`,
+        textoBadge:
+          dias > 0
+            ? `${dias}d ${horas}h en trámite`
+            : `${horas}h ${minutos}m en trámite`,
+        textoDetallado: `Registrado el ${fStr} (${dias} días en trámite)`,
+        fechaReferencia: fStr,
+        claseColor: "badge-tiempo-azul",
+        icon: "fas fa-stopwatch",
+      };
+    }
+
+    return {
+      tipo: "ninguno",
+      dias: 0,
+      horas: 0,
+      minutos: 0,
+      segundos: 0,
+      vencido: false,
+      proximoAVencer: false,
+      textoTiempo: "00:00:00",
+      textoBadge: "En trámite",
+      textoDetallado: "Sin fecha de límite definida",
+      fechaReferencia: "",
+      claseColor: "badge-tiempo-gris",
+      icon: "fas fa-clock",
+    };
+  }
+
+  public getEstadisticasTiempos(): {
+    enPlazo: number;
+    porVencer: number;
+    vencidos: number;
+    total: number;
+  } {
+    let enPlazo = 0;
+    let porVencer = 0;
+    let vencidos = 0;
+    const docs = this.bzOriginal || this.buzon || [];
+    docs.forEach((doc) => {
+      const c = this.getContadorTiempoDoc(doc);
+      if (c.tipo === "limite") {
+        if (c.vencido) {
+          vencidos++;
+        } else if (c.proximoAVencer) {
+          porVencer++;
+        } else {
+          enPlazo++;
+        }
+      } else {
+        enPlazo++;
+      }
+    });
+    return {
+      enPlazo,
+      porVencer,
+      vencidos,
+      total: docs.length,
+    };
   }
 }
 
