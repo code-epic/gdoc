@@ -201,13 +201,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     userCedula: string;
     userCargo: string;
   } = {
-    userId: "",
-    userName: "",
-    userRole: "",
-    userCedula: "",
-    perfil: "",
-    userCargo: "",
-  };
+      userId: "",
+      userName: "",
+      userRole: "",
+      userCedula: "",
+      perfil: "",
+      userCargo: "",
+    };
 
   // ─── Campana Inteligente de Documentos Firmados (Background Stream) ───────────
   public isCheckingFirmados: boolean = false;
@@ -287,8 +287,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     },
 
     {
-      id: "OFICIOS",
-      nombre: "OFICIOS",
+      id: "OFICIOS_NOTFICACIONES",
+      nombre: "OFICIOS Y NOTIFICACIONES",
       icono: "fas fa-envelope",
       color: "#2d969bff",
       funcion: "WKF_CDocumentosGestionOficios",
@@ -510,7 +510,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         c.estadoActual =
           c.id === "RECLAMOS"
             ? c.estadoActual || 6
-            : c.id === "ACTIVIDADES_EN_EL_EXTERIOR" || c.id === "OFICIOS"
+            : c.id === "ACTIVIDADES_EN_EL_EXTERIOR" || c.id === "OFICIOS_NOTIFICACIONES"
               ? 2
               : c.id === "CUADRO_DECISORIO"
                 ? 17
@@ -525,10 +525,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           // Perfil inicial / JefeSecretaria: respeta estadoOrigen inicial propio del objeto
           c.estadoOrigen =
             c.id === "PUNTO_DE_CUENTA" ||
-            c.id === "RECLAMOS" ||
-            c.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-            c.id === "OFICIOS" ||
-            c.id === "CUADRO_DECISORIO"
+              c.id === "RECLAMOS" ||
+              c.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
+              c.id === "OFICIOS_NOTIFICACIONES" ||
+              c.id === "CUADRO_DECISORIO"
               ? 2
               : c.id === "PRESIDENCIALES"
                 ? 3
@@ -738,8 +738,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.estadoOrigen =
       carpeta.estadoOrigen ||
       (carpeta.id === "PUNTO_DE_CUENTA" ||
-      carpeta.id === "RECLAMOS" ||
-      carpeta.id === "ACTIVIDADES_EN_EL_EXTERIOR"
+        carpeta.id === "RECLAMOS" ||
+        carpeta.id === "ACTIVIDADES_EN_EL_EXTERIOR"
         ? 2
         : carpeta.id === "PRESIDENCIALES"
           ? 3
@@ -765,8 +765,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
               (e.tdoc &&
                 (e.tdoc.toLowerCase() === "punto de cuenta" ||
                   e.tdoc.toLowerCase().includes("reclamo"))) ||
-              carpeta.id === "PUNTO_DE_CUENTA" ||
-              carpeta.id === "RECLAMOS"
+                carpeta.id === "PUNTO_DE_CUENTA" ||
+                carpeta.id === "RECLAMOS"
                 ? true
                 : false;
             e.existe = e.anom && e.anom !== "" ? true : false;
@@ -1870,7 +1870,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       try {
         const parts = doc.detalle.split("|PR|");
         jsonToParse = parts.length > 1 ? parts[1] : doc.detalle;
-      } catch (e) {}
+      } catch (e) { }
     }
 
     if (jsonToParse && jsonToParse.includes("{")) {
@@ -2021,7 +2021,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       this.consultarDatosBasicos();
     } else if (
       this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-      this.selectedCarpeta?.id === "OFICIOS"
+      this.selectedCarpeta?.id === "OFICIOS_NOTIFICACIONES"
     ) {
       this.consultarDetalleDocumento(this.activeDoc);
     }
@@ -2058,7 +2058,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       this.consultarDatosBasicos();
     } else if (
       this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-      this.selectedCarpeta?.id === "OFICIOS"
+      this.selectedCarpeta?.id === "OFICIOS_NOTIFICACIONES"
     ) {
       this.consultarDetalleDocumento(this.activeDoc);
     }
@@ -2875,9 +2875,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           </div>
         </div>
 
-        ${
-          tieneObservacion
-            ? `
+        ${tieneObservacion
+        ? `
           <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 14px; margin-top: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
               <span style="font-size: 0.72rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -2890,7 +2889,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             </div>
           </div>
         `
-            : `
+        : `
           <div style="margin-top: 12px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <label for="swal-mppd-comentario" style="font-weight: 700; font-size: 0.75rem; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
@@ -2907,7 +2906,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
                       oninput="this.value = this.value.toUpperCase()"></textarea>
           </div>
         `
-        }
+      }
       </div>
     `;
 
@@ -3043,7 +3042,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     // 5.1 Marca de agua "PAPEL DE TRABAJO" (sin líneas de marco exterior)
     try {
       (pdf as any).saveGraphicsState();
-    } catch (e) {}
+    } catch (e) { }
     pdf.setTextColor(240, 240, 240);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(38);
@@ -3057,7 +3056,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     }
     try {
       (pdf as any).restoreGraphicsState();
-    } catch (e) {}
+    } catch (e) { }
 
     // 5.2 Marca institucional vertical "MPPD" (esquina superior derecha, posición 207mm para despeje total)
     pdf.setFont("helvetica", "bold");
@@ -3069,7 +3068,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (escudoImg) {
       try {
         pdf.addImage(escudoImg, "PNG", 28, 12, 14, 14, undefined, "FAST");
-      } catch (e) {}
+      } catch (e) { }
     }
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(5.5);
@@ -3980,7 +3979,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     // 4.1 Marca de agua "PAPEL DE TRABAJO"
     try {
       (pdf as any).saveGraphicsState();
-    } catch (e) {}
+    } catch (e) { }
     pdf.setTextColor(240, 240, 240);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(38);
@@ -3994,7 +3993,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     }
     try {
       (pdf as any).restoreGraphicsState();
-    } catch (e) {}
+    } catch (e) { }
 
     // 4.2 Marca institucional vertical "MPPD" (esquina superior derecha, posición 207mm)
     pdf.setFont("helvetica", "bold");
@@ -4006,7 +4005,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     if (escudoImg) {
       try {
         pdf.addImage(escudoImg, "PNG", 28, 12, 14, 14, undefined, "FAST");
-      } catch (e) {}
+      } catch (e) { }
     }
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(5.5);
@@ -4144,8 +4143,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       const fechaLimiteStr = (
         viaje.fechaLimiteRespuesta || viaje.fechaConfirmacion
           ? this.formatNgbDate(
-              viaje.fechaLimiteRespuesta || viaje.fechaConfirmacion,
-            )
+            viaje.fechaLimiteRespuesta || viaje.fechaConfirmacion,
+          )
           : this.activeDoc?.alerta
             ? this.formatFechaPuntoCuenta(new Date(this.activeDoc.alerta))
             : "NO ESPECIFICADA"
@@ -4442,7 +4441,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             undefined,
             "FAST",
           );
-        } catch (e) {}
+        } catch (e) { }
       }
 
       pdf.setFontSize(6);
@@ -5427,13 +5426,12 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
               ${numControl}
             </span>
           </div>
-          ${
-            asuntoDoc
-              ? `<div style="font-size: 0.78rem; color: #334155; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          ${asuntoDoc
+        ? `<div style="font-size: 0.78rem; color: #334155; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   <strong>Asunto:</strong> ${asuntoDoc}
                 </div>`
-              : ""
-          }
+        : ""
+      }
         </div>
 
         <!-- Input Textarea Elegante -->
@@ -5644,7 +5642,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     } else if (
       carpetaId === "ACTIVIDADES_EN_EL_EXTERIOR" ||
       carpetaId.includes("ACTIVIDAD") ||
-      carpetaId === "OFICIOS"
+      carpetaId === "OFICIOS_NOTIFICACIONES"
     ) {
       prefijo = "2,2,10";
     }
@@ -5700,9 +5698,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       let localEstadoDestino = 1;
 
       if (
-        this.selectedCarpeta?.id === "OFICIOS" ||
-        this.activeDoc?.tdoc === "OFICIOS" ||
-        this.activeDoc?.tipo_documento === "OFICIOS" ||
+        this.selectedCarpeta?.id === "OFICIOS_NOTIFICACIONES" ||
+        this.activeDoc?.tdoc === "OFICIOS_NOTIFICACIONES" ||
+        this.activeDoc?.tipo_documento === "OFICIOS_NOTIFICACIONES" ||
         this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
         this.selectedCarpeta?.id?.includes("ACTIVIDAD") ||
         this.isActividadExterior(this.activeDoc) ||
@@ -5743,7 +5741,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.selectedCarpeta?.id === "PUNTO_DE_CUENTA" ||
         this.selectedCarpeta?.id === "CUADRO_DECISORIO" ||
         this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-        this.selectedCarpeta?.id === "OFICIOS"
+        this.selectedCarpeta?.id === "OFICIOS_NOTIFICACIONES"
       ) {
         if (this.estadoOrigen === 2) estadoDestino = 5;
         else if (this.estadoOrigen === 5) estadoDestino = 6;
@@ -6064,10 +6062,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     );
     return clas
       ? clas.nombre ||
-          clas.descripcion ||
-          clas.texto ||
-          clas.nombre_clasificacion ||
-          id
+      clas.descripcion ||
+      clas.texto ||
+      clas.nombre_clasificacion ||
+      id
       : id;
   }
 
@@ -6079,10 +6077,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     );
     return comp
       ? comp.nombre ||
-          comp.descripcion ||
-          comp.texto ||
-          comp.nombre_componente ||
-          id
+      comp.descripcion ||
+      comp.texto ||
+      comp.nombre_componente ||
+      id
       : id;
   }
 
@@ -6150,7 +6148,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
               if (parsedSub && typeof parsedSub === "object") {
                 const inner =
                   parsedSub.observacion &&
-                  typeof parsedSub.observacion === "object"
+                    typeof parsedSub.observacion === "object"
                     ? parsedSub.observacion
                     : parsedSub;
                 detailLugar =
@@ -6162,7 +6160,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
                   inner.ubicacion ||
                   "";
               }
-            } catch (_) {}
+            } catch (_) { }
           }
           const finalLugar = detailLugar || prevLugar || "";
 
@@ -6398,14 +6396,14 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       const res = JSON.parse(str);
       if (typeof res === "string") return this.robustJsonParse(res);
       return res;
-    } catch (e1) {}
+    } catch (e1) { }
 
     try {
       const sanitized = str.replace(/[\r\n\t]+/g, " ");
       const res = JSON.parse(sanitized);
       if (typeof res === "string") return this.robustJsonParse(res);
       return res;
-    } catch (e2) {}
+    } catch (e2) { }
 
     try {
       const fixedQuotes = str
@@ -6414,7 +6412,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       const res = JSON.parse(fixedQuotes);
       if (typeof res === "string") return this.robustJsonParse(res);
       return res;
-    } catch (e3) {}
+    } catch (e3) { }
 
     try {
       const extracted: any = {};
@@ -6489,7 +6487,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         }
       }
       if (Object.keys(extracted).length > 0) return extracted;
-    } catch (e4) {}
+    } catch (e4) { }
 
     return null;
   }
@@ -6589,7 +6587,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
                 if (parsed && typeof parsed === "object") {
                   const inner =
                     parsed.observacion &&
-                    typeof parsed.observacion === "object"
+                      typeof parsed.observacion === "object"
                       ? parsed.observacion
                       : parsed;
                   const found =
@@ -6604,7 +6602,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
                     break;
                   }
                 }
-              } catch (_) {}
+              } catch (_) { }
             }
           }
         }
@@ -6710,7 +6708,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
                 if (altParsed && typeof altParsed === "object") {
                   const inner =
                     altParsed.observacion &&
-                    typeof altParsed.observacion === "object"
+                      typeof altParsed.observacion === "object"
                       ? altParsed.observacion
                       : altParsed;
                   data = { ...inner, ...data };
@@ -6737,7 +6735,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
                       inner.fechaConfirmacion ||
                       null;
                 }
-              } catch (_) {}
+              } catch (_) { }
             }
           }
 
@@ -6771,17 +6769,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             data.dirigido = this.limpiarValorFragmento(data.dirigido || "");
             data.lugar = this.limpiarValorFragmento(
               data.lugar ||
-                data.Lugar ||
-                data.LUGAR ||
-                data.destino ||
-                data.Destino ||
-                data.sitio ||
-                data.ubicacion ||
-                data.Ubicacion ||
-                doc.lugar ||
-                (doc as any).Lugar ||
-                (this.activeDoc && this.activeDoc.lugar) ||
-                "",
+              data.Lugar ||
+              data.LUGAR ||
+              data.destino ||
+              data.Destino ||
+              data.sitio ||
+              data.ubicacion ||
+              data.Ubicacion ||
+              doc.lugar ||
+              (doc as any).Lugar ||
+              (this.activeDoc && this.activeDoc.lugar) ||
+              "",
             );
             data.unidad = this.limpiarValorFragmento(
               data.unidad || data.dependencia || "",
@@ -6802,17 +6800,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             data.dirigido = this.limpiarValorFragmento(data.dirigido || "");
             data.lugar = this.limpiarValorFragmento(
               data.lugar ||
-                data.Lugar ||
-                data.LUGAR ||
-                data.destino ||
-                data.Destino ||
-                data.sitio ||
-                data.ubicacion ||
-                data.Ubicacion ||
-                doc.lugar ||
-                (doc as any).Lugar ||
-                (this.activeDoc && this.activeDoc.lugar) ||
-                "",
+              data.Lugar ||
+              data.LUGAR ||
+              data.destino ||
+              data.Destino ||
+              data.sitio ||
+              data.ubicacion ||
+              data.Ubicacion ||
+              doc.lugar ||
+              (doc as any).Lugar ||
+              (this.activeDoc && this.activeDoc.lugar) ||
+              "",
             );
           }
 
@@ -7314,7 +7312,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           c.id === "PUNTO_DE_CUENTA" ||
           c.id === "PRESIDENCIALES" ||
           c.id === "RECLAMOS" ||
-          c.id === "OFICIOS" ||
+          c.id === "OFICIOS_NOTIFICACIONES" ||
           c.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
           c.id === "CUADRO_DECISORIO"),
     );
@@ -7331,7 +7329,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             carpeta.id === "RECLAMOS"
               ? 6
               : carpeta.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-                  carpeta.id === "OFICIOS"
+                carpeta.id === "OFICIOS_NOTIFICACIONES"
                 ? 2
                 : carpeta.id === "CUADRO_DECISORIO"
                   ? 17
