@@ -375,14 +375,14 @@ export class RsconsultaComponent implements OnInit {
   ) {
     this.Estados =
       sessionStorage.getItem(environment.funcion.ESTADO_RESOLUCION_CONSULTAR) !=
-      undefined
+        undefined
         ? JSON.parse(
-            atob(
-              sessionStorage.getItem(
-                environment.funcion.ESTADO_RESOLUCION_CONSULTAR,
-              ),
+          atob(
+            sessionStorage.getItem(
+              environment.funcion.ESTADO_RESOLUCION_CONSULTAR,
             ),
-          )
+          ),
+        )
         : [];
   }
 
@@ -489,9 +489,13 @@ export class RsconsultaComponent implements OnInit {
     }
 
     if (cargo === "CONFIDENCIAL") {
+      this.bEspecifica = true;
+      this.bFiltrada = true;
+      this.bExpandida = true;
       this.bEliminarEntrada = true;
       this.blConfidencial = true;
       this.bArchivo = true;
+
     }
 
     if (this.rutaActiva.snapshot.params.id != undefined) {
@@ -602,7 +606,7 @@ export class RsconsultaComponent implements OnInit {
       this.xAPI.valores = "";
 
       this.apiService.Ejecutar(this.xAPI).subscribe(
-        (data) => {},
+        (data) => { },
         (err) => {
           console.error(err);
         },
