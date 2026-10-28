@@ -1137,7 +1137,7 @@
 
           <!-- BLOQUE NORMAL: Integrantes del Caso -->
           <div
-            *ngIf="(selectedCarpeta?.id !== 'RECLAMOS' || !getReclamosData(activeDoc)) && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS_NOTIFICACIONES'">
+            *ngIf="(selectedCarpeta?.id !== 'RECLAMOS' || !getReclamosData(activeDoc)) && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS'">
             <div class="subcasos-header-bar mb-2">
               <div class="d-flex align-items-center">
                 <i class="fas fa-users text-primary fa-lg mr-2"></i>
@@ -1658,8 +1658,8 @@
             </div>
           </div>
 
-          <!-- BLOQUE OFICIOS_NOTIFICACIONES: Formato Oficio Elegante -->
-          <div *ngIf="selectedCarpeta?.id === 'OFICIOS_NOTIFICACIONES'" class="oficio-modal-container">
+          <!-- BLOQUE OFICIOS Formato Oficio Elegante -->
+          <div *ngIf="selectedCarpeta?.id === 'OFICIOS'" class="oficio-modal-container">
 
             <!-- Barra Superior del Bloque -->
             <div class="subcasos-header-bar mb-3">
@@ -1808,7 +1808,7 @@
           </button>
 
           <button class="btn-modal-tool btn-ficha"
-            *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS_NOTIFICACIONES' && !esDocFirmado(activeDoc) && selectedEstadoBuzon !== 'firmados' && currentProfile !== 'Ministro' && currentProfile !== 'Direccion'"
+            *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS' && !esDocFirmado(activeDoc) && selectedEstadoBuzon !== 'firmados' && currentProfile !== 'Ministro' && currentProfile !== 'Direccion'"
             (click)="irAMinisterial(activeDoc)" title="Ver ficha completa en Ministerial">
             <i class="fas fa-external-link-alt"></i>
             <span>Ficha Completa</span>
@@ -1820,15 +1820,15 @@
           <ng-container *ngIf="currentProfile === 'Ministro'; else defaultDecisions">
             <!-- BOTÓN FIRMAR / APROBAR EN PERFIL MINISTRO -->
             <button class="btn-modal-decision btn-favorable btn-firmar-ministro"
-              (click)="selectedCarpeta?.id === 'CUADRO_DECISORIO' ? generarPuntoDeCuentaPDF() : (selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' ? generarActividadesExteriorPDF() : (selectedCarpeta?.id === 'OFICIOS_NOTIFICACIONES' ? firmarMinistroOficio() : solicitarFirmaMinistro()))"
+              (click)="selectedCarpeta?.id === 'CUADRO_DECISORIO' ? generarPuntoDeCuentaPDF() : (selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' ? generarActividadesExteriorPDF() : (selectedCarpeta?.id === 'OFICIOS' ? firmarMinistroOficio() : solicitarFirmaMinistro()))"
               [disabled]="loadingAction" title="Iniciar decisión y firma ministerial">
               <i class="fas fa-file-signature"></i>
-              <span>{{ selectedCarpeta?.id === 'OFICIOS_NOTIFICACIONES' ? 'Aprobar' : 'Firmar Documento' }}</span>
+              <span>{{ selectedCarpeta?.id === 'OFICIOS' ? 'Aprobar' : 'Firmar Documento' }}</span>
               <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
             </button>
 
-            <!-- BOTÓN RECHAZAR EXCLUSIVO PARA MINISTRO EN OFICIOS_NOTIFICACIONES -->
-            <button class="btn-modal-decision btn-negado" *ngIf="selectedCarpeta?.id === 'OFICIOS_NOTIFICACIONES'"
+            <!-- BOTÓN RECHAZAR EXCLUSIVO PARA MINISTRO EN OFICIOS -->
+            <button class="btn-modal-decision btn-negado" *ngIf="selectedCarpeta?.id === 'OFICIOS'"
               (click)="rechazarOficioMinistro()" [disabled]="loadingAction" title="Rechazar y devolver Oficio">
               <i class="fas fa-times-circle"></i>
               <span>Rechazar</span>
@@ -1866,16 +1866,16 @@
 
               <!-- ENVIAR AL ANALISTA -->
               <button class="btn-modal-decision btn-warning"
-                *ngIf="selectedCarpeta?.id !== 'OFICIOS_NOTIFICACIONES' && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && (currentProfile === 'JefeSecretaria' || currentProfile === 'Direccion')"
+                *ngIf="selectedCarpeta?.id !== 'OFICIOS' && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && (currentProfile === 'JefeSecretaria' || currentProfile === 'Direccion')"
                 (click)="ActualizarUbicacionSecretaria()" [disabled]="loadingAction" title="Devolver al Analista">
                 <i class="fas fa-undo"></i>
                 <span>Enviar al Analista</span>
                 <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
               </button>
 
-              <!-- ARCHIVAR (TRAMITE_ORGANO_REGULAR, PUNTO_DE_CUENTA, PRESIDENCIALES, OFICIOS_NOTIFICACIONES) -->
+              <!-- ARCHIVAR (TRAMITE_ORGANO_REGULAR, PUNTO_DE_CUENTA, PRESIDENCIALES, OFICIOS) -->
               <button class="btn-modal-decision btn-archivar"
-                *ngIf="selectedCarpeta?.id === 'OFICIOS_NOTIFICACIONES' || (currentProfile === 'JefeSecretaria' && (selectedCarpeta?.id === 'TRAMITE_ORGANO_REGULAR' || selectedCarpeta?.id === 'PUNTO_DE_CUENTA' || selectedCarpeta?.id === 'PRESIDENCIALES'))"
+                *ngIf="selectedCarpeta?.id === 'OFICIOS' || (currentProfile === 'JefeSecretaria' && (selectedCarpeta?.id === 'TRAMITE_ORGANO_REGULAR' || selectedCarpeta?.id === 'PUNTO_DE_CUENTA' || selectedCarpeta?.id === 'PRESIDENCIALES'))"
                 (click)="ejecutarAccion('ARCHIVAR')" [disabled]="loadingAction" title="Archivar Documento">
                 <i class="fas fa-archive"></i>
                 <span>Archivar</span>
@@ -1887,18 +1887,18 @@
 
         <!-- Botones Principales en documentos firmados (Enviar a Resoluciones / Enviar a Oficio / Archivar) -->
         <div class="modal-footer-decisions" *ngIf="esDocFirmado(activeDoc)">
-          <!-- Enviar a Resoluciones: Oculto en ACTIVIDADES_EN_EL_EXTERIOR y OFICIOS_NOTIFICACIONES -->
+          <!-- Enviar a Resoluciones: Oculto en ACTIVIDADES_EN_EL_EXTERIOR y OFICIOS -->
           <button class="btn-modal-decision btn-favorable"
-            *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS_NOTIFICACIONES'"
+            *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS'"
             (click)="enviarAResoluciones(activeDoc)" [disabled]="loadingAction" title="Enviar trámite a Resoluciones">
             <i class="fas fa-file-contract"></i>
             <span>Enviar a Resoluciones</span>
             <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
           </button>
 
-          <!-- Enviar a Oficio: Oculto en OFICIOS_NOTIFICACIONES y ACTIVIDADES_EN_EL_EXTERIOR -->
+          <!-- Enviar a Oficio: Oculto en OFICIOS y ACTIVIDADES_EN_EL_EXTERIOR -->
           <button class="btn-modal-decision btn-diferido"
-            *ngIf="selectedCarpeta?.id !== 'OFICIOS_NOTIFICACIONES' && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'"
+            *ngIf="selectedCarpeta?.id !== 'OFICIOS' && selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR'"
             (click)="enviarAOficio(activeDoc)" [disabled]="loadingAction" title="Enviar trámite a Oficio"
             style="background: linear-gradient(135deg, #11cdef 0%, #1171ef 100%); color: #ffffff; border: none;">
             <i class="fas fa-paper-plane"></i>
@@ -1906,7 +1906,7 @@
             <span class="spinner-border spinner-border-sm ml-1" role="status" *ngIf="loadingAction"></span>
           </button>
 
-          <!-- Archivar para ACTIVIDADES_EN_EL_EXTERIOR y OFICIOS_NOTIFICACIONES cuando estén firmados -->
+          <!-- Archivar para ACTIVIDADES_EN_EL_EXTERIOR y OFICIOS cuando estén firmados -->
           <button class="btn-modal-decision btn-archivar"
             *ngIf="selectedCarpeta?.id === 'ACTIVIDADES_EN_EL_EXTERIOR' || selectedCarpeta?.id === 'OFICIOS'"
             (click)="ejecutarAccion('ARCHIVAR')" [disabled]="loadingAction" title="Archivar Documento">

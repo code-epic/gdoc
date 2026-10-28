@@ -287,8 +287,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     },
 
     {
-      id: "OFICIOS_NOTFICACIONES",
-      nombre: "OFICIOS Y NOTIFICACIONES",
+      id: "OFICIOS",
+      nombre: "COMUNICACIONES VARIAS",
       icono: "fas fa-envelope",
       color: "#2d969bff",
       funcion: "WKF_CDocumentosGestionOficios",
@@ -510,7 +510,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         c.estadoActual =
           c.id === "RECLAMOS"
             ? c.estadoActual || 6
-            : c.id === "ACTIVIDADES_EN_EL_EXTERIOR" || c.id === "OFICIOS_NOTIFICACIONES"
+            : c.id === "ACTIVIDADES_EN_EL_EXTERIOR" || c.id === "OFICIOS"
               ? 2
               : c.id === "CUADRO_DECISORIO"
                 ? 17
@@ -527,7 +527,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             c.id === "PUNTO_DE_CUENTA" ||
               c.id === "RECLAMOS" ||
               c.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-              c.id === "OFICIOS_NOTIFICACIONES" ||
+              c.id === "OFICIOS" ||
               c.id === "CUADRO_DECISORIO"
               ? 2
               : c.id === "PRESIDENCIALES"
@@ -2021,7 +2021,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       this.consultarDatosBasicos();
     } else if (
       this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-      this.selectedCarpeta?.id === "OFICIOS_NOTIFICACIONES"
+      this.selectedCarpeta?.id === "OFICIOS"
     ) {
       this.consultarDetalleDocumento(this.activeDoc);
     }
@@ -2058,7 +2058,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       this.consultarDatosBasicos();
     } else if (
       this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-      this.selectedCarpeta?.id === "OFICIOS_NOTIFICACIONES"
+      this.selectedCarpeta?.id === "OFICIOS"
     ) {
       this.consultarDetalleDocumento(this.activeDoc);
     }
@@ -5642,7 +5642,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     } else if (
       carpetaId === "ACTIVIDADES_EN_EL_EXTERIOR" ||
       carpetaId.includes("ACTIVIDAD") ||
-      carpetaId === "OFICIOS_NOTIFICACIONES"
+      carpetaId === "OFICIOS"
     ) {
       prefijo = "2,2,10";
     }
@@ -5698,9 +5698,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       let localEstadoDestino = 1;
 
       if (
-        this.selectedCarpeta?.id === "OFICIOS_NOTIFICACIONES" ||
-        this.activeDoc?.tdoc === "OFICIOS_NOTIFICACIONES" ||
-        this.activeDoc?.tipo_documento === "OFICIOS_NOTIFICACIONES" ||
+        this.selectedCarpeta?.id === "OFICIOS" ||
+        this.activeDoc?.tdoc === "OFICIOS" ||
+        this.activeDoc?.tipo_documento === "OFICIOS" ||
         this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
         this.selectedCarpeta?.id?.includes("ACTIVIDAD") ||
         this.isActividadExterior(this.activeDoc) ||
@@ -5741,7 +5741,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.selectedCarpeta?.id === "PUNTO_DE_CUENTA" ||
         this.selectedCarpeta?.id === "CUADRO_DECISORIO" ||
         this.selectedCarpeta?.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-        this.selectedCarpeta?.id === "OFICIOS_NOTIFICACIONES"
+        this.selectedCarpeta?.id === "OFICIOS"
       ) {
         if (this.estadoOrigen === 2) estadoDestino = 5;
         else if (this.estadoOrigen === 5) estadoDestino = 6;
@@ -7312,7 +7312,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
           c.id === "PUNTO_DE_CUENTA" ||
           c.id === "PRESIDENCIALES" ||
           c.id === "RECLAMOS" ||
-          c.id === "OFICIOS_NOTIFICACIONES" ||
+          c.id === "OFICIOS" ||
           c.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
           c.id === "CUADRO_DECISORIO"),
     );
@@ -7329,7 +7329,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             carpeta.id === "RECLAMOS"
               ? 6
               : carpeta.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
-                carpeta.id === "OFICIOS_NOTIFICACIONES"
+                carpeta.id === "OFICIOS"
                 ? 2
                 : carpeta.id === "CUADRO_DECISORIO"
                   ? 17
