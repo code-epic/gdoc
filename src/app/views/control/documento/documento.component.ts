@@ -828,9 +828,6 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     if (this.esActividadVarias) {
       if (this.actividadesVarias.solicitud) {
         this.actividadesVarias.solicitud = this.actividadesVarias.solicitud.toUpperCase();
-        if (!this.Doc.contenido) {
-          this.Doc.contenido = this.actividadesVarias.solicitud;
-        }
       }
       if (this.actividadesVarias.dirigido) {
         this.actividadesVarias.dirigido = this.actividadesVarias.dirigido.toUpperCase();
@@ -1583,8 +1580,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
         this.actividadesVarias.lugar = this.actividadesVarias.lugar.toUpperCase();
       }
       this.Doc.lugar = this.actividadesVarias.lugar || "";
-      if (this.actividadesVarias.solicitud && !this.Doc.contenido) {
-        this.Doc.contenido = this.actividadesVarias.solicitud.toUpperCase();
+      if (this.actividadesVarias.solicitud) {
+        this.actividadesVarias.solicitud = this.actividadesVarias.solicitud.toUpperCase();
       }
       const payload = {
         tipo: "ACTIVIDADES VARIAS",
@@ -1686,7 +1683,7 @@ export class DocumentoComponent implements OnInit, OnDestroy {
       }
       this.Doc.lugar = this.actividadesVarias.lugar || "";
       if (this.actividadesVarias.solicitud) {
-        this.Doc.contenido = this.actividadesVarias.solicitud.toUpperCase();
+        this.actividadesVarias.solicitud = this.actividadesVarias.solicitud.toUpperCase();
       }
       const payload = {
         tipo: "ACTIVIDADES VARIAS",
@@ -1731,8 +1728,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.xAPI.funcion = "WKF_ADocumentoDetalle";
     this.xAPI.parametros = "";
 
-    this.Doc.contenido = this.Doc.contenido.toUpperCase();
-    this.Doc.instrucciones = this.Doc.instrucciones.toUpperCase();
+    this.Doc.contenido = (this.Doc.contenido || "").toUpperCase();
+    this.Doc.instrucciones = (this.Doc.instrucciones || "").toUpperCase();
 
     this.xAPI.valores = JSON.stringify(this.Doc);
 

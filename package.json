@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "export NODE_OPTIONS=--openssl-legacy-provider; ng serve --host 0.0.0.0  --port 4300 --proxy-config ./src/proxy.conf.json",
-    "build": "ng build --prod --aot --build-optimizer --common-chunk --vendor-chunk --optimization --progress",
+    "build": "export NODE_OPTIONS=--openssl-legacy-provider; ng build --prod --aot --build-optimizer --common-chunk --vendor-chunk --optimization --progress",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
