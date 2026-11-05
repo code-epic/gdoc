@@ -36,7 +36,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
   // Variables para Resoluciones Firmadas
   public lstFirmadas: any[] = [];
   public lstFirmadasOriginal: any[] = [];
-  public tiposResolucion: string[] = [];
+  public tiposResolucion: string[] = ["DISPONIBLES (SIN ASUNTO)"];
 
   // Filtros de fecha (por defecto año en curso)
   public fechaDesde: string = "";
@@ -68,7 +68,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
     private toastrService: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const anioActual = new Date().getFullYear();
@@ -128,9 +128,9 @@ export class RsreportesComponent implements OnInit, OnDestroy {
    * y decodificar entidades como &#176; (°)
    */
   public procesarAsuntoHtml(texto: any): SafeHtml {
-    if (!texto) {
+    if (!texto || (typeof texto === "string" && texto.trim() === "")) {
       return this.sanitizer.bypassSecurityTrustHtml(
-        '<span class="text-muted font-italic">Sin asunto registrado</span>'
+        '<span class="text-muted font-italic">Disponible</span>'
       );
     }
     let html = typeof texto === "string" ? texto : String(texto);
@@ -163,7 +163,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
    * Extrae texto plano para tooltips, ordenamiento, filtros y exportaciones
    */
   public extraerTextoPlano(texto: any): string {
-    if (!texto) return "";
+    if (!texto || (typeof texto === "string" && texto.trim() === "")) return "Disponible";
     let plain = typeof texto === "string" ? texto : String(texto);
 
     plain = plain
@@ -194,7 +194,91 @@ export class RsreportesComponent implements OnInit, OnDestroy {
       .replace(/&#39;/gi, "'")
       .replace(/&amp;/gi, "&");
 
-    return plain.replace(/\s+/g, " ").trim();
+    const result = plain.replace(/\s+/g, " ").trim();
+    return result || "Disponible";
+  }
+
+  /**
+   * Determina si una resolución está disponible (es decir, no tiene asunto registrado)
+   */
+  public isItemDisponible(item: any): boolean {
+    if (!item) return false;
+    const rawCont = (item.contenido || item.asunto || "").toString().trim();
+    const plano = (item.contenido_plano || "").toString().trim();
+    return (
+      !rawCont ||
+      rawCont.toLowerCase() === "disponible" ||
+      !plano ||
+      plano.toLowerCase() === "disponible"
+    );
+  }
+
+  /**
+   * Evalúa si una resolución cumple con los filtros activos de búsqueda
+   */
+  public itemCumpleFiltros(
+    item: any,
+    asuntoFilter: string,
+    numeroFilter: string,
+    tipoFilter: string
+  ): boolean {
+    // 1. Filtro por Asunto
+    if (asuntoFilter) {
+      const esDisp = this.isItemDisponible(item);
+      const contPlano = (item.contenido_plano || "").toLowerCase();
+      const asun = (item.asunto || "").toLowerCase();
+
+      let matchAsunto = false;
+      if (esDisp) {
+        matchAsunto =
+          "disponible".includes(asuntoFilter) ||
+          asuntoFilter.includes("disponible") ||
+          "sin asunto".includes(asuntoFilter) ||
+          asuntoFilter.includes("sin asunto") ||
+          contPlano.includes(asuntoFilter);
+      } else {
+        matchAsunto = contPlano.includes(asuntoFilter) || asun.includes(asuntoFilter);
+      }
+
+      if (!matchAsunto) return false;
+    }
+
+    // 2. Filtro por Número / Resuelto / Control
+    if (numeroFilter) {
+      const numR = (item.numero_resuelto || "").toLowerCase();
+      const totR = (item.total_resueltos || "").toString().toLowerCase();
+      const desc = (item.descripcion || "").toLowerCase();
+      const num = (item.numero || "").toString().toLowerCase();
+
+      const matchNumero =
+        numR.includes(numeroFilter) ||
+        totR.includes(numeroFilter) ||
+        desc.includes(numeroFilter) ||
+        num.includes(numeroFilter);
+
+      if (!matchNumero) return false;
+    }
+
+    // 3. Filtro por Tipo de Resolución
+    if (tipoFilter) {
+      const esFiltroDisponible =
+        tipoFilter === "disponible" ||
+        tipoFilter === "disponibles" ||
+        tipoFilter.includes("sin asunto") ||
+        tipoFilter.includes("disponible");
+
+      if (esFiltroDisponible) {
+        if (!this.isItemDisponible(item)) return false;
+      } else {
+        const itemTipo = (item.tipo || "").toLowerCase();
+        const itemDesResol = (item.des_resol || "").toLowerCase();
+        if (!itemTipo.includes(tipoFilter) && !itemDesResol.includes(tipoFilter)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 
   // ==========================================
@@ -354,23 +438,7 @@ export class RsreportesComponent implements OnInit, OnDestroy {
           const numeroFilter = (this.filtroNumero || "").trim().toLowerCase();
           const tipoFilter = (this.filtroTipo || "").trim().toLowerCase();
 
-          let match = true;
-          if (asuntoFilter) {
-            const cont = (mappedItem.contenido_plano || mappedItem.contenido || "").toLowerCase();
-            const asun = (mappedItem.asunto || "").toLowerCase();
-            if (!cont.includes(asuntoFilter) && !asun.includes(asuntoFilter)) match = false;
-          }
-          if (match && numeroFilter) {
-            const numR = mappedItem.numero_resuelto ? mappedItem.numero_resuelto.toLowerCase() : "";
-            const desc = mappedItem.descripcion ? mappedItem.descripcion.toLowerCase() : "";
-            if (!numR.includes(numeroFilter) && !desc.includes(numeroFilter)) match = false;
-          }
-          if (match && tipoFilter) {
-            const tipo = mappedItem.tipo ? mappedItem.tipo.toLowerCase() : "";
-            if (!tipo.includes(tipoFilter)) match = false;
-          }
-
-          if (match) {
+          if (this.itemCumpleFiltros(mappedItem, asuntoFilter, numeroFilter, tipoFilter)) {
             this.lstFirmadas.push(mappedItem);
           }
 
@@ -383,7 +451,17 @@ export class RsreportesComponent implements OnInit, OnDestroy {
         signal
       );
 
-      this.tiposResolucion = Array.from(setTipos).sort();
+      const tiposLimpios = Array.from(setTipos).filter(
+        (t) =>
+          t !== "DISPONIBLE" &&
+          t !== "DISPONIBLES" &&
+          !t.includes("DISPONIBLE") &&
+          !t.includes("SIN ASUNTO")
+      );
+      tiposLimpios.push("DISPONIBLES (SIN ASUNTO)");
+      this.tiposResolucion = tiposLimpios.sort((a, b) =>
+        a.localeCompare(b, "es", { sensitivity: "base" })
+      );
       // Al finalizar, reaplicamos filtros para asegurar el ordenamiento final
       this.aplicarFiltrosFirmadas();
     } catch (error: any) {
@@ -401,26 +479,9 @@ export class RsreportesComponent implements OnInit, OnDestroy {
     const numeroFilter = (this.filtroNumero || "").trim().toLowerCase();
     const tipoFilter = (this.filtroTipo || "").trim().toLowerCase();
 
-    this.lstFirmadas = this.lstFirmadasOriginal.filter((item) => {
-      const matchAsunto =
-        !asuntoFilter ||
-        (item.contenido_plano && item.contenido_plano.toLowerCase().includes(asuntoFilter)) ||
-        (item.asunto && item.asunto.toLowerCase().includes(asuntoFilter));
-
-      const matchNumero =
-        !numeroFilter ||
-        (item.numero_resuelto && item.numero_resuelto.toLowerCase().includes(numeroFilter)) ||
-        (item.total_resueltos && item.total_resueltos.toString().toLowerCase().includes(numeroFilter)) ||
-        (item.descripcion && item.descripcion.toLowerCase().includes(numeroFilter)) ||
-        (item.numero && item.numero.toString().toLowerCase().includes(numeroFilter));
-
-      const matchTipo =
-        !tipoFilter ||
-        (item.tipo && item.tipo.toLowerCase().includes(tipoFilter)) ||
-        (item.des_resol && item.des_resol.toLowerCase().includes(tipoFilter));
-
-      return matchAsunto && matchNumero && matchTipo;
-    });
+    this.lstFirmadas = this.lstFirmadasOriginal.filter((item) =>
+      this.itemCumpleFiltros(item, asuntoFilter, numeroFilter, tipoFilter)
+    );
 
     this.ejecutarOrdenamiento();
     this.pageIndex = 0;
