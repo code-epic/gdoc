@@ -5692,6 +5692,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.activeDoc?.idd ||
         this.activeDoc?.id ||
         this.activeDoc?.wfdocumento ||
+        this.activeDoc?.numc ||
+        this.activeDoc?.ncontrol ||
         "";
 
       let localEstadoActual = 14;
@@ -5706,9 +5708,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.isActividadExterior(this.activeDoc) ||
         this.isActividadVarias(this.activeDoc)
       ) {
-        // En OFICIOS y ACTIVIDADES, tras venir de 2,2,7 (firmados) se archiva enviando al 2,2,9
+        // En OFICIOS y ACTIVIDADES, tras venir de 2,2,7 (firmados) se archiva enviando al 2,2,8
         localEstadoActual = 2;
-        localEstadoDestino = 9;
+        localEstadoDestino = 8;
       } else if (
         this.selectedEstadoBuzon === "firmados" ||
         this.estadoOrigen === 7 ||
@@ -5891,7 +5893,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   //Guardar la alerte define el momento y estadus
   guardarAlerta(activo: number, fecha: string) {
     this.WAlerta.activo = activo;
-    this.WAlerta.documento = parseInt(this.activeDoc.numc);
+    this.WAlerta.documento = parseInt(this.activeDoc?.numc || this.activeDoc?.idd || "0") || 0;
     this.WAlerta.estado = this.estadoActual;
     this.WAlerta.usuario = this.jwtData.userId;
     this.WAlerta.observacion = `PROCESO DE VALIDACION DEL ${this.selectedCarpeta?.id === "RECLAMOS" ? "RECLAMO" : this.selectedCarpeta?.nombre || "DOCUMENTO"}`;
