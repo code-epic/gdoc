@@ -95,9 +95,9 @@ export class CtrlfirmadosComponent implements OnInit, OnDestroy {
     { valor: "0", texto: "ACEPTAR", visible: "1" },
     { valor: "1", texto: "OTROS DOCUMENTOS", visible: "1" },
     { valor: "2", texto: "PRESIDENCIAL", visible: "1" },
-    { valor: "3", texto: "TRAMITACION POR ORDEN REGULAR", visible: "0" },
+    { valor: "3", texto: "TRAMITACION POR ORDEN REGULAR", visible: "1" },
     { valor: "4", texto: "OTROS DOCUMENTOS", visible: "1" },
-    { valor: "5", texto: "RECLAMOS", visible: "0" },
+    { valor: "5", texto: "RECLAMOS", visible: "1" },
     { valor: "6", texto: "REDISTRIBUCION", visible: "0" },
   ];
 
@@ -465,7 +465,7 @@ export class CtrlfirmadosComponent implements OnInit, OnDestroy {
     this.xAPI.parametros = "";
     this.xAPI.valores = JSON.stringify(this.WAlerta);
     this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (alerData) => {},
+      async (alerData) => { },
       (error) => {
         this.toastrService.error(error, `GDoc Wkf.AAlertas`);
       },
@@ -663,7 +663,7 @@ export class CtrlfirmadosComponent implements OnInit, OnDestroy {
       const txt = document.createElement("textarea");
       txt.innerHTML = str;
       str = txt.value;
-    } catch (e) {}
+    } catch (e) { }
 
     str = str.replace(/<[^>]*>/g, " ");
     str = str
