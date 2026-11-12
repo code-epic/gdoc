@@ -130,6 +130,7 @@ export class ResueltoCanvasComponent
   @Input() lineSpacing: number = 1.15;
   @Input() profile:
     | "Edicion"
+    | "Redactor"
     | "Revision"
     | "Jefe"
     | "Secretaria"
@@ -145,6 +146,8 @@ export class ResueltoCanvasComponent
   @Output() basamentoLegalChange = new EventEmitter<string>();
   @Output() dateChange = new EventEmitter<string>();
   @Output() unicoParrafoChange = new EventEmitter<string>();
+  @Output() resuelveChange = new EventEmitter<string>();
+  @Output() actionChange = new EventEmitter<string>();
   @Output() resolutionChange = new EventEmitter<string>();
   @Output() initialsChange = new EventEmitter<string>();
   @Output() casesBlur = new EventEmitter<void>();
@@ -156,6 +159,7 @@ export class ResueltoCanvasComponent
 
   public basamentoLegalSafe: SafeHtml = "";
   public unicoParrafoSafe: SafeHtml = "";
+  public resuelveSafe: SafeHtml = "";
 
   public showFloatingCommentBtn = false;
   public floatingBtnPos = { x: 0, y: 0 };
@@ -603,6 +607,18 @@ export class ResueltoCanvasComponent
         this.unicoParrafoSafe = this.sanitizer.bypassSecurityTrustHtml(html);
         this.unicoParrafoChange.emit(html);
       }
+
+      const resuelveEl = firstCanvas.querySelector(
+        '[data-section="resuelve"]',
+      ) as HTMLElement | null;
+      if (resuelveEl) {
+        this.cleanAndConsolidateDOM(resuelveEl);
+        const html = resuelveEl.innerHTML;
+        this.documentData.body.action = html;
+        this.resuelveSafe = this.sanitizer.bypassSecurityTrustHtml(html);
+        this.resuelveChange.emit(html);
+        this.actionChange.emit(html);
+      }
     }
   }
 
@@ -814,6 +830,10 @@ export class ResueltoCanvasComponent
           } else if (section === "basamento") {
             this.documentData.body.basamentoLegal = container.innerHTML;
             this.basamentoLegalChange.emit(container.innerHTML);
+          } else if (section === "resuelve") {
+            this.documentData.body.action = container.innerHTML;
+            this.resuelveChange.emit(container.innerHTML);
+            this.actionChange.emit(container.innerHTML);
           }
         }
 
@@ -886,6 +906,10 @@ export class ResueltoCanvasComponent
         } else if (section === "basamento") {
           this.documentData.body.basamentoLegal = container.innerHTML;
           this.basamentoLegalChange.emit(container.innerHTML);
+        } else if (section === "resuelve") {
+          this.documentData.body.action = container.innerHTML;
+          this.resuelveChange.emit(container.innerHTML);
+          this.actionChange.emit(container.innerHTML);
         }
       }
     });
@@ -974,6 +998,11 @@ export class ResueltoCanvasComponent
         this.unicoParrafoSafe = this.sanitizer.bypassSecurityTrustHtml(
           this.documentData.body.unicoParrafo || "",
         );
+        this.resuelveSafe = this.sanitizer.bypassSecurityTrustHtml(
+          this.documentData.body.action ||
+            this.documentData.body.resuelve ||
+            "RESUELVE",
+        );
       }
       if (this.documentData.pages) {
         this.documentData.pages.forEach((p: any) => {
@@ -1039,6 +1068,31 @@ export class ResueltoCanvasComponent
   onUnicoParrafoEdit(event: Event) {
     const target = event.target as HTMLElement;
     this.unicoParrafoChange.emit(target.innerHTML || "");
+
+    const currentCanvas = target.closest(".a4-canvas") as HTMLElement;
+    if (currentCanvas) {
+      let isOverflowing = false;
+      const casesList = currentCanvas.querySelector(".cases-list");
+      if (casesList) {
+        const canvasRect = currentCanvas.getBoundingClientRect();
+        const listRect = casesList.getBoundingClientRect();
+        isOverflowing = canvasRect.bottom - listRect.bottom < 76;
+      }
+
+      if (isOverflowing) {
+        this.paginateDOM();
+      }
+    }
+  }
+
+  onResuelveEdit(event: Event) {
+    const target = event.target as HTMLElement;
+    const html = target.innerHTML || target.innerText || "";
+    if (this.documentData && this.documentData.body) {
+      this.documentData.body.action = html;
+    }
+    this.resuelveChange.emit(html);
+    this.actionChange.emit(html);
 
     const currentCanvas = target.closest(".a4-canvas") as HTMLElement;
     if (currentCanvas) {
@@ -1948,15 +2002,20 @@ export class ResueltoCanvasComponent
         basamentoP.innerHTML = basamentoHtml;
         mainEl.appendChild(basamentoP);
 
+        const resuelveHtml =
+          this.documentData.body?.action ||
+          this.documentData.body?.resuelve ||
+          "RESUELVE";
         const resuelveP = document.createElement("p");
         resuelveP.className = "m-resolucion-resuelve";
+        resuelveP.setAttribute("data-section", "resuelve");
         resuelveP.style.fontWeight = "bold";
         resuelveP.style.textTransform = "uppercase";
         resuelveP.style.textAlign = "center";
         resuelveP.style.marginTop = "13pt";
         resuelveP.style.marginBottom = "13pt";
-        resuelveP.style.lineHeight = "1.35";
-        resuelveP.textContent = this.documentData.body?.action || "RESUELVE";
+        resuelveP.style.lineHeight = `${lineHeights.resuelve || 1.15}`;
+        resuelveP.innerHTML = resuelveHtml;
         mainEl.appendChild(resuelveP);
 
         const unicoHtml = this.documentData.body?.unicoParrafo || "";
@@ -2285,6 +2344,15 @@ export class ResueltoCanvasComponent
       }
     }
 
+    if (target.classList.contains("m-resolucion-resuelve")) {
+      if (this.documentData && this.documentData.body) {
+        const text = target.innerHTML;
+        this.documentData.body.action = text;
+        this.resuelveChange.emit(text || "");
+        this.actionChange.emit(text || "");
+      }
+    }
+
     // Registrar estado al perder foco para almacenar los cambios realizados
     this.saveHistoryState();
   }
@@ -2338,6 +2406,15 @@ export class ResueltoCanvasComponent
         this.documentData.body.basamentoLegal = html;
         this.documentData.body.preamble = html;
         this.basamentoLegalChange.emit(html || "");
+      }
+    }
+
+    if (target.classList.contains("m-resolucion-resuelve")) {
+      if (this.documentData && this.documentData.body) {
+        const html = target.innerHTML;
+        this.documentData.body.action = html;
+        this.resuelveChange.emit(html || "");
+        this.actionChange.emit(html || "");
       }
     }
 

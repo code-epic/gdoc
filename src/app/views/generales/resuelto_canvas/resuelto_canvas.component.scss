@@ -179,7 +179,16 @@
     text-align: center !important;
     margin-top: 13pt !important;
     margin-bottom: 13pt !important;
-    line-height: 1.35 !important;
+    line-height: 1.15; /* Interlineado 1.15 por defecto según norma técnica MPPD, personalizable por sección */
+    
+    /* Asegurar que el contenido editable mantenga formato, centrado, negrita e interlineado */
+    ::ng-deep p, ::ng-deep div {
+      line-height: inherit;
+      font-size: inherit;
+      text-align: center !important;
+      font-weight: bold !important;
+      text-transform: uppercase !important;
+    }
   }
 
   .m-resolucion-comuniquese {

@@ -5,8 +5,8 @@
   <button class="btn btn-sm btn-outline-light" (click)="zoomIn()" title="Acercar"><i class="fas fa-search-plus"></i></button>
   <button class="btn btn-sm btn-outline-light ml-2" (click)="autoFit()" title="Ajustar a pantalla"><i class="fas fa-expand-arrows-alt"></i></button>
   
-  <!-- Line Spacing Controls (Only for Edicion) -->
-  <ng-container *ngIf="profile === 'Edicion'">
+  <!-- Line Spacing Controls (Only for Edicion / Redactor) -->
+  <ng-container *ngIf="profile === 'Edicion' || profile === 'Redactor'">
     <!-- Separator -->
     <div class="d-inline-block ml-3 mr-3" style="border-left: 1px solid rgba(255,255,255,0.3); height: 24px; vertical-align: middle;"></div>
 
@@ -129,13 +129,13 @@
   
   <!-- CABECERA -->
   <header class="doc-header editable-zone" *ngIf="i === 0" (click)="editMode('header')">
-    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px 6px 2px 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
-    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px 6px 2px 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
-    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px 6px 2px 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">DESPACHO DEL MINISTRO</p>
+    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px 6px 2px 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">REPÚBLICA BOLIVARIANA DE VENEZUELA</p>
+    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px 6px 2px 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">MINISTERIO DEL PODER POPULAR PARA LA DEFENSA</p>
+    <p class="m-resolucion-membrete" data-section="header" [style.line-height]="documentData?.styles?.lineHeights?.header ? documentData.styles.lineHeights.header.toString() : '1.75'" [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px 6px 2px 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)">DESPACHO DEL MINISTRO</p>
     
     <!-- 1 línea debajo: Lugar y fecha -->
     <div class="dynamic-row">
-      <p class="m-resolucion-lugar-fecha">Caracas,&nbsp;<span class="variable" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="onDateEdit($event)" [innerText]="documentData.header.date"></span></p>
+      <p class="m-resolucion-lugar-fecha">Caracas,&nbsp;<span class="variable" [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="onDateEdit($event)" [innerText]="documentData.header.date"></span></p>
     </div>
     
     <!-- Debajo: Data -->
@@ -145,7 +145,7 @@
 
     <!-- 1 línea debajo: Resolución -->
     <div class="dynamic-row">
-      <p class="m-resolucion-denominacion">RESOLUCIÓN N° <span style="text-decoration: underline; outline: none; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;" [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="onResolutionEdit($event)" [innerText]="documentData.header.resolutionNum"></span></p>
+      <p class="m-resolucion-denominacion">RESOLUCIÓN N° <span style="text-decoration: underline; outline: none; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;" [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" spellcheck="false" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="onResolutionEdit($event)" [innerText]="documentData.header.resolutionNum"></span></p>
     </div>
   </header>
 
@@ -163,7 +163,7 @@
       <p class="m-resolucion-basamento" 
          data-section="basamento"
          [style.line-height]="documentData?.styles?.lineHeights?.basamento ? documentData.styles.lineHeights.basamento.toString() : '1.75'"
-         [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" 
+         [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" 
          spellcheck="false"
          style="outline: none; padding: 2px 6px 2px 2px; border-radius: 4px; transition: background-color 0.2s;"
          (focus)="onFocusEditable($event)" 
@@ -173,14 +173,25 @@
          [innerHTML]="basamentoLegalSafe">
       </p>
       
-      <!-- 1 línea debajo del basamento legal: RESUELVE -->
-      <p class="m-resolucion-resuelve">{{ documentData.body.action }}</p>
+      <!-- 1 línea debajo del basamento legal: RESUELVE (Editable preservando formato, estilo, centrado, negrita e interlineado) -->
+      <p class="m-resolucion-resuelve"
+         data-section="resuelve"
+         [style.line-height]="documentData?.styles?.lineHeights?.resuelve ? documentData.styles.lineHeights.resuelve.toString() : '1.15'"
+         [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'"
+         spellcheck="false"
+         style="outline: none; padding: 2px 6px 2px 2px; border-radius: 4px; transition: background-color 0.2s; text-align: center; font-weight: bold; text-transform: uppercase;"
+         (focus)="onFocusEditable($event)" 
+         (blur)="onBlurEditable($event)" 
+         (input)="onResuelveEdit($event)"
+         (paste)="onPaste($event)"
+         [innerHTML]="resuelveSafe">
+      </p>
 
       <!-- Único Párrafo (Asunto / Nombramientos) -->
       <p class="m-resolucion-unico" 
          data-section="unico"
          [style.line-height]="documentData?.styles?.lineHeights?.unico ? documentData.styles.lineHeights.unico.toString() : '1.35'"
-         [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" 
+         [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" 
          spellcheck="false"
          style="outline: none; padding: 2px 6px 2px 2px; border-radius: 4px; transition: background-color 0.2s; margin-top: 13pt;"
          (focus)="onFocusEditable($event)" 
@@ -192,7 +203,7 @@
     
     <div class="cases-list" 
          data-section="cases"
-         [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" 
+         [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" 
          spellcheck="false"
          [style.line-height]="documentData?.styles?.lineHeights?.cases ? documentData.styles.lineHeights.cases.toString() : '1.35'"
          style="outline: none; padding: 2px 6px 2px 2px; border-radius: 4px; transition: background-color 0.2s;"
@@ -231,9 +242,9 @@
            
       <!-- Textos de firma -->
       <div class="signatory-info">
-        <p class="m-resolucion-firma-text" data-section="firma"  [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="documentData.signatures.mainSignatory = $any($event.target).innerText" [innerText]="documentData.signatures.mainSignatory"></p>
-        <p class="m-resolucion-firma-text" data-section="firma"  [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="documentData.signatures.signatoryTitle = $any($event.target).innerText" [innerText]="documentData.signatures.signatoryTitle"></p>
-        <p class="m-resolucion-firma-text" data-section="firma"  [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="documentData.signatures.signatoryRole = $any($event.target).innerHTML" [innerHTML]="documentData.signatures.signatoryRole"></p>
+        <p class="m-resolucion-firma-text" data-section="firma"  [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="documentData.signatures.mainSignatory = $any($event.target).innerText" [innerText]="documentData.signatures.mainSignatory"></p>
+        <p class="m-resolucion-firma-text" data-section="firma"  [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="documentData.signatures.signatoryTitle = $any($event.target).innerText" [innerText]="documentData.signatures.signatoryTitle"></p>
+        <p class="m-resolucion-firma-text" data-section="firma"  [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" spellcheck="false" style="outline: none; padding: 2px; border-radius: 4px; transition: background-color 0.2s;" (focus)="onFocusEditable($event)" (blur)="onBlurEditable($event)" (input)="documentData.signatures.signatoryRole = $any($event.target).innerHTML" [innerHTML]="documentData.signatures.signatoryRole"></p>
       </div>
     </div>
 
@@ -244,14 +255,14 @@
       <!-- Contenedor para Iniciales y Media Firma -->
       <div style="position: relative; display: inline-block;">
         <!-- Media firma del director (mg.png) -->
-        <img *ngIf="profile === 'Aprobador' || (profile === 'Edicion' && jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')" 
+        <img *ngIf="profile === 'Aprobador' || ((profile === 'Edicion' || profile === 'Redactor') && jwtData?.userCargo?.toUpperCase() === 'ADMINISTRADOR')" 
              src="assets/img/mppd/mg.png" 
              alt="Media Firma Director"
              style="position: absolute; bottom: 6px; left: 2px; width: 15mm; z-index: 1; pointer-events: none;">
 
         <!-- Iniciales (Media firma): 1 línea antes que la paginación -->
         <div class="initials" data-section="initials" style="position: relative; z-index: 2; font-size: 8pt; color: #000; outline: none; transition: background-color 0.2s; padding: 2px 4px; border-radius: 4px; min-width: 50px; display: inline-block;"
-             [attr.contenteditable]="profile === 'Edicion' ? 'true' : 'false'" spellcheck="false"
+             [attr.contenteditable]="(profile === 'Edicion' || profile === 'Redactor') ? 'true' : 'false'" spellcheck="false"
              (click)="$event.stopPropagation()"
              (focus)="onFocusEditable($event)"
              (blur)="onBlurEditable($event); onInitialsEdit($event)"

@@ -101,6 +101,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   @Input() useCanvas = false;
   @Input() profile:
     | "Edicion"
+    | "Redactor"
     | "Revision"
     | "Jefe"
     | "Secretaria"
@@ -501,7 +502,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       body: {
         basamentoLegal: basamentoLegalText,
         unicoParrafo: headerHtml,
-        action: "RESUELVE",
+        action: this.activeDoc.action || this.activeDoc.resuelve || "RESUELVE",
       },
       pages: pages,
       styles: this.activeDoc.styles || null,
@@ -1045,6 +1046,11 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       this.activeDoc._headerHtml =
         this.resueltoCanvas.documentData.body?.unicoParrafo ||
         this.activeDoc._headerHtml;
+      this.activeDoc.action =
+        this.resueltoCanvas.documentData.body?.action ||
+        this.activeDoc.action ||
+        "RESUELVE";
+      this.activeDoc.resuelve = this.activeDoc.action;
 
       if (this.resueltoCanvas.documentData.styles) {
         this.activeDoc.styles = JSON.parse(
@@ -1104,6 +1110,8 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       numero_resolucion: numeroResolucion,
       basamento_legal:
         this.activeDoc.basamentoLegal || this.defaultBasamentoLegal,
+      resuelve:
+        this.activeDoc.action || this.activeDoc.resuelve || "RESUELVE",
       unico_parrafo:
         this.activeDoc._headerHtml || this.generateHeaderHtml(true),
       lista_casos: this.activeDoc["_pageCasesHtml_0"] || "",
@@ -1170,6 +1178,9 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
     if (this.activeDoc) {
       if (field === "fecha_resolucion" && value) {
         this.activeDoc[field] = value.toString().replace(/\s+/g, "");
+      } else if (field === "action") {
+        this.activeDoc["action"] = value;
+        this.activeDoc["resuelve"] = value;
       } else {
         this.activeDoc[field] = value;
       }
@@ -1910,6 +1921,13 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
             pgTemplate.task.unico_parrafo !== null
           ) {
             doc._headerHtml = pgTemplate.task.unico_parrafo;
+          }
+          if (
+            pgTemplate.task.resuelve !== undefined &&
+            pgTemplate.task.resuelve !== null
+          ) {
+            doc.action = pgTemplate.task.resuelve;
+            doc.resuelve = pgTemplate.task.resuelve;
           }
           if (
             pgTemplate.task.lista_casos !== undefined &&
