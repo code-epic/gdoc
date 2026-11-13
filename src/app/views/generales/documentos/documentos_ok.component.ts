@@ -6147,7 +6147,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     const fnxPayload = {
       funcion: "Fnx_FirmarPuntos",
       codigo: this.encriptarService.GCodeEncrypt(numero_control),
-      archivo: this.encriptarService.GCodeEncrypt(archivo),
+      archivo: archivo,
       puntos: 1,
       decision: dec,
     };
