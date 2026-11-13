@@ -720,3 +720,145 @@ textarea.input-custom {
   justify-content: center !important;
   width: 100% !important;
 }
+
+/* ─── Notificaciones UX/UI de Reintento y Red Inestable ───────────────────── */
+.toast-container .ngx-toastr.gdoc-net-toast {
+  background-image: none !important;
+  padding: 14px 16px !important;
+  width: 340px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14), 0 2px 8px rgba(15, 23, 42, 0.06) !important;
+  color: #1e293b !important;
+  opacity: 1 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  backdrop-filter: blur(8px);
+}
+
+.toast-container .ngx-toastr.gdoc-net-toast--retrying {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%) !important;
+  border-left: 4px solid #11cdef !important;
+}
+
+.toast-container .ngx-toastr.gdoc-net-toast--unstable {
+  background: linear-gradient(135deg, #ffffff 0%, #fff8f1 100%) !important;
+  border-left: 4px solid #fb6340 !important;
+}
+
+.toast-container .ngx-toastr.gdoc-net-toast .toast-close-button {
+  color: #64748b !important;
+  text-shadow: none !important;
+  opacity: 0.75 !important;
+  font-size: 18px !important;
+  right: 8px !important;
+  top: 6px !important;
+}
+
+.toast-container .ngx-toastr.gdoc-net-toast .toast-close-button:hover {
+  color: #0f172a !important;
+  opacity: 1 !important;
+}
+
+.toast-container .ngx-toastr.gdoc-net-toast .toast-progress {
+  height: 3px !important;
+  opacity: 0.85 !important;
+}
+
+.toast-container .ngx-toastr.gdoc-net-toast--unstable .toast-progress {
+  background-color: #fb6340 !important;
+}
+
+.gdoc-net-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Open Sans', 'Roboto', sans-serif;
+}
+
+.gdoc-net-icon-wrap {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gdoc-net-icon-wrap--retrying {
+  background: rgba(17, 205, 239, 0.14);
+  color: #0ea5e9;
+}
+
+.gdoc-net-icon-wrap--unstable {
+  background: rgba(251, 99, 64, 0.14);
+  color: #fb6340;
+}
+
+.gdoc-net-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(14, 165, 233, 0.25);
+  border-top-color: #0ea5e9;
+  border-radius: 50%;
+  animation: gdocNetSpin 0.85s linear infinite;
+}
+
+@keyframes gdocNetSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.gdoc-net-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.gdoc-net-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+
+.gdoc-net-subtitle {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #475569;
+  line-height: 1.35;
+}
+
+.gdoc-net-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.gdoc-net-step {
+  height: 5px;
+  flex: 1;
+  border-radius: 999px;
+  background: #e2e8f0;
+  transition: background-color 0.25s ease;
+}
+
+.gdoc-net-step.is-done {
+  background: #0ea5e9;
+}
+
+.gdoc-net-step.is-active {
+  background: linear-gradient(90deg, #11cdef, #5e72e4);
+  animation: gdocNetPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes gdocNetPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
