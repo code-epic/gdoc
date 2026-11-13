@@ -5960,7 +5960,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     let fnx = {
       funcion: "Fnx_FirmarPuntos",
       codigo: this.encriptarService.GCodeEncrypt(numero_control),
-      archivo: archivo,
+      archivo: this.encriptarService.GCodeEncrypt(archivo),
       puntos: 1,
       decision: dec,
     };
