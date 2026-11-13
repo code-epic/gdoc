@@ -5786,6 +5786,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       (error) => {
         console.error(error);
         this.loadingAction = false;
+        this.notificarErrorHttp(error, "Documentos");
       },
     );
   }
@@ -5914,6 +5915,32 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     ); //
   }
 
+  /**
+   * Traduce un HttpErrorResponse (incluyendo status 0 por corte/fluctuación de red)
+   * a un mensaje legible para el usuario, evitando "[object Object]".
+   */
+  private formatearErrorHttp(
+    err: any,
+    fallbackMsg: string = "Fallo de red, vuelva a intentar en un momento.",
+  ): string {
+    if (err?.status === 0) {
+      return "Fallo de red, vuelva a intentar en un momento.";
+    }
+    if (typeof err === "string" && err.trim()) {
+      return err;
+    }
+    return err?.error?.msj || err?.error?.message || fallbackMsg;
+  }
+
+  private notificarErrorHttp(
+    err: any,
+    titulo: string,
+    fallbackMsg: string = "Fallo de red, vuelva a intentar en un momento.",
+  ): void {
+    const msg = this.formatearErrorHttp(err, fallbackMsg);
+    this.toastrService.warning(msg, titulo);
+  }
+
   public fnxFirmaMinistro(decision: string = "", comentario: string = "") {
     if (!this.activeDoc) {
       console.warn("[fnxFirmaMinistro] No hay documento activo para firmar.");
@@ -5972,7 +5999,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       },
       (errot) => {
         console.error("Error en Fnx_FirmarPuntos:", errot);
-        this.toastrService.error(errot, `GDoc Wkf.FirmarPuntos`);
+        this.loadingAction = false;
+        this.notificarErrorHttp(errot, `GDoc Wkf.FirmarPuntos`);
       },
     ); //
   }
@@ -6018,7 +6046,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       },
       (error) => {
         console.error("Error en WKF_IDocumentoFirmados:", error);
-        this.toastrService.error(error, `GDoc Wkf.IDocumentosFirmados`);
+        this.notificarErrorHttp(error, `GDoc Wkf.IDocumentosFirmados`);
       },
     );
   }
