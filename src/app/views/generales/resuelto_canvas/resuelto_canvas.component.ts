@@ -230,11 +230,15 @@ export class ResueltoCanvasComponent
       this.updateSafeHtmls();
 
       // Forzar repaginación automática tras cargar los datos y renderizar el DOM
-      setTimeout(() => {
-        if (!this.isPaginating) {
-          this.paginateDOM();
-        }
-      }, 200);
+      this.cancelPendingPagination();
+      if (!this.paginationFrozen) {
+        this.pendingPaginationTimer = setTimeout(() => {
+          this.pendingPaginationTimer = null;
+          if (!this.isPaginating && !this.paginationFrozen) {
+            this.paginateDOM();
+          }
+        }, 200);
+      }
     }
   }
 
@@ -973,6 +977,7 @@ export class ResueltoCanvasComponent
     }
 
     this.casesInput$.pipe(debounceTime(350)).subscribe(() => {
+      if (this.paginationFrozen) return;
       this.casesBlur.emit();
       this.paginateDOM();
       this.saveHistoryState();
@@ -984,6 +989,7 @@ export class ResueltoCanvasComponent
   }
 
   ngOnDestroy(): void {
+    this.cancelPendingPagination();
     this.casesInput$.complete();
   }
 
@@ -1908,9 +1914,23 @@ export class ResueltoCanvasComponent
   }
 
   isPaginating = false;
+  public paginationFrozen = false;
+  private pendingPaginationTimer: any = null;
+
+  /**
+   * Cancela cualquier repaginación diferida pendiente (usado antes de capturar el DOM para PDF).
+   */
+  public cancelPendingPagination(): void {
+    if (this.pendingPaginationTimer) {
+      clearTimeout(this.pendingPaginationTimer);
+      this.pendingPaginationTimer = null;
+    }
+  }
 
   paginateDOM() {
-    if (!this.documentData || !this.documentData.pages) return;
+    if (this.paginationFrozen || !this.documentData || !this.documentData.pages) {
+      return;
+    }
 
     this.isPaginating = true;
 
