@@ -346,6 +346,45 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <!-- Sección de Recomendación y Viabilidad Institucional (Resaltado en Rojo) -->
+                            <div class="col-12 mt-3 mb-1">
+                                <div style="background-color: #fef2f2; border: 1.5px solid #f87171; border-radius: 8px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(239, 68, 68, 0.08);">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-exclamation-circle text-danger mr-2" style="font-size: 1.15rem;"></i>
+                                        <h6 class="text-danger font-weight-bold mb-0" style="font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            Recomendación y Viabilidad Institucional (Opcional)
+                                        </h6>
+                                    </div>
+                                    <p class="text-muted small mb-3" style="font-size: 0.78rem;">
+                                        Indique la viabilidad de la invitación al exterior para alertar oportunamente al ciudadano Ministro en caso de no ser favorable.
+                                    </p>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-4 mb-2">
+                                            <label class="form-label-custom font-weight-bold" style="color: #b91c1c;">¿Es Recomendable?</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text icon-box" style="background-color: #fee2e2; border-color: #fca5a5;"><mat-icon class="input-icon text-danger">verified</mat-icon></span>
+                                                </div>
+                                                <select class="input-custom font-weight-bold" style="border-color: #fca5a5; color: #991b1b;" [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.recomendable">
+                                                    <option value="">Seleccione Viabilidad</option>
+                                                    <option value="RECOMENDABLE">RECOMENDABLE</option>
+                                                    <option value="NO RECOMENDABLE">NO RECOMENDABLE</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-8 mb-2">
+                                            <label class="form-label-custom font-weight-bold" style="color: #b91c1c;">Quién recomienda y motivo</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text icon-box" style="background-color: #fee2e2; border-color: #fca5a5;"><mat-icon class="input-icon text-danger">rate_review</mat-icon></span>
+                                                </div>
+                                                <input type="text" class="input-custom" style="border-color: #fca5a5;" placeholder="Describa quién hace la recomendación y cuál es el motivo..." [ngModelOptions]="{standalone: true}" [(ngModel)]="actividadesExt.recomendacion">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Bloque de ACTIVIDADES VARIAS -->

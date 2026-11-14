@@ -391,6 +391,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     fechaInicio: null,
     fechaFin: null,
     fechaConfirmacion: null,
+    recomendable: "",
+    recomendacion: "",
     gastos: {
       boletos: "",
       alimentacion: "",
@@ -638,6 +640,23 @@ export class DocumentoComponent implements OnInit, OnDestroy {
     this.nasociacion = "";
     this.esActividadExterior = false;
     this.esActividadVarias = false;
+    this.actividadesExt = {
+      pais: "",
+      motivo: "",
+      dirigido: "",
+      personas: "",
+      fechaInicio: null,
+      fechaFin: null,
+      fechaConfirmacion: null,
+      recomendable: "",
+      recomendacion: "",
+      gastos: {
+        boletos: "",
+        alimentacion: "",
+        alojamiento: "",
+        transporte: "",
+      },
+    };
     this.actividadesVarias = {
       tipo: "ACTIVIDADES VARIAS",
       solicitud: "",
@@ -1413,6 +1432,8 @@ export class DocumentoComponent implements OnInit, OnDestroy {
             fechaInicio: this.parseDateToNgb(data.fechaInicio),
             fechaFin: this.parseDateToNgb(data.fechaFin),
             fechaConfirmacion: this.parseDateToNgb(data.fechaConfirmacion),
+            recomendable: (data.recomendable || "").toString().trim().toUpperCase(),
+            recomendacion: this.limpiarValorFragmento(data.recomendacion || ""),
             gastos: data.gastos || {
               boletos: "",
               alimentacion: "",

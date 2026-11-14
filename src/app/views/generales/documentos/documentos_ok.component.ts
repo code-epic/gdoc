@@ -4599,9 +4599,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       pdf.setTextColor(0, 0, 0);
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(6.8);
-      const argumentacion =
-        this.activeDoc.argumentacion ||
-        "Se somete a la consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, la participación institucional en la actividad en el exterior descrita, para dar cumplimiento a los objetivos estratégicos, compromisos de cooperación técnico-militar y representación oficial de la Fuerza Armada Nacional Bolivariana.";
+      let argumentacion = this.activeDoc.argumentacion || "";
+      if (!argumentacion) {
+        if (viaje && (viaje.recomendacion || viaje.recomendable)) {
+          const dictamen = viaje.recomendable ? `DICTAMEN: ${viaje.recomendable}. ` : "";
+          argumentacion = `${dictamen}${viaje.recomendacion ? 'RECOMENDACIÓN: ' + viaje.recomendacion + '. ' : ''}Se somete a la consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, la participación institucional en la actividad en el exterior descrita, para dar cumplimiento a los objetivos estratégicos, compromisos de cooperación técnico-militar y representación oficial de la Fuerza Armada Nacional Bolivariana.`;
+        } else {
+          argumentacion =
+            "Se somete a la consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, la participación institucional en la actividad en el exterior descrita, para dar cumplimiento a los objetivos estratégicos, compromisos de cooperación técnico-militar y representación oficial de la Fuerza Armada Nacional Bolivariana.";
+        }
+      }
       const splitArg = pdf.splitTextToSize(argumentacion, contentWidth - 4);
       pdf.text(splitArg, margin + 2, argY + 8);
 
@@ -6719,12 +6726,27 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         if (!data.pais && !data.gastos?.boletos) {
           return true;
         }
-        if (data.opinion || data.recomendacion || data.opinionDe) {
+        if (!data.pais && (data.opinion || data.recomendacion || data.opinionDe)) {
           return true;
         }
       }
     }
     return false;
+  }
+
+  public esRecomendableDesfavorable(viaje: any): boolean {
+    if (!viaje) return false;
+    const rec = (viaje.recomendable || "").toString().trim().toUpperCase();
+    const texto = (viaje.recomendacion || "").toString().trim().toUpperCase();
+    return (
+      rec === "NO" ||
+      rec === "NO RECOMENDABLE" ||
+      rec === "DESFAVORABLE" ||
+      rec.includes("NO RECOMENDABLE") ||
+      texto.includes("NO ES RECOMENDABLE") ||
+      texto.includes("NO RECOMENDABLE") ||
+      texto.includes("DESFAVORABLE")
+    );
   }
 
   public isActividadExterior(doc: any): boolean {
@@ -6990,6 +7012,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             data.pais = this.limpiarValorFragmento(data.pais || "");
             data.motivo = this.limpiarValorFragmento(data.motivo || "");
             data.dirigido = this.limpiarValorFragmento(data.dirigido || "");
+            data.recomendable = (data.recomendable || "").toString().trim().toUpperCase();
+            data.recomendacion = this.limpiarValorFragmento(data.recomendacion || "");
             data.lugar = this.limpiarValorFragmento(
               data.lugar ||
               data.Lugar ||
