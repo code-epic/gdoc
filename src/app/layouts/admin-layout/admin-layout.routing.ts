@@ -56,6 +56,7 @@ import { ResueltosIosComponent } from "src/app/views/generales/resueltos_ios/res
 import { CtrlestadisticasComponent } from "src/app/views/control/ctrlestadisticas/ctrlestadisticas.component";
 import { CtrlreporteComponent } from "src/app/views/control/ctrlreporte/ctrlreporte.component";
 import { CtrlalertasComponent } from "src/app/views/control/ctrlalertas/ctrlalertas.component";
+import { CtrlfirmadosComponent } from "src/app/views/control/ctrlfirmados/ctrlfirmados.component";
 import { DatosbasicosComponent } from "src/app/views/control/datosbasicos/datosbasicos.component";
 import { RsreportesComponent } from "src/app/views/resoluciones/rsreportes/rsreportes.component";
 import { RsalertasComponent } from "src/app/views/resoluciones/rsalertas/rsalertas.component";
@@ -119,6 +120,16 @@ export const AdminLayoutRoutes: Routes = [
   {
     path: "ctrlalertas",
     component: CtrlalertasComponent,
+    canActivate: [AuthGuardGuard],
+  },
+  {
+    path: "ctrlfirmados",
+    component: CtrlfirmadosComponent,
+    canActivate: [AuthGuardGuard],
+  },
+  {
+    path: "control/firmados",
+    component: CtrlfirmadosComponent,
     canActivate: [AuthGuardGuard],
   },
   {

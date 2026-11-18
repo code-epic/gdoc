@@ -71,6 +71,7 @@ export class AuthGuardGuard implements CanActivate {
         "/configuracion",
         "/graedicion",
         "/ctrlalertas",
+        "/ctrlfirmados",
         "/datosbasicos",
         "/principal",
         "/dashboard",

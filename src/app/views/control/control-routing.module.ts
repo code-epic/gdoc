@@ -9,11 +9,20 @@ import { RegistrarComponent } from './registrar/registrar.component';
 import { SalidasComponent } from './salidas/salidas.component';
 import { CtrlestadisticasComponent } from './ctrlestadisticas/ctrlestadisticas.component';
 import { TinderDocumentsComponent } from './tinder-documents/tinder-documents.component';
+import { CtrlfirmadosComponent } from './ctrlfirmados/ctrlfirmados.component';
 
 const routes: Routes = [
   {
     path: '',
     component: ControlComponent
+  },
+  {
+    path: 'ctrlfirmados',
+    component: CtrlfirmadosComponent
+  },
+  {
+    path: 'firmados',
+    component: CtrlfirmadosComponent
   },
   {
     path: 'buzon',

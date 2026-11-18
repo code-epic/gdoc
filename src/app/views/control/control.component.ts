@@ -65,6 +65,17 @@ export class ControlComponent implements OnInit {
   async ngOnInit() {
     
     this.SubMenu = await this.loginService.obtenerSubMenu(this.ruta.url)
+    if (!this.SubMenu) this.SubMenu = [];
+    if (!this.SubMenu.some((item: any) => item.url === '/ctrlfirmados' || item.nombre === 'Documentos Firmados')) {
+      this.SubMenu.push({
+        url: '/ctrlfirmados',
+        nombre: 'Documentos Firmados',
+        descripcion: 'Documentos Firmados',
+        icono: 'fa fa-file-signature',
+        clase: 'text-yellow',
+        color: 'bg-c-yellow'
+      });
+    }
     let prv = this.loginService.obtenerPrivilegiosMenu("/control", this.ruta.url)
     if (prv != undefined && prv.Privilegios != undefined) {
       prv.Privilegios.forEach(e => {

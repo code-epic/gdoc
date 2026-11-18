@@ -520,6 +520,14 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   }
 
   public async printCanvas() {
+    // Congelar la repaginación durante la captura. ngOnChanges agenda una
+    // repaginación cada 200 ms; si se ejecuta a mitad de la captura destruye los
+    // nodos .a4-canvas y html2canvas falla con
+    // "Unable to find element in cloned iframe".
+    if (this.resueltoCanvas) {
+      this.resueltoCanvas.paginationFrozen = true;
+      this.resueltoCanvas.cancelPendingPagination();
+    }
     // 1. Mostrar modal de carga inicial
     Swal.fire({
       title: "Generando PDF...",
@@ -588,9 +596,21 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       this.printModeActive = false;
       this.loadingPdf = false;
       Swal.close();
+      if (this.resueltoCanvas) {
+        this.resueltoCanvas.paginationFrozen = false;
+      }
       this.cdr.detectChanges();
       return;
     }
+
+    // crearSemillero() reasigna canvasData y con ello agenda otra repaginación:
+    // se cancela y se deja asentar el DOM antes de capturar.
+    if (this.resueltoCanvas) {
+      this.resueltoCanvas.cancelPendingPagination();
+    }
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    );
 
     await (document as any).fonts.ready;
 
@@ -604,10 +624,35 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       const pageWidth = 215.9;
       const pageHeight = 330.2; // Oficio
 
-      const canvases = document.querySelectorAll(".a4-canvas");
+      // Selector acotado al contenedor del documento y sin el sandbox de medición:
+      // el querySelectorAll global incluía páginas desechables del sandbox.
+      const canvasHost =
+        (this.resueltoCanvas?.containerRef?.nativeElement as HTMLElement) ||
+        document.body;
+      const canvases = Array.from(
+        canvasHost.querySelectorAll<HTMLElement>(".a4-canvas"),
+      ).filter((el) => !el.closest(".a4-measurement-sandbox"));
       if (canvases.length > 0) {
         for (let i = 0; i < canvases.length; i++) {
-          const canvasElement = canvases[i] as HTMLElement;
+          // Re-consultar el nodo en cada iteración: si Angular lo reemplazó, se
+          // usa el vigente en lugar de una referencia desprendida del DOM.
+          let canvasElement =
+            canvasHost.querySelectorAll<HTMLElement>(".a4-canvas")[i] ||
+            canvases[i];
+          if (!canvasElement || !canvasElement.isConnected) {
+            await new Promise<void>((resolve) =>
+              requestAnimationFrame(() => resolve()),
+            );
+            canvasElement =
+              canvasHost.querySelectorAll<HTMLElement>(".a4-canvas")[i] ||
+              canvasElement;
+          }
+          if (!canvasElement || !canvasElement.isConnected) {
+            console.warn(
+              `[TinderPdfViewer] La página ${i + 1} no está en el DOM; se omite de la captura.`,
+            );
+            continue;
+          }
 
           // Paso 1: Recolectar posiciones exactas de subrayado ANTES de quitar los estilos
           const underlinePositions = this.collectUnderlinePositions(
@@ -616,19 +661,23 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
             pageHeight,
           );
 
-          // Paso 2: Quitar subrayados temporalmente del DOM para que html2canvas no los dibuje mal
+          // Paso 2: Quitar subrayados temporalmente del DOM para que html2canvas no los dibuje mal.
+          // El try/finally garantiza que se restauren aunque la captura falle.
           const strippedUnderlines = this.stripUnderlines(canvasElement);
+          let htmlCanvas: HTMLCanvasElement;
+          try {
+            htmlCanvas = await html2canvas(canvasElement, {
+              scale: 2,
+              useCORS: true,
+              logging: false,
+              allowTaint: true,
+              backgroundColor: "#ffffff",
+            });
+          } finally {
+            this.restoreUnderlines(strippedUnderlines);
+          }
 
-          const htmlCanvas = await html2canvas(canvasElement, {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            allowTaint: true,
-            backgroundColor: "#ffffff",
-          });
-
-          // Paso 3: Restaurar subrayados en el DOM (la vista queda igual que antes)
-          this.restoreUnderlines(strippedUnderlines);
+          // Paso 3: Los subrayados ya se restauraron en el finally anterior
 
           const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
 
@@ -760,16 +809,20 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       });
     } catch (err) {
       console.error("Error generando/firmando PDF: ", err);
-      Swal.fire({
+      await Swal.fire({
         title: "Error",
         text: "Ocurrió un error al generar o firmar el documento PDF.",
         icon: "error",
         confirmButtonColor: "#f5365c",
       });
+      // Se propaga el error: onApprove() debe abortar y NO marcar el documento
+      // como firmado cuando el PDF no se pudo generar.
+      throw err;
     } finally {
       // 3. Restaurar zoom original y apagar modo de impresión
       if (this.resueltoCanvas) {
         this.resueltoCanvas.zoomScale = originalZoom;
+        this.resueltoCanvas.paginationFrozen = false;
       }
       this.printModeActive = false;
       this.loadingPdf = false;
@@ -778,6 +831,13 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
   }
 
   public async printCanvasAdmin() {
+    // Mismo congelamiento que printCanvas(): la repaginación automática no debe
+    // reemplazar los nodos .a4-canvas durante la captura.
+    if (this.resueltoCanvas) {
+      this.resueltoCanvas.paginationFrozen = true;
+      this.resueltoCanvas.cancelPendingPagination();
+    }
+
     // 1. Mostrar modal de carga inicial
     Swal.fire({
       title: "Generando PDF (Administrador)...",
@@ -857,10 +917,35 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       const pageWidth = 215.9;
       const pageHeight = 330.2; // Oficio
 
-      const canvases = document.querySelectorAll(".a4-canvas");
+      // Selector acotado al contenedor del documento y sin el sandbox de medición:
+      // el querySelectorAll global incluía páginas desechables del sandbox.
+      const canvasHost =
+        (this.resueltoCanvas?.containerRef?.nativeElement as HTMLElement) ||
+        document.body;
+      const canvases = Array.from(
+        canvasHost.querySelectorAll<HTMLElement>(".a4-canvas"),
+      ).filter((el) => !el.closest(".a4-measurement-sandbox"));
       if (canvases.length > 0) {
         for (let i = 0; i < canvases.length; i++) {
-          const canvasElement = canvases[i] as HTMLElement;
+          // Re-consultar el nodo en cada iteración: si Angular lo reemplazó, se
+          // usa el vigente en lugar de una referencia desprendida del DOM.
+          let canvasElement =
+            canvasHost.querySelectorAll<HTMLElement>(".a4-canvas")[i] ||
+            canvases[i];
+          if (!canvasElement || !canvasElement.isConnected) {
+            await new Promise<void>((resolve) =>
+              requestAnimationFrame(() => resolve()),
+            );
+            canvasElement =
+              canvasHost.querySelectorAll<HTMLElement>(".a4-canvas")[i] ||
+              canvasElement;
+          }
+          if (!canvasElement || !canvasElement.isConnected) {
+            console.warn(
+              `[TinderPdfViewer] La página ${i + 1} no está en el DOM; se omite de la captura.`,
+            );
+            continue;
+          }
 
           // Paso 1: Recolectar posiciones exactas de subrayado ANTES de quitar los estilos
           const underlinePositions = this.collectUnderlinePositions(
@@ -869,19 +954,23 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
             pageHeight,
           );
 
-          // Paso 2: Quitar subrayados temporalmente del DOM para que html2canvas no los dibuje mal
+          // Paso 2: Quitar subrayados temporalmente del DOM para que html2canvas no los dibuje mal.
+          // El try/finally garantiza que se restauren aunque la captura falle.
           const strippedUnderlines = this.stripUnderlines(canvasElement);
+          let htmlCanvas: HTMLCanvasElement;
+          try {
+            htmlCanvas = await html2canvas(canvasElement, {
+              scale: 2,
+              useCORS: true,
+              logging: false,
+              allowTaint: true,
+              backgroundColor: "#ffffff",
+            });
+          } finally {
+            this.restoreUnderlines(strippedUnderlines);
+          }
 
-          const htmlCanvas = await html2canvas(canvasElement, {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            allowTaint: true,
-            backgroundColor: "#ffffff",
-          });
-
-          // Paso 3: Restaurar subrayados en el DOM
-          this.restoreUnderlines(strippedUnderlines);
+          // Paso 3: Los subrayados ya se restauraron en el finally anterior
 
           const imgData = htmlCanvas.toDataURL("image/jpeg", 0.98);
 
@@ -1012,6 +1101,7 @@ export class TinderPdfViewerComponent implements OnChanges, OnDestroy {
       // 3. Restaurar zoom original y apagar modo de impresión
       if (this.resueltoCanvas) {
         this.resueltoCanvas.zoomScale = originalZoom;
+        this.resueltoCanvas.paginationFrozen = false;
       }
       this.printModeActive = false;
       this.loadingPdf = false;

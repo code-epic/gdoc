@@ -1,0 +1,131 @@
+// --- Estilos para la Tabla y Listado de Documentos ---
+.document-row-item {
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #e9ecef;
+  position: relative;
+
+  &:hover {
+    background-color: #f8fafc;
+  }
+}
+
+.doc-code-link {
+  color: #1e293b;
+  font-size: 0.95rem;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: #5e72e4;
+    text-decoration: underline !important;
+  }
+}
+
+.texto-lista {
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.texto-detalle {
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.hover-actions {
+  .mat-icon-button {
+    transition: transform 0.15s ease, color 0.15s ease;
+    &:hover {
+      transform: scale(1.15);
+      color: #5e72e4 !important;
+    }
+  }
+
+  .pdf-icon-link {
+    margin-left: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
+
+    &:hover {
+      transform: scale(1.15);
+    }
+  }
+}
+
+// --- Streaming Indicator Bar ---
+.streaming-indicator-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(90deg, #ecfdf5 0%, #e0f2fe 100%);
+  color: #065f46;
+  padding: 8px 18px;
+  border-bottom: 1px solid #a7f3d0;
+  font-size: 0.84rem;
+}
+
+.streaming-count-badge {
+  background: #059669;
+  color: #ffffff;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+// --- Estilos para los Filtros de la Cabecera ---
+.filter-control-wrapper {
+  position: relative;
+
+  .custom-select.custom-select-sm {
+    border-radius: 20px;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    height: 36px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    min-width: 130px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #5e72e4;
+      box-shadow: 0 0 0 2px rgba(94, 114, 228, 0.2);
+    }
+  }
+}
+
+// --- Paginador ---
+::ng-deep .mat-paginator {
+  background-color: #f8fafc;
+  color: #64748b;
+  border-top: 1px solid #e2e8f0;
+}
+
+// --- Modal Formal Doc Sheet (Expediente) ---
+.formal-doc-sheet {
+  background-color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+
+  .formal-table {
+    th {
+      font-weight: 600;
+      vertical-align: middle;
+    }
+    td {
+      vertical-align: middle;
+    }
+  }
+}
+
+.qr-box {
+  min-width: 80px;
+}
+
+.empty-state {
+  margin: 2rem auto;
+  max-width: 500px;
+}
+

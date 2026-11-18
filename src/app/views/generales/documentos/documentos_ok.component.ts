@@ -21,7 +21,7 @@ import { EncriptarSDC } from "src/app/services/seguridad/encriptar-sdc.service";
 import jsPDF from "jspdf";
 import { HttpEventType } from "@angular/common/http";
 import { Md5 } from "md5-typescript";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, Observable } from "rxjs";
 import { UtilService } from "src/app/services/util/util.service";
 
 // ─── Interface para Contador de Tiempo de Actividades ──────────────────────────
@@ -80,6 +80,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   // ─── Reloj Contador y Cronometraje en Tiempo Real ──────────────────────────
   public currentDateTime: Date = new Date();
   public relojTimerId: any = null;
+  private isDestroyed = false;
+  private retryTimers = new Set<any>();
 
   // ─── Keyboard shortcuts ──────────────────────────────────────────────────────
   @HostListener("window:keydown", ["$event"])
@@ -460,6 +462,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.isDestroyed = true;
+    this.retryTimers.forEach((timerId) => clearTimeout(timerId));
+    this.retryTimers.clear();
+
     if (this.relojTimerId) {
       clearInterval(this.relojTimerId);
       this.relojTimerId = null;
@@ -4680,9 +4686,16 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       pdf.setTextColor(0, 0, 0);
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(6.8);
-      const argumentacion =
-        this.activeDoc.argumentacion ||
-        "Se somete a la consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, la participación institucional en la actividad en el exterior descrita, para dar cumplimiento a los objetivos estratégicos, compromisos de cooperación técnico-militar y representación oficial de la Fuerza Armada Nacional Bolivariana.";
+      let argumentacion = this.activeDoc.argumentacion || "";
+      if (!argumentacion) {
+        if (viaje && (viaje.recomendacion || viaje.recomendable)) {
+          const dictamen = viaje.recomendable ? `DICTAMEN: ${viaje.recomendable}. ` : "";
+          argumentacion = `${dictamen}${viaje.recomendacion ? 'RECOMENDACIÓN: ' + viaje.recomendacion + '. ' : ''}Se somete a la consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, la participación institucional en la actividad en el exterior descrita, para dar cumplimiento a los objetivos estratégicos, compromisos de cooperación técnico-militar y representación oficial de la Fuerza Armada Nacional Bolivariana.`;
+        } else {
+          argumentacion =
+            "Se somete a la consideración del ciudadano General en Jefe, Ministro del Poder Popular para la Defensa, la participación institucional en la actividad en el exterior descrita, para dar cumplimiento a los objetivos estratégicos, compromisos de cooperación técnico-militar y representación oficial de la Fuerza Armada Nacional Bolivariana.";
+        }
+      }
       const splitArg = pdf.splitTextToSize(argumentacion, contentWidth - 4);
       pdf.text(splitArg, margin + 2, argY + 8);
 
@@ -5779,6 +5792,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.activeDoc?.idd ||
         this.activeDoc?.id ||
         this.activeDoc?.wfdocumento ||
+        this.activeDoc?.numc ||
+        this.activeDoc?.ncontrol ||
         "";
 
       let localEstadoActual = 14;
@@ -5793,9 +5808,9 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.isActividadExterior(this.activeDoc) ||
         this.isActividadVarias(this.activeDoc)
       ) {
-        // En OFICIOS y ACTIVIDADES, tras venir de 2,2,7 (firmados) se archiva enviando al 2,2,9
+        // En OFICIOS y ACTIVIDADES, tras venir de 2,2,7 (firmados) se archiva enviando al 2,2,8
         localEstadoActual = 2;
-        localEstadoDestino = 9;
+        localEstadoDestino = 8;
       } else if (
         this.selectedEstadoBuzon === "firmados" ||
         this.estadoOrigen === 7 ||
@@ -5849,8 +5864,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       console.log(this.xAPI.parametros);
     }
 
-    await this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
+    const payloadXApi: IAPICore = { ...this.xAPI };
+
+    this.ejecutarConReintentoRed(() => this.apiService.Ejecutar(payloadXApi), {
+      tituloError: "Documentos",
+      onSuccess: () => {
         const msgLabel =
           decision === "FIRMAR" || decision === "APROBADO"
             ? "Documento firmado"
@@ -5863,16 +5881,12 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.actualizarBuzon();
 
         this.guardarAlerta(1, this.utilService.ConvertirFecha(null));
-        // this.toastrService.success(
-        //   "El documento ha sido redistribuido segun su selección",
-        //   `GDoc Wkf.DocumentoObservacion`,
-        // );
       },
-      (error) => {
+      onError: (error) => {
         console.error(error);
         this.loadingAction = false;
       },
-    );
+    });
   }
 
   async enviarAResoluciones(doc?: any) {
@@ -5978,7 +5992,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   //Guardar la alerte define el momento y estadus
   guardarAlerta(activo: number, fecha: string) {
     this.WAlerta.activo = activo;
-    this.WAlerta.documento = parseInt(this.activeDoc.numc);
+    this.WAlerta.documento = parseInt(this.activeDoc?.numc || this.activeDoc?.idd || "0") || 0;
     this.WAlerta.estado = this.estadoActual;
     this.WAlerta.usuario = this.jwtData.userId;
     this.WAlerta.observacion = `PROCESO DE VALIDACION DEL ${this.selectedCarpeta?.id === "RECLAMOS" ? "RECLAMO" : this.selectedCarpeta?.nombre || "DOCUMENTO"}`;
@@ -5997,6 +6011,188 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         this.toastrService.error(errot, `GDoc Wkf.AAlertas`);
       },
     ); //
+  }
+
+  /**
+   * Determina si el error corresponde a una falla o cambio transitorio de red.
+   */
+  private esErrorDeRed(err: any): boolean {
+    return (
+      err?.status === 0 ||
+      err?.status === undefined ||
+      err?.status === null ||
+      [502, 503, 504].includes(err?.status) ||
+      err?.name === "TimeoutError"
+    );
+  }
+
+  /**
+   * Traduce un HttpErrorResponse (incluyendo status 0 por corte/fluctuación de red)
+   * a un mensaje legible para el usuario, evitando "[object Object]".
+   */
+  private formatearErrorHttp(
+    err: any,
+    fallbackMsg: string = "Red inestable, intente de nuevo",
+  ): string {
+    if (this.esErrorDeRed(err)) {
+      return "Red inestable, intente de nuevo";
+    }
+    if (typeof err === "string" && err.trim()) {
+      return err;
+    }
+    return err?.error?.msj || err?.error?.message || fallbackMsg;
+  }
+
+  private notificarErrorHttp(
+    err: any,
+    titulo: string,
+    fallbackMsg: string = "Red inestable, intente de nuevo",
+  ): void {
+    if (this.esErrorDeRed(err)) {
+      this.mostrarToastRedInestable();
+      return;
+    }
+    const msg = this.formatearErrorHttp(err, fallbackMsg);
+    this.toastrService.warning(msg, titulo);
+  }
+
+  private mostrarToastReintento(
+    intento: number,
+    maxIntentos: number,
+  ): number | undefined {
+    const pasosHtml = Array.from({ length: maxIntentos }, (_, idx) => {
+      const paso = idx + 1;
+      const cls =
+        paso < intento ? "is-done" : paso === intento ? "is-active" : "";
+      return `<span class="gdoc-net-step ${cls}"></span>`;
+    }).join("");
+
+    const html = `
+      <div class="gdoc-net-card">
+        <div class="gdoc-net-icon-wrap gdoc-net-icon-wrap--retrying">
+          <div class="gdoc-net-spinner"></div>
+        </div>
+        <div class="gdoc-net-body">
+          <div class="gdoc-net-title">Red inestable, por favor espere</div>
+          <div class="gdoc-net-subtitle">Reintentando... (Intento ${intento} de ${maxIntentos})</div>
+          <div class="gdoc-net-steps">${pasosHtml}</div>
+        </div>
+      </div>
+    `;
+
+    const ref = this.toastrService.info(html, "", {
+      enableHtml: true,
+      disableTimeOut: true,
+      tapToDismiss: false,
+      closeButton: false,
+      progressBar: false,
+      toastClass: "ngx-toastr gdoc-net-toast gdoc-net-toast--retrying",
+    });
+
+    return ref?.toastId;
+  }
+
+  private mostrarToastRedInestable(): void {
+    const html = `
+      <div class="gdoc-net-card">
+        <div class="gdoc-net-icon-wrap gdoc-net-icon-wrap--unstable">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+          </svg>
+        </div>
+        <div class="gdoc-net-body">
+          <div class="gdoc-net-title">Conexión</div>
+          <div class="gdoc-net-subtitle">Red inestable, intente de nuevo</div>
+        </div>
+      </div>
+    `;
+
+    this.toastrService.warning(html, "", {
+      enableHtml: true,
+      timeOut: 6500,
+      closeButton: true,
+      progressBar: true,
+      toastClass: "ngx-toastr gdoc-net-toast gdoc-net-toast--unstable",
+    });
+  }
+
+  /**
+   * Ejecuta una petición HTTP con reintento automático ante fallos de red (hasta 3 reintentos).
+   * Muestra un mensaje informativo mientras reintenta y, si persiste el fallo, notifica "Red inestable, intentar de nuevo".
+   */
+  private ejecutarConReintentoRed<T>(
+    requestFactory: () => Observable<T>,
+    callbacks: {
+      onSuccess: (data: T) => void;
+      onError?: (err: any) => void;
+      tituloError: string;
+      maxReintentos?: number;
+      delayMs?: number;
+    },
+  ): void {
+    const maxReintentos = callbacks.maxReintentos ?? 3;
+    const delayMs = callbacks.delayMs ?? 2000;
+    let retryToastId: number | undefined;
+
+    const limpiarToastReintento = () => {
+      if (retryToastId !== undefined) {
+        this.toastrService.clear(retryToastId);
+        retryToastId = undefined;
+      }
+    };
+
+    const intentar = (intentoActual: number) => {
+      if (this.isDestroyed) {
+        limpiarToastReintento();
+        return;
+      }
+
+      requestFactory().subscribe({
+        next: (data) => {
+          limpiarToastReintento();
+          if (!this.isDestroyed) {
+            callbacks.onSuccess(data);
+          }
+        },
+        error: (err) => {
+          if (this.isDestroyed) {
+            limpiarToastReintento();
+            return;
+          }
+
+          if (this.esErrorDeRed(err) && intentoActual < maxReintentos) {
+            const siguienteIntento = intentoActual + 1;
+            limpiarToastReintento();
+            retryToastId = this.mostrarToastReintento(
+              siguienteIntento,
+              maxReintentos,
+            );
+
+            const timerId = setTimeout(() => {
+              this.retryTimers.delete(timerId);
+              intentar(siguienteIntento);
+            }, delayMs);
+            this.retryTimers.add(timerId);
+            return;
+          }
+
+          limpiarToastReintento();
+          if (this.esErrorDeRed(err)) {
+            this.mostrarToastRedInestable();
+          } else {
+            this.notificarErrorHttp(err, callbacks.tituloError);
+          }
+
+          if (callbacks.onError) {
+            callbacks.onError(err);
+          }
+        },
+      });
+    };
+
+    intentar(0);
   }
 
   public fnxFirmaMinistro(decision: string = "", comentario: string = "") {
@@ -6042,7 +6238,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       .trim()
       .toUpperCase();
 
-    let fnx = {
+    const fnxPayload = {
       funcion: "Fnx_FirmarPuntos",
       codigo: this.encriptarService.GCodeEncrypt(numero_control),
       archivo: archivo,
@@ -6050,16 +6246,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       decision: dec,
     };
 
-    this.apiService.ExecFnx(fnx).subscribe(
-      async (data) => {
+    this.ejecutarConReintentoRed(() => this.apiService.ExecFnx(fnxPayload), {
+      tituloError: `GDoc Wkf.FirmarPuntos`,
+      onSuccess: (data) => {
         console.log("Fnx_FirmarPuntos respuesta:", data);
         this.registrarDocumentoFirmado(dec, observacionFinal);
       },
-      (errot) => {
+      onError: (errot) => {
         console.error("Error en Fnx_FirmarPuntos:", errot);
-        this.toastrService.error(errot, `GDoc Wkf.FirmarPuntos`);
+        this.loadingAction = false;
       },
-    ); //
+    });
   }
 
   /**
@@ -6093,19 +6290,21 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       .trim()
       .toUpperCase();
 
-    this.xAPI = {} as IAPICore;
-    this.xAPI.funcion = "WKF_IDocumentoFirmados";
-    this.xAPI.parametros = `${numc},${estatus},${usuario},${obs}`;
+    const payloadXApi = {
+      funcion: "WKF_IDocumentoFirmados",
+      parametros: `${numc},${estatus},${usuario},${obs}`,
+    } as IAPICore;
+    this.xAPI = payloadXApi;
 
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      async (data) => {
+    this.ejecutarConReintentoRed(() => this.apiService.Ejecutar(payloadXApi), {
+      tituloError: `GDoc Wkf.IDocumentosFirmados`,
+      onSuccess: (data) => {
         console.log("WKF_IDocumentoFirmados registrado exitosamente:", data);
       },
-      (error) => {
+      onError: (error) => {
         console.error("Error en WKF_IDocumentoFirmados:", error);
-        this.toastrService.error(error, `GDoc Wkf.IDocumentosFirmados`);
       },
-    );
+    });
   }
   public perfilSolicitante: any = null;
 
@@ -6614,12 +6813,27 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         if (!data.pais && !data.gastos?.boletos) {
           return true;
         }
-        if (data.opinion || data.recomendacion || data.opinionDe) {
+        if (!data.pais && (data.opinion || data.recomendacion || data.opinionDe)) {
           return true;
         }
       }
     }
     return false;
+  }
+
+  public esRecomendableDesfavorable(viaje: any): boolean {
+    if (!viaje) return false;
+    const rec = (viaje.recomendable || "").toString().trim().toUpperCase();
+    const texto = (viaje.recomendacion || "").toString().trim().toUpperCase();
+    return (
+      rec === "NO" ||
+      rec === "NO RECOMENDABLE" ||
+      rec === "DESFAVORABLE" ||
+      rec.includes("NO RECOMENDABLE") ||
+      texto.includes("NO ES RECOMENDABLE") ||
+      texto.includes("NO RECOMENDABLE") ||
+      texto.includes("DESFAVORABLE")
+    );
   }
 
   public isActividadExterior(doc: any): boolean {
@@ -6885,6 +7099,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             data.pais = this.limpiarValorFragmento(data.pais || "");
             data.motivo = this.limpiarValorFragmento(data.motivo || "");
             data.dirigido = this.limpiarValorFragmento(data.dirigido || "");
+            data.recomendable = (data.recomendable || "").toString().trim().toUpperCase();
+            data.recomendacion = this.limpiarValorFragmento(data.recomendacion || "");
             data.lugar = this.limpiarValorFragmento(
               data.lugar ||
               data.Lugar ||

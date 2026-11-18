@@ -13,6 +13,7 @@ import { ControlRoutingModule } from './control-routing.module';
 import { CtrlestadisticasComponent } from './ctrlestadisticas/ctrlestadisticas.component';
 import { CtrlreporteComponent } from './ctrlreporte/ctrlreporte.component';
 import { CtrlalertasComponent } from './ctrlalertas/ctrlalertas.component';
+import { CtrlfirmadosComponent } from './ctrlfirmados/ctrlfirmados.component';
 import { DatosbasicosComponent } from './datosbasicos/datosbasicos.component';
 
 // Tinder Documents Components
@@ -34,6 +35,7 @@ import { WorkflowPanelComponent } from './tinder-documents/components/workflow-p
     CtrlestadisticasComponent,
     CtrlreporteComponent,
     CtrlalertasComponent,
+    CtrlfirmadosComponent,
     DatosbasicosComponent,
     TinderDocumentsComponent,
     CanvasLetterComponent,

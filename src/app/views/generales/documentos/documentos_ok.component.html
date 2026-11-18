@@ -845,6 +845,30 @@
                       style="font-size: 0.85rem; color: #475569; text-transform: uppercase;">{{ viaje.motivo }}</div>
                   </div>
 
+                  <!-- Recomendación y Viabilidad (Debajo del Motivo del Viaje) -->
+                  <div class="info-item" *ngIf="viaje.recomendacion || viaje.recomendable"
+                    [style.background-color]="esRecomendableDesfavorable(viaje) ? '#fff5f5' : '#f0fdf4'"
+                    [style.border]="esRecomendableDesfavorable(viaje) ? '1.5px solid #f87171' : '1.5px solid #86efac'"
+                    style="display: block; padding: 8px 12px; border-radius: 6px;">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap" style="gap: 6px;" [class.mb-1]="viaje.recomendacion">
+                      <span class="info-label font-weight-bold"
+                        [style.color]="esRecomendableDesfavorable(viaje) ? '#dc2626' : '#16a34a'"
+                        style="font-size: 0.75rem;">
+                        <i class="mr-1" [ngClass]="esRecomendableDesfavorable(viaje) ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle'"></i>Recomendación
+                      </span>
+                      <span *ngIf="viaje.recomendable" class="badge"
+                        [ngClass]="esRecomendableDesfavorable(viaje) ? 'badge-danger' : 'badge-success'"
+                        style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                        {{ viaje.recomendable }}
+                      </span>
+                    </div>
+                    <div *ngIf="viaje.recomendacion" class="font-weight-bold"
+                      [style.color]="esRecomendableDesfavorable(viaje) ? '#991b1b' : '#166534'"
+                      style="font-size: 0.82rem; line-height: 1.3; text-transform: uppercase;">
+                      {{ viaje.recomendacion }}
+                    </div>
+                  </div>
+
                   <!-- Fechas -->
                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <div class="info-item text-center" *ngIf="viaje.fechaInicio"
@@ -1380,6 +1404,36 @@
                           class="fas fa-plane-departure mr-1"></i>Motivo del Viaje</div>
                       <div class="info-val font-weight-bold"
                         style="font-size: 0.95rem; color: #475569; text-transform: uppercase;">{{ viaje.motivo }}</div>
+                    </div>
+
+                    <!-- Recomendación y Viabilidad (Debajo del Motivo del Viaje) -->
+                    <div class="info-item" *ngIf="viaje.recomendacion || viaje.recomendable"
+                      [style.background-color]="esRecomendableDesfavorable(viaje) ? '#fff5f5' : '#f0fdf4'"
+                      [style.border]="esRecomendableDesfavorable(viaje) ? '2px solid #ef4444' : '2px solid #22c55e'"
+                      style="display: block; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                      <div class="d-flex align-items-center justify-content-between flex-wrap" style="gap: 8px;" [class.mb-2]="viaje.recomendacion">
+                        <div class="d-flex align-items-center">
+                          <i class="mr-2"
+                            [ngClass]="esRecomendableDesfavorable(viaje) ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle'"
+                            [style.color]="esRecomendableDesfavorable(viaje) ? '#dc2626' : '#16a34a'"
+                            style="font-size: 1.1rem;"></i>
+                          <span class="font-weight-bold text-uppercase"
+                            [style.color]="esRecomendableDesfavorable(viaje) ? '#b91c1c' : '#15803d'"
+                            style="font-size: 0.85rem; letter-spacing: 0.5px;">
+                            Viabilidad
+                          </span>
+                        </div>
+                        <span *ngIf="viaje.recomendable" class="badge px-3 py-1 text-white font-weight-bold shadow-sm"
+                          [style.background-color]="esRecomendableDesfavorable(viaje) ? '#dc2626' : '#16a34a'"
+                          style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                          {{ viaje.recomendable }}
+                        </span>
+                      </div>
+                      <div *ngIf="viaje.recomendacion" class="font-weight-bold"
+                        [style.color]="esRecomendableDesfavorable(viaje) ? '#991b1b' : '#14532d'"
+                        style="font-size: 0.95rem; text-transform: uppercase; line-height: 1.4;">
+                        {{ viaje.recomendacion }}
+                      </div>
                     </div>
 
                     <!-- Fechas -->
