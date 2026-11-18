@@ -72,6 +72,7 @@
           </ng-container>
           <ng-template #normalTitle>
             <span *ngSwitchCase="'JefeSecretaria'">Bandeja del Jefe de Secretaría</span>
+            <span *ngSwitchCase="'JefeControlGestion'">Bandeja del Jefe de Control de Gestión</span>
             <span *ngSwitchCase="'Direccion'">Bandeja de la Dirección del Despacho</span>
             <span *ngSwitchCase="'Ministro'">Bandeja del Ministro</span>
             <span *ngSwitchDefault>Buzón de Documentos</span>
@@ -96,6 +97,7 @@
           style="display: flex; align-items: center; gap: 8px;">
           <select class="profile-select-custom" [(ngModel)]="currentProfile" (change)="onProfileChange()">
             <option value="JefeSecretaria">Jefe de Secretaría</option>
+            <option value="JefeControlGestion">Jefe de Control de Gestión</option>
             <option value="Direccion">Dirección</option>
             <option value="Ministro">Ministro</option>
           </select>
@@ -103,7 +105,7 @@
 
         <!-- Botón Campana Inteligente Asíncrona (Solo visible a nivel del Jefe y en trámites) -->
         <div class="smart-bell-container"
-          *ngIf="currentProfile === 'JefeSecretaria' && selectedEstadoBuzon === 'por_procesar'">
+          *ngIf="(currentProfile === 'JefeSecretaria' || currentProfile === 'JefeControlGestion') && selectedEstadoBuzon === 'por_procesar'">
           <button class="rt-icon-btn rt-bell-btn" [class.is-checking]="isCheckingFirmados"
             (click)="manualCheckFirmadosStream()" [title]="getBellTooltipText()">
             <i class="fas fa-bell" [class.fa-bell-ringing]="totalFirmadosCount > 0 && !isCheckingFirmados"></i>
@@ -141,7 +143,7 @@
 
         <!-- Lista de Carpetas Estáticas -->
         <div class="folders-list-container">
-          <div class="folder-card-compact" *ngFor="let carpeta of carpetas"
+          <div class="folder-card-compact" *ngFor="let carpeta of carpetasVisibles"
             [class.active]="selectedCarpeta?.id === carpeta.id" [class.disabled]="!carpeta.disponible"
             (click)="onCarpetaClick(carpeta)">
 
@@ -167,7 +169,7 @@
 
             <!-- Contador de Firmados por el Ministro (en trámite a nivel de Jefe) -->
             <div class="folder-firmados-badge"
-              *ngIf="currentProfile === 'JefeSecretaria' && selectedEstadoBuzon === 'por_procesar' && (carpeta.contadorFirmados || 0) > 0"
+              *ngIf="(currentProfile === 'JefeSecretaria' || currentProfile === 'JefeControlGestion') && selectedEstadoBuzon === 'por_procesar' && (carpeta.contadorFirmados || 0) > 0"
               [title]="carpeta.contadorFirmados + ' documento(s) firmados por el Ministro listos para revisión'">
               <i class="fas fa-file-signature mr-1"></i>
               <span>{{ carpeta.contadorFirmados }}</span>
@@ -1013,8 +1015,8 @@
             <div class="block-title d-flex justify-content-between align-items-center">
               <span><i class="fas fa-align-left text-primary mr-1"></i> Asunto / Objeto del Caso</span>
 
-              <!-- Botón Editar / Guardar a nivel de trámite para Jefe de Secretaría (no firmado) -->
-              <ng-container *ngIf="currentProfile === 'JefeSecretaria' && !esDocFirmado(activeDoc)">
+              <!-- Botón Editar / Guardar a nivel de trámite para Jefe de Secretaría o Control de Gestión (no firmado) -->
+              <ng-container *ngIf="(currentProfile === 'JefeSecretaria' || currentProfile === 'JefeControlGestion') && !esDocFirmado(activeDoc)">
                 <button type="button" class="btn btn-xs btn-outline-primary font-weight-bold" *ngIf="!editandoContenido"
                   (click)="activarEdicionContenido()" title="Activar edición del Asunto">
                   <i class="fas fa-edit mr-1"></i> Editar
@@ -1035,9 +1037,9 @@
               </ng-container>
             </div>
 
-            <!-- Textarea editable en mayúsculas para Jefe de Secretaría -->
+            <!-- Textarea editable en mayúsculas para Jefe -->
             <ng-container
-              *ngIf="currentProfile === 'JefeSecretaria' && !esDocFirmado(activeDoc); else viewAsuntoReadOnly">
+              *ngIf="(currentProfile === 'JefeSecretaria' || currentProfile === 'JefeControlGestion') && !esDocFirmado(activeDoc); else viewAsuntoReadOnly">
               <textarea class="modal-textarea" rows="3" [(ngModel)]="contenidoEditado"
                 (blur)="contenidoEditado = contenidoEditado ? contenidoEditado.toUpperCase() : ''"
                 [readonly]="!editandoContenido" (click)="!editandoContenido && activarEdicionContenido()"
@@ -1808,7 +1810,7 @@
           </button>
 
           <button class="btn-modal-tool btn-ficha"
-            *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS' && !esDocFirmado(activeDoc) && selectedEstadoBuzon !== 'firmados' && currentProfile !== 'Ministro' && currentProfile !== 'Direccion'"
+            *ngIf="selectedCarpeta?.id !== 'ACTIVIDADES_EN_EL_EXTERIOR' && selectedCarpeta?.id !== 'OFICIOS' && !esDocFirmado(activeDoc) && selectedEstadoBuzon !== 'firmados' && currentProfile !== 'Ministro' && currentProfile !== 'Direccion' && currentProfile !== 'JefeControlGestion'"
             (click)="irAMinisterial(activeDoc)" title="Ver ficha completa en Ministerial">
             <i class="fas fa-external-link-alt"></i>
             <span>Ficha Completa</span>
@@ -1875,7 +1877,7 @@
 
               <!-- ARCHIVAR (TRAMITE_ORGANO_REGULAR, PUNTO_DE_CUENTA, PRESIDENCIALES, OFICIOS) -->
               <button class="btn-modal-decision btn-archivar"
-                *ngIf="selectedCarpeta?.id === 'OFICIOS' || (currentProfile === 'JefeSecretaria' && (selectedCarpeta?.id === 'TRAMITE_ORGANO_REGULAR' || selectedCarpeta?.id === 'PUNTO_DE_CUENTA' || selectedCarpeta?.id === 'PRESIDENCIALES'))"
+                *ngIf="selectedCarpeta?.id === 'OFICIOS' || ((currentProfile === 'JefeSecretaria' || currentProfile === 'JefeControlGestion') && (selectedCarpeta?.id === 'TRAMITE_ORGANO_REGULAR' || selectedCarpeta?.id === 'PUNTO_DE_CUENTA' || selectedCarpeta?.id === 'PRESIDENCIALES'))"
                 (click)="ejecutarAccion('ARCHIVAR')" [disabled]="loadingAction" title="Archivar Documento">
                 <i class="fas fa-archive"></i>
                 <span>Archivar</span>

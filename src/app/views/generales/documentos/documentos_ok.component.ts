@@ -50,7 +50,11 @@ export interface IWKFEtiqueta {
 }
 
 // ─── Tipos de perfil para este módulo ────────────────────────────────────────
-export type DocumentosProfile = "JefeSecretaria" | "Direccion" | "Ministro";
+export type DocumentosProfile =
+  | "JefeSecretaria"
+  | "JefeControlGestion"
+  | "Direccion"
+  | "Ministro";
 
 // ─── Definición de carpetas estáticas ─────────────────────────────────────────
 export interface CarpetaDocumento {
@@ -200,6 +204,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     perfil: string;
     userCedula: string;
     userCargo: string;
+    sistema: string;
   } = {
       userId: "",
       userName: "",
@@ -207,6 +212,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       userCedula: "",
       perfil: "",
       userCargo: "",
+      sistema: "",
     };
 
   // ─── Campana Inteligente de Documentos Firmados (Background Stream) ───────────
@@ -312,6 +318,19 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
       disponible: false,
     },
   ];
+
+  // ─── Carpetas visibles según el perfil (Control de Gestión vs otros) ─────────
+  public get carpetasVisibles(): CarpetaDocumento[] {
+    if (this.currentProfile === "JefeControlGestion") {
+      return this.carpetas.filter(
+        (c) =>
+          c.id === "ACTIVIDADES_EN_EL_EXTERIOR" ||
+          c.id === "OFICIOS" ||
+          (c.funcion && c.funcion.includes("Gestion")),
+      );
+    }
+    return this.carpetas;
+  }
 
   // ─── Acciones del buzón ───────────────────────────────────────────────────────
   private cmbAcciones = [
@@ -431,7 +450,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.updateEstadosFromProfile();
     this.loadDocumentTagsFromStorage();
 
-    const disponible = this.carpetas.find((c) => c.disponible);
+    const disponible = this.carpetasVisibles.find((c) => c.disponible);
     if (disponible) {
       this.onCarpetaClick(disponible);
     }
@@ -478,11 +497,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.router.navigate(["/ministerial", base]);
   }
 
-  // ─── Obtener código de estado según perfil (JefeSecretaria=4, Direccion=5, Ministro=6) ───
+  // ─── Obtener código de estado según perfil (JefeControlGestion=2, JefeSecretaria=4, Direccion=5, Ministro=6) ───
   public getEstadoFromProfile(
     profile: DocumentosProfile = this.currentProfile,
   ): number {
     switch (profile) {
+      case "JefeControlGestion":
+        return 2;
       case "JefeSecretaria":
         return 4;
       case "Direccion":
@@ -496,8 +517,20 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   public selectedEstadoBuzon: "por_procesar" | "firmados" = "por_procesar";
 
-  // ─── Sincronizar estadoOrigen con el perfil actual o modo firmados (estadoActual fijo en 4) ──────────
+  // ─── Sincronizar estadoOrigen con el perfil actual o modo firmados ──────────
   public updateEstadosFromProfile(): void {
+    if (this.currentProfile === "JefeControlGestion") {
+      this.estadoActual = 2;
+      this.estadoOrigen = this.selectedEstadoBuzon === "firmados" ? 7 : 2;
+      this.carpetas.forEach((c) => {
+        if (c.disponible) {
+          c.estadoActual = 2;
+          c.estadoOrigen = this.selectedEstadoBuzon === "firmados" ? 7 : 2;
+        }
+      });
+      return;
+    }
+
     this.estadoActual = 4;
     if (this.selectedEstadoBuzon === "firmados") {
       this.estadoOrigen = 7;
@@ -546,6 +579,11 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         const helper = new JwtHelperService();
         const decoded = helper.decodeToken(token);
         if (decoded && decoded.Usuario) {
+          const sistemaToken =
+            decoded.Usuario.sistema ||
+            sessionStorage.getItem("sistema") ||
+            this.loginService.Usuario?.sistema ||
+            "";
           this.jwtData = {
             userId: decoded.Usuario.usuario || "",
             userName: decoded.Usuario.nombre || decoded.Usuario.usuario || "",
@@ -556,6 +594,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
               decoded.Usuario.descripcion ||
               "",
             userCargo: decoded.Usuario.cargo || "",
+            sistema: sistemaToken,
           };
         }
       }
@@ -570,6 +609,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
             this.loginService.Usuario.descripcion ||
             "",
           userCargo: this.loginService.Usuario.cargo || "",
+          sistema:
+            this.loginService.Usuario.sistema ||
+            sessionStorage.getItem("sistema") ||
+            "",
         };
       }
 
@@ -579,11 +622,22 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
         ""
       ).toUpperCase();
       const roleStr = (this.jwtData.userRole || "").toUpperCase();
+      const cargoStr = (this.jwtData.userCargo || "").toUpperCase();
+      const sistemaStr = (
+        this.jwtData.sistema ||
+        sessionStorage.getItem("sistema") ||
+        this.loginService.Usuario?.sistema ||
+        ""
+      ).toUpperCase();
 
       if (perfilStr) {
         this.mapProfile(perfilStr);
       } else if (roleStr) {
         this.mapProfile(roleStr);
+      } else if (cargoStr) {
+        this.mapProfile(cargoStr);
+      } else if (sistemaStr) {
+        this.mapProfile(sistemaStr);
       } else {
         // Fallback asíncrono
         const t = sessionStorage.getItem("token");
@@ -615,6 +669,17 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
                   sessionStorage.setItem("perfil", rolDesc);
                   this.jwtData.perfil = rolDesc;
                   this.mapProfile(rolDesc);
+                  if (
+                    this.selectedCarpeta &&
+                    !this.carpetasVisibles.some(
+                      (c) => c.id === this.selectedCarpeta?.id,
+                    )
+                  ) {
+                    const disp = this.carpetasVisibles.find(
+                      (c) => c.disponible,
+                    );
+                    if (disp) this.onCarpetaClick(disp);
+                  }
                   this.changeDetector.detectChanges();
                 }
               } catch (e) {
@@ -636,16 +701,38 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
   private mapProfile(perfilVal: string): void {
     const p = (perfilVal || "").toUpperCase();
     const r = (this.jwtData.userRole || "").toUpperCase();
+    const c = (this.jwtData.userCargo || "").toUpperCase();
+    const s = (
+      this.jwtData.sistema ||
+      sessionStorage.getItem("sistema") ||
+      this.loginService.Usuario?.sistema ||
+      ""
+    ).toUpperCase();
 
     if (
       p.includes("MINISTRO") ||
       p.includes("APROB") ||
       r.includes("MIN") ||
-      r.includes("FIRMAN")
+      r.includes("FIRMAN") ||
+      c.includes("MINISTRO")
     ) {
       this.currentProfile = "Ministro";
-    } else if (p.includes("DIRECCION") || r.includes("DIR")) {
+    } else if (
+      p.includes("DIRECCION") ||
+      r.includes("DIR") ||
+      c.includes("DIRECCION")
+    ) {
       this.currentProfile = "Direccion";
+    } else if (
+      p.includes("GESTION") ||
+      p.includes("CONTROL DE GESTION") ||
+      p.includes("CONTROL Y GESTION") ||
+      r.includes("GESTION") ||
+      c.includes("GESTION") ||
+      s.includes("GESTION") ||
+      s.includes("CONTROL DE GESTION")
+    ) {
+      this.currentProfile = "JefeControlGestion";
     } else {
       // Jefe de Secretaría como perfil base
       this.currentProfile = "JefeSecretaria";
@@ -667,10 +754,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.updateEstadosFromProfile();
     const carpetaToLoad =
       (this.selectedCarpeta &&
-        this.carpetas.find(
+        this.carpetasVisibles.find(
           (c) => c.id === this.selectedCarpeta?.id && c.disponible,
         )) ||
-      this.carpetas.find((c) => c.disponible);
+      this.carpetasVisibles.find((c) => c.disponible);
 
     this.buzon = [];
     this.bzOriginal = [];
@@ -688,10 +775,10 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
     this.updateEstadosFromProfile();
     const carpetaToLoad =
       (this.selectedCarpeta &&
-        this.carpetas.find(
+        this.carpetasVisibles.find(
           (c) => c.id === this.selectedCarpeta?.id && c.disponible,
         )) ||
-      this.carpetas.find((c) => c.disponible);
+      this.carpetasVisibles.find((c) => c.disponible);
 
     this.buzon = [];
     this.bzOriginal = [];
@@ -7260,7 +7347,7 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
    */
   public recalcularTotalFirmados(): void {
     let total = 0;
-    this.carpetas.forEach((c) => {
+    this.carpetasVisibles.forEach((c) => {
       total += c.contadorFirmados || 0;
     });
     this.totalFirmadosCount = total;
@@ -7268,12 +7355,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
   /**
    * Inicia la evaluación asíncrona en segundo plano de documentos firmados (estatus 7)
-   * para la matriz del buzón (TRAMITES, PUNTOS, PRESIDENCIA, RECLAMOS, OFICIOS, ACTIVIDADES).
-   * Solo opera a nivel de JefeSecretaria y en estado 'por_procesar' (en trámite).
+   * para la matriz del buzón.
+   * Opera a nivel de JefeSecretaria y JefeControlGestion en estado 'por_procesar' (en trámite).
    */
   public async iniciarEvaluacionFirmadosStream(esManual: boolean = false): Promise<void> {
     if (
-      this.currentProfile !== "JefeSecretaria" ||
+      (this.currentProfile !== "JefeSecretaria" &&
+        this.currentProfile !== "JefeControlGestion") ||
       this.selectedEstadoBuzon !== "por_procesar"
     ) {
       this.limpiarContadoresFirmados();
@@ -7298,13 +7386,13 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
 
     this.isCheckingFirmados = true;
 
-    // Resetear contadores de las carpetas evaluables
-    this.carpetas.forEach((c) => {
+    // Resetear contadores de las carpetas visibles
+    this.carpetasVisibles.forEach((c) => {
       c.contadorFirmados = 0;
     });
     this.totalFirmadosCount = 0;
 
-    const carpetasMatriz = this.carpetas.filter(
+    const carpetasMatriz = this.carpetasVisibles.filter(
       (c) =>
         c.disponible &&
         c.funcion &&
@@ -7455,7 +7543,8 @@ export class DocumentosOkComponent implements OnInit, OnDestroy {
    */
   public verificarYDispararEvaluacionFirmados(): void {
     if (
-      this.currentProfile === "JefeSecretaria" &&
+      (this.currentProfile === "JefeSecretaria" ||
+        this.currentProfile === "JefeControlGestion") &&
       this.selectedEstadoBuzon === "por_procesar"
     ) {
       // Disparo no bloqueante asíncrono
